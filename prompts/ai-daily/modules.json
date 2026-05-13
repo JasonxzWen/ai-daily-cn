@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "modules": [
+    {
+      "name": "base",
+      "purpose": "定义日报主编角色、中文输出、目标读者与事实优先边界。"
+    },
+    {
+      "name": "date_scope",
+      "purpose": "定义 24 小时默认窗口、48 小时 fallback 与窗口扩展记录规则。"
+    },
+    {
+      "name": "source_policy",
+      "purpose": "定义 T0/T1/T2/T3 信源优先级和一手来源回溯要求。"
+    },
+    {
+      "name": "watchlist",
+      "purpose": "定义公司、模型、GitHub 项目、coding/agent 工具与 builder 观察名单。"
+    },
+    {
+      "name": "selection_rules",
+      "purpose": "定义主体信息筛选、去重、降级、数量上限和不凑数规则。"
+    },
+    {
+      "name": "output_markdown",
+      "purpose": "定义 Markdown 输出章节、主体信息标题、来源链接、项目表和自检 JSON 格式。"
+    },
+    {
+      "name": "structured_candidates",
+      "purpose": "定义候选条目的中间结构化字段，供解析器和人工审查对齐。"
+    },
+    {
+      "name": "validation_rules",
+      "purpose": "定义无禁用表达、无无源数字、来源链接和 Builder 不计入主体信息等检查。"
+    },
+    {
+      "name": "publish_status",
+      "purpose": "定义 html_generated、repo_updated、repo_pushed、pages_url、publish_error 字段。"
+    },
+    {
+      "name": "optimization_loop",
+      "purpose": "定义优化建议只记录真实问题，修改 automation.toml 必须等待用户确认。"
+    }
+  ]
+}

@@ -1,0 +1,401 @@
+import { reportRelativePaths, relativeAssetHref } from "./paths.js";
+
+export function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+export function escapeAttribute(value) {
+  return escapeHtml(value).replaceAll("`", "&#96;");
+}
+
+export function renderReportHtml(report) {
+  const paths = reportRelativePaths(report.report_date);
+  const jsonHref = relativeAssetHref(report.html_path, paths.dataPath);
+  const markdownHref = report.markdown_path ? relativeAssetHref(report.html_path, report.markdown_path) : "";
+
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(report.title)}</title>
+  <style>
+${defaultStyleCss}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="${escapeAttribute(relativeAssetHref(report.html_path, "index.html"))}">AI 日报</a>
+    <span class="site-date">${escapeHtml(report.report_date)}</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>${escapeHtml(report.title)}</h1>
+      <p class="summary">${escapeHtml(report.summary)}</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>${report.main_items.length}</strong> 主体信息</span>
+        <span><strong>${report.builder_observations.length}</strong> Builder 观察</span>
+        <span><strong>${report.community_leads.length}</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      ${report.main_items.map(renderMainItem).join("\n")}
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      ${renderProjects(report.projects)}
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      ${renderBuilderObservations(report.builder_observations)}
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      ${renderCommunityLeads(report.community_leads)}
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>${escapeHtml(report.self_check.main_items)}</dd></div>
+        <div><dt>Builder</dt><dd>${escapeHtml(report.self_check.builder_observations)}</dd></div>
+        <div><dt>一手链接</dt><dd>${report.self_check.primary_links ? "通过" : "未通过"}</dd></div>
+        <div><dt>无禁用表达</dt><dd>${report.self_check.no_banned_words ? "通过" : "未通过"}</dd></div>
+        <div><dt>无无源数字</dt><dd>${report.self_check.no_unsourced_numbers ? "通过" : "未通过"}</dd></div>
+      </dl>
+      <p>${escapeHtml(report.self_check.notes || "无额外说明。")}</p>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="${escapeAttribute(jsonHref)}">结构化 JSON</a>
+      ${markdownHref ? `<a href="${escapeAttribute(markdownHref)}">Markdown 原文</a>` : ""}
+    </nav>
+  </main>
+</body>
+</html>
+`;
+}
+
+export function renderIndexHtml(feed) {
+  const latest = feed.reports[0];
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(feed.site_title)}</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <span class="site-title">AI 日报</span>
+    <span class="site-date">更新于 ${escapeHtml(feed.updated_at)}</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">GitHub Pages 静态归档</p>
+      <h1>${escapeHtml(feed.site_title)}</h1>
+      <p class="summary">${latest ? escapeHtml(latest.summary) : "暂无日报。运行 build 后会在这里展示归档。"}</p>
+      <div class="meta-grid" aria-label="站点统计">
+        <span><strong>${feed.reports.length}</strong> 篇日报</span>
+        <span><strong>${latest ? latest.report_date : "-"}</strong> 最新日期</span>
+      </div>
+    </section>
+
+    <section class="section" id="reports">
+      <h2>历史日报</h2>
+      ${feed.reports.length > 0 ? `<ol class="report-list">${feed.reports.map(renderFeedItem).join("\n")}</ol>` : "<p>暂无可展示日报。</p>"}
+    </section>
+  </main>
+</body>
+</html>
+`;
+}
+
+export const defaultStyleCss = `:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+`;
+
+function renderMainItem(item) {
+  return `<article class="item">
+  <h3>${escapeHtml(item.title)}</h3>
+  <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
+  <ul>
+    ${item.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("\n")}
+  </ul>
+  <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
+</article>`;
+}
+
+function renderProjects(projects) {
+  if (projects.length === 0) {
+    return "<p>暂无项目条目。</p>";
+  }
+
+  return `<table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    ${projects
+      .map(
+        (project) =>
+          `<tr><td>${escapeHtml(project.name)}</td><td>${escapeHtml(project.description)}</td><td>${externalLink(project.url, "原文")}</td></tr>`
+      )
+      .join("\n")}
+  </tbody>
+</table>`;
+}
+
+function renderBuilderObservations(items) {
+  if (items.length === 0) {
+    return "<p>暂无 Builder 观察。</p>";
+  }
+
+  return `<ul class="compact-list">${items
+    .map((item) => `<li><strong>${escapeHtml(item.author)}</strong>：${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`)
+    .join("\n")}</ul>`;
+}
+
+function renderCommunityLeads(items) {
+  if (items.length === 0) {
+    return "<p>暂无社区线索。</p>";
+  }
+
+  return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
+}
+
+function renderFeedItem(item) {
+  return `<li class="report-card">
+  <h3><a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a></h3>
+  <p>${escapeHtml(item.summary)}</p>
+  <div class="item-meta"><span>${escapeHtml(item.report_date)}</span><span>${item.main_items} 主体信息</span><span>${item.builder_observations} Builder</span></div>
+</li>`;
+}
+
+function externalLink(url, label) {
+  return `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/feed.schema.json",
+  "title": "AI Daily Feed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "site_title", "site_url", "updated_at", "reports"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "site_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "site_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/feed_report"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "relative_url": {
+      "type": "string",
+      "pattern": "^(?!/)(?![a-zA-Z][a-zA-Z0-9+.-]*:).+"
+    },
+    "feed_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_date",
+        "title",
+        "summary",
+        "url",
+        "data_url",
+        "main_items",
+        "builder_observations",
+        "generated_at"
+      ],
+      "properties": {
+        "report_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/relative_url"
+        },
+        "data_url": {
+          "$ref": "#/$defs/relative_url"
+        },
+        "markdown_url": {
+          "$ref": "#/$defs/relative_url"
+        },
+        "main_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "builder_observations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

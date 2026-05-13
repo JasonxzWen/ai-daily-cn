@@ -1,0 +1,27 @@
+schema: spec-driven
+
+context: |
+  Project: ai-daily-cn
+  Purpose: Generate a Chinese AI daily report, render it into static HTML, and publish it through GitHub Pages after explicit safety gates are in place.
+  Primary language: Chinese documentation and report output, with technical identifiers, URLs, and schema field names preserved in English.
+  Current phase: specification and planning only; do not implement publishing automation until the user explicitly authorizes development.
+  Core constraints:
+    - Preserve first-hand source priority for AI daily report content.
+    - Keep Markdown, JSON, HTML, feed, and publish-status contracts deterministic.
+    - Establish build/test/validate gates before automatic commit or push.
+    - Never force push, reset hard, overwrite unrelated user changes, or hide publish failures.
+    - Prompt optimization requires explicit user confirmation before modifying automation config.
+
+rules:
+  proposal:
+    - Include goals, non-goals, safety boundaries, and open decisions.
+    - Distinguish documentation/specification work from implementation work.
+  design:
+    - Describe artifact flow, data contracts, validation gates, and failure handling.
+    - Record when a capability is only a reference and not yet adopted.
+  tasks:
+    - Keep implementation tasks unchecked until code exists.
+    - Include validation commands and user-confirmation gates before publish automation.
+  spec:
+    - Use SHALL requirements and concrete scenarios.
+    - Cover success, failure, and safety cases.

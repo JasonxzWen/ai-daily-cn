@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "target_repository": "JasonxzWen/ai-daily-cn",
+  "site_title": "AI 日报",
+  "site_url": "https://jasonxzwen.github.io/ai-daily-cn/",
+  "publish_branch": "main",
+  "publish_dir": "docs",
+  "primary_input_dir": "reports-data",
+  "compat_markdown_input_dir": "reports-source",
+  "primary_output": "self-contained-html",
+  "markdown_source_public": true,
+  "daily_markdown_generation": false,
+  "history_retention": "indefinite",
+  "generated_file_ownership": [
+    "docs/.nojekyll",
+    "docs/assets/style.css",
+    "docs/index.html",
+    "docs/feed.json",
+    "docs/reports/**",
+    "docs/data/**"
+  ],
+  "real_publish_policy": "requires_explicit_confirm_push_and_only_publisher_owned_paths",
+  "real_publish_enabled": true
+}
