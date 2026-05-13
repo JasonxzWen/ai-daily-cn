@@ -34,8 +34,9 @@
 6. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。
 7. 运行 `npm run validate`。
 8. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL。
-9. 如果 dry-run 或 validate 失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复。
-10. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块。
+9. 如需真实发布，运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push。
+10. 如果 dry-run、validate 或 publish 失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复。
+11. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块。
 
 最终回复必须包含：
 
@@ -54,7 +55,7 @@
 真实发布命令：
 
 ```powershell
-npm run publish -- --confirm-push --date YYYY-MM-DD
+npm run publish -- confirm-push YYYY-MM-DD
 ```
 
 该命令只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在 `src/`、`prompts/`、`schemas/` 等非发布器管理改动，会停止并返回 `dirty_worktree`。

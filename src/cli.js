@@ -76,10 +76,11 @@ try {
     });
   } else if (command === "publish") {
     const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
     const result = await publishGeneratedArtifacts({
       repoRoot: path.resolve(args["repo-root"] || process.cwd()),
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
-      confirmPush: Boolean(args["confirm-push"]),
+      confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
       commitMessage: args.message
     });
