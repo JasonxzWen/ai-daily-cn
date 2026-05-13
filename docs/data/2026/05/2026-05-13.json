@@ -1,0 +1,286 @@
+{
+  "report_date": "2026-05-13",
+  "title": "AI 日报 2026-05-13",
+  "summary": "今日一手大厂发布较少，日报保留近一周内对工程团队更可执行的模型、API、Agent 工具和开源发布：语音实时模型、默认模型升级、金融 Agent 模板、Grok 连接器、模型迁移提醒，以及 Ollama、vLLM、Codex、LangChain 的近期版本信号。",
+  "source_window": {
+    "date_from": "2026-05-05",
+    "date_to": "2026-05-13",
+    "fallback_window_used": true,
+    "notes": "2026-05-12 至 2026-05-13 的 T0/T2 一手信息不足 5 条；扩展到近一周并保留每条真实 event_date，未把旧事件包装成今日发布。"
+  },
+  "main_items": [
+    {
+      "title": "OpenAI 在 API 中发布新一代实时语音模型",
+      "event_date": "2026-05-07",
+      "url": "https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/",
+      "source": "OpenAI",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Realtime API",
+        "GPT-Realtime-2",
+        "GPT-Realtime-Translate",
+        "GPT-Realtime-Whisper"
+      ],
+      "summary": "OpenAI 发布 GPT-Realtime-2、GPT-Realtime-Translate 和 GPT-Realtime-Whisper，把实时语音从转写和回复扩展到可推理、可调用工具、可实时翻译的生产接口。",
+      "bullets": [
+        "GPT-Realtime-2 面向实时语音 Agent，支持更长上下文、并行工具调用提示、可调 reasoning effort 和更强恢复行为。",
+        "GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。",
+        "价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。"
+      ]
+    },
+    {
+      "title": "OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant",
+      "event_date": "2026-05-05",
+      "url": "https://openai.com/index/gpt-5-5-instant/",
+      "source": "OpenAI",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "ChatGPT",
+        "GPT-5.5 Instant",
+        "chat-latest"
+      ],
+      "summary": "OpenAI 更新 ChatGPT 默认模型，并在 API 中以 chat-latest 提供 GPT-5.5 Instant，重点改进事实性、回答紧凑度、视觉/数学/科学能力和个性化上下文使用。",
+      "bullets": [
+        "原文称 GPT-5.5 Instant 正在替代 GPT-5.3 Instant 成为默认模型，并在 API 中通过 chat-latest 暴露。",
+        "增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。",
+        "对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。"
+      ]
+    },
+    {
+      "title": "Anthropic 提高 Claude Code 与 Claude API 使用限额",
+      "event_date": "2026-05-06",
+      "url": "https://www.anthropic.com/news/higher-limits-spacex",
+      "source": "Anthropic",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Claude Code",
+        "Claude API",
+        "SpaceX"
+      ],
+      "summary": "Anthropic 宣布与 SpaceX 的算力合作，并同步提高 Claude Code 与 Claude API 使用限额，直接影响重度编码 Agent 和 Opus API 用户的容量规划。",
+      "bullets": [
+        "Claude Code 的五小时限额面向 Pro、Max、Team 和 seat-based Enterprise 计划翻倍，并移除 Pro/Max 峰值时段限额下调。",
+        "Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。",
+        "算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。"
+      ]
+    },
+    {
+      "title": "Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成",
+      "event_date": "2026-05-05",
+      "url": "https://www.anthropic.com/news/finance-agents",
+      "source": "Anthropic",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Claude Cowork",
+        "Claude Code",
+        "Claude Managed Agents",
+        "MCP"
+      ],
+      "summary": "Anthropic 发布十个面向金融服务的 ready-to-run Agent 模板，并扩展 Excel、PowerPoint、Word、Outlook、连接器和 Moody's MCP app 等集成。",
+      "bullets": [
+        "模板覆盖 pitchbook、KYC、月结、估值复核、财报审阅、市场研究等工作，可作为 Claude Cowork/Claude Code 插件或 Managed Agents cookbook 使用。",
+        "模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。",
+        "这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。"
+      ]
+    },
+    {
+      "title": "xAI 在 Grok Web、iOS 和 Android 上推出 Connectors",
+      "event_date": "2026-05-06",
+      "url": "https://x.ai/news/grok-connectors",
+      "source": "xAI",
+      "tier": "T0",
+      "entities": [
+        "xAI",
+        "Grok",
+        "Connectors",
+        "MCP"
+      ],
+      "summary": "xAI 发布 Grok Connectors，把 SharePoint、Outlook、OneDrive、Google Workspace、Notion、GitHub、Linear 和自定义 MCP 接入 Grok。",
+      "bullets": [
+        "连接器支持读取、搜索、综合和部分写入动作，让 Grok 直接处理邮件、文档、表格、日历、代码仓库和项目任务。",
+        "GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。",
+        "Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。"
+      ]
+    },
+    {
+      "title": "xAI 公布 2026-05-15 API 模型退休迁移清单",
+      "event_date": "2026-05-07",
+      "url": "https://docs.x.ai/developers/migration/may-15-retirement",
+      "source": "xAI Docs",
+      "tier": "T0",
+      "entities": [
+        "xAI",
+        "Grok API",
+        "Grok 4.3"
+      ],
+      "summary": "xAI 文档列出 2026-05-15 将退休的旧 Grok API 模型，并给出 Grok 4.3 和 grok-imagine-image-quality 等替代项。",
+      "bullets": [
+        "受影响模型包括 grok-4-1、grok-4、grok-code-fast-1、grok-3 和 grok-imagine-image-pro 等旧 API 名称。",
+        "文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。",
+        "使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。"
+      ]
+    },
+    {
+      "title": "Ollama v0.23.3 发布，继续修复 MLX 与更新流程",
+      "event_date": "2026-05-12",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.23.3",
+      "source": "GitHub Releases",
+      "tier": "T2",
+      "entities": [
+        "Ollama",
+        "MLX",
+        "local inference"
+      ],
+      "summary": "Ollama v0.23.3 是近期本地推理工具链的实际发布信号，集中在 MLX model push、imagegen runner、推理状态超时和 macOS 更新流程修复。",
+      "bullets": [
+        "发布说明列出 MLX 相关推送行为、线程亲和性和推理状态超时修复，影响 Apple Silicon 本地推理稳定性。",
+        "同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。",
+        "该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。"
+      ]
+    },
+    {
+      "title": "vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径",
+      "event_date": "2026-05-10",
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.20.2",
+      "source": "GitHub Releases",
+      "tier": "T2",
+      "entities": [
+        "vLLM",
+        "DeepSeek V4",
+        "gpt-oss",
+        "Qwen3-VL"
+      ],
+      "summary": "vLLM v0.20.2 是小型补丁版本，修复 DeepSeek V4 sparse attention 与 KV cache、gpt-oss MXFP4 torch.compile、Qwen3-VL deepstack 边界等问题。",
+      "bullets": [
+        "DeepSeek V4 相关修复覆盖 Hopper persistent topk、CUDA graph capture 和 V1 engine KV cache manager。",
+        "gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。",
+        "线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。"
+      ]
+    },
+    {
+      "title": "OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复",
+      "event_date": "2026-05-08",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.130.0",
+      "source": "GitHub Releases",
+      "tier": "T2",
+      "entities": [
+        "OpenAI Codex",
+        "coding agent",
+        "remote-control",
+        "plugins"
+      ],
+      "summary": "Codex 0.130.0 加入 remote-control 入口、插件详情/分享元数据、app-server 分页和 Bedrock auth 支持，并修复 Windows sandbox 与 apply_patch diff 跟踪等问题。",
+      "bullets": [
+        "remote-control 提供更直接的 headless app-server 启动入口，适合自动化或远程控制场景试验。",
+        "插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。",
+        "Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。"
+      ]
+    },
+    {
+      "title": "LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复",
+      "event_date": "2026-05-07",
+      "url": "https://github.com/langchain-ai/langchain/releases",
+      "source": "GitHub Releases",
+      "tier": "T2",
+      "entities": [
+        "LangChain",
+        "langchain-core",
+        "security"
+      ],
+      "summary": "LangChain 近期 0.3.x 和 core 0.3.x 发布回补 loads/dumps、hub、path traversal 等安全 hardening，提示仍在维护旧版本线的团队尽快升级。",
+      "bullets": [
+        "langchain-core 0.3.86 明确回补 path-traversal 修复，LangChain 0.3.30 同步 harden loads/dumps 并弃用 hub 路径。",
+        "同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。",
+        "仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Ollama",
+      "description": "v0.23.3 在 2026-05-12 发布，主要修复 MLX、本地 imagegen runner 和更新流程；本地推理用户应关注 macOS/Apple Silicon 运行稳定性。",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.23.3"
+    },
+    {
+      "name": "vLLM",
+      "description": "v0.20.2 在 2026-05-10 发布，小补丁覆盖 DeepSeek V4、gpt-oss 和 Qwen3-VL 的推理稳定性问题。",
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.20.2"
+    },
+    {
+      "name": "OpenAI Codex",
+      "description": "0.130.0 在 2026-05-08 发布，remote-control、插件元数据和 Windows sandbox 修复对自动化编码工作流有参考价值。",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.130.0"
+    },
+    {
+      "name": "LangChain",
+      "description": "2026-05-07 相关发布回补反序列化和路径遍历安全修复；依赖旧版本线的 Agent/RAG 服务应安排升级。",
+      "url": "https://github.com/langchain-ai/langchain/releases"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。",
+      "url": "https://mistral.ai/news/mistral-3"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-13",
+    "main_items": 10,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "follow-builders: 仅使用 SKILL.md 约束；本轮没有可验证的一手 builder 观察入选"
+    ],
+    "fallback_sources": [
+      "官方新闻页",
+      "官方文档",
+      "GitHub Releases",
+      "搜索结果仅作发现线索"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "24h/48h 内高质量 T0/T2 信息不足，因此扩展到 2026-05-05 至 2026-05-13；所有主体条目使用官方页面、官方文档或 GitHub Release，并保留真实事件日期。Mistral 3 因页面缺少明确发布日期降级为社区线索。",
+    "optimization_suggestions": [
+      {
+        "issue": "当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。",
+        "evidence": "本轮 2026-05-12 至 2026-05-13 一手条目不足 5 条，但 2026-05-05 至 2026-05-13 有多条高价值官方发布。",
+        "module": "date-scope",
+        "suggestion": "增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。",
+        "expected_benefit": "减少低质量硬凑，同时让窗口扩展可审计。",
+        "requires_user_confirmation": true
+      },
+      {
+        "issue": "官方页面没有显式发布日期时缺少统一处理规则。",
+        "evidence": "Mistral 3 页面正文可用但未暴露明确日期，本轮只能降级为社区线索。",
+        "module": "source-policy",
+        "suggestion": "要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。",
+        "expected_benefit": "避免把无法定日的发布写入日报主体。",
+        "requires_user_confirmation": true
+      },
+      {
+        "issue": "Builder 观察在无一手帖子时容易空缺。",
+        "evidence": "本轮没有可验证原始 builder 链接，builder_observations 保持空数组。",
+        "module": "selection-rules",
+        "suggestion": "保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。",
+        "expected_benefit": "防止用二手转述填充 builder 区域。",
+        "requires_user_confirmation": true
+      }
+    ]
+  },
+  "schema_version": 1,
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html",
+  "html_path": "reports/2026/05/2026-05-13.html",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-13T08:43:54.469Z"
+}
