@@ -12,13 +12,6 @@ export async function createPublishPlan(options = {}) {
   const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
 
-  const status = await git.status();
-  if (status.trim()) {
-    throw new PublisherError("dirty_worktree", "工作树存在未提交改动，dry-run 已停止。", {
-      status: status.trim().split(/\r?\n/)
-    });
-  }
-
   const branch = await git.branch();
   if (branch !== allowedBranch) {
     throw new PublisherError("wrong_branch", `当前分支是 ${branch || "(detached)"}，允许发布分支是 ${allowedBranch}。`, {
@@ -45,6 +38,14 @@ export async function createPublishPlan(options = {}) {
     throw new PublisherError("no_reports", "未发现可发布的结构化日报 JSON 或兼容 Markdown 日报。");
   }
 
+  const statusEntries = parsePorcelain(await git.status());
+  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+  if (unrelated.length > 0) {
+    throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，dry-run 已停止。", {
+      status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
+    });
+  }
+
   const dates = generated.reports.map((report) => report.report_date).sort();
   const repoFiles = toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files);
   const commitMessage =
@@ -60,6 +61,7 @@ export async function createPublishPlan(options = {}) {
     remote,
     will_write_files: repoFiles,
     will_stage_files: repoFiles,
+    current_dirty_files: statusEntries.map((entry) => entry.path).sort(),
     commit_message: commitMessage,
     expected_pages_url: generated.reports.length === 1 ? generated.reports[0].canonical_url : DEFAULT_SITE.siteUrl,
     reports: generated.reports.map((report) => ({
@@ -146,7 +148,7 @@ function toRepoRelativeFiles(repoRoot, outDir, files) {
 export function createGitAdapter(repoRoot) {
   return {
     async status() {
-      return runGit(repoRoot, ["status", "--porcelain=v1"]);
+      return runGit(repoRoot, ["status", "--porcelain=v1"], { trim: false });
     },
     async branch() {
       return runGit(repoRoot, ["branch", "--show-current"]);
@@ -214,8 +216,9 @@ export function parsePorcelain(output) {
     .map((line) => line.trimEnd())
     .filter(Boolean)
     .map((line) => {
-      const code = line.slice(0, 2);
-      let filePath = line.slice(3).trim();
+      const separatorIndex = line.indexOf(" ");
+      const code = line.slice(0, 2).padEnd(2, " ");
+      let filePath = separatorIndex === 1 ? line.slice(2).trim() : line.slice(3).trim();
       if (filePath.includes(" -> ")) {
         filePath = filePath.split(" -> ").at(-1).trim();
       }
@@ -238,11 +241,11 @@ function isPublisherOwnedPath(filePath) {
   );
 }
 
-async function runGit(cwd, args) {
+async function runGit(cwd, args, options = {}) {
   const { stdout } = await execFileAsync("git", args, {
     cwd,
     encoding: "utf8",
     maxBuffer: 1024 * 1024
   });
-  return stdout.trim();
+  return options.trim === false ? stdout : stdout.trim();
 }

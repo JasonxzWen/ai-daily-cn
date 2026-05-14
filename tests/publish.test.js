@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
-import { createPublishPlan, publishGeneratedArtifacts } from "../src/publish.js";
+import { createPublishPlan, parsePorcelain, publishGeneratedArtifacts } from "../src/publish.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -30,7 +30,21 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert(plan.will_stage_files.includes("docs/feed.json"));
 });
 
-test("publish dry-run 遇到 dirty worktree 停止", async () => {
+test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const plan = await createPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    generatedAt: fixedGeneratedAt,
+    git: fakeGit({ status: " M docs/index.html\n?? reports-data/2026/05/2026-05-13.json" })
+  });
+
+  assert.deepEqual(plan.current_dirty_files, ["docs/index.html", "reports-data/2026/05/2026-05-13.json"]);
+  assert(plan.will_stage_files.includes("docs/index.html"));
+});
+
+test("publish dry-run 遇到非发布器管理改动时停止", async () => {
   const repoRoot = await tempRepoWithFixture();
   await assert.rejects(
     createPublishPlan({
@@ -38,7 +52,7 @@ test("publish dry-run 遇到 dirty worktree 停止", async () => {
       inputDir: "reports-source",
       dataInputDir: "reports-data",
       generatedAt: fixedGeneratedAt,
-      git: fakeGit({ status: " M docs/index.html" })
+      git: fakeGit({ status: " M src/cli.js\n M docs/index.html" })
     }),
     (error) => error instanceof PublisherError && error.code === "dirty_worktree"
   );
@@ -104,6 +118,14 @@ test("publish 遇到非发布器管理改动时停止", async () => {
     }),
     (error) => error instanceof PublisherError && error.code === "dirty_worktree"
   );
+});
+
+test("parsePorcelain 保留首行前导状态列并兼容单状态输出", () => {
+  assert.deepEqual(parsePorcelain(" M docs/feed.json\n?? reports-data/2026/05/2026-05-14.json"), [
+    { code: " M", path: "docs/feed.json" },
+    { code: "??", path: "reports-data/2026/05/2026-05-14.json" }
+  ]);
+  assert.deepEqual(parsePorcelain("M docs/feed.json"), [{ code: "M ", path: "docs/feed.json" }]);
 });
 
 function fakeGit(overrides = {}) {
