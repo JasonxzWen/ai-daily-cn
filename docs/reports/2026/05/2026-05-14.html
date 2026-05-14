@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-14</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-14</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-14</h1>
+      <p class="summary">今天可回源的一手动态集中在 Agent 产品化、企业治理和实时交互模型：Anthropic 把 Claude Cowork 打包给小企业，GitHub 开放 Copilot cloud agent 任务 API，SAP 发布 Business AI Platform 与 Autonomous Suite，OpenAI 复盘 Parameter Golf 中 AI coding agent 对开放研究竞赛的改变，Thinking Machines 则给出原生实时交互模型的研究预览。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>5</strong> 主体信息</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>2</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>Anthropic 发布 Claude for Small Business</h3>
+  <div class="item-meta"><span>2026-05-13</span><span>T0</span><span>Anthropic</span><span>Claude Cowork</span><span>Claude for Small Business</span><span>Connectors</span><span>Skills</span></div>
+  <ul>
+    <li>Claude for Small Business 以 Cowork 内的开关形式启用，用户连接已有业务工具后选择任务；发送、发布或付款等动作仍要求人工批准。</li>
+<li>首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。</li>
+<li>权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.anthropic.com/news/claude-for-small-business" target="_blank" rel="noopener noreferrer">Anthropic</a></p>
+</article>
+<article class="item">
+  <h3>GitHub 开放 Copilot cloud agent 任务 REST API 预览</h3>
+  <div class="item-meta"><span>2026-05-13</span><span>T0</span><span>GitHub</span><span>Copilot cloud agent</span><span>Agent tasks REST API</span><span>Copilot Business</span><span>Copilot Enterprise</span></div>
+  <ul>
+    <li>新的 API 处于 public preview，支持用 prompt 启动仓库任务，可指定 base ref、模型和是否创建 pull request。</li>
+<li>GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。</li>
+<li>对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
+</article>
+<article class="item">
+  <h3>SAP 发布 Business AI Platform 与 Autonomous Suite</h3>
+  <div class="item-meta"><span>2026-05-12</span><span>T0</span><span>SAP</span><span>SAP Business AI Platform</span><span>SAP Autonomous Suite</span><span>Joule Studio</span><span>SAP AI Agent Hub</span></div>
+  <ul>
+    <li>SAP Business AI Platform 以 SAP Knowledge Graph 提供业务实体、流程和关系图谱，Joule Studio 则面向企业 Agent、应用和 agentic workflows 构建。</li>
+<li>Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。</li>
+<li>SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" target="_blank" rel="noopener noreferrer">SAP News Center</a></p>
+</article>
+<article class="item">
+  <h3>OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛</h3>
+  <div class="item-meta"><span>2026-05-12</span><span>T0</span><span>OpenAI</span><span>Parameter Golf</span><span>Codex</span><span>FineWeb</span><span>AI coding agents</span></div>
+  <ul>
+    <li>比赛收到 1,000 多名参与者的 2,000 多份提交，OpenAI 独立复现 record track，重点展示优化器调参、GPTQ、per-document LoRA test-time training、CaseOps tokenizer、XSA 和 recurrent layers 等方向。</li>
+<li>OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。</li>
+<li>对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://openai.com/index/what-parameter-golf-taught-us/" target="_blank" rel="noopener noreferrer">OpenAI</a></p>
+</article>
+<article class="item">
+  <h3>Thinking Machines 发布 Interaction Models 研究预览</h3>
+  <div class="item-meta"><span>2026-05-11</span><span>T0</span><span>Thinking Machines Lab</span><span>TML-Interaction-Small</span><span>Interaction Models</span><span>Realtime AI</span><span>Multimodal</span></div>
+  <ul>
+    <li>研究预览模型 TML-Interaction-Small 使用 time-aligned micro-turn 设计，把输入和输出流按 200ms 片段交错处理，从而支持边听边说、视觉触发、计时意识和并行工具调用。</li>
+<li>系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。</li>
+<li>官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://thinkingmachines.ai/blog/interaction-models/" target="_blank" rel="noopener noreferrer">Thinking Machines Lab</a></p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>Copilot Agent tasks REST API</td><td>GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。</td><td><a href="https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>SAP Business AI Platform</td><td>SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。</td><td><a href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>TML-Interaction-Small</td><td>Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。</td><td><a href="https://thinkingmachines.ai/blog/interaction-models/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Parameter Golf</td><td>OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。</td><td><a href="https://openai.com/index/what-parameter-golf-taught-us/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 <a href="https://openai.com/daybreak" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 <a href="https://code.claude.com/docs/en/fast-mode" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>5</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>主体条目均使用官方或原始来源。24 小时内高质量一手主体条目偏少，48 小时窗口内保留 Anthropic、GitHub、SAP、OpenAI 四条；为避免低质量硬凑，将窗口扩到 2026-05-11 并加入 Thinking Machines 官方研究预览。OpenAI Daybreak 与 Claude Opus fast mode 因发布日期或文档一致性不足，仅放入社区线索。</p>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-14.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>
