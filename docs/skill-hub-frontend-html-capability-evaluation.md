@@ -2,14 +2,23 @@
 
 ## 结论
 
-可以通过 `skill-hub` 增强本仓库后续的前端开发、HTML 汇报、浏览器验证和测试规范能力，但当前阶段不建议直接安装或引入生成文件。
+可以通过 `skill-hub` 增强本仓库后续的前端开发、HTML 汇报、浏览器验证和测试规范能力。当前已选择性安装 `html-work-reports`，但不安装完整 `web` profile。
 
 推荐策略：
 
-- 现在只吸收 `skill-hub` 的规范方法：能力分层、路由边界、good/bad/forbidden eval、`build/test/validate` 验证门、HTML report 产物规则。
-- 实现阶段开始前，再用 `skill-hub install ... --dry-run` 查看将写入的技能文件。
+- 已落地 `html-work-reports` 的技能说明、模板、生成器、校验器、schema、fixture 和 smoke 测试。
+- 生产 AI 日报 HTML 仍由本仓库 `src/render.js` 和 `src/site.js` 生成；`html-work-reports` 只用于实现交接、评审、研究说明、状态看板等工作汇报。
+- 继续新增能力前，仍先用 `skill-hub install ... --dry-run` 查看将写入的技能文件。
 - 第一批只考虑与本仓库目标强相关的能力：`html-work-reports`、`webapp-testing`、`e2e-testing`、`frontend-patterns`、`web-design-guidelines`。
 - 暂缓 `frontend-design` 和 `web-artifacts-builder`，除非后续从静态日报站点升级为复杂交互应用或 React/Tailwind artifact。
+
+## 当前落地状态
+
+- 已新增 `.agents/skills/html-work-reports/`，来源为 `D:\skill-hub` 的 `html-work-reports` 技能资产。
+- 已新增根级 `AGENTS.md`，把中文回复、仓库边界、HTML 工作汇报路由和验证门写入 agent 指令面。
+- 已新增 `tests/skills.test.js`，用内置 fixture 生成单文件 HTML，并运行 `validate-html-report.mjs --skip-browser` 校验结构、证据、代码行号、diff、自包含与交互控制。
+- 已把技能 smoke 测试纳入 `npm test`，因此 `npm run validate` 会覆盖该能力。
+- 未安装完整 `web` profile，未引入 `frontend-design`、`web-artifacts-builder`、`frontend-slides` 等与当前日报发布目标无直接关系的技能。
 
 ## 调研来源
 
@@ -25,20 +34,20 @@
 node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agent-readiness --json
 ```
 
-当前仓库分析结果摘要：
+初次分析结果摘要：
 
 - `web` profile 推荐了 HTML 报告、前端模式、浏览器测试、E2E、UI/a11y 审计等能力。
-- 当前仓库缺少 agent 指令面。
-- 当前仓库缺少明确成功标准、OpenSpec tasks 或 Definition of Done。
-- 当前仓库缺少可重复验证命令。
-- 当前仓库缺少 skill routing、agent roles 或 OpenSpec change 等路由资产。
+- 当时仓库缺少 agent 指令面，现已补充根级 `AGENTS.md`。
+- 当时仓库缺少明确成功标准、OpenSpec tasks 或 Definition of Done，现已有 OpenSpec change 与 `npm run validate` 门。
+- 当时仓库缺少可重复验证命令，现已有 `build`、`test`、`test:e2e`、`validate`，并新增技能 smoke 测试。
+- 当时仓库缺少 skill routing、agent roles 或 OpenSpec change 等路由资产，现已补充 `html-work-reports` repo-local 技能路由。
 - 自动化候选应保持手动，直到存在可检查的 `build/test/validate` gate。
 
 ## 可复用能力矩阵
 
 | 能力 | 来源 | 对本仓库的价值 | 当前建议 |
 |---|---|---|---|
-| HTML work reports | `html-work-reports` | 把日报、发布报告、失败分析做成可浏览 HTML 产物；强调自包含、证据、导出、可审计 | 立即吸收规范，后续可安装 |
+| HTML work reports | `html-work-reports` | 把日报、发布报告、失败分析做成可浏览 HTML 产物；强调自包含、证据、导出、可审计 | 已选择性安装为工作汇报技能 |
 | One-off browser testing | `webapp-testing` | 用浏览器打开 `file://` 或本地站点，验证 HTML 非空、布局、交互、链接 | 作为实现阶段验收门 |
 | Durable Playwright suites | `e2e-testing` | 为首页、日报页、feed、移动视口建立稳定 E2E | 实现阶段建立 `test:e2e` |
 | Frontend patterns | `frontend-patterns` | 如果引入 React/Vite 或交互 UI，可约束状态、表单、路由、a11y | 静态 HTML 阶段只作参考 |
@@ -98,15 +107,18 @@ node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agen
 
 ## 能力安装策略
 
-后续若要把 `skill-hub` 的 web profile 装入本仓库，建议先执行 dry-run：
+后续若要继续从 `skill-hub` 增加能力，建议先执行 dry-run：
 
 ```powershell
 npx skill-hub install D:\ai-daily-cn --profile web --agent codex --dry-run --json
 ```
 
-推荐第一批候选：
+已落地：
 
 - `html-work-reports`
+
+后续候选：
+
 - `webapp-testing`
 - `e2e-testing`
 - `frontend-patterns`
@@ -119,9 +131,9 @@ npx skill-hub install D:\ai-daily-cn --profile web --agent codex --dry-run --jso
 - `frontend-slides`：除非日报需要演示 deck。
 - `prototype`：只在明确需要一次性探索交互方案时使用。
 
-## 当前仓库应先补的基础
+## 当前仓库已补的基础
 
-在开发前先补齐：
+当前已具备：
 
 - `docs/` 方案文档。
 - OpenSpec 风格 proposal/design/spec/tasks。

@@ -140,7 +140,7 @@ No automatic publish should be enabled until `validate` exists and passes locall
 
 ## Skill Hub Decision
 
-Skill Hub should be treated as a reference and later optional installer.
+Skill Hub should be treated as a reference and later optional installer. The full `web` profile should not be installed by default; narrow repo-local skills may be installed only when they are validated and do not alter the production daily-report rendering path.
 
 Useful concepts:
 
@@ -151,7 +151,7 @@ Useful concepts:
 - skill routing evals
 - build/test/validate gates
 
-Do not install Skill Hub capabilities in this change.
+Do not install the full Skill Hub web profile in this change. If `html-work-reports` is installed separately, keep it scoped to completed-work handoff reports and cover it with a smoke test.
 
 ## Data Compatibility
 

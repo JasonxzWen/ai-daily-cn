@@ -39,7 +39,7 @@ Out of scope:
 - Implementing a publisher.
 - Creating or changing GitHub Actions.
 - Enabling Pages remotely.
-- Installing Skill Hub capabilities.
+- Installing the full Skill Hub web profile. A later follow-up may selectively install narrow repo-local capabilities such as `html-work-reports` when they are covered by validation.
 - Modifying `C:\Users\Admin\.codex\automations\ai-2\automation.toml`.
 - Committing or pushing changes.
 
@@ -60,4 +60,4 @@ Out of scope:
 - Should Markdown source files be publicly served?
 - Is automatic commit/push allowed after validation is implemented?
 - Should final push status be reflected in public JSON, or only in automation run logs?
-- Should Skill Hub web profile be installed later, or kept as a reference only?
+- Should additional Skill Hub capabilities beyond the selectively installed `html-work-reports` skill be installed later, or kept as references only?

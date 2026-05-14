@@ -1,0 +1,157 @@
+<!doctype html>
+<!-- Use case: PR/code/doc review with multiple findings, severity filters, reviewer focus areas, and code evidence. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Findings Report</title>
+  <style>
+    :root { color-scheme:light; --bg:#f7f8fb; --panel:#fff; --ink:#172033; --muted:#667085; --line:#d7dce5; --accent:#2563eb; --p1:#c2414b; --p2:#b7791f; --p3:#0f766e; --shadow:0 14px 40px rgba(23,32,51,.12); }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.45; }
+    .shell { width:min(1180px,calc(100vw - 32px)); margin:0 auto; padding:28px 0 44px; }
+    header,.panel,.finding,.code,.diff-panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; }
+    header,.panel,.finding { padding:16px; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { font-size:clamp(28px,4vw,42px); line-height:1.05; margin-bottom:8px; }
+    .muted { color:var(--muted); }
+    .toolbar { position:sticky; top:0; z-index:2; display:flex; gap:8px; flex-wrap:wrap; padding:10px; margin:12px 0; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.9); backdrop-filter:blur(10px); }
+    button { min-height:36px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:7px 11px; font:inherit; cursor:pointer; transition:background 140ms ease,border-color 140ms ease,transform 140ms ease; }
+    button:hover,button[aria-pressed="true"] { border-color:var(--accent); background:#eef4ff; }
+    button:focus-visible,a:focus-visible { outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent); outline-offset:2px; }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.72fr); gap:12px; }
+    .findings { display:grid; gap:12px; }
+    .finding { transition:transform 160ms ease,opacity 160ms ease,filter 160ms ease,border-color 160ms ease,box-shadow 160ms ease; }
+    .findings:has(.finding:hover) .finding:not(:hover) { opacity:.38; filter:grayscale(.7) blur(1px); }
+    .finding:hover,.finding:focus-within { border-color:var(--accent); box-shadow:var(--shadow); transform:translateY(-2px); }
+    .badge { display:inline-flex; min-height:26px; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; font-weight:700; }
+    .p1 { color:var(--p1); border-color:color-mix(in srgb,var(--p1) 40%,var(--line)); }
+    .p2 { color:var(--p2); border-color:color-mix(in srgb,var(--p2) 40%,var(--line)); }
+    .p3 { color:var(--p3); border-color:color-mix(in srgb,var(--p3) 40%,var(--line)); }
+    .finding-grid { display:grid; grid-template-columns:92px 1fr; gap:8px 12px; }
+    .code { overflow:auto; background:#111827; color:#dbe4f0; position:sticky; top:70px; }
+    .code header { display:flex; justify-content:space-between; gap:10px; border:0; border-bottom:1px solid #263244; background:#111827; color:#b7c4d8; }
+    .code pre { margin:0; padding:12px; font:13px/1.55 "SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    .source-link { color:inherit; font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; font-size:12px; font-weight:700; overflow-wrap:anywhere; text-decoration:none; }
+    .source-link::before { content:"#"; color:var(--accent); margin-right:6px; }
+    .line,.hot,.diff-line { display:block; position:relative; margin-inline:-12px; padding-inline:58px 12px; }
+    .line::before,.hot::before,.diff-line::before { content:attr(data-line); position:absolute; left:12px; width:36px; color:#7f8da3; text-align:right; user-select:none; }
+    .hot { background:rgba(194,65,75,.25); }
+    .diff-panel { overflow:auto; margin-top:12px; background:#101827; color:#dbe4f0; }
+    .diff-panel header { display:flex; justify-content:space-between; gap:10px; border:0; border-bottom:1px solid #263244; background:#111827; color:#b7c4d8; }
+    .diff-panel pre { margin:0; padding:12px; font:13px/1.55 "SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    .diff-added { background:rgba(22,132,91,.2); color:#b7f7d4; }
+    .diff-removed { background:rgba(194,65,75,.22); color:#ffd1d5; }
+    [hidden] { display:none!important; }
+    @media (max-width:880px) { .shell{width:min(100vw - 20px,1180px); padding-top:14px;} .layout{grid-template-columns:1fr;} .code{position:static;} .finding-grid{grid-template-columns:1fr;} }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after{transition:none!important;animation:none!important;} .finding:hover{transform:none;} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <span class="badge p2">Review report</span>
+      <h1>Replace with PR or change name</h1>
+      <p class="muted">One-line verdict. Keep the full explanation in findings, not a paragraph wall.</p>
+    </header>
+
+    <div class="toolbar" role="toolbar" aria-label="Finding filters">
+      <button data-filter="all" aria-pressed="true">All</button>
+      <button data-filter="p1">P1</button>
+      <button data-filter="p2">P2</button>
+      <button data-filter="p3">P3</button>
+      <button data-copy-from="#actions">Copy actions</button>
+    </div>
+
+    <section class="layout">
+      <div class="findings" id="findings">
+        <article class="finding" data-severity="p1">
+          <div class="finding-grid">
+            <span class="badge p1">P1</span>
+            <div>
+              <h2>Finding title goes here</h2>
+              <ul>
+                <li>Bug or regression in one sentence.</li>
+                <li>Impact and trigger condition.</li>
+                <li>Suggested fix route.</li>
+              </ul>
+            </div>
+            <span class="muted">File</span>
+            <span>src/example.ts:42</span>
+          </div>
+        </article>
+
+        <article class="finding" data-severity="p2">
+          <div class="finding-grid">
+            <span class="badge p2">P2</span>
+            <div>
+              <h2>Second finding</h2>
+              <ul>
+                <li>Keep finding body as bullets.</li>
+                <li>Reference the exact evidence.</li>
+              </ul>
+            </div>
+            <span class="muted">File</span>
+            <span>tests/example.test.ts:18</span>
+          </div>
+        </article>
+
+        <article class="finding" data-severity="p3">
+          <div class="finding-grid">
+            <span class="badge p3">P3</span>
+            <div>
+              <h2>Lower-risk note</h2>
+              <ul>
+                <li>Make low-risk notes easy to collapse or filter away.</li>
+              </ul>
+            </div>
+            <span class="muted">File</span>
+            <span>docs/example.md:10</span>
+          </div>
+        </article>
+      </div>
+
+      <aside class="code" aria-label="Highlighted code evidence">
+        <header><a class="source-link" data-source-link href="#snippet">src/example.ts:40-43</a><button data-copy-from="#snippet">Copy snippet</button></header>
+        <pre id="snippet"><code><span class="line" data-line="40">async function save(input) {</span>
+<span class="line" data-line="41">  const target = path.join(root, input.name);</span>
+<span class="hot" data-line="42">  await fs.writeFile(target, input.body);</span>
+<span class="line" data-line="43">}</span></code></pre>
+      </aside>
+    </section>
+
+    <section class="diff-panel" data-section-type="diff">
+      <header><a class="source-link" data-source-link href="#review-diff">src/example.ts:42</a><button data-copy-from="#review-diff">Copy diff</button></header>
+      <pre id="review-diff"><code><span class="diff-line diff-removed" data-line="1">- await fs.writeFile(target, input.body);</span>
+<span class="diff-line diff-added" data-line="2">+ await fs.writeFile(resolveSafePath(root, input.name), input.body);</span></code></pre>
+    </section>
+
+    <section class="panel" style="margin-top:12px">
+      <h2>Action export</h2>
+      <pre id="actions">- [ ] Fix P1 in src/example.ts:42
+- [ ] Add regression coverage in tests/example.test.ts:18</pre>
+    </section>
+  </main>
+  <script>
+    function setFilter(value) {
+      document.querySelectorAll("[data-severity]").forEach(function (item) {
+        item.hidden = value !== "all" && item.getAttribute("data-severity") !== value;
+      });
+      document.querySelectorAll("[data-filter]").forEach(function (button) {
+        button.setAttribute("aria-pressed", String(button.getAttribute("data-filter") === value));
+      });
+    }
+    document.addEventListener("click", function (event) {
+      var filter = event.target.closest("[data-filter]");
+      if (filter) setFilter(filter.getAttribute("data-filter"));
+      var copy = event.target.closest("[data-copy-from]");
+      if (!copy) return;
+      var source = document.querySelector(copy.getAttribute("data-copy-from"));
+      if (source && navigator.clipboard) navigator.clipboard.writeText(source.textContent.trim());
+      var previous = copy.textContent;
+      copy.textContent = "Copied";
+      setTimeout(function () { copy.textContent = previous; }, 900);
+    });
+  </script>
+</body>
+</html>

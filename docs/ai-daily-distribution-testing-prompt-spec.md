@@ -33,7 +33,7 @@
 - 当前阶段不创建 GitHub Actions。
 - 当前阶段不修改 GitHub Pages 远端设置。
 - 当前阶段不自动改 `automation.toml`。
-- 当前阶段不安装 `skill-hub` profile。
+- 当前阶段不安装完整 `skill-hub` profile；只选择性安装 `html-work-reports` 作为工作汇报技能，不改变生产日报渲染链路。
 
 ## 核心术语
 
