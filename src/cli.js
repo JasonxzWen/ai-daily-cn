@@ -82,19 +82,24 @@ try {
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
-      commitMessage: args.message
+      commitMessage: args.message,
+      verifyPages: true
     });
+    const publishOk = !result.verification_error;
     printJson({
-      ok: true,
+      ok: publishOk,
       publish_status: {
         html_generated: true,
         repo_updated: result.committed,
         repo_pushed: result.pushed,
-        pages_url: "",
-        publish_error: ""
+        pages_url: result.pages_url || "",
+        publish_error: result.verification_error || ""
       },
       result
     });
+    if (!publishOk) {
+      process.exitCode = 1;
+    }
   } else {
     throw new PublisherError("unknown_command", `未知命令：${command || "(empty)"}`);
   }

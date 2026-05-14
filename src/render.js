@@ -75,6 +75,7 @@ ${defaultStyleCss}
         <div><dt>无无源数字</dt><dd>${report.self_check.no_unsourced_numbers ? "通过" : "未通过"}</dd></div>
       </dl>
       <p>${escapeHtml(report.self_check.notes || "无额外说明。")}</p>
+      ${renderOptimizationSuggestions(report.self_check.optimization_suggestions)}
     </section>
 
     <nav class="artifact-links" aria-label="产物链接">
@@ -304,6 +305,18 @@ h3 {
   font-weight: 700;
 }
 
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
 .artifact-links {
   display: flex;
   flex-wrap: wrap;
@@ -386,6 +399,33 @@ function renderCommunityLeads(items) {
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
+}
+
+function renderOptimizationSuggestions(items = []) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return '<p class="muted">暂无提示词或规则迭代建议。</p>';
+  }
+
+  return `<section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list">${items.map(renderOptimizationSuggestion).join("\n")}</ol>
+</section>`;
+}
+
+function renderOptimizationSuggestion(item) {
+  const parts = [
+    item.module ? `<span class="tag">模块：${escapeHtml(item.module)}</span>` : "",
+    typeof item.requires_user_confirmation === "boolean"
+      ? `<span class="tag">${item.requires_user_confirmation ? "需要确认" : "可直接处理"}</span>`
+      : ""
+  ].filter(Boolean);
+  return `<li>
+    <p><strong>${escapeHtml(item.issue || item.suggestion || "未命名建议")}</strong></p>
+    ${parts.length > 0 ? `<div class="item-meta">${parts.join("")}</div>` : ""}
+    ${item.evidence ? `<p>证据：${escapeHtml(item.evidence)}</p>` : ""}
+    ${item.suggestion ? `<p>建议：${escapeHtml(item.suggestion)}</p>` : ""}
+    ${item.expected_benefit ? `<p>预期收益：${escapeHtml(item.expected_benefit)}</p>` : ""}
+  </li>`;
 }
 
 function renderFeedItem(item) {

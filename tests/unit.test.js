@@ -134,6 +134,27 @@ test("HTML 渲染会转义日报正文并保留外链 rel", async () => {
   assert(html.includes('rel="noopener noreferrer"'));
 });
 
+test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () => {
+  const markdown = await readFixture("reports/good/official-release.md");
+  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
+  report.self_check.optimization_suggestions = [
+    {
+      issue: "48 小时窗口仍不足时缺少扩窗规则",
+      evidence: "主体信息不足 5 条。",
+      module: "date-scope",
+      suggestion: "允许扩展到 72 小时并记录原因。",
+      expected_benefit: "避免低质量硬凑。",
+      requires_user_confirmation: true
+    }
+  ];
+  const html = renderReportHtml(report);
+
+  assert(html.includes("提示词与规则迭代建议"));
+  assert(html.includes("48 小时窗口仍不足时缺少扩窗规则"));
+  assert(html.includes("模块：date-scope"));
+  assert(html.includes("需要确认"));
+});
+
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-"));
   const inputDir = path.join(tmp, "reports-source");
@@ -244,6 +265,8 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("最终发布产物是自包含、可读性好的静态 HTML，不是 Markdown"));
   assert(prompt.includes("定时任务假定已经在本仓库根目录启动"));
   assert(prompt.includes("反思与迭代建议"));
+  assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
+  assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("2026-05-15"));
 });
 

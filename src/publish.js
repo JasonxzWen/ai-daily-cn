@@ -3,6 +3,7 @@ import { promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
+import { canonicalReportUrl } from "./paths.js";
 import { planGeneratedFiles } from "./site.js";
 
 const execFileAsync = promisify(execFile);
@@ -124,6 +125,16 @@ export async function publishGeneratedArtifacts(options = {}) {
   await git.add(publishFiles);
   const commitOutput = await git.commit(commitMessage);
   const pushOutput = await git.push(branch);
+  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const verification =
+    pagesUrl && options.verifyPages
+      ? await verifyPublishedUrl(pagesUrl, {
+          attempts: options.verificationAttempts,
+          intervalMs: options.verificationIntervalMs,
+          expectedText: options.reportDate,
+          fetchImpl: options.fetchImpl
+        })
+      : { ok: false, error: "" };
 
   return {
     mode: "publish",
@@ -134,7 +145,56 @@ export async function publishGeneratedArtifacts(options = {}) {
     staged_files: publishFiles.sort(),
     commit_message: commitMessage,
     commit_output: commitOutput,
-    push_output: pushOutput
+    push_output: pushOutput,
+    pages_url: pagesUrl,
+    pages_verified: Boolean(verification.ok),
+    verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
+  };
+}
+
+export async function verifyPublishedUrl(url, options = {}) {
+  const attempts = options.attempts ?? 12;
+  const intervalMs = options.intervalMs ?? 5000;
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const expectedText = options.expectedText || "";
+  let lastError = "";
+
+  if (typeof fetchImpl !== "function") {
+    return {
+      ok: false,
+      error: "当前 Node 环境没有可用 fetch，无法验证 Pages URL。"
+    };
+  }
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetchImpl(url, { method: "GET" });
+      if (response.ok) {
+        if (expectedText) {
+          const body = await response.text();
+          if (!body.includes(expectedText)) {
+            lastError = `HTTP ${response.status} 但页面内容未包含 ${expectedText}`;
+          } else {
+            return { ok: true, status: response.status };
+          }
+        } else {
+          return { ok: true, status: response.status };
+        }
+      } else {
+        lastError = `HTTP ${response.status}`;
+      }
+    } catch (error) {
+      lastError = error.message;
+    }
+
+    if (attempt < attempts && intervalMs > 0) {
+      await delay(intervalMs);
+    }
+  }
+
+  return {
+    ok: false,
+    error: `${url} 在 ${attempts} 次检查后仍不可用：${lastError || "unknown error"}`
   };
 }
 
@@ -248,4 +308,10 @@ async function runGit(cwd, args, options = {}) {
     maxBuffer: 1024 * 1024
   });
   return options.trim === false ? stdout : stdout.trim();
+}
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

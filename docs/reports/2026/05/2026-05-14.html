@@ -186,6 +186,18 @@ h3 {
   font-weight: 700;
 }
 
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
 .artifact-links {
   display: flex;
   flex-wrap: wrap;
@@ -329,6 +341,30 @@ h3 {
         <div><dt>无无源数字</dt><dd>通过</dd></div>
       </dl>
       <p>主体条目均使用官方或原始来源。24 小时内高质量一手主体条目偏少，48 小时窗口内保留 Anthropic、GitHub、SAP、OpenAI 四条；为避免低质量硬凑，将窗口扩到 2026-05-11 并加入 Thinking Machines 官方研究预览。OpenAI Daybreak 与 Claude Opus fast mode 因发布日期或文档一致性不足，仅放入社区线索。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。</strong></p>
+    <div class="item-meta"><span class="tag">模块：date-scope</span><span class="tag">需要确认</span></div>
+    <p>证据：本轮 2026-05-13 至 2026-05-14 与 48 小时窗口内只有 4 条高质量 T0 主体信息；Thinking Machines 的 2026-05-11 官方研究预览质量高但超出 48 小时。</p>
+    <p>建议：增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则。</p>
+    <p>预期收益：避免为了满足条目数引入弱来源，同时让扩窗边界可审计。</p>
+  </li>
+<li>
+    <p><strong>官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。</strong></p>
+    <div class="item-meta"><span class="tag">模块：source-policy</span><span class="tag">需要确认</span></div>
+    <p>证据：OpenAI Daybreak 官方页可访问且内容完整，但页面正文未暴露发布日期；搜索与媒体显示近期发布，本轮仍未写入主体。</p>
+    <p>建议：要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体。</p>
+    <p>预期收益：减少把无法定日的产品页误判成今日发布。</p>
+  </li>
+<li>
+    <p><strong>T1 builder 观察缺少可用原帖时容易空缺。</strong></p>
+    <div class="item-meta"><span class="tag">模块：selection-rules</span><span class="tag">需要确认</span></div>
+    <p>证据：本轮 Claude fast mode 线索来自 X 聚合，且官方 docs 与线索存在版本不一致，builder_observations 继续保持空数组。</p>
+    <p>建议：保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因。</p>
+    <p>预期收益：防止用二手转述填充 Builder 区域，提升日报可追溯性。</p>
+  </li></ol>
+</section>
     </section>
 
     <nav class="artifact-links" aria-label="产物链接">

@@ -31,12 +31,12 @@
 3. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目和工程工具动态；优先一手来源，必要时 24h 扩展到 48h，并在 `source_window` 和 self_check notes 里记录。
 4. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`self_check`；没有项目、Builder 观察或社区线索时使用空数组。
 5. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
-6. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。
+6. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。HTML 页面必须展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
 7. 运行 `npm run validate`。
 8. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL。
-9. 如需真实发布，运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push。
+9. 如需真实发布，运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
 10. 如果 dry-run、validate 或 publish 失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复。
-11. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块。
+11. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
 
 最终回复必须包含：
 
@@ -44,6 +44,7 @@
 - 结构化 JSON 路径。
 - `validate` 结果。
 - `publish:dry-run` 结果和预期 Pages URL。
+- 真实发布后的 Pages URL HTTP 验证结果。
 - 今日采样与提示词规则的差距。
 - 最多 3 条需要用户确认的提示词/规则迭代建议。
 ```

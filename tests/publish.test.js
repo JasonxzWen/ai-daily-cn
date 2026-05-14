@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
-import { createPublishPlan, parsePorcelain, publishGeneratedArtifacts } from "../src/publish.js";
+import { createPublishPlan, parsePorcelain, publishGeneratedArtifacts, verifyPublishedUrl } from "../src/publish.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -110,6 +110,30 @@ test("publish 只提交发布器管理的文件", async () => {
   assert.deepEqual(calls.map((call) => call.name), ["add", "commit", "push"]);
 });
 
+test("publish 可在 push 后验证 Pages URL", async () => {
+  const calls = [];
+  const result = await publishGeneratedArtifacts({
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    verifyPages: true,
+    verificationAttempts: 1,
+    verificationIntervalMs: 0,
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      text: async () => "<title>AI 日报 2026-05-13</title>"
+    }),
+    git: fakeGit({
+      status: " M docs/index.html\n?? reports-data/2026/05/2026-05-13.json",
+      calls
+    })
+  });
+
+  assert.equal(result.pages_verified, true);
+  assert.equal(result.verification_error, "");
+  assert.equal(result.pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+});
+
 test("publish 遇到非发布器管理改动时停止", async () => {
   await assert.rejects(
     publishGeneratedArtifacts({
@@ -126,6 +150,41 @@ test("parsePorcelain 保留首行前导状态列并兼容单状态输出", () =>
     { code: "??", path: "reports-data/2026/05/2026-05-14.json" }
   ]);
   assert.deepEqual(parsePorcelain("M docs/feed.json"), [{ code: "M ", path: "docs/feed.json" }]);
+});
+
+test("verifyPublishedUrl 重试直到页面可访问且包含目标日期", async () => {
+  const statuses = [404, 200];
+  const result = await verifyPublishedUrl("https://example.com/report.html", {
+    attempts: 2,
+    intervalMs: 0,
+    expectedText: "2026-05-13",
+    fetchImpl: async () => {
+      const status = statuses.shift();
+      return {
+        ok: status === 200,
+        status,
+        text: async () => "AI 日报 2026-05-13"
+      };
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, 200);
+});
+
+test("verifyPublishedUrl 在页面持续不可用时返回错误", async () => {
+  const result = await verifyPublishedUrl("https://example.com/missing.html", {
+    attempts: 1,
+    intervalMs: 0,
+    fetchImpl: async () => ({
+      ok: false,
+      status: 404,
+      text: async () => "not found"
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.error, /HTTP 404/);
 });
 
 function fakeGit(overrides = {}) {
