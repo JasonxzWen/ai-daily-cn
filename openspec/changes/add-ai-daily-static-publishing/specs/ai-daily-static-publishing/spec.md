@@ -115,6 +115,11 @@ The system SHALL prioritize first-hand sources and reject unverifiable claims.
 - **THEN** it is not included as a main item
 - **AND** it may only appear as a clearly marked community lead if useful
 
+#### Scenario: Official docs lack a dated release source
+- **WHEN** an official docs page shows a changed product state but lacks a dated changelog, release note, RSS entry, commit, or official dated post
+- **THEN** it is not included as a main item
+- **AND** it may only appear as a community lead marked as awaiting dated-source confirmation
+
 #### Scenario: Unsourced number is detected
 - **WHEN** a claim contains a numeric performance, cost, count, or benchmark value without a source
 - **THEN** validation fails or the number is removed before publishing
@@ -131,6 +136,16 @@ The system SHALL preserve the existing AI daily report quality contract.
 - **WHEN** fewer than five high-quality main items are available in the default window
 - **THEN** the system may widen the window and record the decision in self-check notes
 - **AND** it does not add low-quality filler
+
+#### Scenario: Source coverage is broadened before time expansion
+- **WHEN** the default window has fewer than five high-quality main items
+- **THEN** the system checks additional first-hand source categories before expanding beyond 48 hours
+- **AND** any item older than 48 hours must be a high-signal open-source release or official research/product update from the recent five-day window
+
+#### Scenario: Same-vendor small updates are merged
+- **WHEN** one vendor publishes multiple small updates in the same day or 48-hour window
+- **THEN** the report combines them into one vendor item by default
+- **AND** it only splits them when the updates change different engineering workflows, sources, or risk surfaces
 
 #### Scenario: Banned phrases are detected
 - **WHEN** the report contains banned stock phrases from the prompt contract

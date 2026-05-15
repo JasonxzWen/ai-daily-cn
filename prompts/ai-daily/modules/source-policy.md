@@ -11,3 +11,4 @@
 - 只引用二手媒体而不回源。
 - 把预测、传闻或情绪化观点写成事实。
 - 把 builder 观察计入主体信息数量。
+- 官方 docs 页面没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息；可降级为社区线索，并固定说明“官方文档状态存在但发布日期待交叉确认”。
