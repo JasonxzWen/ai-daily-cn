@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-18</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-18</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-18</h1>
+      <p class="summary">今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Malta 全国 ChatGPT Plus 项目，GitHub Copilot 进入用户级记忆与 GPT-5.3-Codex 企业默认模型切换节点，xAI 把 Grok 订阅接入 Hermes Agent，Pi Coding Agent 0.74.1 补齐图像生成、Together AI 和 Windows ARM64，Palantir Global Branching 从 2026-05-18 起进入 GA。上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 本轮不重复计入主体。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>6</strong> 主体信息</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>3</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划</h3>
+  <div class="item-meta"><span>2026-05-16</span><span>T0</span><span>OpenAI</span><span>Malta</span><span>ChatGPT Plus</span><span>AI for All</span><span>OpenAI for Countries</span></div>
+  <ul>
+    <li>课程由 University of Malta 开发，目标是帮助公众理解 AI 能做什么、不能做什么，以及如何在家庭和工作中负责任地使用；完成课程后可获得一年 ChatGPT Plus 访问权限。</li>
+<li>OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。</li>
+<li>工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://openai.com/index/malta-chatgpt-plus-partnership/" target="_blank" rel="noopener noreferrer">OpenAI News</a></p>
+</article>
+<article class="item">
+  <h3>OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>OpenAI</span><span>Databricks</span><span>GPT-5.5</span><span>Codex</span><span>AgentBricks</span><span>Agent Supervisor API</span></div>
+  <ul>
+    <li>OfficeQA Pro 聚焦 scanned PDFs、legacy files、long-context documents 中的 parsing、retrieval 和 grounded reasoning；这些场景会把早期抽取错误放大到后续 agent 决策。</li>
+<li>OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。</li>
+<li>Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://openai.com/index/databricks/" target="_blank" rel="noopener noreferrer">OpenAI Customer Story</a></p>
+</article>
+<article class="item">
+  <h3>GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点</h3>
+  <div class="item-meta"><span>2026-05-17</span><span>T0</span><span>GitHub</span><span>GitHub Copilot</span><span>GPT-5.3-Codex</span><span>Copilot Memory</span><span>Copilot Business</span><span>Copilot Enterprise</span></div>
+  <ul>
+    <li>GPT-5.3-Codex 作为首个 Copilot LTS model，会在 Business 和 Enterprise 中替代 GPT-4.1 成为尚未通过内部模型审批时的 base model，同时带 1x premium request unit multiplier。</li>
+<li>2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。</li>
+<li>这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
+</article>
+<article class="item">
+  <h3>xAI 允许 Grok 订阅直接接入 Hermes Agent</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>xAI</span><span>Grok</span><span>Hermes Agent</span><span>Nous Research</span><span>OAuth</span><span>SuperGrok</span></div>
+  <ul>
+    <li>官方说明该连接在每个订阅 tier 上可用；用户在 `hermes model` 中选择 xAI Grok OAuth 后，通过浏览器登录，再启动 Hermes TUI。</li>
+<li>Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。</li>
+<li>这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://x.ai/news/grok-hermes" target="_blank" rel="noopener noreferrer">xAI News</a></p>
+</article>
+<article class="item">
+  <h3>Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物</h3>
+  <div class="item-meta"><span>2026-05-16</span><span>T0</span><span>Pi Coding Agent</span><span>Earendil Works</span><span>OpenRouter</span><span>Together AI</span><span>Windows ARM64</span><span>TUI</span></div>
+  <ul>
+    <li>图像生成支持来自 `@earendil-works/pi-ai`，包括 image generation APIs、image model metadata 和 built-in OpenRouter image generation support。</li>
+<li>Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。</li>
+<li>修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://pi.dev/news/releases/0.74.1" target="_blank" rel="noopener noreferrer">Pi Release Notes</a></p>
+</article>
+<article class="item">
+  <h3>Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>Palantir</span><span>Foundry</span><span>AIP Logic</span><span>Global Branching</span><span>Workflow Lineage</span><span>Ontology</span></div>
+  <ul>
+    <li>GA 覆盖 transforms、TypeScript v1 functions repositories、Pipeline Builder、Ontology、Workshop、AIP Logic 和 Object Views；Workflow Lineage 也已支持 Global Branching。</li>
+<li>分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。</li>
+<li>对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.palantir.com/docs/foundry/announcements/2026-05" target="_blank" rel="noopener noreferrer">Palantir Foundry Announcements</a></p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>Grok-Hermes OAuth provider</td><td>xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。</td><td><a href="https://x.ai/news/grok-hermes" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Pi Coding Agent 0.74.1</td><td>Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。</td><td><a href="https://pi.dev/news/releases/0.74.1" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Copilot Memory user preferences</td><td>GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。</td><td><a href="https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Palantir Global Branching</td><td>Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。</td><td><a href="https://www.palantir.com/docs/foundry/announcements/2026-05" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。 <a href="https://github.com/supertone-inc/supertonic" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note；可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。 <a href="https://github.com/tinyhumansai/openhuman" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。 <a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>6</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>本轮 2026-05-18 当天 T0 发布不足 5 条，先拓展官方产品页、GitHub Changelog、开源 release、云平台公告和 AI agent 工具，再扩展到 2026-05-15。主体条目均使用官方或项目一手来源，并保留真实 event_date。已在 2026-05-17 草稿覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 不重复计入主体；Supertonic、OpenHuman、K-Dense Scientific Agent Skills 因官方日期不足或发布日期超出窗口，只放入 community_leads。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。</strong></p>
+    
+    <p>证据：工作区已有 2026-05-16 和 2026-05-17 发布产物，本轮必须人工排除 2026-05-17 中的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI safety 条目。</p>
+    
+    <p>预期收益：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。</p>
+  </li>
+<li>
+    <p><strong>社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。</strong></p>
+    
+    <p>证据：Supertonic、OpenHuman、K-Dense Scientific Agent Skills 都有社区热度，但本轮未找到近 48 小时稳定官方 release note。</p>
+    
+    <p>预期收益：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。</p>
+  </li>
+<li>
+    <p><strong>同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。</strong></p>
+    
+    <p>证据：OpenAI Databricks 是企业 agent workflow 与基准案例，OpenAI Malta 是国家级访问和 AI literacy 交付链路，风险面不同。</p>
+    
+    <p>预期收益：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。</p>
+  </li></ol>
+</section>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-18.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>

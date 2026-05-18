@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-16</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-16</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-16</h1>
+      <p class="summary">今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役和替换节点，GitHub 继续把 Copilot agent 工作台化，Google 为 Genkit 增加 middleware 控制层。由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>5</strong> 主体信息</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>4</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>OpenAI 在 ChatGPT 中推出个人财务体验</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>OpenAI</span><span>ChatGPT</span><span>Personal finances</span><span>Plaid</span><span>Pro</span></div>
+  <ul>
+    <li>该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。</li>
+<li>OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。</li>
+<li>对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" target="_blank" rel="noopener noreferrer">OpenAI Help Center</a></p>
+</article>
+<article class="item">
+  <h3>xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>xAI</span><span>Grok 4.3</span><span>Grok Code Fast 1</span><span>Grok Imagine</span><span>API migration</span></div>
+  <ul>
+    <li>退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。</li>
+<li>reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。</li>
+<li>文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://docs.x.ai/developers/migration/may-15-retirement" target="_blank" rel="noopener noreferrer">xAI Docs</a></p>
+</article>
+<article class="item">
+  <h3>Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>Databricks</span><span>Mosaic AI Model Serving</span><span>Foundation Model APIs</span><span>Meta Llama 3.1 405B</span><span>OpenAI GPT OSS 120B</span></div>
+  <ul>
+    <li>该模型原本作为 Public Preview 暴露为 `databricks-meta-llama-3-1-405b-instruct`，上下文窗口为 128K，适合多步推理和合成数据等任务。</li>
+<li>Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。</li>
+<li>使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" target="_blank" rel="noopener noreferrer">Databricks Docs</a></p>
+</article>
+<article class="item">
+  <h3>GitHub 合并推进 Copilot app 和 cloud agent 自动选模</h3>
+  <div class="item-meta"><span>2026-05-14</span><span>T0</span><span>GitHub</span><span>GitHub Copilot app</span><span>Copilot cloud agent</span><span>Auto model selection</span><span>Agent Merge</span></div>
+  <ul>
+    <li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。</li>
+<li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。</li>
+<li>对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
+</article>
+<article class="item">
+  <h3>Google 为 Genkit 发布 middleware 控制层</h3>
+  <div class="item-meta"><span>2026-05-14</span><span>T0</span><span>Google</span><span>Genkit</span><span>Middleware</span><span>Agentic apps</span><span>Tool loop</span></div>
+  <ul>
+    <li>Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。</li>
+<li>首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。</li>
+<li>这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" target="_blank" rel="noopener noreferrer">Google Developers Blog</a></p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>ChatGPT Finances</td><td>ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。</td><td><a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Grok model retirement guide</td><td>xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。</td><td><a href="https://docs.x.ai/developers/migration/may-15-retirement" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Databricks Foundation Model APIs</td><td>Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。</td><td><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>GitHub Copilot app</td><td>GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。</td><td><a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Genkit Middleware</td><td>Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。</td><td><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。 <a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。 <a href="https://huggingface.co/blog/continuous_async" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。 <a href="https://www.anthropic.com/news/gates-foundation-partnership" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。 <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>5</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>本轮 2026-05-15 新增 T0 工程/产品条目不足 5 条，扩展到 2026-05-14..2026-05-16。xAI 在上一期仅因缺少 dated changelog 被列为社区线索，本轮迁移页 last updated 2026-05-14 且明确 2026-05-15 生效，升级为主体。GitHub Copilot app 与 Genkit Middleware 与上一期重叠，因仍在 48 小时窗口内且主体数量不足而保留；OpenAI Codex remote、Hugging Face、Anthropic、AWS 等上一期主体降级为社区线索。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>48 小时扩展会把上一期主体重新带入候选集，容易形成跨日报重复。</strong></p>
+    
+    <p>证据：本轮 GitHub Copilot app 与 Genkit Middleware 同时出现在 2026-05-15 与 2026-05-16 的主体候选中。</p>
+    
+    <p>预期收益：在主体不足时优先补入未覆盖的 dated official docs 或模型生命周期节点，减少重复阅读负担。</p>
+  </li>
+<li>
+    <p><strong>模型退役和重定向通常出现在官方 docs，而不是 blog 或 changelog，现有规则容易把它们降级。</strong></p>
+    
+    <p>证据：xAI 迁移页和 Databricks 模型目录都有明确生效日期、last updated 和迁移建议，且直接影响 API 行为和成本。</p>
+    
+    <p>预期收益：把带生效日期和 last updated 的官方迁移文档纳入可入主体的 T0 来源，提升模型生命周期覆盖。</p>
+  </li>
+<li>
+    <p><strong>搜索摘要中的发布日期可能与源页面正文日期不一致。</strong></p>
+    
+    <p>证据：OpenAI Codex Windows sandbox 在搜索摘要中显示为 2026-05-15，但源页面正文日期为 2026-05-13，因此本轮没有作为新增主体使用。</p>
+    
+    <p>预期收益：要求最终日期以源页面正文或机器可解析元数据为准，降低旧事件被包装成新事件的风险。</p>
+  </li></ol>
+</section>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-16.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>

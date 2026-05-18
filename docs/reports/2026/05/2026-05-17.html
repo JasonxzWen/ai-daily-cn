@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-17</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-17</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-17</h1>
+      <p class="summary">今天可回源的新发布偏少，主体信息收敛为 5 条：ThreatConnect 8.0 把威胁情报工作台加入 Agentic AI，AWS Partner Central agents 用自然语言和 MCP 推进机会创建，Firecrawl v2.10 强化 agent 数据采集控制，xAI 发布 Grok Build 终端 coding agent early beta，OpenAI 披露 ChatGPT 在敏感对话中的跨轮上下文安全更新。本轮显式扩展到 2026-05-14，以补足 48 小时内不足 5 条的高质量一手来源，并把已在 2026-05-16 覆盖的条目降级为社区线索。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>5</strong> 主体信息</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>3</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform</h3>
+  <div class="item-meta"><span>2026-05-16</span><span>T0</span><span>ThreatConnect</span><span>Agentic AI</span><span>Threat Intelligence</span><span>STRIDE</span><span>Playbooks</span></div>
+  <ul>
+    <li>四个代理都围绕已有 ThreatConnect 情报和 workflow 数据工作，官方说明它们基于 playbook architecture，并在 LLM reasoning layer 之外接入实例内情报和流程数据。</li>
+<li>ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。</li>
+<li>8.0 同时加入 Playbook Routes 和 Parameter Sets，用更少节点表达分支逻辑并复用 app 参数，这说明安全运营平台的 AI 功能正和既有自动化编排层绑定，而不是只做一个聊天侧栏。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer">ThreatConnect Release Notes</a></p>
+</article>
+<article class="item">
+  <h3>AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>AWS</span><span>AWS Partner Central</span><span>Amazon Bedrock AgentCore</span><span>Amazon Q</span><span>MCP</span></div>
+  <ul>
+    <li>合作伙伴可以用自然语言描述交易、上传 meeting notes、proposals、call transcripts，或 clone 现有 opportunity；代理会抽取信息、补充 customer details 并建议修正缺失上下文或字段。</li>
+<li>入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。</li>
+<li>该功能已在所有 commercial AWS Regions 提供，说明 Bedrock AgentCore 正被 AWS 用于内部/伙伴业务流程，而不仅是通用 agent 开发样例。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer">AWS What&#39;s New</a></p>
+</article>
+<article class="item">
+  <h3>Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</h3>
+  <div class="item-meta"><span>2026-05-15</span><span>T0</span><span>Firecrawl</span><span>v2.10</span><span>Parse</span><span>Lockdown Mode</span><span>MCP</span></div>
+  <ul>
+    <li>`/parse` 可把 PDF、Word、spreadsheet 等文件转成 LLM-ready Markdown、JSON 或 summary，并标注文件上限为 50 MB，适合 RAG ingestion 和 agent 文档读取。</li>
+<li>Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。</li>
+<li>Question 和 Highlights format 的重点是上下文压缩：前者返回 page-grounded answer，后者返回匹配 query 的原句、代码块和表格行；对 agent loop 来说，这是把网页读取从“整页塞上下文”改成可控提取。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer">Firecrawl Changelog</a></p>
+</article>
+<article class="item">
+  <h3>xAI 发布 Grok Build 终端 coding agent early beta</h3>
+  <div class="item-meta"><span>2026-05-14</span><span>T0</span><span>xAI</span><span>Grok Build</span><span>Coding agent</span><span>CLI</span><span>MCP</span></div>
+  <ul>
+    <li>Grok Build 支持 plan mode：复杂任务先生成计划，用户可批准、评论单步或重写计划；批准后变更以 clean diff 方式展示。</li>
+<li>官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。</li>
+<li>页面还展示 parallel subagents、worktree integrations、headless mode `-p` 和 ACP support；这使它更像一个可脚本化 agent harness，而不仅是交互式 CLI。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer">xAI News</a></p>
+</article>
+<article class="item">
+  <h3>OpenAI 披露 ChatGPT 在敏感对话中的上下文安全更新</h3>
+  <div class="item-meta"><span>2026-05-14</span><span>T0</span><span>OpenAI</span><span>ChatGPT</span><span>Safety summaries</span><span>GPT-5.5 Instant</span><span>Sensitive conversations</span></div>
+  <ul>
+    <li>该工作聚焦 suicide、self-harm 和 harm-to-others 场景；OpenAI 称 safety summaries 不是通用 personalization 或 long-term memory，而是窄范围、限时、只在严重安全担忧相关时使用。</li>
+<li>OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。</li>
+<li>对构建面向高风险对话的产品团队来说，关键变化是 safety state 成为运行时上下文的一部分；这会影响日志保留、风险升级、用户透明度和普通对话误触发评估。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" target="_blank" rel="noopener noreferrer">OpenAI</a></p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>ThreatConnect Agentic AI</td><td>ThreatConnect 8.0 的四类安全运营代理，覆盖查询、STRIDE 建模、情报报告和 IR 创建。</td><td><a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>AWS Partner Central agents MCP</td><td>AWS Partner Central agents 的可编程入口，可把 co-sell opportunity creation 接入现有销售工具。</td><td><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Firecrawl v2.10</td><td>面向 AI agents 的网页和文档提取版本，包含 `/parse`、Lockdown Mode、Question/Highlights format 和多语言 SDK。</td><td><a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Grok Build</td><td>xAI 的终端 coding agent early beta，支持计划审批、diff、subagents、worktrees、MCP 和 headless mode。</td><td><a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Mux Robots usage update</td><td>Mux Robots 调整 workflow unit 计算并延长 free technical preview；本轮作为视频 AI 工作流商业化线索保留。</td><td><a href="https://www.mux.com/docs/changelog/robots-pricing-update-may-2026" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>Mux 在 2026-05-15 更新 Robots workflow unit 计算，并把 free technical preview 延长到 2026-06-15；该条更偏计费和试用期变化，本轮不计入主体。 <a href="https://www.mux.com/docs/changelog/robots-pricing-update-may-2026" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>OpenAI 2026-05-15 的 ChatGPT personal finances 和 xAI 2026-05-15 的 model retirement 已在 2026-05-16 日报主体覆盖，本轮仅作为连续跟踪线索，不重复写入主体。 <a href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Hugging Face 社区页出现多个近期热度条目，但打开后 Reachy Mini appstore 与 QVAC MedPsy 的明确发布日期分别为 2026-05-06 和 2026-05-07，超出本轮最近 5 天补充窗口。 <a href="https://huggingface.co/blog" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>5</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>本轮 2026-05-16..2026-05-17 高质量 T0 项不足 5 条；48 小时内补入 AWS Partner Central agents 与 Firecrawl v2.10 后仍不足，因此扩展到最近 5 天并采用 2026-05-14 的 xAI Grok Build 与 OpenAI sensitive-conversation safety。已在 2026-05-15/2026-05-16 主体覆盖的 OpenAI personal finances、xAI retirement、GitHub Copilot app、Genkit Middleware、Hugging Face continuous async、AWS SageMaker Qwen3.6 均不重复计入主体。未使用媒体二手稿作为最终来源。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>连续日报缺少自动读取前几期主体标题的重复抑制步骤。</strong></p>
+    
+    <p>证据：2026-05-15 与 2026-05-16 已出现 GitHub Copilot app、Genkit Middleware 等跨日重复风险；本轮需要手动排除 OpenAI personal finances 和 xAI retirement。</p>
+    
+    <p>预期收益：在低新闻量日期优先寻找未覆盖的一手来源，减少读者连续两天看到相同主体。</p>
+  </li>
+<li>
+    <p><strong>低新闻量日期需要更清晰地区分主体条目和次级产品运营线索。</strong></p>
+    
+    <p>证据：Mux Robots 2026-05-15 更新有一手来源和 AI workflow 相关性，但主要是 usage unit 和 free period 变化，低于本轮主体五条的影响面。</p>
+    
+    <p>预期收益：把计费、试用期、文档小更新稳定放入 community_leads，避免主体质量被凑数稀释。</p>
+  </li>
+<li>
+    <p><strong>搜索结果中的最新抓取时间和页面真实发布日期容易混淆。</strong></p>
+    
+    <p>证据：Hugging Face blog 页显示若干 about-hours 热度项，但打开后明确 Published 日期可早到 2026-05-06/2026-05-07，不符合最近 5 天补充窗口。</p>
+    
+    <p>预期收益：要求最终日期以源页面正文或可解析元数据为准，降低旧事件被当作新动态的风险。</p>
+  </li></ol>
+</section>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-17.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>

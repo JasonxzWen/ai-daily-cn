@@ -1,0 +1,231 @@
+{
+  "report_date": "2026-05-18",
+  "title": "AI 日报 2026-05-18",
+  "summary": "今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Malta 全国 ChatGPT Plus 项目，GitHub Copilot 进入用户级记忆与 GPT-5.3-Codex 企业默认模型切换节点，xAI 把 Grok 订阅接入 Hermes Agent，Pi Coding Agent 0.74.1 补齐图像生成、Together AI 和 Windows ARM64，Palantir Global Branching 从 2026-05-18 起进入 GA。上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 本轮不重复计入主体。",
+  "source_window": {
+    "date_from": "2026-05-15",
+    "date_to": "2026-05-18",
+    "fallback_window_used": true,
+    "notes": "按 2026-05-18 Asia/Shanghai 生成。先检查 2026-05-17..2026-05-18 的官方发布、GitHub Changelog、云厂商公告、AI agent 工具 release、Hugging Face 和开源项目；24 小时内只有 GitHub GPT-5.3-Codex 企业默认模型生效和 Palantir Global Branching GA 具备明确日期，主体不足 5 条。继续拓展到 48 小时后仍不足，因此按提示词允许扩展到 2026-05-15，补入 OpenAI Databricks、OpenAI Malta、xAI Grok-Hermes 和 Pi 0.74.1。2026-05-17 已生成草稿中的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 不重复计入主体；Supertonic、OpenHuman、K-Dense Scientific Agent Skills 因缺少近 48 小时官方 release 或发布日期不够稳定，降级为社区线索。"
+  },
+  "main_items": [
+    {
+      "title": "OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划",
+      "event_date": "2026-05-16",
+      "url": "https://openai.com/index/malta-chatgpt-plus-partnership/",
+      "source": "OpenAI News",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Malta",
+        "ChatGPT Plus",
+        "AI for All",
+        "OpenAI for Countries"
+      ],
+      "summary": "OpenAI 与 Malta 政府宣布合作，把 ChatGPT Plus 提供给完成 AI literacy 课程的 Maltese citizens；首阶段在 2026 年 5 月启动，由 Malta Digital Innovation Authority 管理分发。",
+      "bullets": [
+        "课程由 University of Malta 开发，目标是帮助公众理解 AI 能做什么、不能做什么，以及如何在家庭和工作中负责任地使用；完成课程后可获得一年 ChatGPT Plus 访问权限。",
+        "OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。",
+        "工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。"
+      ]
+    },
+    {
+      "title": "OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流",
+      "event_date": "2026-05-15",
+      "url": "https://openai.com/index/databricks/",
+      "source": "OpenAI Customer Story",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Databricks",
+        "GPT-5.5",
+        "Codex",
+        "AgentBricks",
+        "Agent Supervisor API"
+      ],
+      "summary": "OpenAI 发布 Databricks 案例，说明 GPT-5.5 已通过 AI Unity Gateway 面向 Databricks 客户 agent workflow 使用，并在 OfficeQA Pro 这类复杂企业文档任务上获得新的内部基准结果。",
+      "bullets": [
+        "OfficeQA Pro 聚焦 scanned PDFs、legacy files、long-context documents 中的 parsing、retrieval 和 grounded reasoning；这些场景会把早期抽取错误放大到后续 agent 决策。",
+        "OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。",
+        "Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。"
+      ]
+    },
+    {
+      "title": "GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点",
+      "event_date": "2026-05-17",
+      "url": "https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub",
+        "GitHub Copilot",
+        "GPT-5.3-Codex",
+        "Copilot Memory",
+        "Copilot Business",
+        "Copilot Enterprise"
+      ],
+      "summary": "GitHub 先前公告中的关键日期在 2026-05-17 生效：GPT-5.3-Codex 成为 Copilot Business 和 Copilot Enterprise 的 base model；同一窗口内，Copilot Memory 也开始支持 Pro 和 Pro+ 用户级偏好。",
+      "bullets": [
+        "GPT-5.3-Codex 作为首个 Copilot LTS model，会在 Business 和 Enterprise 中替代 GPT-4.1 成为尚未通过内部模型审批时的 base model，同时带 1x premium request unit multiplier。",
+        "2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。",
+        "这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。"
+      ]
+    },
+    {
+      "title": "xAI 允许 Grok 订阅直接接入 Hermes Agent",
+      "event_date": "2026-05-15",
+      "url": "https://x.ai/news/grok-hermes",
+      "source": "xAI News",
+      "tier": "T0",
+      "entities": [
+        "xAI",
+        "Grok",
+        "Hermes Agent",
+        "Nous Research",
+        "OAuth",
+        "SuperGrok"
+      ],
+      "summary": "xAI 宣布 Grok subscribers 可在 Nous Research 的开源 Hermes Agent 中登录并使用 Grok 4.3、Grok Text-to-Speech 和 Grok Imagine，接入方式是 Hermes 的 xAI Grok OAuth provider。",
+      "bullets": [
+        "官方说明该连接在每个订阅 tier 上可用；用户在 `hermes model` 中选择 xAI Grok OAuth 后，通过浏览器登录，再启动 Hermes TUI。",
+        "Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。",
+        "这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。"
+      ]
+    },
+    {
+      "title": "Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物",
+      "event_date": "2026-05-16",
+      "url": "https://pi.dev/news/releases/0.74.1",
+      "source": "Pi Release Notes",
+      "tier": "T0",
+      "entities": [
+        "Pi Coding Agent",
+        "Earendil Works",
+        "OpenRouter",
+        "Together AI",
+        "Windows ARM64",
+        "TUI"
+      ],
+      "summary": "Pi 0.74.1 release notes 显示，该 coding agent 新增图像生成 API 和模型元数据、Together AI provider、Windows ARM64 standalone binaries，并修复多项流式响应、终端渲染和会话恢复问题。",
+      "bullets": [
+        "图像生成支持来自 `@earendil-works/pi-ai`，包括 image generation APIs、image model metadata 和 built-in OpenRouter image generation support。",
+        "Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。",
+        "修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。"
+      ]
+    },
+    {
+      "title": "Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流",
+      "event_date": "2026-05-18",
+      "url": "https://www.palantir.com/docs/foundry/announcements/2026-05",
+      "source": "Palantir Foundry Announcements",
+      "tier": "T0",
+      "entities": [
+        "Palantir",
+        "Foundry",
+        "AIP Logic",
+        "Global Branching",
+        "Workflow Lineage",
+        "Ontology"
+      ],
+      "summary": "Palantir 的 2026 年 5 月公告页说明，Global Branching 从 2026-05-18 当周开始面向所有 enrollments GA，让用户在单一 branch 中跨应用修改、测试并合并 Foundry 资源。",
+      "bullets": [
+        "GA 覆盖 transforms、TypeScript v1 functions repositories、Pipeline Builder、Ontology、Workshop、AIP Logic 和 Object Views；Workflow Lineage 也已支持 Global Branching。",
+        "分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。",
+        "对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Grok-Hermes OAuth provider",
+      "description": "xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。",
+      "url": "https://x.ai/news/grok-hermes"
+    },
+    {
+      "name": "Pi Coding Agent 0.74.1",
+      "description": "Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。",
+      "url": "https://pi.dev/news/releases/0.74.1"
+    },
+    {
+      "name": "Copilot Memory user preferences",
+      "description": "GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。",
+      "url": "https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/"
+    },
+    {
+      "name": "Palantir Global Branching",
+      "description": "Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。",
+      "url": "https://www.palantir.com/docs/foundry/announcements/2026-05"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。",
+      "url": "https://github.com/supertone-inc/supertonic"
+    },
+    {
+      "content": "OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note；可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。",
+      "url": "https://github.com/tinyhumansai/openhuman"
+    },
+    {
+      "content": "K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。",
+      "url": "https://github.com/K-Dense-AI/scientific-agent-skills"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-18",
+    "main_items": 6,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "official-ai-releases: 使用 OpenAI News、OpenAI Customer Story、GitHub Changelog、xAI News、Pi Release Notes、Palantir Foundry Announcements 等一手来源",
+      "github-ai-trending: 检查 Supertonic、OpenHuman、K-Dense Scientific Agent Skills 等开源项目；缺少近 48 小时官方 release 的项目降级为社区线索",
+      "follow-builders: 读取技能约束；本轮未找到可回源且适合入选的 builder 原帖，因此 builder_observations 为空"
+    ],
+    "fallback_sources": [
+      "官方新闻页",
+      "官方 customer story",
+      "GitHub Changelog",
+      "官方 release notes",
+      "官方产品公告",
+      "GitHub repo README 仅作社区线索"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "本轮 2026-05-18 当天 T0 发布不足 5 条，先拓展官方产品页、GitHub Changelog、开源 release、云平台公告和 AI agent 工具，再扩展到 2026-05-15。主体条目均使用官方或项目一手来源，并保留真实 event_date。已在 2026-05-17 草稿覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 不重复计入主体；Supertonic、OpenHuman、K-Dense Scientific Agent Skills 因官方日期不足或发布日期超出窗口，只放入 community_leads。",
+    "optimization_suggestions": [
+      {
+        "issue": "连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。",
+        "evidence": "工作区已有 2026-05-16 和 2026-05-17 发布产物，本轮必须人工排除 2026-05-17 中的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI safety 条目。",
+        "suggested_module": "prompts/ai-daily/modules/selection-rules.md",
+        "expected_benefit": "把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。",
+        "needs_user_confirmation": true
+      },
+      {
+        "issue": "社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。",
+        "evidence": "Supertonic、OpenHuman、K-Dense Scientific Agent Skills 都有社区热度，但本轮未找到近 48 小时稳定官方 release note。",
+        "suggested_module": "prompts/ai-daily/modules/source-policy.md",
+        "expected_benefit": "要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。",
+        "needs_user_confirmation": true
+      },
+      {
+        "issue": "同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。",
+        "evidence": "OpenAI Databricks 是企业 agent workflow 与基准案例，OpenAI Malta 是国家级访问和 AI literacy 交付链路，风险面不同。",
+        "suggested_module": "prompts/ai-daily/modules/selection-rules.md",
+        "expected_benefit": "允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。",
+        "needs_user_confirmation": true
+      }
+    ]
+  },
+  "schema_version": 1,
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-18.html",
+  "html_path": "reports/2026/05/2026-05-18.html",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-18.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-18T03:08:13.972Z"
+}
