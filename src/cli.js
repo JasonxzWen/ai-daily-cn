@@ -2,7 +2,7 @@
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError, toPublishError } from "./errors.js";
-import { createPublishPlan, publishGeneratedArtifacts } from "./publish.js";
+import { checkPublishPreflight, createPublishPlan, publishGeneratedArtifacts } from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
@@ -47,6 +47,23 @@ try {
         publish_error: ""
       },
       plan
+    });
+  } else if (command === "publish:preflight") {
+    const args = parseArgs(argv);
+    const preflight = await checkPublishPreflight({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch
+    });
+    printJson({
+      ok: true,
+      publish_status: {
+        html_generated: false,
+        repo_updated: false,
+        repo_pushed: false,
+        pages_url: "",
+        publish_error: ""
+      },
+      preflight
     });
   } else if (command === "prompt:build") {
     const args = parseArgs(argv);

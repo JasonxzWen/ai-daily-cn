@@ -12,6 +12,7 @@
     "test:e2e": "node scripts/run-e2e.mjs",
     "validate:openspec": "node scripts/validate-openspec.mjs add-ai-daily-static-publishing",
     "validate": "npm run test && npm run build && npm run test:e2e && npm run validate:openspec && git diff --check",
+    "publish:preflight": "node src/cli.js publish:preflight",
     "publish:dry-run": "node src/cli.js publish:dry-run --data-input reports-data --input reports-source --out docs",
     "publish": "node src/cli.js publish"
   },

@@ -5,7 +5,13 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
-import { createPublishPlan, parsePorcelain, publishGeneratedArtifacts, verifyPublishedUrl } from "../src/publish.js";
+import {
+  checkPublishPreflight,
+  createPublishPlan,
+  parsePorcelain,
+  publishGeneratedArtifacts,
+  verifyPublishedUrl
+} from "../src/publish.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -83,6 +89,29 @@ test("publish dry-run 遇到 remote ahead 停止", async () => {
       git: fakeGit({ remoteAhead: 1 })
     }),
     (error) => error instanceof PublisherError && error.code === "remote_ahead"
+  );
+});
+
+test("publish preflight 检查分支、远端、工作树和 git 写权限", async () => {
+  const result = await checkPublishPreflight({
+    git: fakeGit({ status: " M docs/index.html" }),
+    gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
+  });
+
+  assert.equal(result.mode, "preflight");
+  assert.equal(result.git_writable, true);
+  assert.deepEqual(result.current_dirty_files, ["docs/index.html"]);
+});
+
+test("publish preflight 在 git 元数据不可写时停止", async () => {
+  await assert.rejects(
+    checkPublishPreflight({
+      git: fakeGit({ status: " M docs/index.html" }),
+      gitWritableCheck: async () => {
+        throw new PublisherError("git_not_writable", "当前环境不能写入 Git 元数据目录，真实发布无法创建 index.lock。");
+      }
+    }),
+    (error) => error instanceof PublisherError && error.code === "git_not_writable"
   );
 });
 
