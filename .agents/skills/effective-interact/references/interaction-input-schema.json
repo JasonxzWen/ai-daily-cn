@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-hub.local/effective-interact/interaction-input-schema.json",
+  "title": "Effective Interact Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "summary", "status", "sections"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["complete", "ready", "blocked", "review", "draft"]
+    },
+    "generatedAt": {
+      "type": "string",
+      "description": "ISO-8601 timestamp. The generator fills this when omitted."
+    },
+    "template": {
+      "type": "string",
+      "enum": ["implementation-handoff", "conclusion-dashboard", "review-findings", "research-explainer", "decision-matrix"],
+      "default": "implementation-handoff"
+    },
+    "renderMode": {
+      "type": "string",
+      "enum": ["runtime-cdn", "pre-rendered", "fallback-only", "runtime"],
+      "default": "runtime-cdn",
+      "description": "`runtime` is a legacy alias accepted by the generator and normalized to `runtime-cdn`."
+    },
+    "showRuntimeDependencies": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, expose the runtime dependency manifest as a visible report section. The manifest remains machine-readable but hidden by default."
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional reader intent metadata used to keep reports conclusion-first.",
+      "properties": {
+        "audience": { "type": "string" },
+        "primaryQuestion": { "type": "string" },
+        "decision": { "type": "string" },
+        "timeBudget": { "type": "string" },
+        "artifactKind": {
+          "type": "string",
+          "enum": ["handoff", "review", "status", "research", "decision", "explainer", "editor"]
+        },
+        "successCriteria": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["type", "title"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "summary-cards",
+              "data-table",
+              "markdown",
+              "mermaid",
+              "code",
+              "diff",
+              "timeline",
+              "evidence",
+              "decision-matrix",
+              "actions",
+              "tabs",
+              "filterable-cards",
+              "chart"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string",
+            "description": "Optional content-first navigation group such as summary, main, changes, impact, risks, verification, next, details, or a custom short label."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Optional group-local sort hint. Lower values appear first."
+          },
+          "summary": {
+            "type": "string",
+            "description": "Optional one-line section summary used in grouped navigation or section headers."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ready", "warn", "failed", "info", "pending", "degraded", "complete", "review", "blocked", "draft"]
+          },
+          "richId": {
+            "type": "string",
+            "description": "Optional stable id for runtime-rendered rich content."
+          },
+          "trustLevel": {
+            "type": "string",
+            "enum": ["trusted-generated", "mixed-trust", "untrusted"],
+            "description": "Trust level used by the generator and validator to choose escaping and sanitization boundaries."
+          },
+          "content": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "sourceHref": {
+            "type": "string"
+          },
+          "startLine": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "endLine": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "highlightLines": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "columns": {
+            "type": "array",
+            "description": "Columns for data-table sections. Items may be strings or objects with key, label, and optional align.",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["label"],
+                  "properties": {
+                    "key": { "type": "string" },
+                    "label": { "type": "string" },
+                    "align": { "type": "string", "enum": ["left", "center", "right"] },
+                    "width": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          },
+          "rows": {
+            "type": "array",
+            "description": "Rows for data-table sections. Items may be arrays or objects keyed by column key.",
+            "items": {
+              "oneOf": [
+                { "type": "array" },
+                { "type": "object" }
+              ]
+            }
+          },
+          "caption": {
+            "type": "string",
+            "description": "Optional short caption shown above a data-table section."
+          },
+          "chart": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["type", "title", "takeaway", "data", "encoding", "source", "altText", "tableFallback"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["bar", "line", "sparkline", "bullet", "slope", "matrix"]
+              },
+              "title": { "type": "string" },
+              "takeaway": { "type": "string" },
+              "data": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "encoding": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string" },
+                  "url": { "type": "string" },
+                  "accessedAt": { "type": "string" }
+                }
+              },
+              "altText": { "type": "string" },
+              "tableFallback": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        { "type": "string" },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["label"],
+                          "properties": {
+                            "key": { "type": "string" },
+                            "label": { "type": "string" },
+                            "align": { "type": "string", "enum": ["left", "center", "right"] },
+                            "width": { "type": "string" }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "rows": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        { "type": "array" },
+                        { "type": "object" }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "statement": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["conclusion", "risk", "metric", "trend", "recommendation", "assumption"]
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "confidence": {
+            "oneOf": [
+              { "type": "string", "enum": ["high", "medium", "low", "unknown"] },
+              { "type": "number", "minimum": 0, "maximum": 1 }
+            ]
+          },
+          "dateRange": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": { "type": "string" },
+                  "end": { "type": "string" }
+                }
+              }
+            ]
+          },
+          "knownLimits": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "label"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["file", "command", "source", "assumption", "verification"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warn", "fail", "info", "not-run"]
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "sourceTitle": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string"
+          },
+          "accessedAt": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "extractDate": {
+            "type": "string"
+          },
+          "dateRange": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": { "type": "string" },
+                  "end": { "type": "string" }
+                }
+              }
+            ]
+          },
+          "knownLimits": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "trustLevel": {
+            "type": "string",
+            "enum": ["trusted-generated", "mixed-trust", "untrusted"]
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "status"],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warn", "fail", "not-run"]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nextActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

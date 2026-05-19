@@ -1,0 +1,45 @@
+{
+  "title": "HTML 汇报工作流修正",
+  "summary": "问题不是少几个样式补丁，而是默认工作流把组件当成了报告质量；现在已改为内容优先、中文优先、组件可选。",
+  "status": "complete",
+  "template": "implementation-handoff",
+  "renderMode": "runtime-cdn",
+  "generatedAt": "2026-05-14T00:00:00.000+08:00",
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "结论",
+      "group": "summary",
+      "status": "ready",
+      "content": "- 默认报告只保留读者需要的内容，不再强制展示代码、Mermaid、证据、验证、下一步或运行时依赖。\n- 目录按汇报问题分组，而不是按组件能力分组。\n- UTF-8 中文和乱码检查进入生成器、校验器和回归测试。"
+    },
+    {
+      "type": "markdown",
+      "title": "已修复",
+      "group": "changes",
+      "status": "ready",
+      "content": "- `evidence` 从必填改为可选；空的证据、验证、下一步不会生成板块。\n- 运行时依赖清单默认隐藏，只保留机器可验证数据。\n- 目录取消自动补“图表/代码/证据/验证/下一步”，只展示真实内容。\n- 校验器改成按需检查可选模块，避免逼迫报告堆组件。\n- 新增简洁中文报告测试，防止后续回退。"
+    },
+    {
+      "type": "markdown",
+      "title": "为什么会出现",
+      "group": "details",
+      "status": "ready",
+      "content": "- 我把富渲染能力当成了默认交付目标，导致内容被组件噪音稀释。\n- 旧 schema 把 evidence 设为必填，生成器又无条件追加验证和行动区，目录自然会堆叠。\n- 验证标准偏向“组件存在”，没有约束“组件是否服务内容”。"
+    },
+    {
+      "type": "markdown",
+      "title": "新规则",
+      "group": "details",
+      "status": "ready",
+      "content": "- 先写一句话结论，再决定是否需要结构化展开。\n- 代码、图表、证据、图标、状态标签都是可选工具，不是质量证明。\n- 能一句话讲完的事情不拆成两句；能用三个短点讲清的内容不堆成长段。"
+    },
+    {
+      "type": "markdown",
+      "title": "验证",
+      "group": "verification",
+      "status": "ready",
+      "content": "- `bun test ./tests/effectiveInteractSkill.test.ts` 已通过。\n- `openspec validate polish-effective-interact-runtime-quality` 已通过。\n- 源文件乱码哨兵检查已通过：未发现连续半角问号或替换字符。"
+    }
+  ]
+}

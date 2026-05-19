@@ -1,0 +1,82 @@
+/* Use case: runtime-rendered Markdown, Mermaid, and highlighted code in Effective reports. */
+.rendered-markdown {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+}
+
+.rendered-markdown > * + * {
+  margin-top: 8px;
+}
+
+.rendered-markdown h1,
+.rendered-markdown h2,
+.rendered-markdown h3 {
+  margin: 0;
+  line-height: 1.14;
+}
+
+.rendered-markdown p {
+  margin: 0;
+}
+
+.rendered-markdown ul,
+.rendered-markdown ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.rendered-markdown table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  overflow: auto;
+  border: 1px solid var(--line, #d0d7e2);
+  border-radius: 8px;
+}
+
+.rendered-markdown th,
+.rendered-markdown td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line, #d0d7e2);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.rendered-markdown th {
+  background: #eef4ff;
+  color: #111827;
+  font-weight: 700;
+}
+
+.rich-target[data-rich-markdown] {
+  min-height: 48px;
+}
+
+.rich-toolbar {
+  margin-bottom: 8px;
+}
+
+.rich-status {
+  font-size: 12px;
+}
+
+.mermaid-rendered[data-render-state="ready"] {
+  min-height: 0;
+}
+
+.mermaid-rendered[data-render-state="failed"],
+.mermaid-rendered[data-render-state="degraded"] {
+  display: grid;
+  place-items: center;
+  color: var(--warn, #a15c07);
+  font-weight: 650;
+}
+
+.hljs {
+  display: block;
+  border-radius: 8px;
+}

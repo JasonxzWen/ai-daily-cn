@@ -1,0 +1,136 @@
+{
+  "title": "Option gallery decision brief",
+  "summary": "**Compare-first conclusion:** use the generated report path unless the choice needs a custom disposable editor.",
+  "status": "review",
+  "template": "decision-matrix",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-18T00:00:00.000Z",
+  "intent": {
+    "audience": "Skill maintainer",
+    "primaryQuestion": "Which HTML artifact shape should the next agent choose?",
+    "decision": "Start with an option gallery when the user is choosing between alternatives.",
+    "timeBudget": "2m",
+    "artifactKind": "decision",
+    "successCriteria": [
+      "Options are visible side-by-side.",
+      "The recommendation appears before details.",
+      "The chosen path can be copied as a next action."
+    ]
+  },
+  "claims": [
+    {
+      "id": "claim-option-gallery",
+      "statement": "Option gallery reports lower decision cost when the unresolved work is choosing between alternatives.",
+      "kind": "recommendation",
+      "evidenceIds": ["evidence-html-effectiveness"],
+      "confidence": "high",
+      "dateRange": "2026-05-18",
+      "knownLimits": [
+        "Use a concise Markdown answer instead when there is only one obvious path."
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "type": "decision-matrix",
+      "title": "Option gallery",
+      "group": "decision",
+      "status": "review",
+      "summary": "Compare alternatives in one reading plane before implementation starts.",
+      "options": [
+        {
+          "name": "Generated decision matrix",
+          "status": "recommended",
+          "points": [
+            "Best for implementation approaches, rollout options, and planning choices.",
+            "Keeps recommendation, tradeoffs, assumptions, and next action in one file.",
+            "Uses existing generator and validator without custom HTML."
+          ]
+        },
+        {
+          "name": "Research explainer",
+          "status": "conditional",
+          "points": [
+            "Best when the reader first needs background, citations, or a module map.",
+            "Add tabs, glossary, and diagrams only when they shorten understanding.",
+            "Avoid it when the decision is already clear."
+          ]
+        },
+        {
+          "name": "Disposable export editor",
+          "status": "conditional",
+          "points": [
+            "Best when the user needs to sort, tune, or toggle a small decision surface.",
+            "Must export Markdown, JSON, or diff as visible text.",
+            "Must not write files, call network APIs, or persist secrets."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "Selection rules",
+      "group": "decision",
+      "status": "ready",
+      "summary": "Use the smallest artifact that performs the needed HTML-only job.",
+      "columns": [
+        { "key": "signal", "label": "Signal" },
+        { "key": "shape", "label": "Shape" },
+        { "key": "guardrail", "label": "Guardrail" }
+      ],
+      "rows": [
+        {
+          "signal": "Multiple viable options",
+          "shape": "side-by-side option gallery",
+          "guardrail": "Top recommendation first"
+        },
+        {
+          "signal": "Call path or architecture",
+          "shape": "module-map or flow-drilldown",
+          "guardrail": "Source anchors required"
+        },
+        {
+          "signal": "Small user choice surface",
+          "shape": "disposable export editor",
+          "guardrail": "Visible export only"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "title": "Next action",
+      "group": "next",
+      "status": "ready",
+      "items": [
+        "Choose `option-gallery` when unresolved work is comparing alternatives.",
+        "Choose `module-map` or `flow-drilldown` when structure is the hard part.",
+        "Choose `disposable-export-editor` only when a local export tightens the user loop."
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-html-effectiveness",
+      "kind": "source",
+      "label": "HTML effectiveness gallery",
+      "value": "20 self-contained HTML examples grouped by work type",
+      "status": "info",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/",
+      "sourceTitle": "The unreasonable effectiveness of HTML",
+      "sourceType": "web",
+      "accessedAt": "2026-05-18",
+      "trustLevel": "mixed-trust"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Fixture scope",
+      "status": "pass",
+      "detail": "Exercises existing decision-matrix, data-table, actions, claims, and source evidence paths."
+    }
+  ],
+  "nextActions": [
+    "Generate this fixture through create-interaction.mjs.",
+    "Validate the generated HTML with validate-interaction.mjs."
+  ]
+}
