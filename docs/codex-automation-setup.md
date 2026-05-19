@@ -29,9 +29,9 @@
 1. 计算今天的 `YYYY-MM-DD` 日期。
 2. 运行 `npm run publish:preflight`；如果当前分支、远端状态、非发布产物脏改动或 `.git` 写权限检查失败，立即报告 `publish_error` 并停止，不要先生成本地日报产物。
 3. 运行 `npm run prompt:build -- YYYY-MM-DD`，把输出作为本次日报生成与发布的完整工作契约。
-4. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目和工程工具动态；优先一手来源。主体信息不足时先拓展信源覆盖，再从 24h 扩展到 48h；48h 仍不足时，才允许补入最近 5 天内高信号开源 release 或官方研究/产品更新，并在 `source_window` 和 self_check notes 里记录，不要把日报长期滚成周报。
+4. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目、工程工具动态和高质量工程博客；优先一手来源。模型发布优先写入 `model_releases`，热门技术博客写入 `hot_blogs`，只有重大工程影响才同时进入 `main_items`。主体信息不足时先拓展信源覆盖，再从 24h 扩展到 48h；48h 仍不足时，才允许补入最近 5 天内高信号开源 release 或官方研究/产品更新，并在 `source_window` 和 self_check notes 里记录，不要把日报长期滚成周报。
 5. 同一厂商同日或同一 48h 窗口内的多条小更新默认合并成一条厂商动态；官方 docs 没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息，只作为社区线索并标记待验证。
-6. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`self_check`；没有项目、Builder 观察或社区线索时使用空数组。
+6. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`model_releases`、`hot_blogs`、`self_check`；没有模型发布、热门技术博客、项目、Builder 观察或社区线索时使用空数组。
 7. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
 8. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。HTML 页面必须展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
 9. 运行 `npm run validate`。

@@ -17,6 +17,22 @@ export function renderReportHtml(report) {
   const paths = reportRelativePaths(report.report_date);
   const jsonHref = relativeAssetHref(report.html_path, paths.dataPath);
   const markdownHref = report.markdown_path ? relativeAssetHref(report.html_path, report.markdown_path) : "";
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
+  const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
+  const projects = Array.isArray(report.projects) ? report.projects : [];
+  const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
+  const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const metaItems = [
+    `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
+    modelReleases.length > 0 ? `<span><strong>${modelReleases.length}</strong> 模型发布</span>` : "",
+    hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技术博客</span>` : "",
+    `<span><strong>${builderObservations.length}</strong> Builder 观察</span>`,
+    `<span><strong>${communityLeads.length}</strong> 社区线索</span>`
+  ]
+    .filter(Boolean)
+    .join("\n        ");
+  const optionalSections = [renderModelReleasesSection(modelReleases), renderHotBlogsSection(hotBlogs)].filter(Boolean).join("\n\n");
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -39,30 +55,28 @@ ${defaultStyleCss}
       <h1>${escapeHtml(report.title)}</h1>
       <p class="summary">${escapeHtml(report.summary)}</p>
       <div class="meta-grid" aria-label="日报统计">
-        <span><strong>${report.main_items.length}</strong> 主体信息</span>
-        <span><strong>${report.builder_observations.length}</strong> Builder 观察</span>
-        <span><strong>${report.community_leads.length}</strong> 社区线索</span>
+        ${metaItems}
       </div>
     </section>
 
     <section class="section" id="main-items">
       <h2>主体信息</h2>
-      ${report.main_items.map(renderMainItem).join("\n")}
+      ${mainItems.map(renderMainItem).join("\n")}
     </section>
-
+${optionalSections ? `\n    ${optionalSections}\n` : ""}
     <section class="section" id="projects">
       <h2>今日值得关注的项目</h2>
-      ${renderProjects(report.projects)}
+      ${renderProjects(projects)}
     </section>
 
     <section class="section" id="builder-observations">
       <h2>Builder 观察</h2>
-      ${renderBuilderObservations(report.builder_observations)}
+      ${renderBuilderObservations(builderObservations)}
     </section>
 
     <section class="section" id="community-leads">
       <h2>社区线索</h2>
-      ${renderCommunityLeads(report.community_leads)}
+      ${renderCommunityLeads(communityLeads)}
     </section>
 
     <section class="section" id="self-check">
@@ -363,6 +377,67 @@ function renderMainItem(item) {
   </ul>
   <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
 </article>`;
+}
+
+function renderModelReleasesSection(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="model-releases">
+      <h2>模型发布</h2>
+      ${items.map(renderModelRelease).join("\n")}
+    </section>`;
+}
+
+function renderModelRelease(item) {
+  return `<article class="item">
+  <h3>${escapeHtml(item.name)}</h3>
+  <div class="item-meta">
+    <span>${escapeHtml(item.event_date)}</span>
+    <span>${escapeHtml(item.provider)}</span>
+    <span>${escapeHtml(renderAvailability(item.availability))}</span>
+  </div>
+  <p>${escapeHtml(item.summary)}</p>
+  ${item.notes ? `<p class="muted">${escapeHtml(item.notes)}</p>` : ""}
+  <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
+</article>`;
+}
+
+function renderHotBlogsSection(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="hot-blogs">
+      <h2>热门技术博客</h2>
+      ${items.map(renderHotBlog).join("\n")}
+    </section>`;
+}
+
+function renderHotBlog(item) {
+  return `<article class="item">
+  <h3>${externalLink(item.url, item.title)}</h3>
+  <div class="item-meta">
+    <span>${escapeHtml(item.event_date)}</span>
+    <span>${escapeHtml(item.publisher)}</span>
+    <span>${escapeHtml(item.author)}</span>
+    <span>${escapeHtml(item.topic)}</span>
+  </div>
+  <p>${escapeHtml(item.summary)}</p>
+  <p><strong>为什么重要：</strong>${escapeHtml(item.why_it_matters)}</p>
+</article>`;
+}
+
+function renderAvailability(value) {
+  const labels = {
+    open_weights: "开源权重",
+    closed_api: "闭源 API",
+    closed_product: "产品内可用",
+    research_preview: "研究预览"
+  };
+  const label = labels[value];
+  return label ? `${label} (${value})` : value;
 }
 
 function renderProjects(projects) {

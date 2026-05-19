@@ -9,22 +9,24 @@
 本仓库负责中文 AI 日报的结构化数据、静态 HTML 渲染、GitHub Pages 发布产物和本地发布安全门。
 
 - 生产日报页面由 `src/render.js`、`src/site.js` 和 `docs/` 产物链生成。
-- 工作汇报、实现交接、评审结论、研究说明和状态看板使用 `.agents/skills/html-work-reports`。
-- 不要把工作汇报技能混入每日公开日报模板，除非任务明确要求升级生产页面能力。
+- 工作汇报、实现交接、评审结论、研究说明、状态看板和中间对齐材料使用 `.agents/skills/effective-interact`。
+- 不要把交互报告技能混入每日公开日报模板，除非任务明确要求升级生产页面能力。
 - 不要自动 commit、push、改远端 Pages 设置或修改自动化配置，除非用户明确授权。
 
-## HTML 工作汇报技能
+## Effective Interact 交互报告技能
 
-当一个非平凡任务已经完成，并且需要交付可浏览的结论、证据、文件行号、验证结果、风险或后续动作时，优先使用本地技能：
+当一个非平凡任务需要交付可浏览的结论、证据、文件行号、验证结果、风险、后续动作、选项比较、架构说明或状态看板时，优先使用本地技能：
 
 ```powershell
-node .agents/skills/html-work-reports/scripts/create-report.mjs --input <report.json> --out-dir reports --slug <name> --json
-node .agents/skills/html-work-reports/scripts/validate-html-report.mjs reports/<name>.html --json
+node .agents/skills/effective-interact/scripts/create-interaction.mjs --input <interaction.json> --slug <name> --json
+node .agents/skills/effective-interact/scripts/validate-interaction.mjs <outputPath> --json
 ```
 
-默认使用 `pre-rendered` 模式，保持单文件 HTML 的主要阅读内容自包含。只有明确需要运行时编辑、源码切换或动态渲染时，才使用 `runtime` 模式。
+默认把临时交互报告写入被忽略的 `.agents/skills/effective-interact/artifacts/`。只有需要长期保留的仓库示例，才显式使用 `--out-dir reports`。
 
-代码相关汇报必须包含文件路径、行号、最小必要代码片段和验证命令。涉及架构、流程或数据流时，优先加入 Mermaid 或等价的可审计图示。
+默认使用 skill 推荐的模式。需要 Mermaid、Markdown、代码高亮等富内容真实运行时渲染时，使用 `runtime-cdn` 并运行 `validate-interaction.mjs --require-browser`；需要完全离线自包含且可以接受静态 fallback 时，才使用 `pre-rendered`。
+
+代码相关交互报告必须包含文件路径、行号、最小必要代码片段和验证命令。涉及架构、流程或数据流时，优先加入 Mermaid 或等价的可审计图示。
 
 ## 验证门
 
@@ -34,4 +36,4 @@ node .agents/skills/html-work-reports/scripts/validate-html-report.mjs reports/<
 npm run validate
 ```
 
-如果只改动 `.agents/skills/html-work-reports`，还要确认技能 smoke 测试通过；该测试已包含在 `npm test` 中。
+如果只改动 `.agents/skills/effective-interact`，还要确认技能 smoke 测试通过；该测试已包含在 `npm test` 中。

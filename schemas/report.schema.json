@@ -75,6 +75,20 @@
       },
       "default": []
     },
+    "model_releases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/model_release"
+      },
+      "default": []
+    },
+    "hot_blogs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hot_blog"
+      },
+      "default": []
+    },
     "projects": {
       "type": "array",
       "items": {
@@ -168,6 +182,98 @@
             "minLength": 1
           },
           "default": []
+        }
+      }
+    },
+    "model_release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "provider",
+        "availability",
+        "event_date",
+        "url",
+        "source",
+        "summary",
+        "notes"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "availability": {
+          "enum": ["open_weights", "closed_api", "closed_product", "research_preview"]
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "hot_blog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url",
+        "publisher",
+        "author",
+        "event_date",
+        "topic",
+        "summary",
+        "why_it_matters"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_it_matters": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
