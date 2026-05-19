@@ -9,48 +9,48 @@ import test from "node:test";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
-const skillDir = path.join(rootDir, ".agents", "skills", "html-work-reports");
+const skillDir = path.join(rootDir, ".agents", "skills", "effective-interact");
 const skillPath = path.join(skillDir, "SKILL.md");
-const createReportScript = path.join(skillDir, "scripts", "create-report.mjs");
-const validateReportScript = path.join(skillDir, "scripts", "validate-html-report.mjs");
+const createReportScript = path.join(skillDir, "scripts", "create-interaction.mjs");
+const validateReportScript = path.join(skillDir, "scripts", "validate-interaction.mjs");
 
-test("repo has Chinese agent instructions and html-work-reports routing", async () => {
+test("repo has Chinese agent instructions and effective-interact routing", async () => {
   const agents = await fsp.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
 
   assert.match(agents, /始终使用中文回复用户/);
-  assert.match(agents, /\.agents\/skills\/html-work-reports/);
+  assert.match(agents, /\.agents\/skills\/effective-interact/);
   assert.match(agents, /npm run validate/);
 });
 
-test("html-work-reports skill is installed with generator, validator, schema, and templates", async () => {
+test("effective-interact skill is installed with generator, validator, schema, and templates", async () => {
   const skill = await fsp.readFile(skillPath, "utf8");
   const requiredFiles = [
     createReportScript,
     validateReportScript,
-    path.join(skillDir, "references", "report-input-schema.json"),
-    path.join(skillDir, "references", "html-report-patterns.md"),
+    path.join(skillDir, "references", "interaction-input-schema.json"),
+    path.join(skillDir, "references", "interaction-patterns.md"),
     path.join(skillDir, "assets", "templates", "implementation-handoff.html"),
     path.join(skillDir, "assets", "templates", "review-findings.html"),
-    path.join(skillDir, "assets", "components", "report-ui.css"),
-    path.join(skillDir, "assets", "components", "report-ui.js"),
+    path.join(skillDir, "assets", "components", "interaction-ui.css"),
+    path.join(skillDir, "assets", "components", "interaction-ui.js"),
     path.join(skillDir, "assets", "fixtures", "pre-rendered-report.json")
   ];
 
-  assert.match(skill, /self-contained HTML report/);
+  assert.match(skill, /Chinese `\.html`/);
   assert.match(skill, /source file link/);
-  assert.match(skill, /validate-html-report\.mjs/);
+  assert.match(skill, /validate-interaction\.mjs/);
 
   for (const file of requiredFiles) {
     assert.equal(fs.existsSync(file), true, `${file} should exist`);
   }
 
-  const schema = JSON.parse(await fsp.readFile(path.join(skillDir, "references", "report-input-schema.json"), "utf8"));
-  assert.deepEqual(schema.required, ["title", "summary", "status", "sections", "evidence"]);
+  const schema = JSON.parse(await fsp.readFile(path.join(skillDir, "references", "interaction-input-schema.json"), "utf8"));
+  assert.deepEqual(schema.required, ["title", "summary", "status", "sections"]);
   assert(schema.properties.sections.items.properties.type.enum.includes("diff"));
 });
 
-test("html-work-reports generator creates a validated self-contained report", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-html-work-report-"));
+test("effective-interact generator creates a validated self-contained interaction report", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-"));
   const fixture = path.join(skillDir, "assets", "fixtures", "pre-rendered-report.json");
 
   const generated = spawnSync(
@@ -62,7 +62,7 @@ test("html-work-reports generator creates a validated self-contained report", as
 
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /data-html-work-report/);
+  assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
   assert.match(html, /data-section-type="diff"/);
   assert.doesNotMatch(html, /https:\/\/cdn\.jsdelivr\.net/);
@@ -76,5 +76,4 @@ test("html-work-reports generator creates a validated self-contained report", as
   const result = JSON.parse(validation.stdout);
   assert.equal(result.ok, true);
   assert(result.checks.includes("source-linked-code-evidence"));
-  assert.equal(result.browser.status, "degraded");
 });

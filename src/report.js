@@ -49,6 +49,8 @@ export function normalizeReportDraft(draft, options = {}) {
       fallback_window_used: false,
       notes: ""
     },
+    model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
+    hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
     projects: Array.isArray(draft.projects) ? draft.projects : [],
     builder_observations: Array.isArray(draft.builder_observations) ? draft.builder_observations : [],
     community_leads: Array.isArray(draft.community_leads) ? draft.community_leads : [],

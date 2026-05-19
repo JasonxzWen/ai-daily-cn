@@ -13,16 +13,23 @@ const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 
 const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-e2e-"));
 const inputDir = path.join(tmp, "reports-source");
+const dataInputDir = path.join(tmp, "reports-data");
 const outDir = path.join(tmp, "docs");
 await fs.mkdir(inputDir, { recursive: true });
+await fs.mkdir(dataInputDir, { recursive: true });
 await fs.copyFile(
   path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
   path.join(inputDir, "official-release.md")
+);
+await fs.copyFile(
+  path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"),
+  path.join(dataInputDir, "structured-report.json")
 );
 
 await buildSite({
   rootDir: tmp,
   inputDir,
+  dataInputDir,
   outDir,
   generatedAt: fixedGeneratedAt
 });
@@ -44,6 +51,13 @@ try {
   assert.deepEqual(artifactHrefs.sort(), ["../../../data/2026/05/2026-05-13.json", "./2026-05-13.md"].sort());
   assert.equal(await page.locator("link[rel='stylesheet']").count(), 0);
   assert.equal(await page.locator("style").count(), 1);
+  assert.equal(await allExternalLinksHaveRel(page), true);
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  assert.equal(await page.locator("#model-releases").count(), 1);
+  assert.match(await page.locator("#model-releases").textContent(), /ExampleModel 2/);
+  assert.equal(await page.locator("#hot-blogs").count(), 1);
+  assert.match(await page.locator("#hot-blogs").textContent(), /Harness Engineering for Long Running Agents/);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.setViewportSize({ width: 375, height: 812 });

@@ -245,9 +245,10 @@ h3 {
     <section class="report-hero">
       <p class="eyebrow">每日 AI 技术观察</p>
       <h1>AI 日报 2026-05-19</h1>
-      <p class="summary">今天同日可回源的 AI 产品与工程发布不足 5 条，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-18。入选主体集中在企业 agent 部署、代码 agent 操作面、技能系统、文档解析和 agentic analytics：OpenAI 与 Dell 把 Codex 推向混合和本地企业环境，GitHub Copilot 在 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制，xAI 推出 Grok Skills，PaddleOCR 3.5 接入 Hugging Face Transformers 后端，Sigma 发布面向 AI coding agents 的数据建模能力，Zignal AI 把公开信息处理成可供 agent workflow 消费的结构化情报。</p>
+      <p class="summary">今天同日可回源的 AI 产品与工程发布不足 5 条，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-18。主体信息保留 5 条真正改变工程工作流的产品和平台动态：OpenAI 与 Dell 把 Codex 推向混合和本地企业环境，GitHub Copilot 集中增强 cloud agent、Spaces 和远程会话控制，xAI 推出 Grok Skills，Sigma 发布面向 AI coding agents 的数据建模能力，Zignal AI 把公开信息处理成可供 agent workflow 消费的结构化情报。PaddleOCR 3.5 的 Hugging Face 工程文章单列到热门技术博客，不再计入主体条目。</p>
       <div class="meta-grid" aria-label="日报统计">
-        <span><strong>6</strong> 主体信息</span>
+        <span><strong>5</strong> 主体信息</span>
+        <span><strong>1</strong> 技术博客</span>
         <span><strong>0</strong> Builder 观察</span>
         <span><strong>2</strong> 社区线索</span>
       </div>
@@ -286,16 +287,6 @@ h3 {
   <p class="source-line">来源：<a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer">xAI News</a></p>
 </article>
 <article class="item">
-  <h3>PaddleOCR 3.5 在 Hugging Face 发布 Transformers 推理后端</h3>
-  <div class="item-meta"><span>2026-05-18</span><span>T1</span><span>PaddleOCR</span><span>PaddlePaddle</span><span>Hugging Face</span><span>Transformers</span><span>Document AI</span><span>RAG</span></div>
-  <ul>
-    <li>新后端通过 `engine=&quot;transformers&quot;` 接入，面向 PP-OCRv5、PaddleOCR-VL 1.5 等 OCR 与文档解析能力提供更贴近 Hugging Face 生态的运行方式。</li>
-<li>文章强调 Document AI、RAG 和文档 agent 的前置难点是把 PDF、扫描件、截图、表格、图表和公式转成可靠结构化数据。</li>
-<li>对工程团队来说，这是 ingestion 层的实际更新：如果文档解析不稳，下游 LLM 检索、引用和 agent 决策都会被早期抽取错误放大。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers" target="_blank" rel="noopener noreferrer">Hugging Face Blog / PaddlePaddle Team Article</a></p>
-</article>
-<article class="item">
   <h3>Sigma 发布面向 AI coding agents 的数据建模能力</h3>
   <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>Sigma</span><span>Data Modeling Skills for AI Agents</span><span>OpenAI Codex</span><span>Claude Code</span><span>Cursor</span><span>Snowflake Cortex Code</span></div>
   <ul>
@@ -314,6 +305,21 @@ h3 {
 <li>这代表 agent 系统的一个现实约束：很多高风险场景需要上游信息形成层先做过滤、富集、验证和结构化，不能让 agent 直接吞原始噪声。</li>
   </ul>
   <p class="source-line">来源：<a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer">Zignal Labs / GlobeNewswire Press Release</a></p>
+</article>
+    </section>
+
+    <section class="section" id="hot-blogs">
+      <h2>热门技术博客</h2>
+      <article class="item">
+  <h3><a href="https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers" target="_blank" rel="noopener noreferrer">PaddleOCR 3.5 在 Hugging Face 发布 Transformers 推理后端</a></h3>
+  <div class="item-meta">
+    <span>2026-05-18</span>
+    <span>Hugging Face Blog / PaddlePaddle Team</span>
+    <span>PaddlePaddle Team</span>
+    <span>Document AI / OCR / Transformers backend</span>
+  </div>
+  <p>PaddlePaddle 团队说明 PaddleOCR 3.5 的 OCR 与文档解析模型现在可以通过 Hugging Face Transformers 后端运行。</p>
+  <p><strong>为什么重要：</strong>这篇文章更像工程实现说明而不是综合新闻：它直接影响 Document AI、RAG ingestion 和文档 agent 的前置解析链路，因此单列为热门技术博客。</p>
 </article>
     </section>
 
@@ -345,13 +351,13 @@ h3 {
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
-        <div><dt>主条目</dt><dd>6</dd></div>
+        <div><dt>主条目</dt><dd>5</dd></div>
         <div><dt>Builder</dt><dd>0</dd></div>
         <div><dt>一手链接</dt><dd>通过</dd></div>
         <div><dt>无禁用表达</dt><dd>通过</dd></div>
         <div><dt>无无源数字</dt><dd>通过</dd></div>
       </dl>
-      <p>2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。</p>
+      <p>2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。PaddleOCR 3.5 Hugging Face 文章从主体条目迁移到 hot_blogs，避免热门工程博客挤占 main_items。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。</p>
       <section class="suggestions" aria-label="提示词或规则迭代建议">
   <h3>提示词与规则迭代建议</h3>
   <ol class="compact-list"><li>

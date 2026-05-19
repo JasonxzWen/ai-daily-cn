@@ -68,6 +68,49 @@ test("schema 能校验日期、URL 和 required fields", async () => {
   assert(validation.errors.length >= 3);
 });
 
+test("schema 支持模型发布和热门技术博客，并为旧日报默认空数组", async () => {
+  const markdown = await readFixture("reports/good/official-release.md");
+  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
+
+  assert.deepEqual(report.model_releases, []);
+  assert.deepEqual(report.hot_blogs, []);
+
+  const enriched = structuredClone(report);
+  enriched.model_releases = [
+    {
+      name: "ExampleModel 2",
+      provider: "Example AI",
+      availability: "open_weights",
+      event_date: "2026-05-13",
+      url: "https://example.com/model/examplemodel-2",
+      source: "Example AI Model Card",
+      summary: "ExampleModel 2 发布开放权重。",
+      notes: "fixture: 模型发布独立追踪。"
+    }
+  ];
+  enriched.hot_blogs = [
+    {
+      title: "Harness Engineering for Long Running Agents",
+      url: "https://example.com/blog/harness-engineering",
+      publisher: "Example Engineering",
+      author: "Example Author",
+      event_date: "2026-05-13",
+      topic: "agent harness",
+      summary: "该博客说明长任务 agent harness 的工程设计。",
+      why_it_matters: "它是工程实践读物，不应计入主体信息数量。"
+    }
+  ];
+
+  const validation = validateReport(enriched);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const invalid = structuredClone(enriched);
+  invalid.model_releases[0].availability = "unknown";
+  const invalidValidation = validateReport(invalid);
+  assert.equal(invalidValidation.valid, false);
+  assert(invalidValidation.errors.some((error) => error.path.includes("/model_releases/0/availability")));
+});
+
 test("feed 按日期幂等更新并倒序排序", async () => {
   const markdown = await readFixture("reports/good/official-release.md");
   const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
@@ -175,6 +218,23 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(html.includes("需要确认"));
 });
 
+test("HTML 渲染会展示模型发布和热门技术博客", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const html = renderReportHtml(validation.value);
+
+  assert(html.includes('id="model-releases"'));
+  assert(html.includes("模型发布"));
+  assert(html.includes("ExampleModel 2"));
+  assert(html.includes("open_weights"));
+  assert(html.includes('id="hot-blogs"'));
+  assert(html.includes("热门技术博客"));
+  assert(html.includes("Harness Engineering for Long Running Agents"));
+  assert(html.includes('target="_blank" rel="noopener noreferrer"'));
+});
+
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-"));
   const inputDir = path.join(tmp, "reports-source");
@@ -226,11 +286,50 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
 
   const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
   assert(html.includes("<style>"));
+  assert(html.includes("模型发布"));
+  assert(html.includes("ExampleModel 2"));
+  assert(html.includes("热门技术博客"));
+  assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(!html.includes('<link rel="stylesheet"'));
   assert(!html.includes("Markdown 原文"));
 
+  const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
+  assert.equal(data.model_releases.length, 1);
+  assert.equal(data.hot_blogs.length, 1);
+
   const feed = JSON.parse(await fs.readFile(path.join(outDir, "feed.json"), "utf8"));
   assert.equal(feed.reports[0].markdown_url, undefined);
+});
+
+test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-legacy-json-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  const legacyReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  delete legacyReport.model_releases;
+  delete legacyReport.hot_blogs;
+  await fs.writeFile(path.join(dataInputDir, "legacy-structured-report.json"), `${JSON.stringify(legacyReport, null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+
+  assert.deepEqual(result.reports[0].model_releases, []);
+  assert.deepEqual(result.reports[0].hot_blogs, []);
+
+  const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
+  assert.deepEqual(data.model_releases, []);
+  assert.deepEqual(data.hot_blogs, []);
+
+  const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
+  assert(!html.includes('id="model-releases"'));
+  assert(!html.includes('id="hot-blogs"'));
 });
 
 test("report:write 标准化结构化草稿并写入 reports-data", async () => {
@@ -247,6 +346,8 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.report_date, "2026-05-16");
   assert.equal(result.report.html_path, "reports/2026/05/2026-05-16.html");
   assert.equal(result.report.publish_status.repo_pushed, false);
+  assert.deepEqual(result.report.model_releases, []);
+  assert.deepEqual(result.report.hot_blogs, []);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
   assert.equal(await exists(result.path), true);
 });
