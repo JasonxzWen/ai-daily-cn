@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-19",
+  "title": "AI 日报 2026-05-19",
+  "summary": "今天同日可回源的 AI 产品与工程发布不足 5 条，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-18。入选主体集中在企业 agent 部署、代码 agent 操作面、技能系统、文档解析和 agentic analytics：OpenAI 与 Dell 把 Codex 推向混合和本地企业环境，GitHub Copilot 在 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制，xAI 推出 Grok Skills，PaddleOCR 3.5 接入 Hugging Face Transformers 后端，Sigma 发布面向 AI coding agents 的数据建模能力，Zignal AI 把公开信息处理成可供 agent workflow 消费的结构化情报。",
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-19.html",
+  "html_path": "reports/2026/05/2026-05-19.html",
+  "source_window": {
+    "date_from": "2026-05-18",
+    "date_to": "2026-05-19",
+    "fallback_window_used": true,
+    "notes": "按 2026-05-19 Asia/Shanghai 生成。先检查 2026-05-19 当天的 OpenAI、Anthropic、Google Developers、xAI、Mistral、GitHub Changelog、Hugging Face、AWS、Azure/Google Cloud release notes 等官方来源；当天稳定 dated release 不足 5 条，因此按提示词扩展到 48 小时。OpenAI 与 Dell 的 Codex/企业本地化公告按同一合作事件合并为一条；GitHub 5 月 18 日多条 Copilot 小更新按同厂商动态合并。Google I/O 预告、Mistral 3 页面和 Anthropic MCP 安全活动因不是当天可验证产品 release，或页面日期/事件性质不满足主体规则，降级为社区线索。"
+  },
+  "main_items": [
+    {
+      "title": "OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境",
+      "event_date": "2026-05-18",
+      "url": "https://openai.com/index/dell-codex-enterprise-partnership/",
+      "source": "OpenAI News",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Dell Technologies",
+        "Codex",
+        "ChatGPT Enterprise",
+        "Dell AI Data Platform",
+        "Dell AI Factory"
+      ],
+      "summary": "OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。",
+      "bullets": [
+        "Codex 将连接 Dell AI Data Platform，面向已经在本地治理数据的企业提供更贴近内部上下文的 agent 使用路径。",
+        "双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。",
+        "对工程组织而言，重点不是又一个 coding assistant，而是企业 agent 的部署边界改变：代码、知识库、系统权限和本地基础设施需要被统一纳入治理。"
+      ]
+    },
+    {
+      "title": "GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制",
+      "event_date": "2026-05-18",
+      "url": "https://github.blog/changelog/",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub",
+        "GitHub Copilot",
+        "Copilot cloud agent",
+        "Copilot Spaces",
+        "Copilot CLI",
+        "GitHub Mobile"
+      ],
+      "summary": "GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。",
+      "bullets": [
+        "cloud agent 从“接任务”进一步进入 CI 修复和仓库安全治理：失败 Actions 可直接发起修复，配置 API 暴露 MCP server、工具、workflow policy 和 firewall 设置。",
+        "模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。",
+        "Spaces API 与 CLI 远程控制把上下文管理、会话监控、权限批准和移动端续接连起来，Copilot 正在形成跨 CLI、Web、移动端和 IDE 的 agent 操作面。"
+      ]
+    },
+    {
+      "title": "xAI 推出 Grok Skills，让偏好和工作流跨会话复用",
+      "event_date": "2026-05-18",
+      "url": "https://x.ai/news/grok-skills",
+      "source": "xAI News",
+      "tier": "T0",
+      "entities": [
+        "xAI",
+        "Grok",
+        "Grok Skills",
+        "iOS",
+        "Android",
+        "Web"
+      ],
+      "summary": "xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。",
+      "bullets": [
+        "每个 Grok 账号会带有 xAI 内置 skills，用户也可以创建或覆盖自己的版本，个人版本优先级更高。",
+        "技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。",
+        "这和近期 coding agent 的 AGENTS.md、插件、MCP 配置相呼应：可迁移、可复用的“技能文件”正在成为 AI 产品争夺工作流记忆的接口。"
+      ]
+    },
+    {
+      "title": "PaddleOCR 3.5 在 Hugging Face 发布 Transformers 推理后端",
+      "event_date": "2026-05-18",
+      "url": "https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers",
+      "source": "Hugging Face Blog / PaddlePaddle Team Article",
+      "tier": "T1",
+      "entities": [
+        "PaddleOCR",
+        "PaddlePaddle",
+        "Hugging Face",
+        "Transformers",
+        "Document AI",
+        "RAG"
+      ],
+      "summary": "PaddlePaddle 团队在 Hugging Face 发布 PaddleOCR 3.5 文章，说明 PaddleOCR 的 OCR 和文档解析模型现在可以用 Hugging Face Transformers 作为推理后端运行。",
+      "bullets": [
+        "新后端通过 `engine=\"transformers\"` 接入，面向 PP-OCRv5、PaddleOCR-VL 1.5 等 OCR 与文档解析能力提供更贴近 Hugging Face 生态的运行方式。",
+        "文章强调 Document AI、RAG 和文档 agent 的前置难点是把 PDF、扫描件、截图、表格、图表和公式转成可靠结构化数据。",
+        "对工程团队来说，这是 ingestion 层的实际更新：如果文档解析不稳，下游 LLM 检索、引用和 agent 决策都会被早期抽取错误放大。"
+      ]
+    },
+    {
+      "title": "Sigma 发布面向 AI coding agents 的数据建模能力",
+      "event_date": "2026-05-18",
+      "url": "https://www.sigmacomputing.com/resources/announcements/series-e",
+      "source": "Sigma Announcement",
+      "tier": "T0",
+      "entities": [
+        "Sigma",
+        "Data Modeling Skills for AI Agents",
+        "OpenAI Codex",
+        "Claude Code",
+        "Cursor",
+        "Snowflake Cortex Code"
+      ],
+      "summary": "Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。",
+      "bullets": [
+        "公告明确点名 OpenAI Codex、Claude Code、Cursor 和 Snowflake Cortex Code，说明 BI/analytics 平台开始把 agent 作为数据建模入口，而不只作为问答层。",
+        "这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。",
+        "数据平台团队需要关注模型变更的审计、review 和回滚：当 agent 能改 data model，analytics governance 会变成软件工程流程的一部分。"
+      ]
+    },
+    {
+      "title": "Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报",
+      "event_date": "2026-05-18",
+      "url": "https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html",
+      "source": "Zignal Labs / GlobeNewswire Press Release",
+      "tier": "T1",
+      "entities": [
+        "Zignal Labs",
+        "Zignal AI",
+        "ZEN",
+        "Peraton IRIS",
+        "agentic reporting",
+        "multi-agent workflows"
+      ],
+      "summary": "Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。",
+      "bullets": [
+        "Zignal AI 的目标不是提供更多原始公开数据，而是输出叙事检测、地理定位视觉情报、聚类事件、告警和结构化 intelligence artifacts。",
+        "发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。",
+        "这代表 agent 系统的一个现实约束：很多高风险场景需要上游信息形成层先做过滤、富集、验证和结构化，不能让 agent 直接吞原始噪声。"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Dell Deskside Agentic AI",
+      "description": "Dell 在同日发布的本地 agentic AI 工作组方案，结合 Dell 高性能工作站、NVIDIA NemoClaw、OpenShell runtime 和 Dell Services。",
+      "url": "https://www.dell.com/en-us/dt/corporate/newsroom/announcements/detailpage.press-releases~usa~2026~05~dell-technologies-delivers-production-ready-agentic-ai-from-deskside-to-data-center.htm"
+    },
+    {
+      "name": "Copilot Spaces API",
+      "description": "GitHub Copilot Spaces API 已 GA，可用程序创建、读取、更新、删除 Spaces 并管理协作者和资源。",
+      "url": "https://github.blog/changelog/2026-05-18-copilot-spaces-api-now-generally-available"
+    },
+    {
+      "name": "Copilot CLI Remote Control",
+      "description": "Copilot CLI 远程控制在 GitHub Mobile、github.com、VS Code 和 JetBrains 场景进入 GA，用于实时查看、转向和批准会话。",
+      "url": "https://github.blog/changelog/2026-05-18-remote-control-for-copilot-cli-sessions-now-generally-available-on-mobile-web-and-vs-code"
+    },
+    {
+      "name": "Grok Skills",
+      "description": "xAI 的跨会话技能系统，覆盖内置 office 文档技能、PDF、表格和自定义 skill 创建。",
+      "url": "https://x.ai/news/grok-skills"
+    },
+    {
+      "name": "PaddleOCR 3.5 Transformers backend",
+      "description": "PaddleOCR 的 OCR 与文档解析模型新增 Hugging Face Transformers 推理后端，服务 Document AI 和 RAG ingestion。",
+      "url": "https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "Google I/O 2026 于 2026-05-19 至 2026-05-20 举行，Google Developers Blog 预告会覆盖 Gemini、AI、Cloud 和 agentic coding；但本轮截稿时可回源的细分产品发布页仍不足，先作为待复核线索。",
+      "url": "https://developers.googleblog.com/get-ready-for-google-io-2026/"
+    },
+    {
+      "content": "Mistral 3 页面展示了开放多模态/多语言模型家族和 vLLM、Red Hat、NVIDIA 协作信息，但页面在本轮采样中缺少稳定可交叉确认的 2026-05-19/48h 发布日期，因此未写入主体。",
+      "url": "https://mistral.ai/news/mistral-3"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-19",
+    "main_items": 6,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "official-ai-releases: 使用 OpenAI News、xAI News、GitHub Changelog、Hugging Face team article、Sigma announcement 和 Zignal Labs press release 等可回源页面",
+      "github-ai-trending: 检查 GitHub Copilot/Spaces/CLI、PaddleOCR、agent workflow 相关开源与工具线索；缺少稳定 dated release 的项目不升入主体",
+      "follow-builders: 按技能约束检查 builder 观察入口；本轮未找到可回源且适合独立入选的 builder 原始帖，因此 builder_observations 为空"
+    ],
+    "fallback_sources": [
+      "官方新闻页",
+      "官方 changelog",
+      "官方公司公告",
+      "Hugging Face team article",
+      "GitHub Changelog 汇总页",
+      "Press release 仅在公司原始发布信息明确时使用"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。",
+    "optimization_suggestions": [
+      {
+        "issue": "同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。",
+        "evidence": "OpenAI-Dell Codex 合作有 OpenAI 页面和 Dell 新闻稿；本轮为避免重复计数，只把 OpenAI 作为主体 URL，Dell 相关页面放入 projects。",
+        "suggested_module": "schemas/report.schema.json 与 prompts/ai-daily/modules/output-html.md",
+        "expected_benefit": "增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。",
+        "needs_user_confirmation": true
+      },
+      {
+        "issue": "官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。",
+        "evidence": "Google Developers 首页和搜索结果在 2026-05-19 显示 Google I/O 与 Gemini 相关卡片，但详情页日期多为 2026-02 或 2026-04，Mistral 3 页面也缺少稳定日期交叉确认。",
+        "suggested_module": "prompts/ai-daily/modules/source-policy.md",
+        "expected_benefit": "明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。",
+        "needs_user_confirmation": true
+      },
+      {
+        "issue": "GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。",
+        "evidence": "2026-05-18 GitHub Copilot 同日包含 Actions 一键修复、低成本模型、Web 上下文问答、配置 API、Spaces API 和远程控制等多条更新；主体只能挂 GitHub Changelog 汇总页。",
+        "suggested_module": "prompts/ai-daily/modules/selection-rules.md",
+        "expected_benefit": "要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。",
+        "needs_user_confirmation": true
+      }
+    ]
+  },
+  "publish_status": {
+    "html_generated": false,
+    "repo_updated": false,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-19.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-19T07:28:39.901Z"
+}

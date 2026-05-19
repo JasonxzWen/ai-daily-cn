@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-19</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-19</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-19</h1>
+      <p class="summary">今天同日可回源的 AI 产品与工程发布不足 5 条，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-18。入选主体集中在企业 agent 部署、代码 agent 操作面、技能系统、文档解析和 agentic analytics：OpenAI 与 Dell 把 Codex 推向混合和本地企业环境，GitHub Copilot 在 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制，xAI 推出 Grok Skills，PaddleOCR 3.5 接入 Hugging Face Transformers 后端，Sigma 发布面向 AI coding agents 的数据建模能力，Zignal AI 把公开信息处理成可供 agent workflow 消费的结构化情报。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>6</strong> 主体信息</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>2</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>OpenAI</span><span>Dell Technologies</span><span>Codex</span><span>ChatGPT Enterprise</span><span>Dell AI Data Platform</span><span>Dell AI Factory</span></div>
+  <ul>
+    <li>Codex 将连接 Dell AI Data Platform，面向已经在本地治理数据的企业提供更贴近内部上下文的 agent 使用路径。</li>
+<li>双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。</li>
+<li>对工程组织而言，重点不是又一个 coding assistant，而是企业 agent 的部署边界改变：代码、知识库、系统权限和本地基础设施需要被统一纳入治理。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://openai.com/index/dell-codex-enterprise-partnership/" target="_blank" rel="noopener noreferrer">OpenAI News</a></p>
+</article>
+<article class="item">
+  <h3>GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>GitHub</span><span>GitHub Copilot</span><span>Copilot cloud agent</span><span>Copilot Spaces</span><span>Copilot CLI</span><span>GitHub Mobile</span></div>
+  <ul>
+    <li>cloud agent 从“接任务”进一步进入 CI 修复和仓库安全治理：失败 Actions 可直接发起修复，配置 API 暴露 MCP server、工具、workflow policy 和 firewall 设置。</li>
+<li>模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。</li>
+<li>Spaces API 与 CLI 远程控制把上下文管理、会话监控、权限批准和移动端续接连起来，Copilot 正在形成跨 CLI、Web、移动端和 IDE 的 agent 操作面。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
+</article>
+<article class="item">
+  <h3>xAI 推出 Grok Skills，让偏好和工作流跨会话复用</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>xAI</span><span>Grok</span><span>Grok Skills</span><span>iOS</span><span>Android</span><span>Web</span></div>
+  <ul>
+    <li>每个 Grok 账号会带有 xAI 内置 skills，用户也可以创建或覆盖自己的版本，个人版本优先级更高。</li>
+<li>技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。</li>
+<li>这和近期 coding agent 的 AGENTS.md、插件、MCP 配置相呼应：可迁移、可复用的“技能文件”正在成为 AI 产品争夺工作流记忆的接口。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer">xAI News</a></p>
+</article>
+<article class="item">
+  <h3>PaddleOCR 3.5 在 Hugging Face 发布 Transformers 推理后端</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T1</span><span>PaddleOCR</span><span>PaddlePaddle</span><span>Hugging Face</span><span>Transformers</span><span>Document AI</span><span>RAG</span></div>
+  <ul>
+    <li>新后端通过 `engine=&quot;transformers&quot;` 接入，面向 PP-OCRv5、PaddleOCR-VL 1.5 等 OCR 与文档解析能力提供更贴近 Hugging Face 生态的运行方式。</li>
+<li>文章强调 Document AI、RAG 和文档 agent 的前置难点是把 PDF、扫描件、截图、表格、图表和公式转成可靠结构化数据。</li>
+<li>对工程团队来说，这是 ingestion 层的实际更新：如果文档解析不稳，下游 LLM 检索、引用和 agent 决策都会被早期抽取错误放大。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers" target="_blank" rel="noopener noreferrer">Hugging Face Blog / PaddlePaddle Team Article</a></p>
+</article>
+<article class="item">
+  <h3>Sigma 发布面向 AI coding agents 的数据建模能力</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>Sigma</span><span>Data Modeling Skills for AI Agents</span><span>OpenAI Codex</span><span>Claude Code</span><span>Cursor</span><span>Snowflake Cortex Code</span></div>
+  <ul>
+    <li>公告明确点名 OpenAI Codex、Claude Code、Cursor 和 Snowflake Cortex Code，说明 BI/analytics 平台开始把 agent 作为数据建模入口，而不只作为问答层。</li>
+<li>这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。</li>
+<li>数据平台团队需要关注模型变更的审计、review 和回滚：当 agent 能改 data model，analytics governance 会变成软件工程流程的一部分。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.sigmacomputing.com/resources/announcements/series-e" target="_blank" rel="noopener noreferrer">Sigma Announcement</a></p>
+</article>
+<article class="item">
+  <h3>Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T1</span><span>Zignal Labs</span><span>Zignal AI</span><span>ZEN</span><span>Peraton IRIS</span><span>agentic reporting</span><span>multi-agent workflows</span></div>
+  <ul>
+    <li>Zignal AI 的目标不是提供更多原始公开数据，而是输出叙事检测、地理定位视觉情报、聚类事件、告警和结构化 intelligence artifacts。</li>
+<li>发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。</li>
+<li>这代表 agent 系统的一个现实约束：很多高风险场景需要上游信息形成层先做过滤、富集、验证和结构化，不能让 agent 直接吞原始噪声。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer">Zignal Labs / GlobeNewswire Press Release</a></p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>Dell Deskside Agentic AI</td><td>Dell 在同日发布的本地 agentic AI 工作组方案，结合 Dell 高性能工作站、NVIDIA NemoClaw、OpenShell runtime 和 Dell Services。</td><td><a href="https://www.dell.com/en-us/dt/corporate/newsroom/announcements/detailpage.press-releases~usa~2026~05~dell-technologies-delivers-production-ready-agentic-ai-from-deskside-to-data-center.htm" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Copilot Spaces API</td><td>GitHub Copilot Spaces API 已 GA，可用程序创建、读取、更新、删除 Spaces 并管理协作者和资源。</td><td><a href="https://github.blog/changelog/2026-05-18-copilot-spaces-api-now-generally-available" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Copilot CLI Remote Control</td><td>Copilot CLI 远程控制在 GitHub Mobile、github.com、VS Code 和 JetBrains 场景进入 GA，用于实时查看、转向和批准会话。</td><td><a href="https://github.blog/changelog/2026-05-18-remote-control-for-copilot-cli-sessions-now-generally-available-on-mobile-web-and-vs-code" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Grok Skills</td><td>xAI 的跨会话技能系统，覆盖内置 office 文档技能、PDF、表格和自定义 skill 创建。</td><td><a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>PaddleOCR 3.5 Transformers backend</td><td>PaddleOCR 的 OCR 与文档解析模型新增 Hugging Face Transformers 推理后端，服务 Document AI 和 RAG ingestion。</td><td><a href="https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>Google I/O 2026 于 2026-05-19 至 2026-05-20 举行，Google Developers Blog 预告会覆盖 Gemini、AI、Cloud 和 agentic coding；但本轮截稿时可回源的细分产品发布页仍不足，先作为待复核线索。 <a href="https://developers.googleblog.com/get-ready-for-google-io-2026/" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Mistral 3 页面展示了开放多模态/多语言模型家族和 vLLM、Red Hat、NVIDIA 协作信息，但页面在本轮采样中缺少稳定可交叉确认的 2026-05-19/48h 发布日期，因此未写入主体。 <a href="https://mistral.ai/news/mistral-3" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>6</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。</strong></p>
+    
+    <p>证据：OpenAI-Dell Codex 合作有 OpenAI 页面和 Dell 新闻稿；本轮为避免重复计数，只把 OpenAI 作为主体 URL，Dell 相关页面放入 projects。</p>
+    
+    <p>预期收益：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。</p>
+  </li>
+<li>
+    <p><strong>官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。</strong></p>
+    
+    <p>证据：Google Developers 首页和搜索结果在 2026-05-19 显示 Google I/O 与 Gemini 相关卡片，但详情页日期多为 2026-02 或 2026-04，Mistral 3 页面也缺少稳定日期交叉确认。</p>
+    
+    <p>预期收益：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。</p>
+  </li>
+<li>
+    <p><strong>GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。</strong></p>
+    
+    <p>证据：2026-05-18 GitHub Copilot 同日包含 Actions 一键修复、低成本模型、Web 上下文问答、配置 API、Spaces API 和远程控制等多条更新；主体只能挂 GitHub Changelog 汇总页。</p>
+    
+    <p>预期收益：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。</p>
+  </li></ol>
+</section>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-19.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>
