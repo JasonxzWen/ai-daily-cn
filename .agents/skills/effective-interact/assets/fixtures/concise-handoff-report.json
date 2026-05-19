@@ -1,0 +1,39 @@
+{
+  "title": "Concise implementation handoff",
+  "summary": "The change is ready for review; no rich modules are needed for the first read.",
+  "status": "complete",
+  "template": "implementation-handoff",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-18T00:00:00.000Z",
+  "intent": {
+    "audience": "maintainer",
+    "primaryQuestion": "What changed and can it be reviewed quickly?",
+    "decision": "Review the scoped diff and accept if verification stays green.",
+    "timeBudget": "30s",
+    "artifactKind": "handoff",
+    "successCriteria": [
+      "The first screen states the conclusion.",
+      "No optional chart, code, or editor modules appear before the answer."
+    ]
+  },
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "Conclusion",
+      "group": "summary",
+      "status": "ready",
+      "content": "- **Ready for review** after focused validation.\n- Scope stays inside the requested skill and test files."
+    }
+  ],
+  "verification": [
+    {
+      "label": "Focused test",
+      "status": "pass",
+      "detail": "bun test ./tests/effectiveInteractSkill.test.ts"
+    }
+  ],
+  "nextActions": [
+    "Review the changed files.",
+    "Archive the OpenSpec change after acceptance."
+  ]
+}

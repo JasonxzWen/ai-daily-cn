@@ -1,0 +1,93 @@
+{
+  "title": "Decision quality report",
+  "summary": "Use intent, claims, and evidence to decide whether the HTML report contract is ready to extend.",
+  "status": "review",
+  "template": "decision-matrix",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-18T00:00:00.000Z",
+  "intent": {
+    "audience": "skill maintainer",
+    "primaryQuestion": "Does the report give enough evidence to make the next implementation decision?",
+    "decision": "Proceed only if claims are traceable and unsupported claims are labeled honestly.",
+    "timeBudget": "3m",
+    "artifactKind": "decision",
+    "successCriteria": [
+      "Key claims link to evidence.",
+      "Assumptions and known limits are visible.",
+      "Actions are copyable without reading implementation details first."
+    ]
+  },
+  "claims": [
+    {
+      "id": "claim-intent-contract",
+      "statement": "Intent metadata should control density before visual modules are selected.",
+      "kind": "conclusion",
+      "evidenceIds": ["evidence-design-doc"],
+      "confidence": "high",
+      "dateRange": "2026-05-18",
+      "knownLimits": ["Intent is optional for backward compatibility."]
+    },
+    {
+      "id": "claim-open-question",
+      "statement": "A future release may add deeper automated accessibility tooling.",
+      "kind": "assumption",
+      "evidenceIds": [],
+      "confidence": "medium",
+      "knownLimits": ["This change uses deterministic checks first."]
+    }
+  ],
+  "sections": [
+    {
+      "type": "decision-matrix",
+      "title": "Decision options",
+      "group": "decision",
+      "status": "review",
+      "options": [
+        {
+          "name": "Implement intent and claims first",
+          "status": "recommended",
+          "points": ["Keeps the report conclusion-first", "Improves validator coverage", "Avoids broad UI expansion"]
+        },
+        {
+          "name": "Add a general dashboard builder",
+          "status": "rejected",
+          "points": ["Outside skill boundary", "Harder to validate", "Duplicates frontend builder skills"]
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "title": "Reader actions",
+      "group": "next",
+      "status": "ready",
+      "items": [
+        "Check claim links before trusting the conclusion.",
+        "Run the fixture validator after generating the report."
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-design-doc",
+      "kind": "file",
+      "label": "Decision quality design",
+      "value": "docs/effective-interact-decision-quality.md",
+      "status": "info",
+      "filePath": "docs/effective-interact-decision-quality.md",
+      "line": 18,
+      "sourceType": "local-doc",
+      "trustLevel": "trusted-generated"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Claims linked",
+      "status": "pass",
+      "detail": "Each important claim names evidence or is marked as an assumption."
+    }
+  ],
+  "nextActions": [
+    "Generate this fixture through create-interaction.mjs.",
+    "Validate the generated HTML with validate-interaction.mjs."
+  ]
+}

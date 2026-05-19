@@ -1,0 +1,170 @@
+{
+  "title": "Disposable export editor brief",
+  "summary": "**Visible export only:** use a disposable HTML editor only when the user must tune a small decision surface and then copy Markdown, JSON, or diff back into the real workflow.",
+  "status": "review",
+  "template": "research-explainer",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-18T00:00:00.000Z",
+  "intent": {
+    "audience": "Skill maintainer",
+    "primaryQuestion": "When may effective-interact create an editor-like artifact?",
+    "decision": "Create one only for local, disposable tuning with an explicit export path.",
+    "timeBudget": "2m",
+    "artifactKind": "editor",
+    "successCriteria": [
+      "The artifact never writes to the repo, network, credentials, or hidden storage.",
+      "Every editable decision can be exported as visible Markdown, JSON, or diff.",
+      "The report still has a readable conclusion without interaction."
+    ]
+  },
+  "claims": [
+    {
+      "id": "claim-visible-export",
+      "statement": "Editor-like HTML reports are acceptable only when the export path is visible and copyable.",
+      "kind": "recommendation",
+      "evidenceIds": ["evidence-editor-cases"],
+      "confidence": "high",
+      "dateRange": "2026-05-18",
+      "knownLimits": [
+        "Use frontend-design or web-artifacts-builder when the artifact becomes product UI or a bundled app."
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "type": "summary-cards",
+      "title": "Editor boundary",
+      "group": "overview",
+      "priority": 1,
+      "status": "review",
+      "summary": "The editor is a decision aid, not a persistence layer.",
+      "cards": [
+        {
+          "label": "Allowed",
+          "value": "Visible export only"
+        },
+        {
+          "label": "Forbidden",
+          "value": "no network writes, no repo writes, no credentials, no hidden persistence"
+        },
+        {
+          "label": "Exit path",
+          "value": "copy Markdown, JSON, or diff"
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "title": "Export surfaces",
+      "group": "editor",
+      "priority": 1,
+      "status": "ready",
+      "summary": "Each tab models an explicit export format.",
+      "tabs": [
+        {
+          "label": "Markdown export",
+          "content": "Use for human-readable plans, ticket triage, review notes, and final next actions. The editor should render the resulting Markdown as text that can be copied."
+        },
+        {
+          "label": "JSON export",
+          "content": "Use for small structured choices such as flags, routing rules, or checklist state. The output must be complete enough to paste into a real file after review."
+        },
+        {
+          "label": "diff export",
+          "content": "Use when the safest handoff is a minimal patch. The diff must be visible before the user applies it elsewhere."
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "Safety contract",
+      "group": "editor",
+      "priority": 2,
+      "status": "ready",
+      "summary": "If one row cannot be satisfied, do not use this skill for the editor.",
+      "columns": [
+        { "key": "rule", "label": "Rule" },
+        { "key": "why", "label": "Why it exists" },
+        { "key": "fallback", "label": "Fallback" }
+      ],
+      "rows": [
+        {
+          "rule": "no network writes",
+          "why": "The report is a local decision artifact, not an integration surface.",
+          "fallback": "Export text and let the user paste or apply it."
+        },
+        {
+          "rule": "no repo writes",
+          "why": "A disposable editor must not mutate the workspace behind the reader.",
+          "fallback": "Export a reviewed diff."
+        },
+        {
+          "rule": "no hidden persistence",
+          "why": "The next agent must be able to inspect the full state from the file itself.",
+          "fallback": "Keep state in visible controls or export blocks."
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "title": "JSON export block",
+      "group": "exports",
+      "priority": 1,
+      "status": "ready",
+      "summary": "Structured export should be copyable and inert.",
+      "language": "json",
+      "filePath": "reports/example-export.json",
+      "startLine": 1,
+      "highlightLines": [2, 6],
+      "content": "{\n  \"mode\": \"visible-export-only\",\n  \"selected\": [\"option-gallery\", \"disposable-export-editor\"],\n  \"blocked\": [\"network-write\", \"repo-write\", \"credential-edit\"],\n  \"handoff\": {\n    \"format\": \"json\",\n    \"reviewRequired\": true\n  }\n}"
+    },
+    {
+      "type": "diff",
+      "title": "Diff export preview",
+      "group": "exports",
+      "priority": 2,
+      "status": "ready",
+      "summary": "A diff export keeps the mutation reviewable outside the report.",
+      "filePath": "reports/example-export.diff",
+      "startLine": 1,
+      "content": "--- before.md\n+++ after.md\n@@ -1,3 +1,5 @@\n ## Next actions\n - Compare options in a generated HTML report.\n+- Tune only the small decision surface in a local disposable editor.\n+- Copy the exported diff before applying any workspace change."
+    },
+    {
+      "type": "actions",
+      "title": "Use this editor shape when",
+      "group": "next",
+      "priority": 1,
+      "status": "ready",
+      "items": [
+        "The user needs to sort, toggle, or tune a small local decision surface.",
+        "The final output can be represented as Markdown, JSON, or diff.",
+        "The artifact can remain useful without saving hidden state."
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-editor-cases",
+      "kind": "source",
+      "label": "HTML effectiveness editor cases",
+      "value": "Ticket triage board, feature flag editor, and prompt tuner all end in copyable output.",
+      "status": "info",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/",
+      "sourceTitle": "The unreasonable effectiveness of HTML",
+      "sourceType": "web",
+      "accessedAt": "2026-05-18",
+      "trustLevel": "mixed-trust"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Mutation boundary",
+      "status": "pass",
+      "detail": "The fixture uses generated static HTML, copy buttons, tabs, code, diff, and actions; it does not depend on hidden storage or write APIs."
+    }
+  ],
+  "nextActions": [
+    "Use this fixture when evaluating lightweight editor guidance.",
+    "Keep production UI, bundled apps, and slide decks routed to their adjacent skills."
+  ]
+}

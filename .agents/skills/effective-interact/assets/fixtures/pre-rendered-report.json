@@ -1,5 +1,5 @@
 {
-  "title": "HTML work report generation handoff",
+  "title": "effective interaction generation handoff",
   "summary": "The generator can produce a readable, evidence-backed report without CDN dependencies.",
   "status": "complete",
   "template": "implementation-handoff",
@@ -37,16 +37,16 @@
     {
       "type": "code",
       "title": "Core code path",
-      "filePath": ".agents/skills/html-work-reports/scripts/create-report.mjs",
+      "filePath": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
       "language": "javascript",
       "startLine": 504,
       "highlightLines": [505],
-      "content": "export function createReport(input) {\n  return renderHtml(input);\n}"
+      "content": "export function createInteraction(input) {\n  return renderHtml(input);\n}"
     },
     {
       "type": "diff",
       "title": "Generated evidence diff",
-      "filePath": ".agents/skills/html-work-reports/scripts/create-report.mjs",
+      "filePath": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
       "startLine": 505,
       "content": "- return renderMarkdownOnly(input);\n+ return renderHtml(input);"
     },
@@ -86,13 +86,13 @@
     {
       "kind": "file",
       "label": "Generator script",
-      "value": ".agents/skills/html-work-reports/scripts/create-report.mjs",
+      "value": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
       "status": "info"
     },
     {
       "kind": "command",
       "label": "Focused tests",
-      "value": "bun test ./tests/htmlWorkReportsSkill.test.ts",
+      "value": "bun test ./tests/effectiveInteractSkill.test.ts",
       "status": "pass"
     },
     {

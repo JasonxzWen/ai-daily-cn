@@ -3,23 +3,29 @@
   "summary": "Runtime mode is explicit, pinned, and still keeps evidence readable.",
   "status": "review",
   "template": "research-explainer",
-  "renderMode": "runtime",
+  "renderMode": "runtime-cdn",
   "generatedAt": "2026-05-13T00:00:00.000Z",
   "sections": [
     {
       "type": "markdown",
       "title": "Runtime markdown",
+      "group": "overview",
+      "status": "ready",
       "content": "## Runtime source\n\n- Marked parses Markdown\n- DOMPurify sanitizes untrusted HTML\n\n| Runtime | Version |\n| --- | --- |\n| marked | 18.0.3 |"
     },
     {
       "type": "mermaid",
       "title": "Runtime diagram",
+      "group": "diagrams",
+      "status": "ready",
       "content": "graph TD\n  Source --> Runtime\n  Runtime --> Fallback"
     },
     {
       "type": "code",
       "title": "Runtime code",
-      "filePath": ".agents/skills/html-work-reports/assets/components/rich-render-runtime.js",
+      "group": "code",
+      "status": "ready",
+      "filePath": ".codex/skills/effective-interact/assets/components/rich-render-runtime.js",
       "language": "javascript",
       "startLine": 103,
       "highlightLines": [104],
