@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-hub.local/html-work-reports/report-input-schema.json",
+  "title": "HTML Work Report Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "summary", "status", "sections", "evidence"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["complete", "ready", "blocked", "review", "draft"]
+    },
+    "generatedAt": {
+      "type": "string",
+      "description": "ISO-8601 timestamp. The generator fills this when omitted."
+    },
+    "template": {
+      "type": "string",
+      "enum": ["implementation-handoff", "review-findings", "research-explainer", "decision-matrix"],
+      "default": "implementation-handoff"
+    },
+    "renderMode": {
+      "type": "string",
+      "enum": ["pre-rendered", "runtime"],
+      "default": "pre-rendered"
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["type", "title"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "summary-cards",
+              "markdown",
+              "mermaid",
+              "code",
+              "diff",
+              "timeline",
+              "evidence",
+              "decision-matrix",
+              "actions",
+              "tabs",
+              "filterable-cards"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "sourceHref": {
+            "type": "string"
+          },
+          "startLine": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "endLine": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "highlightLines": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "label"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["file", "command", "source", "assumption", "verification"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warn", "fail", "info", "not-run"]
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "status"],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warn", "fail", "not-run"]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nextActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

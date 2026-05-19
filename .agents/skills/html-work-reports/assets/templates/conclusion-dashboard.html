@@ -1,0 +1,164 @@
+<!doctype html>
+<!-- Use case: completed non-trivial task handoff, release readiness summary, implementation conclusion, verification report. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Conclusion Report</title>
+  <style>
+    :root { color-scheme: light; --bg:#f7f8fb; --panel:#fff; --ink:#172033; --muted:#667085; --line:#d7dce5; --accent:#2563eb; --ok:#16845b; --warn:#b7791f; --danger:#c2414b; --shadow:0 14px 40px rgba(23,32,51,.12); }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.45; }
+    .shell { width:min(1180px,calc(100vw - 32px)); margin:0 auto; padding:28px 0 44px; }
+    header,.panel,.card,.code-panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; }
+    header { padding:22px; display:grid; gap:16px; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { font-size:clamp(28px,4vw,44px); line-height:1.04; margin-bottom:0; }
+    h2 { font-size:20px; }
+    .meta,.eyebrow { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:0; }
+    .title-row,.toolbar,.split { display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+    .wide-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr); gap:12px; margin-top:12px; }
+    .panel,.card { padding:16px; }
+    .card { transition:transform 160ms ease,opacity 160ms ease,filter 160ms ease,border-color 160ms ease,box-shadow 160ms ease; }
+    .focus-field:has(.card:hover) .card:not(:hover) { opacity:.42; filter:grayscale(.6) blur(1px); }
+    .card:hover,.card:focus-within { border-color:var(--accent); box-shadow:var(--shadow); transform:translateY(-2px); }
+    .pill,.file-chip { display:inline-flex; align-items:center; gap:6px; min-height:28px; max-width:100%; padding:4px 9px; border:1px solid var(--line); border-radius:999px; background:#f9fafc; white-space:nowrap; }
+    .ok { color:var(--ok); border-color:color-mix(in srgb,var(--ok) 35%,var(--line)); }
+    .warn { color:var(--warn); border-color:color-mix(in srgb,var(--warn) 35%,var(--line)); }
+    button { min-height:36px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:7px 11px; font:inherit; cursor:pointer; transition:background 140ms ease,border-color 140ms ease,transform 140ms ease; }
+    button:hover,button[aria-pressed="true"] { border-color:var(--accent); background:#eef4ff; }
+    button:focus-visible,a:focus-visible { outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent); outline-offset:2px; }
+    nav { position:sticky; top:0; z-index:2; margin:12px 0; padding:10px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.9); backdrop-filter:blur(10px); }
+    nav a { margin-right:12px; color:var(--accent); font-weight:600; text-decoration:none; }
+    .timeline { display:grid; gap:10px; }
+    .step { display:grid; grid-template-columns:120px 1fr; gap:10px; padding:10px; border-left:3px solid var(--accent); background:#f9fafc; border-radius:6px; }
+    .code-panel { overflow:auto; background:#111827; color:#dbe4f0; }
+    .code-panel header { display:flex; justify-content:space-between; gap:10px; padding:10px 12px; border:0; border-bottom:1px solid #263244; background:#111827; color:#b7c4d8; }
+    .code-panel pre { margin:0; padding:12px; font:13px/1.55 "SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+    .hot { display:block; margin-inline:-12px; padding-inline:12px; background:rgba(37,99,235,.22); }
+    .diagram svg { width:100%; height:auto; }
+    details { border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:#fff; }
+    @media (max-width:800px) { .shell{width:min(100vw - 20px,1180px); padding-top:14px;} .wide-grid{grid-template-columns:1fr;} .step{grid-template-columns:1fr;} .pill,.file-chip{white-space:normal;} }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important;} .card:hover{transform:none;} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">Completed task conclusion</div>
+          <h1>Replace with task title</h1>
+        </div>
+        <span class="pill ok">Status: complete</span>
+      </div>
+      <div class="grid">
+        <section class="card">
+          <div class="meta">Decision</div>
+          <strong>Primary conclusion in one sentence.</strong>
+        </section>
+        <section class="card">
+          <div class="meta">Verification</div>
+          <strong>Tests/checks run and result.</strong>
+        </section>
+        <section class="card">
+          <div class="meta">Risk</div>
+          <strong>Open caveat or none known.</strong>
+        </section>
+      </div>
+    </header>
+
+    <nav aria-label="Report sections">
+      <a href="#summary">Summary</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#flow">Flow</a>
+      <a href="#next">Next</a>
+    </nav>
+
+    <section id="summary" class="grid focus-field">
+      <article class="card">
+        <h2>What changed</h2>
+        <ul>
+          <li>Short visual bullet, not a paragraph.</li>
+          <li>Short visual bullet, not a paragraph.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Why it matters</h2>
+        <ul>
+          <li>Outcome or user impact.</li>
+          <li>Boundary or caveat.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Verification gates</h2>
+        <ul>
+          <li><span class="pill ok">pass</span> command or check</li>
+          <li><span class="pill warn">not run</span> reason if skipped</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="wide-grid">
+      <section id="evidence" class="panel">
+        <div class="split">
+          <h2>File evidence</h2>
+          <button data-copy-from="#file-list">Copy paths</button>
+        </div>
+        <div id="file-list" class="grid">
+          <span class="file-chip">src/example.ts:42</span>
+          <span class="file-chip">tests/example.test.ts:18</span>
+        </div>
+        <div class="code-panel" style="margin-top:12px">
+          <header><span>src/example.ts:42</span><button data-copy-from="#snippet">Copy snippet</button></header>
+          <pre id="snippet"><code>40  function summarize(result) {
+41    const status = result.ok ? "complete" : "blocked";
+42    <span class="hot">return { status, evidence: result.files };</span>
+43  }</code></pre>
+        </div>
+      </section>
+
+      <section id="flow" class="panel diagram">
+        <h2>Rendered flow</h2>
+        <svg viewBox="0 0 520 260" role="img" aria-label="Rendered workflow diagram">
+          <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#2563eb"/></marker></defs>
+          <rect x="20" y="35" width="130" height="58" rx="8" fill="#eef4ff" stroke="#2563eb"/>
+          <text x="85" y="68" text-anchor="middle" font-size="14">Input</text>
+          <rect x="195" y="35" width="130" height="58" rx="8" fill="#f9fafc" stroke="#d7dce5"/>
+          <text x="260" y="68" text-anchor="middle" font-size="14">Work</text>
+          <rect x="370" y="35" width="130" height="58" rx="8" fill="#ecfdf5" stroke="#16845b"/>
+          <text x="435" y="68" text-anchor="middle" font-size="14">Conclusion</text>
+          <path d="M150 64 H195" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M325 64 H370" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)"/>
+        </svg>
+        <details>
+          <summary>Mermaid/source fallback</summary>
+          <pre>graph LR
+  Input --&gt; Work --&gt; Conclusion</pre>
+        </details>
+      </section>
+    </div>
+
+    <section id="next" class="panel" style="margin-top:12px">
+      <h2>Next actions</h2>
+      <div class="timeline">
+        <div class="step"><strong>Now</strong><span>Action item or reviewer focus.</span></div>
+        <div class="step"><strong>Later</strong><span>Follow-up only if needed.</span></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-copy-from]");
+      if (!button) return;
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      if (!source) return;
+      if (navigator.clipboard) navigator.clipboard.writeText(source.textContent.trim());
+      var previous = button.textContent;
+      button.textContent = "Copied";
+      setTimeout(function () { button.textContent = previous; }, 900);
+    });
+  </script>
+</body>
+</html>

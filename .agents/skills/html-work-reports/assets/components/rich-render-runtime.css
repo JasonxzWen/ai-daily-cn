@@ -1,0 +1,96 @@
+/* Use case: rich rendered Markdown, Mermaid, and highlighted code in HTML work reports. The generator inlines this only for runtime mode. */
+.rendered-markdown {
+  display: grid;
+  gap: 10px;
+}
+
+.rendered-markdown h1,
+.rendered-markdown h2,
+.rendered-markdown h3 {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.rendered-markdown p {
+  margin: 0;
+}
+
+.rendered-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid var(--line, #d7dce5);
+  border-radius: 8px;
+}
+
+.rendered-markdown th,
+.rendered-markdown td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line, #d7dce5);
+  text-align: left;
+  vertical-align: top;
+}
+
+.rendered-markdown th {
+  background: #f3f6fb;
+}
+
+.rich-render-source {
+  margin-top: 10px;
+}
+
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-height: 320px;
+  margin: 8px 0 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: #111827;
+  color: #dbe4f0;
+}
+
+.mermaid,
+.mermaid-rendered {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  overflow: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line, #d7dce5);
+  border-radius: 999px;
+  background: #f9fafc;
+  color: var(--muted, #667085);
+  font-size: 12px;
+}
+
+.rich-status[data-state="ready"] {
+  color: #16845b;
+  border-color: color-mix(in srgb, #16845b 35%, var(--line, #d7dce5));
+}
+
+.rich-status[data-state="fallback"] {
+  color: #b7791f;
+  border-color: color-mix(in srgb, #b7791f 35%, var(--line, #d7dce5));
+}
+
+.rich-status[data-state="error"] {
+  color: #c2414b;
+  border-color: color-mix(in srgb, #c2414b 35%, var(--line, #d7dce5));
+}
+
+.hljs {
+  border-radius: 8px;
+}
