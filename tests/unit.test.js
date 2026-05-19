@@ -124,6 +124,26 @@ test("无新日报时 feed 更新时间保持稳定", () => {
   assert.equal(validateFeed(feed).valid, true);
 });
 
+test("相同日报重建时 feed 更新时间保持稳定", async () => {
+  const markdown = await readFixture("reports/good/official-release.md");
+  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
+  const existing = mergeFeed(
+    {
+      schema_version: 1,
+      site_title: "AI 日报",
+      site_url: siteUrl,
+      updated_at: "2026-05-13T02:35:00+08:00",
+      reports: []
+    },
+    [report],
+    { siteUrl, updatedAt: "2026-05-13T02:35:00+08:00" }
+  );
+
+  const feed = mergeFeed(existing, [report], { siteUrl, updatedAt: "2026-05-13T03:00:00+08:00" });
+  assert.equal(feed.updated_at, "2026-05-13T02:35:00+08:00");
+  assert.equal(validateFeed(feed).valid, true);
+});
+
 test("HTML 渲染会转义日报正文并保留外链 rel", async () => {
   const markdown = await readFixture("reports/good/html-escaping.md");
   const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });

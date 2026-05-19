@@ -128,7 +128,6 @@ export async function planGeneratedFiles(options = {}) {
 export function mergeFeed(existingFeed, reports, options = {}) {
   const siteTitle = options.siteTitle || existingFeed?.site_title || DEFAULT_SITE.title;
   const siteUrl = options.siteUrl || existingFeed?.site_url || DEFAULT_SITE.siteUrl;
-  const updatedAt = reports.length === 0 && existingFeed?.updated_at ? existingFeed.updated_at : options.updatedAt || defaultGeneratedAt();
   const byDate = new Map();
 
   for (const item of existingFeed?.reports || []) {
@@ -153,13 +152,30 @@ export function mergeFeed(existingFeed, reports, options = {}) {
     byDate.set(report.report_date, entry);
   }
 
+  const mergedReports = [...byDate.values()].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const updatedAt =
+    existingFeed?.updated_at && reportsAreEqual(existingFeed.reports || [], mergedReports)
+      ? existingFeed.updated_at
+      : options.updatedAt || defaultGeneratedAt();
+
   return {
     schema_version: 1,
     site_title: siteTitle,
     site_url: siteUrl,
     updated_at: updatedAt,
-    reports: [...byDate.values()].sort((a, b) => b.report_date.localeCompare(a.report_date))
+    reports: mergedReports
   };
+}
+
+function reportsAreEqual(left, right) {
+  const normalize = (items) => [...items].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const normalizedLeft = normalize(left);
+  const normalizedRight = normalize(right);
+  if (normalizedLeft.length !== normalizedRight.length) {
+    return false;
+  }
+
+  return normalizedLeft.every((item, index) => JSON.stringify(item) === JSON.stringify(normalizedRight[index]));
 }
 
 async function walk(dir, files) {
