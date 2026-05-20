@@ -87,7 +87,8 @@ function textFromHtml(fragment) {
 function collectTagText(html, tagName) {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "gi");
   const values = [];
-  for (const match of html.matchAll(pattern)) {
+  let match;
+  while ((match = pattern.exec(html)) !== null) {
     values.push(textFromHtml(match[1]));
   }
   return values.filter(Boolean);
@@ -190,7 +191,7 @@ function collectNavigationOrderIssues(documentMarkup) {
 
   const navIds = [...nav.matchAll(/<a\b(?=[^>]*data-nav-link)[^>]*href="([^"]+)"/gi)]
     .map((match) => normalizeFragmentId(match[1]))
-    .filter(Boolean);
+    .filter((id) => id && id !== "report-top");
   if (navIds.length === 0) return issues;
 
   const sectionIds = [...documentMarkup.matchAll(/<section\b[^>]*>/gi)]
@@ -1013,8 +1014,8 @@ async function validateBrowserWithCdp(file, mode) {
       if (viewport.clippedText?.length) issues.push(`clipped text at ${viewport.width}: ${viewport.clippedText.join("; ")}`);
     }
     for (const item of mermaid) {
-      if (!["ready", "degraded", "failed"].includes(item.state)) issues.push(`mermaid ${item.id} has unresolved state ${item.state}`);
-      if (item.state === "ready" && item.svgCount === 0) issues.push(`mermaid ${item.id} is ready without SVG`);
+      if (item.state !== "ready") issues.push(`mermaid ${item.id} did not render ready SVG; state=${item.state}`);
+      if (item.svgCount === 0) issues.push(`mermaid ${item.id} rendered no SVG`);
       if (!item.hasFallback) issues.push(`mermaid ${item.id} lacks source fallback`);
       if (item.textOverflow) issues.push(`mermaid ${item.id} text appears outside SVG bounds`);
     }
@@ -1044,6 +1045,8 @@ async function validateBrowserWithCdp(file, mode) {
     if (!accessibility.primaryConclusionVisible) issues.push("primary conclusion is not visible before interaction");
     if (accessibility.chartIssues?.length) issues.push(accessibility.chartIssues.join(" | "));
     if (mode === "runtime-cdn" && runtime.pending > 0) issues.push(`runtime still pending for ${runtime.pending} sections`);
+    if (mode === "runtime-cdn" && runtime.failed > 0) issues.push(`runtime failed for ${runtime.failed} rich section(s)`);
+    if (mode === "runtime-cdn" && runtime.degraded > 0) issues.push(`runtime degraded for ${runtime.degraded} rich section(s)`);
     if (mode === "runtime-cdn" && runtime.dependencyStates?.length === 0) issues.push("runtime dependency states were not exposed");
     if (mode === "runtime-cdn" && runtime.dependencyStates?.includes("pending")) issues.push("runtime dependency states are still pending");
 

@@ -14,11 +14,12 @@
   --warn: #a15c07;
   --danger: #b42318;
   --info: #0f766e;
-  --code-bg: #0b1220;
+  --code-bg: #090d1a;
   --code-panel: #111827;
-  --code-line: #d6e2f1;
+  --code-line: #e6f0ff;
   --code-muted: #9fb0c7;
   --code-border: #2d3b52;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --shadow: 0 12px 32px rgba(17, 24, 39, 0.10);
   --focus: 0 0 0 3px rgba(29, 78, 216, 0.24);
 }
@@ -470,7 +471,7 @@ h3 {
   overflow-wrap: anywhere;
   word-break: break-word;
   color: inherit;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--code-font);
   font-size: 12px;
   font-weight: 650;
   line-height: 1.35;
@@ -502,6 +503,39 @@ button[aria-pressed="true"],
 button[aria-selected="true"] {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
 }
 
 button[data-copy-state="success"] {
@@ -552,9 +586,12 @@ summary:focus-visible {
 .report-nav-group {
   display: flex;
   flex: 0 0 auto;
-  gap: 6px;
-  padding-block: 0;
-  border-top: 0;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
 }
 
 .report-nav-group:first-of-type {
@@ -574,15 +611,27 @@ summary:focus-visible {
   flex: 0 0 auto;
   gap: 8px;
   align-items: center;
-  padding: 6px 7px;
+  padding: 6px 8px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 0;
   color: var(--ink);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.25;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
 }
 
 .report-nav a span {
@@ -647,7 +696,7 @@ summary:focus-visible {
   padding: 12px;
   background: var(--code-bg);
   color: var(--code-line);
-  font: 500 13px/1.28 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font: 500 13px/1.35 var(--code-font);
   tab-size: 2;
 }
 
@@ -671,7 +720,7 @@ summary:focus-visible {
   margin-inline: -12px;
   padding-inline: 58px 12px;
   position: relative;
-  line-height: 1.28;
+  line-height: 1.35;
   white-space: pre;
 }
 
@@ -710,18 +759,20 @@ summary:focus-visible {
 .hljs-selector-tag,
 .hljs-built_in,
 .hljs-name {
-  color: #93c5fd;
+  color: #7dd3fc;
+  font-weight: 750;
 }
 
 .hljs-string,
 .hljs-title,
 .hljs-section {
-  color: #86efac;
+  color: #bef264;
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #a8b3c7;
+  color: #94a3b8;
+  font-style: italic;
 }
 
 .hljs-number,
@@ -733,6 +784,48 @@ summary:focus-visible {
 .hljs-variable,
 .hljs-template-variable {
   color: #f0abfc;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c084fc;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #67e8f9;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #fb7185;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #f97316;
+}
+
+.hljs-addition {
+  color: #86efac;
+}
+
+.hljs-deletion {
+  color: #fda4af;
 }
 
 .diagram-panel,

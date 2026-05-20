@@ -170,10 +170,13 @@
     if (!id) return null;
     var target = document.getElementById(id);
     if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
     if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
       return target;
     }
-    return target.closest("[id][data-section-type], #evidence, #verification, #next-actions");
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
   }
 
   function sectionIsVisible(section) {
@@ -201,7 +204,7 @@
   }
 
   function updateActiveNavigation() {
-    var sections = Array.prototype.slice.call(document.querySelectorAll("[id][data-section-type], #evidence, #verification, #next-actions"));
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
     var hashSection = reportSectionForId(hashTargetId());
     var active = sections
       .map(function (section) {

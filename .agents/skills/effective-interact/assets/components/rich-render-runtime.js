@@ -238,6 +238,72 @@
       .filter(function (item) { return Number.isFinite(item); });
   }
 
+  function escapeFallbackHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function stashToken(tokens, html, pattern, renderToken) {
+    return html.replace(pattern, function () {
+      var args = Array.prototype.slice.call(arguments);
+      var match = args[0];
+      var key = "\u0000EFFECTIVE_HL_" + tokens.length + "\u0000";
+      tokens.push(typeof renderToken === "function"
+        ? renderToken.apply(null, args)
+        : '<span class="' + renderToken + '">' + match + "</span>");
+      return key;
+    });
+  }
+
+  function restoreTokens(tokens, html) {
+    return html.replace(/\u0000EFFECTIVE_HL_(\d+)\u0000/g, function (_match, index) {
+      return tokens[Number(index)] || "";
+    });
+  }
+
+  function fallbackHighlightLine(line, language) {
+    var lang = String(language || "").toLowerCase();
+    var tokens = [];
+    var html = escapeFallbackHtml(line);
+    html = stashToken(tokens, html, /(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g, "hljs-string");
+    if (["bash", "sh", "shell", "powershell", "ps1"].includes(lang)) {
+      html = stashToken(tokens, html, /(^|\s)(#.*)$/g, function (_match, prefix, comment) {
+        return prefix + '<span class="hljs-comment">' + comment + "</span>";
+      });
+      html = stashToken(tokens, html, /(--?[A-Za-z][A-Za-z0-9-]*)/g, "hljs-attr");
+      html = stashToken(tokens, html, /\b(bun|node|npm|pnpm|yarn|git|gh|openspec|powershell|pwsh|cd|dir|ls|rg|curl|docker)\b/g, "hljs-built_in");
+      return restoreTokens(tokens, html);
+    }
+
+    html = stashToken(tokens, html, /(\/\/.*)$/g, "hljs-comment");
+    html = stashToken(tokens, html, /\b(class|interface|type|enum)\s+([A-Za-z_$][\w$]*)/g, function (_match, keyword, name) {
+      return '<span class="hljs-keyword">' + keyword + '</span> <span class="hljs-title class_">' + name + "</span>";
+    });
+    html = stashToken(tokens, html, /\b(function|def)\s+([A-Za-z_$][\w$]*)/g, function (_match, keyword, name) {
+      return '<span class="hljs-keyword">' + keyword + '</span> <span class="hljs-title function_">' + name + "</span>";
+    });
+    html = stashToken(tokens, html, /\b(async|await|const|let|var|return|function|export|import|from|if|else|try|catch|new|typeof|instanceof|extends|implements|public|private|protected|static|readonly|yield|switch|case|break|continue|throw|throws|for|while|do|in|of)\b/g, "hljs-keyword");
+    html = stashToken(tokens, html, /\b(string|number|boolean|unknown|never|void|object|Record|Promise|Array|Map|Set)\b/g, "hljs-type");
+    html = stashToken(tokens, html, /\b(true|false|null|undefined|NaN|Infinity)\b/g, "hljs-literal");
+    html = stashToken(tokens, html, /\b(\d+(?:\.\d+)?)\b/g, "hljs-number");
+    html = stashToken(tokens, html, /([A-Za-z_$][\w$]*)(\s*:)/g, function (_match, name, colon) {
+      return '<span class="hljs-attr">' + name + "</span>" + colon;
+    });
+    return restoreTokens(tokens, html);
+  }
+
+  function fallbackHighlightCode(source, language) {
+    return String(source || "").replace(/\r\n/g, "\n").split("\n")
+      .map(function (line) { return fallbackHighlightLine(line, language); })
+      .join("\n");
+  }
+
+  function hasHighlightTokens(html) {
+    return /\bclass=(?:"|')hljs-/.test(String(html || ""));
+  }
+
   function highlightCode() {
     if (!window.hljs || typeof window.hljs.highlight !== "function") {
       setDependencyState("highlightjs", "failed");
@@ -281,6 +347,9 @@
         var highlighted = temp.innerHTML || (window.hljs.getLanguage(language)
           ? window.hljs.highlight(source, { language: language, ignoreIllegals: true }).value
           : window.hljs.highlightAuto(source).value);
+        if (!hasHighlightTokens(highlighted)) {
+          highlighted = fallbackHighlightCode(source, language);
+        }
         node.innerHTML = wrapHighlightedLines(highlighted, source, startLine, highlightLines);
         node.dataset.highlighted = "true";
         setStatus(statusId, "ready", "ready");

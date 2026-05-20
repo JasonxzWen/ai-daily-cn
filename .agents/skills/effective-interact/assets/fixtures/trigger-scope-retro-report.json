@@ -1,18 +1,19 @@
 {
   "title": "HTML 汇报漏触发复盘",
-  "summary": "**结论：缺口在触发合同，不在生成能力。** 已把完成态 OpenSpec、实现、验收交付写成默认触发，并用路由文档、专项测试和浏览器验收锁住。",
+  "summary": "**结论：缺口在触发合同和信息组织，不在生成能力。** 已把非平凡会话默认考虑、重大 repo/skill 变更必须汇报、信息架构方法写入技能，并用路由文档、专项测试和浏览器验收锁住。",
   "status": "complete",
   "template": "implementation-handoff",
   "renderMode": "runtime-cdn",
   "intent": {
     "audience": "Skill Hub maintainer",
-    "primaryQuestion": "哪条触发规则让这次应有 HTML 汇报却漏掉？",
-    "decision": "完成态工程交付默认给 HTML 汇报；生产 UI、slide deck、bundled app 仍排除。",
+    "primaryQuestion": "为什么这次应有 HTML 汇报却漏掉，后续如何避免？",
+    "decision": "每个非平凡会话默认考虑 effective-interact，重大 repo/skill 变更必须给 HTML 汇报；生产 UI、slide deck、bundled app 仍排除。",
     "timeBudget": "2 分钟",
     "artifactKind": "handoff",
     "successCriteria": [
-      "默认触发写进 SKILL.md",
+      "默认考虑加载写进 SKILL.md",
       "路由文档同步",
+      "信息组织理论落到可执行规则",
       "专项测试与浏览器验收通过"
     ]
   },
@@ -21,7 +22,7 @@
       "type": "data-table",
       "title": "触发合同修复",
       "group": "changes",
-      "summary": "4 个入口从模糊判断改成完成态默认汇报。",
+      "summary": "5 个入口从窄触发改成默认考虑、重大变更必汇报。",
       "columns": [
         "入口",
         "之前",
@@ -31,27 +32,33 @@
       "rows": [
         [
           "SKILL description",
-          "依赖显式“需要 HTML”判断",
-          "完成态工程交付默认加载",
-          "少一次主观漏判"
+          "依赖显式“需要 HTML”或完成态判断",
+          "非平凡会话默认考虑，重大变更必须汇报",
+          "覆盖本次漏判"
         ],
         [
           "Decision Rule",
-          "只覆盖 Markdown wall",
-          "OpenSpec apply/archive 完成后默认触发",
-          "本次场景被纳入"
+          "只覆盖 Markdown wall 和完成态",
+          "计划中、执行中、最终交付都做 HTML-worthiness check",
+          "范围不再过窄"
         ],
         [
           "Trigger Examples",
-          "没有 OpenSpec 验收汇报示例",
-          "新增 apply acceptance report 示例",
-          "后续更容易命中"
+          "没有 skill/repo 行为变更汇报示例",
+          "新增 material-change report 示例",
+          "本类维护任务直接命中"
         ],
         [
           "Routing docs",
-          "只说非平凡完成结论",
-          "多文件工程 handoff 默认 HTML",
+          "只说非平凡交互产物",
+          "非平凡会话默认考虑，重大变更要求 HTML 报告",
           "与项目路由一致"
+        ],
+        [
+          "Information Architecture",
+          "BLUF/SCQA 等停留在零散提示",
+          "补充 Pyramid、PREP、MECE、LATCH、DIKW、OODA、信息熵",
+          "减少低信息密度复述"
         ]
       ]
     },
@@ -60,20 +67,20 @@
       "title": "触发决策链路",
       "group": "changes",
       "status": "ready",
-      "summary": "把本次漏判改成默认路由，而不是依赖用户点名 HTML。",
-      "content": "flowchart LR\n  A[\"完成态 OpenSpec / 实现 / 验收\"] --> B{\"非平凡工程交付？\"}\n  B -->|是| C[\"默认加载 effective-interact\"]\n  C --> D[\"生成 HTML 汇报 + 验证链接\"]\n  B -->|否| E[\"普通聊天回复\"]\n  D --> F[\"仍排除 production UI / slide deck / bundled app\"]"
+      "summary": "把本次漏判改成默认检查和重大变更必汇报，而不是依赖用户点名 HTML。",
+      "content": "flowchart LR\n  A[\"非平凡会话\"] --> B[\"默认考虑 effective-interact\"]\n  B --> C{\"有强信号或交付义务？\"}\n  C -->|是| D[\"生成 HTML 汇报 + 浏览器验证\"]\n  C -->|否| E[\"聊天或 Markdown\"]\n  D --> F[\"重大 repo/skill 变更保留证据链\"]\n  E --> G[\"仍排除 permission pause / trivial chat\"]"
     },
     {
       "type": "code",
       "title": "触发描述证据",
       "group": "evidence",
       "status": "ready",
-      "summary": "用精确片段证明触发合同已经覆盖完成态交付。",
+      "summary": "用精确片段证明触发合同已经覆盖默认考虑和重大变更汇报。",
       "language": "yaml",
       "filePath": ".codex/skills/effective-interact/SKILL.md",
       "startLine": 3,
       "highlightLines": [3],
-      "content": "description: Load when completed implementation, OpenSpec, validation, or review work has a complete conclusion needing a concise Chinese-first self-contained HTML report, plan, status dashboard, research explainer, architecture walkthrough, or lightweight export editor; skip permission pauses, simple chat answers, production UI, slide decks, and bundled web apps."
+      "content": "description: Load broadly for non-trivial sessions when a Chinese-first self-contained HTML artifact can clarify planning, implementation/review progress, research, architecture, learning, validation, status, or handoff better than chat; default-consider every session, especially final reports after material repo changes; skip permission-only pauses, trivial chat, production UI, slides, bundled apps."
     },
     {
       "type": "data-table",
@@ -89,7 +96,7 @@
         [
           "触发范围断言",
           "通过",
-          "覆盖 implementation、OpenSpec、validation gates"
+          "覆盖 non-trivial sessions、material repo changes、default-consider"
         ],
         [
           "聚焦测试",
@@ -108,13 +115,13 @@
       "title": "边界不变",
       "group": "risks",
       "status": "ready",
-      "content": "- **只改完成态工程汇报触发**：不进入 production UI、slide deck、bundled app 或通用 frontend builder。\n- **报告仍走 JSON fixture + generator**：不是手写一次性页面。\n- **验收必须过 validator + browser**：布局、锚点、复制按钮都要被检查。"
+      "content": "- **扩大的是默认考虑和交付义务**：不进入 production UI、slide deck、bundled app 或通用 frontend builder。\n- **重大 repo/skill 变更必须 HTML 汇报**：尤其是触发合同、验证规则、路由边界发生变化时。\n- **验收必须过 validator + browser**：Mermaid、布局、锚点、复制按钮都要被检查。"
     }
   ],
   "claims": [
     {
       "id": "claim-trigger-root-cause",
-      "statement": "漏掉 HTML 汇报的直接原因是触发合同没覆盖完成态 OpenSpec、实现和验收交付。",
+      "statement": "漏掉 HTML 汇报的直接原因是触发合同没有把非平凡会话默认考虑和重大 repo/skill 变更汇报写成义务。",
       "kind": "conclusion",
       "evidenceIds": [
         "e-skill-description",
@@ -124,7 +131,7 @@
     },
     {
       "id": "claim-boundary-preserved",
-      "statement": "修复只扩大完成态工程交付汇报，不改变生产 UI、slide deck、bundled app 的排除边界。",
+      "statement": "修复只扩大默认考虑和重大变更汇报，不改变生产 UI、slide deck、bundled app 的排除边界。",
       "kind": "conclusion",
       "evidenceIds": [
         "e-routing-docs",
@@ -137,7 +144,7 @@
     {
       "id": "e-skill-description",
       "kind": "file",
-      "label": "技能触发描述和 Decision Rule",
+      "label": "技能触发描述和默认考虑规则",
       "filePath": ".codex/skills/effective-interact/SKILL.md",
       "line": 3,
       "status": "pass",
@@ -157,7 +164,7 @@
       "kind": "command",
       "label": "触发范围红灯",
       "command": "bun test ./tests/effectiveInteractSkill.test.ts",
-      "value": "新增断言后 3 tests failed，失败点集中在缺少 completed implementation、OpenSpec apply、默认触发说明。",
+      "value": "新增断言后失败点集中在缺少 default-consider、material-change report、信息架构契约。",
       "status": "pass",
       "trustLevel": "trusted-generated"
     },
@@ -166,7 +173,7 @@
       "kind": "command",
       "label": "触发范围绿灯",
       "command": "bun test ./tests/effectiveInteractSkill.test.ts",
-      "value": "28 pass，0 fail，386 expect() calls。",
+      "value": "专项测试通过，覆盖默认触发、运行时渲染、导航、代码高亮、浏览器验证。",
       "status": "pass",
       "trustLevel": "trusted-generated"
     }
@@ -189,7 +196,7 @@
     }
   ],
   "nextActions": [
-    "今后完成 OpenSpec apply/archive 或多文件实现后，默认附 HTML 汇报。",
+    "今后非平凡会话先做 HTML-worthiness check；重大 repo/skill 变更默认附 HTML 汇报。",
     "最终回复只保留一句结论、报告链接和验证命令，不复述整份报告。"
   ]
 }

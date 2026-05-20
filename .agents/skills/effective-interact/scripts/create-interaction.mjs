@@ -749,20 +749,44 @@ function highlightCode(source, language = "text", highlightLines = [], startLine
   return `<code class="hljs language-${escapeAttr(language)}">${highlighted.join("")}</code>`;
 }
 
+function stashHighlightToken(tokens, html, pattern, renderToken) {
+  return html.replace(pattern, (...args) => {
+    const key = `\u0000EFFECTIVE_HL_${tokens.length}\u0000`;
+    tokens.push(renderToken(...args));
+    return key;
+  });
+}
+
+function restoreHighlightTokens(tokens, html) {
+  return html.replace(/\u0000EFFECTIVE_HL_(\d+)\u0000/g, (_match, index) => tokens[Number(index)] || "");
+}
+
 function highlightLine(line, language) {
   let html = escapeHtml(line);
+  const tokens = [];
+  const stashClass = (pattern, className) => {
+    html = stashHighlightToken(tokens, html, pattern, (match) => `<span class="${className}">${match}</span>`);
+  };
   if (["javascript", "js", "typescript", "ts"].includes(language)) {
-    html = html.replace(/\b(async|await|const|let|var|return|function|export|import|from|if|else|try|catch|new|type|string|boolean)\b/g, '<span class="hljs-keyword">$1</span>');
-    html = html.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g, '<span class="hljs-string">$1</span>');
-    html = html.replace(/\b(true|false|null|undefined)\b/g, '<span class="hljs-literal">$1</span>');
-    html = html.replace(/(\/\/.*)$/g, '<span class="hljs-comment">$1</span>');
+    stashClass(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g, "hljs-string");
+    stashClass(/(\/\/.*)$/g, "hljs-comment");
+    html = stashHighlightToken(tokens, html, /\b(class|interface|type|enum)\s+([A-Za-z_$][\w$]*)/g, (_match, keyword, name) => `<span class="hljs-keyword">${keyword}</span> <span class="hljs-title class_">${name}</span>`);
+    html = stashHighlightToken(tokens, html, /\b(function)\s+([A-Za-z_$][\w$]*)/g, (_match, keyword, name) => `<span class="hljs-keyword">${keyword}</span> <span class="hljs-title function_">${name}</span>`);
+    stashClass(/\b(async|await|const|let|var|return|function|export|import|from|if|else|try|catch|new|typeof|instanceof|extends|implements|public|private|protected|static|readonly|yield|switch|case|break|continue|throw|for|while|do|in|of)\b/g, "hljs-keyword");
+    stashClass(/\b(string|number|boolean|unknown|never|void|object|Record|Promise|Array|Map|Set)\b/g, "hljs-type");
+    stashClass(/\b(true|false|null|undefined)\b/g, "hljs-literal");
+    stashClass(/\b(\d+(?:\.\d+)?)\b/g, "hljs-number");
+    html = stashHighlightToken(tokens, html, /([A-Za-z_$][\w$]*)(\s*:)/g, (_match, name, colon) => `<span class="hljs-attr">${name}</span>${colon}`);
   } else if (["json"].includes(language)) {
-    html = html.replace(/(&quot;[^&]*?&quot;)(\s*:)?/g, '<span class="hljs-string">$1</span>$2');
-    html = html.replace(/\b(true|false|null)\b/g, '<span class="hljs-literal">$1</span>');
+    html = stashHighlightToken(tokens, html, /(&quot;[^&]*?&quot;)(\s*:)?/g, (_match, text, colon = "") => `<span class="${colon ? "hljs-attr" : "hljs-string"}">${text}</span>${colon}`);
+    stashClass(/\b(true|false|null)\b/g, "hljs-literal");
+    stashClass(/\b(\d+(?:\.\d+)?)\b/g, "hljs-number");
   } else if (["bash", "sh", "shell", "powershell"].includes(language)) {
-    html = html.replace(/\b(bun|node|npm|git|openspec|powershell|pwsh)\b/g, '<span class="hljs-keyword">$1</span>');
+    html = stashHighlightToken(tokens, html, /(^|\s)(#.*)$/g, (_match, prefix, comment) => `${prefix}<span class="hljs-comment">${comment}</span>`);
+    stashClass(/(--?[A-Za-z][A-Za-z0-9-]*)/g, "hljs-attr");
+    stashClass(/\b(bun|node|npm|pnpm|yarn|git|gh|openspec|powershell|pwsh|cd|dir|ls|rg|curl|docker)\b/g, "hljs-built_in");
   }
-  return html;
+  return restoreHighlightTokens(tokens, html);
 }
 
 async function renderMermaidSvg(source, title, options) {
@@ -1143,6 +1167,7 @@ function renderGroupedNav(sections) {
     <div class="report-nav-title">速览</div>
     <div class="report-nav-group" data-nav-group="reading-order">
       <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       ${entries.map((section, index) => `<a href="#${escapeAttr(section.id)}" title="${escapeAttr(section.title)}" data-nav-link data-nav-index="${index + 1}" data-nav-group-name="${escapeAttr(section.group || "main")}" data-nav-status="${escapeAttr(section.status || "info")}"><span>${escapeHtml(section.title)}</span></a>`).join("\n")}
     </div>
   </nav>`;
@@ -1282,7 +1307,7 @@ async function createInteraction(input, options = {}) {
 </head>
 <body>
   <main class="report-shell">
-    <header class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
       <div class="title-row">
         <div>
           <div class="eyebrow">${escapeHtml(meta.label)} | ${escapeHtml(meta.useCase)}</div>

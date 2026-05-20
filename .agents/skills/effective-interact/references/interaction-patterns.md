@@ -1,30 +1,26 @@
 # Effective Interact Patterns
 
-## Table of Contents
-
-- [Interaction Workflow](#interaction-workflow)
-- [HTML Usefulness Gate](#html-usefulness-gate)
-- [Pattern Selection](#pattern-selection)
-- [Template Catalogue](#template-catalogue)
-- [Generator Contract](#generator-contract)
-- [Decision Quality Contract](#decision-quality-contract)
-- [Artifact Selection](#artifact-selection)
-- [Rich Content Contract](#rich-content-contract)
-- [Runtime Rendering Support](#runtime-rendering-support)
-- [Validation Contract](#validation-contract)
-- [Layout Skeleton](#layout-skeleton)
-- [Interaction Rules](#interaction-rules)
-- [Visual Rules](#visual-rules)
-
 ## Interaction Workflow
 
 Use this workflow every time the skill loads:
 
-1. Confirm the interaction point needs HTML because it performs at least one job Markdown cannot: side-by-side comparison, spatial structure, inspectable evidence, small local interaction, or visible export.
+1. Treat loading as permission to run an HTML-worthiness check, not as an obligation to emit HTML.
 2. Choose one primary pattern from [Pattern Selection](#pattern-selection). If no pattern fits, answer in chat or Markdown instead.
 3. Start with the generator and the closest template. Use hand-written HTML only when the generator cannot express the required local editor or visualization.
 4. Add rich sections only when the chosen pattern requires them. Do not add charts, Mermaid, code, diff, tabs, filters, claims, or controls just to make the page look richer or silence an advisory warning.
 5. Validate the HTML and hand off the artifact link with validation status and any kept advisory warnings.
+
+## Default Session Routing
+
+The skill may load in every non-trivial session. The decision is whether to produce an artifact:
+
+| Checkpoint | Produce HTML when | Chat/Markdown remains enough when |
+|---|---|---|
+| Session start | The user is comparing paths, reviewing evidence, learning a complex system, or asking for a durable alignment surface. | The task is a short factual answer, permission pause, or one-command status. |
+| During work | The next useful user input depends on seeing options, blockers, file evidence, validation state, or a process map together. | The user only needs a concise status sentence before work continues. |
+| Final handoff | Material repo or skill behavior changed, validation evidence matters, or the final answer would become a long linear file list. | The work is tiny, self-evident, and has no durable evidence beyond one command result. |
+
+For material repo or skill changes, default to an `implementation-handoff` or `conclusion-dashboard` artifact. It should include the why, changed contract, file evidence, validation, remaining risks, and next action. This rule is meant to catch changes where a plain final answer hides the decision trail.
 
 ## HTML Usefulness Gate
 
@@ -33,7 +29,7 @@ Use this quick gate before choosing a pattern:
 | Gate | Use HTML when | Markdown default |
 |---|---|---|
 | Strong signal | Options, structures, evidence, or controls become faster to compare, inspect, or act on in a browser. | A short answer, plain list, or compact table answers the user's question. |
-| Comparison | There are 3 or more comparable options, statuses, files, findings, or scenarios. | There are 1-2 items and no meaningful side-by-side tradeoff. |
+| Comparison | There are 2 or more comparable options, statuses, files, findings, or scenarios with meaningful tradeoffs. | There is one item, or two items with no meaningful side-by-side decision. |
 | Structure | The content is a flow, state, timeline, map, call path, architecture, dependency, or ownership model. | The sequence is linear and shorter than a small diagram. |
 | Action | The user must choose, tune, sort, filter, copy, export, or return structured input. | The user only needs to read and acknowledge. |
 | Evidence | Source anchors, code, diff, citations, evidence, or validation need local navigation. | One or two inline references are enough. |
@@ -214,6 +210,25 @@ HTML interaction artifacts exist to lower the reader's decision cost. Use the Py
 
 The validator exposes `decision-brief-scan` as a non-blocking quality check. Treat its warnings as prompts to rewrite the artifact before handoff.
 
+## Information Architecture Contract
+
+Use communication theory as a design constraint, not as decoration:
+
+| Principle | Artifact move | Failure symptom |
+|---|---|---|
+| BLUF / Pyramid | Put the conclusion and decision request first, then reveal support by priority. | The reader must scroll before knowing what happened. |
+| SCQA | Use Situation, Complication, Question, Answer to explain why the artifact exists. | Context feels like a pile of facts with no tension. |
+| PREP | For each major claim, state Point, Reason, Evidence, and Practical next step. | Cards repeat conclusions without proof or action. |
+| MECE | Split sections into mutually distinct buckets such as trigger, rendering, typography, navigation, validation. | Cards overlap and lower information entropy. |
+| LATCH | Order details by Location, Alphabet, Time, Category, or Hierarchy; pick one order and keep it visible. | Navigation feels random or disconnected. |
+| DIKW | Separate raw data, interpreted information, knowledge, and decision wisdom. | Evidence and recommendation blur together. |
+| OODA | Show observation, orientation, decision, and next action when a workflow is still moving. | The page explains history but not what to do next. |
+| Cognitive load | Use progressive disclosure, filters, tabs, and tables only when they reduce working memory. | Controls exist but do not shorten reading. |
+| Information scent | Nav labels, section titles, and cards must promise the exact detail they contain. | Clicking a section does not answer the expected question. |
+| Information entropy | Each block should add a new decision-relevant bit: status, contrast, evidence, risk, or action. | Multiple blocks paraphrase the same vague reassurance. |
+
+When the artifact feels low-entropy, cut duplicated claims before adding components. When it feels dense but hard to use, add structure: grouped navigation, a data table, a rendered diagram, or code evidence.
+
 ## Warning Policy
 
 Validator warnings are advisory prompts, not a checklist to clear. In short: warning != required fix.
@@ -261,8 +276,8 @@ Generator and validator scripts are internal `effective-interact` assets. Do not
 
 - **Language/encoding**: generated artifacts are Chinese-first UTF-8. Continuous half-width question marks or replacement characters are validation failures because they usually indicate a non-UTF-8 shell/stdin path corrupted the interaction input.
 - **Markdown**: convert headings, lists, tables, callouts, links, `**strong**`, `*emphasis*`, and `==highlight==` into semantic HTML. Do not make the user read raw Markdown unless it is an explicit source excerpt.
-- **Mermaid**: use it only when a non-trivial sequence, architecture, call-path, or data-flow diagram is faster than text. For dynamic diagrams, pin Mermaid and call `mermaid.render`; keep Mermaid source in hidden machine-verifiable fallback data, not a visible source block.
-- **Code**: show code only when the artifact needs exact implementation evidence. Use the smallest useful snippet with source file link, line number or range, copied snippet, highlighted decisive lines, and a one-line reason.
+- **Mermaid**: use it only when a non-trivial sequence, architecture, call-path, or data-flow diagram is faster than text. For dynamic diagrams, pin Mermaid and call `mermaid.render`; keep Mermaid source in hidden machine-verifiable fallback data, not a visible source block. A Mermaid section that remains failed or degraded after browser validation is not handoff-ready.
+- **Code**: show code only when the artifact needs exact implementation evidence. Use the smallest useful snippet with source file link, line number or range, copied snippet, highlighted decisive lines, and a one-line reason. Code should use a rounded editor-like monospace stack and a broad, vivid token palette so the snippet is faster to scan than plain text.
 - **Diff**: include a `diff` section only for review findings, behavioral changes, or before/after examples where prose would be ambiguous.
 - **File references**: render as clickable local-path anchors when the host supports them, or as copyable path chips otherwise; do not create a separate evidence section when one sentence is enough.
 - **Citations**: keep source cards short and optional: title, source, date/accessed, and why it matters.
@@ -285,7 +300,7 @@ Use `runtime-cdn` as the default Codex-visible artifact path. It keeps the artif
 Render modes:
 
 - `runtime-cdn` is the default. It declares pinned runtime dependencies in a hidden machine-readable manifest, keeps hidden source fallback data, and exposes ready/degraded/failed state through attributes rather than visible effect tags. Set `showRuntimeDependencies: true` only when dependency loading is part of the artifact.
-- `pre-rendered` is explicit. Critical CSS/JS is inlined, Markdown becomes semantic HTML, Mermaid becomes inline SVG or degraded fallback, and code gets static highlight spans.
+- `pre-rendered` is explicit. Critical CSS/JS is inlined, Markdown becomes semantic HTML, Mermaid should become real inline SVG, and code gets static highlight spans. If Mermaid cannot render, do not treat the fallback as a successful diagram.
 - `fallback-only` is explicit degraded output. It keeps source text readable without claiming rich rendering success.
 - `runtime` is a legacy alias accepted by the generator and normalized to `runtime-cdn`.
 
@@ -310,7 +325,7 @@ Pinned runtime bundle pattern:
 Runtime rules:
 
 - Marked parses Markdown but does not sanitize output; sanitize with DOMPurify unless the Markdown is trusted generated content.
-- Mermaid should initialize with `startOnLoad: false` and a strict security level, then render each diagram into its own target with independent failure state.
+- Mermaid should initialize with `startOnLoad: false` and a strict security level, then render each diagram into its own target with independent failure state. Browser-required validation fails when any Mermaid section is not `ready` with an SVG.
 - highlight.js should use explicit language classes such as `language-typescript`; line-number wrappers and highlighted lines are applied by local interaction JS around highlighted token markup. Do not insert text newlines between block line wrappers; that creates fake blank rows in `<pre>`.
 - Every runtime-rendered block still needs hidden source fallback data for audit and degraded states, but do not show `Source fallback`, `Code source`, `Markdown rendered`, or `Code highlighted` labels during normal successful rendering.
 - CDN runtime use is a conscious tradeoff: better Codex-visible rendering, but weaker offline guarantees than pre-rendered output.
@@ -324,6 +339,7 @@ Runtime rules:
 - Use component groups such as `diagrams`, `code`, or `evidence` only when the artifact intentionally contains those components and the group helps the reader.
 - Desktop artifacts should keep navigation visually separate from the reading column.
 - Narrow artifacts should wrap, collapse, or scroll navigation without body-level horizontal overflow.
+- Navigation, tab, and filter controls should read as joined segmented groups, not scattered buttons. Include a return-to-overview path for long artifacts.
 - Long section names need wrapping, truncation with `title`, or an equivalent accessible affordance. Navigation labels are Chinese by default and should describe the argument, not the widget inventory.
 
 ## Visual Quality Contract
@@ -331,6 +347,7 @@ Runtime rules:
 - Body text, metadata, card text, code, table cells, and diagram labels need explicit font size, line height, and font weight.
 - Engineering artifacts should be dense but readable; avoid oversized gaps and ultra-light text.
 - Code line height should stay near normal editor density; blank vertical gaps between consecutive code lines are a bug.
+- Code highlighting should distinguish keywords, strings, numbers, attributes, properties, comments, types, functions, tags, additions, and deletions with clearly different colors.
 - Code panels own their overflow and must not expand the page width.
 - Mermaid panels own their overflow and must not cover adjacent sections.
 - Hover and focus states may change color, outline, border, and shadow, but must not shift neighboring layout.
@@ -359,7 +376,7 @@ Run `scripts/validate-interaction.mjs` on generated or custom HTML before handof
 - runtime dependency integrity metadata or documented exemptions
 - trust-model boundaries and unsafe sinks for mixed-trust or untrusted content
 - Markdown table/list rendering or explicit runtime fallback
-- Mermaid inline SVG, runtime target, or explicit degraded state
+- Mermaid ready SVG in browser-required validation; degraded or failed Mermaid is blocking
 - code highlight markup, language classes, line wrappers, and inert file path labels
 - evidence, verification status, filter, tab, and copy controls only when the artifact contains those optional modules
 - browser checks across narrow, medium, and desktop viewports for body overflow, major overlap, Mermaid containment, code tokens, chart containment, visible focus, reduced-motion CSS, primary conclusion visibility, and control state changes
