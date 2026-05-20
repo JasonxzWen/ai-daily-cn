@@ -9,6 +9,7 @@ import {
   checkPublishPreflight,
   createPublishPlan,
   parsePorcelain,
+  preparePublishWorktree,
   publishGeneratedArtifacts,
   verifyPublishedUrl
 } from "../src/publish.js";
@@ -113,6 +114,49 @@ test("publish preflight 在 git 元数据不可写时停止", async () => {
     }),
     (error) => error instanceof PublisherError && error.code === "git_not_writable"
   );
+});
+
+test("publish prepare-worktree 先提交本地改动再切回发布分支", async () => {
+  const calls = [];
+  let branch = "feature/report-sections";
+  let status = " M src/cli.js\n?? notes.md";
+
+  const result = await preparePublishWorktree({
+    commitMessage: "chore: save local changes before daily report",
+    git: {
+      async status() {
+        return status;
+      },
+      async branch() {
+        return branch;
+      },
+      async remoteStatus() {
+        return {
+          status: "ok",
+          upstream: "origin/main",
+          localAhead: 0,
+          remoteAhead: 0
+        };
+      },
+      async addAll() {
+        calls.push({ name: "addAll" });
+      },
+      async commit(message) {
+        calls.push({ name: "commit", message });
+        status = "";
+        return "[feature/report-sections abc123] save";
+      },
+      async checkout(targetBranch) {
+        calls.push({ name: "checkout", branch: targetBranch });
+        branch = targetBranch;
+      }
+    }
+  });
+
+  assert.equal(result.committed_local_changes, true);
+  assert.equal(result.switched_branch, true);
+  assert.equal(result.current_branch, "main");
+  assert.deepEqual(calls.map((call) => call.name), ["addAll", "commit", "checkout"]);
 });
 
 test("publish 需要显式确认参数", async () => {

@@ -49,6 +49,51 @@ export async function checkPublishPreflight(options = {}) {
   };
 }
 
+export async function preparePublishWorktree(options = {}) {
+  const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
+  const git = options.git || createGitAdapter(repoRoot);
+
+  const startingBranch = await git.branch();
+  const statusEntries = parsePorcelain(await git.status());
+  const commitMessage =
+    options.commitMessage || `chore: save local changes before AI daily publish`;
+  let commitOutput = "";
+
+  if (statusEntries.length > 0) {
+    await git.addAll();
+    commitOutput = await git.commit(commitMessage);
+  }
+
+  const branchAfterCommit = await git.branch();
+  let switchedBranch = false;
+  if (branchAfterCommit !== allowedBranch) {
+    await git.checkout(allowedBranch);
+    switchedBranch = true;
+  }
+
+  const preflight = await checkPublishPreflight({
+    ...options,
+    repoRoot,
+    allowedBranch,
+    git
+  });
+
+  return {
+    mode: "prepare-worktree",
+    repo_root: repoRoot,
+    starting_branch: startingBranch,
+    current_branch: preflight.branch,
+    allowed_branch: allowedBranch,
+    committed_local_changes: statusEntries.length > 0,
+    commit_message: statusEntries.length > 0 ? commitMessage : "",
+    commit_output: commitOutput,
+    saved_dirty_files: statusEntries.map((entry) => `${entry.code} ${entry.path}`),
+    switched_branch: switchedBranch,
+    preflight
+  };
+}
+
 export async function createPublishPlan(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
@@ -297,8 +342,14 @@ export function createGitAdapter(repoRoot) {
     async add(files) {
       return runGit(repoRoot, ["add", "--", ...files]);
     },
+    async addAll() {
+      return runGit(repoRoot, ["add", "--all"]);
+    },
     async commit(message) {
       return runGit(repoRoot, ["commit", "-m", message]);
+    },
+    async checkout(branch) {
+      return runGit(repoRoot, ["checkout", branch]);
     },
     async push(branch) {
       return runGit(repoRoot, ["push", "origin", branch]);

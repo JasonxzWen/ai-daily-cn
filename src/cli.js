@@ -2,7 +2,12 @@
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError, toPublishError } from "./errors.js";
-import { checkPublishPreflight, createPublishPlan, publishGeneratedArtifacts } from "./publish.js";
+import {
+  checkPublishPreflight,
+  createPublishPlan,
+  preparePublishWorktree,
+  publishGeneratedArtifacts
+} from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
@@ -64,6 +69,24 @@ try {
         publish_error: ""
       },
       preflight
+    });
+  } else if (command === "publish:prepare-worktree") {
+    const args = parseArgs(argv);
+    const prepared = await preparePublishWorktree({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      commitMessage: args.message
+    });
+    printJson({
+      ok: true,
+      publish_status: {
+        html_generated: false,
+        repo_updated: prepared.committed_local_changes,
+        repo_pushed: false,
+        pages_url: "",
+        publish_error: ""
+      },
+      prepared
     });
   } else if (command === "prompt:build") {
     const args = parseArgs(argv);
