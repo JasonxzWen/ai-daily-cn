@@ -116,6 +116,23 @@ test("publish preflight 在 git 元数据不可写时停止", async () => {
   );
 });
 
+test("publish prepare-worktree defers git_not_writable so report generation can continue", async () => {
+  const result = await preparePublishWorktree({
+    git: fakeGit(),
+    gitWritableCheck: async () => {
+      throw new PublisherError("git_not_writable", "当前环境不能写入 Git 元数据目录，真实发布无法创建 index.lock。", {
+        gitDir: "D:\\ai-daily-cn\\.git"
+      });
+    }
+  });
+
+  assert.equal(result.publish_ready, false);
+  assert.equal(result.publish_blocker.code, "git_not_writable");
+  assert.equal(result.publish_blocker.details.gitDir, "D:\\ai-daily-cn\\.git");
+  assert.equal(result.preflight, null);
+  assert.equal(result.current_branch, "main");
+});
+
 test("publish prepare-worktree 先提交本地改动再切回发布分支", async () => {
   const calls = [];
   let branch = "feature/report-sections";

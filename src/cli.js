@@ -84,7 +84,9 @@ try {
         repo_updated: prepared.committed_local_changes,
         repo_pushed: false,
         pages_url: "",
-        publish_error: ""
+        publish_error: prepared.publish_blocker
+          ? `${prepared.publish_blocker.code}: ${prepared.publish_blocker.message}`
+          : ""
       },
       prepared
     });

@@ -72,24 +72,38 @@ export async function preparePublishWorktree(options = {}) {
     switchedBranch = true;
   }
 
-  const preflight = await checkPublishPreflight({
-    ...options,
-    repoRoot,
-    allowedBranch,
-    git
-  });
+  let preflight = null;
+  let publishBlocker = null;
+
+  try {
+    preflight = await checkPublishPreflight({
+      ...options,
+      repoRoot,
+      allowedBranch,
+      git
+    });
+  } catch (error) {
+    if (!isDeferredPrepareBlocker(error)) {
+      throw error;
+    }
+    publishBlocker = toPrepareBlocker(error);
+  }
+
+  const currentBranch = preflight?.branch || (await git.branch());
 
   return {
     mode: "prepare-worktree",
     repo_root: repoRoot,
     starting_branch: startingBranch,
-    current_branch: preflight.branch,
+    current_branch: currentBranch,
     allowed_branch: allowedBranch,
     committed_local_changes: statusEntries.length > 0,
     commit_message: statusEntries.length > 0 ? commitMessage : "",
     commit_output: commitOutput,
     saved_dirty_files: statusEntries.map((entry) => `${entry.code} ${entry.path}`),
     switched_branch: switchedBranch,
+    publish_ready: !publishBlocker,
+    publish_blocker: publishBlocker,
     preflight
   };
 }
@@ -449,6 +463,18 @@ async function assertGitDirectoryWritable(repoRoot, git, gitWritableCheck) {
   return {
     ok: true,
     git_dir: path.relative(repoRoot, gitDir).split(path.sep).join(path.posix.sep) || gitDir
+  };
+}
+
+function isDeferredPrepareBlocker(error) {
+  return error instanceof PublisherError && ["git_not_writable", "remote_ahead"].includes(error.code);
+}
+
+function toPrepareBlocker(error) {
+  return {
+    code: error instanceof PublisherError ? error.code : "unexpected_error",
+    message: error.message,
+    details: error.details || {}
   };
 }
 
