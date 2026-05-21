@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -431,6 +444,7 @@ h3 {
 <li>WordPress 7.0 release schedule 显示 2026-05-20 发布，Beta 1 文档曾说明 Web Client AI API 会进入 Core；待最终 release post 出现后可复核是否进入主体。 <a href="https://make.wordpress.org/core/7-0/" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
 
+
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
@@ -445,23 +459,17 @@ h3 {
   <h3>提示词与规则迭代建议</h3>
   <ol class="compact-list"><li>
     <p><strong>聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。</strong></p>
-    
     <p>证据：本轮 Google I/O 开发者栈涉及 Gemini 3.5、Managed Agents、Antigravity、AI Studio；GitHub Copilot 涉及 Gemini 3.5 Flash 和 Fix with Copilot。单 URL 会丢失部分子页面证据。</p>
-    
     <p>预期收益：为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。</p>
   </li>
 <li>
     <p><strong>model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。</strong></p>
-    
     <p>证据：Gemini 3.5 Flash 同时出现在 Gemini app、AI Mode、Antigravity、Gemini API、AI Studio、GitHub Copilot 和企业平台；当前只能选 closed_api 并把其余信息塞进 notes。</p>
-    
     <p>预期收益：增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。</p>
   </li>
 <li>
     <p><strong>社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。</strong></p>
-    
     <p>证据：Mistral 3 官方页有完整模型信息和可用路径，但本轮没有稳定 published date；需要表达为 date_unverified，而不是普通 community lead。</p>
-    
     <p>预期收益：给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。</p>
   </li></ol>
 </section>

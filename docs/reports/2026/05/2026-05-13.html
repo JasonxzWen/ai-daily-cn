@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -379,6 +392,7 @@ h3 {
       <h2>社区线索</h2>
       <ul class="compact-list"><li>Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。 <a href="https://mistral.ai/news/mistral-3" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
+
 
     <section class="section" id="self-check">
       <h2>自检摘要</h2>

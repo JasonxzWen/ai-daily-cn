@@ -1,136 +1,225 @@
 {
-  "schema_version": 1,
   "report_date": "2026-05-21",
   "title": "AI 日报 2026-05-21",
-  "summary": "今天可回源的一手 AI 动态集中在 2026-05-19 到 2026-05-20。主体保留 6 条：Google I/O 把 Gemini 3.5、Gemini Omni、Antigravity 和 Managed Agents 放到同一条 agent 开发链路里；GitHub Copilot 在 5 月 20 日继续调整模型路由、Web 模型列表和 issue 语义检索；AWS SageMaker AI endpoints 增加 OpenAI-compatible API；Vercel 同日扩展 AI Gateway、Chat SDK 和 WordPress AI Client 连接器；Anthropic 收购 Stainless，强化 SDK、CLI 和 MCP server 工具链；Hugging Face 上 Ettin reranker 与 OlmoEarth v1.1 带来两个开源模型方向。模型发布和技术博客单列，不计入主体数量。",
+  "summary": "今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker OpenAI-compatible API、Claude Managed Agents 企业级执行边界，以及 GitHub Trending 中持续升温的 coding-agent 基础设施项目。本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转。",
   "source_window": {
-    "date_from": "2026-05-18",
+    "date_from": "2026-05-19",
     "date_to": "2026-05-21",
     "fallback_window_used": true,
-    "notes": "按 2026-05-21 Asia/Shanghai 生成。优先采样 2026-05-20 与 2026-05-21 的官方博客、官方 changelog、开发者博客和 Hugging Face 原文；24/48 小时内强主体主要来自 Google、GitHub、AWS 和 Vercel，少于 5 条，因此扩展到最近 5 天内的高信号一手来源，补入 2026-05-18 Anthropic 收购 Stainless。Google I/O 与 GitHub Copilot 的同厂商多条小更新按规则合并，不把同日碎片强行拆成多条主体。"
+    "notes": "24 小时内的 T0 官方源不足以覆盖模型、开发工具、开源项目与 Builder 动向，因此补充 2026-05-19 至 2026-05-20 的官方发布、GitHub Trending 当日抓取和 follow-builders feed。GitHub Trending 检查时间为 2026-05-21，Builder feed 生成时间为 2026-05-20T07:32:12.985Z。"
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GitHub Trending daily all",
+          "url": "https://github.com/trending?since=daily",
+          "status": "checked",
+          "notes": "解析候选 17 个。"
+        },
+        {
+          "name": "GitHub Trending weekly all",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "checked",
+          "notes": "解析候选 14 个。"
+        },
+        {
+          "name": "GitHub Trending daily Python",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "解析候选 17 个。"
+        },
+        {
+          "name": "GitHub Trending weekly Python",
+          "url": "https://github.com/trending/python?since=weekly",
+          "status": "checked",
+          "notes": "解析候选 13 个。"
+        },
+        {
+          "name": "GitHub Trending daily TypeScript",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "解析候选 15 个。"
+        },
+        {
+          "name": "GitHub Trending weekly TypeScript",
+          "url": "https://github.com/trending/typescript?since=weekly",
+          "status": "checked",
+          "notes": "解析候选 17 个。"
+        },
+        {
+          "name": "GitHub Trending daily Rust",
+          "url": "https://github.com/trending/rust?since=daily",
+          "status": "checked",
+          "notes": "解析候选 18 个。"
+        },
+        {
+          "name": "GitHub Trending weekly Rust",
+          "url": "https://github.com/trending/rust?since=weekly",
+          "status": "checked",
+          "notes": "解析候选 17 个。"
+        },
+        {
+          "name": "GitHub Trending daily Go",
+          "url": "https://github.com/trending/go?since=daily",
+          "status": "checked",
+          "notes": "解析候选 17 个。"
+        },
+        {
+          "name": "GitHub Trending weekly Go",
+          "url": "https://github.com/trending/go?since=weekly",
+          "status": "checked",
+          "notes": "解析候选 15 个。"
+        }
+      ],
+      "candidates_found": 121,
+      "included": 6,
+      "notes": "本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders prepare-digest",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "checked",
+          "notes": "stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。"
+        },
+        {
+          "name": "follow-builders X feed",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "checked",
+          "notes": "通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。"
+        },
+        {
+          "name": "Training Data podcast",
+          "url": "https://www.youtube.com/watch?v=j7ypvRUFY7M",
+          "status": "checked",
+          "notes": "2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。"
+        },
+        {
+          "name": "Claude Managed Agents blog from builder feed",
+          "url": "https://claude.com/blog/claude-managed-agents-updates",
+          "status": "checked",
+          "notes": "Builder feed 命中后回溯到 Claude 官方博客。"
+        }
+      ],
+      "candidates_found": 43,
+      "included": 4,
+      "notes": "只采用原始链接或官方页；X feed 可用，未使用二手转述。"
+    }
   },
   "main_items": [
     {
-      "title": "Google I/O 2026 发布 Gemini 3.5 Flash、Gemini Omni 与 Antigravity agent 开发栈",
-      "event_date": "2026-05-20",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/",
-      "source": "Google Blog",
+      "title": "Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上",
+      "event_date": "2026-05-19",
+      "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
+      "source": "Google Developers Blog",
       "tier": "T0",
       "entities": [
         "Google",
-        "Gemini 3.5 Flash",
+        "Gemini 3.5",
         "Gemini Omni",
-        "Google Antigravity",
-        "Managed Agents",
+        "Antigravity",
         "Google AI Studio"
       ],
-      "summary": "Google 在 I/O 汇总中把 Gemini 3.5 Flash、Gemini Omni、Antigravity、Managed Agents 和 AI Studio 放到同一条开发者产品线上，重点从“辅助写代码”转向“能编排、执行、验证任务的 agent 开发环境”。",
+      "summary": "Google 在 I/O 2026 开发者主题演讲中发布 Gemini 3.5 系列，并升级 Antigravity 这个 agent-first development platform，把模型、IDE、AI Studio 与 agent 编排放进同一套开发链路。",
       "bullets": [
-        "Gemini 3.5 Flash 已通过 Antigravity、Gemini API、Google AI Studio 和 Android Studio 等入口开放，Google 将其定位为面向长周期 agent 任务的 Flash 级模型。",
-        "Gemini Omni 从视频开始处理多模态生成和编辑，并通过 Gemini app、Google Flow、YouTube Shorts Remix 等产品路径滚动可用。",
-        "Antigravity 2.0、Antigravity CLI/SDK 与 Managed Agents 把远程沙箱、子 agent、工具调用和部署接口组合成可编排开发栈，开发团队需要关注权限、日志、沙箱和成本边界。"
+        "Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。",
+        "Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。",
+        "对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。"
       ]
     },
     {
-      "title": "GitHub Copilot 5 月 20 日更新集中在模型路由、Web 模型收敛和 issue 语义检索",
+      "title": "GitHub Copilot 在 VS Code 中推出按任务自动路由模型",
       "event_date": "2026-05-20",
-      "url": "https://github.blog/changelog/",
+      "url": "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
       "source": "GitHub Changelog",
       "tier": "T0",
       "entities": [
-        "GitHub",
         "GitHub Copilot",
-        "Auto model selection",
-        "Copilot Chat",
-        "Semantic issue search"
+        "VS Code",
+        "model routing"
       ],
-      "summary": "GitHub Changelog 在 2026-05-20 列出多条 Copilot 更新：VS Code 的 Auto model selection 会基于任务和模型健康信号路由；Copilot on web 收窄可选模型；Copilot Chat 增加 issue 语义检索。",
+      "summary": "GitHub Changelog 显示，Copilot auto model selection 现在会基于任务、模型健康度和使用情况，把 VS Code 中的请求路由到更合适的模型。",
       "bullets": [
-        "Auto model selection 会结合实时可用性、可靠性、推理难度、代码复杂度和工具编排需求选择模型，并显示本次响应使用的模型。",
-        "Copilot on web 移除了 Gemini 以及部分其他模型，Web Chat 后续会用更有限的模型列表换取稳定性和响应一致性。",
-        "Semantic issue search 让用户用自然语言在 issue 中查找、分组和分析相关问题，适合 triage、规划和跨仓库上下文发现。"
+        "这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。",
+        "组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。"
       ]
     },
     {
-      "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API，降低自托管模型接入成本",
+      "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
       "event_date": "2026-05-20",
       "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
       "source": "AWS Machine Learning Blog",
       "tier": "T0",
       "entities": [
-        "AWS",
         "Amazon SageMaker AI",
-        "OpenAI-compatible API",
+        "OpenAI SDK",
         "LangChain",
-        "Strands Agents",
-        "vLLM"
+        "Strands Agents"
       ],
-      "summary": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 OpenAI-compatible API；使用 OpenAI SDK、LangChain 或 Strands Agents 的应用可以通过替换 endpoint URL 调用自有 SageMaker 模型。",
+      "summary": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 OpenAI-compatible API，让使用 OpenAI SDK、LangChain 或 Strands Agents 的应用通过改 endpoint URL 调用 SageMaker 模型。",
       "bullets": [
-        "SageMaker endpoint 暴露 `/openai/v1` 路径，支持 Chat Completions 与 streaming，响应由容器返回，应用侧不需要自定义 SigV4 client。",
-        "Bearer token 由 SageMaker Python SDK 基于 AWS 凭据生成，最长有效 12 小时；实际权限仍由 IAM 控制。",
-        "同一 endpoint 可通过 inference components 承载多个模型，让通用模型、领域微调模型和小型分类模型共享 OpenAI-compatible 调用面。"
+        "这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。",
+        "对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。"
       ]
     },
     {
-      "title": "Vercel 5 月 20 日把 AI Gateway、Chat SDK 与 WordPress AI Client 串到更多 agent 场景",
-      "event_date": "2026-05-20",
+      "title": "Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels",
+      "event_date": "2026-05-19",
+      "url": "https://claude.com/blog/claude-managed-agents-updates",
+      "source": "Claude Blog",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Claude Managed Agents",
+        "MCP",
+        "Vercel Sandbox",
+        "Modal",
+        "Cloudflare"
+      ],
+      "summary": "Anthropic 在 Claude Managed Agents 中加入 self-hosted sandboxes 和 MCP tunnels，把 agent loop 与工具执行环境、私有 MCP 访问边界拆开。",
+      "bullets": [
+        "官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。",
+        "这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。"
+      ]
+    },
+    {
+      "title": "Vercel AI Gateway 上线 Gemini 3.5 Flash",
+      "event_date": "2026-05-19",
       "url": "https://vercel.com/changelog",
       "source": "Vercel Changelog",
       "tier": "T0",
       "entities": [
         "Vercel",
         "AI Gateway",
-        "Grok Build 0.1",
-        "Chat SDK",
-        "WordPress AI Client"
+        "AI SDK",
+        "Gemini 3.5 Flash"
       ],
-      "summary": "Vercel Changelog 同日发布多条 AI 相关更新：AI Gateway 新增 Grok Build 0.1；Chat SDK 内置 AI SDK toolset、message subject 和 callback URL；WordPress 插件把 AI Gateway 接入 WordPress AI Client。",
+      "summary": "Vercel Changelog 显示 Gemini 3.5 Flash 已可通过 AI Gateway 使用，并给出 AI SDK 中的 `google/gemini-3.5-flash` 模型标识。",
       "bullets": [
-        "Grok Build 0.1 作为早期访问的 agentic coding beta 模型进入 AI Gateway，可通过 AI SDK 使用 `xai/grok-build-0.1`。",
-        "Chat SDK 的 `chat/ai` 子路径提供 `createChatTools(chat)`，可把 chat 的读写动作变成 agent 工具，并保留审批默认值和 preset 范围控制。",
-        "WordPress AI Gateway plugin 作为 WordPress AI Client 连接器，让插件通过一个网关 key 调用多家模型，并获得 fallback、模型发现、计费和观测能力。"
+        "Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。",
+        "对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。"
       ]
     },
     {
-      "title": "Anthropic 收购 Stainless，补强 Claude API、SDK、CLI 与 MCP server 生成链路",
-      "event_date": "2026-05-18",
-      "url": "https://www.anthropic.com/news/anthropic-acquires-stainless?guides=image-generation-social-good",
-      "source": "Anthropic",
-      "tier": "T0",
-      "entities": [
-        "Anthropic",
-        "Stainless",
-        "Claude API",
-        "SDK",
-        "CLI",
-        "MCP"
-      ],
-      "summary": "Anthropic 宣布收购 Stainless。Stainless 长期为 Anthropic 官方 SDK 生成提供基础能力，也服务于 SDK、CLI 和 MCP server 生成场景。",
-      "bullets": [
-        "Anthropic 的表述很明确：agent 能力取决于能连接到哪些系统，SDK、CLI 和 MCP server 是把 API 暴露给 agent 的关键层。",
-        "Stainless 能把 API spec 转成 TypeScript、Python、Go、Java 等语言的 SDK，并生成 CLI 与 MCP server，收购后会进入 Claude Platform 的开发者体验链路。",
-        "对平台团队来说，这类交易说明 API schema、SDK 生成、连接器质量和 MCP server 生命周期会成为 agent 平台竞争的一部分。"
-      ]
-    },
-    {
-      "title": "Hugging Face 上两组 5 月 19 日模型发布分别覆盖 RAG reranking 与地球观测",
+      "title": "Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新",
       "event_date": "2026-05-19",
       "url": "https://huggingface.co/blog/ettin-reranker",
-      "source": "Hugging Face Blog",
+      "source": "Hugging Face Blog / Ai2 Blog",
       "tier": "T0",
       "entities": [
         "Hugging Face",
-        "Sentence Transformers",
         "Ettin Reranker",
         "Ai2",
-        "OlmoEarth v1.1"
+        "OlmoEarth"
       ],
-      "summary": "Hugging Face 5 月 19 日出现两组可验证模型发布：Ettin Reranker Family 发布 6 个 CrossEncoder reranker 与训练数据/recipe；Ai2 发布 OlmoEarth v1.1，面向遥感任务降低运行成本。",
+      "summary": "Hugging Face 发布 Ettin Reranker family，Ai2 发布 OlmoEarth v1.1；两者都指向一个趋势：专业任务模型继续沿着更小、更可部署、更可验证的方向推进。",
       "bullets": [
-        "Ettin reranker 覆盖 17M 到 1B 参数，并公开训练数据与 distillation recipe，可直接用于 retrieve-then-rerank RAG 链路。",
-        "OlmoEarth v1.1 提供模型 collection、技术报告和代码，目标是在保持任务表现的同时把地球观测模型的计算成本压低。",
-        "这两类发布都不是通用聊天模型，但更贴近生产检索和垂直 AI 工作流，适合作为模型发布区的独立条目跟踪。"
+        "Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。",
+        "Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。"
       ]
     }
   ],
@@ -139,51 +228,41 @@
       "name": "Gemini 3.5 Flash",
       "provider": "Google",
       "availability": "closed_api",
-      "event_date": "2026-05-20",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/",
+      "event_date": "2026-05-19",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/",
       "source": "Google Blog",
-      "summary": "Google 在 I/O 2026 汇总中确认 Gemini 3.5 Flash 已通过 Antigravity、Gemini API、Google AI Studio 和 Android Studio 等入口可用，定位为兼顾速度与 agent 执行能力的 Flash 系列新模型。",
-      "notes": "同一模型也进入 GitHub Copilot 与 Vercel AI Gateway 等第三方产品路径；本条以 Google 官方 I/O 汇总作为模型发布源。"
+      "summary": "Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。",
+      "notes": "同时已出现在 Vercel AI Gateway，开发者可通过 Vercel AI SDK 使用 `google/gemini-3.5-flash`。"
     },
     {
-      "name": "Gemini Omni Flash",
+      "name": "Gemini Omni",
       "provider": "Google",
       "availability": "closed_product",
-      "event_date": "2026-05-20",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/",
+      "event_date": "2026-05-19",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/",
       "source": "Google Blog",
-      "summary": "Gemini Omni Flash 开始在 Gemini app、Google Flow、YouTube Shorts Remix 和 YouTube Create 等产品中滚动使用，主打从文本、图像、视频等输入生成和编辑视频。",
-      "notes": "当前主要是产品可用性，API 和企业入口按 Google 官方说明后续推进。"
-    },
-    {
-      "name": "Grok Build 0.1",
-      "provider": "xAI / Vercel AI Gateway",
-      "availability": "closed_api",
-      "event_date": "2026-05-20",
-      "url": "https://vercel.com/changelog",
-      "source": "Vercel Changelog",
-      "summary": "Vercel AI Gateway 新增 Grok Build 0.1，这是面向 agentic coding 的 beta 模型，可通过 AI SDK 使用 `xai/grok-build-0.1` 调用。",
-      "notes": "Vercel 标注为 early access；reasoning effort 不可配置，也没有 non-reasoning mode。"
+      "summary": "Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。",
+      "notes": "本轮仅按官方 I/O 汇总记录，不引入第三方推断。"
     },
     {
       "name": "Ettin Reranker Family",
-      "provider": "Hugging Face / Sentence Transformers community",
+      "provider": "Hugging Face",
       "availability": "open_weights",
       "event_date": "2026-05-19",
       "url": "https://huggingface.co/blog/ettin-reranker",
       "source": "Hugging Face Blog",
-      "summary": "Tom Aarsen 发布 6 个基于 Ettin ModernBERT encoder 的 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数，并公开数据与训练 recipe。",
-      "notes": "适合 RAG 的 retrieve-then-rerank 链路；文章提供模型、dataset 和训练脚本说明。"
+      "summary": "Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。",
+      "notes": "适合作为 RAG pipeline 中低参数 reranker 的候选，需要在自有语料上做离线评估。"
     },
     {
       "name": "OlmoEarth v1.1",
-      "provider": "Ai2 / Allen Institute for AI",
+      "provider": "Ai2",
       "availability": "open_weights",
       "event_date": "2026-05-19",
-      "url": "https://huggingface.co/blog/allenai/olmoearth-v1-1",
-      "source": "Hugging Face Blog / Ai2",
-      "summary": "Ai2 发布 OlmoEarth v1.1 地球观测模型家族，提供 Hugging Face collection、技术报告和训练代码，强调更低计算成本与遥感任务可用性。",
-      "notes": "面向垂直遥感任务，不是通用对话模型；适合环境监测、农作物映射和地理空间 AI 工作流。"
+      "url": "https://allenai.org/blog/olmoearth-v1-1",
+      "source": "Ai2 Blog",
+      "summary": "Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。",
+      "notes": "官方页提供模型、技术报告和代码入口，后续可跟踪实际下游应用复现。"
     }
   ],
   "hot_blogs": [
@@ -193,19 +272,19 @@
       "publisher": "AWS Machine Learning Blog",
       "author": "Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng",
       "event_date": "2026-05-20",
-      "topic": "OpenAI-compatible inference endpoint / self-hosted model serving",
-      "summary": "文章给出 SageMaker AI endpoint 的 OpenAI-compatible path、bearer token、单模型 endpoint、inference component 多模型部署和 Strands Agents 集成示例。",
-      "why_it_matters": "对已有 OpenAI SDK、LangChain、Strands Agents 或 AI Gateway 的系统，迁移到自托管 SageMaker endpoint 的改造面更小。"
+      "topic": "model serving / OpenAI-compatible API",
+      "summary": "SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。",
+      "why_it_matters": "这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。"
     },
     {
-      "title": "An important update: Transitioning Gemini CLI to Antigravity CLI",
-      "url": "https://developers.googleblog.com/en/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
-      "publisher": "Google Developers Blog",
-      "author": "Dmitry Lyalin, Taylor Mullen",
+      "title": "New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels",
+      "url": "https://claude.com/blog/claude-managed-agents-updates",
+      "publisher": "Claude Blog",
+      "author": "Anthropic",
       "event_date": "2026-05-19",
-      "topic": "Coding agent CLI migration / multi-agent harness",
-      "summary": "Google 宣布把 Gemini CLI 面向个人和免费用户的路径迁移到 Antigravity CLI，并给出 2026-06-18 的服务停止时间线。",
-      "why_it_matters": "使用 Gemini CLI、Gemini Code Assist IDE extension 或 GitHub 集成的团队需要区分 consumer 与 enterprise 路径，并提前迁移插件、skills、hooks 与多 agent 工作流。"
+      "topic": "managed agents / MCP / sandboxing",
+      "summary": "Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。",
+      "why_it_matters": "生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。"
     },
     {
       "title": "Introducing the Ettin Reranker Family",
@@ -213,103 +292,164 @@
       "publisher": "Hugging Face Blog",
       "author": "Tom Aarsen",
       "event_date": "2026-05-19",
-      "topic": "RAG reranking / Sentence Transformers",
-      "summary": "文章解释 reranker 与 embedder 的 retrieve-then-rerank 配合方式，并公开 6 个 CrossEncoder 模型、distillation 数据、训练 recipe 和性能表。",
-      "why_it_matters": "RAG 质量常卡在候选排序；这类开源 reranker 让团队能在成本可控范围内替换或复训检索后排序模型。"
+      "topic": "reranker / RAG",
+      "summary": "Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。",
+      "why_it_matters": "RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。"
     }
   ],
   "projects": [
     {
-      "name": "Google Antigravity",
-      "description": "Google 的 agent-first 开发平台，本轮 I/O 扩展桌面应用、CLI、SDK、subagents、hooks、异步任务和 agent harness。",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/"
+      "name": "colbymchenry/codegraph",
+      "description": "为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。",
+      "url": "https://github.com/colbymchenry/codegraph",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending daily / weekly",
+      "signal": "trending",
+      "evidence": "npm run discover:github-trending -- 50 抓取到该项目，并按 code knowledge graph / coding agent 关键词命中。"
     },
     {
-      "name": "Amazon SageMaker AI OpenAI-compatible endpoints",
-      "description": "SageMaker real-time inference endpoints 新增 `/openai/v1` 调用路径，支持用 OpenAI SDK 与常见 agent 框架调用自托管模型。",
-      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/"
+      "name": "volcengine/OpenViking",
+      "description": "面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。",
+      "url": "https://github.com/volcengine/OpenViking",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending",
+      "signal": "trending",
+      "evidence": "discover:github-trending 把该项目列为 AI agent context database 候选。"
     },
     {
-      "name": "Vercel Chat SDK AI tools",
-      "description": "Chat SDK 新增 `chat/ai` 子路径和 `createChatTools(chat)`，把聊天平台的读写动作暴露为 agent 工具，并支持审批与 preset 范围。",
-      "url": "https://vercel.com/changelog"
+      "name": "humanlayer/12-factor-agents",
+      "description": "把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。",
+      "url": "https://github.com/humanlayer/12-factor-agents",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending",
+      "signal": "trending",
+      "evidence": "discover:github-trending 候选列表命中，且与 production LLM software / agents 主题相关。"
     },
     {
-      "name": "Vercel AI Gateway WordPress plugin",
-      "description": "作为 WordPress AI Client 连接器，让 WordPress 插件通过一个 AI Gateway key 使用多模型、fallback、观测和统一计费。",
-      "url": "https://vercel.com/changelog"
+      "name": "InsForge/InsForge",
+      "description": "面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。",
+      "url": "https://github.com/InsForge/InsForge",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending TypeScript",
+      "signal": "trending",
+      "evidence": "Trending TypeScript 候选命中，描述直接指向 agentic coding 后端平台。"
     },
     {
-      "name": "Ettin rerankers",
-      "description": "6 个 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数，并公开训练数据与 recipe。",
-      "url": "https://huggingface.co/blog/ettin-reranker"
+      "name": "code-yeongyu/oh-my-openagent",
+      "description": "以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。",
+      "url": "https://github.com/code-yeongyu/oh-my-openagent",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending",
+      "signal": "trending",
+      "evidence": "discover:github-trending 候选命中，适合作为后续项目发现入口而非单一产品发布。"
     },
     {
-      "name": "OlmoEarth v1.1",
-      "description": "Ai2 的地球观测模型家族更新，提供 Hugging Face collection、技术报告和代码，面向低成本遥感推理和微调。",
-      "url": "https://huggingface.co/blog/allenai/olmoearth-v1-1"
+      "name": "Lum1104/Understand-Anything",
+      "description": "为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-05-21",
+      "source": "GitHub Trending",
+      "signal": "trending",
+      "evidence": "discover:github-trending 候选命中，描述同时覆盖多个主流 coding agent / IDE agent。"
     }
   ],
-  "builder_observations": [],
+  "builder_observations": [
+    {
+      "author": "Andrej Karpathy",
+      "role": "Anthropic researcher / AI educator",
+      "content": "公开宣布加入 Anthropic，回到 frontier LLM R&D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。",
+      "url": "https://x.com/karpathy/status/2056753169888334312",
+      "event_date": "2026-05-21",
+      "source": "follow-builders X feed",
+      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I've joined Anthropic..."
+    },
+    {
+      "author": "Josh Woodward",
+      "role": "Google Labs / Gemini App / AI Studio product lead",
+      "content": "介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。",
+      "url": "https://x.com/joshwoodward/status/2056873495116845485",
+      "event_date": "2026-05-21",
+      "source": "follow-builders X feed",
+      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent..."
+    },
+    {
+      "author": "Guillermo Rauch",
+      "role": "Vercel CEO",
+      "content": "把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。",
+      "url": "https://x.com/rauchg/status/2056735989830471977",
+      "event_date": "2026-05-21",
+      "source": "follow-builders X feed",
+      "evidence": "prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。"
+    },
+    {
+      "author": "Swyx",
+      "role": "AI Engineer / Latent Space",
+      "content": "把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。",
+      "url": "https://x.com/swyx/status/2056877529991205072",
+      "event_date": "2026-05-21",
+      "source": "follow-builders X feed",
+      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 there's 4 parts to this AI SDLC..."
+    }
+  ],
   "community_leads": [
     {
-      "content": "Google I/O 同期还有 WebMCP、Chrome DevTools for agents、AI Studio Android 支持、Science Skills 等多条 developer 工具更新；本轮已用 Google I/O 主体条目合并，不再逐条拆分。",
-      "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/"
+      "content": "karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。",
+      "url": "https://github.com/karpathy/autoresearch"
     },
     {
-      "content": "Vercel Changelog 提到 WordPress 7.0 今日发布并引入 WordPress AI Client，但本轮未找到 WordPress Core 最终 release post，暂不把 WordPress 7.0 作为独立主体。",
-      "url": "https://vercel.com/changelog"
+      "content": "anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。",
+      "url": "https://github.com/anthropics/claude-plugins-official"
     },
     {
-      "content": "NVIDIA Nemotron 3 Nano Omni 是高信号开源多模态模型，但官方发布日期为 2026-04-28，超出本轮 5 天回看边界，未纳入主体或模型发布列表。",
-      "url": "https://blogs.nvidia.com/blog/nemotron-3-nano-omni-multimodal-ai-agents/"
+      "content": "HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。",
+      "url": "https://github.com/HKUDS/CLI-Anything"
+    },
+    {
+      "content": "Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。",
+      "url": "https://x.com/GoogleLabs/status/2056872996988756228"
     }
   ],
   "self_check": {
     "report_date": "2026-05-21",
     "main_items": 6,
-    "hot_blogs": 3,
-    "builder_observations": 0,
+    "builder_observations": 4,
     "builder_skill_used": [
-      "official-ai-releases: 使用 Google Blog、Google Developers Blog、GitHub Changelog、AWS Machine Learning Blog、Anthropic、Vercel Changelog 和 Hugging Face 原文",
-      "github-ai-trending: 检查 RAG、agent、coding、MCP 和模型服务方向，最终只保留有官方 release/article 的项目到 projects 或 model_releases",
-      "follow-builders: 本轮未使用 X/YouTube 二手 builder 内容，builder_observations 保持空数组"
+      "official-ai-releases: checked official blogs, changelogs and model pages for 2026-05-19..2026-05-21",
+      "github-ai-trending: ran npm run discover:github-trending -- 50; 10 GitHub Trending sources checked; 121 unique candidates found",
+      "follow-builders: ran prepare-digest.js; 17 X builders, 40 tweets, 2 blog posts and 1 podcast checked"
     ],
     "fallback_sources": [
-      "官方博客",
-      "官方 changelog",
-      "官方开发者博客",
-      "Hugging Face 原文",
-      "官方项目页"
+      "Google Developers Blog",
+      "Google Blog I/O 2026 collection",
+      "GitHub Changelog",
+      "AWS Machine Learning Blog",
+      "Claude Blog",
+      "Vercel Changelog",
+      "Hugging Face Blog",
+      "Ai2 Blog",
+      "GitHub Trending",
+      "follow-builders X feed"
     ],
     "primary_links": true,
     "no_banned_words": true,
     "no_unsourced_numbers": true,
-    "notes": "本轮先覆盖 2026-05-20 到 2026-05-21，强主体少于 5 条后扩展到 2026-05-18。Google I/O 多条模型、agent、AI Studio 与产品更新合并为 Google 开发者栈主体；GitHub Copilot 5 月 20 日多条小更新合并为一个 Copilot 主体；Vercel 5 月 20 日多条 AI Changelog 合并为一个平台主体；Anthropic Stainless 为 2026-05-18 高信号一手来源，作为 5 天内 fallback 纳入；NVIDIA Nemotron 3 Nano Omni 因日期超出边界降级为社区线索。",
+    "notes": "主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。",
     "optimization_suggestions": [
       {
-        "issue": "聚合型主体条目仍只有单一 url 字段，Google I/O、GitHub Copilot、Vercel Changelog 这类同日多子发布只能挂总页或代表页。",
-        "evidence": "本轮 Google I/O 涉及 Gemini 3.5、Gemini Omni、Antigravity、Managed Agents；GitHub Copilot 涉及模型路由、Web 模型列表和 issue 语义检索；Vercel 涉及 AI Gateway、Chat SDK 和 WordPress plugin。",
-        "suggested_module": "schemas/report.schema.json 与 src/render.js",
-        "expected_benefit": "给 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。",
-        "needs_user_confirmation": true
+        "area": "source_audit",
+        "suggestion": "把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。"
       },
       {
-        "issue": "model_releases 的 availability 只能选一个枚举，难以表达同一模型同时进入 API、产品和第三方平台。",
-        "evidence": "Gemini 3.5 Flash 同时出现在 Gemini API、Google AI Studio、Android Studio、GitHub Copilot 和 Vercel AI Gateway。",
-        "suggested_module": "schemas/report.schema.json 与 prompts/ai-daily/modules/structured-report-json.md",
-        "expected_benefit": "增加 platforms 或 availability_notes 字段后，模型区块更适合追踪跨产品、跨平台发布。",
-        "needs_user_confirmation": true
+        "area": "schema",
+        "suggestion": "为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。"
       },
       {
-        "issue": "发布状态已支持 prepare 阶段不阻塞生成，但最终回复模板还应明确区分“本地日报已生成”和“Pages 已发布”。",
-        "evidence": "本轮刚修改 publish:prepare-worktree，使 git_not_writable 和 remote_ahead 只标记 publish blocker；未来定时任务可能生成成功但 publish 失败。",
-        "suggested_module": "docs/codex-automation-setup.md 与 prompts/ai-daily/modules/publish-workflow.md",
-        "expected_benefit": "减少用户把本地产物生成成功误解为 Pages 已更新的风险。",
-        "needs_user_confirmation": true
+        "area": "builder_observations",
+        "suggestion": "为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。"
       }
     ]
   },
+  "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-21.html",
   "html_path": "reports/2026/05/2026-05-21.html",
   "publish_status": {
@@ -319,5 +459,5 @@
     "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-21.html",
     "publish_error": ""
   },
-  "generated_at": "2026-05-21T03:37:51.780Z"
+  "generated_at": "2026-05-21T04:19:58.638Z"
 }

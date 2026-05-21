@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -333,6 +346,7 @@ h3 {
 <li>Hugging Face 社区页出现多个近期热度条目，但打开后 Reachy Mini appstore 与 QVAC MedPsy 的明确发布日期分别为 2026-05-06 和 2026-05-07，超出本轮最近 5 天补充窗口。 <a href="https://huggingface.co/blog" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
 
+
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
@@ -347,23 +361,17 @@ h3 {
   <h3>提示词与规则迭代建议</h3>
   <ol class="compact-list"><li>
     <p><strong>连续日报缺少自动读取前几期主体标题的重复抑制步骤。</strong></p>
-    
     <p>证据：2026-05-15 与 2026-05-16 已出现 GitHub Copilot app、Genkit Middleware 等跨日重复风险；本轮需要手动排除 OpenAI personal finances 和 xAI retirement。</p>
-    
     <p>预期收益：在低新闻量日期优先寻找未覆盖的一手来源，减少读者连续两天看到相同主体。</p>
   </li>
 <li>
     <p><strong>低新闻量日期需要更清晰地区分主体条目和次级产品运营线索。</strong></p>
-    
     <p>证据：Mux Robots 2026-05-15 更新有一手来源和 AI workflow 相关性，但主要是 usage unit 和 free period 变化，低于本轮主体五条的影响面。</p>
-    
     <p>预期收益：把计费、试用期、文档小更新稳定放入 community_leads，避免主体质量被凑数稀释。</p>
   </li>
 <li>
     <p><strong>搜索结果中的最新抓取时间和页面真实发布日期容易混淆。</strong></p>
-    
     <p>证据：Hugging Face blog 页显示若干 about-hours 热度项，但打开后明确 Published 日期可早到 2026-05-06/2026-05-07，不符合最近 5 天补充窗口。</p>
-    
     <p>预期收益：要求最终日期以源页面正文或可解析元数据为准，降低旧事件被当作新动态的风险。</p>
   </li></ol>
 </section>

@@ -162,6 +162,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);

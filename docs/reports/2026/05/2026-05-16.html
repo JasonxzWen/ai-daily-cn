@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -334,6 +347,7 @@ h3 {
 <li>AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。 <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
 
+
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
@@ -348,23 +362,17 @@ h3 {
   <h3>提示词与规则迭代建议</h3>
   <ol class="compact-list"><li>
     <p><strong>48 小时扩展会把上一期主体重新带入候选集，容易形成跨日报重复。</strong></p>
-    
     <p>证据：本轮 GitHub Copilot app 与 Genkit Middleware 同时出现在 2026-05-15 与 2026-05-16 的主体候选中。</p>
-    
     <p>预期收益：在主体不足时优先补入未覆盖的 dated official docs 或模型生命周期节点，减少重复阅读负担。</p>
   </li>
 <li>
     <p><strong>模型退役和重定向通常出现在官方 docs，而不是 blog 或 changelog，现有规则容易把它们降级。</strong></p>
-    
     <p>证据：xAI 迁移页和 Databricks 模型目录都有明确生效日期、last updated 和迁移建议，且直接影响 API 行为和成本。</p>
-    
     <p>预期收益：把带生效日期和 last updated 的官方迁移文档纳入可入主体的 T0 来源，提升模型生命周期覆盖。</p>
   </li>
 <li>
     <p><strong>搜索摘要中的发布日期可能与源页面正文日期不一致。</strong></p>
-    
     <p>证据：OpenAI Codex Windows sandbox 在搜索摘要中显示为 2026-05-15，但源页面正文日期为 2026-05-13，因此本轮没有作为新增主体使用。</p>
-    
     <p>预期收益：要求最终日期以源页面正文或机器可解析元数据为准，降低旧事件被包装成新事件的风险。</p>
   </li></ol>
 </section>

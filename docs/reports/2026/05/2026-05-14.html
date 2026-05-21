@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -330,6 +343,7 @@ h3 {
       <ul class="compact-list"><li>OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 <a href="https://openai.com/daybreak" target="_blank" rel="noopener noreferrer">来源</a></li>
 <li>Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 <a href="https://code.claude.com/docs/en/fast-mode" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
+
 
     <section class="section" id="self-check">
       <h2>自检摘要</h2>

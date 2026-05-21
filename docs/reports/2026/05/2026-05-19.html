@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -348,6 +361,7 @@ h3 {
 <li>Mistral 3 页面展示了开放多模态/多语言模型家族和 vLLM、Red Hat、NVIDIA 协作信息，但页面在本轮采样中缺少稳定可交叉确认的 2026-05-19/48h 发布日期，因此未写入主体。 <a href="https://mistral.ai/news/mistral-3" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
 
+
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
@@ -362,23 +376,17 @@ h3 {
   <h3>提示词与规则迭代建议</h3>
   <ol class="compact-list"><li>
     <p><strong>同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。</strong></p>
-    
     <p>证据：OpenAI-Dell Codex 合作有 OpenAI 页面和 Dell 新闻稿；本轮为避免重复计数，只把 OpenAI 作为主体 URL，Dell 相关页面放入 projects。</p>
-    
     <p>预期收益：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。</p>
   </li>
 <li>
     <p><strong>官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。</strong></p>
-    
     <p>证据：Google Developers 首页和搜索结果在 2026-05-19 显示 Google I/O 与 Gemini 相关卡片，但详情页日期多为 2026-02 或 2026-04，Mistral 3 页面也缺少稳定日期交叉确认。</p>
-    
     <p>预期收益：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。</p>
   </li>
 <li>
     <p><strong>GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。</strong></p>
-    
     <p>证据：2026-05-18 GitHub Copilot 同日包含 Actions 一键修复、低成本模型、Web 上下文问答、配置 API、Spaces API 和远程控制等多条更新；主体只能挂 GitHub Changelog 汇总页。</p>
-    
     <p>预期收益：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。</p>
   </li></ol>
 </section>

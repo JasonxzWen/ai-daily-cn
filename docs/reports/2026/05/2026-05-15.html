@@ -169,6 +169,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -342,6 +355,7 @@ h3 {
 <li>Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。 <a href="https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/" target="_blank" rel="noopener noreferrer">来源</a></li>
 <li>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。 <a href="https://docs.x.ai/developers/models?cluster=us-east-1" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
     </section>
+
 
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
