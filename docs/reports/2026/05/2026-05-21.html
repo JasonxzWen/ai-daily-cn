@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 日报 2026-05-21</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #17202a;
+  --muted: #5f6f7f;
+  --line: #d9e0e7;
+  --accent: #146c94;
+  --accent-2: #246b45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.site-title {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.report-hero {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.summary {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-grid span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item,
+.report-card {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.item-meta,
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.source-line {
+  margin-top: 12px;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compact-list,
+.report-list {
+  padding-left: 1.25rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.check-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.check-list dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.check-list dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.suggestions {
+  margin-top: 20px;
+}
+
+.suggestions li {
+  margin-bottom: 16px;
+}
+
+.artifact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.artifact-links a {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+
+  .page {
+    width: min(100% - 24px, 1040px);
+    padding-top: 20px;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+
+  .project-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../../../index.html">AI 日报</a>
+    <span class="site-date">2026-05-21</span>
+  </header>
+  <main class="page">
+    <section class="report-hero">
+      <p class="eyebrow">每日 AI 技术观察</p>
+      <h1>AI 日报 2026-05-21</h1>
+      <p class="summary">今天可回源的一手 AI 动态集中在 2026-05-19 到 2026-05-20。主体保留 6 条：Google I/O 把 Gemini 3.5、Gemini Omni、Antigravity 和 Managed Agents 放到同一条 agent 开发链路里；GitHub Copilot 在 5 月 20 日继续调整模型路由、Web 模型列表和 issue 语义检索；AWS SageMaker AI endpoints 增加 OpenAI-compatible API；Vercel 同日扩展 AI Gateway、Chat SDK 和 WordPress AI Client 连接器；Anthropic 收购 Stainless，强化 SDK、CLI 和 MCP server 工具链；Hugging Face 上 Ettin reranker 与 OlmoEarth v1.1 带来两个开源模型方向。模型发布和技术博客单列，不计入主体数量。</p>
+      <div class="meta-grid" aria-label="日报统计">
+        <span><strong>6</strong> 主体信息</span>
+        <span><strong>5</strong> 模型发布</span>
+        <span><strong>3</strong> 技术博客</span>
+        <span><strong>0</strong> Builder 观察</span>
+        <span><strong>3</strong> 社区线索</span>
+      </div>
+    </section>
+
+    <section class="section" id="main-items">
+      <h2>主体信息</h2>
+      <article class="item">
+  <h3>Google I/O 2026 发布 Gemini 3.5 Flash、Gemini Omni 与 Antigravity agent 开发栈</h3>
+  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>Google</span><span>Gemini 3.5 Flash</span><span>Gemini Omni</span><span>Google Antigravity</span><span>Managed Agents</span><span>Google AI Studio</span></div>
+  <ul>
+    <li>Gemini 3.5 Flash 已通过 Antigravity、Gemini API、Google AI Studio 和 Android Studio 等入口开放，Google 将其定位为面向长周期 agent 任务的 Flash 级模型。</li>
+<li>Gemini Omni 从视频开始处理多模态生成和编辑，并通过 Gemini app、Google Flow、YouTube Shorts Remix 等产品路径滚动可用。</li>
+<li>Antigravity 2.0、Antigravity CLI/SDK 与 Managed Agents 把远程沙箱、子 agent、工具调用和部署接口组合成可编排开发栈，开发团队需要关注权限、日志、沙箱和成本边界。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" target="_blank" rel="noopener noreferrer">Google Blog</a></p>
+</article>
+<article class="item">
+  <h3>GitHub Copilot 5 月 20 日更新集中在模型路由、Web 模型收敛和 issue 语义检索</h3>
+  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>GitHub</span><span>GitHub Copilot</span><span>Auto model selection</span><span>Copilot Chat</span><span>Semantic issue search</span></div>
+  <ul>
+    <li>Auto model selection 会结合实时可用性、可靠性、推理难度、代码复杂度和工具编排需求选择模型，并显示本次响应使用的模型。</li>
+<li>Copilot on web 移除了 Gemini 以及部分其他模型，Web Chat 后续会用更有限的模型列表换取稳定性和响应一致性。</li>
+<li>Semantic issue search 让用户用自然语言在 issue 中查找、分组和分析相关问题，适合 triage、规划和跨仓库上下文发现。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
+</article>
+<article class="item">
+  <h3>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API，降低自托管模型接入成本</h3>
+  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>AWS</span><span>Amazon SageMaker AI</span><span>OpenAI-compatible API</span><span>LangChain</span><span>Strands Agents</span><span>vLLM</span></div>
+  <ul>
+    <li>SageMaker endpoint 暴露 `/openai/v1` 路径，支持 Chat Completions 与 streaming，响应由容器返回，应用侧不需要自定义 SigV4 client。</li>
+<li>Bearer token 由 SageMaker Python SDK 基于 AWS 凭据生成，最长有效 12 小时；实际权限仍由 IAM 控制。</li>
+<li>同一 endpoint 可通过 inference components 承载多个模型，让通用模型、领域微调模型和小型分类模型共享 OpenAI-compatible 调用面。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">AWS Machine Learning Blog</a></p>
+</article>
+<article class="item">
+  <h3>Vercel 5 月 20 日把 AI Gateway、Chat SDK 与 WordPress AI Client 串到更多 agent 场景</h3>
+  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>Vercel</span><span>AI Gateway</span><span>Grok Build 0.1</span><span>Chat SDK</span><span>WordPress AI Client</span></div>
+  <ul>
+    <li>Grok Build 0.1 作为早期访问的 agentic coding beta 模型进入 AI Gateway，可通过 AI SDK 使用 `xai/grok-build-0.1`。</li>
+<li>Chat SDK 的 `chat/ai` 子路径提供 `createChatTools(chat)`，可把 chat 的读写动作变成 agent 工具，并保留审批默认值和 preset 范围控制。</li>
+<li>WordPress AI Gateway plugin 作为 WordPress AI Client 连接器，让插件通过一个网关 key 调用多家模型，并获得 fallback、模型发现、计费和观测能力。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
+</article>
+<article class="item">
+  <h3>Anthropic 收购 Stainless，补强 Claude API、SDK、CLI 与 MCP server 生成链路</h3>
+  <div class="item-meta"><span>2026-05-18</span><span>T0</span><span>Anthropic</span><span>Stainless</span><span>Claude API</span><span>SDK</span><span>CLI</span><span>MCP</span></div>
+  <ul>
+    <li>Anthropic 的表述很明确：agent 能力取决于能连接到哪些系统，SDK、CLI 和 MCP server 是把 API 暴露给 agent 的关键层。</li>
+<li>Stainless 能把 API spec 转成 TypeScript、Python、Go、Java 等语言的 SDK，并生成 CLI 与 MCP server，收购后会进入 Claude Platform 的开发者体验链路。</li>
+<li>对平台团队来说，这类交易说明 API schema、SDK 生成、连接器质量和 MCP server 生命周期会成为 agent 平台竞争的一部分。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://www.anthropic.com/news/anthropic-acquires-stainless?guides=image-generation-social-good" target="_blank" rel="noopener noreferrer">Anthropic</a></p>
+</article>
+<article class="item">
+  <h3>Hugging Face 上两组 5 月 19 日模型发布分别覆盖 RAG reranking 与地球观测</h3>
+  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Hugging Face</span><span>Sentence Transformers</span><span>Ettin Reranker</span><span>Ai2</span><span>OlmoEarth v1.1</span></div>
+  <ul>
+    <li>Ettin reranker 覆盖 17M 到 1B 参数，并公开训练数据与 distillation recipe，可直接用于 retrieve-then-rerank RAG 链路。</li>
+<li>OlmoEarth v1.1 提供模型 collection、技术报告和代码，目标是在保持任务表现的同时把地球观测模型的计算成本压低。</li>
+<li>这两类发布都不是通用聊天模型，但更贴近生产检索和垂直 AI 工作流，适合作为模型发布区的独立条目跟踪。</li>
+  </ul>
+  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog</a></p>
+</article>
+    </section>
+
+    <section class="section" id="model-releases">
+      <h2>模型发布</h2>
+      <article class="item">
+  <h3>Gemini 3.5 Flash</h3>
+  <div class="item-meta">
+    <span>2026-05-20</span>
+    <span>Google</span>
+    <span>闭源 API (closed_api)</span>
+  </div>
+  <p>Google 在 I/O 2026 汇总中确认 Gemini 3.5 Flash 已通过 Antigravity、Gemini API、Google AI Studio 和 Android Studio 等入口可用，定位为兼顾速度与 agent 执行能力的 Flash 系列新模型。</p>
+  <p class="muted">同一模型也进入 GitHub Copilot 与 Vercel AI Gateway 等第三方产品路径；本条以 Google 官方 I/O 汇总作为模型发布源。</p>
+  <p class="source-line">来源：<a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" target="_blank" rel="noopener noreferrer">Google Blog</a></p>
+</article>
+<article class="item">
+  <h3>Gemini Omni Flash</h3>
+  <div class="item-meta">
+    <span>2026-05-20</span>
+    <span>Google</span>
+    <span>产品内可用 (closed_product)</span>
+  </div>
+  <p>Gemini Omni Flash 开始在 Gemini app、Google Flow、YouTube Shorts Remix 和 YouTube Create 等产品中滚动使用，主打从文本、图像、视频等输入生成和编辑视频。</p>
+  <p class="muted">当前主要是产品可用性，API 和企业入口按 Google 官方说明后续推进。</p>
+  <p class="source-line">来源：<a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" target="_blank" rel="noopener noreferrer">Google Blog</a></p>
+</article>
+<article class="item">
+  <h3>Grok Build 0.1</h3>
+  <div class="item-meta">
+    <span>2026-05-20</span>
+    <span>xAI / Vercel AI Gateway</span>
+    <span>闭源 API (closed_api)</span>
+  </div>
+  <p>Vercel AI Gateway 新增 Grok Build 0.1，这是面向 agentic coding 的 beta 模型，可通过 AI SDK 使用 `xai/grok-build-0.1` 调用。</p>
+  <p class="muted">Vercel 标注为 early access；reasoning effort 不可配置，也没有 non-reasoning mode。</p>
+  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
+</article>
+<article class="item">
+  <h3>Ettin Reranker Family</h3>
+  <div class="item-meta">
+    <span>2026-05-19</span>
+    <span>Hugging Face / Sentence Transformers community</span>
+    <span>开源权重 (open_weights)</span>
+  </div>
+  <p>Tom Aarsen 发布 6 个基于 Ettin ModernBERT encoder 的 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数，并公开数据与训练 recipe。</p>
+  <p class="muted">适合 RAG 的 retrieve-then-rerank 链路；文章提供模型、dataset 和训练脚本说明。</p>
+  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog</a></p>
+</article>
+<article class="item">
+  <h3>OlmoEarth v1.1</h3>
+  <div class="item-meta">
+    <span>2026-05-19</span>
+    <span>Ai2 / Allen Institute for AI</span>
+    <span>开源权重 (open_weights)</span>
+  </div>
+  <p>Ai2 发布 OlmoEarth v1.1 地球观测模型家族，提供 Hugging Face collection、技术报告和训练代码，强调更低计算成本与遥感任务可用性。</p>
+  <p class="muted">面向垂直遥感任务，不是通用对话模型；适合环境监测、农作物映射和地理空间 AI 工作流。</p>
+  <p class="source-line">来源：<a href="https://huggingface.co/blog/allenai/olmoearth-v1-1" target="_blank" rel="noopener noreferrer">Hugging Face Blog / Ai2</a></p>
+</article>
+    </section>
+
+<section class="section" id="hot-blogs">
+      <h2>热门技术博客</h2>
+      <article class="item">
+  <h3><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></h3>
+  <div class="item-meta">
+    <span>2026-05-20</span>
+    <span>AWS Machine Learning Blog</span>
+    <span>Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng</span>
+    <span>OpenAI-compatible inference endpoint / self-hosted model serving</span>
+  </div>
+  <p>文章给出 SageMaker AI endpoint 的 OpenAI-compatible path、bearer token、单模型 endpoint、inference component 多模型部署和 Strands Agents 集成示例。</p>
+  <p><strong>为什么重要：</strong>对已有 OpenAI SDK、LangChain、Strands Agents 或 AI Gateway 的系统，迁移到自托管 SageMaker endpoint 的改造面更小。</p>
+</article>
+<article class="item">
+  <h3><a href="https://developers.googleblog.com/en/an-important-update-transitioning-gemini-cli-to-antigravity-cli/" target="_blank" rel="noopener noreferrer">An important update: Transitioning Gemini CLI to Antigravity CLI</a></h3>
+  <div class="item-meta">
+    <span>2026-05-19</span>
+    <span>Google Developers Blog</span>
+    <span>Dmitry Lyalin, Taylor Mullen</span>
+    <span>Coding agent CLI migration / multi-agent harness</span>
+  </div>
+  <p>Google 宣布把 Gemini CLI 面向个人和免费用户的路径迁移到 Antigravity CLI，并给出 2026-06-18 的服务停止时间线。</p>
+  <p><strong>为什么重要：</strong>使用 Gemini CLI、Gemini Code Assist IDE extension 或 GitHub 集成的团队需要区分 consumer 与 enterprise 路径，并提前迁移插件、skills、hooks 与多 agent 工作流。</p>
+</article>
+<article class="item">
+  <h3><a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></h3>
+  <div class="item-meta">
+    <span>2026-05-19</span>
+    <span>Hugging Face Blog</span>
+    <span>Tom Aarsen</span>
+    <span>RAG reranking / Sentence Transformers</span>
+  </div>
+  <p>文章解释 reranker 与 embedder 的 retrieve-then-rerank 配合方式，并公开 6 个 CrossEncoder 模型、distillation 数据、训练 recipe 和性能表。</p>
+  <p><strong>为什么重要：</strong>RAG 质量常卡在候选排序；这类开源 reranker 让团队能在成本可控范围内替换或复训检索后排序模型。</p>
+</article>
+    </section>
+
+    <section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      <table class="project-table">
+  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
+  <tbody>
+    <tr><td>Google Antigravity</td><td>Google 的 agent-first 开发平台，本轮 I/O 扩展桌面应用、CLI、SDK、subagents、hooks、异步任务和 agent harness。</td><td><a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Amazon SageMaker AI OpenAI-compatible endpoints</td><td>SageMaker real-time inference endpoints 新增 `/openai/v1` 调用路径，支持用 OpenAI SDK 与常见 agent 框架调用自托管模型。</td><td><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Vercel Chat SDK AI tools</td><td>Chat SDK 新增 `chat/ai` 子路径和 `createChatTools(chat)`，把聊天平台的读写动作暴露为 agent 工具，并支持审批与 preset 范围。</td><td><a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Vercel AI Gateway WordPress plugin</td><td>作为 WordPress AI Client 连接器，让 WordPress 插件通过一个 AI Gateway key 使用多模型、fallback、观测和统一计费。</td><td><a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>Ettin rerankers</td><td>6 个 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数，并公开训练数据与 recipe。</td><td><a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+<tr><td>OlmoEarth v1.1</td><td>Ai2 的地球观测模型家族更新，提供 Hugging Face collection、技术报告和代码，面向低成本遥感推理和微调。</td><td><a href="https://huggingface.co/blog/allenai/olmoearth-v1-1" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      <p>暂无 Builder 观察。</p>
+    </section>
+
+    <section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      <ul class="compact-list"><li>Google I/O 同期还有 WebMCP、Chrome DevTools for agents、AI Studio Android 支持、Science Skills 等多条 developer 工具更新；本轮已用 Google I/O 主体条目合并，不再逐条拆分。 <a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>Vercel Changelog 提到 WordPress 7.0 今日发布并引入 WordPress AI Client，但本轮未找到 WordPress Core 最终 release post，暂不把 WordPress 7.0 作为独立主体。 <a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">来源</a></li>
+<li>NVIDIA Nemotron 3 Nano Omni 是高信号开源多模态模型，但官方发布日期为 2026-04-28，超出本轮 5 天回看边界，未纳入主体或模型发布列表。 <a href="https://blogs.nvidia.com/blog/nemotron-3-nano-omni-multimodal-ai-agents/" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
+    </section>
+
+    <section class="section" id="self-check">
+      <h2>自检摘要</h2>
+      <dl class="check-list">
+        <div><dt>主条目</dt><dd>6</dd></div>
+        <div><dt>Builder</dt><dd>0</dd></div>
+        <div><dt>一手链接</dt><dd>通过</dd></div>
+        <div><dt>无禁用表达</dt><dd>通过</dd></div>
+        <div><dt>无无源数字</dt><dd>通过</dd></div>
+      </dl>
+      <p>本轮先覆盖 2026-05-20 到 2026-05-21，强主体少于 5 条后扩展到 2026-05-18。Google I/O 多条模型、agent、AI Studio 与产品更新合并为 Google 开发者栈主体；GitHub Copilot 5 月 20 日多条小更新合并为一个 Copilot 主体；Vercel 5 月 20 日多条 AI Changelog 合并为一个平台主体；Anthropic Stainless 为 2026-05-18 高信号一手来源，作为 5 天内 fallback 纳入；NVIDIA Nemotron 3 Nano Omni 因日期超出边界降级为社区线索。</p>
+      <section class="suggestions" aria-label="提示词或规则迭代建议">
+  <h3>提示词与规则迭代建议</h3>
+  <ol class="compact-list"><li>
+    <p><strong>聚合型主体条目仍只有单一 url 字段，Google I/O、GitHub Copilot、Vercel Changelog 这类同日多子发布只能挂总页或代表页。</strong></p>
+    
+    <p>证据：本轮 Google I/O 涉及 Gemini 3.5、Gemini Omni、Antigravity、Managed Agents；GitHub Copilot 涉及模型路由、Web 模型列表和 issue 语义检索；Vercel 涉及 AI Gateway、Chat SDK 和 WordPress plugin。</p>
+    
+    <p>预期收益：给 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。</p>
+  </li>
+<li>
+    <p><strong>model_releases 的 availability 只能选一个枚举，难以表达同一模型同时进入 API、产品和第三方平台。</strong></p>
+    
+    <p>证据：Gemini 3.5 Flash 同时出现在 Gemini API、Google AI Studio、Android Studio、GitHub Copilot 和 Vercel AI Gateway。</p>
+    
+    <p>预期收益：增加 platforms 或 availability_notes 字段后，模型区块更适合追踪跨产品、跨平台发布。</p>
+  </li>
+<li>
+    <p><strong>发布状态已支持 prepare 阶段不阻塞生成，但最终回复模板还应明确区分“本地日报已生成”和“Pages 已发布”。</strong></p>
+    
+    <p>证据：本轮刚修改 publish:prepare-worktree，使 git_not_writable 和 remote_ahead 只标记 publish blocker；未来定时任务可能生成成功但 publish 失败。</p>
+    
+    <p>预期收益：减少用户把本地产物生成成功误解为 Pages 已更新的风险。</p>
+  </li></ol>
+</section>
+    </section>
+
+    <nav class="artifact-links" aria-label="产物链接">
+      <a href="../../../data/2026/05/2026-05-21.json">结构化 JSON</a>
+      
+    </nav>
+  </main>
+</body>
+</html>
