@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
+import { collectGitHubTrending, parseGitHubTrendingHtml } from "../src/discovery.js";
 import { renderReportHtml } from "../src/render.js";
 import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
@@ -235,6 +236,76 @@ test("HTML 渲染会展示模型发布和热门技术博客", async () => {
   assert(html.includes('target="_blank" rel="noopener noreferrer"'));
 });
 
+test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.projects = [
+    {
+      name: "Example Trending Agent",
+      description: "用于验证 GitHub trending 项目信号展示。",
+      url: "https://github.com/example/trending-agent",
+      event_date: "2026-05-15",
+      source: "GitHub Trending",
+      signal: "trending",
+      evidence: "出现在 daily trending，并有可运行 README。"
+    }
+  ];
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      role: "maintainer",
+      content: "发布了 agent harness 的实现经验。",
+      url: "https://example.com/builder-post",
+      event_date: "2026-05-15",
+      source: "follow-builders",
+      evidence: "原始帖子链接可访问。"
+    }
+  ];
+  report.self_check.builder_observations = 1;
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const html = renderReportHtml(validation.value);
+  assert(html.includes('id="source-audit"'));
+  assert(html.includes("信源审计"));
+  assert(html.includes("GitHub Trending"));
+  assert(html.includes("Builder 原始源"));
+  assert(html.includes("信号：trending"));
+  assert(html.includes("出现在 daily trending"));
+  assert(html.includes("原始帖子链接可访问"));
+});
+
+test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
+  const source = {
+    name: "GitHub Trending TypeScript daily",
+    url: "https://github.com/trending/typescript?since=daily",
+    language: "typescript",
+    window: "daily"
+  };
+  const html = githubTrendingFixture();
+  const candidates = parseGitHubTrendingHtml(html, source);
+
+  assert.equal(candidates.length, 2);
+  assert.equal(candidates[0].repo, "example/trending-agent");
+  assert.equal(candidates[0].signal, "trending");
+  assert.equal(candidates[0].language, "typescript");
+  assert.equal(candidates[0].description, "Agent workbench with a runnable demo.");
+
+  const collected = await collectGitHubTrending({
+    sources: [source],
+    fetchImpl: async () => ({
+      ok: true,
+      text: async () => html
+    })
+  });
+
+  assert.equal(collected.source_audit.github_trending.checked, true);
+  assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
+  assert.equal(collected.source_audit.github_trending.candidates_found, 2);
+  assert.equal(collected.candidates[1].repo, "example/rag-eval");
+});
+
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-"));
   const inputDir = path.join(tmp, "reports-source");
@@ -348,8 +419,24 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.publish_status.repo_pushed, false);
   assert.deepEqual(result.report.model_releases, []);
   assert.deepEqual(result.report.hot_blogs, []);
+  assert.equal(result.report.source_audit.github_trending.checked, true);
+  assert.equal(result.report.source_audit.builder_sources.checked, true);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
   assert.equal(await exists(result.path), true);
+});
+
+test("report:write 要求结构化草稿记录 GitHub Trending 和 Builder 信源审计", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  delete draft.source_audit;
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    "source_audit_missing"
+  );
 });
 
 test("report draft 缺少内容 required fields 时失败，不猜测", () => {
@@ -388,6 +475,11 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("反思与迭代建议"));
   assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
+  assert(prompt.includes("GitHub Trending"));
+  assert(prompt.includes("npm run discover:github-trending"));
+  assert(prompt.includes("follow-builders"));
+  assert(prompt.includes("source_audit"));
+  assert(prompt.includes("builder_sources"));
   assert(prompt.includes("2026-05-15"));
 });
 
@@ -414,4 +506,57 @@ async function exists(filePath) {
   } catch {
     return false;
   }
+}
+
+function sourceAuditFixture() {
+  return {
+    github_trending: {
+      checked: true,
+      sources: [
+        {
+          name: "GitHub Trending",
+          url: "https://github.com/trending?since=daily",
+          status: "checked",
+          notes: "fixture"
+        }
+      ],
+      candidates_found: 2,
+      included: 1,
+      notes: "fixture"
+    },
+    builder_sources: {
+      checked: true,
+      sources: [
+        {
+          name: "follow-builders central feed",
+          url: "https://github.com/zarazhangrui/follow-builders",
+          status: "checked",
+          notes: "fixture"
+        }
+      ],
+      candidates_found: 1,
+      included: 1,
+      notes: "fixture"
+    }
+  };
+}
+
+function githubTrendingFixture() {
+  return `
+<article class="Box-row">
+  <h2 class="h3 lh-condensed">
+    <a href="/example/trending-agent">
+      example / trending-agent
+    </a>
+  </h2>
+  <p class="col-9 color-fg-muted my-1 pr-4">Agent workbench with a runnable demo.</p>
+</article>
+<article class="Box-row">
+  <h2 class="h3 lh-condensed">
+    <a href="/example/rag-eval">
+      example / rag-eval
+    </a>
+  </h2>
+  <p class="col-9 color-fg-muted my-1 pr-4">RAG eval toolkit.</p>
+</article>`;
 }

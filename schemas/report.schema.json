@@ -67,6 +67,9 @@
         }
       }
     },
+    "source_audit": {
+      "$ref": "#/$defs/source_audit"
+    },
     "main_items": {
       "type": "array",
       "minItems": 1,
@@ -292,6 +295,21 @@
         },
         "url": {
           "$ref": "#/$defs/absolute_url"
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signal": {
+          "enum": ["release", "star_velocity", "trending", "notable_pr", "ecosystem", "official_update"]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -310,6 +328,22 @@
         },
         "url": {
           "$ref": "#/$defs/absolute_url"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -390,6 +424,67 @@
         },
         "publish_status": {
           "$ref": "#/$defs/publish_status"
+        }
+      }
+    },
+    "source_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["github_trending", "builder_sources"],
+      "properties": {
+        "github_trending": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "builder_sources": {
+          "$ref": "#/$defs/source_audit_group"
+        }
+      }
+    },
+    "source_audit_group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checked", "sources", "candidates_found", "included", "notes"],
+      "properties": {
+        "checked": {
+          "type": "boolean"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_audit_source"
+          },
+          "default": []
+        },
+        "candidates_found": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "included": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "source_audit_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url", "status"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "status": {
+          "enum": ["checked", "blocked", "no_signal"]
+        },
+        "notes": {
+          "type": "string"
         }
       }
     },

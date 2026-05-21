@@ -77,3 +77,12 @@ npm run publish -- confirm-push YYYY-MM-DD
 ```
 
 该命令只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在 `src/`、`prompts/`、`schemas/` 等非发布器管理改动，会停止并返回 `dirty_worktree`。
+
+## 发现源与审计补充
+
+后续定时任务生成日报时，除了官方发布、模型、论文和工程博客，还必须固定检查：
+
+- `github-ai-trending`：先运行 `npm run discover:github-trending -- 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending，并至少交叉 OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories 或等价趋势源。
+- `follow-builders`：只把 builder/researcher/founder/maintainer 的原始帖子、个人博客、公开视频或播客片段写入 `builder_observations`；没有原始 URL 时不得收录。
+
+结构化草稿必须包含 `source_audit.github_trending` 与 `source_audit.builder_sources`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因。GitHub trending 项目进入 `projects` 时应填写 `event_date`、`source`、`signal`、`evidence`；Builder 条目进入 `builder_observations` 时应填写 `role`、`event_date`、`source`、`evidence`。没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。

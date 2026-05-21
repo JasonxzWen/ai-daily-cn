@@ -77,5 +77,29 @@ export function normalizeReportDraft(draft, options = {}) {
     });
   }
 
+  requireSourceAudit(validation.value);
+
   return validation.value;
+}
+
+function requireSourceAudit(report) {
+  const audit = report.source_audit;
+  if (!audit || typeof audit !== "object") {
+    throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录 GitHub Trending 和 Builder 原始源检查结果。");
+  }
+
+  requireAuditGroup(audit.github_trending, "source_audit.github_trending");
+  requireAuditGroup(audit.builder_sources, "source_audit.builder_sources");
+}
+
+function requireAuditGroup(group, pathName) {
+  if (!group || typeof group !== "object") {
+    throw new PublisherError("source_audit_incomplete", `${pathName} 缺失。`);
+  }
+  if (group.checked !== true) {
+    throw new PublisherError("source_audit_incomplete", `${pathName}.checked 必须为 true。`);
+  }
+  if (!Array.isArray(group.sources) || group.sources.length === 0) {
+    throw new PublisherError("source_audit_incomplete", `${pathName}.sources 必须至少记录一个已检查来源。`);
+  }
 }

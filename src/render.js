@@ -23,6 +23,8 @@ export function renderReportHtml(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const sourceAudit = report.source_audit && typeof report.source_audit === "object" ? report.source_audit : null;
+  const sourceAuditSection = sourceAudit ? `\n    ${renderSourceAudit(sourceAudit)}\n` : "";
   const metaItems = [
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     modelReleases.length > 0 ? `<span><strong>${modelReleases.length}</strong> 模型发布</span>` : "",
@@ -79,6 +81,7 @@ ${optionalSections ? `\n    ${optionalSections}\n` : ""}
       ${renderCommunityLeads(communityLeads)}
     </section>
 
+${sourceAuditSection}
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
       <dl class="check-list">
@@ -302,6 +305,19 @@ h3 {
   gap: 10px;
 }
 
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.audit-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
 .check-list div {
   padding: 12px;
   border: 1px solid var(--line);
@@ -451,11 +467,23 @@ function renderProjects(projects) {
     ${projects
       .map(
         (project) =>
-          `<tr><td>${escapeHtml(project.name)}</td><td>${escapeHtml(project.description)}</td><td>${externalLink(project.url, "原文")}</td></tr>`
+          `<tr><td>${escapeHtml(project.name)}</td><td>${renderProjectDetails(project)}</td><td>${externalLink(project.url, "原文")}</td></tr>`
       )
       .join("\n")}
   </tbody>
 </table>`;
+}
+
+function renderProjectDetails(project) {
+  const meta = [
+    project.event_date ? `日期：${project.event_date}` : "",
+    project.signal ? `信号：${project.signal}` : "",
+    project.source ? `来源：${project.source}` : ""
+  ].filter(Boolean);
+  const evidence = project.evidence ? `<p class="muted">${escapeHtml(project.evidence)}</p>` : "";
+  return `${escapeHtml(project.description)}${
+    meta.length > 0 ? `<div class="item-meta">${meta.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>` : ""
+  }${evidence}`;
 }
 
 function renderBuilderObservations(items) {
@@ -464,8 +492,19 @@ function renderBuilderObservations(items) {
   }
 
   return `<ul class="compact-list">${items
-    .map((item) => `<li><strong>${escapeHtml(item.author)}</strong>：${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`)
+    .map((item) => `<li>${renderBuilderObservation(item)}</li>`)
     .join("\n")}</ul>`;
+}
+
+function renderBuilderObservation(item) {
+  const meta = [
+    item.role ? item.role : "",
+    item.event_date ? item.event_date : "",
+    item.source ? item.source : ""
+  ].filter(Boolean);
+  const metaHtml = meta.length > 0 ? `<div class="item-meta">${meta.map((value) => `<span>${escapeHtml(value)}</span>`).join("")}</div>` : "";
+  const evidence = item.evidence ? `<p class="muted">${escapeHtml(item.evidence)}</p>` : "";
+  return `<strong>${escapeHtml(item.author)}</strong>：${escapeHtml(item.content)} ${externalLink(item.url, "来源")}${metaHtml}${evidence}`;
 }
 
 function renderCommunityLeads(items) {
@@ -474,6 +513,47 @@ function renderCommunityLeads(items) {
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
+}
+
+function renderSourceAudit(audit) {
+  return `<section class="section" id="source-audit">
+      <h2>信源审计</h2>
+      <div class="audit-grid">
+        ${renderAuditGroup("GitHub Trending", audit.github_trending)}
+        ${renderAuditGroup("Builder 原始源", audit.builder_sources)}
+      </div>
+    </section>`;
+}
+
+function renderAuditGroup(title, group) {
+  if (!group) {
+    return "";
+  }
+
+  const status = group.checked ? "已检查" : "未检查";
+  return `<article class="audit-card">
+  <h3>${escapeHtml(title)}</h3>
+  <div class="item-meta">
+    <span>${escapeHtml(status)}</span>
+    <span>${escapeHtml(group.candidates_found)} 候选</span>
+    <span>${escapeHtml(group.included)} 入选</span>
+  </div>
+  ${group.notes ? `<p>${escapeHtml(group.notes)}</p>` : ""}
+  ${renderAuditSources(group.sources)}
+</article>`;
+}
+
+function renderAuditSources(sources = []) {
+  if (!Array.isArray(sources) || sources.length === 0) {
+    return '<p class="muted">未记录具体来源。</p>';
+  }
+
+  return `<ul class="compact-list">${sources
+    .map((source) => {
+      const notes = source.notes ? `：${escapeHtml(source.notes)}` : "";
+      return `<li>${externalLink(source.url, source.name)} <span class="tag">${escapeHtml(source.status)}</span>${notes}</li>`;
+    })
+    .join("\n")}</ul>`;
 }
 
 function renderOptimizationSuggestions(items = []) {
@@ -494,12 +574,15 @@ function renderOptimizationSuggestion(item) {
       ? `<span class="tag">${item.requires_user_confirmation ? "需要确认" : "可直接处理"}</span>`
       : ""
   ].filter(Boolean);
+  const details = [
+    `<p><strong>${escapeHtml(item.issue || item.suggestion || "未命名建议")}</strong></p>`,
+    parts.length > 0 ? `<div class="item-meta">${parts.join("")}</div>` : "",
+    item.evidence ? `<p>证据：${escapeHtml(item.evidence)}</p>` : "",
+    item.suggestion ? `<p>建议：${escapeHtml(item.suggestion)}</p>` : "",
+    item.expected_benefit ? `<p>预期收益：${escapeHtml(item.expected_benefit)}</p>` : ""
+  ].filter(Boolean);
   return `<li>
-    <p><strong>${escapeHtml(item.issue || item.suggestion || "未命名建议")}</strong></p>
-    ${parts.length > 0 ? `<div class="item-meta">${parts.join("")}</div>` : ""}
-    ${item.evidence ? `<p>证据：${escapeHtml(item.evidence)}</p>` : ""}
-    ${item.suggestion ? `<p>建议：${escapeHtml(item.suggestion)}</p>` : ""}
-    ${item.expected_benefit ? `<p>预期收益：${escapeHtml(item.expected_benefit)}</p>` : ""}
+    ${details.join("\n    ")}
   </li>`;
 }
 

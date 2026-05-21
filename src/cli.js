@@ -9,6 +9,7 @@ import {
   publishGeneratedArtifacts
 } from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
+import { collectGitHubTrending } from "./discovery.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
 
@@ -115,6 +116,16 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       canonical_url: result.report.canonical_url
+    });
+  } else if (command === "discover:github-trending") {
+    const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
+    const result = await collectGitHubTrending({
+      limit: Number.parseInt(args.limit || positional[0] || "50", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
     });
   } else if (command === "publish") {
     const args = parseArgs(argv);

@@ -17,6 +17,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `canonical_url`
 - `html_path`
 - `source_window`
+- `source_audit`
 - `main_items`
 - `model_releases`
 - `hot_blogs`
@@ -51,3 +52,18 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 没有模型发布、热门博客、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
+
+`source_audit` 是每日结构化草稿的必填审计字段，用于证明已经检查 GitHub trending 与 Builder 原始源。它包含：
+
+- `github_trending.checked: true`
+- `github_trending.sources[]`：每个来源包含 `name`、`url`、`status`、可选 `notes`
+- `github_trending.candidates_found`
+- `github_trending.included`
+- `github_trending.notes`
+- `builder_sources.checked: true`
+- `builder_sources.sources[]`
+- `builder_sources.candidates_found`
+- `builder_sources.included`
+- `builder_sources.notes`
+
+`projects` 可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。
