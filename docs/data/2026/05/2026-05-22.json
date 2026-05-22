@@ -1,0 +1,462 @@
+{
+  "report_date": "2026-05-22",
+  "title": "AI 日报 2026-05-22",
+  "summary": "本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路；Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1；GitHub Copilot 加强任务路由与语义 issue 检索；AWS SageMaker 用 OpenAI-compatible API 降低迁移成本；Anthropic 继续把 Claude Managed Agents 的执行环境和私有 MCP 访问边界拆开。GitHub Trending 继续显示 coding-agent skills、代码图谱、MCP 和 agent memory 工具升温；Builder feed 本轮受网络限制未收录。",
+  "source_window": {
+    "date_from": "2026-05-19",
+    "date_to": "2026-05-22",
+    "fallback_window_used": true,
+    "notes": "按 2026-05-22 Asia/Shanghai 生成。最近 24 小时内高质量 T0/T1 主体信息不足 5 条，因此先扩展信源覆盖，再纳入 2026-05-19 至 2026-05-21 的官方发布、模型卡、GitHub Changelog、Claude Code changelog、Vercel Changelog、GitHub Trending 与 Hugging Face Blog；每条保留真实 event_date，没有把旧事件包装成今日发布。"
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "npm run discover:github-trending -- 50",
+          "url": "https://github.com/trending?since=daily",
+          "status": "blocked",
+          "notes": "仓库命令在 shell 环境返回 fetch failed，未产出候选；随后用浏览器复核 GitHub Trending 页面。"
+        },
+        {
+          "name": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily",
+          "status": "checked",
+          "notes": "浏览器可访问；抽样命中 anthropics/claude-plugins-official、colbymchenry/codegraph、HKUDS/CLI-Anything、ChromeDevTools/chrome-devtools-mcp 等。"
+        },
+        {
+          "name": "GitHub Trending weekly",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "checked",
+          "notes": "浏览器可访问；抽样命中 tinyhumansai/openhuman、colbymchenry/codegraph、rohitg00/agentmemory 等。"
+        },
+        {
+          "name": "GitHub Trending Python daily",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "浏览器可访问；抽样命中 Claude Code 插件、CLI-Anything、notebooklm-py、forge、karpathy/autoresearch。"
+        },
+        {
+          "name": "GitHub Trending TypeScript daily",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "浏览器可访问；抽样命中 codegraph、chrome-devtools-mcp、oh-my-pi、Understand-Anything、stitch-skills。"
+        },
+        {
+          "name": "GitHub Trending Rust daily",
+          "url": "https://github.com/trending/rust?since=daily",
+          "status": "checked",
+          "notes": "页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。"
+        },
+        {
+          "name": "GitHub Trending Go daily",
+          "url": "https://github.com/trending/go?since=daily",
+          "status": "checked",
+          "notes": "页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。"
+        },
+        {
+          "name": "OSSInsight AI trending",
+          "url": "https://ossinsight.io/trending/ai",
+          "status": "checked",
+          "notes": "搜索结果确认该页用于 AI agent、LLM tools、MCP、coding agents 与 RAG 工具趋势交叉检查。"
+        },
+        {
+          "name": "Trendshift GitHub trending repositories",
+          "url": "https://trendshift.io/github-trending-repositories",
+          "status": "checked",
+          "notes": "搜索结果确认可作为 GitHub trending 历史和 AI agent topic 交叉源。"
+        }
+      ],
+      "candidates_found": 25,
+      "included": 6,
+      "notes": "shell 内置发现命令受网络限制；浏览器复核后只纳入与 coding agent、MCP、代码知识图谱、agent memory 或 agent skills 直接相关的项目，未把泛化课程、非 AI 项目或可疑高星噪声写入项目表。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders prepare-digest",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "blocked",
+          "notes": "node prepare-digest.js 返回 fetch failed，无法取得本轮中心 feed。"
+        },
+        {
+          "name": "X direct original links spot check",
+          "url": "https://x.com",
+          "status": "blocked",
+          "notes": "直接打开 X status 页面返回空 HTML，无法可靠读取原帖正文。"
+        },
+        {
+          "name": "Builder web search",
+          "url": "https://www.google.com/search?q=AI+builder+May+21+2026+agent+coding",
+          "status": "no_signal",
+          "notes": "搜索结果未给出可稳定回源的本日 builder 原帖正文；本轮不硬凑 Builder 观察。"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。"
+    }
+  },
+  "main_items": [
+    {
+      "title": "Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路",
+      "event_date": "2026-05-19",
+      "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
+      "source": "Google Developers Blog",
+      "tier": "T0",
+      "entities": [
+        "Google",
+        "Gemini 3.5",
+        "Antigravity",
+        "WebMCP",
+        "Managed Agents"
+      ],
+      "summary": "Google I/O 开发者主题演讲确认 Gemini 3.5 系列、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 等能力同场发布，核心不是单点模型，而是让 agent 在 IDE、浏览器、移动端和托管运行环境之间形成更完整的执行链路。",
+      "bullets": [
+        "Antigravity 2.0 与 Antigravity CLI 支持专用 subagents、跨平台终端沙箱、凭据 masking 和 Git policy hardening，说明 coding agent 的边界正在从模型选择扩展到执行环境和策略约束。",
+        "Google AI Studio、Cloud Run、Firebase 与 Antigravity 的项目状态导出被放在同一段落，意味着从原型到部署的 agent workflow 会被更紧地绑定到 Google 开发者工具。",
+        "WebMCP origin trial、Chrome DevTools for agents 和 Modern Web Guidance 指向浏览器侧 agent 工具标准化，后续值得跟踪它与现有 MCP server 生态的兼容边界。"
+      ]
+    },
+    {
+      "title": "Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent",
+      "event_date": "2026-05-21",
+      "url": "https://vercel.com/changelog",
+      "source": "Vercel Changelog",
+      "tier": "T0",
+      "entities": [
+        "Vercel",
+        "AI Gateway",
+        "Qwen 3.7 Max",
+        "Grok Build 0.1",
+        "Chat SDK"
+      ],
+      "summary": "Vercel 在 48 小时内连续更新 AI Gateway 与 Chat SDK：Qwen 3.7 Max 可通过 `alibaba/qwen-3.7-max` 调用，Grok Build 0.1 可通过 `xai/grok-build-0.1` 调用，Chat SDK 新增 `chat/ai` 工具入口，`createChatTools(chat)` 可把聊天读写动作接入 agent。",
+      "bullets": [
+        "Qwen 3.7 Max 被 Vercel 定位为 agent foundation，覆盖 coding、office workflow automation 和 long-horizon autonomous execution。",
+        "Grok Build 0.1 是 early access 的 agentic coding 模型，并且明确没有可配置 reasoning effort 或 non-reasoning mode。",
+        "Chat SDK 工具层默认对写操作保留 approval gate，`reader`、`messenger`、`moderator` preset 也让 agent 权限范围更容易被产品代码表达。"
+      ]
+    },
+    {
+      "title": "GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表",
+      "event_date": "2026-05-20",
+      "url": "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub Copilot",
+        "VS Code",
+        "semantic issue search",
+        "model routing"
+      ],
+      "summary": "GitHub Copilot 的 auto model selection 现在会结合实时可用性、可靠性和任务维度为 VS Code 请求选模型；同日 Copilot Chat on web 上线语义 issue 检索，并收窄 Web Chat 的可用模型列表以保证稳定响应。",
+      "bullets": [
+        "自动路由会评估 reasoning、代码生成复杂度、bug 诊断难度和 tool orchestration 需求，管理员模型策略仍会生效。",
+        "语义 issue 检索使 Copilot Chat 能用自然语言寻找、分组和分析 issue，不再只依赖标题或精确关键词。",
+        "Web Chat 移除所有 Gemini 模型和部分其他模型，显示大厂 coding assistant 正在同时追求模型多样性和产品面稳定性。"
+      ]
+    },
+    {
+      "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "event_date": "2026-05-20",
+      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+      "source": "AWS Machine Learning Blog",
+      "tier": "T0",
+      "entities": [
+        "Amazon SageMaker AI",
+        "OpenAI SDK",
+        "LangChain",
+        "Strands Agents"
+      ],
+      "summary": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 `/openai/v1` 路径，现有 OpenAI SDK、LangChain 或 Strands Agents 应用可以通过更换 endpoint URL 调用自有 SageMaker 模型，且支持 streaming 与 time-limited bearer token。",
+      "bullets": [
+        "该能力把自托管模型服务和 OpenAI-compatible client 连接起来，降低企业把 agent 或 LLM 应用迁移到自有 AWS 账户内推理端点的代码成本。",
+        "SageMaker 通过 endpoint name 路由请求，并允许 inference components 下多个模型共享同一接口，适合多模型托管和 fine-tuned model serving。",
+        "对平台团队来说，关键变化是不用在应用层维护 SigV4 wrapper 或自定义 client，就能把治理、部署和监控留在 SageMaker。"
+      ]
+    },
+    {
+      "title": "Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels",
+      "event_date": "2026-05-19",
+      "url": "https://claude.com/blog/claude-managed-agents-updates",
+      "source": "Claude Blog",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Claude Managed Agents",
+        "MCP",
+        "self-hosted sandboxes"
+      ],
+      "summary": "Anthropic 宣布 Claude Managed Agents 可在用户控制的 sandbox 中执行工具，并通过 MCP tunnels 连接私有 MCP servers；self-hosted sandboxes 处于 public beta，MCP tunnels 处于 research preview。",
+      "bullets": [
+        "官方说明 agent loop 仍在 Anthropic infrastructure 处理 orchestration、context management 和 error recovery，而工具执行移动到用户配置环境。",
+        "self-hosting 控制代码执行位置，MCP tunnels 控制 Anthropic 如何访问企业网络中的 MCP servers，两者相互独立也可以组合使用。",
+        "这会让企业评估 managed agent 时重点看凭据隔离、网络边界、审计日志和 sandbox provider 的实际运行特性。"
+      ]
+    },
+    {
+      "title": "Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节",
+      "event_date": "2026-05-21",
+      "url": "https://code.claude.com/docs/en/changelog",
+      "source": "Claude Code Docs",
+      "tier": "T0",
+      "entities": [
+        "Claude Code",
+        "PowerShell",
+        "MCP",
+        "Agent SDK"
+      ],
+      "summary": "Claude Code 2.1.146 将 `/simplify` 更名为 `/code-review` 并支持 effort level，同时修复 winget 或 Microsoft Store 安装的 pwsh 命令行错误、MCP resources/prompts 分页丢项、Windows Terminal 后台会话 strobing 和 Agent SDK 流结束异常等问题。",
+      "bullets": [
+        "这次更新集中在工具可靠性和 Windows 体验，和本仓库最近遇到的 PowerShell / Windows 自动化边界高度相关。",
+        "MCP 分页修复会影响大型 MCP server 的资源、模板和 prompt 枚举完整性，适合放入 agent 工具链稳定性观察。",
+        "`/code-review high` 这种命令形态也表明代码评审开始被做成一等交互，而不是单纯的 prompt 模板。"
+      ]
+    },
+    {
+      "title": "Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径",
+      "event_date": "2026-05-19",
+      "url": "https://huggingface.co/blog/ettin-reranker",
+      "source": "Hugging Face Blog",
+      "tier": "T0",
+      "entities": [
+        "Hugging Face",
+        "Sentence Transformers",
+        "Ettin Reranker",
+        "RAG"
+      ],
+      "summary": "Hugging Face 发布 6 个基于 Ettin ModernBERT encoders 的 Sentence Transformers CrossEncoder rerankers，并同时给出数据与训练 recipe，面向 RAG 检索链路中的轻量 rerank 评估和部署。",
+      "bullets": [
+        "发布覆盖 17M 到 1B 级别的 reranker artifact，给 RAG 团队提供了更细的延迟、成本和质量取舍空间。",
+        "文章公开 distillation、training dataset 和 evaluation 细节，降低团队在自有语料上复现实验的门槛。",
+        "相比泛化大模型更新，这类专用 reranker 更直接影响检索增强应用的召回后排序质量。"
+      ]
+    }
+  ],
+  "model_releases": [
+    {
+      "name": "Gemini 3.5 Flash",
+      "provider": "Google",
+      "availability": "closed_api",
+      "event_date": "2026-05-19",
+      "url": "https://deepmind.google/models/model-cards/gemini-3-5-flash/",
+      "source": "Google DeepMind Model Card",
+      "summary": "Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。",
+      "notes": "同时出现在 Google I/O 官方汇总、Antigravity、Gemini API、GitHub Copilot 和 Vercel AI Gateway 相关发布中；本轮只按官方来源记录可用性。"
+    },
+    {
+      "name": "Qwen 3.7 Max on Vercel AI Gateway",
+      "provider": "Alibaba / Vercel",
+      "availability": "closed_api",
+      "event_date": "2026-05-21",
+      "url": "https://vercel.com/changelog",
+      "source": "Vercel Changelog",
+      "summary": "Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。",
+      "notes": "按 Vercel 官方网关可用性记录；未使用二手媒体中的 Alibaba 发布细节。"
+    },
+    {
+      "name": "Grok Build 0.1 on Vercel AI Gateway",
+      "provider": "xAI / Vercel",
+      "availability": "closed_api",
+      "event_date": "2026-05-20",
+      "url": "https://vercel.com/changelog",
+      "source": "Vercel Changelog",
+      "summary": "Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。",
+      "notes": "官方 changelog 说明 reasoning effort 不可配置，也没有 non-reasoning mode。"
+    },
+    {
+      "name": "Ettin Reranker Family",
+      "provider": "Hugging Face",
+      "availability": "open_weights",
+      "event_date": "2026-05-19",
+      "url": "https://huggingface.co/blog/ettin-reranker",
+      "source": "Hugging Face Blog",
+      "summary": "Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。",
+      "notes": "适合 RAG pipeline 的 retrieve-then-rerank 实验；上线前仍应在自有查询集上离线评估。"
+    }
+  ],
+  "hot_blogs": [
+    {
+      "title": "All the news from the Google I/O 2026 Developer keynote",
+      "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
+      "publisher": "Google Developers Blog",
+      "author": "The Google I/O team",
+      "event_date": "2026-05-19",
+      "topic": "agentic development / WebMCP / Antigravity",
+      "summary": "Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。",
+      "why_it_matters": "这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。"
+    },
+    {
+      "title": "Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints",
+      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng",
+      "event_date": "2026-05-20",
+      "topic": "model serving / OpenAI-compatible API",
+      "summary": "SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。",
+      "why_it_matters": "它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。"
+    },
+    {
+      "title": "New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels",
+      "url": "https://claude.com/blog/claude-managed-agents-updates",
+      "publisher": "Claude Blog",
+      "author": "Anthropic",
+      "event_date": "2026-05-19",
+      "topic": "managed agents / sandboxing / MCP",
+      "summary": "Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。",
+      "why_it_matters": "文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。"
+    },
+    {
+      "title": "Introducing the Ettin Reranker Family",
+      "url": "https://huggingface.co/blog/ettin-reranker",
+      "publisher": "Hugging Face Blog",
+      "author": "Tom Aarsen",
+      "event_date": "2026-05-19",
+      "topic": "reranker / RAG",
+      "summary": "Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。",
+      "why_it_matters": "RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。"
+    }
+  ],
+  "projects": [
+    {
+      "name": "anthropics/claude-plugins-official",
+      "description": "Anthropic-managed Claude Code plugins 官方目录，在 GitHub Trending daily 与 Python daily 中出现，说明 Claude Code 插件生态正在被集中发现。",
+      "url": "https://github.com/anthropics/claude-plugins-official",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending daily / Python daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily 显示该项目为 Official, Anthropic-managed directory of high quality Claude Code Plugins，并显示 891 stars today；Python daily 抽样也命中。"
+    },
+    {
+      "name": "colbymchenry/codegraph",
+      "description": "面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。",
+      "url": "https://github.com/colbymchenry/codegraph",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending daily / weekly / TypeScript daily",
+      "signal": "star_velocity",
+      "evidence": "GitHub Trending daily 显示 4,222 stars today；weekly 显示 6,731 stars this week；TypeScript daily 也命中。"
+    },
+    {
+      "name": "ChromeDevTools/chrome-devtools-mcp",
+      "description": "Chrome DevTools for coding agents，在 TypeScript daily 和全站 daily 中出现，适合关注 browser debugging 与 MCP 化工具链。",
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending daily / TypeScript daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending TypeScript daily 描述为 Chrome DevTools for coding agents，并显示 132 stars today。"
+    },
+    {
+      "name": "HKUDS/CLI-Anything",
+      "description": "宣称让所有软件 agent-native 的 CLI-Hub 项目，在全站 daily 与 Python daily 中出现。",
+      "url": "https://github.com/HKUDS/CLI-Anything",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending daily / Python daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily 描述为 Making ALL Software Agent-Native；Python daily 抽样显示 890 stars today。"
+    },
+    {
+      "name": "rohitg00/agentmemory",
+      "description": "面向 AI coding agents 的 persistent memory 项目，在 GitHub Trending weekly 中出现。",
+      "url": "https://github.com/rohitg00/agentmemory",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending weekly",
+      "signal": "star_velocity",
+      "evidence": "GitHub Trending weekly 描述为 #1 Persistent memory for AI coding agents based on real-world benchmarks，并显示 7,976 stars this week。"
+    },
+    {
+      "name": "Lum1104/Understand-Anything",
+      "description": "面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具，在 TypeScript daily 中出现。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-05-22",
+      "source": "GitHub Trending TypeScript daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending TypeScript daily 描述为 Turn any code into an interactive knowledge graph，并显示覆盖多种 coding agents。"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。",
+      "url": "https://github.com/karpathy/autoresearch"
+    },
+    {
+      "content": "multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。",
+      "url": "https://github.com/multica-ai/andrej-karpathy-skills"
+    },
+    {
+      "content": "can1357/oh-my-pi 出现在 TypeScript daily trending，描述为 terminal AI coding agent；本轮缺少 release 或维护者原文，先作为 agent harness 观察线索。",
+      "url": "https://github.com/can1357/oh-my-pi"
+    },
+    {
+      "content": "Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。",
+      "url": "https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-22",
+    "main_items": 7,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "official-ai-releases: checked Google Developers Blog, Google DeepMind model card, AWS Machine Learning Blog, Claude Blog, Vercel Changelog, GitHub Changelog, Claude Code Docs and Hugging Face Blog for 2026-05-19..2026-05-22",
+      "github-ai-trending: npm run discover:github-trending -- 50 failed with fetch failed; browser fallback checked GitHub Trending daily/weekly plus Python, TypeScript, Rust and Go pages; 25 candidates sampled and 6 included",
+      "follow-builders: platform detected as other; prepare-digest.js failed with fetch failed; direct X status pages returned empty HTML; builder_observations kept empty"
+    ],
+    "fallback_sources": [
+      "Google Developers Blog",
+      "Google Blog I/O 2026 announcements",
+      "Google DeepMind Model Card",
+      "Vercel Changelog",
+      "GitHub Changelog",
+      "AWS Machine Learning Blog",
+      "Claude Blog",
+      "Claude Code Docs",
+      "Hugging Face Blog",
+      "GitHub Trending",
+      "OSSInsight",
+      "Trendshift"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。",
+    "optimization_suggestions": [
+      {
+        "issue": "GitHub Trending 仓库命令受 shell 网络限制时只能人工浏览器复核",
+        "evidence": "`npm run discover:github-trending -- 50` 返回 fetch failed，但浏览器能访问 GitHub Trending 页面并抽取候选。",
+        "module": "discovery-audit",
+        "suggestion": "为 discovery 命令增加可选的 browser-export 输入路径，允许自动化把浏览器采样结果或保存的 HTML 交给同一解析器处理。",
+        "expected_benefit": "减少 shell 网络限制导致的 source_audit 断裂，让 GitHub Trending 候选仍可结构化复用。",
+        "requires_user_confirmation": true
+      },
+      {
+        "issue": "Builder feed 不可访问时只能记录 blocked，无法区分临时网络错误和中心 feed 真实无内容",
+        "evidence": "follow-builders prepare-digest.js 本轮返回 fetch failed，X status 页面直接打开为空 HTML。",
+        "module": "builder-observations",
+        "suggestion": "为 Builder 来源增加 `blocked_reason` 和 `last_successful_feed_at` 字段，避免只在 notes 中描述失败状态。",
+        "expected_benefit": "让日报读者和后续自动化能判断 Builder 观察为空是网络问题还是确实没有合格原始源。",
+        "requires_user_confirmation": true
+      },
+      {
+        "issue": "模型发布与网关接入容易混在同一条事实中",
+        "evidence": "Qwen 3.7 Max 本轮只能用 Vercel 官方网关可用性作为一手来源，二手媒体包含 Alibaba 发布细节但未进入主事实。",
+        "module": "model-releases",
+        "suggestion": "在 model_releases 中增加 `release_scope`，区分 provider official launch、gateway availability、preview access 和 model card update。",
+        "expected_benefit": "减少把第三方网关接入误写成模型厂商正式发布的风险。",
+        "requires_user_confirmation": true
+      }
+    ]
+  },
+  "schema_version": 1,
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-22.html",
+  "html_path": "reports/2026/05/2026-05-22.html",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-22.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-21T18:40:13.114Z"
+}
