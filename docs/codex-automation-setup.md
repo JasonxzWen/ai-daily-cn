@@ -37,9 +37,10 @@
 9. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。HTML 页面必须展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
 10. 运行 `npm run validate`。
 11. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
-12. 如需真实发布，运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
-13. 如果 validate 或真实 publish 失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
-14. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
+12. 如需真实发布，优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
+13. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。
+14. 如果 validate、真实 publish 或 API 兜底发布失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
+15. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
 
 最终回复必须包含：
 
@@ -54,7 +55,7 @@
 
 ## 当前发布边界
 
-当前仓库已具备本地生成、HTML 渲染、验证、`publish:dry-run` 和显式确认后的安全 `publish` 能力。
+当前仓库已具备本地生成、HTML 渲染、验证、`publish:dry-run`、显式确认后的安全本机 Git `publish`，以及不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力。
 
 发布前工作树整理与预检命令：
 
@@ -77,6 +78,14 @@ npm run publish -- confirm-push YYYY-MM-DD
 ```
 
 该命令只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在 `src/`、`prompts/`、`schemas/` 等非发布器管理改动，会停止并返回 `dirty_worktree`。
+
+本机 Git 元数据不可写时的兜底发布命令：
+
+```powershell
+npm run publish:github-api -- confirm-push YYYY-MM-DD
+```
+
+该命令需要 `GH_TOKEN` 或 `GITHUB_TOKEN` 具备当前仓库 `contents:write` 权限。它读取本地生成的发布产物，比较远端 `main` 当前 tree，只把远端缺失或内容不同的 `docs/` 与 `reports-data/` 文件写成一个远端提交，并用 `force:false` 更新分支；本机 `.git` 不会被写入。
 
 ## 发现源与审计补充
 

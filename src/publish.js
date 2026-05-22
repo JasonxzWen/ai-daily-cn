@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -256,6 +257,150 @@ export async function publishGeneratedArtifacts(options = {}) {
   };
 }
 
+export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
+  if (!options.confirmPush) {
+    throw new PublisherError(
+      "publish_confirmation_required",
+      "真实发布需要显式传入 --confirm-push；不会默认通过 GitHub API 写入远端。"
+    );
+  }
+
+  const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
+  const git = options.git || createGitAdapter(repoRoot);
+  const currentBranch = await git.branch();
+  if (currentBranch !== branch) {
+    throw new PublisherError("wrong_branch", `当前分支是 ${currentBranch || "(detached)"}，允许发布分支是 ${branch}。`, {
+      branch: currentBranch,
+      allowedBranch: branch
+    });
+  }
+
+  const statusEntries = parsePorcelain(await git.status());
+  const publishFiles = uniqueSorted(
+    statusEntries
+      .map((entry) => entry.path)
+      .filter((file) => isPublisherOwnedPath(file))
+  );
+  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+
+  if (unrelated.length > 0) {
+    throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，GitHub API 发布已停止。", {
+      status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
+    });
+  }
+
+  if (publishFiles.length === 0) {
+    return {
+      mode: "publish-github-api",
+      branch,
+      committed: false,
+      pushed: false,
+      message: "没有发布产物变更需要提交。"
+    };
+  }
+
+  const token = options.token || process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new PublisherError("github_token_missing", "GitHub API 发布需要 GH_TOKEN 或 GITHUB_TOKEN。");
+  }
+
+  const repository = options.repository || process.env.GITHUB_REPOSITORY || parseGitHubRepository(await git.remoteUrl());
+  if (!repository) {
+    throw new PublisherError("github_repository_missing", "无法识别 GitHub 仓库，请传入 --repo owner/name 或设置 GITHUB_REPOSITORY。");
+  }
+
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  if (typeof fetchImpl !== "function") {
+    throw new PublisherError("github_api_unavailable", "当前 Node 环境没有可用 fetch，无法调用 GitHub API。");
+  }
+
+  const client = createGitHubApiClient({
+    fetchImpl,
+    token,
+    repository,
+    apiBaseUrl: options.apiBaseUrl
+  });
+  const ref = await client.request("GET", `/git/ref/heads/${branch}`);
+  const baseCommitSha = ref.object?.sha;
+  if (!baseCommitSha) {
+    throw new PublisherError("github_api_invalid_ref", `无法读取远端分支 ${branch} 的 commit SHA。`, { repository, branch });
+  }
+
+  const baseCommit = await client.request("GET", `/git/commits/${baseCommitSha}`);
+  const baseTreeSha = baseCommit.tree?.sha;
+  if (!baseTreeSha) {
+    throw new PublisherError("github_api_invalid_commit", `无法读取远端分支 ${branch} 的 tree SHA。`, {
+      repository,
+      branch,
+      baseCommitSha
+    });
+  }
+
+  const remoteTree = await client.request("GET", `/git/trees/${baseTreeSha}?recursive=1`);
+  const remoteBlobShas = new Map(
+    (remoteTree.tree || [])
+      .filter((entry) => entry.type === "blob")
+      .map((entry) => [entry.path, entry.sha])
+  );
+  const treeEntries = await createChangedTreeEntries(repoRoot, publishFiles, remoteBlobShas);
+
+  if (treeEntries.length === 0) {
+    return {
+      mode: "publish-github-api",
+      branch,
+      repository,
+      base_commit_sha: baseCommitSha,
+      committed: false,
+      pushed: false,
+      published_files: [],
+      message: "远端已经包含相同发布产物，没有需要提交的变更。"
+    };
+  }
+
+  const commitMessage =
+    options.commitMessage || `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`;
+  const newTree = await client.request("POST", "/git/trees", {
+    base_tree: baseTreeSha,
+    tree: treeEntries
+  });
+  const newCommit = await client.request("POST", "/git/commits", {
+    message: commitMessage,
+    tree: newTree.sha,
+    parents: [baseCommitSha]
+  });
+  await client.request("PATCH", `/git/refs/heads/${branch}`, {
+    sha: newCommit.sha,
+    force: false
+  });
+
+  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const verification =
+    pagesUrl && options.verifyPages
+      ? await verifyPublishedUrl(pagesUrl, {
+          attempts: options.verificationAttempts,
+          intervalMs: options.verificationIntervalMs,
+          expectedText: options.reportDate,
+          fetchImpl
+        })
+      : { ok: false, error: "" };
+
+  return {
+    mode: "publish-github-api",
+    branch,
+    repository,
+    base_commit_sha: baseCommitSha,
+    commit_sha: newCommit.sha,
+    committed: true,
+    pushed: true,
+    published_files: treeEntries.map((entry) => entry.path).sort(),
+    commit_message: commitMessage,
+    pages_url: pagesUrl,
+    pages_verified: Boolean(verification.ok),
+    verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
+  };
+}
+
 export async function verifyPublishedUrl(url, options = {}) {
   const attempts = options.attempts ?? 12;
   const intervalMs = options.intervalMs ?? 5000;
@@ -353,6 +498,9 @@ export function createGitAdapter(repoRoot) {
     async gitDir() {
       return runGit(repoRoot, ["rev-parse", "--git-dir"]);
     },
+    async remoteUrl() {
+      return runGit(repoRoot, ["remote", "get-url", "origin"]);
+    },
     async add(files) {
       return runGit(repoRoot, ["add", "--", ...files]);
     },
@@ -412,6 +560,132 @@ function isPublisherOwnedPath(filePath) {
     filePath.startsWith("docs/reports/") ||
     filePath.startsWith("reports-data/")
   );
+}
+
+function uniqueSorted(values) {
+  return [...new Set(values)].sort();
+}
+
+async function createChangedTreeEntries(repoRoot, publishFiles, remoteBlobShas) {
+  const entries = [];
+
+  for (const filePath of publishFiles) {
+    const absolutePath = path.join(repoRoot, ...filePath.split("/"));
+    let fileBuffer = null;
+    try {
+      fileBuffer = await fs.readFile(absolutePath);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+
+    if (!fileBuffer) {
+      if (remoteBlobShas.has(filePath)) {
+        entries.push({
+          path: filePath,
+          mode: "100644",
+          type: "blob",
+          sha: null
+        });
+      }
+      continue;
+    }
+
+    const localSha = gitBlobSha(fileBuffer);
+    if (remoteBlobShas.get(filePath) === localSha) {
+      continue;
+    }
+
+    entries.push({
+      path: filePath,
+      mode: "100644",
+      type: "blob",
+      content: fileBuffer.toString("utf8")
+    });
+  }
+
+  return entries;
+}
+
+function gitBlobSha(buffer) {
+  return crypto
+    .createHash("sha1")
+    .update(Buffer.concat([Buffer.from(`blob ${buffer.length}\0`), buffer]))
+    .digest("hex");
+}
+
+function parseGitHubRepository(remoteUrl) {
+  if (!remoteUrl) {
+    return "";
+  }
+
+  const sshMatch = remoteUrl.match(/^git@github\.com:([^/]+\/[^/]+?)(?:\.git)?$/);
+  if (sshMatch) {
+    return sshMatch[1];
+  }
+
+  const sshUrlMatch = remoteUrl.match(/^ssh:\/\/git@github\.com\/([^/]+\/[^/]+?)(?:\.git)?$/);
+  if (sshUrlMatch) {
+    return sshUrlMatch[1];
+  }
+
+  try {
+    const parsed = new URL(remoteUrl);
+    if (parsed.hostname !== "github.com") {
+      return "";
+    }
+    const [owner, repo] = parsed.pathname.replace(/^\/+/, "").replace(/\.git$/, "").split("/");
+    return owner && repo ? `${owner}/${repo}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function createGitHubApiClient({ fetchImpl, token, repository, apiBaseUrl }) {
+  const baseUrl = apiBaseUrl || `https://api.github.com/repos/${repository}`;
+
+  return {
+    async request(method, resourcePath, body) {
+      const response = await fetchImpl(`${baseUrl}${resourcePath}`, {
+        method,
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28"
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const text = await response.text();
+      const payload = parseJsonPayload(text);
+
+      if (!response.ok) {
+        throw new PublisherError(
+          "github_api_error",
+          `GitHub API ${method} ${resourcePath} 返回 HTTP ${response.status}。`,
+          {
+            status: response.status,
+            message: payload.message || text || "unknown error"
+          }
+        );
+      }
+
+      return payload;
+    }
+  };
+}
+
+function parseJsonPayload(text) {
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
 }
 
 async function runGit(cwd, args, options = {}) {

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -10,6 +11,7 @@ import {
   createPublishPlan,
   parsePorcelain,
   preparePublishWorktree,
+  publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
   verifyPublishedUrl
 } from "../src/publish.js";
@@ -183,6 +185,90 @@ test("publish 需要显式确认参数", async () => {
   );
 });
 
+test("github api publish 需要显式确认参数", async () => {
+  await assert.rejects(
+    publishGeneratedArtifactsViaGitHubApi({ git: fakeGit({ status: " M docs/index.html" }) }),
+    (error) => error instanceof PublisherError && error.code === "publish_confirmation_required"
+  );
+});
+
+test("github api publish 通过远端 API 提交发布产物且不写本机 git 元数据", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), "<!doctype html><title>AI 日报 2026-05-13</title>");
+
+  const calls = [];
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: true,
+    verificationAttempts: 1,
+    verificationIntervalMs: 0,
+    git: fakeGit({ status: " M docs/index.html" }),
+    fetchImpl: fakeGitHubFetch({ calls })
+  });
+
+  assert.equal(result.committed, true);
+  assert.equal(result.pushed, true);
+  assert.equal(result.commit_sha, "commit-new");
+  assert.deepEqual(result.published_files, ["docs/index.html"]);
+  assert.equal(result.pages_verified, true);
+  assert.equal(calls.find((call) => call.method === "PATCH").body.force, false);
+  assert.equal(
+    calls.find((call) => call.url.endsWith("/git/trees")).body.tree[0].content,
+    "<!doctype html><title>AI 日报 2026-05-13</title>"
+  );
+});
+
+test("github api publish 跳过远端已一致的发布产物", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  const content = "<!doctype html><title>same</title>";
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), content);
+
+  const calls = [];
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({ status: " M docs/index.html" }),
+    fetchImpl: fakeGitHubFetch({
+      calls,
+      remoteTree: [{ path: "docs/index.html", type: "blob", sha: gitBlobSha(content) }]
+    })
+  });
+
+  assert.equal(result.committed, false);
+  assert.equal(result.pushed, false);
+  assert.equal(result.message, "远端已经包含相同发布产物，没有需要提交的变更。");
+  assert.equal(calls.some((call) => call.method === "POST"), false);
+});
+
+test("github api publish 遇到非发布器管理改动时停止", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  await fs.mkdir(path.join(repoRoot, "src"), { recursive: true });
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), "<!doctype html>");
+  await fs.writeFile(path.join(repoRoot, "src/cli.js"), "console.log('dirty');");
+
+  await assert.rejects(
+    publishGeneratedArtifactsViaGitHubApi({
+      repoRoot,
+      confirmPush: true,
+      token: "test-token",
+      repository: "owner/repo",
+      git: fakeGit({ status: " M src/cli.js\n M docs/index.html" }),
+      fetchImpl: fakeGitHubFetch()
+    }),
+    (error) => error instanceof PublisherError && error.code === "dirty_worktree"
+  );
+});
+
 test("publish 只提交发布器管理的文件", async () => {
   const calls = [];
   const result = await publishGeneratedArtifacts({
@@ -305,8 +391,61 @@ function fakeGit(overrides = {}) {
     async push(branch) {
       calls.push({ name: "push", branch });
       return "pushed";
+    },
+    async remoteUrl() {
+      return overrides.remoteUrl || "git@github.com:owner/repo.git";
     }
   };
+}
+
+function fakeGitHubFetch(options = {}) {
+  const calls = options.calls || [];
+  const remoteTree = options.remoteTree || [];
+  return async (url, init = {}) => {
+    const method = init.method || "GET";
+    const body = init.body ? JSON.parse(init.body) : undefined;
+    calls.push({ url, method, body });
+
+    if (url.endsWith("/git/ref/heads/main")) {
+      return jsonResponse({ object: { sha: "commit-base" } });
+    }
+    if (url.endsWith("/git/commits/commit-base")) {
+      return jsonResponse({ sha: "commit-base", tree: { sha: "tree-base" } });
+    }
+    if (url.endsWith("/git/trees/tree-base?recursive=1")) {
+      return jsonResponse({ tree: remoteTree });
+    }
+    if (url.endsWith("/git/trees") && method === "POST") {
+      return jsonResponse({ sha: "tree-new" });
+    }
+    if (url.endsWith("/git/commits") && method === "POST") {
+      return jsonResponse({ sha: "commit-new" });
+    }
+    if (url.endsWith("/git/refs/heads/main") && method === "PATCH") {
+      return jsonResponse({ object: { sha: "commit-new" } });
+    }
+    if (url.includes("github.io")) {
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "AI 日报 2026-05-13"
+      };
+    }
+    return jsonResponse({ message: `unexpected ${method} ${url}` }, 404);
+  };
+}
+
+function jsonResponse(value, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => JSON.stringify(value),
+    json: async () => value
+  };
+}
+
+function gitBlobSha(content) {
+  return crypto.createHash("sha1").update(`blob ${Buffer.byteLength(content)}\0${content}`).digest("hex");
 }
 
 async function tempRepoWithFixture() {

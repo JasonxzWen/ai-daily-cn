@@ -6,6 +6,7 @@ import {
   checkPublishPreflight,
   createPublishPlan,
   preparePublishWorktree,
+  publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts
 } from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
@@ -136,6 +137,33 @@ try {
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
       commitMessage: args.message,
+      verifyPages: true
+    });
+    const publishOk = !result.verification_error;
+    printJson({
+      ok: publishOk,
+      publish_status: {
+        html_generated: true,
+        repo_updated: result.committed,
+        repo_pushed: result.pushed,
+        pages_url: result.pages_url || "",
+        publish_error: result.verification_error || ""
+      },
+      result
+    });
+    if (!publishOk) {
+      process.exitCode = 1;
+    }
+  } else if (command === "publish:github-api") {
+    const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
+    const result = await publishGeneratedArtifactsViaGitHubApi({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
+      reportDate: args.date || firstPositionalDate(argv),
+      commitMessage: args.message,
+      repository: args.repo,
       verifyPages: true
     });
     const publishOk = !result.verification_error;

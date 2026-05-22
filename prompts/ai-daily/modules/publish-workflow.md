@@ -11,7 +11,9 @@
 5. 运行 `npm run build` 生成 `docs/` 静态站点。
 6. 运行 `npm run validate`。
 7. 运行 `npm run publish:dry-run` 查看将写入、将暂存、commit message 和预期 Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
-8. 只有在真实发布命令已被用户授权且发布环境可用后，才允许普通 commit/push。
-9. 真实发布后必须验证当日 Pages URL 返回 HTTP 200，并确认页面内容包含当日 `report_date`；如果仍是 404 或内容不匹配，报告 `publish_error`，不要宣称发布成功。
+8. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`，使用本机 Git 进行普通 commit/push。
+9. 如果本机 Git 发布失败原因是 `.git` 不可写、`index.lock` 无法创建或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，改用 `npm run publish:github-api -- confirm-push YYYY-MM-DD`。该兜底通道只通过 GitHub API 写入远端 `main`，不会写本机 `.git`，只允许发布 `docs/` 与 `reports-data/` 下的产物，并使用 `force:false` 更新远端分支。
+10. 如果 API 发布缺少 token、远端分支已并发变化或 GitHub API 返回错误，保留本地产物并报告 `publish_error`；不要重试破坏性操作。
+11. 真实发布后必须验证当日 Pages URL 返回 HTTP 200，并确认页面内容包含当日 `report_date`；如果仍是 404 或内容不匹配，报告 `publish_error`，不要宣称发布成功。
 
 禁止执行 `git reset --hard`、`git push --force`、自动 stash 或覆盖用户未提交改动。
