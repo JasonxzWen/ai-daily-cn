@@ -3,7 +3,8 @@ import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
-import { defaultStyleCss, renderIndexHtml, renderReportHtml } from "./render.js";
+import { defaultStyleCss, renderIndexHtml } from "./render.js";
+import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateFeed, validateReport } from "./schema.js";
@@ -28,13 +29,13 @@ export async function buildSite(options = {}) {
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
-    await writeReportArtifacts(outDir, report, writtenFiles, markdown);
+    await writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown);
     reports.push(report);
   }
 
   for (const file of reportJsonFiles) {
     const report = await readReportJson(file);
-    await writeReportArtifacts(outDir, report, writtenFiles);
+    await writeReportArtifacts(rootDir, outDir, report, writtenFiles);
     reports.push(report);
   }
 
@@ -212,9 +213,11 @@ async function writeFileTracked(outDir, relativePath, content, writtenFiles) {
   writtenFiles.push(relativePath);
 }
 
-async function writeReportArtifacts(outDir, report, writtenFiles, markdown = null) {
+async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null) {
   const paths = reportRelativePaths(report.report_date);
-  const reportHtml = renderReportHtml(report);
+  const reportHtml = await renderReportWithEffectiveInteract(report, {
+    rootDir
+  });
   await writeJsonTracked(outDir, paths.dataPath, report, writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
   if (markdown !== null && report.markdown_path) {

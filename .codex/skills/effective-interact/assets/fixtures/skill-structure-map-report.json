@@ -1,0 +1,281 @@
+{
+  "title": "effective-interact 结构地图",
+  "summary": "状态：effective-interact 由触发合同、eval、生成、验证、参考和资产六层组成。",
+  "status": "review",
+  "template": "research-explainer",
+  "renderMode": "runtime-cdn",
+  "generatedAt": "2026-05-21T00:00:00.000Z",
+  "intent": {
+    "audience": "Skill maintainer",
+    "primaryQuestion": "effective-interact 的文件结构如何支撑复杂沟通与 HTML 升级？",
+    "decision": "用结构树和职责表展示，避免把目录关系压成线性段落。",
+    "timeBudget": "3m",
+    "artifactKind": "explainer",
+    "successCriteria": [
+      "一眼看到目录层级。",
+      "每个文件或目录的作用可审查。",
+      "能定位触发、eval、生成、验证和资产边界。"
+    ]
+  },
+  "sections": [
+    {
+      "type": "summary-cards",
+      "title": "结构总览",
+      "group": "overview",
+      "priority": 1,
+      "status": "ready",
+      "cards": [
+        {
+          "label": "核心合同",
+          "value": "SKILL.md"
+        },
+        {
+          "label": "触发回归",
+          "value": "evals/routing-cases.json"
+        },
+        {
+          "label": "HTML 通道",
+          "value": "scripts + references + assets"
+        }
+      ]
+    },
+    {
+      "type": "mermaid",
+      "title": "目录树和职责流",
+      "group": "structure",
+      "priority": 1,
+      "status": "ready",
+      "summary": "从根目录到触发、eval、生成、验证和资产层的关系。",
+    "content": "flowchart TB\n  root[\"effective-interact/\"] --> skill[\"SKILL.md\\n触发合同、模式阶梯、HTML 升级规则\"]\n  root --> gitignore[\".gitignore\\n忽略本地 artifacts 输出\"]\n  root --> evals[\"evals/routing-cases.json\\n正例、反例、禁止加载、HTML 时机\"]\n  root --> refs[\"references/\\n详细模式与输入 schema\"]\n  refs --> patterns[\"interaction-patterns.md\\n第一性原理编排、模式选择、运行时边界\"]\n  refs --> schema[\"interaction-input-schema.json\\n生成器输入结构\"]\n  root --> scripts[\"scripts/\\n生成和验证执行层\"]\n  scripts --> create[\"create-interaction.mjs\\nJSON -> 单文件 HTML\"]\n  scripts --> validate[\"validate-interaction.mjs\\n静态 + 浏览器校验\"]\n  root --> assets[\"assets/\\n模板、组件、fixtures\"]\n  assets --> templates[\"templates/\\n报告页面形态\"]\n  assets --> components[\"components/\\n交互和 rich render 运行时\"]\n  assets --> fixtures[\"fixtures/\\n生成器和触发场景回归输入\"]\n  fixtures --> structure[\"skill-structure-map-report.json\\n本结构地图输入\"]"
+    },
+    {
+      "type": "data-table",
+      "title": "文件与目录职责",
+      "group": "structure",
+      "priority": 2,
+      "status": "ready",
+      "summary": "把目录树拆成可扫读的职责表。",
+      "columns": [
+        { "key": "path", "label": "路径", "width": "32%" },
+        { "key": "role", "label": "作用", "width": "42%" },
+        { "key": "when", "label": "何时读取/执行", "width": "26%" }
+      ],
+      "rows": [
+        {
+          "path": "SKILL.md",
+          "role": "最小触发合同：何时加载、如何选择 plain text / Markdown / visual Markdown / HTML。",
+          "when": "skill 触发时必读"
+        },
+      {
+        "path": ".gitignore",
+        "role": "忽略本地 artifacts/，让中间 ledger 和生成 HTML 不进入版本控制。",
+        "when": "生成或检查临时产物边界时"
+      },
+        {
+          "path": "evals/routing-cases.json",
+          "role": "正例、相邻反例、禁止加载、HTML 升级时机的可迁移 eval。",
+          "when": "改 description 或升级规则前"
+        },
+        {
+          "path": "references/interaction-patterns.md",
+          "role": "详细编排范式：BLUF、MECE、LATCH、模式选择、HTML 硬条件、运行时边界。",
+          "when": "复杂汇报或 HTML 选择不确定时"
+        },
+        {
+          "path": "references/interaction-input-schema.json",
+          "role": "HTML 生成器输入 schema，约束 sections、claims、evidence、verification 等结构。",
+          "when": "写 artifact JSON 输入时"
+        },
+        {
+          "path": "scripts/create-interaction.mjs",
+          "role": "把 JSON 输入生成单文件 HTML，支持 Mermaid、Markdown、code、diff、table、timeline 等区块。",
+          "when": "选择 html-artifact 模式时"
+        },
+        {
+          "path": "scripts/validate-interaction.mjs",
+          "role": "检查结构、安全、runtime 依赖、浏览器渲染、Mermaid SVG 和响应式布局。",
+          "when": "HTML 交付前必跑"
+        },
+        {
+          "path": "assets/templates/",
+          "role": "预设报告形态：handoff、review、decision、research、dashboard。",
+          "when": "生成器选择页面骨架时"
+        },
+        {
+          "path": "assets/components/",
+          "role": "报告交互、导航、rich render、表格/代码/图表运行时。",
+          "when": "生成 HTML 内联资源时"
+        },
+        {
+          "path": "assets/fixtures/",
+          "role": "回归输入与示例，包括本结构地图、触发范围回顾、运行时 stress、选项比较等。",
+          "when": "测试生成器和报告质量时"
+        }
+      ]
+    },
+    {
+      "type": "decision-matrix",
+      "title": "输出模式选择",
+      "group": "routing",
+      "priority": 1,
+      "status": "ready",
+      "summary": "同一个 skill 不默认 HTML，而是按沟通成本升级。",
+      "options": [
+        {
+          "name": "plain-brief",
+          "status": "ready",
+          "points": [
+            "一个结论 + Top 3 依据足够。",
+            "适合短决策、可行性、直接状态。"
+          ]
+        },
+        {
+          "name": "structured-markdown",
+          "status": "ready",
+          "points": [
+            "需要分组证据、风险、下一步。",
+            "不需要浏览器交互。"
+          ]
+        },
+        {
+          "name": "visual-markdown",
+          "status": "ready",
+          "points": [
+            "一个 Mermaid、表格或命令块足够。",
+            "结构能留在聊天记录里。"
+          ]
+        },
+        {
+          "name": "html-artifact",
+          "status": "recommended",
+          "points": [
+            "需要筛选、复制、导航、宽结构图或多维审批。",
+            "结构树、模块依赖和 milestone 地图属于高概率 HTML 场景。"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "evidence",
+      "title": "关键源文件",
+      "group": "evidence",
+      "priority": 1,
+      "status": "ready",
+      "items": [
+        {
+          "label": "触发合同",
+          "value": "skills/effective-interact/SKILL.md",
+          "filePath": "skills/effective-interact/SKILL.md",
+          "line": 1,
+          "status": "info"
+        },
+        {
+          "label": "路由 eval",
+          "value": "skills/effective-interact/evals/routing-cases.json",
+          "filePath": "skills/effective-interact/evals/routing-cases.json",
+          "line": 1,
+          "status": "info"
+        },
+        {
+          "label": "生成器",
+          "value": "skills/effective-interact/scripts/create-interaction.mjs",
+          "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
+          "line": 167,
+          "status": "info"
+        },
+        {
+          "label": "校验器",
+          "value": "skills/effective-interact/scripts/validate-interaction.mjs",
+          "filePath": "skills/effective-interact/scripts/validate-interaction.mjs",
+          "line": 30,
+          "status": "info"
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "title": "触发合同摘录",
+      "group": "evidence",
+      "priority": 2,
+      "status": "ready",
+      "summary": "description 是路由入口，evals 是修改它之前的检查面。",
+      "filePath": "skills/effective-interact/SKILL.md",
+      "language": "yaml",
+      "startLine": 1,
+      "highlightLines": [3],
+      "content": "---\nname: effective-interact\ndescription: Load when Chinese-first clear complex communication, alignment, multi-option choice, status/incident reporting, implementation plans, reviews, architecture/dependency/milestone maps, explainer/design/editor artifacts, or handoff needs first-principles structure; choose plain text, Markdown, visual Markdown, or HTML by decision cost; do not load merely because an answer is long; skip trivial chat, production UI, decks, bundled apps.\n---"
+    },
+    {
+      "type": "actions",
+      "title": "维护动作",
+      "group": "next",
+      "priority": 1,
+      "status": "ready",
+      "items": [
+        "改触发 description 前先改 evals/routing-cases.json。",
+        "新增 HTML 场景时补一个 artifact fixture，并用 validate-interaction.mjs --require-browser 验证。",
+        "结构、依赖、milestone、多方案审批这类场景默认先考虑 visual Markdown 或 HTML，而不是纯文本。"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-skill-contract",
+      "kind": "file",
+      "label": "触发合同",
+      "value": "skills/effective-interact/SKILL.md",
+      "status": "info",
+      "filePath": "skills/effective-interact/SKILL.md",
+      "line": 1
+    },
+    {
+      "id": "evidence-routing-evals",
+      "kind": "file",
+      "label": "路由 eval",
+      "value": "skills/effective-interact/evals/routing-cases.json",
+      "status": "info",
+      "filePath": "skills/effective-interact/evals/routing-cases.json",
+      "line": 1
+    },
+    {
+      "id": "evidence-generator",
+      "kind": "file",
+      "label": "生成器",
+      "value": "skills/effective-interact/scripts/create-interaction.mjs",
+      "status": "info",
+      "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
+      "line": 167
+    },
+    {
+      "id": "evidence-validator",
+      "kind": "file",
+      "label": "校验器",
+      "value": "skills/effective-interact/scripts/validate-interaction.mjs",
+      "status": "info",
+      "filePath": "skills/effective-interact/scripts/validate-interaction.mjs",
+      "line": 30
+    }
+  ],
+  "verification": [
+    {
+      "label": "结构场景触发",
+      "status": "pass",
+      "detail": "skill-local eval includes positive-skill-structure-tree-html."
+    },
+    {
+      "label": "生成器输入",
+      "status": "not-run",
+      "detail": "Run create-interaction.mjs with this fixture."
+    },
+    {
+      "label": "浏览器验证",
+      "status": "not-run",
+      "detail": "Run validate-interaction.mjs with --require-browser."
+    }
+  ],
+  "nextActions": [
+    "Generate the structure map under ignored skill-local artifacts.",
+    "Validate the generated report with browser checks.",
+    "Use this artifact as the canonical structure walkthrough for this skill."
+  ]
+}

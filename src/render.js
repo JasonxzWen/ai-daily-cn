@@ -1,4 +1,5 @@
 import { reportRelativePaths, relativeAssetHref } from "./paths.js";
+import { cleanProjectDescription, modelReleaseTags, projectHeatTags } from "./presentation.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -413,9 +414,9 @@ function renderModelRelease(item) {
     <span>${escapeHtml(item.event_date)}</span>
     <span>${escapeHtml(item.provider)}</span>
     <span>${escapeHtml(renderAvailability(item.availability))}</span>
+    ${renderTags(modelReleaseTags(item))}
   </div>
   <p>${escapeHtml(item.summary)}</p>
-  ${item.notes ? `<p class="muted">${escapeHtml(item.notes)}</p>` : ""}
   <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
 </article>`;
 }
@@ -475,15 +476,13 @@ function renderProjects(projects) {
 }
 
 function renderProjectDetails(project) {
-  const meta = [
-    project.event_date ? `日期：${project.event_date}` : "",
-    project.signal ? `信号：${project.signal}` : "",
-    project.source ? `来源：${project.source}` : ""
-  ].filter(Boolean);
-  const evidence = project.evidence ? `<p class="muted">${escapeHtml(project.evidence)}</p>` : "";
-  return `${escapeHtml(project.description)}${
-    meta.length > 0 ? `<div class="item-meta">${meta.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>` : ""
-  }${evidence}`;
+  const tags = projectHeatTags(project);
+  const tagsHtml = tags.length > 0 ? `<div class="item-meta">${renderTags(tags)}</div>` : "";
+  return `${tagsHtml}<p>${escapeHtml(cleanProjectDescription(project.description))}</p>`;
+}
+
+function renderTags(tags) {
+  return tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
 }
 
 function renderBuilderObservations(items) {
@@ -531,12 +530,17 @@ function renderAuditGroup(title, group) {
   }
 
   const status = group.checked ? "已检查" : "未检查";
+  const meta = [
+    status,
+    `${group.candidates_found} 候选`,
+    `${group.included} 入选`,
+    group.blocked_reason ? `阻塞：${group.blocked_reason}` : "",
+    group.last_successful_feed_at ? `上次成功：${group.last_successful_feed_at}` : ""
+  ].filter(Boolean);
   return `<article class="audit-card">
   <h3>${escapeHtml(title)}</h3>
   <div class="item-meta">
-    <span>${escapeHtml(status)}</span>
-    <span>${escapeHtml(group.candidates_found)} 候选</span>
-    <span>${escapeHtml(group.included)} 入选</span>
+    ${meta.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
   </div>
   ${group.notes ? `<p>${escapeHtml(group.notes)}</p>` : ""}
   ${renderAuditSources(group.sources)}

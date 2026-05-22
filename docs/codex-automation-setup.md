@@ -4,7 +4,7 @@
 
 | 字段 | 值 |
 |---|---|
-| Name | `AI 日报生成与 GitHub Pages 发布` |
+| Name | `AI 日报生成、push 与 GitHub Pages 发布` |
 | Kind | `cron` |
 | Execution environment | `local` |
 | CWD | 当前项目目录；如界面要求显式路径，使用 `D:\ai-daily-cn` |
@@ -22,7 +22,7 @@
 
 你在 ai-daily-cn 项目根目录内运行；不要切换到其他固定路径。不要修改 C:\Users\Admin\.codex\automations\ai-2\automation.toml，除非用户明确确认。不要执行 git reset --hard、git push --force、自动 stash 或覆盖用户未提交改动。
 
-目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报，最终发布主产物是高度可读、自包含、适合人类浏览的静态 HTML，并准备 GitHub Pages 发布计划。Markdown 不是每日主产物。
+目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报，最终发布主产物是由 `.codex/skills/effective-interact` 生成的高度可读、自包含、适合人类浏览的静态 HTML；验证通过后自动提交并 push 到 `main`，由 GitHub Actions Pages workflow 发布到 GitHub Pages。Markdown 不是每日主产物。
 
 执行流程：
 
@@ -34,11 +34,11 @@
 6. 同一厂商同日或同一 48h 窗口内的多条小更新默认合并成一条厂商动态；官方 docs 没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息，只作为社区线索并标记待验证。
 7. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`model_releases`、`hot_blogs`、`self_check`；没有模型发布、热门技术博客、项目、Builder 观察或社区线索时使用空数组。
 8. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
-9. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。HTML 页面必须展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
+9. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。日报 HTML 必须由 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 以 `pre-rendered` 模式生成，并展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
 10. 运行 `npm run validate`。
 11. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
-12. 如需真实发布，优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
-13. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。
+12. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 到 `main` 后，仓库内 `.github/workflows/deploy-pages.yml` 会运行 `npm run build`，上传 `docs/` artifact，并通过 GitHub Actions 发布 GitHub Pages。发布后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
+13. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。用于兜底的 token 必须能触发仓库 workflow；如果使用的是 GitHub Actions 自带的 `GITHUB_TOKEN`，不要假设它会触发新的 workflow。
 14. 如果 validate、真实 publish 或 API 兜底发布失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
 15. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
 
@@ -55,7 +55,7 @@
 
 ## 当前发布边界
 
-当前仓库已具备本地生成、HTML 渲染、验证、`publish:dry-run`、显式确认后的安全本机 Git `publish`，以及不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力。
+当前仓库已具备本地生成、effective-interact HTML 渲染、验证、`publish:dry-run`、显式确认后的安全本机 Git `publish`、不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力，以及 push 后由 GitHub Actions 发布 `docs/` artifact 到 GitHub Pages 的 workflow。远端 Pages 设置必须使用 `GitHub Actions` source；如果仍是 `main /docs` legacy source，先不要切换到“只依赖 workflow”的发布假设。
 
 发布前工作树整理与预检命令：
 
@@ -79,6 +79,8 @@ npm run publish -- confirm-push YYYY-MM-DD
 
 该命令只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在 `src/`、`prompts/`、`schemas/` 等非发布器管理改动，会停止并返回 `dirty_worktree`。
 
+push 成功后，`.github/workflows/deploy-pages.yml` 会在 `main` 上自动执行 GitHub Pages 发布。该 workflow 会安装依赖、运行 `npm run build`、上传 `docs/` 目录作为 Pages artifact，并使用 `actions/deploy-pages` 发布；仓库 Pages source 需要配置为 `GitHub Actions`。
+
 本机 Git 元数据不可写时的兜底发布命令：
 
 ```powershell
@@ -94,4 +96,4 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 - `github-ai-trending`：先运行 `npm run discover:github-trending -- 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending，并至少交叉 OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories 或等价趋势源。
 - `follow-builders`：只把 builder/researcher/founder/maintainer 的原始帖子、个人博客、公开视频或播客片段写入 `builder_observations`；没有原始 URL 时不得收录。
 
-结构化草稿必须包含 `source_audit.github_trending` 与 `source_audit.builder_sources`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因。GitHub trending 项目进入 `projects` 时应填写 `event_date`、`source`、`signal`、`evidence`；Builder 条目进入 `builder_observations` 时应填写 `role`、`event_date`、`source`、`evidence`。没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。
+结构化草稿必须包含 `source_audit.github_trending` 与 `source_audit.builder_sources`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因。GitHub trending 项目进入 `projects` 时应填写 `event_date`、`source`、`signal`、`evidence`；如果 shell 网络受限但浏览器能保存 GitHub Trending HTML 或采样 JSON，可运行 `npm run discover:github-trending -- --browser-export <path>` 复用同一解析器。Builder 来源受阻时必须在 `source_audit.builder_sources` 填写 `blocked_reason` 与 `last_successful_feed_at`，不要只写进 notes。Builder 条目进入 `builder_observations` 时应填写 `role`、`event_date`、`source`、`evidence`。没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。

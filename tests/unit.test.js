@@ -8,6 +8,7 @@ import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
 import { collectGitHubTrending, parseGitHubTrendingHtml } from "../src/discovery.js";
 import { renderReportHtml } from "../src/render.js";
+import { reportToInteractionInput } from "../src/interaction-report.js";
 import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
@@ -82,6 +83,7 @@ test("schema 支持模型发布和热门技术博客，并为旧日报默认空�
       name: "ExampleModel 2",
       provider: "Example AI",
       availability: "open_weights",
+      release_scope: "provider_official_launch",
       event_date: "2026-05-13",
       url: "https://example.com/model/examplemodel-2",
       source: "Example AI Model Card",
@@ -110,6 +112,12 @@ test("schema 支持模型发布和热门技术博客，并为旧日报默认空�
   const invalidValidation = validateReport(invalid);
   assert.equal(invalidValidation.valid, false);
   assert(invalidValidation.errors.some((error) => error.path.includes("/model_releases/0/availability")));
+
+  const invalidScope = structuredClone(enriched);
+  invalidScope.model_releases[0].release_scope = "unknown";
+  const invalidScopeValidation = validateReport(invalidScope);
+  assert.equal(invalidScopeValidation.valid, false);
+  assert(invalidScopeValidation.errors.some((error) => error.path.includes("/model_releases/0/release_scope")));
 });
 
 test("feed 按日期幂等更新并倒序排序", async () => {
@@ -239,15 +247,17 @@ test("HTML 渲染会展示模型发布和热门技术博客", async () => {
 test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
+  report.source_audit.builder_sources.blocked_reason = "fetch_failed";
+  report.source_audit.builder_sources.last_successful_feed_at = "2026-05-14T02:35:00+08:00";
   report.projects = [
     {
       name: "Example Trending Agent",
-      description: "用于验证 GitHub trending 项目信号展示。",
+      description: "用于验证 GitHub trending 项目展示，在 GitHub Trending daily 中出现。",
       url: "https://github.com/example/trending-agent",
       event_date: "2026-05-15",
       source: "GitHub Trending",
       signal: "trending",
-      evidence: "出现在 daily trending，并有可运行 README。"
+      evidence: "GitHub Trending daily 显示 123 stars today，并有可运行 README。"
     }
   ];
   report.builder_observations = [
@@ -271,9 +281,55 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert(html.includes("信源审计"));
   assert(html.includes("GitHub Trending"));
   assert(html.includes("Builder 原始源"));
-  assert(html.includes("信号：trending"));
-  assert(html.includes("出现在 daily trending"));
+  assert(html.includes("阻塞：fetch_failed"));
+  assert(html.includes("上次成功：2026-05-14T02:35:00+08:00"));
+  assert(html.includes("今日 +123 stars"));
+  assert(!html.includes("信号：trending"));
+  assert(!html.includes("GitHub Trending daily 显示 123 stars today"));
+  assert(!html.includes("在 GitHub Trending daily 中出现"));
   assert(html.includes("原始帖子链接可访问"));
+});
+
+test("日报可以转换为 effective-interact 输入", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.summary = "Google 把模型和 agent 工具放进同一条链路；Vercel AI Gateway 接入更多模型；GitHub Copilot 加强任务路由；GitHub Trending 显示 agent memory 升温。";
+  report.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
+  report.projects = [
+    {
+      name: "Example Agent Memory",
+      description: "面向 coding agents 的 persistent memory 项目，在 GitHub Trending weekly 中出现。",
+      url: "https://github.com/example/agent-memory",
+      event_date: "2026-05-15",
+      source: "GitHub Trending weekly",
+      signal: "star_velocity",
+      evidence: "GitHub Trending weekly 显示 456 stars this week。"
+    }
+  ];
+  const input = reportToInteractionInput(report);
+
+  assert.equal(input.template, "research-explainer");
+  assert.equal(input.renderMode, "pre-rendered");
+  assert(input.summary.includes("- Google 把模型和 agent 工具放进同一条链路"));
+  assert(input.summary.includes("- 更多信号见主线摘要、主体信息与项目分区。"));
+  const mainlineSection = input.sections.find((section) => section.title === "主线摘要");
+  assert(mainlineSection.content.includes("**Agent 开发链路**"));
+  assert(mainlineSection.content.includes("**模型入口**"));
+  const modelSection = input.sections.find((section) => section.title === "模型发布");
+  assert(modelSection.content.includes("==多平台信号=="));
+  assert(modelSection.content.includes("==官方可用性=="));
+  assert(!modelSection.content.includes("备注："));
+  const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
+  assert(projectsSection.content.includes("==本周 +456 stars=="));
+  assert(projectsSection.content.includes("面向 coding agents 的 persistent memory 项目。"));
+  assert(!projectsSection.content.includes("信号："));
+  assert(!projectsSection.content.includes("证据："));
+  assert(!projectsSection.content.includes("GitHub Trending weekly 中出现"));
+  assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
+  assert(input.sections.some((section) => section.title === "主体信息"));
+  assert(input.sections.some((section) => section.title === "信源审计"));
+  assert(input.sections.some((section) => typeof section.content === "string" && section.content.includes("结构化 JSON")));
+  assert(input.evidence.some((item) => item.value === "https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -304,6 +360,25 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
   assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
   assert.equal(collected.source_audit.github_trending.candidates_found, 2);
   assert.equal(collected.candidates[1].repo, "example/rag-eval");
+});
+
+test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-browser-export-"));
+  const exportPath = path.join(tmp, "github-trending.html");
+  await fs.writeFile(exportPath, githubTrendingFixture(), "utf8");
+
+  const collected = await collectGitHubTrending({
+    browserExportPath: exportPath,
+    fetchImpl: async () => {
+      throw new Error("fetch should not be called for browser-export input");
+    }
+  });
+
+  assert.equal(collected.source_audit.github_trending.checked, true);
+  assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
+  assert.match(collected.source_audit.github_trending.sources[0].notes, /browser export/);
+  assert.equal(collected.source_audit.github_trending.candidates_found, 2);
+  assert.equal(collected.candidates[0].repo, "example/trending-agent");
 });
 
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
@@ -337,10 +412,20 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
   await fs.mkdir(dataInputDir, { recursive: true });
-  await fs.copyFile(
-    path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"),
-    path.join(dataInputDir, "structured-report.json")
-  );
+  const structuredReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  structuredReport.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
+  structuredReport.projects = [
+    {
+      name: "Example Agent Tool",
+      description: "面向 coding agents 的本地工具，在 GitHub Trending daily 中出现。",
+      url: "https://github.com/example/agent-tool",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      signal: "trending",
+      evidence: "GitHub Trending daily 显示 321 stars today。"
+    }
+  ];
+  await fs.writeFile(path.join(dataInputDir, "structured-report.json"), `${JSON.stringify(structuredReport, null, 2)}\n`, "utf8");
 
   const result = await buildSite({
     rootDir: tmp,
@@ -357,10 +442,22 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
 
   const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
   assert(html.includes("<style>"));
+  assert(html.includes("data-html-work-report"));
+  assert(html.includes('data-render-mode="pre-rendered"'));
   assert(html.includes("模型发布"));
   assert(html.includes("ExampleModel 2"));
+  assert(html.includes("多平台信号"));
+  assert(html.includes("官方可用性"));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
+  assert(html.includes("今日 +321 stars"));
+  assert(!html.includes("备注："));
+  assert(!html.includes("信号：trending"));
+  assert(!html.includes("证据：GitHub Trending daily 显示 321 stars today"));
+  assert(!html.includes("在 GitHub Trending daily 中出现"));
+  assert(html.includes("https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json"));
+  assert(html.includes('rel="noopener noreferrer"'));
+  assert(!html.includes('<span class="unsafe-link"'));
   assert(!html.includes('<link rel="stylesheet"'));
   assert(!html.includes("Markdown 原文"));
 
@@ -471,15 +568,21 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   });
 
   assert(prompt.includes("最终发布产物是自包含、可读性好的静态 HTML，不是 Markdown"));
+  assert(prompt.includes(".codex/skills/effective-interact"));
+  assert(prompt.includes('renderMode: "pre-rendered"'));
   assert(prompt.includes("定时任务假定已经在本仓库根目录启动"));
   assert(prompt.includes("反思与迭代建议"));
   assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("GitHub Trending"));
   assert(prompt.includes("npm run discover:github-trending"));
+  assert(prompt.includes("--browser-export"));
+  assert(prompt.includes("release_scope"));
   assert(prompt.includes("follow-builders"));
   assert(prompt.includes("source_audit"));
   assert(prompt.includes("builder_sources"));
+  assert(prompt.includes("blocked_reason"));
+  assert(prompt.includes("last_successful_feed_at"));
   assert(prompt.includes("2026-05-15"));
 });
 

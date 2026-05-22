@@ -1,518 +1,1961 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-template="research-explainer" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="effective-interact create-interaction.mjs">
+  <meta name="generated-at" content="2026-05-21T04:19:58.638Z">
+  <meta name="render-mode" content="pre-rendered">
   <title>AI 日报 2026-05-21</title>
-  <style>
+  <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
 :root {
   color-scheme: light;
-  --bg: #f6f7f9;
+  --bg: #faf9f5;
   --panel: #ffffff;
-  --text: #17202a;
-  --muted: #5f6f7f;
-  --line: #d9e0e7;
-  --accent: #146c94;
-  --accent-2: #246b45;
+  --panel-soft: #f0eee6;
+  --ink: #3d3d3a;
+  --muted: #87867f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757; /* visual token reference: #D97757 */
+  --accent-soft: #fbf1ec;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --code-bg: #141413;
+  --code-panel: #1f1e1b;
+  --code-line: #e8e6de;
+  --code-muted: #9c9a93;
+  --code-border: #3d3d3a;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
 }
 
 * {
   box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
 }
 
 a {
   color: var(--accent);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
 }
 
-.site-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--line);
-  background: #ffffff;
+p,
+ul,
+ol {
+  margin-block: 8px;
 }
 
-.site-title {
-  color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
+.rendered-markdown ul,
+.rendered-markdown ol,
+.panel > ul,
+.action-list,
+.claim-limits {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  line-height: 1.62;
 }
 
-.site-date {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.page {
-  width: min(1040px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 32px 0 56px;
-}
-
-.report-hero {
-  padding: 28px 0 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--accent-2);
-  font-weight: 700;
+.rendered-markdown li + li,
+.panel > ul li + li,
+.action-list li + li,
+.claim-limits li + li {
+  margin-top: 4px;
 }
 
 h1,
 h2,
-h3,
-p {
-  overflow-wrap: anywhere;
-}
-
-h1 {
+h3 {
   margin: 0;
-  font-size: 2rem;
-  line-height: 1.25;
+  color: var(--ink);
+  font-weight: 680;
+  line-height: 1.16;
+  letter-spacing: 0;
 }
 
 h2 {
-  margin: 0 0 16px;
-  font-size: 1.35rem;
+  font-size: 20px;
 }
 
 h3 {
-  margin: 0 0 10px;
-  font-size: 1.05rem;
+  font-size: 15px;
 }
 
-.summary {
-  max-width: 760px;
+.report-hero strong,
+.rendered-markdown strong,
+.report-data-table strong,
+.evidence-card > strong {
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.rendered-markdown em,
+.report-data-table em {
+  color: #5f5d57;
+  font-style: italic;
+  font-weight: 520;
+}
+
+.rendered-markdown mark.text-highlight,
+.report-data-table mark.text-highlight,
+.report-hero mark.text-highlight {
+  padding: 0 0.18em;
+  border-radius: 4px;
+  background: #f7dfae;
+  color: #3d2a12;
+  box-decoration-break: clone;
+}
+
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 40px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.report-hero,
+.panel,
+.finding,
+.evidence-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.panel {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.section-focus {
+  animation: section-focus-pulse 900ms ease-out 1;
+}
+
+@keyframes section-focus-pulse {
+  from {
+    box-shadow: 0 0 0 7px rgba(217, 119, 87, 0.22), var(--shadow);
+  }
+
+  to {
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+  }
+}
+
+.report-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.eyebrow,
+.meta,
+.chip,
+.status-pill {
   color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
-.meta-grid {
+.title-row,
+.toolbar,
+.split-row {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-}
-
-.meta-grid span,
-.tag {
-  display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 4px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  color: var(--muted);
-}
-
-.section {
-  padding: 28px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.item,
-.report-card {
-  margin: 0 0 16px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-
-.item-meta,
-.source-line {
-  display: flex;
+  justify-content: space-between;
   flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  font-size: 34px;
+  line-height: 1.08;
+  max-width: 920px;
+  overflow-wrap: anywhere;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.hero-summary-text {
+  min-height: 72px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  color: #8a3b1e;
+  font-size: 17px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+p.hero-summary-text {
+  display: flex;
+  align-items: center;
+}
+
+.hero-summary-list {
+  display: grid;
+  align-content: start;
   gap: 8px;
-  color: var(--muted);
-  font-size: 0.95rem;
+  list-style: none;
 }
 
-.source-line {
-  margin-top: 12px;
+.hero-summary-list li {
+  position: relative;
+  max-width: 78ch;
+  padding-left: 17px;
 }
 
-.project-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
+.hero-summary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
-.project-table th,
-.project-table td {
-  padding: 12px;
-  border: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-
-.compact-list,
-.report-list {
-  padding-left: 1.25rem;
-}
-
-.check-list {
+.hero-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: start;
 }
 
-.audit-grid {
+.hero-stat {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.audit-card {
-  padding: 18px;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--panel);
+  background: var(--panel-soft);
 }
 
-.check-list div {
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-
-.check-list dt {
+.hero-stat span,
+.hero-stat small {
   color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.check-list dd {
-  margin: 4px 0 0;
+  font-size: 11px;
   font-weight: 700;
 }
 
-.muted {
-  color: var(--muted);
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
 }
 
-.suggestions {
-  margin-top: 20px;
+.hero-decision-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 10px;
 }
 
-.suggestions li {
-  margin-bottom: 16px;
+.hero-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
 }
 
-.artifact-links {
+.hero-decision-card strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.hero-criteria-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 24px;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.artifact-links a {
-  padding: 8px 12px;
+.hero-criteria-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3b1e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.eyebrow,
+.meta,
+.panel,
+.finding,
+.evidence-card,
+.hero-brief,
+.hero-decision-card,
+.lede-grid > *,
+.metric-grid > *,
+.section-heading,
+.section-summary {
+  overflow-wrap: anywhere;
+}
+
+.lede-grid,
+.metric-grid,
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.supplemental-panel {
+  padding: 20px;
+}
+
+.supplemental-panel > .section-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.claims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel,
+.finding,
+.evidence-card {
+  padding: 16px;
+}
+
+.section-heading {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.section-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.evidence-card h3 {
+  line-height: 1.42;
+}
+
+.evidence-card p {
+  margin: 0;
+  color: #5f5d57;
+  line-height: 1.52;
+}
+
+.interactive-card {
+  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.evidence-spotlight {
+  position: relative;
+  overflow: hidden;
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+}
+
+.evidence-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), rgba(217, 119, 87, 0.12), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.evidence-spotlight:hover::before,
+.evidence-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
+.focus-field.has-filter .interactive-card[hidden] {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+}
+
+.chip,
+.status-pill,
+.file-chip,
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  text-transform: none;
+  white-space: normal;
+}
+
+.card-tags,
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.swatch-chip > span {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line));
+  border-radius: 999px;
+  background: var(--swatch, var(--accent));
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.mini-metrics div {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mini-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.mini-metrics dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-ok,
+.rich-status[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  color: var(--ok);
+  background: #e4e9dc;
+}
+
+.status-warn,
+.rich-status[data-state="pending"],
+.rich-status[data-state="degraded"],
+.rich-status[data-state="fallback"] {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: var(--warn);
+  background: #fbf1ec;
+}
+
+.status-danger,
+.rich-status[data-state="failed"],
+.rich-status[data-state="error"] {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  color: var(--danger);
+  background: #f3d9cc;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  color: var(--info);
+  background: #e8efeb;
+}
+
+.source-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: inherit;
+  font-family: var(--code-font);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.source-link::before {
+  content: "#";
+  color: var(--accent);
+}
+
+button,
+.button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.button:hover,
+button[aria-pressed="true"],
+button[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+button[data-copy-state="success"] {
+  border-color: color-mix(in srgb, var(--ok) 58%, var(--line));
+  background: #e4e9dc;
+  color: var(--ok);
+}
+
+button[data-copy-state="failed"] {
+  border-color: color-mix(in srgb, var(--danger) 58%, var(--line));
+  background: #f3d9cc;
+  color: var(--danger);
+}
+
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group:first-of-type {
+  border-top: 0;
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.report-nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-nav a small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.code-panel,
+.diff-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: var(--code-line);
+}
+
+.code-panel header,
+.diff-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: #d1cfc5;
+}
+
+.code-panel header > div,
+.diff-panel header > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.diff-panel h2 {
+  color: #faf9f5;
+  font-size: 16px;
+}
+
+.code-panel pre,
+.diff-panel pre,
+.fallback-source-block,
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--code-line);
+  font: 500 13px/1.35 var(--code-font);
+  tab-size: 2;
+}
+
+.rich-render-source,
+.mermaid-source {
+  margin-top: 10px;
+}
+
+.rich-render-source summary,
+.mermaid-source summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.code-line,
+.line-hot,
+.diff-line {
+  display: block;
+  min-width: max-content;
+  margin-inline: -12px;
+  padding-inline: 58px 12px;
+  position: relative;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.code-line::before,
+.line-hot::before,
+.diff-line::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 12px;
+  width: 36px;
+  color: var(--code-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.line-hot {
+  background: rgba(217, 119, 87, 0.24);
+}
+
+.diff-added {
+  background: rgba(120, 140, 93, 0.24);
+  color: #dce4d2;
+}
+
+.diff-removed {
+  background: rgba(176, 74, 63, 0.25);
+  color: #f3d9cc;
+}
+
+.diff-hunk {
+  color: #f3d9cc;
+  background: rgba(217, 119, 87, 0.22);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #e0897a;
+  font-weight: 750;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section {
+  color: #b8c99d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9c9a93;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-attr {
+  color: #f0c36d;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e8c9ba;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c9b98a;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #8cb6a3;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #d97757;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #a67c52;
+}
+
+.hljs-addition {
+  color: #b8c99d;
+}
+
+.hljs-deletion {
+  color: #e0897a;
+}
+
+.diagram-panel,
+.mermaid-evidence {
+  border-left: 4px solid var(--accent);
+}
+
+.mermaid-rendered,
+[data-rich-mermaid-target] {
+  display: block;
+  min-height: 180px;
+  max-height: 620px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.diagram-panel svg,
+.mermaid-rendered svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.table-caption {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
 }
 
-@media (max-width: 640px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 14px 16px;
-  }
+.report-data-table {
+  width: 100%;
+  min-width: 640px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 1.38;
+}
 
-  .page {
-    width: min(100% - 24px, 1040px);
-    padding-top: 20px;
-  }
+.report-data-table th,
+.report-data-table td {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
 
-  h1 {
-    font-size: 1.55rem;
-  }
+.report-data-table thead th {
+  z-index: 2;
+  background: #f0eee6;
+  color: #8a3b1e;
+  font-weight: 760;
+}
 
-  .project-table {
-    display: block;
-    overflow-x: auto;
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-data-table [data-align="center"] {
+  text-align: center;
+}
+
+.report-data-table [data-align="right"] {
+  text-align: right;
+}
+
+.report-data-table [data-table-cell] {
+  outline: 0;
+}
+
+.report-data-table [data-table-cell]:focus-visible {
+  box-shadow: var(--focus);
+  z-index: 4;
+}
+
+.report-data-table .table-row-highlight {
+  background: color-mix(in srgb, var(--accent-soft) 58%, #ffffff);
+}
+
+.report-data-table .table-column-highlight {
+  background: color-mix(in srgb, #d9f7f1 62%, #ffffff);
+}
+
+.report-data-table .table-row-highlight.table-column-highlight {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.16), rgba(61, 110, 110, 0.16)),
+    #ffffff;
+}
+
+.report-data-table .table-cell-highlight {
+  z-index: 5;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  transform: scale(1.045);
+  box-shadow: 0 10px 24px rgba(61, 61, 58, 0.16);
+}
+
+.table-cell-list,
+.table-cell-map {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.table-cell-map {
+  display: grid;
+  gap: 5px;
+  padding-left: 0;
+}
+
+.table-cell-map div {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.table-cell-map dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.table-cell-map dd {
+  margin: 0;
+}
+
+.claim-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.claim-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-card-title {
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.46;
+}
+
+.claim-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.claim-evidence-links a,
+.chart-bar-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.chart-panel figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chart-panel figcaption {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.chart-panel figcaption strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.7fr) minmax(120px, 2fr) minmax(42px, auto) minmax(72px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-bar-label,
+.chart-bar-value {
+  font-weight: 650;
+}
+
+.chart-bar-track {
+  display: block;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.chart-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.chart-line {
+  width: 100%;
+  min-height: 160px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.chart-line text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.chart-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.chart-matrix-cell,
+.chart-degraded {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.chart-degraded {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.chart-source-row {
+  margin: 0;
+}
+
+.chart-table-fallback {
+  margin-top: 2px;
+}
+
+.runtime-panel .source-link::before {
+  content: "";
+}
+
+.tab-panel[hidden],
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero-brief,
+  .hero-decision-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-  </style>
+@media (max-width: 720px) {
+  .report-shell {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
+  .split-row,
+  .code-panel header,
+  .diff-panel header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-hero {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 24px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-stat {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .hero-stat strong {
+    font-size: 19px;
+  }
+
+  .hero-decision-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .hero-decision-card strong {
+    font-size: 13px;
+  }
+
+  .chip,
+  .status-pill,
+  .file-chip {
+    white-space: normal;
+  }
+
+  .report-data-table {
+    min-width: 560px;
+  }
+
+  .chart-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .report-data-table .table-cell-highlight {
+    transform: none;
+  }
+}
+
+
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="site-title" href="../../../index.html">AI 日报</a>
-    <span class="site-date">2026-05-21</span>
-  </header>
-  <main class="page">
-    <section class="report-hero">
-      <p class="eyebrow">每日 AI 技术观察</p>
-      <h1>AI 日报 2026-05-21</h1>
-      <p class="summary">今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker OpenAI-compatible API、Claude Managed Agents 企业级执行边界，以及 GitHub Trending 中持续升温的 coding-agent 基础设施项目。本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转。</p>
-      <div class="meta-grid" aria-label="日报统计">
-        <span><strong>6</strong> 主体信息</span>
-        <span><strong>4</strong> 模型发布</span>
-        <span><strong>3</strong> 技术博客</span>
-        <span><strong>4</strong> Builder 观察</span>
-        <span><strong>4</strong> 社区线索</span>
+  <main class="report-shell">
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
+          <h1 class="report-title">AI 日报 2026-05-21</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-    </section>
+      <div class="hero-brief">
+        <ul class="hero-summary-text hero-summary-list"><li>今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型…</li><li>本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</li></ul>
+        <div class="hero-stat-grid" aria-label="报告摘要指标">
+    <div class="hero-stat"><span>证据</span><strong>2</strong><small>条</small></div>
+<div class="hero-stat"><span>行动</span><strong>3</strong><small>项</small></div>
+  </div>
+      </div>
+      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <article class="hero-decision-card">
+      <div class="meta">漏点</div>
+      <strong>2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">修复</div>
+      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">验收口径</div>
+      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
+    </article>
+  </div>
+    </header>
 
-    <section class="section" id="main-items">
+    <div class="report-layout">
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
+<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
+<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
+<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
+<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+<a href="#evidence" title="证据" data-nav-link data-nav-index="10" data-nav-group-name="evidence" data-nav-status="info"><span>证据</span></a>
+<a href="#next-actions" title="下一步" data-nav-link data-nav-index="11" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
+    </div>
+  </nav>
+      <div class="report-section-stack" data-report-region="sections">
+        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">摘要</p>
+      <h2>日报概览</h2>
+
+    </div>
+
+  </div>
+    <div class="metric-grid focus-field">
+      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-21</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>4</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>3</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>6</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>4</strong></article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+
+      <h2>主线摘要</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Agent 开发链路</strong>：今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker Open…</li><li><strong>开源信号</strong>：本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</li></ul></div>
+    <template data-rich-source data-source-fallback>- **Agent 开发链路**：今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker Open…
+- **开源信号**：本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>主体信息</h2>
-      <article class="item">
-  <h3>Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Google</span><span>Gemini 3.5</span><span>Gemini Omni</span><span>Antigravity</span><span>Google AI Studio</span></div>
-  <ul>
-    <li>Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。</li>
-<li>Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。</li>
-<li>对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" target="_blank" rel="noopener noreferrer">Google Developers Blog</a></p>
-</article>
-<article class="item">
-  <h3>GitHub Copilot 在 VS Code 中推出按任务自动路由模型</h3>
-  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>GitHub Copilot</span><span>VS Code</span><span>model routing</span></div>
-  <ul>
-    <li>这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。</li>
-<li>组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
-</article>
-<article class="item">
-  <h3>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</h3>
-  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>Amazon SageMaker AI</span><span>OpenAI SDK</span><span>LangChain</span><span>Strands Agents</span></div>
-  <ul>
-    <li>这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。</li>
-<li>对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">AWS Machine Learning Blog</a></p>
-</article>
-<article class="item">
-  <h3>Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Anthropic</span><span>Claude Managed Agents</span><span>MCP</span><span>Vercel Sandbox</span><span>Modal</span><span>Cloudflare</span></div>
-  <ul>
-    <li>官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。</li>
-<li>这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://claude.com/blog/claude-managed-agents-updates" target="_blank" rel="noopener noreferrer">Claude Blog</a></p>
-</article>
-<article class="item">
-  <h3>Vercel AI Gateway 上线 Gemini 3.5 Flash</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Vercel</span><span>AI Gateway</span><span>AI SDK</span><span>Gemini 3.5 Flash</span></div>
-  <ul>
-    <li>Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。</li>
-<li>对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
-</article>
-<article class="item">
-  <h3>Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Hugging Face</span><span>Ettin Reranker</span><span>Ai2</span><span>OlmoEarth</span></div>
-  <ul>
-    <li>Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。</li>
-<li>Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog / Ai2 Blog</a></p>
-</article>
-    </section>
 
-    <section class="section" id="model-releases">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><p>1. <strong>Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上</strong>（2026-05-19，T0）</p>
+<ul><li>Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。</li><li>Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。</li><li>对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。</li><li>来源：<a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">Google Developers Blog</a></li></ul>
+<p>2. <strong>GitHub Copilot 在 VS Code 中推出按任务自动路由模型</strong>（2026-05-20，T0）</p>
+<ul><li>这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。</li><li>组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。</li><li>来源：<a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
+<p>3. <strong>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</strong>（2026-05-20，T0）</p>
+<ul><li>这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。</li><li>对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。</li><li>来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">AWS Machine Learning Blog</a></li></ul>
+<p>4. <strong>Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels</strong>（2026-05-19，T0）</p>
+<ul><li>官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。</li><li>这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。</li><li>来源：<a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">Claude Blog</a></li></ul>
+<p>5. <strong>Vercel AI Gateway 上线 Gemini 3.5 Flash</strong>（2026-05-19，T0）</p>
+<ul><li>Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。</li><li>对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。</li><li>来源：<a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog</a></li></ul>
+<p>6. <strong>Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新</strong>（2026-05-19，T0）</p>
+<ul><li>Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。</li><li>Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。</li><li>来源：<a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog / Ai2 Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>1. **Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上**（2026-05-19，T0）
+  - Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。
+  - Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。
+  - 对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。
+  - 来源：[Google Developers Blog](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)
+
+2. **GitHub Copilot 在 VS Code 中推出按任务自动路由模型**（2026-05-20，T0）
+  - 这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。
+  - 组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。
+  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/)
+
+3. **Amazon SageMaker AI endpoints 增加 OpenAI-compatible API**（2026-05-20，T0）
+  - 这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。
+  - 对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。
+  - 来源：[AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)
+
+4. **Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels**（2026-05-19，T0）
+  - 官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。
+  - 这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。
+  - 来源：[Claude Blog](https://claude.com/blog/claude-managed-agents-updates)
+
+5. **Vercel AI Gateway 上线 Gemini 3.5 Flash**（2026-05-19，T0）
+  - Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。
+  - 对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。
+  - 来源：[Vercel Changelog](https://vercel.com/changelog)
+
+6. **Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新**（2026-05-19，T0）
+  - Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。
+  - Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。
+  - 来源：[Hugging Face Blog / Ai2 Blog](https://huggingface.co/blog/ettin-reranker)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>模型发布</h2>
-      <article class="item">
-  <h3>Gemini 3.5 Flash</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Google</span>
-    <span>闭源 API (closed_api)</span>
-  </div>
-  <p>Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。</p>
-  <p class="muted">同时已出现在 Vercel AI Gateway，开发者可通过 Vercel AI SDK 使用 `google/gemini-3.5-flash`。</p>
-  <p class="source-line">来源：<a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/" target="_blank" rel="noopener noreferrer">Google Blog</a></p>
-</article>
-<article class="item">
-  <h3>Gemini Omni</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Google</span>
-    <span>产品内可用 (closed_product)</span>
-  </div>
-  <p>Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。</p>
-  <p class="muted">本轮仅按官方 I/O 汇总记录，不引入第三方推断。</p>
-  <p class="source-line">来源：<a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/" target="_blank" rel="noopener noreferrer">Google Blog</a></p>
-</article>
-<article class="item">
-  <h3>Ettin Reranker Family</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Hugging Face</span>
-    <span>开源权重 (open_weights)</span>
-  </div>
-  <p>Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。</p>
-  <p class="muted">适合作为 RAG pipeline 中低参数 reranker 的候选，需要在自有语料上做离线评估。</p>
-  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog</a></p>
-</article>
-<article class="item">
-  <h3>OlmoEarth v1.1</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Ai2</span>
-    <span>开源权重 (open_weights)</span>
-  </div>
-  <p>Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。</p>
-  <p class="muted">官方页提供模型、技术报告和代码入口，后续可跟踪实际下游应用复现。</p>
-  <p class="source-line">来源：<a href="https://allenai.org/blog/olmoearth-v1-1" target="_blank" rel="noopener noreferrer">Ai2 Blog</a></p>
-</article>
-    </section>
 
-<section class="section" id="hot-blogs">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Gemini 3.5 Flash</strong>（Google，closed_api，2026-05-19）：Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。 <a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/" rel="noopener noreferrer">Google Blog</a></li><li><strong>Gemini Omni</strong> <mark class="text-highlight">官方可用性</mark>（Google，closed_product，2026-05-19）：Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。 <a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/" rel="noopener noreferrer">Google Blog</a></li><li><strong>Ettin Reranker Family</strong> <mark class="text-highlight">RAG 评估</mark>（Hugging Face，open_weights，2026-05-19）：Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。 <a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog</a></li><li><strong>OlmoEarth v1.1</strong> <mark class="text-highlight">官方可用性</mark>（Ai2，open_weights，2026-05-19）：Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。 <a href="https://allenai.org/blog/olmoearth-v1-1" rel="noopener noreferrer">Ai2 Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Gemini 3.5 Flash**（Google，closed_api，2026-05-19）：Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。 [Google Blog](https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/)
+- **Gemini Omni** ==官方可用性==（Google，closed_product，2026-05-19）：Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。 [Google Blog](https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/)
+- **Ettin Reranker Family** ==RAG 评估==（Hugging Face，open_weights，2026-05-19）：Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。 [Hugging Face Blog](https://huggingface.co/blog/ettin-reranker)
+- **OlmoEarth v1.1** ==官方可用性==（Ai2，open_weights，2026-05-19）：Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。 [Ai2 Blog](https://allenai.org/blog/olmoearth-v1-1)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>热门技术博客</h2>
-      <article class="item">
-  <h3><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></h3>
-  <div class="item-meta">
-    <span>2026-05-20</span>
-    <span>AWS Machine Learning Blog</span>
-    <span>Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng</span>
-    <span>model serving / OpenAI-compatible API</span>
-  </div>
-  <p>SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。</p>
-  <p><strong>为什么重要：</strong>这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。</p>
-</article>
-<article class="item">
-  <h3><a href="https://claude.com/blog/claude-managed-agents-updates" target="_blank" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Claude Blog</span>
-    <span>Anthropic</span>
-    <span>managed agents / MCP / sandboxing</span>
-  </div>
-  <p>Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。</p>
-  <p><strong>为什么重要：</strong>生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。</p>
-</article>
-<article class="item">
-  <h3><a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Hugging Face Blog</span>
-    <span>Tom Aarsen</span>
-    <span>reranker / RAG</span>
-  </div>
-  <p>Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</p>
-  <p><strong>为什么重要：</strong>RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。</p>
-</article>
-    </section>
 
-    <section class="section" id="projects">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></strong>（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。</li><li>为什么重要：这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。</li><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></strong>（Claude Blog / Anthropic，2026-05-19）：Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。</li><li>为什么重要：生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</li><li>为什么重要：RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)**（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。
+  - 为什么重要：这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。
+- **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。
+  - 为什么重要：生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。
+- **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。
+  - 为什么重要：RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">projects</p>
       <h2>今日值得关注的项目</h2>
-      <table class="project-table">
-  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
-  <tbody>
-    <tr><td>colbymchenry/codegraph</td><td>为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending daily / weekly</span></div><p class="muted">npm run discover:github-trending -- 50 抓取到该项目，并按 code knowledge graph / coding agent 关键词命中。</p></td><td><a href="https://github.com/colbymchenry/codegraph" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>volcengine/OpenViking</td><td>面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending</span></div><p class="muted">discover:github-trending 把该项目列为 AI agent context database 候选。</p></td><td><a href="https://github.com/volcengine/OpenViking" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>humanlayer/12-factor-agents</td><td>把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending</span></div><p class="muted">discover:github-trending 候选列表命中，且与 production LLM software / agents 主题相关。</p></td><td><a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>InsForge/InsForge</td><td>面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending TypeScript</span></div><p class="muted">Trending TypeScript 候选命中，描述直接指向 agentic coding 后端平台。</p></td><td><a href="https://github.com/InsForge/InsForge" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>code-yeongyu/oh-my-openagent</td><td>以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending</span></div><p class="muted">discover:github-trending 候选命中，适合作为后续项目发现入口而非单一产品发布。</p></td><td><a href="https://github.com/code-yeongyu/oh-my-openagent" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>Lum1104/Understand-Anything</td><td>为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。<div class="item-meta"><span>日期：2026-05-21</span><span>信号：trending</span><span>来源：GitHub Trending</span></div><p class="muted">discover:github-trending 候选命中，描述同时覆盖多个主流 coding agent / IDE agent。</p></td><td><a href="https://github.com/Lum1104/Understand-Anything" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-  </tbody>
-</table>
-    </section>
 
-    <section class="section" id="builder-observations">
-      <h2>Builder 观察</h2>
-      <ul class="compact-list"><li><strong>Andrej Karpathy</strong>：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 <a href="https://x.com/karpathy/status/2056753169888334312" target="_blank" rel="noopener noreferrer">来源</a><div class="item-meta"><span>Anthropic researcher / AI educator</span><span>2026-05-21</span><span>follow-builders X feed</span></div><p class="muted">prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I&#39;ve joined Anthropic...</p></li>
-<li><strong>Josh Woodward</strong>：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 <a href="https://x.com/joshwoodward/status/2056873495116845485" target="_blank" rel="noopener noreferrer">来源</a><div class="item-meta"><span>Google Labs / Gemini App / AI Studio product lead</span><span>2026-05-21</span><span>follow-builders X feed</span></div><p class="muted">prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...</p></li>
-<li><strong>Guillermo Rauch</strong>：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 <a href="https://x.com/rauchg/status/2056735989830471977" target="_blank" rel="noopener noreferrer">来源</a><div class="item-meta"><span>Vercel CEO</span><span>2026-05-21</span><span>follow-builders X feed</span></div><p class="muted">prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。</p></li>
-<li><strong>Swyx</strong>：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 <a href="https://x.com/swyx/status/2056877529991205072" target="_blank" rel="noopener noreferrer">来源</a><div class="item-meta"><span>AI Engineer / Latent Space</span><span>2026-05-21</span><span>follow-builders X feed</span></div><p class="muted">prepare-digest.js 抓取原始 X 链接，文本开头为 there&#39;s 4 parts to this AI SDLC...</p></li></ul>
-    </section>
+    </div>
 
-    <section class="section" id="community-leads">
-      <h2>社区线索</h2>
-      <ul class="compact-list"><li>karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 <a href="https://github.com/karpathy/autoresearch" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 <a href="https://github.com/anthropics/claude-plugins-official" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 <a href="https://github.com/HKUDS/CLI-Anything" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 <a href="https://x.com/GoogleLabs/status/2056872996988756228" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
-    </section>
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></strong> <mark class="text-highlight">Weekly trending</mark>：为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。</li><li><strong><a href="https://github.com/volcengine/OpenViking" rel="noopener noreferrer">volcengine/OpenViking</a></strong>：面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。</li><li><strong><a href="https://github.com/humanlayer/12-factor-agents" rel="noopener noreferrer">humanlayer/12-factor-agents</a></strong>：把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。</li><li><strong><a href="https://github.com/InsForge/InsForge" rel="noopener noreferrer">InsForge/InsForge</a></strong>：面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。</li><li><strong><a href="https://github.com/code-yeongyu/oh-my-openagent" rel="noopener noreferrer">code-yeongyu/oh-my-openagent</a></strong>：以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong>：为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)** ==Weekly trending==：为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。
+- **[volcengine/OpenViking](https://github.com/volcengine/OpenViking)**：面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。
+- **[humanlayer/12-factor-agents](https://github.com/humanlayer/12-factor-agents)**：把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。
+- **[InsForge/InsForge](https://github.com/InsForge/InsForge)**：面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。
+- **[code-yeongyu/oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent)**：以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。
+- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)**：为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。</template>
+  </section>
+<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">signals</p>
+      <h2>Builder 观察与社区线索</h2>
 
+    </div>
 
-    <section class="section" id="source-audit">
+  </div>
+    <div class="rendered-markdown"><h4>Builder 观察</h4>
+<ul><li><strong>Andrej Karpathy</strong>（Anthropic researcher / AI educator）：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 <a href="https://x.com/karpathy/status/2056753169888334312" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I&#39;ve joined Anthropic...</li><li><strong>Josh Woodward</strong>（Google Labs / Gemini App / AI Studio product lead）：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 <a href="https://x.com/joshwoodward/status/2056873495116845485" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...</li><li><strong>Guillermo Rauch</strong>（Vercel CEO）：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 <a href="https://x.com/rauchg/status/2056735989830471977" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。</li><li><strong>Swyx</strong>（AI Engineer / Latent Space）：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 <a href="https://x.com/swyx/status/2056877529991205072" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 there&#39;s 4 parts to this AI SDLC...</li></ul>
+<h4>社区线索</h4>
+<ul><li>karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 <a href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">来源</a></li><li>anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 <a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">来源</a></li><li>HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 <a href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">来源</a></li><li>Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 <a href="https://x.com/GoogleLabs/status/2056872996988756228" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>### Builder 观察
+
+- **Andrej Karpathy**（Anthropic researcher / AI educator）：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 [follow-builders X feed](https://x.com/karpathy/status/2056753169888334312)
+  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I&#39;ve joined Anthropic...
+- **Josh Woodward**（Google Labs / Gemini App / AI Studio product lead）：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 [follow-builders X feed](https://x.com/joshwoodward/status/2056873495116845485)
+  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...
+- **Guillermo Rauch**（Vercel CEO）：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 [follow-builders X feed](https://x.com/rauchg/status/2056735989830471977)
+  - 证据：prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。
+- **Swyx**（AI Engineer / Latent Space）：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 [follow-builders X feed](https://x.com/swyx/status/2056877529991205072)
+  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 there&#39;s 4 parts to this AI SDLC...
+
+### 社区线索
+
+- karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 [来源](https://github.com/karpathy/autoresearch)
+- anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 [来源](https://github.com/anthropics/claude-plugins-official)
+- HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 [来源](https://github.com/HKUDS/CLI-Anything)
+- Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 [来源](https://x.com/GoogleLabs/status/2056872996988756228)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
       <h2>信源审计</h2>
-      <div class="audit-grid">
-        <article class="audit-card">
-  <h3>GitHub Trending</h3>
-  <div class="item-meta">
-    <span>已检查</span>
-    <span>121 候选</span>
-    <span>6 入选</span>
+
+    </div>
+
   </div>
-  <p>本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。</p>
-  <ul class="compact-list"><li><a href="https://github.com/trending?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily all</a> <span class="tag">checked</span>：解析候选 17 个。</li>
-<li><a href="https://github.com/trending?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly all</a> <span class="tag">checked</span>：解析候选 14 个。</li>
-<li><a href="https://github.com/trending/python?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily Python</a> <span class="tag">checked</span>：解析候选 17 个。</li>
-<li><a href="https://github.com/trending/python?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly Python</a> <span class="tag">checked</span>：解析候选 13 个。</li>
-<li><a href="https://github.com/trending/typescript?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily TypeScript</a> <span class="tag">checked</span>：解析候选 15 个。</li>
-<li><a href="https://github.com/trending/typescript?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly TypeScript</a> <span class="tag">checked</span>：解析候选 17 个。</li>
-<li><a href="https://github.com/trending/rust?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily Rust</a> <span class="tag">checked</span>：解析候选 18 个。</li>
-<li><a href="https://github.com/trending/rust?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly Rust</a> <span class="tag">checked</span>：解析候选 17 个。</li>
-<li><a href="https://github.com/trending/go?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily Go</a> <span class="tag">checked</span>：解析候选 17 个。</li>
-<li><a href="https://github.com/trending/go?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly Go</a> <span class="tag">checked</span>：解析候选 15 个。</li></ul>
-</article>
-        <article class="audit-card">
-  <h3>Builder 原始源</h3>
-  <div class="item-meta">
-    <span>已检查</span>
-    <span>43 候选</span>
-    <span>4 入选</span>
+    <div class="rendered-markdown"><h4>GitHub Trending</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：121 / 6</li><li>说明：本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。</li></ul>
+<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily all</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly all</a>：checked，解析候选 14 个。</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending daily Python</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/python?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Python</a>：checked，解析候选 13 个。</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending daily TypeScript</a>：checked，解析候选 15 个。</li><li><a href="https://github.com/trending/typescript?since=weekly" rel="noopener noreferrer">GitHub Trending weekly TypeScript</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/rust?since=daily" rel="noopener noreferrer">GitHub Trending daily Rust</a>：checked，解析候选 18 个。</li><li><a href="https://github.com/trending/rust?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Rust</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/go?since=daily" rel="noopener noreferrer">GitHub Trending daily Go</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/go?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Go</a>：checked，解析候选 15 个。</li></ul>
+<h4>Builder 原始源</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：43 / 4</li><li>说明：只采用原始链接或官方页；X feed 可用，未使用二手转述。</li></ul>
+<ul><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders prepare-digest</a>：checked，stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。</li><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders X feed</a>：checked，通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。</li><li><a href="https://www.youtube.com/watch?v=j7ypvRUFY7M" rel="noopener noreferrer">Training Data podcast</a>：checked，2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。</li><li><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">Claude Managed Agents blog from builder feed</a>：checked，Builder feed 命中后回溯到 Claude 官方博客。</li></ul></div>
+    <template data-rich-source data-source-fallback>### GitHub Trending
+
+- 检查状态：已检查
+- 候选 / 入选：121 / 6
+- 说明：本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。
+
+- [GitHub Trending daily all](https://github.com/trending?since=daily)：checked，解析候选 17 个。
+- [GitHub Trending weekly all](https://github.com/trending?since=weekly)：checked，解析候选 14 个。
+- [GitHub Trending daily Python](https://github.com/trending/python?since=daily)：checked，解析候选 17 个。
+- [GitHub Trending weekly Python](https://github.com/trending/python?since=weekly)：checked，解析候选 13 个。
+- [GitHub Trending daily TypeScript](https://github.com/trending/typescript?since=daily)：checked，解析候选 15 个。
+- [GitHub Trending weekly TypeScript](https://github.com/trending/typescript?since=weekly)：checked，解析候选 17 个。
+- [GitHub Trending daily Rust](https://github.com/trending/rust?since=daily)：checked，解析候选 18 个。
+- [GitHub Trending weekly Rust](https://github.com/trending/rust?since=weekly)：checked，解析候选 17 个。
+- [GitHub Trending daily Go](https://github.com/trending/go?since=daily)：checked，解析候选 17 个。
+- [GitHub Trending weekly Go](https://github.com/trending/go?since=weekly)：checked，解析候选 15 个。
+
+### Builder 原始源
+
+- 检查状态：已检查
+- 候选 / 入选：43 / 4
+- 说明：只采用原始链接或官方页；X feed 可用，未使用二手转述。
+
+- [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：checked，stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。
+- [follow-builders X feed](https://github.com/zarazhangrui/follow-builders)：checked，通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。
+- [Training Data podcast](https://www.youtube.com/watch?v=j7ypvRUFY7M)：checked，2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。
+- [Claude Managed Agents blog from builder feed](https://claude.com/blog/claude-managed-agents-updates)：checked，Builder feed 命中后回溯到 Claude 官方博客。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>自检与产物</h2>
+
+    </div>
+
   </div>
-  <p>只采用原始链接或官方页；X feed 可用，未使用二手转述。</p>
-  <ul class="compact-list"><li><a href="https://github.com/zarazhangrui/follow-builders" target="_blank" rel="noopener noreferrer">follow-builders prepare-digest</a> <span class="tag">checked</span>：stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。</li>
-<li><a href="https://github.com/zarazhangrui/follow-builders" target="_blank" rel="noopener noreferrer">follow-builders X feed</a> <span class="tag">checked</span>：通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。</li>
-<li><a href="https://www.youtube.com/watch?v=j7ypvRUFY7M" target="_blank" rel="noopener noreferrer">Training Data podcast</a> <span class="tag">checked</span>：2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。</li>
-<li><a href="https://claude.com/blog/claude-managed-agents-updates" target="_blank" rel="noopener noreferrer">Claude Managed Agents blog from builder feed</a> <span class="tag">checked</span>：Builder feed 命中后回溯到 Claude 官方博客。</li></ul>
-</article>
+    <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：4</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。</li></ul>
+<h4>提示词与规则迭代建议</h4>
+<ul><li><strong>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</strong>：把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</li><li><strong>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</strong>：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</li><li><strong>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</strong>：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</li></ul>
+<ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- 主体信息：6
+- Builder 观察：4
+- 一手链接：通过
+- 无禁用表达：通过
+- 无无源数字：通过
+- 说明：主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。
+
+### 提示词与规则迭代建议
+
+- **把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。**：把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。
+- **为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。**：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。
+- **为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。**：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。
+
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json)</template>
+  </section>
+
+
+        <section class="panel supplemental-panel" id="evidence" data-section-type="evidence" data-section-group="evidence" data-report-region="evidence"><div class="section-heading split-row">
+    <div>
+
+      <h2>证据</h2>
+      <p class="section-summary">文件、命令和验证来源集中在这里。</p>
+    </div>
+
+  </div><div class="evidence-grid" data-evidence>
+    <article class="interactive-card evidence-card evidence-spotlight" id="evidence-1" data-evidence-spotlight data-evidence-id="evidence-1" data-evidence-kind="file" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">文件</span><span class="status-pill status-info">信息</span></div>
+      <h3>结构化日报 JSON</h3>
+      <p>https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json</p>
+
+
+    </article>
+<article class="interactive-card evidence-card evidence-spotlight" id="evidence-2" data-evidence-spotlight data-evidence-id="evidence-2" data-evidence-kind="assumption" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">假设</span><span class="status-pill status-ok">通过</span></div>
+      <h3>页面生成器</h3>
+      <p>由 .codex/skills/effective-interact/scripts/create-interaction.mjs 生成公开日报 HTML。</p>
+
+
+    </article>
+  </div></section>
+
+        <section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list"><li>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</li><li>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</li><li>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</li></ul></section>
       </div>
-    </section>
-
-    <section class="section" id="self-check">
-      <h2>自检摘要</h2>
-      <dl class="check-list">
-        <div><dt>主条目</dt><dd>6</dd></div>
-        <div><dt>Builder</dt><dd>4</dd></div>
-        <div><dt>一手链接</dt><dd>通过</dd></div>
-        <div><dt>无禁用表达</dt><dd>通过</dd></div>
-        <div><dt>无无源数字</dt><dd>通过</dd></div>
-      </dl>
-      <p>主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。</p>
-      <section class="suggestions" aria-label="提示词或规则迭代建议">
-  <h3>提示词与规则迭代建议</h3>
-  <ol class="compact-list"><li>
-    <p><strong>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</strong></p>
-    <p>建议：把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</p>
-  </li>
-<li>
-    <p><strong>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</strong></p>
-    <p>建议：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</p>
-  </li>
-<li>
-    <p><strong>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</strong></p>
-    <p>建议：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</p>
-  </li></ol>
-</section>
-    </section>
-
-    <nav class="artifact-links" aria-label="产物链接">
-      <a href="../../../data/2026/05/2026-05-21.json">结构化 JSON</a>
-      
-    </nav>
+    </div>
   </main>
+
+  <script>/* Use case: small local interactions for self-contained Effective reports. The generator inlines this into the final <script> block. */
+(function () {
+  var sectionFocusTimer = null;
+  var lastActiveNavId = "";
+
+  function setCopyButtonState(button, label, state) {
+    if (!button) return;
+    if (!button.getAttribute("data-copy-label")) {
+      button.setAttribute("data-copy-label", button.textContent);
+    }
+    if (button.getAttribute("data-copy-timer")) {
+      clearTimeout(Number(button.getAttribute("data-copy-timer")));
+    }
+    button.textContent = label;
+    button.setAttribute("data-copy-state", state);
+    button.setAttribute("aria-live", "polite");
+    var timer = setTimeout(function () {
+      button.textContent = button.getAttribute("data-copy-label") || label;
+      button.removeAttribute("data-copy-state");
+      button.removeAttribute("data-copy-timer");
+    }, 1100);
+    button.setAttribute("data-copy-timer", String(timer));
+  }
+
+  function fallbackCopyText(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(area);
+    }
+  }
+
+  function copyText(text, button) {
+    var value = String(text || "").trim();
+    if (!value) {
+      setCopyButtonState(button, "无内容", "empty");
+      return;
+    }
+    var done = function () {
+      setCopyButtonState(button, "已复制", "success");
+    };
+    var fail = function () {
+      setCopyButtonState(button, "复制失败", "failed");
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done, function () {
+        if (fallbackCopyText(value)) done();
+        else fail();
+      });
+      return;
+    }
+
+    if (fallbackCopyText(value)) done();
+    else fail();
+  }
+
+  function copySourceText(source) {
+    if (!source) return "";
+    if (source.matches("ul, ol")) {
+      return Array.prototype.slice.call(source.querySelectorAll("li"))
+        .map(function (item) { return "- " + (item.innerText || item.textContent || "").trim(); })
+        .filter(Boolean)
+        .join("\n");
+    }
+    return (source.innerText || source.textContent || "").trim();
+  }
+
+  function applyFilter(button) {
+    var target = button.getAttribute("data-filter-target");
+    var value = button.getAttribute("data-filter-value");
+    if (!target || !value) return;
+
+    document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      var match = value === "all" || item.getAttribute("data-filter-value") === value;
+      item.hidden = !match;
+    });
+
+    document.querySelectorAll("button[data-filter-target='" + target + "']").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+
+    var field = document.querySelector("[data-focus-field='" + target + "']");
+    if (field) {
+      field.classList.toggle("has-filter", value !== "all");
+    }
+  }
+
+  function activateTab(button) {
+    var group = button.getAttribute("data-tab-group");
+    var panel = button.getAttribute("data-tab");
+    if (!group || !panel) return;
+
+    document.querySelectorAll("[data-tab-group='" + group + "'][data-tab]").forEach(function (peer) {
+      peer.setAttribute("aria-selected", String(peer === button));
+    });
+
+    document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
+      item.hidden = item.id !== panel;
+    });
+  }
+
+  function applySearch(input) {
+    var target = input.getAttribute("data-search-for");
+    var query = input.value.trim().toLowerCase();
+    if (!target) return;
+
+    document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
+      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+    });
+  }
+
+  function updateEvidenceSpotlight(card, event) {
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
+    card.style.setProperty("--spotlight-y", event.clientY - rect.top + "px");
+  }
+
+  function clearDataTableHighlight(table) {
+    if (!table) return;
+    table.removeAttribute("data-hover-row");
+    table.removeAttribute("data-hover-column");
+    table.querySelectorAll(".table-row-highlight, .table-column-highlight, .table-cell-highlight").forEach(function (cell) {
+      cell.classList.remove("table-row-highlight", "table-column-highlight", "table-cell-highlight");
+    });
+  }
+
+  function applyDataTableHighlight(cell) {
+    var table = cell.closest("[data-report-data-table]");
+    if (!table) return;
+    var row = cell.getAttribute("data-table-row");
+    var column = cell.getAttribute("data-table-column");
+    clearDataTableHighlight(table);
+    if (!row || !column) return;
+
+    table.setAttribute("data-hover-row", row);
+    table.setAttribute("data-hover-column", column);
+
+    table.querySelectorAll("[data-table-row='" + row + "']").forEach(function (peer) {
+      peer.classList.add("table-row-highlight");
+    });
+    table.querySelectorAll("[data-table-column='" + column + "']").forEach(function (peer) {
+      peer.classList.add("table-column-highlight");
+    });
+    cell.classList.add("table-cell-highlight");
+  }
+
+  function hashTargetId() {
+    if (!window.location.hash || window.location.hash === "#") return "";
+    var raw = window.location.hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function reportSectionForId(id) {
+    if (!id) return null;
+    var target = document.getElementById(id);
+    if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
+    if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
+      return target;
+    }
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
+  }
+
+  function sectionIsVisible(section) {
+    if (!section) return false;
+    var rect = section.getBoundingClientRect();
+    return rect.bottom > 80 && rect.top < window.innerHeight;
+  }
+
+  function highlightTargetSection(id) {
+    document.querySelectorAll(".section-focus").forEach(function (section) {
+      section.classList.remove("section-focus");
+    });
+    if (sectionFocusTimer) {
+      clearTimeout(sectionFocusTimer);
+      sectionFocusTimer = null;
+    }
+
+    var section = reportSectionForId(id);
+    if (!section) return;
+    section.classList.add("section-focus");
+    sectionFocusTimer = setTimeout(function () {
+      section.classList.remove("section-focus");
+      sectionFocusTimer = null;
+    }, 1600);
+  }
+
+  function updateActiveNavigation() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
+    var hashSection = reportSectionForId(hashTargetId());
+    var active = sections
+      .map(function (section) {
+        var rect = section.getBoundingClientRect();
+        return { id: section.id, section: section, top: Math.abs(rect.top - 96), visible: sectionIsVisible(section) };
+      })
+      .filter(function (item) { return item.visible; })
+      .sort(function (a, b) { return a.top - b.top; })[0];
+    if (hashSection && sectionIsVisible(hashSection)) {
+      active = { id: hashSection.id, section: hashSection, top: 0, visible: true };
+    }
+
+    var activeLink = null;
+    document.querySelectorAll("[data-nav-link]").forEach(function (link) {
+      var isActive = Boolean(active && link.getAttribute("href") === "#" + active.id);
+      link.setAttribute("aria-current", isActive ? "true" : "false");
+      if (isActive) activeLink = link;
+    });
+
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
+    }
+    lastActiveNavId = active ? active.id : "";
+  }
+
+  document.addEventListener("click", function (event) {
+    var navLink = event.target.closest("[data-nav-link]");
+    if (navLink) {
+      var href = navLink.getAttribute("href") || "";
+      if (href.charAt(0) === "#") {
+        window.setTimeout(function () {
+          highlightTargetSection(hashTargetId());
+          updateActiveNavigation();
+        }, 80);
+      }
+    }
+
+    var button = event.target.closest("button");
+    if (!button) return;
+
+    if (button.matches("[data-copy-text]")) {
+      copyText(button.getAttribute("data-copy-text"), button);
+    }
+
+    if (button.matches("[data-copy-from]")) {
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      copyText(source ? (source.content ? source.content.textContent : copySourceText(source)) : "", button);
+    }
+
+    if (button.matches("[data-filter-target][data-filter-value]")) {
+      applyFilter(button);
+    }
+
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
+    }
+  });
+
+  document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-search-for]")) {
+      applySearch(event.target);
+    }
+  });
+
+  document.addEventListener("pointermove", function (event) {
+    var card = event.target.closest("[data-evidence-spotlight]");
+    if (card) {
+      updateEvidenceSpotlight(card, event);
+    }
+  });
+
+  document.addEventListener("pointerover", function (event) {
+    var cell = event.target.closest("[data-table-cell]");
+    if (cell) {
+      applyDataTableHighlight(cell);
+    }
+  });
+
+  document.addEventListener("pointerout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches("[data-table-cell]")) {
+      applyDataTableHighlight(event.target);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("scroll", updateActiveNavigation, { passive: true });
+  window.addEventListener("resize", updateActiveNavigation);
+  window.addEventListener("hashchange", function () {
+    highlightTargetSection(hashTargetId());
+    updateActiveNavigation();
+  });
+  highlightTargetSection(hashTargetId());
+  updateActiveNavigation();
+})();
+
+</script>
 </body>
 </html>

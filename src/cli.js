@@ -122,7 +122,12 @@ try {
     const args = parseArgs(argv);
     const positional = positionalArgs(argv);
     const result = await collectGitHubTrending({
-      limit: Number.parseInt(args.limit || positional[0] || "50", 10)
+      limit: Number.parseInt(args.limit || positional[0] || "50", 10),
+      browserExportPath: args["browser-export"],
+      browserExportName: args["browser-export-name"],
+      browserExportUrl: args["browser-export-url"],
+      browserExportLanguage: args["browser-export-language"],
+      browserExportWindow: args["browser-export-window"]
     });
     printJson({
       ok: true,

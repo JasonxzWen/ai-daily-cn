@@ -95,7 +95,9 @@
       ],
       "candidates_found": 0,
       "included": 0,
-      "notes": "已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。"
+      "notes": "已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。",
+      "blocked_reason": "fetch_failed",
+      "last_successful_feed_at": "2026-05-20T07:32:12.985Z"
     }
   },
   "main_items": [
@@ -244,7 +246,8 @@
       "url": "https://deepmind.google/models/model-cards/gemini-3-5-flash/",
       "source": "Google DeepMind Model Card",
       "summary": "Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。",
-      "notes": "同时出现在 Google I/O 官方汇总、Antigravity、Gemini API、GitHub Copilot 和 Vercel AI Gateway 相关发布中；本轮只按官方来源记录可用性。"
+      "notes": "同时出现在 Google I/O 官方汇总、Antigravity、Gemini API、GitHub Copilot 和 Vercel AI Gateway 相关发布中；本轮只按官方来源记录可用性。",
+      "release_scope": "model_card_update"
     },
     {
       "name": "Qwen 3.7 Max on Vercel AI Gateway",
@@ -254,7 +257,8 @@
       "url": "https://vercel.com/changelog",
       "source": "Vercel Changelog",
       "summary": "Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。",
-      "notes": "按 Vercel 官方网关可用性记录；未使用二手媒体中的 Alibaba 发布细节。"
+      "notes": "按 Vercel 官方网关可用性记录；未使用二手媒体中的 Alibaba 发布细节。",
+      "release_scope": "gateway_availability"
     },
     {
       "name": "Grok Build 0.1 on Vercel AI Gateway",
@@ -264,7 +268,8 @@
       "url": "https://vercel.com/changelog",
       "source": "Vercel Changelog",
       "summary": "Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。",
-      "notes": "官方 changelog 说明 reasoning effort 不可配置，也没有 non-reasoning mode。"
+      "notes": "官方 changelog 说明 reasoning effort 不可配置，也没有 non-reasoning mode。",
+      "release_scope": "gateway_availability"
     },
     {
       "name": "Ettin Reranker Family",
@@ -274,7 +279,8 @@
       "url": "https://huggingface.co/blog/ettin-reranker",
       "source": "Hugging Face Blog",
       "summary": "Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。",
-      "notes": "适合 RAG pipeline 的 retrieve-then-rerank 实验；上线前仍应在自有查询集上离线评估。"
+      "notes": "适合 RAG pipeline 的 retrieve-then-rerank 实验；上线前仍应在自有查询集上离线评估。",
+      "release_scope": "provider_official_launch"
     }
   ],
   "hot_blogs": [
@@ -421,32 +427,7 @@
     "no_banned_words": true,
     "no_unsourced_numbers": true,
     "notes": "主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。",
-    "optimization_suggestions": [
-      {
-        "issue": "GitHub Trending 仓库命令受 shell 网络限制时只能人工浏览器复核",
-        "evidence": "`npm run discover:github-trending -- 50` 返回 fetch failed，但浏览器能访问 GitHub Trending 页面并抽取候选。",
-        "module": "discovery-audit",
-        "suggestion": "为 discovery 命令增加可选的 browser-export 输入路径，允许自动化把浏览器采样结果或保存的 HTML 交给同一解析器处理。",
-        "expected_benefit": "减少 shell 网络限制导致的 source_audit 断裂，让 GitHub Trending 候选仍可结构化复用。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "Builder feed 不可访问时只能记录 blocked，无法区分临时网络错误和中心 feed 真实无内容",
-        "evidence": "follow-builders prepare-digest.js 本轮返回 fetch failed，X status 页面直接打开为空 HTML。",
-        "module": "builder-observations",
-        "suggestion": "为 Builder 来源增加 `blocked_reason` 和 `last_successful_feed_at` 字段，避免只在 notes 中描述失败状态。",
-        "expected_benefit": "让日报读者和后续自动化能判断 Builder 观察为空是网络问题还是确实没有合格原始源。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "模型发布与网关接入容易混在同一条事实中",
-        "evidence": "Qwen 3.7 Max 本轮只能用 Vercel 官方网关可用性作为一手来源，二手媒体包含 Alibaba 发布细节但未进入主事实。",
-        "module": "model-releases",
-        "suggestion": "在 model_releases 中增加 `release_scope`，区分 provider official launch、gateway availability、preview access 和 model card update。",
-        "expected_benefit": "减少把第三方网关接入误写成模型厂商正式发布的风险。",
-        "requires_user_confirmation": true
-      }
-    ]
+    "optimization_suggestions": []
   },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-22.html",

@@ -1,0 +1,158 @@
+{
+  "title": "Long-task session ledger",
+  "summary": "Decision: use a local JSONL ledger only when long-task facts would drift.",
+  "status": "review",
+  "template": "conclusion-dashboard",
+  "renderMode": "runtime-cdn",
+  "generatedAt": "2026-05-21T00:00:00.000Z",
+  "intent": {
+    "audience": "skill maintainer",
+    "primaryQuestion": "Does effective-interact preserve long-task facts before reporting them?",
+    "decision": "Use a ledger only when it lowers drift risk for later status or HTML reporting.",
+    "timeBudget": "2m",
+    "artifactKind": "status",
+    "successCriteria": [
+      "The ledger path is local and ignored.",
+      "Important tool results are summarized, not pasted raw.",
+      "Sensitive or oversized data is explicitly excluded."
+    ]
+  },
+  "claims": [
+    {
+      "id": "claim-ledger-path",
+      "statement": "The session ledger belongs under the ignored skill-local artifacts tree.",
+      "kind": "conclusion",
+      "evidenceIds": ["ledger-schema", "skill-gitignore"],
+      "confidence": "high",
+      "dateRange": "2026-05-21"
+    },
+    {
+      "id": "claim-redaction",
+      "statement": "Ledger entries should summarize tool output and never store secrets or raw large logs.",
+      "kind": "risk",
+      "evidenceIds": ["ledger-schema"],
+      "confidence": "high",
+      "knownLimits": ["The ledger is a fact preservation aid; source evidence still needs commands, files, or assumptions."]
+    }
+  ],
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "Usage boundary",
+      "group": "summary",
+      "status": "ready",
+      "content": "- **Use it for long tasks** where checkpoints, data, status, and tool-result summaries may drift.\n- **Skip it for short commands** and routine explanations.\n- **Never store secrets**, credentials, raw large logs, full copyrighted text, or hidden persistence.\n- Default path: `skills/effective-interact/artifacts/session-ledgers/<task-slug>.jsonl`."
+    },
+    {
+      "type": "timeline",
+      "title": "Ledger-backed reporting path",
+      "group": "main",
+      "status": "ready",
+      "items": [
+        {
+          "label": "Checkpoint",
+          "detail": "Record milestone, current state, and next action after meaningful work changes."
+        },
+        {
+          "label": "Tool result",
+          "detail": "Record tool-result status, command or file anchor, and a short factual summary."
+        },
+        {
+          "label": "Handoff source",
+          "detail": "Before HTML generation, map ledger facts into claims, evidence, verification, timeline, and data-table sections."
+        }
+      ]
+    },
+    {
+      "type": "mermaid",
+      "title": "Fact preservation map",
+      "group": "main",
+      "status": "ready",
+      "content": "graph LR\n  A[Long task checkpoint] --> B[Session ledger JSONL]\n  C[Tool result summary] --> B\n  D[Verification result] --> B\n  B --> E[Claims]\n  B --> F[Evidence]\n  B --> G[Timeline]\n  B --> H[HTML report]"
+    },
+    {
+      "type": "data-table",
+      "title": "Ledger entry contract",
+      "group": "main",
+      "status": "ready",
+      "summary": "Each row is a compact fact, not a transcript dump.",
+      "columns": [
+        { "key": "kind", "label": "kind", "width": "18%" },
+        { "key": "keep", "label": "record", "width": "40%" },
+        { "key": "avoid", "label": "avoid", "width": "42%" }
+      ],
+      "rows": [
+        {
+          "kind": "checkpoint",
+          "keep": "milestone, state, next action",
+          "avoid": "minute-by-minute diary"
+        },
+        {
+          "kind": "tool-result",
+          "keep": "tool/command, status, summary, path or line anchor",
+          "avoid": "raw large logs, full command output, secrets"
+        },
+        {
+          "kind": "verification",
+          "keep": "gate, pass/fail/degraded result, residual risk",
+          "avoid": "claiming proof without source evidence"
+        },
+        {
+          "kind": "handoff-source",
+          "keep": "facts that must feed the final report",
+          "avoid": "unlabeled inference or memory-only claims"
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "title": "Example JSONL entry",
+      "group": "evidence",
+      "status": "ready",
+      "language": "json",
+      "filePath": "skills/effective-interact/artifacts/session-ledgers/example.jsonl",
+      "startLine": 1,
+      "content": "{\"ts\":\"2026-05-21T20:45:00+08:00\",\"kind\":\"tool-result\",\"status\":\"pass\",\"summary\":\"Focused effective-interact tests passed.\",\"source\":{\"tool\":\"shell_command\",\"command\":\"bun test ./tests/effectiveInteractSkill.test.ts\"},\"evidence\":[\"102 tests passed\"],\"next\":[\"Generate the durable report fixture.\"]}"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ledger-schema",
+      "kind": "file",
+      "label": "Session ledger schema",
+      "value": "skills/effective-interact/references/session-ledger-schema.json",
+      "status": "info",
+      "filePath": "skills/effective-interact/references/session-ledger-schema.json",
+      "line": 1,
+      "sourceType": "local-schema",
+      "trustLevel": "trusted-generated"
+    },
+    {
+      "id": "skill-gitignore",
+      "kind": "file",
+      "label": "Ignored artifact tree",
+      "value": "skills/effective-interact/.gitignore",
+      "status": "pass",
+      "filePath": "skills/effective-interact/.gitignore",
+      "line": 2,
+      "sourceType": "local-config",
+      "trustLevel": "trusted-generated"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Schema boundary",
+      "status": "pass",
+      "detail": "session-ledger-schema.json requires ts, kind, and summary, and disallows additional properties."
+    },
+    {
+      "label": "Routing evals",
+      "status": "pass",
+      "detail": "routing-cases.json includes a positive long-task ledger case and a forbidden one-command ledger case."
+    }
+  ],
+  "nextActions": [
+    "Create a ledger only when long-task facts would otherwise drift.",
+    "Use ledger facts as report inputs, then still cite commands, files, or assumptions."
+  ]
+}

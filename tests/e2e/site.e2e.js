@@ -46,18 +46,19 @@ try {
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.match(await page.locator("h1").textContent(), /AI 日报 2026-05-13/);
-  assert.equal(await page.locator("#main-items article").count(), 2);
-  const artifactHrefs = await page.locator(".artifact-links a").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  assert.deepEqual(artifactHrefs.sort(), ["../../../data/2026/05/2026-05-13.json", "./2026-05-13.md"].sort());
+  assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
+  assert.match(await page.locator("body").textContent(), /主体信息/);
+  assert.match(await page.locator("body").textContent(), /信源审计/);
+  assert.equal(await page.locator("a[href='https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json']").count(), 1);
   assert.equal(await page.locator("link[rel='stylesheet']").count(), 0);
   assert.equal(await page.locator("style").count(), 1);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  assert.equal(await page.locator("#model-releases").count(), 1);
-  assert.match(await page.locator("#model-releases").textContent(), /ExampleModel 2/);
-  assert.equal(await page.locator("#hot-blogs").count(), 1);
-  assert.match(await page.locator("#hot-blogs").textContent(), /Harness Engineering for Long Running Agents/);
+  assert.match(await page.locator("body").textContent(), /模型发布/);
+  assert.match(await page.locator("body").textContent(), /ExampleModel 2/);
+  assert.match(await page.locator("body").textContent(), /热门技术博客/);
+  assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.setViewportSize({ width: 375, height: 812 });

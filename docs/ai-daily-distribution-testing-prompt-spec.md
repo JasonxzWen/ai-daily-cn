@@ -20,7 +20,7 @@
 
 - `ai-2` 生成中文 AI 日报。
 - 日报 Markdown 转结构化 JSON。
-- 静态 HTML 渲染。
+- 通过 `.codex/skills/effective-interact` 进行静态 HTML 渲染。
 - 首页和 `feed.json` 更新。
 - 写入 GitHub Pages 发布目录。
 - 安全 git commit/push 策略设计。
@@ -33,7 +33,7 @@
 - 当前阶段不创建 GitHub Actions。
 - 当前阶段不修改 GitHub Pages 远端设置。
 - 当前阶段不自动改 `automation.toml`。
-- 当前阶段不安装完整 `skill-hub` profile；只选择性安装 `html-work-reports` 作为工作汇报技能，不改变生产日报渲染链路。
+- 当前生产日报渲染链路使用 `.codex/skills/effective-interact`，不再使用旧手写单篇日报模板。
 
 ## 核心术语
 
@@ -48,6 +48,7 @@
 | 发布器 | 后续实现的本地程序，负责转换、渲染、写文件和安全 git 操作 |
 | 自检字段 | 日报末尾 `## 自检与优化建议` 中的 JSON |
 | prompt 包 | 由 base、信源、格式、校验、发布状态等模块拼接成的提示词 |
+| effective-interact | 公开日报 HTML 生成技能，输入为仓库转换出的 interaction JSON，输出为 `pre-rendered` 静态 HTML |
 
 ## 分发架构
 

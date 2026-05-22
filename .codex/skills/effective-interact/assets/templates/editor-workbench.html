@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- Use case: local-only triage, feature-flag, or prompt-tuning editor with visible Markdown, JSON, diff, or prompt export. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor Workbench</title>
+  <style>
+    :root{color-scheme:light;--bg:#FAF9F5;--panel:#fff;--soft:#F0EEE6;--ink:#3D3D3A;--muted:#87867F;--line:#D1CFC5;--accent:#D97757;--ok:#788C5D;--warn:#A67C52;--danger:#B04A3F;--code:#1F1E1B;--codeText:#E8E6DE}
+    *{box-sizing:border-box;min-width:0} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .shell{width:min(1180px,calc(100vw - 28px));margin:0 auto;padding:24px 0 44px} header,.panel,.item{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:16px}
+    h1,h2,h3,p{margin-top:0} h1{font-size:clamp(28px,4vw,42px);line-height:1.06}.muted{color:var(--muted)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.82fr);gap:12px;margin-top:12px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    button{min-height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 10px;font:inherit;font-weight:650;cursor:pointer}button:hover,button[aria-pressed=true],button:focus-visible{border-color:var(--accent);background:#FBF1EC;box-shadow:0 0 0 3px rgba(217,119,87,.18)}
+    .list{display:grid;gap:10px}.item{display:grid;gap:8px}.item[hidden]{display:none}.chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-size:12px;font-weight:700}.ok{color:var(--ok)}.warn{color:var(--warn)}.danger{color:var(--danger)}
+    textarea,pre{width:100%;min-height:220px;margin:0;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--code);color:var(--codeText);font:13px/1.45 "Cascadia Code","JetBrains Mono","SFMono-Regular",Consolas,monospace;white-space:pre-wrap}
+    @media(max-width:860px){.shell{width:min(100vw - 18px,1180px)}.layout{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <span class="chip warn">Local editor</span>
+      <h1>Replace with triage, flag, or prompt tuning task</h1>
+      <p class="muted">No network writes, repo writes, credentials, or hidden persistence. The useful output is copied text.</p>
+    </header>
+    <section class="layout">
+      <article class="panel">
+        <h2>Items</h2>
+        <div class="toolbar" role="toolbar" aria-label="Filters">
+          <button data-filter="all" aria-pressed="true">All</button>
+          <button data-filter="risk">Risk</button>
+          <button data-filter="ready">Ready</button>
+        </div>
+        <div class="list">
+          <article class="item" data-group="risk"><span class="chip danger">Risk</span><h3>Needs decision</h3><p>Explain the tradeoff and selected value.</p></article>
+          <article class="item" data-group="ready"><span class="chip ok">Ready</span><h3>Accepted default</h3><p>Keep this value unless scope changes.</p></article>
+        </div>
+      </article>
+      <aside class="panel">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h2>Export</h2><button data-copy-from="#export">Copy export</button></div>
+        <textarea id="export"># Export
+- [ ] Decision item
+```json
+{ "selected": true }
+```</textarea>
+      </aside>
+    </section>
+  </main>
+  <script>
+    function setFilter(value) {
+      document.querySelectorAll("[data-group]").forEach(function (item) { item.hidden = value !== "all" && item.getAttribute("data-group") !== value; });
+      document.querySelectorAll("[data-filter]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-filter") === value)); });
+    }
+    document.addEventListener("click", function (event) {
+      var filter = event.target.closest("[data-filter]");
+      if (filter) setFilter(filter.getAttribute("data-filter"));
+      var copy = event.target.closest("[data-copy-from]");
+      if (!copy || !navigator.clipboard) return;
+      var source = document.querySelector(copy.getAttribute("data-copy-from"));
+      if (source) navigator.clipboard.writeText(source.value || source.textContent.trim());
+    });
+  </script>
+</body>
+</html>

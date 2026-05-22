@@ -1,0 +1,28 @@
+# Logic Prototype
+
+Use a logic prototype when the question is about behavior rather than appearance.
+
+Good fits:
+
+- state machine edge cases
+- lifecycle transitions
+- data shape decisions
+- command flow
+- public interface feel
+
+Process:
+
+1. State the question in a README or top comment.
+2. Use the host project's language and task runner.
+3. Put the actual logic behind a pure interface.
+4. Build a thin terminal shell that drives the logic.
+5. Re-render or print the relevant state after each action.
+6. Give the user one command to run.
+7. Capture what the prototype proved.
+
+Anti-patterns:
+
+- adding tests for the prototype shell
+- wiring to a real production database
+- mixing terminal code into the reusable logic
+- leaving the throwaway shell in the repo after the decision is made

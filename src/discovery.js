@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 const GITHUB_BASE_URL = "https://github.com";
 
 export const DEFAULT_GITHUB_TRENDING_SOURCES = [
@@ -14,6 +17,10 @@ export const DEFAULT_GITHUB_TRENDING_SOURCES = [
 ];
 
 export async function collectGitHubTrending(options = {}) {
+  if (options.browserExportPath || options.browserExport) {
+    return collectGitHubTrendingFromBrowserExport(options);
+  }
+
   const fetchImpl = options.fetchImpl || globalThis.fetch;
   if (typeof fetchImpl !== "function") {
     throw new Error("fetch is not available in this runtime");
@@ -78,6 +85,83 @@ export async function collectGitHubTrending(options = {}) {
     },
     candidates
   };
+}
+
+async function collectGitHubTrendingFromBrowserExport(options = {}) {
+  const sources = await readBrowserExportSources(options.browserExportPath || options.browserExport, {
+    name: options.browserExportName || "GitHub Trending browser export",
+    url: options.browserExportUrl || DEFAULT_GITHUB_TRENDING_SOURCES[0].url,
+    language: options.browserExportLanguage || DEFAULT_GITHUB_TRENDING_SOURCES[0].language,
+    window: options.browserExportWindow || DEFAULT_GITHUB_TRENDING_SOURCES[0].window
+  });
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
+  const sourceResults = [];
+  const byRepo = new Map();
+
+  for (const exportSource of sources) {
+    const parsed = parseGitHubTrendingHtml(exportSource.html, exportSource);
+    sourceResults.push({
+      name: exportSource.name,
+      url: exportSource.url,
+      status: parsed.length > 0 ? "checked" : "no_signal",
+      notes: `${parsed.length} repositories parsed from browser export`
+    });
+
+    for (const candidate of parsed) {
+      if (!byRepo.has(candidate.repo)) {
+        byRepo.set(candidate.repo, candidate);
+      }
+    }
+  }
+
+  return {
+    source_audit: {
+      github_trending: {
+        checked: true,
+        sources: sourceResults,
+        candidates_found: byRepo.size,
+        included: 0,
+        notes: "Candidates parsed from browser-export input; still require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion."
+      }
+    },
+    candidates: [...byRepo.values()].slice(0, limit)
+  };
+}
+
+async function readBrowserExportSources(filePath, fallback) {
+  const resolved = path.resolve(filePath);
+  const raw = await fs.readFile(resolved, "utf8");
+  if (path.extname(resolved).toLowerCase() !== ".json") {
+    return [{ ...fallback, html: raw }];
+  }
+
+  const payload = JSON.parse(raw);
+  const items = Array.isArray(payload) ? payload : payload.sources || payload.pages || payload.exports || [payload];
+  return items.map((item, index) => normalizeBrowserExportItem(item, fallback, index));
+}
+
+function normalizeBrowserExportItem(item, fallback, index) {
+  const html = item?.html || item?.content || item?.body;
+  if (typeof html !== "string" || html.trim() === "") {
+    throw new Error(`browser-export item ${index + 1} must include non-empty html, content, or body`);
+  }
+
+  return {
+    name: item.name || item.title || fallback.name,
+    url: isHttpUrl(item.url) ? item.url : fallback.url,
+    language: item.language || fallback.language,
+    window: item.window || fallback.window,
+    html
+  };
+}
+
+function isHttpUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 export function parseGitHubTrendingHtml(html, sourceInfo = {}) {

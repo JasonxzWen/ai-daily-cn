@@ -1,0 +1,121 @@
+{
+  "title": "effective interaction generation handoff",
+  "summary": "The generator can produce a readable, evidence-backed report without CDN dependencies.",
+  "status": "complete",
+  "template": "implementation-handoff",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-13T00:00:00.000Z",
+  "sections": [
+    {
+      "type": "summary-cards",
+      "title": "Status cards",
+      "cards": [
+        {
+          "label": "Decision",
+          "value": "Use JSON-driven generation first"
+        },
+        {
+          "label": "Reliability",
+          "value": "Primary content is pre-rendered"
+        },
+        {
+          "label": "Risk",
+          "value": "Browser Mermaid rendering can degrade visibly"
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "title": "Rendered markdown",
+      "content": "## What changed\n\n- Added generator entrypoint\n- Added validation gate\n\n| Area | Status |\n| --- | --- |\n| Markdown | Rendered |\n| Mermaid | Inline SVG |\n\n[unsafe](javascript:alert(1)) <img src=x onerror=alert(1)> <script>alert('x')</script>"
+    },
+    {
+      "type": "mermaid",
+      "title": "Report flow",
+      "content": "graph LR\n  Input --> Generate\n  Generate --> Validate\n  Validate --> Handoff"
+    },
+    {
+      "type": "code",
+      "title": "Core code path",
+      "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
+      "language": "javascript",
+      "startLine": 504,
+      "highlightLines": [505],
+      "content": "export function createInteraction(input) {\n  return renderHtml(input);\n}"
+    },
+    {
+      "type": "diff",
+      "title": "Generated evidence diff",
+      "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
+      "startLine": 505,
+      "content": "- return renderMarkdownOnly(input);\n+ return renderHtml(input);"
+    },
+    {
+      "type": "filterable-cards",
+      "title": "Findings",
+      "filterLabel": "Focus",
+      "items": [
+        {
+          "title": "Generated artifact",
+          "group": "pass",
+          "body": "One HTML file includes evidence and verification."
+        },
+        {
+          "title": "Fallback boundary",
+          "group": "warn",
+          "body": "Browser-only checks report degraded status when skipped."
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "title": "Rendered and source",
+      "tabs": [
+        {
+          "label": "Rendered",
+          "content": "Primary content is available without network runtime."
+        },
+        {
+          "label": "Source",
+          "content": "Auditable Markdown, Mermaid, and code source remains in fallbacks."
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "file",
+      "label": "Generator script",
+      "value": "skills/effective-interact/scripts/create-interaction.mjs",
+      "status": "info"
+    },
+    {
+      "kind": "command",
+      "label": "Focused tests",
+      "value": "bun test ./tests/effectiveInteractSkill.test.ts",
+      "status": "pass"
+    },
+    {
+      "kind": "assumption",
+      "label": "Reliability boundary",
+      "value": "Default reports remain readable when CDN scripts are unavailable.",
+      "status": "info"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Generator output",
+      "status": "pass",
+      "detail": "Report writes a single HTML file."
+    },
+    {
+      "label": "Unsafe links",
+      "status": "pass",
+      "detail": "Unsupported protocols are neutralized."
+    }
+  ],
+  "nextActions": [
+    "Review generated report visually.",
+    "Archive the OpenSpec change after final validation."
+  ]
+}

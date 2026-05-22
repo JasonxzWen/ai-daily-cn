@@ -33,6 +33,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `name`
 - `provider`
 - `availability`：只能使用 `open_weights`、`closed_api`、`closed_product`、`research_preview`
+- `release_scope`：新草稿必须填写，只能使用 `provider_official_launch`、`gateway_availability`、`preview_access`、`model_card_update`；历史数据可缺省
 - `event_date`
 - `url`
 - `source`
@@ -64,6 +65,8 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `builder_sources.sources[]`
 - `builder_sources.candidates_found`
 - `builder_sources.included`
+- `builder_sources.blocked_reason`：当 Builder 来源被阻塞或为空时填写机器可读原因，例如 `fetch_failed`、`auth_required`、`empty_feed`、`rate_limited`、`no_recent_signal`
+- `builder_sources.last_successful_feed_at`：记录上次成功获取中心 feed 的 ISO 时间；没有历史记录时用 `null`
 - `builder_sources.notes`
 
 `projects` 可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。

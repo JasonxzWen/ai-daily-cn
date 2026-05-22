@@ -1,0 +1,59 @@
+<!doctype html>
+<!-- Use case: visual direction, design-system, component-variant, or SVG illustration approval before production UI work. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visual Exploration Board</title>
+  <style>
+    :root{color-scheme:light;--bg:#FAF9F5;--panel:#fff;--soft:#F0EEE6;--ink:#3D3D3A;--muted:#87867F;--line:#D1CFC5;--accent:#D97757;--ok:#788C5D;--warn:#A67C52;--danger:#B04A3F;--shadow:0 14px 40px rgba(61,61,58,.12)}
+    *{box-sizing:border-box;min-width:0} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .shell{width:min(1280px,calc(100vw - 28px));margin:0 auto;padding:24px 0 44px} header,.panel,.direction{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:16px}
+    h1,h2,h3,p{margin-top:0} h1{font-size:clamp(28px,4vw,42px);line-height:1.06}.muted{color:var(--muted)}
+    .board{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:12px}.direction{display:grid;gap:12px;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+    .board:has(.direction:hover) .direction:not(:hover){opacity:.48;filter:grayscale(.55)}.direction:hover,.direction:focus-within{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-2px)}
+    .artboard{display:grid;align-items:center;justify-items:center;min-height:180px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,#fff,#F0EEE6)}
+    .chip,.swatch{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-weight:700}
+    .swatches,.tags{display:flex;flex-wrap:wrap;gap:6px}.dot{width:14px;height:14px;border-radius:999px;border:1px solid var(--line);background:var(--c)}
+    .token-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.token{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
+    button{min-height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 10px;font:inherit;cursor:pointer}button:hover,button[aria-pressed=true],button:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px rgba(217,119,87,.18)}
+    @media(max-width:720px){.shell{width:min(100vw - 18px,1280px)}.board{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.direction:hover{transform:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <span class="chip">Visual approval</span>
+      <h1>Replace with visual decision</h1>
+      <p class="muted">Compare directions by density, tone, component feel, risks, and implementation fit before building the product UI.</p>
+    </header>
+    <section class="board" aria-label="Visual directions">
+      <article class="direction">
+        <div class="artboard"><svg viewBox="0 0 180 120" width="180" height="120" role="img" aria-label="Direction preview"><rect x="18" y="22" width="144" height="76" rx="8" fill="#FBF1EC" stroke="#D97757"/><circle cx="58" cy="60" r="18" fill="#D97757"/><rect x="86" y="46" width="54" height="9" rx="4" fill="#3D3D3A"/><rect x="86" y="64" width="38" height="8" rx="4" fill="#87867F"/></svg></div>
+        <h2>Direction A</h2>
+        <p>Warm, dense, engineering-workbench style.</p>
+        <div class="swatches"><span class="swatch"><span class="dot" style="--c:#D97757"></span>Clay</span><span class="swatch"><span class="dot" style="--c:#788C5D"></span>Olive</span></div>
+        <div class="tags"><span class="chip">high scan</span><span class="chip">low decoration</span></div>
+      </article>
+      <article class="direction">
+        <div class="artboard"><svg viewBox="0 0 180 120" width="180" height="120" role="img" aria-label="Direction preview"><rect x="24" y="24" width="132" height="72" rx="8" fill="#E8EFEB" stroke="#3D6E6E"/><path d="M52 72 C70 38 100 92 128 48" fill="none" stroke="#3D6E6E" stroke-width="8" stroke-linecap="round"/></svg></div>
+        <h2>Direction B</h2>
+        <p>Calmer explainer style for concept or research artifacts.</p>
+        <div class="swatches"><span class="swatch"><span class="dot" style="--c:#3D6E6E"></span>Teal</span><span class="swatch"><span class="dot" style="--c:#F0EEE6"></span>Soft</span></div>
+        <div class="tags"><span class="chip">conceptual</span><span class="chip">source rail</span></div>
+      </article>
+    </section>
+    <section class="panel" style="margin-top:12px">
+      <h2>Token checks</h2>
+      <div class="token-grid"><div class="token"><strong>Type</strong><p>System sans, no viewport-scaled body copy.</p></div><div class="token"><strong>Color</strong><p>Status and grouping only, no decorative blobs.</p></div><div class="token"><strong>Density</strong><p>Compact cards, 8px radius, visible evidence.</p></div></div>
+    </section>
+  </main>
+  <script>
+    document.addEventListener("click", function (event) {
+      var card = event.target.closest(".direction");
+      if (!card) return;
+      document.querySelectorAll(".direction").forEach(function (item) { item.toggleAttribute("data-selected", item === card); });
+    });
+  </script>
+</body>
+</html>

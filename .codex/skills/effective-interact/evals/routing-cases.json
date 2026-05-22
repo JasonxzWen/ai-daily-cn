@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "description": "Routing and output-mode evals for effective-interact. Cases cover positive loads, adjacent negative routes, forbidden loads, and HTML escalation timing.",
+  "cases": [
+    {
+      "id": "positive-short-decision-plain-brief",
+      "kind": "positive",
+      "prompt": "这两个修复路径哪个更稳？只要结论和关键取舍。",
+      "shouldLoad": true,
+      "expectedMode": "plain-brief",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": false,
+      "rationale": "A short answer still needs recommendation, tradeoff, and decision framing."
+    },
+    {
+      "id": "positive-material-change-structured-handoff",
+      "kind": "positive",
+      "prompt": "这个 skill 的触发合同改完了，给我结论、证据、风险和下一步，不要 HTML。",
+      "shouldLoad": true,
+      "expectedMode": "structured-markdown",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": false,
+      "rationale": "The user needs a structured handoff, but explicitly excludes HTML."
+    },
+    {
+      "id": "positive-call-path-visual-markdown",
+      "kind": "positive",
+      "prompt": "解释这个调用链，给一个 Mermaid 图和三个关键风险即可。",
+      "shouldLoad": true,
+      "expectedMode": "visual-markdown",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": false,
+      "rationale": "One diagram plus concise risks is enough; browser navigation is not needed."
+    },
+    {
+      "id": "positive-multi-option-approval-html",
+      "kind": "positive",
+      "prompt": "把 6 个技术方案做成审批页，支持按风险、成本、迁移难度筛选，并给推荐路径。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "option-gallery",
+      "rationale": "Multiple options and filter dimensions make a browsable approval artifact faster than a compact table."
+    },
+    {
+      "id": "positive-visual-style-approval-html",
+      "kind": "positive",
+      "prompt": "给这个后台工具做 4 个视觉风格方向的审批板，比较密度、语气、组件风格和风险，不要直接做产品 UI。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "visual-option-board",
+      "rationale": "The task is approval and comparison of styles, not production UI implementation, so an interaction artifact is appropriate."
+    },
+    {
+      "id": "positive-milestone-dependency-html",
+      "kind": "positive",
+      "prompt": "把这个季度 milestones、阻塞关系、验收门槛和负责人做成可浏览的计划图，方便评审。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "milestone-timeline",
+      "rationale": "Timeline plus dependencies and acceptance gates benefit from navigation and filtering."
+    },
+    {
+      "id": "positive-module-dependency-html",
+      "kind": "positive",
+      "prompt": "展示这个仓库的架构、模块边界、依赖关系和关键文件职责，最好能按层级浏览。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "module-dependency-map",
+      "rationale": "A wide module/dependency map with file roles is too dense for linear prose."
+    },
+    {
+      "id": "positive-skill-structure-tree-html",
+      "kind": "positive",
+      "prompt": "展示这个 skill 的目录树，每个文件和目录的作用都要概述，让我一眼看懂结构。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "structure-tree",
+      "rationale": "A tree plus role table is the clearest representation of nested skill structure."
+    },
+    {
+      "id": "positive-code-approach-comparison-html",
+      "kind": "positive",
+      "prompt": "Compare three implementation approaches with code snippets, pros and cons, testability, migration risk, and a recommendation I can approve.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "approach-comparison",
+      "rationale": "Multiple code approaches plus snippets and risk dimensions benefit from side-by-side browsing."
+    },
+    {
+      "id": "positive-implementation-plan-html",
+      "kind": "positive",
+      "prompt": "Turn this feature proposal into an implementation plan with milestones, dependencies, acceptance gates, risks, owners, and open questions.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "implementation-plan",
+      "rationale": "Milestones, dependencies, gates, and owners form a dense planning surface that benefits from navigation."
+    },
+    {
+      "id": "positive-pr-writeup-html",
+      "kind": "positive",
+      "prompt": "Create a reviewer-facing PR writeup with motivation, before/after, file tour, review focus, test plan, rollout notes, and copyable checklist.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "pr-writeup",
+      "rationale": "The task is author-side communication with file tour and review focus, not only bug finding."
+    },
+    {
+      "id": "positive-code-understanding-map-html",
+      "kind": "positive",
+      "prompt": "Explain how authentication flows through this codebase with module boundaries, call path, source anchors, snippets, and gotchas.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "module-map",
+      "rationale": "A multi-file code tour with anchors and snippets is easier to inspect as a navigable artifact."
+    },
+    {
+      "id": "positive-design-system-reference-html",
+      "kind": "positive",
+      "prompt": "Summarize this design system for approval: color tokens, typography, spacing scale, component rules, and do/don't examples.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "design-system-reference",
+      "rationale": "Design-system communication needs visual specimens and structured usage boundaries."
+    },
+    {
+      "id": "positive-component-variant-matrix-html",
+      "kind": "positive",
+      "prompt": "Show the component variant matrix across states, density, tone, risk, and recommended defaults before implementation.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "component-variant-matrix",
+      "rationale": "Variant/state comparisons are visual inspection surfaces, not linear prose."
+    },
+    {
+      "id": "positive-prototype-animation-approval-html",
+      "kind": "positive",
+      "prompt": "Create an approval artifact for this micro-interaction with timing, easing, replay/reset, accessibility notes, and exportable decision.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "prototype-approval",
+      "rationale": "The user needs to inspect and approve the animation behavior, not build a production UI."
+    },
+    {
+      "id": "positive-prototype-interaction-approval-html",
+      "kind": "positive",
+      "prompt": "Let me try this small interaction model, compare the states, and copy the resulting decision checklist back into the thread.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "prototype-approval",
+      "rationale": "A bounded local interaction plus visible export is an effective communication artifact."
+    },
+    {
+      "id": "positive-illustration-gallery-html",
+      "kind": "positive",
+      "prompt": "Compare these SVG illustration directions for a technical explainer and show palette, usage fit, risks, and recommendation.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "illustration-gallery",
+      "rationale": "Illustration choices require visual side-by-side inspection and rationale."
+    },
+    {
+      "id": "positive-annotated-flowchart-html",
+      "kind": "positive",
+      "prompt": "Show the deploy pipeline as an annotated flowchart with gates, failure branches, owners, timings, and follow-up actions.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "flow-drilldown",
+      "rationale": "Branches, gates, and owners make the flow too dense for one compact diagram."
+    },
+    {
+      "id": "positive-research-feature-explainer-html",
+      "kind": "positive",
+      "prompt": "Create an explainer for this feature with TL;DR, mechanism, examples, source rail, citations, and caveats.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "explorable-explainer",
+      "rationale": "Feature research with citations and examples benefits from tabs and source navigation."
+    },
+    {
+      "id": "positive-research-concept-explainer-html",
+      "kind": "positive",
+      "prompt": "Teach this concept with a compact interactive model, glossary, examples, and fallback explanation.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "explorable-explainer",
+      "rationale": "A concept model with controls and glossary is a bounded explainer artifact."
+    },
+    {
+      "id": "positive-status-dashboard-html",
+      "kind": "positive",
+      "prompt": "Create a weekly engineering status dashboard with progress, risks, owners, key changes, validation, and next actions.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "status-dashboard",
+      "rationale": "Recurring status with risk and owner dimensions benefits from a scan-first dashboard."
+    },
+    {
+      "id": "positive-long-task-session-ledger-html",
+      "kind": "positive",
+      "prompt": "这个长任务会持续多个阶段，请在 skill 临时区记录关键节点、数据、状态、重要 tool result 摘要，并在最后生成 HTML 状态报告。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "session-ledger-backed-status-dashboard",
+      "rationale": "The user explicitly needs durable task-state facts and a later HTML report, so the skill should use a ledger-backed artifact path."
+    },
+    {
+      "id": "positive-incident-report-html",
+      "kind": "positive",
+      "prompt": "Create an incident report with concrete timeline, impact, root cause evidence, mitigations, follow-ups, and uncertainty boundaries.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "incident-report",
+      "rationale": "Incident communication needs timeline, facts, evidence, and action ownership in one artifact."
+    },
+    {
+      "id": "positive-triage-board-editor-html",
+      "kind": "positive",
+      "prompt": "Build a local triage board so I can filter items by status/risk, reorder decisions mentally, and copy a Markdown action plan.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "triage-board-editor",
+      "rationale": "A local board with visible export lowers alignment cost without mutating external systems."
+    },
+    {
+      "id": "positive-feature-flag-editor-html",
+      "kind": "positive",
+      "prompt": "Make a local feature-flag review surface with toggles, warnings, JSON preview, and diff export, but do not write config files.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "feature-flag-editor",
+      "rationale": "Feature flag review is a bounded editor-like communication surface when it exports text only."
+    },
+    {
+      "id": "positive-prompt-tuner-editor-html",
+      "kind": "positive",
+      "prompt": "Create a prompt tuning workbench with section controls, preview, quality checklist, and copyable prompt export.",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "prompt-tuner-editor",
+      "rationale": "Prompt tuning needs a small local editor and explicit export, not hidden persistence."
+    },
+    {
+      "id": "negative-production-ui-visual-design",
+      "kind": "negative",
+      "prompt": "帮我实现一个生产级 SaaS 首页，包含视觉风格、组件和完整交互。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": "frontend-design",
+      "htmlEscalation": false,
+      "rationale": "Production UI belongs to frontend-design, not a communication artifact skill."
+    },
+    {
+      "id": "negative-slide-deck-milestones",
+      "kind": "negative",
+      "prompt": "把这些 milestones 做成正式路演 PPT，每页都有动画和演讲备注。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": "frontend-slides",
+      "htmlEscalation": false,
+      "rationale": "Slide decks route to frontend-slides even if the content is a milestone plan."
+    },
+    {
+      "id": "negative-throwaway-prototype-build",
+      "kind": "negative",
+      "prompt": "Build a throwaway drag-and-drop prototype so I can test which interaction model feels better.",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": "prototype",
+      "htmlEscalation": false,
+      "rationale": "When the primary job is building a throwaway interaction experiment, route to prototype."
+    },
+    {
+      "id": "forbidden-routine-long-explanation",
+      "kind": "forbidden-load",
+      "prompt": "请用 300 字解释这段普通日志，不需要选择、风险判断、证据链或下一步。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": null,
+      "htmlEscalation": false,
+      "rationale": "Length alone is not enough; the user only asked for a routine explanation."
+    },
+    {
+      "id": "forbidden-permission-only-pause",
+      "kind": "forbidden-load",
+      "prompt": "发布前先问我确认。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": null,
+      "htmlEscalation": false,
+      "rationale": "A permission gate is not a complex communication need."
+    },
+    {
+      "id": "forbidden-short-status-ledger",
+      "kind": "forbidden-load",
+      "prompt": "运行 date 看一眼，并在 effective-interact ledger 里记一下。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "expectedSkill": null,
+      "htmlEscalation": false,
+      "rationale": "A one-command status does not justify loading the complex communication skill or creating a task ledger."
+    }
+  ]
+}

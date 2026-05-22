@@ -9,7 +9,7 @@ import test from "node:test";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
-const skillDir = path.join(rootDir, ".agents", "skills", "effective-interact");
+const skillDir = path.join(rootDir, ".codex", "skills", "effective-interact");
 const skillPath = path.join(skillDir, "SKILL.md");
 const createReportScript = path.join(skillDir, "scripts", "create-interaction.mjs");
 const validateReportScript = path.join(skillDir, "scripts", "validate-interaction.mjs");
@@ -18,7 +18,7 @@ test("repo has Chinese agent instructions and effective-interact routing", async
   const agents = await fsp.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
 
   assert.match(agents, /始终使用中文回复用户/);
-  assert.match(agents, /\.agents\/skills\/effective-interact/);
+  assert.match(agents, /\.codex\/skills\/effective-interact/);
   assert.match(agents, /npm run validate/);
 });
 
@@ -76,4 +76,24 @@ test("effective-interact generator creates a validated self-contained interactio
   const result = JSON.parse(validation.stdout);
   assert.equal(result.ok, true);
   assert(result.checks.includes("source-linked-code-evidence"));
+});
+
+test("GitHub Pages deployment workflow publishes the generated docs artifact", async () => {
+  const workflow = await fsp.readFile(path.join(rootDir, ".github", "workflows", "deploy-pages.yml"), "utf8");
+
+  assert.match(workflow, /push:\r?\n\s+branches: \["main"\]/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.match(workflow, /pages: write/);
+  assert.match(workflow, /id-token: write/);
+  assert.match(workflow, /deploy:\r?\n\s+runs-on: ubuntu-latest\r?\n\s+environment:/);
+  assert.match(workflow, /name: Setup Node\r?\n\s+uses: actions\/setup-node@v6\r?\n\s+with:\r?\n\s+node-version: "22"/);
+  assert.match(workflow, /uses: actions\/checkout@v6/);
+  assert.match(workflow, /uses: actions\/setup-node@v6/);
+  assert.match(workflow, /run: npm ci/);
+  assert.match(workflow, /run: npm run build/);
+  assert.match(workflow, /uses: actions\/configure-pages@v5/);
+  assert.match(workflow, /uses: actions\/upload-pages-artifact@v4/);
+  assert.match(workflow, /path: docs/);
+  assert.match(workflow, /uses: actions\/deploy-pages@v4/);
+  assert.match(workflow, /name: github-pages/);
 });

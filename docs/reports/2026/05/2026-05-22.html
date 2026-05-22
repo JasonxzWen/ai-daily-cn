@@ -1,548 +1,1970 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-template="research-explainer" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="effective-interact create-interaction.mjs">
+  <meta name="generated-at" content="2026-05-21T18:40:13.114Z">
+  <meta name="render-mode" content="pre-rendered">
   <title>AI 日报 2026-05-22</title>
-  <style>
+  <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
 :root {
   color-scheme: light;
-  --bg: #f6f7f9;
+  --bg: #faf9f5;
   --panel: #ffffff;
-  --text: #17202a;
-  --muted: #5f6f7f;
-  --line: #d9e0e7;
-  --accent: #146c94;
-  --accent-2: #246b45;
+  --panel-soft: #f0eee6;
+  --ink: #3d3d3a;
+  --muted: #87867f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757; /* visual token reference: #D97757 */
+  --accent-soft: #fbf1ec;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --code-bg: #141413;
+  --code-panel: #1f1e1b;
+  --code-line: #e8e6de;
+  --code-muted: #9c9a93;
+  --code-border: #3d3d3a;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
 }
 
 * {
   box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
 }
 
 a {
   color: var(--accent);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
 }
 
-.site-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--line);
-  background: #ffffff;
+p,
+ul,
+ol {
+  margin-block: 8px;
 }
 
-.site-title {
-  color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
+.rendered-markdown ul,
+.rendered-markdown ol,
+.panel > ul,
+.action-list,
+.claim-limits {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  line-height: 1.62;
 }
 
-.site-date {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.page {
-  width: min(1040px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 32px 0 56px;
-}
-
-.report-hero {
-  padding: 28px 0 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--accent-2);
-  font-weight: 700;
+.rendered-markdown li + li,
+.panel > ul li + li,
+.action-list li + li,
+.claim-limits li + li {
+  margin-top: 4px;
 }
 
 h1,
 h2,
-h3,
-p {
-  overflow-wrap: anywhere;
-}
-
-h1 {
+h3 {
   margin: 0;
-  font-size: 2rem;
-  line-height: 1.25;
+  color: var(--ink);
+  font-weight: 680;
+  line-height: 1.16;
+  letter-spacing: 0;
 }
 
 h2 {
-  margin: 0 0 16px;
-  font-size: 1.35rem;
+  font-size: 20px;
 }
 
 h3 {
-  margin: 0 0 10px;
-  font-size: 1.05rem;
+  font-size: 15px;
 }
 
-.summary {
-  max-width: 760px;
+.report-hero strong,
+.rendered-markdown strong,
+.report-data-table strong,
+.evidence-card > strong {
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.rendered-markdown em,
+.report-data-table em {
+  color: #5f5d57;
+  font-style: italic;
+  font-weight: 520;
+}
+
+.rendered-markdown mark.text-highlight,
+.report-data-table mark.text-highlight,
+.report-hero mark.text-highlight {
+  padding: 0 0.18em;
+  border-radius: 4px;
+  background: #f7dfae;
+  color: #3d2a12;
+  box-decoration-break: clone;
+}
+
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 40px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.report-hero,
+.panel,
+.finding,
+.evidence-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.panel {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.section-focus {
+  animation: section-focus-pulse 900ms ease-out 1;
+}
+
+@keyframes section-focus-pulse {
+  from {
+    box-shadow: 0 0 0 7px rgba(217, 119, 87, 0.22), var(--shadow);
+  }
+
+  to {
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+  }
+}
+
+.report-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.eyebrow,
+.meta,
+.chip,
+.status-pill {
   color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
-.meta-grid {
+.title-row,
+.toolbar,
+.split-row {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-}
-
-.meta-grid span,
-.tag {
-  display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 4px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  color: var(--muted);
-}
-
-.section {
-  padding: 28px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.item,
-.report-card {
-  margin: 0 0 16px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-
-.item-meta,
-.source-line {
-  display: flex;
+  justify-content: space-between;
   flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  font-size: 34px;
+  line-height: 1.08;
+  max-width: 920px;
+  overflow-wrap: anywhere;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.hero-summary-text {
+  min-height: 72px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  color: #8a3b1e;
+  font-size: 17px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+p.hero-summary-text {
+  display: flex;
+  align-items: center;
+}
+
+.hero-summary-list {
+  display: grid;
+  align-content: start;
   gap: 8px;
-  color: var(--muted);
-  font-size: 0.95rem;
+  list-style: none;
 }
 
-.source-line {
-  margin-top: 12px;
+.hero-summary-list li {
+  position: relative;
+  max-width: 78ch;
+  padding-left: 17px;
 }
 
-.project-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
+.hero-summary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
-.project-table th,
-.project-table td {
-  padding: 12px;
-  border: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-
-.compact-list,
-.report-list {
-  padding-left: 1.25rem;
-}
-
-.check-list {
+.hero-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: start;
 }
 
-.audit-grid {
+.hero-stat {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.audit-card {
-  padding: 18px;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--panel);
+  background: var(--panel-soft);
 }
 
-.check-list div {
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-
-.check-list dt {
+.hero-stat span,
+.hero-stat small {
   color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.check-list dd {
-  margin: 4px 0 0;
+  font-size: 11px;
   font-weight: 700;
 }
 
-.muted {
-  color: var(--muted);
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
 }
 
-.suggestions {
-  margin-top: 20px;
+.hero-decision-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 10px;
 }
 
-.suggestions li {
-  margin-bottom: 16px;
+.hero-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
 }
 
-.artifact-links {
+.hero-decision-card strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.hero-criteria-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 24px;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.artifact-links a {
-  padding: 8px 12px;
+.hero-criteria-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3b1e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.eyebrow,
+.meta,
+.panel,
+.finding,
+.evidence-card,
+.hero-brief,
+.hero-decision-card,
+.lede-grid > *,
+.metric-grid > *,
+.section-heading,
+.section-summary {
+  overflow-wrap: anywhere;
+}
+
+.lede-grid,
+.metric-grid,
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.supplemental-panel {
+  padding: 20px;
+}
+
+.supplemental-panel > .section-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.claims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel,
+.finding,
+.evidence-card {
+  padding: 16px;
+}
+
+.section-heading {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.section-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.evidence-card h3 {
+  line-height: 1.42;
+}
+
+.evidence-card p {
+  margin: 0;
+  color: #5f5d57;
+  line-height: 1.52;
+}
+
+.interactive-card {
+  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.evidence-spotlight {
+  position: relative;
+  overflow: hidden;
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+}
+
+.evidence-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), rgba(217, 119, 87, 0.12), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.evidence-spotlight:hover::before,
+.evidence-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
+.focus-field.has-filter .interactive-card[hidden] {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+}
+
+.chip,
+.status-pill,
+.file-chip,
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  text-transform: none;
+  white-space: normal;
+}
+
+.card-tags,
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.swatch-chip > span {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line));
+  border-radius: 999px;
+  background: var(--swatch, var(--accent));
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.mini-metrics div {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mini-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.mini-metrics dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-ok,
+.rich-status[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  color: var(--ok);
+  background: #e4e9dc;
+}
+
+.status-warn,
+.rich-status[data-state="pending"],
+.rich-status[data-state="degraded"],
+.rich-status[data-state="fallback"] {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: var(--warn);
+  background: #fbf1ec;
+}
+
+.status-danger,
+.rich-status[data-state="failed"],
+.rich-status[data-state="error"] {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  color: var(--danger);
+  background: #f3d9cc;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  color: var(--info);
+  background: #e8efeb;
+}
+
+.source-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: inherit;
+  font-family: var(--code-font);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.source-link::before {
+  content: "#";
+  color: var(--accent);
+}
+
+button,
+.button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.button:hover,
+button[aria-pressed="true"],
+button[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+button[data-copy-state="success"] {
+  border-color: color-mix(in srgb, var(--ok) 58%, var(--line));
+  background: #e4e9dc;
+  color: var(--ok);
+}
+
+button[data-copy-state="failed"] {
+  border-color: color-mix(in srgb, var(--danger) 58%, var(--line));
+  background: #f3d9cc;
+  color: var(--danger);
+}
+
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group:first-of-type {
+  border-top: 0;
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.report-nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-nav a small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.code-panel,
+.diff-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: var(--code-line);
+}
+
+.code-panel header,
+.diff-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: #d1cfc5;
+}
+
+.code-panel header > div,
+.diff-panel header > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.diff-panel h2 {
+  color: #faf9f5;
+  font-size: 16px;
+}
+
+.code-panel pre,
+.diff-panel pre,
+.fallback-source-block,
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--code-line);
+  font: 500 13px/1.35 var(--code-font);
+  tab-size: 2;
+}
+
+.rich-render-source,
+.mermaid-source {
+  margin-top: 10px;
+}
+
+.rich-render-source summary,
+.mermaid-source summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.code-line,
+.line-hot,
+.diff-line {
+  display: block;
+  min-width: max-content;
+  margin-inline: -12px;
+  padding-inline: 58px 12px;
+  position: relative;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.code-line::before,
+.line-hot::before,
+.diff-line::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 12px;
+  width: 36px;
+  color: var(--code-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.line-hot {
+  background: rgba(217, 119, 87, 0.24);
+}
+
+.diff-added {
+  background: rgba(120, 140, 93, 0.24);
+  color: #dce4d2;
+}
+
+.diff-removed {
+  background: rgba(176, 74, 63, 0.25);
+  color: #f3d9cc;
+}
+
+.diff-hunk {
+  color: #f3d9cc;
+  background: rgba(217, 119, 87, 0.22);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #e0897a;
+  font-weight: 750;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section {
+  color: #b8c99d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9c9a93;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-attr {
+  color: #f0c36d;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e8c9ba;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c9b98a;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #8cb6a3;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #d97757;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #a67c52;
+}
+
+.hljs-addition {
+  color: #b8c99d;
+}
+
+.hljs-deletion {
+  color: #e0897a;
+}
+
+.diagram-panel,
+.mermaid-evidence {
+  border-left: 4px solid var(--accent);
+}
+
+.mermaid-rendered,
+[data-rich-mermaid-target] {
+  display: block;
+  min-height: 180px;
+  max-height: 620px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.diagram-panel svg,
+.mermaid-rendered svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.table-caption {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
 }
 
-@media (max-width: 640px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 14px 16px;
-  }
+.report-data-table {
+  width: 100%;
+  min-width: 640px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 1.38;
+}
 
-  .page {
-    width: min(100% - 24px, 1040px);
-    padding-top: 20px;
-  }
+.report-data-table th,
+.report-data-table td {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
 
-  h1 {
-    font-size: 1.55rem;
-  }
+.report-data-table thead th {
+  z-index: 2;
+  background: #f0eee6;
+  color: #8a3b1e;
+  font-weight: 760;
+}
 
-  .project-table {
-    display: block;
-    overflow-x: auto;
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-data-table [data-align="center"] {
+  text-align: center;
+}
+
+.report-data-table [data-align="right"] {
+  text-align: right;
+}
+
+.report-data-table [data-table-cell] {
+  outline: 0;
+}
+
+.report-data-table [data-table-cell]:focus-visible {
+  box-shadow: var(--focus);
+  z-index: 4;
+}
+
+.report-data-table .table-row-highlight {
+  background: color-mix(in srgb, var(--accent-soft) 58%, #ffffff);
+}
+
+.report-data-table .table-column-highlight {
+  background: color-mix(in srgb, #d9f7f1 62%, #ffffff);
+}
+
+.report-data-table .table-row-highlight.table-column-highlight {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.16), rgba(61, 110, 110, 0.16)),
+    #ffffff;
+}
+
+.report-data-table .table-cell-highlight {
+  z-index: 5;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  transform: scale(1.045);
+  box-shadow: 0 10px 24px rgba(61, 61, 58, 0.16);
+}
+
+.table-cell-list,
+.table-cell-map {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.table-cell-map {
+  display: grid;
+  gap: 5px;
+  padding-left: 0;
+}
+
+.table-cell-map div {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.table-cell-map dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.table-cell-map dd {
+  margin: 0;
+}
+
+.claim-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.claim-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-card-title {
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.46;
+}
+
+.claim-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.claim-evidence-links a,
+.chart-bar-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.chart-panel figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chart-panel figcaption {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.chart-panel figcaption strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.7fr) minmax(120px, 2fr) minmax(42px, auto) minmax(72px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-bar-label,
+.chart-bar-value {
+  font-weight: 650;
+}
+
+.chart-bar-track {
+  display: block;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.chart-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.chart-line {
+  width: 100%;
+  min-height: 160px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.chart-line text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.chart-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.chart-matrix-cell,
+.chart-degraded {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.chart-degraded {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.chart-source-row {
+  margin: 0;
+}
+
+.chart-table-fallback {
+  margin-top: 2px;
+}
+
+.runtime-panel .source-link::before {
+  content: "";
+}
+
+.tab-panel[hidden],
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero-brief,
+  .hero-decision-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-  </style>
+@media (max-width: 720px) {
+  .report-shell {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
+  .split-row,
+  .code-panel header,
+  .diff-panel header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-hero {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 24px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-stat {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .hero-stat strong {
+    font-size: 19px;
+  }
+
+  .hero-decision-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .hero-decision-card strong {
+    font-size: 13px;
+  }
+
+  .chip,
+  .status-pill,
+  .file-chip {
+    white-space: normal;
+  }
+
+  .report-data-table {
+    min-width: 560px;
+  }
+
+  .chart-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .report-data-table .table-cell-highlight {
+    transform: none;
+  }
+}
+
+
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="site-title" href="../../../index.html">AI 日报</a>
-    <span class="site-date">2026-05-22</span>
-  </header>
-  <main class="page">
-    <section class="report-hero">
-      <p class="eyebrow">每日 AI 技术观察</p>
-      <h1>AI 日报 2026-05-22</h1>
-      <p class="summary">本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路；Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1；GitHub Copilot 加强任务路由与语义 issue 检索；AWS SageMaker 用 OpenAI-compatible API 降低迁移成本；Anthropic 继续把 Claude Managed Agents 的执行环境和私有 MCP 访问边界拆开。GitHub Trending 继续显示 coding-agent skills、代码图谱、MCP 和 agent memory 工具升温；Builder feed 本轮受网络限制未收录。</p>
-      <div class="meta-grid" aria-label="日报统计">
-        <span><strong>7</strong> 主体信息</span>
-        <span><strong>4</strong> 模型发布</span>
-        <span><strong>4</strong> 技术博客</span>
-        <span><strong>0</strong> Builder 观察</span>
-        <span><strong>4</strong> 社区线索</span>
+  <main class="report-shell">
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-22 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
+          <h1 class="report-title">AI 日报 2026-05-22</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-    </section>
+      <div class="hero-brief">
+        <ul class="hero-summary-text hero-summary-list"><li>本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li>Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li>GitHub Copilot 加强任务路由与语义 issue 检索</li><li>更多信号见主线摘要、主体信息与项目分区。</li></ul>
+        <div class="hero-stat-grid" aria-label="报告摘要指标">
+    <div class="hero-stat"><span>证据</span><strong>2</strong><small>条</small></div>
+  </div>
+      </div>
+      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-22 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <article class="hero-decision-card">
+      <div class="meta">漏点</div>
+      <strong>2026-05-22 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">修复</div>
+      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">验收口径</div>
+      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
+    </article>
+  </div>
+    </header>
 
-    <section class="section" id="main-items">
+    <div class="report-layout">
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
+<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
+<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
+<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
+<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+<a href="#evidence" title="证据" data-nav-link data-nav-index="10" data-nav-group-name="evidence" data-nav-status="info"><span>证据</span></a>
+    </div>
+  </nav>
+      <div class="report-section-stack" data-report-region="sections">
+        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">摘要</p>
+      <h2>日报概览</h2>
+
+    </div>
+
+  </div>
+    <div class="metric-grid focus-field">
+      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-22</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>7</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>4</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>4</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>6</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>0</strong></article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+
+      <h2>主线摘要</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Agent 开发链路</strong>：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li><strong>模型入口</strong>：Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li><strong>开发工作流</strong>：GitHub Copilot 加强任务路由与语义 issue 检索</li><li><strong>迁移成本</strong>：AWS SageMaker 用 OpenAI-compatible API 降低迁移成本</li><li><strong>执行边界</strong>：Anthropic 继续把 Claude Managed Agents 的执行环境和私有 MCP 访问边界拆开</li><li><strong>开源信号</strong>：GitHub Trending 继续显示 coding-agent skills、代码图谱、MCP 和 agent memory 工具升温</li><li><strong>信源边界</strong>：Builder feed 本轮受网络限制未收录</li></ul></div>
+    <template data-rich-source data-source-fallback>- **Agent 开发链路**：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路
+- **模型入口**：Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1
+- **开发工作流**：GitHub Copilot 加强任务路由与语义 issue 检索
+- **迁移成本**：AWS SageMaker 用 OpenAI-compatible API 降低迁移成本
+- **执行边界**：Anthropic 继续把 Claude Managed Agents 的执行环境和私有 MCP 访问边界拆开
+- **开源信号**：GitHub Trending 继续显示 coding-agent skills、代码图谱、MCP 和 agent memory 工具升温
+- **信源边界**：Builder feed 本轮受网络限制未收录</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>主体信息</h2>
-      <article class="item">
-  <h3>Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Google</span><span>Gemini 3.5</span><span>Antigravity</span><span>WebMCP</span><span>Managed Agents</span></div>
-  <ul>
-    <li>Antigravity 2.0 与 Antigravity CLI 支持专用 subagents、跨平台终端沙箱、凭据 masking 和 Git policy hardening，说明 coding agent 的边界正在从模型选择扩展到执行环境和策略约束。</li>
-<li>Google AI Studio、Cloud Run、Firebase 与 Antigravity 的项目状态导出被放在同一段落，意味着从原型到部署的 agent workflow 会被更紧地绑定到 Google 开发者工具。</li>
-<li>WebMCP origin trial、Chrome DevTools for agents 和 Modern Web Guidance 指向浏览器侧 agent 工具标准化，后续值得跟踪它与现有 MCP server 生态的兼容边界。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" target="_blank" rel="noopener noreferrer">Google Developers Blog</a></p>
-</article>
-<article class="item">
-  <h3>Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent</h3>
-  <div class="item-meta"><span>2026-05-21</span><span>T0</span><span>Vercel</span><span>AI Gateway</span><span>Qwen 3.7 Max</span><span>Grok Build 0.1</span><span>Chat SDK</span></div>
-  <ul>
-    <li>Qwen 3.7 Max 被 Vercel 定位为 agent foundation，覆盖 coding、office workflow automation 和 long-horizon autonomous execution。</li>
-<li>Grok Build 0.1 是 early access 的 agentic coding 模型，并且明确没有可配置 reasoning effort 或 non-reasoning mode。</li>
-<li>Chat SDK 工具层默认对写操作保留 approval gate，`reader`、`messenger`、`moderator` preset 也让 agent 权限范围更容易被产品代码表达。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
-</article>
-<article class="item">
-  <h3>GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表</h3>
-  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>GitHub Copilot</span><span>VS Code</span><span>semantic issue search</span><span>model routing</span></div>
-  <ul>
-    <li>自动路由会评估 reasoning、代码生成复杂度、bug 诊断难度和 tool orchestration 需求，管理员模型策略仍会生效。</li>
-<li>语义 issue 检索使 Copilot Chat 能用自然语言寻找、分组和分析 issue，不再只依赖标题或精确关键词。</li>
-<li>Web Chat 移除所有 Gemini 模型和部分其他模型，显示大厂 coding assistant 正在同时追求模型多样性和产品面稳定性。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" target="_blank" rel="noopener noreferrer">GitHub Changelog</a></p>
-</article>
-<article class="item">
-  <h3>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</h3>
-  <div class="item-meta"><span>2026-05-20</span><span>T0</span><span>Amazon SageMaker AI</span><span>OpenAI SDK</span><span>LangChain</span><span>Strands Agents</span></div>
-  <ul>
-    <li>该能力把自托管模型服务和 OpenAI-compatible client 连接起来，降低企业把 agent 或 LLM 应用迁移到自有 AWS 账户内推理端点的代码成本。</li>
-<li>SageMaker 通过 endpoint name 路由请求，并允许 inference components 下多个模型共享同一接口，适合多模型托管和 fine-tuned model serving。</li>
-<li>对平台团队来说，关键变化是不用在应用层维护 SigV4 wrapper 或自定义 client，就能把治理、部署和监控留在 SageMaker。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">AWS Machine Learning Blog</a></p>
-</article>
-<article class="item">
-  <h3>Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Anthropic</span><span>Claude Managed Agents</span><span>MCP</span><span>self-hosted sandboxes</span></div>
-  <ul>
-    <li>官方说明 agent loop 仍在 Anthropic infrastructure 处理 orchestration、context management 和 error recovery，而工具执行移动到用户配置环境。</li>
-<li>self-hosting 控制代码执行位置，MCP tunnels 控制 Anthropic 如何访问企业网络中的 MCP servers，两者相互独立也可以组合使用。</li>
-<li>这会让企业评估 managed agent 时重点看凭据隔离、网络边界、审计日志和 sandbox provider 的实际运行特性。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://claude.com/blog/claude-managed-agents-updates" target="_blank" rel="noopener noreferrer">Claude Blog</a></p>
-</article>
-<article class="item">
-  <h3>Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节</h3>
-  <div class="item-meta"><span>2026-05-21</span><span>T0</span><span>Claude Code</span><span>PowerShell</span><span>MCP</span><span>Agent SDK</span></div>
-  <ul>
-    <li>这次更新集中在工具可靠性和 Windows 体验，和本仓库最近遇到的 PowerShell / Windows 自动化边界高度相关。</li>
-<li>MCP 分页修复会影响大型 MCP server 的资源、模板和 prompt 枚举完整性，适合放入 agent 工具链稳定性观察。</li>
-<li>`/code-review high` 这种命令形态也表明代码评审开始被做成一等交互，而不是单纯的 prompt 模板。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://code.claude.com/docs/en/changelog" target="_blank" rel="noopener noreferrer">Claude Code Docs</a></p>
-</article>
-<article class="item">
-  <h3>Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径</h3>
-  <div class="item-meta"><span>2026-05-19</span><span>T0</span><span>Hugging Face</span><span>Sentence Transformers</span><span>Ettin Reranker</span><span>RAG</span></div>
-  <ul>
-    <li>发布覆盖 17M 到 1B 级别的 reranker artifact，给 RAG 团队提供了更细的延迟、成本和质量取舍空间。</li>
-<li>文章公开 distillation、training dataset 和 evaluation 细节，降低团队在自有语料上复现实验的门槛。</li>
-<li>相比泛化大模型更新，这类专用 reranker 更直接影响检索增强应用的召回后排序质量。</li>
-  </ul>
-  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog</a></p>
-</article>
-    </section>
 
-    <section class="section" id="model-releases">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><p>1. <strong>Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路</strong>（2026-05-19，T0）</p>
+<ul><li>Antigravity 2.0 与 Antigravity CLI 支持专用 subagents、跨平台终端沙箱、凭据 masking 和 Git policy hardening，说明 coding agent 的边界正在从模型选择扩展到执行环境和策略约束。</li><li>Google AI Studio、Cloud Run、Firebase 与 Antigravity 的项目状态导出被放在同一段落，意味着从原型到部署的 agent workflow 会被更紧地绑定到 Google 开发者工具。</li><li>WebMCP origin trial、Chrome DevTools for agents 和 Modern Web Guidance 指向浏览器侧 agent 工具标准化，后续值得跟踪它与现有 MCP server 生态的兼容边界。</li><li>来源：<a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">Google Developers Blog</a></li></ul>
+<p>2. <strong>Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent</strong>（2026-05-21，T0）</p>
+<ul><li>Qwen 3.7 Max 被 Vercel 定位为 agent foundation，覆盖 coding、office workflow automation 和 long-horizon autonomous execution。</li><li>Grok Build 0.1 是 early access 的 agentic coding 模型，并且明确没有可配置 reasoning effort 或 non-reasoning mode。</li><li>Chat SDK 工具层默认对写操作保留 approval gate，`reader`、`messenger`、`moderator` preset 也让 agent 权限范围更容易被产品代码表达。</li><li>来源：<a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog</a></li></ul>
+<p>3. <strong>GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表</strong>（2026-05-20，T0）</p>
+<ul><li>自动路由会评估 reasoning、代码生成复杂度、bug 诊断难度和 tool orchestration 需求，管理员模型策略仍会生效。</li><li>语义 issue 检索使 Copilot Chat 能用自然语言寻找、分组和分析 issue，不再只依赖标题或精确关键词。</li><li>Web Chat 移除所有 Gemini 模型和部分其他模型，显示大厂 coding assistant 正在同时追求模型多样性和产品面稳定性。</li><li>来源：<a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
+<p>4. <strong>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</strong>（2026-05-20，T0）</p>
+<ul><li>该能力把自托管模型服务和 OpenAI-compatible client 连接起来，降低企业把 agent 或 LLM 应用迁移到自有 AWS 账户内推理端点的代码成本。</li><li>SageMaker 通过 endpoint name 路由请求，并允许 inference components 下多个模型共享同一接口，适合多模型托管和 fine-tuned model serving。</li><li>对平台团队来说，关键变化是不用在应用层维护 SigV4 wrapper 或自定义 client，就能把治理、部署和监控留在 SageMaker。</li><li>来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">AWS Machine Learning Blog</a></li></ul>
+<p>5. <strong>Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels</strong>（2026-05-19，T0）</p>
+<ul><li>官方说明 agent loop 仍在 Anthropic infrastructure 处理 orchestration、context management 和 error recovery，而工具执行移动到用户配置环境。</li><li>self-hosting 控制代码执行位置，MCP tunnels 控制 Anthropic 如何访问企业网络中的 MCP servers，两者相互独立也可以组合使用。</li><li>这会让企业评估 managed agent 时重点看凭据隔离、网络边界、审计日志和 sandbox provider 的实际运行特性。</li><li>来源：<a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">Claude Blog</a></li></ul>
+<p>6. <strong>Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节</strong>（2026-05-21，T0）</p>
+<ul><li>这次更新集中在工具可靠性和 Windows 体验，和本仓库最近遇到的 PowerShell / Windows 自动化边界高度相关。</li><li>MCP 分页修复会影响大型 MCP server 的资源、模板和 prompt 枚举完整性，适合放入 agent 工具链稳定性观察。</li><li>`/code-review high` 这种命令形态也表明代码评审开始被做成一等交互，而不是单纯的 prompt 模板。</li><li>来源：<a href="https://code.claude.com/docs/en/changelog" rel="noopener noreferrer">Claude Code Docs</a></li></ul>
+<p>7. <strong>Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径</strong>（2026-05-19，T0）</p>
+<ul><li>发布覆盖 17M 到 1B 级别的 reranker artifact，给 RAG 团队提供了更细的延迟、成本和质量取舍空间。</li><li>文章公开 distillation、training dataset 和 evaluation 细节，降低团队在自有语料上复现实验的门槛。</li><li>相比泛化大模型更新，这类专用 reranker 更直接影响检索增强应用的召回后排序质量。</li><li>来源：<a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>1. **Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路**（2026-05-19，T0）
+  - Antigravity 2.0 与 Antigravity CLI 支持专用 subagents、跨平台终端沙箱、凭据 masking 和 Git policy hardening，说明 coding agent 的边界正在从模型选择扩展到执行环境和策略约束。
+  - Google AI Studio、Cloud Run、Firebase 与 Antigravity 的项目状态导出被放在同一段落，意味着从原型到部署的 agent workflow 会被更紧地绑定到 Google 开发者工具。
+  - WebMCP origin trial、Chrome DevTools for agents 和 Modern Web Guidance 指向浏览器侧 agent 工具标准化，后续值得跟踪它与现有 MCP server 生态的兼容边界。
+  - 来源：[Google Developers Blog](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)
+
+2. **Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent**（2026-05-21，T0）
+  - Qwen 3.7 Max 被 Vercel 定位为 agent foundation，覆盖 coding、office workflow automation 和 long-horizon autonomous execution。
+  - Grok Build 0.1 是 early access 的 agentic coding 模型，并且明确没有可配置 reasoning effort 或 non-reasoning mode。
+  - Chat SDK 工具层默认对写操作保留 approval gate，`reader`、`messenger`、`moderator` preset 也让 agent 权限范围更容易被产品代码表达。
+  - 来源：[Vercel Changelog](https://vercel.com/changelog)
+
+3. **GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表**（2026-05-20，T0）
+  - 自动路由会评估 reasoning、代码生成复杂度、bug 诊断难度和 tool orchestration 需求，管理员模型策略仍会生效。
+  - 语义 issue 检索使 Copilot Chat 能用自然语言寻找、分组和分析 issue，不再只依赖标题或精确关键词。
+  - Web Chat 移除所有 Gemini 模型和部分其他模型，显示大厂 coding assistant 正在同时追求模型多样性和产品面稳定性。
+  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/)
+
+4. **Amazon SageMaker AI endpoints 增加 OpenAI-compatible API**（2026-05-20，T0）
+  - 该能力把自托管模型服务和 OpenAI-compatible client 连接起来，降低企业把 agent 或 LLM 应用迁移到自有 AWS 账户内推理端点的代码成本。
+  - SageMaker 通过 endpoint name 路由请求，并允许 inference components 下多个模型共享同一接口，适合多模型托管和 fine-tuned model serving。
+  - 对平台团队来说，关键变化是不用在应用层维护 SigV4 wrapper 或自定义 client，就能把治理、部署和监控留在 SageMaker。
+  - 来源：[AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)
+
+5. **Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels**（2026-05-19，T0）
+  - 官方说明 agent loop 仍在 Anthropic infrastructure 处理 orchestration、context management 和 error recovery，而工具执行移动到用户配置环境。
+  - self-hosting 控制代码执行位置，MCP tunnels 控制 Anthropic 如何访问企业网络中的 MCP servers，两者相互独立也可以组合使用。
+  - 这会让企业评估 managed agent 时重点看凭据隔离、网络边界、审计日志和 sandbox provider 的实际运行特性。
+  - 来源：[Claude Blog](https://claude.com/blog/claude-managed-agents-updates)
+
+6. **Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节**（2026-05-21，T0）
+  - 这次更新集中在工具可靠性和 Windows 体验，和本仓库最近遇到的 PowerShell / Windows 自动化边界高度相关。
+  - MCP 分页修复会影响大型 MCP server 的资源、模板和 prompt 枚举完整性，适合放入 agent 工具链稳定性观察。
+  - `/code-review high` 这种命令形态也表明代码评审开始被做成一等交互，而不是单纯的 prompt 模板。
+  - 来源：[Claude Code Docs](https://code.claude.com/docs/en/changelog)
+
+7. **Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径**（2026-05-19，T0）
+  - 发布覆盖 17M 到 1B 级别的 reranker artifact，给 RAG 团队提供了更细的延迟、成本和质量取舍空间。
+  - 文章公开 distillation、training dataset 和 evaluation 细节，降低团队在自有语料上复现实验的门槛。
+  - 相比泛化大模型更新，这类专用 reranker 更直接影响检索增强应用的召回后排序质量。
+  - 来源：[Hugging Face Blog](https://huggingface.co/blog/ettin-reranker)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>模型发布</h2>
-      <article class="item">
-  <h3>Gemini 3.5 Flash</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Google</span>
-    <span>闭源 API (closed_api)</span>
-  </div>
-  <p>Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。</p>
-  <p class="muted">同时出现在 Google I/O 官方汇总、Antigravity、Gemini API、GitHub Copilot 和 Vercel AI Gateway 相关发布中；本轮只按官方来源记录可用性。</p>
-  <p class="source-line">来源：<a href="https://deepmind.google/models/model-cards/gemini-3-5-flash/" target="_blank" rel="noopener noreferrer">Google DeepMind Model Card</a></p>
-</article>
-<article class="item">
-  <h3>Qwen 3.7 Max on Vercel AI Gateway</h3>
-  <div class="item-meta">
-    <span>2026-05-21</span>
-    <span>Alibaba / Vercel</span>
-    <span>闭源 API (closed_api)</span>
-  </div>
-  <p>Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。</p>
-  <p class="muted">按 Vercel 官方网关可用性记录；未使用二手媒体中的 Alibaba 发布细节。</p>
-  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
-</article>
-<article class="item">
-  <h3>Grok Build 0.1 on Vercel AI Gateway</h3>
-  <div class="item-meta">
-    <span>2026-05-20</span>
-    <span>xAI / Vercel</span>
-    <span>闭源 API (closed_api)</span>
-  </div>
-  <p>Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。</p>
-  <p class="muted">官方 changelog 说明 reasoning effort 不可配置，也没有 non-reasoning mode。</p>
-  <p class="source-line">来源：<a href="https://vercel.com/changelog" target="_blank" rel="noopener noreferrer">Vercel Changelog</a></p>
-</article>
-<article class="item">
-  <h3>Ettin Reranker Family</h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Hugging Face</span>
-    <span>开源权重 (open_weights)</span>
-  </div>
-  <p>Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。</p>
-  <p class="muted">适合 RAG pipeline 的 retrieve-then-rerank 实验；上线前仍应在自有查询集上离线评估。</p>
-  <p class="source-line">来源：<a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Hugging Face Blog</a></p>
-</article>
-    </section>
 
-<section class="section" id="hot-blogs">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Gemini 3.5 Flash</strong> <mark class="text-highlight">模型卡更新</mark> <mark class="text-highlight">多平台信号</mark> <mark class="text-highlight">官方可用性</mark>（Google，closed_api，2026-05-19）：Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。 <a href="https://deepmind.google/models/model-cards/gemini-3-5-flash/" rel="noopener noreferrer">Google DeepMind Model Card</a></li><li><strong>Qwen 3.7 Max on Vercel AI Gateway</strong> <mark class="text-highlight">网关可用</mark> <mark class="text-highlight">官方可用性</mark> <mark class="text-highlight">只采官方</mark>（Alibaba / Vercel，closed_api，2026-05-21）：Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。 <a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog</a></li><li><strong>Grok Build 0.1 on Vercel AI Gateway</strong> <mark class="text-highlight">网关可用</mark> <mark class="text-highlight">官方可用性</mark> <mark class="text-highlight">能力边界</mark>（xAI / Vercel，closed_api，2026-05-20）：Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。 <a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog</a></li><li><strong>Ettin Reranker Family</strong> <mark class="text-highlight">厂商正式发布</mark> <mark class="text-highlight">RAG 评估</mark>（Hugging Face，open_weights，2026-05-19）：Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。 <a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Gemini 3.5 Flash** ==模型卡更新== ==多平台信号== ==官方可用性==（Google，closed_api，2026-05-19）：Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。 [Google DeepMind Model Card](https://deepmind.google/models/model-cards/gemini-3-5-flash/)
+- **Qwen 3.7 Max on Vercel AI Gateway** ==网关可用== ==官方可用性== ==只采官方==（Alibaba / Vercel，closed_api，2026-05-21）：Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。 [Vercel Changelog](https://vercel.com/changelog)
+- **Grok Build 0.1 on Vercel AI Gateway** ==网关可用== ==官方可用性== ==能力边界==（xAI / Vercel，closed_api，2026-05-20）：Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。 [Vercel Changelog](https://vercel.com/changelog)
+- **Ettin Reranker Family** ==厂商正式发布== ==RAG 评估==（Hugging Face，open_weights，2026-05-19）：Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。 [Hugging Face Blog](https://huggingface.co/blog/ettin-reranker)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
       <h2>热门技术博客</h2>
-      <article class="item">
-  <h3><a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" target="_blank" rel="noopener noreferrer">All the news from the Google I/O 2026 Developer keynote</a></h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Google Developers Blog</span>
-    <span>The Google I/O team</span>
-    <span>agentic development / WebMCP / Antigravity</span>
-  </div>
-  <p>Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。</p>
-  <p><strong>为什么重要：</strong>这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。</p>
-</article>
-<article class="item">
-  <h3><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" target="_blank" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></h3>
-  <div class="item-meta">
-    <span>2026-05-20</span>
-    <span>AWS Machine Learning Blog</span>
-    <span>Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng</span>
-    <span>model serving / OpenAI-compatible API</span>
-  </div>
-  <p>SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。</p>
-  <p><strong>为什么重要：</strong>它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。</p>
-</article>
-<article class="item">
-  <h3><a href="https://claude.com/blog/claude-managed-agents-updates" target="_blank" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Claude Blog</span>
-    <span>Anthropic</span>
-    <span>managed agents / sandboxing / MCP</span>
-  </div>
-  <p>Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。</p>
-  <p><strong>为什么重要：</strong>文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。</p>
-</article>
-<article class="item">
-  <h3><a href="https://huggingface.co/blog/ettin-reranker" target="_blank" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></h3>
-  <div class="item-meta">
-    <span>2026-05-19</span>
-    <span>Hugging Face Blog</span>
-    <span>Tom Aarsen</span>
-    <span>reranker / RAG</span>
-  </div>
-  <p>Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</p>
-  <p><strong>为什么重要：</strong>RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。</p>
-</article>
-    </section>
 
-    <section class="section" id="projects">
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">All the news from the Google I/O 2026 Developer keynote</a></strong>（Google Developers Blog / The Google I/O team，2026-05-19）：Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。</li><li>为什么重要：这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。</li><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></strong>（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。</li><li>为什么重要：它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。</li><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></strong>（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。</li><li>为什么重要：文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</li><li>为什么重要：RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[All the news from the Google I/O 2026 Developer keynote](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)**（Google Developers Blog / The Google I/O team，2026-05-19）：Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。
+  - 为什么重要：这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。
+- **[Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)**（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。
+  - 为什么重要：它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。
+- **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。
+  - 为什么重要：文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。
+- **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。
+  - 为什么重要：RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">projects</p>
       <h2>今日值得关注的项目</h2>
-      <table class="project-table">
-  <thead><tr><th>项目</th><th>说明</th><th>链接</th></tr></thead>
-  <tbody>
-    <tr><td>anthropics/claude-plugins-official</td><td>Anthropic-managed Claude Code plugins 官方目录，在 GitHub Trending daily 与 Python daily 中出现，说明 Claude Code 插件生态正在被集中发现。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：trending</span><span>来源：GitHub Trending daily / Python daily</span></div><p class="muted">GitHub Trending daily 显示该项目为 Official, Anthropic-managed directory of high quality Claude Code Plugins，并显示 891 stars today；Python daily 抽样也命中。</p></td><td><a href="https://github.com/anthropics/claude-plugins-official" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>colbymchenry/codegraph</td><td>面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：star_velocity</span><span>来源：GitHub Trending daily / weekly / TypeScript daily</span></div><p class="muted">GitHub Trending daily 显示 4,222 stars today；weekly 显示 6,731 stars this week；TypeScript daily 也命中。</p></td><td><a href="https://github.com/colbymchenry/codegraph" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>ChromeDevTools/chrome-devtools-mcp</td><td>Chrome DevTools for coding agents，在 TypeScript daily 和全站 daily 中出现，适合关注 browser debugging 与 MCP 化工具链。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：trending</span><span>来源：GitHub Trending daily / TypeScript daily</span></div><p class="muted">GitHub Trending TypeScript daily 描述为 Chrome DevTools for coding agents，并显示 132 stars today。</p></td><td><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>HKUDS/CLI-Anything</td><td>宣称让所有软件 agent-native 的 CLI-Hub 项目，在全站 daily 与 Python daily 中出现。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：trending</span><span>来源：GitHub Trending daily / Python daily</span></div><p class="muted">GitHub Trending daily 描述为 Making ALL Software Agent-Native；Python daily 抽样显示 890 stars today。</p></td><td><a href="https://github.com/HKUDS/CLI-Anything" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>rohitg00/agentmemory</td><td>面向 AI coding agents 的 persistent memory 项目，在 GitHub Trending weekly 中出现。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：star_velocity</span><span>来源：GitHub Trending weekly</span></div><p class="muted">GitHub Trending weekly 描述为 #1 Persistent memory for AI coding agents based on real-world benchmarks，并显示 7,976 stars this week。</p></td><td><a href="https://github.com/rohitg00/agentmemory" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-<tr><td>Lum1104/Understand-Anything</td><td>面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具，在 TypeScript daily 中出现。<div class="item-meta"><span>日期：2026-05-22</span><span>信号：trending</span><span>来源：GitHub Trending TypeScript daily</span></div><p class="muted">GitHub Trending TypeScript daily 描述为 Turn any code into an interactive knowledge graph，并显示覆盖多种 coding agents。</p></td><td><a href="https://github.com/Lum1104/Understand-Anything" target="_blank" rel="noopener noreferrer">原文</a></td></tr>
-  </tbody>
-</table>
-    </section>
 
-    <section class="section" id="builder-observations">
-      <h2>Builder 观察</h2>
-      <p>暂无 Builder 观察。</p>
-    </section>
+    </div>
 
-    <section class="section" id="community-leads">
-      <h2>社区线索</h2>
-      <ul class="compact-list"><li>karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。 <a href="https://github.com/karpathy/autoresearch" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。 <a href="https://github.com/multica-ai/andrej-karpathy-skills" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>can1357/oh-my-pi 出现在 TypeScript daily trending，描述为 terminal AI coding agent；本轮缺少 release 或维护者原文，先作为 agent harness 观察线索。 <a href="https://github.com/can1357/oh-my-pi" target="_blank" rel="noopener noreferrer">来源</a></li>
-<li>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。 <a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" target="_blank" rel="noopener noreferrer">来源</a></li></ul>
-    </section>
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></strong> <mark class="text-highlight">今日 +891 stars</mark>：Anthropic-managed Claude Code plugins 官方目录。</li><li><strong><a href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></strong> <mark class="text-highlight">今日 +4,222 stars</mark> <mark class="text-highlight">本周 +6,731 stars</mark>：面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。</li><li><strong><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></strong> <mark class="text-highlight">今日 +132 stars</mark>：Chrome DevTools for coding agents，适合关注 browser debugging 与 MCP 化工具链。</li><li><strong><a href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">HKUDS/CLI-Anything</a></strong> <mark class="text-highlight">今日 +890 stars</mark>：宣称让所有软件 agent-native 的 CLI-Hub 项目。</li><li><strong><a href="https://github.com/rohitg00/agentmemory" rel="noopener noreferrer">rohitg00/agentmemory</a></strong> <mark class="text-highlight">本周 +7,976 stars</mark>：面向 AI coding agents 的 persistent memory 项目。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight">TypeScript daily</mark>：面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)** ==今日 +891 stars==：Anthropic-managed Claude Code plugins 官方目录。
+- **[colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)** ==今日 +4,222 stars== ==本周 +6,731 stars==：面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。
+- **[ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)** ==今日 +132 stars==：Chrome DevTools for coding agents，适合关注 browser debugging 与 MCP 化工具链。
+- **[HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything)** ==今日 +890 stars==：宣称让所有软件 agent-native 的 CLI-Hub 项目。
+- **[rohitg00/agentmemory](https://github.com/rohitg00/agentmemory)** ==本周 +7,976 stars==：面向 AI coding agents 的 persistent memory 项目。
+- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==TypeScript daily==：面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具。</template>
+  </section>
+<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">signals</p>
+      <h2>Builder 观察与社区线索</h2>
 
+    </div>
 
-    <section class="section" id="source-audit">
+  </div>
+    <div class="rendered-markdown"><h4>Builder 观察</h4>
+<p>暂无 Builder 观察。</p>
+<h4>社区线索</h4>
+<ul><li>karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。 <a href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">来源</a></li><li>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。 <a href="https://github.com/multica-ai/andrej-karpathy-skills" rel="noopener noreferrer">来源</a></li><li>can1357/oh-my-pi 出现在 TypeScript daily trending，描述为 terminal AI coding agent；本轮缺少 release 或维护者原文，先作为 agent harness 观察线索。 <a href="https://github.com/can1357/oh-my-pi" rel="noopener noreferrer">来源</a></li><li>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。 <a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>### Builder 观察
+
+暂无 Builder 观察。
+
+### 社区线索
+
+- karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。 [来源](https://github.com/karpathy/autoresearch)
+- multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。 [来源](https://github.com/multica-ai/andrej-karpathy-skills)
+- can1357/oh-my-pi 出现在 TypeScript daily trending，描述为 terminal AI coding agent；本轮缺少 release 或维护者原文，先作为 agent harness 观察线索。 [来源](https://github.com/can1357/oh-my-pi)
+- Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。 [来源](https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
       <h2>信源审计</h2>
-      <div class="audit-grid">
-        <article class="audit-card">
-  <h3>GitHub Trending</h3>
-  <div class="item-meta">
-    <span>已检查</span>
-    <span>25 候选</span>
-    <span>6 入选</span>
+
+    </div>
+
   </div>
-  <p>shell 内置发现命令受网络限制；浏览器复核后只纳入与 coding agent、MCP、代码知识图谱、agent memory 或 agent skills 直接相关的项目，未把泛化课程、非 AI 项目或可疑高星噪声写入项目表。</p>
-  <ul class="compact-list"><li><a href="https://github.com/trending?since=daily" target="_blank" rel="noopener noreferrer">npm run discover:github-trending -- 50</a> <span class="tag">blocked</span>：仓库命令在 shell 环境返回 fetch failed，未产出候选；随后用浏览器复核 GitHub Trending 页面。</li>
-<li><a href="https://github.com/trending?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending daily</a> <span class="tag">checked</span>：浏览器可访问；抽样命中 anthropics/claude-plugins-official、colbymchenry/codegraph、HKUDS/CLI-Anything、ChromeDevTools/chrome-devtools-mcp 等。</li>
-<li><a href="https://github.com/trending?since=weekly" target="_blank" rel="noopener noreferrer">GitHub Trending weekly</a> <span class="tag">checked</span>：浏览器可访问；抽样命中 tinyhumansai/openhuman、colbymchenry/codegraph、rohitg00/agentmemory 等。</li>
-<li><a href="https://github.com/trending/python?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending Python daily</a> <span class="tag">checked</span>：浏览器可访问；抽样命中 Claude Code 插件、CLI-Anything、notebooklm-py、forge、karpathy/autoresearch。</li>
-<li><a href="https://github.com/trending/typescript?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending TypeScript daily</a> <span class="tag">checked</span>：浏览器可访问；抽样命中 codegraph、chrome-devtools-mcp、oh-my-pi、Understand-Anything、stitch-skills。</li>
-<li><a href="https://github.com/trending/rust?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending Rust daily</a> <span class="tag">checked</span>：页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。</li>
-<li><a href="https://github.com/trending/go?since=daily" target="_blank" rel="noopener noreferrer">GitHub Trending Go daily</a> <span class="tag">checked</span>：页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。</li>
-<li><a href="https://ossinsight.io/trending/ai" target="_blank" rel="noopener noreferrer">OSSInsight AI trending</a> <span class="tag">checked</span>：搜索结果确认该页用于 AI agent、LLM tools、MCP、coding agents 与 RAG 工具趋势交叉检查。</li>
-<li><a href="https://trendshift.io/github-trending-repositories" target="_blank" rel="noopener noreferrer">Trendshift GitHub trending repositories</a> <span class="tag">checked</span>：搜索结果确认可作为 GitHub trending 历史和 AI agent topic 交叉源。</li></ul>
-</article>
-        <article class="audit-card">
-  <h3>Builder 原始源</h3>
-  <div class="item-meta">
-    <span>已检查</span>
-    <span>0 候选</span>
-    <span>0 入选</span>
+    <div class="rendered-markdown"><h4>GitHub Trending</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：25 / 6</li><li>说明：shell 内置发现命令受网络限制；浏览器复核后只纳入与 coding agent、MCP、代码知识图谱、agent memory 或 agent skills 直接相关的项目，未把泛化课程、非 AI 项目或可疑高星噪声写入项目表。</li></ul>
+<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">npm run discover:github-trending -- 50</a>：blocked，仓库命令在 shell 环境返回 fetch failed，未产出候选；随后用浏览器复核 GitHub Trending 页面。</li><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：checked，浏览器可访问；抽样命中 anthropics/claude-plugins-official、colbymchenry/codegraph、HKUDS/CLI-Anything、ChromeDevTools/chrome-devtools-mcp 等。</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：checked，浏览器可访问；抽样命中 tinyhumansai/openhuman、colbymchenry/codegraph、rohitg00/agentmemory 等。</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending Python daily</a>：checked，浏览器可访问；抽样命中 Claude Code 插件、CLI-Anything、notebooklm-py、forge、karpathy/autoresearch。</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending TypeScript daily</a>：checked，浏览器可访问；抽样命中 codegraph、chrome-devtools-mcp、oh-my-pi、Understand-Anything、stitch-skills。</li><li><a href="https://github.com/trending/rust?since=daily" rel="noopener noreferrer">GitHub Trending Rust daily</a>：checked，页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。</li><li><a href="https://github.com/trending/go?since=daily" rel="noopener noreferrer">GitHub Trending Go daily</a>：checked，页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。</li><li><a href="https://ossinsight.io/trending/ai" rel="noopener noreferrer">OSSInsight AI trending</a>：checked，搜索结果确认该页用于 AI agent、LLM tools、MCP、coding agents 与 RAG 工具趋势交叉检查。</li><li><a href="https://trendshift.io/github-trending-repositories" rel="noopener noreferrer">Trendshift GitHub trending repositories</a>：checked，搜索结果确认可作为 GitHub trending 历史和 AI agent topic 交叉源。</li></ul>
+<h4>Builder 原始源</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>阻塞原因：fetch_failed</li><li>上次成功获取：2026-05-20T07:32:12.985Z</li><li>说明：已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。</li></ul>
+<ul><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders prepare-digest</a>：blocked，node prepare-digest.js 返回 fetch failed，无法取得本轮中心 feed。</li><li><a href="https://x.com" rel="noopener noreferrer">X direct original links spot check</a>：blocked，直接打开 X status 页面返回空 HTML，无法可靠读取原帖正文。</li><li><a href="https://www.google.com/search?q=AI+builder+May+21+2026+agent+coding" rel="noopener noreferrer">Builder web search</a>：no_signal，搜索结果未给出可稳定回源的本日 builder 原帖正文；本轮不硬凑 Builder 观察。</li></ul></div>
+    <template data-rich-source data-source-fallback>### GitHub Trending
+
+- 检查状态：已检查
+- 候选 / 入选：25 / 6
+- 说明：shell 内置发现命令受网络限制；浏览器复核后只纳入与 coding agent、MCP、代码知识图谱、agent memory 或 agent skills 直接相关的项目，未把泛化课程、非 AI 项目或可疑高星噪声写入项目表。
+
+- [npm run discover:github-trending -- 50](https://github.com/trending?since=daily)：blocked，仓库命令在 shell 环境返回 fetch failed，未产出候选；随后用浏览器复核 GitHub Trending 页面。
+- [GitHub Trending daily](https://github.com/trending?since=daily)：checked，浏览器可访问；抽样命中 anthropics/claude-plugins-official、colbymchenry/codegraph、HKUDS/CLI-Anything、ChromeDevTools/chrome-devtools-mcp 等。
+- [GitHub Trending weekly](https://github.com/trending?since=weekly)：checked，浏览器可访问；抽样命中 tinyhumansai/openhuman、colbymchenry/codegraph、rohitg00/agentmemory 等。
+- [GitHub Trending Python daily](https://github.com/trending/python?since=daily)：checked，浏览器可访问；抽样命中 Claude Code 插件、CLI-Anything、notebooklm-py、forge、karpathy/autoresearch。
+- [GitHub Trending TypeScript daily](https://github.com/trending/typescript?since=daily)：checked，浏览器可访问；抽样命中 codegraph、chrome-devtools-mcp、oh-my-pi、Understand-Anything、stitch-skills。
+- [GitHub Trending Rust daily](https://github.com/trending/rust?since=daily)：checked，页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。
+- [GitHub Trending Go daily](https://github.com/trending/go?since=daily)：checked，页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。
+- [OSSInsight AI trending](https://ossinsight.io/trending/ai)：checked，搜索结果确认该页用于 AI agent、LLM tools、MCP、coding agents 与 RAG 工具趋势交叉检查。
+- [Trendshift GitHub trending repositories](https://trendshift.io/github-trending-repositories)：checked，搜索结果确认可作为 GitHub trending 历史和 AI agent topic 交叉源。
+
+### Builder 原始源
+
+- 检查状态：已检查
+- 候选 / 入选：0 / 0
+- 阻塞原因：fetch_failed
+- 上次成功获取：2026-05-20T07:32:12.985Z
+- 说明：已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。
+
+- [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：blocked，node prepare-digest.js 返回 fetch failed，无法取得本轮中心 feed。
+- [X direct original links spot check](https://x.com)：blocked，直接打开 X status 页面返回空 HTML，无法可靠读取原帖正文。
+- [Builder web search](https://www.google.com/search?q=AI+builder+May+21+2026+agent+coding)：no_signal，搜索结果未给出可稳定回源的本日 builder 原帖正文；本轮不硬凑 Builder 观察。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>自检与产物</h2>
+
+    </div>
+
   </div>
-  <p>已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。</p>
-  <ul class="compact-list"><li><a href="https://github.com/zarazhangrui/follow-builders" target="_blank" rel="noopener noreferrer">follow-builders prepare-digest</a> <span class="tag">blocked</span>：node prepare-digest.js 返回 fetch failed，无法取得本轮中心 feed。</li>
-<li><a href="https://x.com" target="_blank" rel="noopener noreferrer">X direct original links spot check</a> <span class="tag">blocked</span>：直接打开 X status 页面返回空 HTML，无法可靠读取原帖正文。</li>
-<li><a href="https://www.google.com/search?q=AI+builder+May+21+2026+agent+coding" target="_blank" rel="noopener noreferrer">Builder web search</a> <span class="tag">no_signal</span>：搜索结果未给出可稳定回源的本日 builder 原帖正文；本轮不硬凑 Builder 观察。</li></ul>
-</article>
+    <div class="rendered-markdown"><ul><li>主体信息：7</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。</li></ul>
+<h4>提示词与规则迭代建议</h4>
+<ul><li>本轮无新增建议。</li></ul>
+<ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-22.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- 主体信息：7
+- Builder 观察：0
+- 一手链接：通过
+- 无禁用表达：通过
+- 无无源数字：通过
+- 说明：主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。
+
+### 提示词与规则迭代建议
+
+- 本轮无新增建议。
+
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-22.json)</template>
+  </section>
+
+
+        <section class="panel supplemental-panel" id="evidence" data-section-type="evidence" data-section-group="evidence" data-report-region="evidence"><div class="section-heading split-row">
+    <div>
+
+      <h2>证据</h2>
+      <p class="section-summary">文件、命令和验证来源集中在这里。</p>
+    </div>
+
+  </div><div class="evidence-grid" data-evidence>
+    <article class="interactive-card evidence-card evidence-spotlight" id="evidence-1" data-evidence-spotlight data-evidence-id="evidence-1" data-evidence-kind="file" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">文件</span><span class="status-pill status-info">信息</span></div>
+      <h3>结构化日报 JSON</h3>
+      <p>https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-22.json</p>
+
+
+    </article>
+<article class="interactive-card evidence-card evidence-spotlight" id="evidence-2" data-evidence-spotlight data-evidence-id="evidence-2" data-evidence-kind="assumption" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">假设</span><span class="status-pill status-ok">通过</span></div>
+      <h3>页面生成器</h3>
+      <p>由 .codex/skills/effective-interact/scripts/create-interaction.mjs 生成公开日报 HTML。</p>
+
+
+    </article>
+  </div></section>
+
+
       </div>
-    </section>
-
-    <section class="section" id="self-check">
-      <h2>自检摘要</h2>
-      <dl class="check-list">
-        <div><dt>主条目</dt><dd>7</dd></div>
-        <div><dt>Builder</dt><dd>0</dd></div>
-        <div><dt>一手链接</dt><dd>通过</dd></div>
-        <div><dt>无禁用表达</dt><dd>通过</dd></div>
-        <div><dt>无无源数字</dt><dd>通过</dd></div>
-      </dl>
-      <p>主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。</p>
-      <section class="suggestions" aria-label="提示词或规则迭代建议">
-  <h3>提示词与规则迭代建议</h3>
-  <ol class="compact-list"><li>
-    <p><strong>GitHub Trending 仓库命令受 shell 网络限制时只能人工浏览器复核</strong></p>
-    <div class="item-meta"><span class="tag">模块：discovery-audit</span><span class="tag">需要确认</span></div>
-    <p>证据：`npm run discover:github-trending -- 50` 返回 fetch failed，但浏览器能访问 GitHub Trending 页面并抽取候选。</p>
-    <p>建议：为 discovery 命令增加可选的 browser-export 输入路径，允许自动化把浏览器采样结果或保存的 HTML 交给同一解析器处理。</p>
-    <p>预期收益：减少 shell 网络限制导致的 source_audit 断裂，让 GitHub Trending 候选仍可结构化复用。</p>
-  </li>
-<li>
-    <p><strong>Builder feed 不可访问时只能记录 blocked，无法区分临时网络错误和中心 feed 真实无内容</strong></p>
-    <div class="item-meta"><span class="tag">模块：builder-observations</span><span class="tag">需要确认</span></div>
-    <p>证据：follow-builders prepare-digest.js 本轮返回 fetch failed，X status 页面直接打开为空 HTML。</p>
-    <p>建议：为 Builder 来源增加 `blocked_reason` 和 `last_successful_feed_at` 字段，避免只在 notes 中描述失败状态。</p>
-    <p>预期收益：让日报读者和后续自动化能判断 Builder 观察为空是网络问题还是确实没有合格原始源。</p>
-  </li>
-<li>
-    <p><strong>模型发布与网关接入容易混在同一条事实中</strong></p>
-    <div class="item-meta"><span class="tag">模块：model-releases</span><span class="tag">需要确认</span></div>
-    <p>证据：Qwen 3.7 Max 本轮只能用 Vercel 官方网关可用性作为一手来源，二手媒体包含 Alibaba 发布细节但未进入主事实。</p>
-    <p>建议：在 model_releases 中增加 `release_scope`，区分 provider official launch、gateway availability、preview access 和 model card update。</p>
-    <p>预期收益：减少把第三方网关接入误写成模型厂商正式发布的风险。</p>
-  </li></ol>
-</section>
-    </section>
-
-    <nav class="artifact-links" aria-label="产物链接">
-      <a href="../../../data/2026/05/2026-05-22.json">结构化 JSON</a>
-      
-    </nav>
+    </div>
   </main>
+
+  <script>/* Use case: small local interactions for self-contained Effective reports. The generator inlines this into the final <script> block. */
+(function () {
+  var sectionFocusTimer = null;
+  var lastActiveNavId = "";
+
+  function setCopyButtonState(button, label, state) {
+    if (!button) return;
+    if (!button.getAttribute("data-copy-label")) {
+      button.setAttribute("data-copy-label", button.textContent);
+    }
+    if (button.getAttribute("data-copy-timer")) {
+      clearTimeout(Number(button.getAttribute("data-copy-timer")));
+    }
+    button.textContent = label;
+    button.setAttribute("data-copy-state", state);
+    button.setAttribute("aria-live", "polite");
+    var timer = setTimeout(function () {
+      button.textContent = button.getAttribute("data-copy-label") || label;
+      button.removeAttribute("data-copy-state");
+      button.removeAttribute("data-copy-timer");
+    }, 1100);
+    button.setAttribute("data-copy-timer", String(timer));
+  }
+
+  function fallbackCopyText(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(area);
+    }
+  }
+
+  function copyText(text, button) {
+    var value = String(text || "").trim();
+    if (!value) {
+      setCopyButtonState(button, "无内容", "empty");
+      return;
+    }
+    var done = function () {
+      setCopyButtonState(button, "已复制", "success");
+    };
+    var fail = function () {
+      setCopyButtonState(button, "复制失败", "failed");
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done, function () {
+        if (fallbackCopyText(value)) done();
+        else fail();
+      });
+      return;
+    }
+
+    if (fallbackCopyText(value)) done();
+    else fail();
+  }
+
+  function copySourceText(source) {
+    if (!source) return "";
+    if (source.matches("ul, ol")) {
+      return Array.prototype.slice.call(source.querySelectorAll("li"))
+        .map(function (item) { return "- " + (item.innerText || item.textContent || "").trim(); })
+        .filter(Boolean)
+        .join("\n");
+    }
+    return (source.innerText || source.textContent || "").trim();
+  }
+
+  function applyFilter(button) {
+    var target = button.getAttribute("data-filter-target");
+    var value = button.getAttribute("data-filter-value");
+    if (!target || !value) return;
+
+    document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      var match = value === "all" || item.getAttribute("data-filter-value") === value;
+      item.hidden = !match;
+    });
+
+    document.querySelectorAll("button[data-filter-target='" + target + "']").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+
+    var field = document.querySelector("[data-focus-field='" + target + "']");
+    if (field) {
+      field.classList.toggle("has-filter", value !== "all");
+    }
+  }
+
+  function activateTab(button) {
+    var group = button.getAttribute("data-tab-group");
+    var panel = button.getAttribute("data-tab");
+    if (!group || !panel) return;
+
+    document.querySelectorAll("[data-tab-group='" + group + "'][data-tab]").forEach(function (peer) {
+      peer.setAttribute("aria-selected", String(peer === button));
+    });
+
+    document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
+      item.hidden = item.id !== panel;
+    });
+  }
+
+  function applySearch(input) {
+    var target = input.getAttribute("data-search-for");
+    var query = input.value.trim().toLowerCase();
+    if (!target) return;
+
+    document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
+      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+    });
+  }
+
+  function updateEvidenceSpotlight(card, event) {
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
+    card.style.setProperty("--spotlight-y", event.clientY - rect.top + "px");
+  }
+
+  function clearDataTableHighlight(table) {
+    if (!table) return;
+    table.removeAttribute("data-hover-row");
+    table.removeAttribute("data-hover-column");
+    table.querySelectorAll(".table-row-highlight, .table-column-highlight, .table-cell-highlight").forEach(function (cell) {
+      cell.classList.remove("table-row-highlight", "table-column-highlight", "table-cell-highlight");
+    });
+  }
+
+  function applyDataTableHighlight(cell) {
+    var table = cell.closest("[data-report-data-table]");
+    if (!table) return;
+    var row = cell.getAttribute("data-table-row");
+    var column = cell.getAttribute("data-table-column");
+    clearDataTableHighlight(table);
+    if (!row || !column) return;
+
+    table.setAttribute("data-hover-row", row);
+    table.setAttribute("data-hover-column", column);
+
+    table.querySelectorAll("[data-table-row='" + row + "']").forEach(function (peer) {
+      peer.classList.add("table-row-highlight");
+    });
+    table.querySelectorAll("[data-table-column='" + column + "']").forEach(function (peer) {
+      peer.classList.add("table-column-highlight");
+    });
+    cell.classList.add("table-cell-highlight");
+  }
+
+  function hashTargetId() {
+    if (!window.location.hash || window.location.hash === "#") return "";
+    var raw = window.location.hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function reportSectionForId(id) {
+    if (!id) return null;
+    var target = document.getElementById(id);
+    if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
+    if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
+      return target;
+    }
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
+  }
+
+  function sectionIsVisible(section) {
+    if (!section) return false;
+    var rect = section.getBoundingClientRect();
+    return rect.bottom > 80 && rect.top < window.innerHeight;
+  }
+
+  function highlightTargetSection(id) {
+    document.querySelectorAll(".section-focus").forEach(function (section) {
+      section.classList.remove("section-focus");
+    });
+    if (sectionFocusTimer) {
+      clearTimeout(sectionFocusTimer);
+      sectionFocusTimer = null;
+    }
+
+    var section = reportSectionForId(id);
+    if (!section) return;
+    section.classList.add("section-focus");
+    sectionFocusTimer = setTimeout(function () {
+      section.classList.remove("section-focus");
+      sectionFocusTimer = null;
+    }, 1600);
+  }
+
+  function updateActiveNavigation() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
+    var hashSection = reportSectionForId(hashTargetId());
+    var active = sections
+      .map(function (section) {
+        var rect = section.getBoundingClientRect();
+        return { id: section.id, section: section, top: Math.abs(rect.top - 96), visible: sectionIsVisible(section) };
+      })
+      .filter(function (item) { return item.visible; })
+      .sort(function (a, b) { return a.top - b.top; })[0];
+    if (hashSection && sectionIsVisible(hashSection)) {
+      active = { id: hashSection.id, section: hashSection, top: 0, visible: true };
+    }
+
+    var activeLink = null;
+    document.querySelectorAll("[data-nav-link]").forEach(function (link) {
+      var isActive = Boolean(active && link.getAttribute("href") === "#" + active.id);
+      link.setAttribute("aria-current", isActive ? "true" : "false");
+      if (isActive) activeLink = link;
+    });
+
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
+    }
+    lastActiveNavId = active ? active.id : "";
+  }
+
+  document.addEventListener("click", function (event) {
+    var navLink = event.target.closest("[data-nav-link]");
+    if (navLink) {
+      var href = navLink.getAttribute("href") || "";
+      if (href.charAt(0) === "#") {
+        window.setTimeout(function () {
+          highlightTargetSection(hashTargetId());
+          updateActiveNavigation();
+        }, 80);
+      }
+    }
+
+    var button = event.target.closest("button");
+    if (!button) return;
+
+    if (button.matches("[data-copy-text]")) {
+      copyText(button.getAttribute("data-copy-text"), button);
+    }
+
+    if (button.matches("[data-copy-from]")) {
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      copyText(source ? (source.content ? source.content.textContent : copySourceText(source)) : "", button);
+    }
+
+    if (button.matches("[data-filter-target][data-filter-value]")) {
+      applyFilter(button);
+    }
+
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
+    }
+  });
+
+  document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-search-for]")) {
+      applySearch(event.target);
+    }
+  });
+
+  document.addEventListener("pointermove", function (event) {
+    var card = event.target.closest("[data-evidence-spotlight]");
+    if (card) {
+      updateEvidenceSpotlight(card, event);
+    }
+  });
+
+  document.addEventListener("pointerover", function (event) {
+    var cell = event.target.closest("[data-table-cell]");
+    if (cell) {
+      applyDataTableHighlight(cell);
+    }
+  });
+
+  document.addEventListener("pointerout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches("[data-table-cell]")) {
+      applyDataTableHighlight(event.target);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("scroll", updateActiveNavigation, { passive: true });
+  window.addEventListener("resize", updateActiveNavigation);
+  window.addEventListener("hashchange", function () {
+    highlightTargetSection(hashTargetId());
+    updateActiveNavigation();
+  });
+  highlightTargetSection(hashTargetId());
+  updateActiveNavigation();
+})();
+
+</script>
 </body>
 </html>

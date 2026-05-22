@@ -30,6 +30,7 @@ export async function assemblePrompt(options = {}) {
   parts.push("- 先把结构化日报草稿写入 `.tmp/daily-report.json`，再调用 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。");
   parts.push("- 最终发布主产物是 `docs/reports/YYYY/MM/YYYY-MM-DD.html`。");
   parts.push("- 结构化数据写入 `reports-data/YYYY/MM/YYYY-MM-DD.json`，再由仓库工具渲染 HTML。");
+  parts.push("- 公开日报 HTML 由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成。");
   parts.push("- 发布前必须通过 `npm run validate` 和 `npm run publish:dry-run`。");
   parts.push("- 真实 commit/push 或 GitHub API 远端写入只有在用户已授权的发布命令中执行。");
   parts.push("- 真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200 且页面内容包含当日 `report_date`。");

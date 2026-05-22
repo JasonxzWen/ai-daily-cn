@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-hub.local/effective-interact/session-ledger-entry.schema.json",
+  "title": "Effective Interact Session Ledger Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ts", "kind", "summary"],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "description": "ISO-8601 timestamp or a precise local timestamp for the checkpoint."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "checkpoint",
+        "tool-result",
+        "decision",
+        "assumption",
+        "risk",
+        "blocker",
+        "verification",
+        "handoff-source"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short factual summary. Do not paste raw large logs, secrets, credentials, or token-shaped values."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["info", "pass", "warn", "fail", "blocked", "pending", "complete"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": { "type": "string" },
+        "command": { "type": "string" },
+        "filePath": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "url": { "type": "string" },
+        "ref": { "type": "string" }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Compact source anchors or result summaries, not full raw output."
+    },
+    "next": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "redactions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Names of removed sensitive or oversized fields, such as token, credential, raw-log, absolute-path, or copyrighted-text."
+    }
+  }
+}

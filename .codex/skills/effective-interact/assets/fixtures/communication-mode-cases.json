@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "forbidden-routine-long-summary",
+      "prompt": "请用 300 字解释这段普通日志，不需要选择、风险判断、证据链或下一步。",
+      "shouldLoad": false,
+      "expectedMode": null,
+      "reason": "Length alone is not enough; the user only asked for a routine explanation."
+    },
+    {
+      "id": "positive-short-decision",
+      "prompt": "这两个修复路径哪个更稳？只要结论和关键取舍。",
+      "shouldLoad": true,
+      "expectedMode": "plain-brief",
+      "reason": "A short answer still needs recommendation, tradeoff, and decision framing."
+    },
+    {
+      "id": "positive-structured-handoff",
+      "prompt": "这个 skill 的触发合同改完了，给我结论、证据、风险和下一步，不要 HTML。",
+      "shouldLoad": true,
+      "expectedMode": "structured-markdown",
+      "reason": "The user needs a structured handoff, but explicitly does not want HTML."
+    },
+    {
+      "id": "positive-visual-architecture",
+      "prompt": "解释这个调用链，给一个 Mermaid 图和三个关键风险即可。",
+      "shouldLoad": true,
+      "expectedMode": "visual-markdown",
+      "reason": "A single diagram plus concise risks is enough; browser navigation is not needed."
+    },
+    {
+      "id": "positive-html-source-navigation",
+      "prompt": "把这次跨 8 个文件的审查做成可筛选的交接页，带源码锚点和复制行动项。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "reason": "Filtering, many source anchors, and copyable actions make browser navigation useful."
+    }
+  ]
+}

@@ -5,6 +5,7 @@
 1. GitHub Trending / 开源趋势面：
    - 必查 `github-ai-trending` 技能规则。
    - 优先运行 `npm run discover:github-trending -- 50`，把输出的 `source_audit.github_trending` 和 `candidates` 作为开源趋势候选池。
+   - 如果 shell 网络受限但浏览器可以保存 GitHub Trending HTML 或采样 JSON，改用 `npm run discover:github-trending -- --browser-export <path>`，让同一解析器处理浏览器导出的内容。
    - 至少检查 GitHub Trending daily 与 weekly：`https://github.com/trending?since=daily`、`https://github.com/trending?since=weekly`。
    - 对 AI 工程常用语言补扫 Python、TypeScript、Rust、Go 的 daily/weekly trending。
    - 至少补看一个趋势交叉源：OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories，或等价可访问来源。
@@ -14,7 +15,7 @@
 2. Builder 原始源面：
    - 必查 `follow-builders` 技能规则，但不要把二手转述当成 Builder 观察。
    - Builder 观察只收录 builder、researcher、founder、maintainer 的原始帖子、个人博客、公开视频或播客片段；没有原始 URL 就不收录。
-   - 如果 X/YouTube/feed 无法访问，`builder_observations` 保持空数组，但 `source_audit.builder_sources` 必须记录 `checked:true`、检查过的来源、阻塞状态和原因。
+   - 如果 X/YouTube/feed 无法访问，`builder_observations` 保持空数组，但 `source_audit.builder_sources` 必须记录 `checked:true`、检查过的来源、阻塞状态和原因，并填写 `blocked_reason` 与 `last_successful_feed_at`。
    - Builder 条目必须尽量填写 `role`、`event_date`、`source`、`evidence`；不要把 Builder 条目计入 `main_items`。
 
 结构化草稿必须包含：
@@ -47,6 +48,8 @@
     ],
     "candidates_found": 0,
     "included": 0,
+    "blocked_reason": "",
+    "last_successful_feed_at": null,
     "notes": ""
   }
 }

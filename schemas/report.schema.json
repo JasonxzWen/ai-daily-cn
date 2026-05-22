@@ -213,6 +213,9 @@
         "availability": {
           "enum": ["open_weights", "closed_api", "closed_product", "research_preview"]
         },
+        "release_scope": {
+          "enum": ["provider_official_launch", "gateway_availability", "preview_access", "model_card_update"]
+        },
         "event_date": {
           "type": "string",
           "format": "date"
@@ -462,6 +465,20 @@
         "included": {
           "type": "integer",
           "minimum": 0
+        },
+        "blocked_reason": {
+          "type": "string"
+        },
+        "last_successful_feed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "notes": {
           "type": "string"
