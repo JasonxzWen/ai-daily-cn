@@ -140,12 +140,46 @@ The system SHALL preserve the existing AI daily report quality contract.
 #### Scenario: Source coverage is broadened before time expansion
 - **WHEN** the default window has fewer than five high-quality main items
 - **THEN** the system checks additional first-hand source categories before expanding beyond 48 hours
-- **AND** any item older than 48 hours must be a high-signal open-source release or official research/product update from the recent five-day window
+- **AND** any item older than 48 hours must be an open-source release or official research/product update from the recent five-day window that directly changes an engineering workflow
+
+### Requirement: Candidate pool hard gate
+
+The system SHALL require a replayable candidate pool before accepting a new structured daily report.
+
+#### Scenario: Report entries reference candidates
+- **WHEN** `report:write` accepts a structured daily report
+- **THEN** it also reads a candidate pool for the same report date
+- **AND** every `main_items`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` entry references an included candidate by `candidate_id`
+- **AND** each referenced candidate has the same URL and event date as the report entry
+
+#### Scenario: Candidate pool is missing or inconsistent
+- **WHEN** a new structured daily report lacks a candidate pool or references a missing candidate
+- **THEN** `report:write` fails before writing publish artifacts
+- **AND** the error identifies the missing or invalid candidate reference
+
+#### Scenario: Candidate pool is retained
+- **WHEN** a report is written and built
+- **THEN** the candidate pool is stored beside the structured report data
+- **AND** the generated site includes a public `docs/data/YYYY/MM/YYYY-MM-DD.candidates.json` copy
 
 #### Scenario: Same-vendor small updates are merged
 - **WHEN** one vendor publishes multiple small updates in the same day or 48-hour window
 - **THEN** the report combines them into one vendor item by default
 - **AND** it only splits them when the updates change different engineering workflows, sources, or risk surfaces
+
+#### Scenario: Recent duplicate URLs are blocked from main items
+- **WHEN** a candidate URL has appeared in any report section during the previous seven days
+- **THEN** `report:write` rejects a new report that puts the same URL into `main_items`
+- **AND** the report may still publish with fewer main items instead of filling with repeated material
+
+#### Scenario: Same-day cross-section duplicates are blocked
+- **WHEN** the same URL appears in more than one of `main_items`, `model_releases`, or `hot_blogs`
+- **THEN** `report:write` rejects the draft before writing artifacts
+
+#### Scenario: Old items are kept out of the lead
+- **WHEN** an item is more than 48 hours older than the report date
+- **THEN** it cannot appear in `summary` or `main_items`
+- **AND** old background/community material is limited to one included candidate per report
 
 #### Scenario: Banned phrases are detected
 - **WHEN** the report contains banned stock phrases from the prompt contract

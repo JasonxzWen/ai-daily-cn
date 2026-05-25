@@ -44,12 +44,14 @@ function createAjv() {
 
 export const schemas = {
   report: loadSchema("report.schema.json"),
-  feed: loadSchema("feed.schema.json")
+  feed: loadSchema("feed.schema.json"),
+  candidatePool: loadSchema("candidates.schema.json")
 };
 
 const ajv = createAjv();
 const validateReportSchema = ajv.compile(schemas.report);
 const validateFeedSchema = ajv.compile(schemas.feed);
+const validateCandidatePoolSchema = ajv.compile(schemas.candidatePool);
 
 export function validateReport(report) {
   const candidate = structuredClone(report);
@@ -68,6 +70,16 @@ export function validateFeed(feed) {
     valid,
     value: candidate,
     errors: valid ? [] : normalizeAjvErrors(validateFeedSchema.errors)
+  };
+}
+
+export function validateCandidatePool(candidatePool) {
+  const candidate = structuredClone(candidatePool);
+  const valid = validateCandidatePoolSchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateCandidatePoolSchema.errors)
   };
 }
 

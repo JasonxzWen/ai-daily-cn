@@ -69,4 +69,6 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `builder_sources.last_successful_feed_at`：记录上次成功获取中心 feed 的 ISO 时间；没有历史记录时用 `null`
 - `builder_sources.notes`
 
+`main_items`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
+
 `projects` 可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。

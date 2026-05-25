@@ -70,6 +70,9 @@
     "source_audit": {
       "$ref": "#/$defs/source_audit"
     },
+    "candidate_pool_path": {
+      "$ref": "#/$defs/relative_path"
+    },
     "main_items": {
       "type": "array",
       "minItems": 1,
@@ -151,6 +154,9 @@
           "type": "string",
           "minLength": 1
         },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
         "event_date": {
           "type": "string",
           "format": "date"
@@ -206,6 +212,9 @@
           "type": "string",
           "minLength": 1
         },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
         "provider": {
           "type": "string",
           "minLength": 1
@@ -254,6 +263,9 @@
           "type": "string",
           "minLength": 1
         },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
         "url": {
           "$ref": "#/$defs/absolute_url"
         },
@@ -292,6 +304,9 @@
           "type": "string",
           "minLength": 1
         },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
         "description": {
           "type": "string",
           "minLength": 1
@@ -324,6 +339,9 @@
         "author": {
           "type": "string",
           "minLength": 1
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
         },
         "content": {
           "type": "string",
@@ -540,6 +558,10 @@
           "type": "string"
         }
       }
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
     }
   }
 }

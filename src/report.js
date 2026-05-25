@@ -5,6 +5,14 @@ import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { defaultGeneratedAt, isValidDateString } from "./time.js";
 import { defaultPublishStatus } from "./parser.js";
+import { requirePlainLanguage } from "./plain-language.js";
+import { requireFreshReport } from "./quality-gates.js";
+import {
+  readCandidatePool,
+  requireCandidateCoverage,
+  reportCandidatePoolPublicPath,
+  writeCandidatePool
+} from "./candidates.js";
 import { validateReport } from "./schema.js";
 
 export async function writeReportDraft(options = {}) {
@@ -12,20 +20,37 @@ export async function writeReportDraft(options = {}) {
   const outputDir = path.resolve(rootDir, options.outputDir || "reports-data");
   const raw = options.inputPath ? await fs.readFile(path.resolve(rootDir, options.inputPath), "utf8") : await fs.readFile(0, "utf8");
   const draft = JSON.parse(raw);
+  const reportDate = options.reportDate || draft.report_date;
+  if (!isValidDateString(reportDate)) {
+    throw new PublisherError("report_date_invalid", "结构化日报必须提供有效的 report_date 或 --date。");
+  }
+  const { candidatePool } = await readCandidatePool({
+    rootDir,
+    reportDate,
+    inputPath: options.candidatePoolPath
+  });
   const report = normalizeReportDraft(draft, {
-    reportDate: options.reportDate,
+    reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
-    generatedAt: options.generatedAt
+    generatedAt: options.generatedAt,
+    candidatePool
+  });
+  await requireFreshReport(report, {
+    historyDir: outputDir,
+    historyDays: options.historyDays,
+    candidatePool
   });
   const [year, month] = report.report_date.split("-");
   const target = path.join(outputDir, year, month, `${report.report_date}.json`);
 
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.writeFile(target, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  const candidatePoolPath = await writeCandidatePool(outputDir, report.report_date, candidatePool);
 
   return {
     report,
-    path: target
+    path: target,
+    candidatePoolPath
   };
 }
 
@@ -49,6 +74,7 @@ export function normalizeReportDraft(draft, options = {}) {
       fallback_window_used: false,
       notes: ""
     },
+    candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
     projects: Array.isArray(draft.projects) ? draft.projects : [],
@@ -78,6 +104,8 @@ export function normalizeReportDraft(draft, options = {}) {
   }
 
   requireSourceAudit(validation.value);
+  requirePlainLanguage(validation.value);
+  requireCandidateCoverage(validation.value, options.candidatePool);
 
   return validation.value;
 }

@@ -14,7 +14,8 @@ export function reportRelativePaths(reportDate) {
   return {
     markdownPath: path.posix.join("reports", year, month, `${reportDate}.md`),
     htmlPath: path.posix.join("reports", year, month, `${reportDate}.html`),
-    dataPath: path.posix.join("data", year, month, `${reportDate}.json`)
+    dataPath: path.posix.join("data", year, month, `${reportDate}.json`),
+    candidateDataPath: path.posix.join("data", year, month, `${reportDate}.candidates.json`)
   };
 }
 

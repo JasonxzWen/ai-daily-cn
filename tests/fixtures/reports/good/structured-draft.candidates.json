@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-16",
+  "generated_at": "2026-05-16T02:35:00+08:00",
+  "sources": [
+    {
+      "id": "source-report-write",
+      "name": "Report Write Source",
+      "url": "https://example.com/report-write",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-16T02:35:00+08:00",
+      "notes": "fixture"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "main-report-write",
+      "source_id": "source-report-write",
+      "category": "main_item",
+      "title": "report:write 写入结构化日报",
+      "url": "https://example.com/report-write",
+      "source": "Report Write Source",
+      "event_date": "2026-05-16",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "fixture"
+    }
+  ]
+}

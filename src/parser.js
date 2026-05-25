@@ -1,4 +1,4 @@
-import { BANNED_PHRASES, DEFAULT_SITE, OPTIONAL_SECTION_HEADINGS, SELF_CHECK_HEADINGS, SOURCE_TIERS } from "./config.js";
+import { AI_STOCK_PHRASES, DEFAULT_SITE, OPTIONAL_SECTION_HEADINGS, SELF_CHECK_HEADINGS, SOURCE_TIERS } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { defaultGeneratedAt, isValidDateString } from "./time.js";
@@ -71,7 +71,7 @@ export function defaultPublishStatus(pagesUrl = "") {
 }
 
 function assertNoForbiddenPhrases(markdown) {
-  const phrase = BANNED_PHRASES.find((item) => markdown.includes(item));
+  const phrase = AI_STOCK_PHRASES.find((item) => markdown.includes(item));
   if (phrase) {
     throw new PublisherError("forbidden_phrase", `日报包含禁用模板化表达：${phrase}`, { phrase });
   }
