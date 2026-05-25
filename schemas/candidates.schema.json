@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/candidates.schema.json",
+  "title": "AI Daily Candidate Pool",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_date", "generated_at", "sources", "candidates"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "report_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/candidate"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "absolute_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "url", "category", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "category": {
+          "enum": ["official_release", "github_trending", "builder", "blog", "community", "model_registry", "repository", "other"]
+        },
+        "status": {
+          "enum": ["checked", "blocked", "no_signal"]
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_id", "category", "title", "url", "source", "event_date", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_id": {
+          "$ref": "#/$defs/id"
+        },
+        "category": {
+          "enum": ["main_item", "model_release", "hot_blog", "project", "builder_observation", "community_lead"]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "enum": ["included", "excluded"]
+        },
+        "included_in": {
+          "enum": ["main_items", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads"]
+        },
+        "exclusion_reason": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    }
+  }
+}

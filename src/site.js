@@ -8,6 +8,7 @@ import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateFeed, validateReport } from "./schema.js";
+import { normalizeCandidatePool } from "./candidates.js";
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -35,7 +36,7 @@ export async function buildSite(options = {}) {
 
   for (const file of reportJsonFiles) {
     const report = await readReportJson(file);
-    await writeReportArtifacts(rootDir, outDir, report, writtenFiles);
+    await writeReportArtifacts(rootDir, outDir, report, writtenFiles, null, file);
     reports.push(report);
   }
 
@@ -86,7 +87,10 @@ export async function collectJsonFiles(inputDir) {
 
   const files = [];
   await walk(inputDir, files);
-  return files.filter((file) => file.toLowerCase().endsWith(".json")).sort();
+  return files
+    .filter((file) => file.toLowerCase().endsWith(".json"))
+    .filter((file) => !file.toLowerCase().endsWith(".candidates.json"))
+    .sort();
 }
 
 export async function planGeneratedFiles(options = {}) {
@@ -113,6 +117,9 @@ export async function planGeneratedFiles(options = {}) {
     const report = await readReportJson(file);
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
+    if (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date)))) {
+      files.push(paths.candidateDataPath);
+    }
     if (report.markdown_path) {
       files.push(report.markdown_path);
     }
@@ -213,13 +220,16 @@ async function writeFileTracked(outDir, relativePath, content, writtenFiles) {
   writtenFiles.push(relativePath);
 }
 
-async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null) {
+async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null) {
   const paths = reportRelativePaths(report.report_date);
   const reportHtml = await renderReportWithEffectiveInteract(report, {
     rootDir
   });
   await writeJsonTracked(outDir, paths.dataPath, report, writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
+  if (reportJsonPath) {
+    await copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles);
+  }
   if (markdown !== null && report.markdown_path) {
     await writeFileTracked(outDir, report.markdown_path, markdown.replace(/\r\n/g, "\n"), writtenFiles);
   }
@@ -244,6 +254,35 @@ async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {
 
 function uniqueSorted(items) {
   return [...new Set(items)].sort((a, b) => String(a).localeCompare(String(b)));
+}
+
+async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles) {
+  const candidatePath = candidatePoolPathForReportFile(reportJsonPath, report.report_date);
+  const candidateExists = await exists(candidatePath);
+  if (!candidateExists && !report.candidate_pool_path) {
+    return;
+  }
+  if (!candidateExists) {
+    throw new PublisherError("candidate_pool_missing", `日报声明了候选池，但文件不存在：${candidatePath}`, {
+      path: candidatePath
+    });
+  }
+
+  const candidatePool = normalizeCandidatePool(JSON.parse(await fs.readFile(candidatePath, "utf8")), report.report_date);
+  await writeJsonTracked(outDir, reportRelativePaths(report.report_date).candidateDataPath, candidatePool, writtenFiles);
+}
+
+function candidatePoolPathForReportFile(reportJsonPath, reportDate) {
+  return path.join(path.dirname(reportJsonPath), `${reportDate}.candidates.json`);
+}
+
+async function exists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function relativeWrittenFiles(rootDir, files) {

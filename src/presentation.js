@@ -3,7 +3,7 @@ export function modelReleaseTags(item) {
   const tags = [modelReleaseScopeLabel(item?.release_scope)];
 
   if (/同时出现在|同时出现|多处|多个来源|多个平台|相关发布/.test(notes)) {
-    tags.push("多平台信号");
+    tags.push("多平台可见");
   }
   if (/官方来源|官方|官方 changelog|官方网关|官方网关/.test(notes)) {
     tags.push("官方可用性");

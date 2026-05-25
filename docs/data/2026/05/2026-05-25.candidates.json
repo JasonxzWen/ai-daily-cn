@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-25",
+  "generated_at": "2026-05-25T04:35:00.000Z",
+  "sources": [
+    {
+      "id": "openai-status",
+      "name": "OpenAI Status",
+      "url": "https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "Codex rate-limit incident page, resolved on 2026-05-23."
+    },
+    {
+      "id": "hf-blog",
+      "name": "Hugging Face Blog",
+      "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "Community article by Hugging Face open-source team member Niels Rogge, published 2026-05-24."
+    },
+    {
+      "id": "github-trending-daily",
+      "name": "GitHub Trending daily",
+      "url": "https://github.com/trending?since=daily",
+      "category": "github_trending",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "discover:github-trending parsed 16 repositories for daily all-language trending."
+    },
+    {
+      "id": "github-trending-weekly",
+      "name": "GitHub Trending weekly",
+      "url": "https://github.com/trending?since=weekly",
+      "category": "github_trending",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "discover:github-trending parsed 17 repositories for weekly all-language trending."
+    },
+    {
+      "id": "github-trending-python",
+      "name": "GitHub Trending Python daily",
+      "url": "https://github.com/trending/python?since=daily",
+      "category": "github_trending",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "discover:github-trending parsed 18 repositories."
+    },
+    {
+      "id": "github-repo-metadata",
+      "name": "GitHub repo metadata via gh api",
+      "url": "https://api.github.com/",
+      "category": "repository",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "Unauthenticated REST fetch returned 403; authenticated gh api succeeded for selected repositories."
+    },
+    {
+      "id": "follow-builders",
+      "name": "follow-builders central feed",
+      "url": "https://github.com/zarazhangrui/follow-builders",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "prepare-digest returned feed generated at 2026-05-24T07:25:51.477Z, with X posts and one podcast episode."
+    },
+    {
+      "id": "official-labs-scan",
+      "name": "Official lab and platform scan",
+      "url": "https://openai.com/",
+      "category": "official_release",
+      "status": "no_signal",
+      "checked_at": "2026-05-25T04:35:00.000Z",
+      "notes": "Checked OpenAI, Anthropic, Google, GitHub Changelog, AWS ML Blog, Mistral and model registry searches; no new frontier-model launch in the 2026-05-23..2026-05-25 window."
+    }
+  ],
+  "candidates": [
+    {
+      "id": "main-openai-codex-rate-limit",
+      "source_id": "openai-status",
+      "category": "main_item",
+      "title": "OpenAI Codex 速率限制 incident 已恢复",
+      "url": "https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN",
+      "source": "OpenAI Status",
+      "event_date": "2026-05-23",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "OpenAI Status page says the Codex rate-limit incident was resolved and affected Codex components."
+    },
+    {
+      "id": "main-hf-paperswithcode",
+      "source_id": "hf-blog",
+      "category": "main_item",
+      "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
+      "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
+      "source": "Hugging Face Blog",
+      "event_date": "2026-05-24",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "Article lists new benchmark metrics, external paper submission, lineage, method pages, leaderboard screenshotting and roughly 3k evals."
+    },
+    {
+      "id": "main-github-agent-tooling",
+      "source_id": "github-trending-daily",
+      "category": "main_item",
+      "title": "GitHub 今日趋势继续偏向 agent 工具、代码上下文和视频生成基础设施",
+      "url": "https://github.com/trending?since=daily",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-25",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "discover:github-trending found 127 candidates; selected repositories were cross-checked with gh api or commit/release pages before inclusion."
+    },
+    {
+      "id": "project-pi-v0755",
+      "source_id": "github-repo-metadata",
+      "category": "project",
+      "title": "earendil-works/pi v0.75.5",
+      "url": "https://github.com/earendil-works/pi/releases/tag/v0.75.5",
+      "source": "GitHub Release",
+      "event_date": "2026-05-23",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "Release v0.75.5 adds cleaner read-tool output, faster Windows file tools, package update fixes and Anthropic-compatible adaptive-thinking configuration."
+    },
+    {
+      "id": "project-anthropic-knowledge-work-plugins",
+      "source_id": "github-repo-metadata",
+      "category": "project",
+      "title": "anthropics/knowledge-work-plugins",
+      "url": "https://github.com/anthropics/knowledge-work-plugins/commits/main/",
+      "source": "GitHub commits",
+      "event_date": "2026-05-24",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "Commit page shows 2026-05-24 migration of scan-plugins.yml to Workload Identity Federation auth."
+    },
+    {
+      "id": "project-longlive",
+      "source_id": "github-repo-metadata",
+      "category": "project",
+      "title": "NVlabs/LongLive",
+      "url": "https://github.com/NVlabs/LongLive/commits/main/",
+      "source": "GitHub commits",
+      "event_date": "2026-05-25",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "Commit page shows 2026-05-25 updates for NVFP4 inference path and README throughput improvement."
+    },
+    {
+      "id": "project-mirofish",
+      "source_id": "github-repo-metadata",
+      "category": "project",
+      "title": "666ghj/MiroFish",
+      "url": "https://github.com/666ghj/MiroFish",
+      "source": "GitHub repo metadata",
+      "event_date": "2026-05-24",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "gh api reports pushed_at 2026-05-24T16:48:58Z; repository describes a swarm-intelligence engine."
+    },
+    {
+      "id": "builder-thariq-cost-prompt",
+      "source_id": "follow-builders",
+      "category": "builder_observation",
+      "title": "Thariq: 用 agent 清理遗留服务成本",
+      "url": "https://x.com/trq212/status/2058377974882210096",
+      "source": "X",
+      "event_date": "2026-05-24",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Original post says the 'please save me money' prompt can work; follow-up notes it was used on a legacy startup codebase."
+    },
+    {
+      "id": "builder-steipete-scratch-log",
+      "source_id": "follow-builders",
+      "category": "builder_observation",
+      "title": "Peter Steinberger: 让 Codex 维护 scratch-log",
+      "url": "https://x.com/steipete/status/2058308112134635528",
+      "source": "X",
+      "event_date": "2026-05-23",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Original post recommends asking Codex to maintain decisions, tradeoffs and review-fix notes during larger refactors."
+    },
+    {
+      "id": "excluded-kedro-122",
+      "source_id": "official-labs-scan",
+      "category": "hot_blog",
+      "title": "Kedro 1.2.0 and Kedro-Viz 12.3.0",
+      "url": "https://lfaidata.foundation/blog/2026/05/22/kedro-1-2-0-and-kedro-viz-12-3-0-released-advancing-ai-experimentation-and-pipeline-visibility/",
+      "source": "LF AI & Data",
+      "event_date": "2026-05-22",
+      "status": "excluded",
+      "exclusion_reason": "Outside the 48-hour main window for 2026-05-25 and not used as filler."
+    },
+    {
+      "id": "excluded-github-copilot-web-models",
+      "source_id": "official-labs-scan",
+      "category": "main_item",
+      "title": "GitHub Copilot web model list update",
+      "url": "https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web",
+      "source": "GitHub Changelog",
+      "event_date": "2026-05-20",
+      "status": "excluded",
+      "exclusion_reason": "Already older than 48 hours and close to items covered in recent reports."
+    },
+    {
+      "id": "excluded-google-io",
+      "source_id": "official-labs-scan",
+      "category": "main_item",
+      "title": "Google I/O 2026 developer highlights",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
+      "source": "Google Blog",
+      "event_date": "2026-05-19",
+      "status": "excluded",
+      "exclusion_reason": "Repeated in recent reports and outside the freshness window."
+    },
+    {
+      "id": "excluded-no-priors-cerebras",
+      "source_id": "follow-builders",
+      "category": "builder_observation",
+      "title": "No Priors: Cerebras IPO episode",
+      "url": "https://www.youtube.com/watch?v=jeop9wfb9jU",
+      "source": "No Priors",
+      "event_date": "2026-05-21",
+      "status": "excluded",
+      "exclusion_reason": "Podcast was available in the builder feed, but published outside the freshness window for this report."
+    }
+  ]
+}

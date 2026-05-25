@@ -108,6 +108,7 @@ try {
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       inputPath: args.input || positional[0],
       outputDir: args.out || positional[1] || "reports-data",
+      candidatePoolPath: args["candidate-pool"],
       reportDate: args.date || firstPositionalDate(argv),
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"] || firstPositionalDateTime(argv)
@@ -237,7 +238,19 @@ function firstPositionalDateTime(args) {
 }
 
 function positionalArgs(args) {
-  return args.filter((token) => !token.startsWith("--"));
+  const values = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    if (token.startsWith("--")) {
+      const next = args[index + 1];
+      if (next && !next.startsWith("--")) {
+        index += 1;
+      }
+      continue;
+    }
+    values.push(token);
+  }
+  return values;
 }
 
 function printJson(value) {

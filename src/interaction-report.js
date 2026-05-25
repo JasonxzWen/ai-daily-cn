@@ -102,20 +102,6 @@ export function reportToInteractionInput(report) {
         content: `${formatSelfCheck(report.self_check)}\n\n- ${markdownLink(dataHref, "结构化 JSON")}`
       }
     ],
-    evidence: [
-      {
-        kind: "file",
-        label: "结构化日报 JSON",
-        value: dataHref,
-        status: "info"
-      },
-      {
-        kind: "assumption",
-        label: "页面生成器",
-        value: "由 .codex/skills/effective-interact/scripts/create-interaction.mjs 生成公开日报 HTML。",
-        status: "pass"
-      }
-    ],
     nextActions: Array.isArray(report.self_check?.optimization_suggestions)
       ? report.self_check.optimization_suggestions.map((item) => item.suggestion).filter(Boolean).slice(0, 3)
       : []
@@ -125,20 +111,20 @@ export function reportToInteractionInput(report) {
 function formatHeroSummary(summary) {
   const clauses = splitSummaryClauses(summary).slice(0, 3);
   if (clauses.length < 2) {
-    return `重点：${String(summary || "").trim()}`;
+    return String(summary || "").trim();
   }
 
   const bullets = clauses.map((clause) => `- ${shortenText(clause, 88)}`);
   if (splitSummaryClauses(summary).length > clauses.length) {
-    bullets.push("- 更多信号见主线摘要、主体信息与项目分区。");
+    bullets.push("- 其余条目见后文。");
   }
-  return `重点：\n${bullets.join("\n")}`;
+  return bullets.join("\n");
 }
 
 function formatMainlineSummary(summary) {
   const clauses = splitSummaryClauses(summary);
   if (clauses.length < 2) {
-    return `- **重点**：${String(summary || "").trim()}`;
+    return `- **概览**：${String(summary || "").trim()}`;
   }
 
   const bullets = clauses.slice(0, 7).map((clause, index) => {
@@ -147,7 +133,7 @@ function formatMainlineSummary(summary) {
   });
 
   if (clauses.length > bullets.length) {
-    bullets.push(`- **其他信号**：还有 ${clauses.length - bullets.length} 条补充信息，详见后续分区。`);
+    bullets.push(`- **未展开**：还有 ${clauses.length - bullets.length} 条内容见后续分区。`);
   }
 
   return bullets.join("\n");
@@ -162,16 +148,19 @@ function cleanSummaryClause(clause) {
 function inferSummaryLabel(clause, index) {
   const text = String(clause || "");
   const labels = [
-    [/Google|Gemini|Antigravity|WebMCP|托管 agent|agent 工程栈/i, "Agent 开发链路"],
+    [/AWS|SageMaker|OpenAI-compatible|迁移/i, "SageMaker"],
+    [/OpenAI Codex|Codex/i, "Codex"],
+    [/Anthropic|Claude|Glasswing|Mythos|CVD|漏洞|安全/i, "安全扫描"],
+    [/Google|Gemini|Antigravity|WebMCP|Managed Agents|托管 agent|agent 工程栈/i, "Google I/O"],
+    [/GitHub Copilot|issue|任务路由|语义/i, "Copilot"],
+    [/Mistral|Emmi|工业物理/i, "工业 AI"],
     [/Vercel|Qwen|Grok|Gateway/i, "模型入口"],
-    [/GitHub Copilot|issue|任务路由|语义/i, "开发工作流"],
-    [/AWS|SageMaker|OpenAI-compatible|迁移/i, "迁移成本"],
-    [/Trending|coding-agent|代码图谱|memory|开源/i, "开源信号"],
-    [/Anthropic|Claude|MCP|执行环境|访问边界/i, "执行边界"],
-    [/Builder feed|网络限制|未收录/i, "信源边界"]
+    [/Trending|coding-agent|代码图谱|memory|开源/i, "开源项目"],
+    [/Builder feed|网络限制|未收录/i, "Builder 来源"],
+    [/24\/48|48 小时|source_window|event_date|扩展到/i, "日期范围"]
   ];
   const match = labels.find(([pattern]) => pattern.test(text));
-  return match ? match[1] : `重点 ${index + 1}`;
+  return match ? match[1] : "概览";
 }
 
 function splitSummaryClauses(summary) {
@@ -368,10 +357,17 @@ function formatSelfCheck(selfCheck) {
 
   const suggestions = Array.isArray(selfCheck.optimization_suggestions) && selfCheck.optimization_suggestions.length > 0
     ? selfCheck.optimization_suggestions
-        .map((item) => `- **${item.issue || item.suggestion || "未命名建议"}**：${item.suggestion || ""}${item.expected_benefit ? `\n  - 预期收益：${item.expected_benefit}` : ""}`)
+        .map(formatOptimizationSuggestion)
         .join("\n")
     : "- 本轮无新增建议。";
   return `- 主体信息：${selfCheck.main_items}\n- Builder 观察：${selfCheck.builder_observations}\n- 一手链接：${selfCheck.primary_links ? "通过" : "未通过"}\n- 无禁用表达：${selfCheck.no_banned_words ? "通过" : "未通过"}\n- 无无源数字：${selfCheck.no_unsourced_numbers ? "通过" : "未通过"}\n- 说明：${selfCheck.notes || "无"}\n\n### 提示词与规则迭代建议\n\n${suggestions}`;
+}
+
+function formatOptimizationSuggestion(item) {
+  const title = item.issue || item.observed_issue || item.suggestion || "建议";
+  const change = item.suggestion || item.proposed_change || "";
+  const firstLine = change ? `- **${title}**：${change}` : `- **${title}**`;
+  return `${firstLine}${item.expected_benefit ? `\n  - 为什么要改：${item.expected_benefit}` : ""}`;
 }
 
 function markdownLink(url, label) {

@@ -14,6 +14,10 @@
       "purpose": "强制检查 GitHub Trending、OSSInsight/Trendshift 和 Builder 原始源，并把检查结果写入 source_audit。"
     },
     {
+      "name": "candidate_pool",
+      "purpose": "定义候选池 sidecar 和 candidate_id 回指硬门禁，确保正文条目可复查。"
+    },
+    {
       "name": "source_policy",
       "purpose": "定义 T0/T1/T2/T3 信源优先级和一手来源回溯要求。"
     },
@@ -24,6 +28,10 @@
     {
       "name": "selection_rules",
       "purpose": "定义主体信息筛选、去重、降级、数量上限和不凑数规则。"
+    },
+    {
+      "name": "plain_language",
+      "purpose": "要求写入结构化 JSON 前去掉泛化套话、工作汇报腔和用户不需要关心的执行细节。"
     },
     {
       "name": "output_markdown",

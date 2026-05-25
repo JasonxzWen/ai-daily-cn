@@ -30,17 +30,20 @@
 2. 运行 `npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"`；如果当前分支存在本地改动，先在当前分支提交这些改动；如果当前分支不是 `main`，再切回 `main`。不要使用 `stash`、`reset --hard`、`push --force` 或覆盖用户改动。`wrong_branch` 和非发布产物脏改动不再作为日报生成前的拦截理由，必须先用本步骤归档并回到发布分支。
 3. `publish:prepare-worktree` 会在切回 `main` 后执行发布预检；如果远端领先或 `.git` 不可写，它会返回 `publish_status.publish_error` 和 `prepared.publish_ready:false`，但不要因此停止日报生成。只有提交本地改动失败、切分支失败或无法保护用户改动时，才停止。
 4. 运行 `npm run prompt:build -- YYYY-MM-DD`，把输出作为本次日报生成与发布的完整工作契约。
-5. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目、工程工具动态和高质量工程博客；优先一手来源。模型发布优先写入 `model_releases`，热门技术博客写入 `hot_blogs`，只有重大工程影响才同时进入 `main_items`。主体信息不足时先拓展信源覆盖，再从 24h 扩展到 48h；48h 仍不足时，才允许补入最近 5 天内高信号开源 release 或官方研究/产品更新，并在 `source_window` 和 self_check notes 里记录，不要把日报长期滚成周报。
-6. 同一厂商同日或同一 48h 窗口内的多条小更新默认合并成一条厂商动态；官方 docs 没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息，只作为社区线索并标记待验证。
-7. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`model_releases`、`hot_blogs`、`self_check`；没有模型发布、热门技术博客、项目、Builder 观察或社区线索时使用空数组。
-8. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
-9. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/feed.json` 和 `docs/index.html`。日报 HTML 必须由 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 以 `pre-rendered` 模式生成，并展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
-10. 运行 `npm run validate`。
-11. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
-12. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 到 `main` 后，仓库内 `.github/workflows/deploy-pages.yml` 会运行 `npm run build`，上传 `docs/` artifact，并通过 GitHub Actions 发布 GitHub Pages。发布后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
-13. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。用于兜底的 token 必须能触发仓库 workflow；如果使用的是 GitHub Actions 自带的 `GITHUB_TOKEN`，不要假设它会触发新的 workflow。
-14. 如果 validate、真实 publish 或 API 兜底发布失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
-15. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
+5. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目、工程工具动态和高质量工程博客；优先一手来源。模型发布优先写入 `model_releases`，热门技术博客写入 `hot_blogs`，只有重大工程影响才同时进入 `main_items`。主体信息不足时先拓展信源覆盖，再从 24h 扩展到 48h；48h 仍不足时，才允许补入最近 5 天内与工程工作流直接相关的开源 release 或官方研究/产品更新，并在 `source_window` 和 self_check notes 里记录，不要把日报长期滚成周报。
+6. 先写入 `.tmp/source-candidates-YYYY-MM-DD.json` 候选池；所有来源成功、失败、无近期内容都要留痕。允许板块为空，但正文不得绕过候选池。
+7. 写入 `.tmp/daily-report.json` 前执行去重和新鲜度检查：最近 7 天出现过的 URL 默认不能再进 `main_items`；同一 URL 不得同时进入 `main_items`、`model_releases` 或 `hot_blogs`；48 小时外内容不得进入摘要或主体信息，只能作为补充/背景且每天最多 1 条。严格筛完只有 2-3 条也正常发布。
+8. 写入 `.tmp/daily-report.json` 前执行去套话检查：删掉“高信号”“核心信号”“可观察信号”“更多信号”“其他信号”“预期收益”等泛化或工作汇报式措辞；摘要只写用户需要快速判断的事实、日期、来源和变化。
+9. 同一厂商同日或同一 48h 窗口内的多条小更新默认合并成一条厂商动态；官方 docs 没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息，只作为社区线索并标记待验证。
+10. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`model_releases`、`hot_blogs`、`self_check`；没有模型发布、热门技术博客、项目、Builder 观察或社区线索时使用空数组。`main_items`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写候选池中的 `candidate_id`。
+11. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`；该命令会同时写入 `reports-data/YYYY/MM/YYYY-MM-DD.candidates.json`。如果返回 `candidate_pool_missing`、`candidate_pool_reference_invalid` 或 `freshness_gate_failed`，修正候选池、条目回指或重复/旧内容，不要绕过门禁。
+12. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/data/YYYY/MM/YYYY-MM-DD.candidates.json`、`docs/feed.json` 和 `docs/index.html`。日报 HTML 必须由 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 以 `pre-rendered` 模式生成，并展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
+13. 运行 `npm run validate`。
+14. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
+15. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 到 `main` 后，仓库内 `.github/workflows/deploy-pages.yml` 会运行 `npm run build`，上传 `docs/` artifact，并通过 GitHub Actions 发布 GitHub Pages。发布后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
+16. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。用于兜底的 token 必须能触发仓库 workflow；如果使用的是 GitHub Actions 自带的 `GITHUB_TOKEN`，不要假设它会触发新的 workflow。
+17. 如果 validate、真实 publish 或 API 兜底发布失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
+18. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
 
 最终回复必须包含：
 

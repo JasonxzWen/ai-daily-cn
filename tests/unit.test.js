@@ -13,6 +13,8 @@ import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
+import { findPlainLanguageIssues } from "../src/plain-language.js";
+import { findFreshnessIssues } from "../src/quality-gates.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -311,12 +313,12 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.template, "research-explainer");
   assert.equal(input.renderMode, "pre-rendered");
   assert(input.summary.includes("- Google 把模型和 agent 工具放进同一条链路"));
-  assert(input.summary.includes("- 更多信号见主线摘要、主体信息与项目分区。"));
+  assert(input.summary.includes("- 其余条目见后文。"));
   const mainlineSection = input.sections.find((section) => section.title === "主线摘要");
-  assert(mainlineSection.content.includes("**Agent 开发链路**"));
+  assert(mainlineSection.content.includes("**Google I/O**"));
   assert(mainlineSection.content.includes("**模型入口**"));
   const modelSection = input.sections.find((section) => section.title === "模型发布");
-  assert(modelSection.content.includes("==多平台信号=="));
+  assert(modelSection.content.includes("==多平台可见=="));
   assert(modelSection.content.includes("==官方可用性=="));
   assert(!modelSection.content.includes("备注："));
   const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
@@ -329,7 +331,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(input.sections.some((section) => section.title === "主体信息"));
   assert(input.sections.some((section) => section.title === "信源审计"));
   assert(input.sections.some((section) => typeof section.content === "string" && section.content.includes("结构化 JSON")));
-  assert(input.evidence.some((item) => item.value === "https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json"));
+  assert.equal(input.evidence, undefined);
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -446,7 +448,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes('data-render-mode="pre-rendered"'));
   assert(html.includes("模型发布"));
   assert(html.includes("ExampleModel 2"));
-  assert(html.includes("多平台信号"));
+  assert(html.includes("多平台可见"));
   assert(html.includes("官方可用性"));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
@@ -503,10 +505,12 @@ test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build",
 test("report:write 标准化结构化草稿并写入 reports-data", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-write-"));
   const draftPath = path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json");
+  const candidatePoolPath = path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json");
   const result = await writeReportDraft({
     rootDir: tmp,
     inputPath: draftPath,
     outputDir: "reports-data",
+    candidatePoolPath,
     siteUrl,
     generatedAt: fixedGeneratedAt
   });
@@ -514,12 +518,33 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.report_date, "2026-05-16");
   assert.equal(result.report.html_path, "reports/2026/05/2026-05-16.html");
   assert.equal(result.report.publish_status.repo_pushed, false);
+  assert.equal(result.report.candidate_pool_path, "data/2026/05/2026-05-16.candidates.json");
+  assert.equal(result.report.main_items[0].candidate_id, "main-report-write");
   assert.deepEqual(result.report.model_releases, []);
   assert.deepEqual(result.report.hot_blogs, []);
   assert.equal(result.report.source_audit.github_trending.checked, true);
   assert.equal(result.report.source_audit.builder_sources.checked, true);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
+  assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
+  assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write 缺少候选池时停止", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-write-missing-candidates-"));
+  const draftPath = path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json");
+
+  await assert.rejects(
+    () =>
+      writeReportDraft({
+        rootDir: tmp,
+        inputPath: draftPath,
+        outputDir: "reports-data",
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    (error) => error instanceof PublisherError && error.code === "candidate_pool_missing"
+  );
 });
 
 test("report:write 要求结构化草稿记录 GitHub Trending 和 Builder 信源审计", async () => {
@@ -534,6 +559,161 @@ test("report:write 要求结构化草稿记录 GitHub Trending 和 Builder 信�
       }),
     "source_audit_missing"
   );
+});
+
+test("report:write 拒绝结构化草稿中的泛化套话", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  draft.summary = "今天的高信号更新集中在 agent 工具链。";
+
+  assert.deepEqual(findPlainLanguageIssues(draft).map((item) => item.phrase), ["高信号"]);
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    "plain_language_failed"
+  );
+});
+
+test("report:write 要求入选条目回指候选池", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.main_items[0].candidate_id = "missing-candidate";
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "candidate_pool_reference_invalid"
+  );
+});
+
+test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.model_releases = [
+    {
+      candidate_id: "model-report-write",
+      name: "Report Write Model",
+      provider: "Example AI",
+      availability: "closed_api",
+      release_scope: "provider_official_launch",
+      event_date: "2026-05-16",
+      url: "https://example.com/report-write",
+      source: "Report Write Source",
+      summary: "同一 URL 不能被包装成模型发布。",
+      notes: "fixture"
+    }
+  ];
+  candidatePool.candidates.push({
+    id: "model-report-write",
+    source_id: "source-report-write",
+    category: "model_release",
+    title: "Report Write Model",
+    url: "https://example.com/report-write",
+    source: "Report Write Source",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "model_releases",
+    evidence: "fixture"
+  });
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  const issues = findFreshnessIssues(report);
+  assert.equal(issues[0].code, "same_report_duplicate_url");
+});
+
+test("report:write 拒绝最近 7 天已出现 URL 再进主体信息", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-history-duplicate-"));
+  const draftPath = path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json");
+  const candidatePoolPath = path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json");
+  const priorDir = path.join(tmp, "reports-data", "2026", "05");
+  await fs.mkdir(priorDir, { recursive: true });
+  await fs.writeFile(
+    path.join(priorDir, "2026-05-15.json"),
+    `${JSON.stringify({
+      report_date: "2026-05-15",
+      main_items: [{ url: "https://example.com/report-write" }]
+    })}\n`,
+    "utf8"
+  );
+
+  await assert.rejects(
+    () =>
+      writeReportDraft({
+        rootDir: tmp,
+        inputPath: draftPath,
+        outputDir: "reports-data",
+        candidatePoolPath,
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    (error) => error instanceof PublisherError && error.code === "freshness_gate_failed"
+  );
+});
+
+test("report:write 拒绝 48 小时外条目进入主体信息或摘要", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.summary = "这条 2026-05-10 旧内容不能进入摘要。";
+  draft.main_items[0].event_date = "2026-05-10";
+  candidatePool.candidates[0].event_date = "2026-05-10";
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  const codes = findFreshnessIssues(report).map((issue) => issue.code);
+  assert(codes.includes("old_main_item"));
+  assert(codes.includes("old_date_in_summary"));
+});
+
+test("report:write 限制 48 小时外补充内容数量", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  candidatePool.candidates.push(
+    {
+      id: "community-old-1",
+      source_id: "source-report-write",
+      category: "community_lead",
+      title: "old lead 1",
+      url: "https://example.com/old-lead-1",
+      source: "Example",
+      event_date: "2026-05-10",
+      status: "included",
+      included_in: "community_leads",
+      evidence: "fixture"
+    },
+    {
+      id: "community-old-2",
+      source_id: "source-report-write",
+      category: "community_lead",
+      title: "old lead 2",
+      url: "https://example.com/old-lead-2",
+      source: "Example",
+      event_date: "2026-05-11",
+      status: "included",
+      included_in: "community_leads",
+      evidence: "fixture"
+    }
+  );
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  const codes = findFreshnessIssues(report, [], candidatePool).map((issue) => issue.code);
+  assert(codes.includes("too_many_old_background_items"));
 });
 
 test("report draft 缺少内容 required fields 时失败，不猜测", () => {
@@ -572,6 +752,10 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes('renderMode: "pre-rendered"'));
   assert(prompt.includes("定时任务假定已经在本仓库根目录启动"));
   assert(prompt.includes("反思与迭代建议"));
+  assert(prompt.includes("去套话检查"));
+  assert(prompt.includes("plain_language_failed"));
+  assert(prompt.includes("候选池"));
+  assert(prompt.includes("candidate_id"));
   assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("GitHub Trending"));

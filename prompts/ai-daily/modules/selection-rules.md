@@ -2,6 +2,10 @@
 
 - 主体信息默认 5-10 条，但不要为了凑数加入低质量内容。
 - 同一事件只保留一条，优先官方或原始来源。
+- 去重和新鲜度优先于丰富度；严格筛完只剩 2-3 条也可以发布，不要用旧内容补满页面。
+- 最近 7 天已经进入任何日报正文或项目/博客/模型区的 URL，默认不能再次进入 `main_items`。
+- 同一 URL 不能在同一天同时进入 `main_items`、`model_releases` 或 `hot_blogs`。
+- 48 小时外的内容不能进入 `summary` 或 `main_items`；如确有必要，只能作为补充/背景线索，且每天最多 1 条。
 - 同一厂商同日或同一 48 小时窗口内的多条小更新默认合并为一条厂商动态；只有当它们分别改变不同工程工作流、来源和风险面时才拆分。
 - 模型发布优先进入 `model_releases`，包括 OpenAI、Anthropic、Google、Meta、Mistral、xAI、Qwen、DeepSeek、Kimi、Hugging Face 等来源的开源权重、闭源 API、产品内可用或研究预览。只有当它同时改变重要工程工作流、迁移风险、成本/权限边界或生产可用路径时，才同时进入 `main_items`。
 - 热门技术博客进入 `hot_blogs`，不计入主体信息数量；它不是新闻凑数池，只有高质量工程、研究、agent、coding、eval、harness 或 design 文章才收录。

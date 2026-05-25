@@ -579,11 +579,11 @@ function renderOptimizationSuggestion(item) {
       : ""
   ].filter(Boolean);
   const details = [
-    `<p><strong>${escapeHtml(item.issue || item.suggestion || "未命名建议")}</strong></p>`,
+    `<p><strong>${escapeHtml(item.issue || item.observed_issue || item.suggestion || "建议")}</strong></p>`,
     parts.length > 0 ? `<div class="item-meta">${parts.join("")}</div>` : "",
     item.evidence ? `<p>证据：${escapeHtml(item.evidence)}</p>` : "",
-    item.suggestion ? `<p>建议：${escapeHtml(item.suggestion)}</p>` : "",
-    item.expected_benefit ? `<p>预期收益：${escapeHtml(item.expected_benefit)}</p>` : ""
+    item.suggestion || item.proposed_change ? `<p>建议：${escapeHtml(item.suggestion || item.proposed_change)}</p>` : "",
+    item.expected_benefit ? `<p>为什么要改：${escapeHtml(item.expected_benefit)}</p>` : ""
   ].filter(Boolean);
   return `<li>
     ${details.join("\n    ")}
