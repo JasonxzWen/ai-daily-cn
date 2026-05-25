@@ -1,0 +1,1953 @@
+<!doctype html>
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-template="research-explainer" data-runtime-state="not-runtime">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="effective-interact create-interaction.mjs">
+  <meta name="generated-at" content="2026-05-22T18:39:07.361Z">
+  <meta name="render-mode" content="pre-rendered">
+  <title>AI 日报 2026-05-23</title>
+  <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
+:root {
+  color-scheme: light;
+  --bg: #faf9f5;
+  --panel: #ffffff;
+  --panel-soft: #f0eee6;
+  --ink: #3d3d3a;
+  --muted: #87867f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757; /* visual token reference: #D97757 */
+  --accent-soft: #fbf1ec;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --code-bg: #141413;
+  --code-panel: #1f1e1b;
+  --code-line: #e8e6de;
+  --code-muted: #9c9a93;
+  --code-border: #3d3d3a;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+a {
+  color: var(--accent);
+}
+
+p,
+ul,
+ol {
+  margin-block: 8px;
+}
+
+.rendered-markdown ul,
+.rendered-markdown ol,
+.panel > ul,
+.action-list,
+.claim-limits {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  line-height: 1.62;
+}
+
+.rendered-markdown li + li,
+.panel > ul li + li,
+.action-list li + li,
+.claim-limits li + li {
+  margin-top: 4px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 680;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+.report-hero strong,
+.rendered-markdown strong,
+.report-data-table strong,
+.evidence-card > strong {
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.rendered-markdown em,
+.report-data-table em {
+  color: #5f5d57;
+  font-style: italic;
+  font-weight: 520;
+}
+
+.rendered-markdown mark.text-highlight,
+.report-data-table mark.text-highlight,
+.report-hero mark.text-highlight {
+  padding: 0 0.18em;
+  border-radius: 4px;
+  background: #f7dfae;
+  color: #3d2a12;
+  box-decoration-break: clone;
+}
+
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 40px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.report-hero,
+.panel,
+.finding,
+.evidence-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.panel {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.section-focus {
+  animation: section-focus-pulse 900ms ease-out 1;
+}
+
+@keyframes section-focus-pulse {
+  from {
+    box-shadow: 0 0 0 7px rgba(217, 119, 87, 0.22), var(--shadow);
+  }
+
+  to {
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+  }
+}
+
+.report-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.eyebrow,
+.meta,
+.chip,
+.status-pill {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.title-row,
+.toolbar,
+.split-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  font-size: 34px;
+  line-height: 1.08;
+  max-width: 920px;
+  overflow-wrap: anywhere;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.hero-summary-text {
+  min-height: 72px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  color: #8a3b1e;
+  font-size: 17px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+p.hero-summary-text {
+  display: flex;
+  align-items: center;
+}
+
+.hero-summary-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  list-style: none;
+}
+
+.hero-summary-list li {
+  position: relative;
+  max-width: 78ch;
+  padding-left: 17px;
+}
+
+.hero-summary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: start;
+}
+
+.hero-stat {
+  display: grid;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.hero-stat span,
+.hero-stat small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.hero-decision-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 10px;
+}
+
+.hero-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.hero-decision-card strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.hero-criteria-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-criteria-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3b1e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.eyebrow,
+.meta,
+.panel,
+.finding,
+.evidence-card,
+.hero-brief,
+.hero-decision-card,
+.lede-grid > *,
+.metric-grid > *,
+.section-heading,
+.section-summary {
+  overflow-wrap: anywhere;
+}
+
+.lede-grid,
+.metric-grid,
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.supplemental-panel {
+  padding: 20px;
+}
+
+.supplemental-panel > .section-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.claims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel,
+.finding,
+.evidence-card {
+  padding: 16px;
+}
+
+.section-heading {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.section-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.evidence-card h3 {
+  line-height: 1.42;
+}
+
+.evidence-card p {
+  margin: 0;
+  color: #5f5d57;
+  line-height: 1.52;
+}
+
+.interactive-card {
+  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.evidence-spotlight {
+  position: relative;
+  overflow: hidden;
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+}
+
+.evidence-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), rgba(217, 119, 87, 0.12), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.evidence-spotlight:hover::before,
+.evidence-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
+.focus-field.has-filter .interactive-card[hidden] {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+}
+
+.chip,
+.status-pill,
+.file-chip,
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  text-transform: none;
+  white-space: normal;
+}
+
+.card-tags,
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.swatch-chip > span {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line));
+  border-radius: 999px;
+  background: var(--swatch, var(--accent));
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.mini-metrics div {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mini-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.mini-metrics dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-ok,
+.rich-status[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  color: var(--ok);
+  background: #e4e9dc;
+}
+
+.status-warn,
+.rich-status[data-state="pending"],
+.rich-status[data-state="degraded"],
+.rich-status[data-state="fallback"] {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: var(--warn);
+  background: #fbf1ec;
+}
+
+.status-danger,
+.rich-status[data-state="failed"],
+.rich-status[data-state="error"] {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  color: var(--danger);
+  background: #f3d9cc;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  color: var(--info);
+  background: #e8efeb;
+}
+
+.source-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: inherit;
+  font-family: var(--code-font);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.source-link::before {
+  content: "#";
+  color: var(--accent);
+}
+
+button,
+.button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.button:hover,
+button[aria-pressed="true"],
+button[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+button[data-copy-state="success"] {
+  border-color: color-mix(in srgb, var(--ok) 58%, var(--line));
+  background: #e4e9dc;
+  color: var(--ok);
+}
+
+button[data-copy-state="failed"] {
+  border-color: color-mix(in srgb, var(--danger) 58%, var(--line));
+  background: #f3d9cc;
+  color: var(--danger);
+}
+
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group:first-of-type {
+  border-top: 0;
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.report-nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-nav a small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.code-panel,
+.diff-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: var(--code-line);
+}
+
+.code-panel header,
+.diff-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: #d1cfc5;
+}
+
+.code-panel header > div,
+.diff-panel header > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.diff-panel h2 {
+  color: #faf9f5;
+  font-size: 16px;
+}
+
+.code-panel pre,
+.diff-panel pre,
+.fallback-source-block,
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--code-line);
+  font: 500 13px/1.35 var(--code-font);
+  tab-size: 2;
+}
+
+.rich-render-source,
+.mermaid-source {
+  margin-top: 10px;
+}
+
+.rich-render-source summary,
+.mermaid-source summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.code-line,
+.line-hot,
+.diff-line {
+  display: block;
+  min-width: max-content;
+  margin-inline: -12px;
+  padding-inline: 58px 12px;
+  position: relative;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.code-line::before,
+.line-hot::before,
+.diff-line::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 12px;
+  width: 36px;
+  color: var(--code-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.line-hot {
+  background: rgba(217, 119, 87, 0.24);
+}
+
+.diff-added {
+  background: rgba(120, 140, 93, 0.24);
+  color: #dce4d2;
+}
+
+.diff-removed {
+  background: rgba(176, 74, 63, 0.25);
+  color: #f3d9cc;
+}
+
+.diff-hunk {
+  color: #f3d9cc;
+  background: rgba(217, 119, 87, 0.22);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #e0897a;
+  font-weight: 750;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section {
+  color: #b8c99d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9c9a93;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-attr {
+  color: #f0c36d;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e8c9ba;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c9b98a;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #8cb6a3;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #d97757;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #a67c52;
+}
+
+.hljs-addition {
+  color: #b8c99d;
+}
+
+.hljs-deletion {
+  color: #e0897a;
+}
+
+.diagram-panel,
+.mermaid-evidence {
+  border-left: 4px solid var(--accent);
+}
+
+.mermaid-rendered,
+[data-rich-mermaid-target] {
+  display: block;
+  min-height: 180px;
+  max-height: 620px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.diagram-panel svg,
+.mermaid-rendered svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.table-caption {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.report-data-table {
+  width: 100%;
+  min-width: 640px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.report-data-table th,
+.report-data-table td {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.report-data-table thead th {
+  z-index: 2;
+  background: #f0eee6;
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-data-table [data-align="center"] {
+  text-align: center;
+}
+
+.report-data-table [data-align="right"] {
+  text-align: right;
+}
+
+.report-data-table [data-table-cell] {
+  outline: 0;
+}
+
+.report-data-table [data-table-cell]:focus-visible {
+  box-shadow: var(--focus);
+  z-index: 4;
+}
+
+.report-data-table .table-row-highlight {
+  background: color-mix(in srgb, var(--accent-soft) 58%, #ffffff);
+}
+
+.report-data-table .table-column-highlight {
+  background: color-mix(in srgb, #d9f7f1 62%, #ffffff);
+}
+
+.report-data-table .table-row-highlight.table-column-highlight {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.16), rgba(61, 110, 110, 0.16)),
+    #ffffff;
+}
+
+.report-data-table .table-cell-highlight {
+  z-index: 5;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  transform: scale(1.045);
+  box-shadow: 0 10px 24px rgba(61, 61, 58, 0.16);
+}
+
+.table-cell-list,
+.table-cell-map {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.table-cell-map {
+  display: grid;
+  gap: 5px;
+  padding-left: 0;
+}
+
+.table-cell-map div {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.table-cell-map dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.table-cell-map dd {
+  margin: 0;
+}
+
+.claim-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.claim-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-card-title {
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.46;
+}
+
+.claim-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.claim-evidence-links a,
+.chart-bar-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.chart-panel figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chart-panel figcaption {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.chart-panel figcaption strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.7fr) minmax(120px, 2fr) minmax(42px, auto) minmax(72px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-bar-label,
+.chart-bar-value {
+  font-weight: 650;
+}
+
+.chart-bar-track {
+  display: block;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.chart-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.chart-line {
+  width: 100%;
+  min-height: 160px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.chart-line text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.chart-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.chart-matrix-cell,
+.chart-degraded {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.chart-degraded {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.chart-source-row {
+  margin: 0;
+}
+
+.chart-table-fallback {
+  margin-top: 2px;
+}
+
+.runtime-panel .source-link::before {
+  content: "";
+}
+
+.tab-panel[hidden],
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero-brief,
+  .hero-decision-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .report-shell {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
+  .split-row,
+  .code-panel header,
+  .diff-panel header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-hero {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 24px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-stat {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .hero-stat strong {
+    font-size: 19px;
+  }
+
+  .hero-decision-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .hero-decision-card strong {
+    font-size: 13px;
+  }
+
+  .chip,
+  .status-pill,
+  .file-chip {
+    white-space: normal;
+  }
+
+  .report-data-table {
+    min-width: 560px;
+  }
+
+  .chart-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .report-data-table .table-cell-highlight {
+    transform: none;
+  }
+}
+
+
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
+</head>
+<body>
+  <main class="report-shell">
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
+          <h1 class="report-title">AI 日报 2026-05-23</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
+      </div>
+      <div class="hero-brief">
+        <ul class="hero-summary-text hero-summary-list"><li>今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施</li><li>24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</li></ul>
+        <div class="hero-stat-grid" aria-label="报告摘要指标">
+    <div class="hero-stat"><span>证据</span><strong>2</strong><small>条</small></div>
+  </div>
+      </div>
+      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <article class="hero-decision-card">
+      <div class="meta">漏点</div>
+      <strong>2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">修复</div>
+      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">验收口径</div>
+      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
+    </article>
+  </div>
+    </header>
+
+    <div class="report-layout">
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
+<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
+<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
+<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
+<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+<a href="#evidence" title="证据" data-nav-link data-nav-index="10" data-nav-group-name="evidence" data-nav-status="info"><span>证据</span></a>
+    </div>
+  </nav>
+      <div class="report-section-stack" data-report-region="sections">
+        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">摘要</p>
+      <h2>日报概览</h2>
+
+    </div>
+
+  </div>
+    <div class="metric-grid focus-field">
+      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-23</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>1</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>4</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>5</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>0</strong></article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+
+      <h2>主线摘要</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>重点 1</strong>：今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施</li><li><strong>重点 2</strong>：24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</li></ul></div>
+    <template data-rich-source data-source-fallback>- **重点 1**：今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施
+- **重点 2**：24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>主体信息</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><p>1. <strong>OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</strong>（2026-05-21，T0）</p>
+<ul><li>这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。</li><li>OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。</li><li>工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。</li><li>来源：<a href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer">OpenAI Help Center</a></li></ul>
+<p>2. <strong>Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路</strong>（2026-05-21，T0）</p>
+<ul><li>Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。</li><li>Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。</li><li>这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。</li><li>来源：<a href="https://support.claude.com/en/articles/12138966-release-notes" rel="noopener noreferrer">Claude Release Notes / Claude Blog</a></li></ul>
+<p>3. <strong>Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族</strong>（2026-05-21，T0）</p>
+<ul><li>Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。</li><li>官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。</li><li>对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。</li><li>来源：<a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research</a></li></ul>
+<p>4. <strong>Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台</strong>（2026-05-21，T0）</p>
+<ul><li>Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。</li><li>Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。</li><li>这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。</li><li>来源：<a href="https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx" rel="noopener noreferrer">Docusign Press Release</a></li></ul>
+<p>5. <strong>Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施</strong>（2026-05-21，T0）</p>
+<ul><li>Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。</li><li>文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。</li><li>这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。</li><li>来源：<a href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal Blog</a></li></ul>
+<p>6. <strong>OpenAI 模型给出离散几何单位距离问题的新反例</strong>（2026-05-20，T0）</p>
+<ul><li>该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。</li><li>OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</li><li>工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。</li><li>来源：<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/" rel="noopener noreferrer">OpenAI Research</a></li></ul></div>
+    <template data-rich-source data-source-fallback>1. **OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享**（2026-05-21，T0）
+  - 这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。
+  - OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。
+  - 工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。
+  - 来源：[OpenAI Help Center](https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf)
+
+2. **Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路**（2026-05-21，T0）
+  - Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。
+  - Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。
+  - 这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。
+  - 来源：[Claude Release Notes / Claude Blog](https://support.claude.com/en/articles/12138966-release-notes)
+
+3. **Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族**（2026-05-21，T0）
+  - Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。
+  - 官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。
+  - 对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。
+  - 来源：[Microsoft Research](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)
+
+4. **Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台**（2026-05-21，T0）
+  - Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。
+  - Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。
+  - 这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。
+  - 来源：[Docusign Press Release](https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx)
+
+5. **Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施**（2026-05-21，T0）
+  - Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。
+  - 文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。
+  - 这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。
+  - 来源：[Modal Blog](https://modal.com/blog/modal-series-c)
+
+6. **OpenAI 模型给出离散几何单位距离问题的新反例**（2026-05-20，T0）
+  - 该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。
+  - OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。
+  - 工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。
+  - 来源：[OpenAI Research](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>模型发布</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Fara1.5</strong> <mark class="text-highlight">预览开放</mark> <mark class="text-highlight">官方可用性</mark>（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 <a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Fara1.5** ==预览开放== ==官方可用性==（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 [Microsoft Research](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>热门技术博客</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></strong>（Claude Blog / Claude Code team，2026-05-20）：Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</li><li>为什么重要：这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。</li><li><strong><a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></strong>（Microsoft Research / Microsoft Research AI Frontiers team，2026-05-21）：文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。</li><li>为什么重要：CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。</li><li><strong><a href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></strong>（Claude Blog / Anthropic，2026-05-21）：Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。</li><li>为什么重要：安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。</li><li><strong><a href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></strong>（Modal Blog / Modal，2026-05-21）：Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</li><li>为什么重要：agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[Using Claude Code: The unreasonable effectiveness of HTML](https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html)**（Claude Blog / Claude Code team，2026-05-20）：Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。
+  - 为什么重要：这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。
+- **[Fara1.5 - A family of frontier computer use agent models](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)**（Microsoft Research / Microsoft Research AI Frontiers team，2026-05-21）：文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。
+  - 为什么重要：CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。
+- **[How our partners are putting Opus to work for cybersecurity](https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity)**（Claude Blog / Anthropic，2026-05-21）：Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。
+  - 为什么重要：安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。
+- **[Modal&#39;s Series C: Raising $355M at a $4.65B valuation](https://modal.com/blog/modal-series-c)**（Modal Blog / Modal，2026-05-21）：Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。
+  - 为什么重要：agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">projects</p>
+      <h2>今日值得关注的项目</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></strong>：Anthropic 管理的 Claude Code plugin 目录，包含内部插件和第三方插件入口，README 强调安装前需要信任插件来源。</li><li><strong><a href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></strong>：面向 Claude Code、Codex、Cursor、OpenCode 等 coding agent 的本地代码知识图谱和 MCP 工具，目标是减少扫描文件、token 和工具调用。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong>：把代码库、知识库或文档转成可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等。</li><li><strong><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></strong>：Chrome DevTools MCP server，让 coding agent 控制和检查真实 Chrome，支持性能 trace、网络请求、截图、console 调试和自动化。</li><li><strong><a href="https://github.com/dotnet/skills" rel="noopener noreferrer">dotnet/skills</a></strong>：.NET 团队维护的 Agent Skills 与 custom agents 集合，覆盖 MSBuild、NuGet、升级、诊断、测试、ASP.NET、.NET AI/RAG/MCP 等任务。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)**：Anthropic 管理的 Claude Code plugin 目录，包含内部插件和第三方插件入口，README 强调安装前需要信任插件来源。
+- **[colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)**：面向 Claude Code、Codex、Cursor、OpenCode 等 coding agent 的本地代码知识图谱和 MCP 工具，目标是减少扫描文件、token 和工具调用。
+- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)**：把代码库、知识库或文档转成可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等。
+- **[ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)**：Chrome DevTools MCP server，让 coding agent 控制和检查真实 Chrome，支持性能 trace、网络请求、截图、console 调试和自动化。
+- **[dotnet/skills](https://github.com/dotnet/skills)**：.NET 团队维护的 Agent Skills 与 custom agents 集合，覆盖 MSBuild、NuGet、升级、诊断、测试、ASP.NET、.NET AI/RAG/MCP 等任务。</template>
+  </section>
+<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">signals</p>
+      <h2>Builder 观察与社区线索</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><h4>Builder 观察</h4>
+<p>暂无 Builder 观察。</p>
+<h4>社区线索</h4>
+<ul><li>GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 <a href="https://github.com/trending" rel="noopener noreferrer">来源</a></li><li>Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 <a href="https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>### Builder 观察
+
+暂无 Builder 观察。
+
+### 社区线索
+
+- GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 [来源](https://github.com/trending)
+- Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 [来源](https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>信源审计</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><h4>GitHub Trending</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：35 / 5</li><li>说明：官方 GitHub Trending 抽取受限，未把官方排名写成精确事实；项目区采用 GitTrend、Trendshift 与仓库 README 交叉可见的 AI coding-agent / MCP / skills 项目。</li></ul>
+<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：blocked，npm run discover:github-trending -- 50 在 shell 网络下 fetch failed；Web 文本视图可打开页面但只稳定返回筛选器，未稳定返回官方仓库列表。</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：blocked，同上，已检查但无法由当前自动解析器稳定抽取官方榜单。</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending language pages</a>：blocked，Python、TypeScript、Rust、Go daily/weekly 均由 discover 命令检查，当前 shell fetch failed。</li><li><a href="https://gittrend.io/" rel="noopener noreferrer">GitTrend daily repositories</a>：checked，页面显示 Ranked by engagement, May 22, 2026，并列出 codegraph、claude-plugins-official、Understand-Anything、hermes-agent 等 AI/coding-agent 项目。</li><li><a href="https://trendshift.io/" rel="noopener noreferrer">Trendshift live trending repositories</a>：checked，页面显示 Today(UTC) live ranking，包含 claude-plugins-official、codegraph、Understand-Anything、ChromeDevTools/chrome-devtools-mcp、dotnet/skills 等项目。</li><li><a href="https://ossinsight.io/trending/ai" rel="noopener noreferrer">OSSInsight AI trending</a>：checked，页面声明按 GitHub stars 与 recent growth 排名 AI agent frameworks、LLM tools、MCP servers、coding agents、RAG 与 inference 项目。</li></ul>
+<h4>Builder 原始源</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>阻塞原因：fetch_failed</li><li>上次成功获取：2026-04-27T08:20:43.831Z</li><li>说明：本轮未收录 Builder 观察，原因是中心 feed 抓取失败且本地缓存过旧；没有原始近期 URL 的内容不进入 builder_observations。</li></ul>
+<ul><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders prepare-digest</a>：blocked，node C:\Users\Admin\.codex\skills\follow-builders\scripts\prepare-digest.js 返回 fetch failed。</li><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders local X cache</a>：no_signal，本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。</li><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer">follow-builders local blog cache</a>：no_signal，本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。</li></ul></div>
+    <template data-rich-source data-source-fallback>### GitHub Trending
+
+- 检查状态：已检查
+- 候选 / 入选：35 / 5
+- 说明：官方 GitHub Trending 抽取受限，未把官方排名写成精确事实；项目区采用 GitTrend、Trendshift 与仓库 README 交叉可见的 AI coding-agent / MCP / skills 项目。
+
+- [GitHub Trending daily](https://github.com/trending?since=daily)：blocked，npm run discover:github-trending -- 50 在 shell 网络下 fetch failed；Web 文本视图可打开页面但只稳定返回筛选器，未稳定返回官方仓库列表。
+- [GitHub Trending weekly](https://github.com/trending?since=weekly)：blocked，同上，已检查但无法由当前自动解析器稳定抽取官方榜单。
+- [GitHub Trending language pages](https://github.com/trending/python?since=daily)：blocked，Python、TypeScript、Rust、Go daily/weekly 均由 discover 命令检查，当前 shell fetch failed。
+- [GitTrend daily repositories](https://gittrend.io/)：checked，页面显示 Ranked by engagement, May 22, 2026，并列出 codegraph、claude-plugins-official、Understand-Anything、hermes-agent 等 AI/coding-agent 项目。
+- [Trendshift live trending repositories](https://trendshift.io/)：checked，页面显示 Today(UTC) live ranking，包含 claude-plugins-official、codegraph、Understand-Anything、ChromeDevTools/chrome-devtools-mcp、dotnet/skills 等项目。
+- [OSSInsight AI trending](https://ossinsight.io/trending/ai)：checked，页面声明按 GitHub stars 与 recent growth 排名 AI agent frameworks、LLM tools、MCP servers、coding agents、RAG 与 inference 项目。
+
+### Builder 原始源
+
+- 检查状态：已检查
+- 候选 / 入选：0 / 0
+- 阻塞原因：fetch_failed
+- 上次成功获取：2026-04-27T08:20:43.831Z
+- 说明：本轮未收录 Builder 观察，原因是中心 feed 抓取失败且本地缓存过旧；没有原始近期 URL 的内容不进入 builder_observations。
+
+- [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：blocked，node C:\Users\Admin\.codex\skills\follow-builders\scripts\prepare-digest.js 返回 fetch failed。
+- [follow-builders local X cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。
+- [follow-builders local blog cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>自检与产物</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 6 条，未强行填满 10 条。因 24 小时 T0 一手来源不足，本轮扩展至 2026-05-20；2026-05-20 条目只作为高信号研究补充并保留真实 event_date。Builder 观察为空是因为 follow-builders 中央 feed 当前 fetch failed 且本地缓存过旧。项目表未把 GitHub 官方 Trending 解析失败伪装成成功，改用可访问趋势源和仓库 README 交叉验证。</li></ul>
+<h4>提示词与规则迭代建议</h4>
+<ul><li><strong>未命名建议</strong>：</li><li>预期收益：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。</li><li><strong>未命名建议</strong>：</li><li>预期收益：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。</li><li><strong>未命名建议</strong>：</li><li>预期收益：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。</li></ul>
+<ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- 主体信息：6
+- Builder 观察：0
+- 一手链接：通过
+- 无禁用表达：通过
+- 无无源数字：通过
+- 说明：主体信息 6 条，未强行填满 10 条。因 24 小时 T0 一手来源不足，本轮扩展至 2026-05-20；2026-05-20 条目只作为高信号研究补充并保留真实 event_date。Builder 观察为空是因为 follow-builders 中央 feed 当前 fetch failed 且本地缓存过旧。项目表未把 GitHub 官方 Trending 解析失败伪装成成功，改用可访问趋势源和仓库 README 交叉验证。
+
+### 提示词与规则迭代建议
+
+- **未命名建议**：
+  - 预期收益：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。
+- **未命名建议**：
+  - 预期收益：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。
+- **未命名建议**：
+  - 预期收益：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。
+
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json)</template>
+  </section>
+
+
+        <section class="panel supplemental-panel" id="evidence" data-section-type="evidence" data-section-group="evidence" data-report-region="evidence"><div class="section-heading split-row">
+    <div>
+
+      <h2>证据</h2>
+      <p class="section-summary">文件、命令和验证来源集中在这里。</p>
+    </div>
+
+  </div><div class="evidence-grid" data-evidence>
+    <article class="interactive-card evidence-card evidence-spotlight" id="evidence-1" data-evidence-spotlight data-evidence-id="evidence-1" data-evidence-kind="file" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">文件</span><span class="status-pill status-info">信息</span></div>
+      <h3>结构化日报 JSON</h3>
+      <p>https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json</p>
+
+
+    </article>
+<article class="interactive-card evidence-card evidence-spotlight" id="evidence-2" data-evidence-spotlight data-evidence-id="evidence-2" data-evidence-kind="assumption" data-trust-level="mixed-trust">
+      <div class="split-row"><span class="meta">假设</span><span class="status-pill status-ok">通过</span></div>
+      <h3>页面生成器</h3>
+      <p>由 .codex/skills/effective-interact/scripts/create-interaction.mjs 生成公开日报 HTML。</p>
+
+
+    </article>
+  </div></section>
+
+
+      </div>
+    </div>
+  </main>
+
+  <script>/* Use case: small local interactions for self-contained Effective reports. The generator inlines this into the final <script> block. */
+(function () {
+  var sectionFocusTimer = null;
+  var lastActiveNavId = "";
+
+  function setCopyButtonState(button, label, state) {
+    if (!button) return;
+    if (!button.getAttribute("data-copy-label")) {
+      button.setAttribute("data-copy-label", button.textContent);
+    }
+    if (button.getAttribute("data-copy-timer")) {
+      clearTimeout(Number(button.getAttribute("data-copy-timer")));
+    }
+    button.textContent = label;
+    button.setAttribute("data-copy-state", state);
+    button.setAttribute("aria-live", "polite");
+    var timer = setTimeout(function () {
+      button.textContent = button.getAttribute("data-copy-label") || label;
+      button.removeAttribute("data-copy-state");
+      button.removeAttribute("data-copy-timer");
+    }, 1100);
+    button.setAttribute("data-copy-timer", String(timer));
+  }
+
+  function fallbackCopyText(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(area);
+    }
+  }
+
+  function copyText(text, button) {
+    var value = String(text || "").trim();
+    if (!value) {
+      setCopyButtonState(button, "无内容", "empty");
+      return;
+    }
+    var done = function () {
+      setCopyButtonState(button, "已复制", "success");
+    };
+    var fail = function () {
+      setCopyButtonState(button, "复制失败", "failed");
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done, function () {
+        if (fallbackCopyText(value)) done();
+        else fail();
+      });
+      return;
+    }
+
+    if (fallbackCopyText(value)) done();
+    else fail();
+  }
+
+  function copySourceText(source) {
+    if (!source) return "";
+    if (source.matches("ul, ol")) {
+      return Array.prototype.slice.call(source.querySelectorAll("li"))
+        .map(function (item) { return "- " + (item.innerText || item.textContent || "").trim(); })
+        .filter(Boolean)
+        .join("\n");
+    }
+    return (source.innerText || source.textContent || "").trim();
+  }
+
+  function applyFilter(button) {
+    var target = button.getAttribute("data-filter-target");
+    var value = button.getAttribute("data-filter-value");
+    if (!target || !value) return;
+
+    document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      var match = value === "all" || item.getAttribute("data-filter-value") === value;
+      item.hidden = !match;
+    });
+
+    document.querySelectorAll("button[data-filter-target='" + target + "']").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+
+    var field = document.querySelector("[data-focus-field='" + target + "']");
+    if (field) {
+      field.classList.toggle("has-filter", value !== "all");
+    }
+  }
+
+  function activateTab(button) {
+    var group = button.getAttribute("data-tab-group");
+    var panel = button.getAttribute("data-tab");
+    if (!group || !panel) return;
+
+    document.querySelectorAll("[data-tab-group='" + group + "'][data-tab]").forEach(function (peer) {
+      peer.setAttribute("aria-selected", String(peer === button));
+    });
+
+    document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
+      item.hidden = item.id !== panel;
+    });
+  }
+
+  function applySearch(input) {
+    var target = input.getAttribute("data-search-for");
+    var query = input.value.trim().toLowerCase();
+    if (!target) return;
+
+    document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
+      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+    });
+  }
+
+  function updateEvidenceSpotlight(card, event) {
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
+    card.style.setProperty("--spotlight-y", event.clientY - rect.top + "px");
+  }
+
+  function clearDataTableHighlight(table) {
+    if (!table) return;
+    table.removeAttribute("data-hover-row");
+    table.removeAttribute("data-hover-column");
+    table.querySelectorAll(".table-row-highlight, .table-column-highlight, .table-cell-highlight").forEach(function (cell) {
+      cell.classList.remove("table-row-highlight", "table-column-highlight", "table-cell-highlight");
+    });
+  }
+
+  function applyDataTableHighlight(cell) {
+    var table = cell.closest("[data-report-data-table]");
+    if (!table) return;
+    var row = cell.getAttribute("data-table-row");
+    var column = cell.getAttribute("data-table-column");
+    clearDataTableHighlight(table);
+    if (!row || !column) return;
+
+    table.setAttribute("data-hover-row", row);
+    table.setAttribute("data-hover-column", column);
+
+    table.querySelectorAll("[data-table-row='" + row + "']").forEach(function (peer) {
+      peer.classList.add("table-row-highlight");
+    });
+    table.querySelectorAll("[data-table-column='" + column + "']").forEach(function (peer) {
+      peer.classList.add("table-column-highlight");
+    });
+    cell.classList.add("table-cell-highlight");
+  }
+
+  function hashTargetId() {
+    if (!window.location.hash || window.location.hash === "#") return "";
+    var raw = window.location.hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function reportSectionForId(id) {
+    if (!id) return null;
+    var target = document.getElementById(id);
+    if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
+    if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
+      return target;
+    }
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
+  }
+
+  function sectionIsVisible(section) {
+    if (!section) return false;
+    var rect = section.getBoundingClientRect();
+    return rect.bottom > 80 && rect.top < window.innerHeight;
+  }
+
+  function highlightTargetSection(id) {
+    document.querySelectorAll(".section-focus").forEach(function (section) {
+      section.classList.remove("section-focus");
+    });
+    if (sectionFocusTimer) {
+      clearTimeout(sectionFocusTimer);
+      sectionFocusTimer = null;
+    }
+
+    var section = reportSectionForId(id);
+    if (!section) return;
+    section.classList.add("section-focus");
+    sectionFocusTimer = setTimeout(function () {
+      section.classList.remove("section-focus");
+      sectionFocusTimer = null;
+    }, 1600);
+  }
+
+  function updateActiveNavigation() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
+    var hashSection = reportSectionForId(hashTargetId());
+    var active = sections
+      .map(function (section) {
+        var rect = section.getBoundingClientRect();
+        return { id: section.id, section: section, top: Math.abs(rect.top - 96), visible: sectionIsVisible(section) };
+      })
+      .filter(function (item) { return item.visible; })
+      .sort(function (a, b) { return a.top - b.top; })[0];
+    if (hashSection && sectionIsVisible(hashSection)) {
+      active = { id: hashSection.id, section: hashSection, top: 0, visible: true };
+    }
+
+    var activeLink = null;
+    document.querySelectorAll("[data-nav-link]").forEach(function (link) {
+      var isActive = Boolean(active && link.getAttribute("href") === "#" + active.id);
+      link.setAttribute("aria-current", isActive ? "true" : "false");
+      if (isActive) activeLink = link;
+    });
+
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
+    }
+    lastActiveNavId = active ? active.id : "";
+  }
+
+  document.addEventListener("click", function (event) {
+    var navLink = event.target.closest("[data-nav-link]");
+    if (navLink) {
+      var href = navLink.getAttribute("href") || "";
+      if (href.charAt(0) === "#") {
+        window.setTimeout(function () {
+          highlightTargetSection(hashTargetId());
+          updateActiveNavigation();
+        }, 80);
+      }
+    }
+
+    var button = event.target.closest("button");
+    if (!button) return;
+
+    if (button.matches("[data-copy-text]")) {
+      copyText(button.getAttribute("data-copy-text"), button);
+    }
+
+    if (button.matches("[data-copy-from]")) {
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      copyText(source ? (source.content ? source.content.textContent : copySourceText(source)) : "", button);
+    }
+
+    if (button.matches("[data-filter-target][data-filter-value]")) {
+      applyFilter(button);
+    }
+
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
+    }
+  });
+
+  document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-search-for]")) {
+      applySearch(event.target);
+    }
+  });
+
+  document.addEventListener("pointermove", function (event) {
+    var card = event.target.closest("[data-evidence-spotlight]");
+    if (card) {
+      updateEvidenceSpotlight(card, event);
+    }
+  });
+
+  document.addEventListener("pointerover", function (event) {
+    var cell = event.target.closest("[data-table-cell]");
+    if (cell) {
+      applyDataTableHighlight(cell);
+    }
+  });
+
+  document.addEventListener("pointerout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches("[data-table-cell]")) {
+      applyDataTableHighlight(event.target);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("scroll", updateActiveNavigation, { passive: true });
+  window.addEventListener("resize", updateActiveNavigation);
+  window.addEventListener("hashchange", function () {
+    highlightTargetSection(hashTargetId());
+    updateActiveNavigation();
+  });
+  highlightTargetSection(hashTargetId());
+  updateActiveNavigation();
+})();
+
+</script>
+</body>
+</html>

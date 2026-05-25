@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-23",
+  "title": "AI 日报 2026-05-23",
+  "summary": "今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施。24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客。",
+  "source_window": {
+    "date_from": "2026-05-20",
+    "date_to": "2026-05-23",
+    "fallback_window_used": true,
+    "notes": "默认 24 小时内主要只有 OpenAI 2026-05-22 的 Codex 企业采用信号；先扩展官方发布页、Claude/OpenAI release notes、Microsoft Research、企业 agent 平台、AI 基础设施博客和趋势源覆盖后，仍不足 5 条高质量主体信息，因此补入 2026-05-20 至 2026-05-21 的一手官方来源。每个主体条目均保留真实 event_date。"
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily",
+          "status": "blocked",
+          "notes": "npm run discover:github-trending -- 50 在 shell 网络下 fetch failed；Web 文本视图可打开页面但只稳定返回筛选器，未稳定返回官方仓库列表。"
+        },
+        {
+          "name": "GitHub Trending weekly",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "blocked",
+          "notes": "同上，已检查但无法由当前自动解析器稳定抽取官方榜单。"
+        },
+        {
+          "name": "GitHub Trending language pages",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "blocked",
+          "notes": "Python、TypeScript、Rust、Go daily/weekly 均由 discover 命令检查，当前 shell fetch failed。"
+        },
+        {
+          "name": "GitTrend daily repositories",
+          "url": "https://gittrend.io/",
+          "status": "checked",
+          "notes": "页面显示 Ranked by engagement, May 22, 2026，并列出 codegraph、claude-plugins-official、Understand-Anything、hermes-agent 等 AI/coding-agent 项目。"
+        },
+        {
+          "name": "Trendshift live trending repositories",
+          "url": "https://trendshift.io/",
+          "status": "checked",
+          "notes": "页面显示 Today(UTC) live ranking，包含 claude-plugins-official、codegraph、Understand-Anything、ChromeDevTools/chrome-devtools-mcp、dotnet/skills 等项目。"
+        },
+        {
+          "name": "OSSInsight AI trending",
+          "url": "https://ossinsight.io/trending/ai",
+          "status": "checked",
+          "notes": "页面声明按 GitHub stars 与 recent growth 排名 AI agent frameworks、LLM tools、MCP servers、coding agents、RAG 与 inference 项目。"
+        }
+      ],
+      "candidates_found": 35,
+      "included": 5,
+      "notes": "官方 GitHub Trending 抽取受限，未把官方排名写成精确事实；项目区采用 GitTrend、Trendshift 与仓库 README 交叉可见的 AI coding-agent / MCP / skills 项目。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders prepare-digest",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "blocked",
+          "notes": "node C:\\Users\\Admin\\.codex\\skills\\follow-builders\\scripts\\prepare-digest.js 返回 fetch failed。"
+        },
+        {
+          "name": "follow-builders local X cache",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "no_signal",
+          "notes": "本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。"
+        },
+        {
+          "name": "follow-builders local blog cache",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "no_signal",
+          "notes": "本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "blocked_reason": "fetch_failed",
+      "last_successful_feed_at": "2026-04-27T08:20:43.831Z",
+      "notes": "本轮未收录 Builder 观察，原因是中心 feed 抓取失败且本地缓存过旧；没有原始近期 URL 的内容不进入 builder_observations。"
+    }
+  },
+  "main_items": [
+    {
+      "title": "OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享",
+      "event_date": "2026-05-21",
+      "url": "https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf",
+      "source": "OpenAI Help Center",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Codex",
+        "ChatGPT Enterprise",
+        "ChatGPT Edu",
+        "Goal mode",
+        "Codex analytics"
+      ],
+      "summary": "OpenAI 在 ChatGPT Enterprise/Edu release notes 中集中更新 Codex：Goal mode 已覆盖 app、IDE extension 和 CLI，浏览器标注更细，锁屏后远程继续工作、管理员 Codex analytics 和插件共享也进入企业治理面。",
+      "bullets": [
+        "这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。",
+        "OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。",
+        "工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。"
+      ]
+    },
+    {
+      "title": "Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路",
+      "event_date": "2026-05-21",
+      "url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "source": "Claude Release Notes / Claude Blog",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Claude",
+        "Claude Compliance API",
+        "Claude Opus",
+        "Claude Security"
+      ],
+      "summary": "Claude release notes 显示 Compliance API integrations 已接入更多安全与合规工具；同日 Claude Blog 发布 Opus 在 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等安全场景中的落地案例。",
+      "bullets": [
+        "Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。",
+        "Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。",
+        "这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。"
+      ]
+    },
+    {
+      "title": "Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族",
+      "event_date": "2026-05-21",
+      "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
+      "source": "Microsoft Research",
+      "tier": "T0",
+      "entities": [
+        "Microsoft Research",
+        "Fara1.5",
+        "computer use agent",
+        "MagenticLite",
+        "Microsoft Foundry"
+      ],
+      "summary": "Microsoft Research 介绍 Fara1.5-4B、9B、27B 三个浏览器计算机使用 agent 模型，并给出 WebVoyager、Online-Mind2Web、WebTailBench 和合成环境评测；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
+      "bullets": [
+        "Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。",
+        "官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。",
+        "对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。"
+      ]
+    },
+    {
+      "title": "Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台",
+      "event_date": "2026-05-21",
+      "url": "https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx",
+      "source": "Docusign Press Release",
+      "tier": "T0",
+      "entities": [
+        "Docusign",
+        "Iris",
+        "Agent Studio",
+        "MCP",
+        "Claude",
+        "Gemini",
+        "ChatGPT"
+      ],
+      "summary": "Docusign 在 Momentum conference 发布 AI assistant、agents 和 Agent Studio，围绕协议审阅、审批、义务跟踪、风险标记和业务系统集成构建 agreement work 的 agent 层。",
+      "bullets": [
+        "Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。",
+        "Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。",
+        "这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。"
+      ]
+    },
+    {
+      "title": "Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施",
+      "event_date": "2026-05-21",
+      "url": "https://modal.com/blog/modal-series-c",
+      "source": "Modal Blog",
+      "tier": "T0",
+      "entities": [
+        "Modal",
+        "AI infrastructure",
+        "Sandboxes",
+        "reinforcement learning",
+        "inference"
+      ],
+      "summary": "Modal 宣布 3.55 亿美元 Series C，并把下一阶段重点放在低延迟推理、训练和推理闭环、agent 执行环境以及更细粒度 RBAC。",
+      "bullets": [
+        "Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。",
+        "文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。",
+        "这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。"
+      ]
+    },
+    {
+      "title": "OpenAI 模型给出离散几何单位距离问题的新反例",
+      "event_date": "2026-05-20",
+      "url": "https://openai.com/index/model-disproves-discrete-geometry-conjecture/",
+      "source": "OpenAI Research",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "discrete geometry",
+        "unit distance problem",
+        "reasoning model"
+      ],
+      "summary": "OpenAI 称其内部通用推理模型给出单位距离问题长期猜想的反例，并由外部数学家检查证明；这是本轮 48 小时外补入的高信号研究里程碑。",
+      "bullets": [
+        "该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。",
+        "OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。",
+        "工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。"
+      ]
+    }
+  ],
+  "model_releases": [
+    {
+      "name": "Fara1.5",
+      "provider": "Microsoft Research",
+      "availability": "research_preview",
+      "release_scope": "preview_access",
+      "event_date": "2026-05-21",
+      "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
+      "source": "Microsoft Research",
+      "summary": "面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
+      "notes": "官方称 4B 和 27B 将很快在 Microsoft Foundry 提供；当前按 research preview 记录，不写成开放权重。"
+    }
+  ],
+  "hot_blogs": [
+    {
+      "title": "Using Claude Code: The unreasonable effectiveness of HTML",
+      "url": "https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html",
+      "publisher": "Claude Blog",
+      "author": "Claude Code team",
+      "event_date": "2026-05-20",
+      "topic": "agent output / HTML reports / coding workflow",
+      "summary": "Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。",
+      "why_it_matters": "这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。"
+    },
+    {
+      "title": "Fara1.5 - A family of frontier computer use agent models",
+      "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
+      "publisher": "Microsoft Research",
+      "author": "Microsoft Research AI Frontiers team",
+      "event_date": "2026-05-21",
+      "topic": "computer use agents / browser agents / evaluation",
+      "summary": "文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。",
+      "why_it_matters": "CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。"
+    },
+    {
+      "title": "How our partners are putting Opus to work for cybersecurity",
+      "url": "https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity",
+      "publisher": "Claude Blog",
+      "author": "Anthropic",
+      "event_date": "2026-05-21",
+      "topic": "AI security operations / Opus / vulnerability remediation",
+      "summary": "Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。",
+      "why_it_matters": "安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。"
+    },
+    {
+      "title": "Modal's Series C: Raising $355M at a $4.65B valuation",
+      "url": "https://modal.com/blog/modal-series-c",
+      "publisher": "Modal Blog",
+      "author": "Modal",
+      "event_date": "2026-05-21",
+      "topic": "AI infrastructure / agent runtime / sandboxes",
+      "summary": "Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。",
+      "why_it_matters": "agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。"
+    }
+  ],
+  "projects": [
+    {
+      "name": "anthropics/claude-plugins-official",
+      "description": "Anthropic 管理的 Claude Code plugin 目录，包含内部插件和第三方插件入口，README 强调安装前需要信任插件来源。",
+      "url": "https://github.com/anthropics/claude-plugins-official",
+      "event_date": "2026-05-22",
+      "source": "Trendshift / GitHub repository",
+      "signal": "trending",
+      "evidence": "Trendshift live ranking 列为当日靠前项目；仓库 README 显示 official, Anthropic-managed directory of high quality Claude Code Plugins。"
+    },
+    {
+      "name": "colbymchenry/codegraph",
+      "description": "面向 Claude Code、Codex、Cursor、OpenCode 等 coding agent 的本地代码知识图谱和 MCP 工具，目标是减少扫描文件、token 和工具调用。",
+      "url": "https://github.com/colbymchenry/codegraph",
+      "event_date": "2026-05-22",
+      "source": "GitTrend / Trendshift / GitHub repository",
+      "signal": "trending",
+      "evidence": "GitTrend May 22 排名显示为 #1 trending；仓库 README 给出本地索引、MCP、benchmark 和多 agent 安装说明。"
+    },
+    {
+      "name": "Lum1104/Understand-Anything",
+      "description": "把代码库、知识库或文档转成可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-05-22",
+      "source": "GitTrend / Trendshift / GitHub repository",
+      "signal": "trending",
+      "evidence": "Trendshift 与 GitTrend 均列入 AI coding assistant / AI skills 趋势项目；仓库 README 明确支持多种 coding agent。"
+    },
+    {
+      "name": "ChromeDevTools/chrome-devtools-mcp",
+      "description": "Chrome DevTools MCP server，让 coding agent 控制和检查真实 Chrome，支持性能 trace、网络请求、截图、console 调试和自动化。",
+      "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "event_date": "2026-05-22",
+      "source": "Trendshift / GitHub repository",
+      "signal": "trending",
+      "evidence": "Trendshift live ranking 将其列为 AI agent / AI coding assistant / MCP 项目；仓库 README 描述其为 Chrome DevTools for agents。"
+    },
+    {
+      "name": "dotnet/skills",
+      "description": ".NET 团队维护的 Agent Skills 与 custom agents 集合，覆盖 MSBuild、NuGet、升级、诊断、测试、ASP.NET、.NET AI/RAG/MCP 等任务。",
+      "url": "https://github.com/dotnet/skills",
+      "event_date": "2026-05-22",
+      "source": "Trendshift / GitHub repository",
+      "signal": "trending",
+      "evidence": "Trendshift live ranking 收录该项目；仓库 README 写明这是 .NET team's curated set of core skills and custom agents for coding agents。"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。",
+      "url": "https://github.com/trending"
+    },
+    {
+      "content": "Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。",
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-23",
+    "main_items": 6,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "official-ai-releases: checked official OpenAI, Claude/Anthropic, Microsoft Research, Docusign and Modal sources for 2026-05-20..2026-05-23",
+      "github-ai-trending: ran npm run discover:github-trending -- 50; shell fetch failed, then checked GitHub Trending pages, GitTrend, Trendshift and OSSInsight via Web",
+      "follow-builders: ran prepare-digest.js; central feed returned fetch failed, local cache last successful at 2026-04-27T08:20:43.831Z"
+    ],
+    "fallback_sources": [
+      "OpenAI Help Center",
+      "OpenAI Research",
+      "OpenAI Adoption page",
+      "Claude Release Notes",
+      "Claude Blog",
+      "Microsoft Research",
+      "Docusign Press Release",
+      "Modal Blog",
+      "GitTrend",
+      "Trendshift",
+      "OSSInsight"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "主体信息 6 条，未强行填满 10 条。因 24 小时 T0 一手来源不足，本轮扩展至 2026-05-20；2026-05-20 条目只作为高信号研究补充并保留真实 event_date。Builder 观察为空是因为 follow-builders 中央 feed 当前 fetch failed 且本地缓存过旧。项目表未把 GitHub 官方 Trending 解析失败伪装成成功，改用可访问趋势源和仓库 README 交叉验证。",
+    "optimization_suggestions": [
+      {
+        "area": "discovery.github_trending",
+        "observed_issue": "当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。",
+        "evidence": "npm run discover:github-trending -- 50 返回 10 个 GitHub Trending source 均 blocked；本轮只能用 GitTrend/Trendshift/OSSInsight 交叉补充。",
+        "suggested_module": "src/discovery.js 与 prompts/ai-daily/modules/discovery-audit.md",
+        "expected_benefit": "让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。",
+        "needs_user_confirmation": true
+      },
+      {
+        "area": "builder_observations",
+        "observed_issue": "follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。",
+        "evidence": "prepare-digest.js 返回 fetch failed；本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口。",
+        "suggested_module": "prompts/ai-daily/modules/discovery-audit.md 与 follow-builders source_audit 规则",
+        "expected_benefit": "增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。",
+        "needs_user_confirmation": true
+      },
+      {
+        "area": "source_window",
+        "observed_issue": "周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。",
+        "evidence": "本轮 24 小时内不足 5 条主体信息，最终补入 2026-05-20 的 OpenAI 数学研究与 Claude HTML 技术博客。",
+        "suggested_module": "schemas/report.schema.json 与 src/interaction-report.js",
+        "expected_benefit": "增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。",
+        "needs_user_confirmation": true
+      }
+    ]
+  },
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-23.html",
+  "html_path": "reports/2026/05/2026-05-23.html",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-23.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-22T18:39:07.361Z"
+}

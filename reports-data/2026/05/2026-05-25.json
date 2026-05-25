@@ -1,0 +1,416 @@
+{
+  "report_date": "2026-05-25",
+  "title": "AI 日报 2026-05-25",
+  "summary": "今天的高信号更新集中在 agent 工程化与治理：OpenAI Codex 扩展上下文和 Goal mode，Anthropic 用 Claude Mythos Preview 披露开源安全扫描进展，Google I/O 的 Gemini 3.5 / Gemini Omni / Managed Agents 继续把模型发布和 agent 平台绑定，AWS SageMaker 增加 OpenAI-compatible endpoint，GitHub Copilot 继续把 IDE 侧 agent 能力开源和自动路由，Mistral 则把工业物理 AI 纳入产品路线。24/48 小时内一手发布较少，本轮明确扩展到 2026-05-19 起的官方高信号窗口，并保留真实 event_date。",
+  "source_window": {
+    "date_from": "2026-05-19",
+    "date_to": "2026-05-25",
+    "fallback_window_used": true,
+    "notes": "默认 24 小时和 48 小时窗口内高质量 T0/T1 主体信息不足 5 条；先补查官方发布页、GitHub Changelog、AWS/Google/Anthropic/Mistral/OpenAI/Hugging Face 与 GitHub Trending 后，仍需纳入 2026-05-19 Google I/O 官方模型与 agent 平台发布。所有条目均保留真实 event_date，未把旧事件包装为今日发布。"
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "npm run discover:github-trending -- 50",
+          "url": "https://github.com/trending?since=daily",
+          "status": "blocked",
+          "notes": "shell 内 GitHub Trending daily/weekly 与 Python/TypeScript/Rust/Go daily/weekly 均返回 fetch failed。"
+        },
+        {
+          "name": "GitHub Trending today web view",
+          "url": "https://github.com/trending",
+          "status": "checked",
+          "notes": "Web 文本视图返回 Lum1104/Understand-Anything、anthropics/claude-plugins-official、colbymchenry/codegraph、multica-ai/multica、manaflow-ai/cmux、dotnet/skills 等候选。"
+        },
+        {
+          "name": "OSSInsight AI trending",
+          "url": "https://ossinsight.io/trending/ai",
+          "status": "checked",
+          "notes": "页面说明按 GitHub stars 与 recent growth 跟踪 AI agent frameworks、LLM tools、MCP servers、coding agents、RAG、inference 等项目。"
+        },
+        {
+          "name": "Trendshift GitHub trending repositories",
+          "url": "https://trendshift.io/",
+          "status": "checked",
+          "notes": "作为 shell 抓取失败后的趋势交叉源；只把具备明确 AI/coding-agent/MCP/skills 工作流描述的项目写入 projects。"
+        }
+      ],
+      "candidates_found": 18,
+      "included": 6,
+      "notes": "官方 GitHub Trending shell 抓取失败未被伪装为成功；本轮使用 Web 文本视图和交叉趋势源补足，并只收录有可运行仓库或明确工程用途的项目。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders prepare-digest",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "blocked",
+          "notes": "node C:\\Users\\Admin\\.codex\\skills\\follow-builders\\scripts\\prepare-digest.js 返回 fetch failed。"
+        },
+        {
+          "name": "follow-builders local X cache",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "no_signal",
+          "notes": "本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过本轮采样窗口。"
+        },
+        {
+          "name": "follow-builders local blog cache",
+          "url": "https://github.com/zarazhangrui/follow-builders",
+          "status": "no_signal",
+          "notes": "本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过本轮采样窗口。"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "blocked_reason": "fetch_failed",
+      "last_successful_feed_at": "2026-04-27T08:20:43.831Z",
+      "notes": "没有近期原始 builder URL，因此 builder_observations 保持空数组；没有用二手转述补位。"
+    }
+  },
+  "main_items": [
+    {
+      "title": "OpenAI Codex 增加 richer context、Goal mode 与远程锁屏继续运行",
+      "event_date": "2026-05-21",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes-whats-new",
+      "source": "OpenAI Help Center",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Codex",
+        "Goal mode",
+        "Appshots",
+        "browser annotations"
+      ],
+      "summary": "OpenAI 在 ChatGPT release notes 中集中更新 Codex：Appshots 让 macOS Codex app 可把窗口截图与可用文本附到线程，Goal mode 已覆盖 Codex app、IDE extension 和 CLI，浏览器标注更适合前端反馈，符合条件的 Mac Computer Use 用户可在电脑锁定后继续远程运行。",
+      "bullets": [
+        "这不是单点代码补全更新，而是把 coding agent 推向更长任务、更丰富上下文和跨界面协作。",
+        "对工程团队的影响在于任务成功标准、截图上下文、浏览器反馈和远程执行都进入同一 Codex 工作流，后续需要更重视任务边界、审计与人工确认。",
+        "本条使用官方 release notes；未采用无日期的帮助文档页面作为主体来源。"
+      ]
+    },
+    {
+      "title": "Anthropic 公布 Project Glasswing 早期进展与 CVD dashboard",
+      "event_date": "2026-05-22",
+      "url": "https://www.anthropic.com/research/glasswing-initial-update?xs=1",
+      "source": "Anthropic Research",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "Project Glasswing",
+        "Claude Mythos Preview",
+        "CVD",
+        "open source security"
+      ],
+      "summary": "Anthropic 发布 Project Glasswing 初步更新，称其用 Claude Mythos Preview 扫描超过 1,000 个开源项目，并把部分已披露漏洞放入 coordinated vulnerability disclosure dashboard 跟踪。",
+      "bullets": [
+        "官方 CVD dashboard 显示截至 2026-05-22 已披露 1,596 个漏洞，覆盖 281 个开源项目，并区分发现、候选、外部安全公司复核、维护者报告与补丁状态。",
+        "工程意义不只是“AI 找漏洞”，而是漏洞验证、披露窗口、维护者沟通和补丁落地成为吞吐瓶颈。",
+        "安全团队评估这类能力时要同时看 false positive、人类复核、CVE/GHSA 归档和维护者修复闭环。"
+      ]
+    },
+    {
+      "title": "Google I/O 2026 把 Gemini 3.5、Managed Agents 和 Antigravity 放进同一开发者链路",
+      "event_date": "2026-05-19",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
+      "source": "Google Blog",
+      "tier": "T0",
+      "entities": [
+        "Google",
+        "Gemini 3.5 Flash",
+        "Managed Agents",
+        "Gemini API",
+        "Antigravity",
+        "Google AI Studio"
+      ],
+      "summary": "Google I/O 2026 developer highlights 发布 Gemini 3.5 Flash、Google Antigravity 2.0、Gemini API Managed Agents 和 AI Studio Android 支持；其中 Managed Agents 可通过单次 API 调用启动具备推理、工具使用和代码执行能力的隔离 Linux 环境。",
+      "bullets": [
+        "Google 的发布把模型、云端 sandbox、agent harness、AI Studio 和 IDE/Android 原型能力合并成开发者工作流，而不是只发布一个模型名。",
+        "Gemini 3.5 Flash 被定位为面向 agentic workflows 的高速模型；Managed Agents 则把执行环境与自定义 instructions/skills/data 文件化。",
+        "对团队选型的关键问题是：Google 的托管环境能否提供足够可观测性、权限隔离、状态恢复和企业审计。"
+      ]
+    },
+    {
+      "title": "AWS SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "event_date": "2026-05-20",
+      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+      "source": "AWS Machine Learning Blog",
+      "tier": "T0",
+      "entities": [
+        "Amazon SageMaker AI",
+        "OpenAI SDK",
+        "LangChain",
+        "Strands Agents",
+        "real-time inference endpoints"
+      ],
+      "summary": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 OpenAI-compatible API；使用 OpenAI SDK、LangChain 或 Strands Agents 的应用可通过更改 endpoint URL 调用 SageMaker 模型，无需自定义 SigV4 wrapper。",
+      "bullets": [
+        "SageMaker endpoints 暴露 `/openai/v1` 路径，支持 Chat Completions 请求和 streaming，并增加最长 12 小时的 time-limited bearer token。",
+        "这降低了把 OpenAI 生态应用迁移到自管 GPU、私有模型或企业数据驻留环境的改造成本。",
+        "安全边界仍在 IAM 权限和 bearer token 生命周期上，生产接入时应避免把 token 存入日志、配置文件或持久缓存。"
+      ]
+    },
+    {
+      "title": "GitHub Copilot for Eclipse 以 MIT 许可证开源",
+      "event_date": "2026-05-21",
+      "url": "https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub Copilot",
+        "Eclipse",
+        "MIT license",
+        "MCP",
+        "custom agents"
+      ],
+      "summary": "GitHub 宣布 Copilot for Eclipse 插件开源，代码位于 microsoft/copilot-for-eclipse，覆盖 completions、Next Edit Suggestions、chat、agent mode、skills、prompt files、BYOK、custom agents、isolated subagents、plan agent 和 MCP integration 等实现面。",
+      "bullets": [
+        "这让 Eclipse 与 Java-heavy 团队可以审查 IDE 插件如何处理上下文、skills、agent handoff 和 MCP 配置，而不是只信任封闭扩展。",
+        "开源的是 IDE 前端和集成层，不等于 Copilot 服务本身免费或开放模型。",
+        "企业 rollout 可以把该仓库作为审查 AI IDE 插件行为、权限和提示词加载机制的参考实现。"
+      ]
+    },
+    {
+      "title": "GitHub Copilot 在 VS Code 推出按任务自动模型路由，并在 Web Chat 支持语义 issue 搜索",
+      "event_date": "2026-05-20",
+      "url": "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub Copilot",
+        "VS Code",
+        "Auto model selection",
+        "semantic issue search"
+      ],
+      "summary": "GitHub Copilot auto model selection 现在会依据任务类型、模型健康度和利用率在 VS Code 中路由模型；同日 GitHub 还宣布 Copilot Chat on web 可用自然语言搜索、聚类和分析 issues。",
+      "bullets": [
+        "模型选择从手动 picker 走向任务路由，Copilot 会按 reasoning、代码生成复杂度、bug diagnosis 和 tool orchestration 等维度选择模型。",
+        "语义 issue 搜索把 triage 和 planning 往 chat 界面迁移，适合“记不清标题但记得症状”的场景。",
+        "需要关注的风险是自动路由的可解释性、成本倍率、管理员策略遵循，以及语义搜索对最新 issue 与精确布尔查询的替代边界。"
+      ]
+    },
+    {
+      "title": "Mistral AI 收购 Emmi AI，补强工业物理 AI 与工程 agent 能力",
+      "event_date": "2026-05-22",
+      "url": "https://mistral.ai/news/science-to-win-industrial-ai",
+      "source": "Mistral AI",
+      "tier": "T0",
+      "entities": [
+        "Mistral AI",
+        "Emmi AI",
+        "industrial AI",
+        "physics AI",
+        "engineering agents"
+      ],
+      "summary": "Mistral AI 宣布已达成收购 Physics AI pioneer Emmi AI 的最终协议，Emmi 超过 30 名研究与工程成员将加入 Mistral 的 Science 和 Applied AI 团队，目标是增强工业工程和制造场景中的物理建模与 agent 能力。",
+      "bullets": [
+        "Mistral 将这次收购描述为其 Science roadmap 的一部分，重点是让模型理解和建模物理，并让 AI agents 使用现有工程工具。",
+        "这表明欧洲模型厂商正在把差异化从通用聊天模型转向工业工程、仿真、数字孪生和制造流程。",
+        "对企业用户来说，后续值得观察 Emmi 的物理模型如何进入 Mistral 产品，而不是只停留在并购叙事。"
+      ]
+    }
+  ],
+  "model_releases": [
+    {
+      "name": "Gemini 3.5 Flash",
+      "provider": "Google",
+      "availability": "closed_api",
+      "release_scope": "provider_official_launch",
+      "event_date": "2026-05-19",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/",
+      "source": "Google Blog",
+      "summary": "Google 发布 Gemini 3.5 家族，首个模型 Gemini 3.5 Flash 面向 agentic workflows，官方强调 frontier intelligence、速度和 action 能力。",
+      "notes": "已在 Google Antigravity、Gemini API in Google AI Studio、Android Studio、Gemini Enterprise Agent Platform 和 Gemini Enterprise 等入口提供。"
+    },
+    {
+      "name": "Gemini Omni Flash",
+      "provider": "Google",
+      "availability": "closed_product",
+      "release_scope": "provider_official_launch",
+      "event_date": "2026-05-19",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-omni/",
+      "source": "Google Blog",
+      "summary": "Google 发布 Gemini Omni，首个模型 Gemini Omni Flash 从视频开始，支持多模态输入、生成高质量视频并通过自然语言编辑视频。",
+      "notes": "官方称 Omni Flash 正在通过 Gemini app、Google Flow 和 YouTube Shorts / Create 逐步提供；开发者和企业 API 将在后续数周推出。"
+    }
+  ],
+  "hot_blogs": [
+    {
+      "title": "Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints",
+      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng",
+      "event_date": "2026-05-20",
+      "topic": "model serving / OpenAI-compatible API / agent infrastructure",
+      "summary": "AWS 系统说明 SageMaker AI endpoint 如何以 OpenAI-compatible Chat Completions 接口服务模型、生成 bearer token、支持 inference components 和 Strands Agents。",
+      "why_it_matters": "这是把现有 OpenAI SDK 应用迁移到企业自管推理基础设施的低摩擦路径，尤其适合多模型网关和 agent 工作流。"
+    },
+    {
+      "title": "When does autoresearch need a human?",
+      "url": "https://huggingface.co/blog/ProlificAI/autoresearch-hitl-experiment",
+      "publisher": "Hugging Face Blog",
+      "author": "Nora Petrova",
+      "event_date": "2026-05-21",
+      "topic": "autonomous research agents / human evaluation / DPO",
+      "summary": "文章用 Karpathy 风格 autoresearch loop 跑 DPO 实验，并让 300 名参与者做成对评价，讨论自动研究代理何时仍需要人类判断。",
+      "why_it_matters": "自动研究 agent 的难点不只在能否跑更多实验，还在指标漂移、不可复现尖峰和人类偏好评价之间如何闭环。"
+    },
+    {
+      "title": "Text Degeneration: A Production Failure Mode That Most Benchmarks Do Not Track",
+      "url": "https://huggingface.co/blog/Dharma-AI/text-degeneration-a-production-failure-mode",
+      "publisher": "Hugging Face Blog",
+      "author": "Erick Lachmann, Gabriel Pimenta",
+      "event_date": "2026-05-22",
+      "topic": "LLM production failure / OCR / observability",
+      "summary": "文章讨论 autoregressive language model 的 text degeneration 如何在真实 PDF/OCR 场景中造成推理耗时和吞吐风险，并指出多数 benchmark 没有跟踪这种失败模式。",
+      "why_it_matters": "生产 LLM 评估需要把 latency tail、异常 token 循环和成本放进观测，而不能只看平均准确率。"
+    },
+    {
+      "title": "SANA-WM Bidirectional on Apple Silicon",
+      "url": "https://huggingface.co/blog/junafinity/sana-wm-bidirectional-on-apple-silicon",
+      "publisher": "Hugging Face Blog",
+      "author": "Arjun Reddy, Kesavan Sekar, Mahesh Kumar, Venkatesh Rajendran, Pritam Christpin",
+      "event_date": "2026-05-20",
+      "topic": "world model / Apple Silicon / local inference",
+      "summary": "文章记录 SANA-WM Bidirectional 在 M3 Max MacBook Pro 上的 staged runtime、MPS patch、96 GB memory contract 和分阶段子进程执行策略。",
+      "why_it_matters": "本地世界模型推理的主要瓶颈是内存驻留和 CUDA 假设迁移；该文给出可审查的工程 patch 和内存边界。"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Lum1104/Understand-Anything",
+      "description": "把代码、知识库或文档转成可探索、可搜索、可提问的交互式 knowledge graph，面向 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等 coding agents。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面显示该仓库位于今日榜首附近，并标注面向 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。"
+    },
+    {
+      "name": "anthropics/claude-plugins-official",
+      "description": "Anthropic-managed Claude Code Plugins directory，用于分发高质量 Claude Code 插件。",
+      "url": "https://github.com/anthropics/claude-plugins-official",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面显示该仓库今日获得高星增量；描述为 official, Anthropic-managed directory of high quality Claude Code Plugins。"
+    },
+    {
+      "name": "colbymchenry/codegraph",
+      "description": "为 Claude Code、Codex、Cursor、OpenCode 等预索引本地 code knowledge graph，以减少 token 和工具调用。",
+      "url": "https://github.com/colbymchenry/codegraph",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面显示该仓库今日高增，并明确面向 coding agent 的本地代码图谱。"
+    },
+    {
+      "name": "multica-ai/multica",
+      "description": "开源 managed agents platform，把 coding agents 组织成可分配任务、跟踪进度和沉淀 skills 的协作对象。",
+      "url": "https://github.com/multica-ai/multica",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面描述其为 open-source managed agents platform，主题与 agent 工程化直接相关。"
+    },
+    {
+      "name": "manaflow-ai/cmux",
+      "description": "基于 Ghostty 的 macOS terminal，带垂直 tabs 和 AI coding agents 通知，服务多 agent 本地开发工作流。",
+      "url": "https://github.com/manaflow-ai/cmux",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面将其描述为面向 AI coding agents 的终端工具。"
+    },
+    {
+      "name": "dotnet/skills",
+      "description": ".NET 团队维护的 agent skills 仓库，用于帮助 AI coding agents 处理 .NET 和 C# 项目任务。",
+      "url": "https://github.com/dotnet/skills",
+      "event_date": "2026-05-25",
+      "source": "GitHub Trending today web view",
+      "signal": "trending",
+      "evidence": "GitHub Trending 页面显示该仓库今日进入趋势；描述为 Repository for skills to assist AI coding agents with .NET and C#。"
+    }
+  ],
+  "builder_observations": [],
+  "community_leads": [
+    {
+      "content": "GitHub Trending shell 抓取持续 fetch failed，但 Web 文本视图本轮可读；建议后续把浏览器导出路径固化进自动化，以免项目区依赖人工 Web 补查。",
+      "url": "https://github.com/trending"
+    },
+    {
+      "content": "follow-builders 中心 feed 抓取失败且本地缓存停留在 2026-04-27；本轮没有足够近期原始 builder URL，因此不收录 Builder 观察。",
+      "url": "https://github.com/zarazhangrui/follow-builders"
+    },
+    {
+      "content": "OpenAI API changelog 搜索结果最新可见内容停留在 2026 年 1 月，未发现可写入今日主体的 2026-05-25 API changelog 条目。",
+      "url": "https://platform.openai.com/docs/changelog"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-05-25",
+    "main_items": 7,
+    "builder_observations": 0,
+    "builder_skill_used": [
+      "official-ai-releases: checked official OpenAI, Anthropic, Google, AWS, GitHub and Mistral sources for 2026-05-19..2026-05-25",
+      "github-ai-trending: ran npm run discover:github-trending -- 50; shell fetch failed, then checked GitHub Trending web view plus OSSInsight and Trendshift",
+      "follow-builders: ran prepare-digest.js; central feed returned fetch failed, local cache last successful at 2026-04-27T08:20:43.831Z"
+    ],
+    "fallback_sources": [
+      "OpenAI Help Center",
+      "Anthropic Research",
+      "Anthropic CVD dashboard",
+      "Google Blog",
+      "AWS Machine Learning Blog",
+      "GitHub Changelog",
+      "Mistral AI",
+      "Hugging Face Blog",
+      "GitHub Trending",
+      "OSSInsight",
+      "Trendshift"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "主体信息 7 条，未强行填满 10 条。24/48 小时内高质量一手发布偏少，因此扩展到 2026-05-19 的 Google I/O 官方高信号发布；每条均保留真实 event_date。Builder 观察为空是因为 follow-builders feed fetch failed 且本地缓存过旧。GitHub Trending shell 抓取失败已记录，项目区使用 Web 文本视图与交叉趋势源补查。",
+    "optimization_suggestions": [
+      {
+        "area": "discovery.github_trending",
+        "observed_issue": "discover:github-trending 在 shell 中连续 fetch failed，需要人工 Web 补查才能填充项目区。",
+        "evidence": "本轮 npm run discover:github-trending -- 50 返回 10 个 GitHub Trending source 均 blocked；Web 文本视图可以读到今日趋势项目。",
+        "suggested_module": "src/discovery.js 与 prompts/ai-daily/modules/discovery-audit.md",
+        "expected_benefit": "把浏览器导出的 GitHub Trending HTML/JSON 作为自动兜底输入，减少项目区空转或人工补查。",
+        "needs_user_confirmation": true
+      },
+      {
+        "area": "builder_observations",
+        "observed_issue": "follow-builders 中心 feed 不可用时，Builder 观察长期为空。",
+        "evidence": "prepare-digest.js 返回 fetch failed；本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，已超过当前采样窗口。",
+        "suggested_module": "prompts/ai-daily/modules/discovery-audit.md",
+        "expected_benefit": "增加经过批准的备用原始源清单或明确空结果阈值，避免把 feed 单点故障误判为生态无信号。",
+        "needs_user_confirmation": true
+      },
+      {
+        "area": "source_window",
+        "observed_issue": "低发布日会扩展到近一周高信号来源，但当前 schema 只能在 notes 中解释扩窗原因。",
+        "evidence": "本轮为了覆盖 Google I/O 官方模型与 agent 平台发布，将 source_window 起点扩展到 2026-05-19。",
+        "suggested_module": "schemas/report.schema.json 与 src/interaction-report.js",
+        "expected_benefit": "增加 per-item fallback_reason 或 source_window_expansion_reason 后，读者能区分今日发布、48 小时内更新和高信号补充。",
+        "needs_user_confirmation": true
+      }
+    ]
+  },
+  "schema_version": 1,
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-25.html",
+  "html_path": "reports/2026/05/2026-05-25.html",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-25.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-25T02:42:55.096Z"
+}
