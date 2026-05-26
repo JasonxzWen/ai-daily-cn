@@ -96,7 +96,8 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 
 后续定时任务生成日报时，除了官方发布、模型、论文和工程博客，还必须固定检查：
 
-- `github-ai-trending`：先运行 `npm run discover:github-trending -- 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending，并至少交叉 OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories 或等价趋势源。
-- `follow-builders`：只把 builder/researcher/founder/maintainer 的原始帖子、个人博客、公开视频或播客片段写入 `builder_observations`；没有原始 URL 时不得收录。
+- `github-ai-trending`：先运行 `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending；该命令在 GitHub Trending 全部抓取失败或没有解析出仓库时，会自动用 OSSInsight `List trending repos` API 兜底。浏览器可保存 HTML/JSON 时，运行 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>` 复用同一解析器。
+- `follow-builders`：只把 builder/researcher/founder/maintainer 的原始帖子、个人博客、公开视频或播客片段写入 `builder_observations`；没有原始 URL 时不得收录。中心 feed 抓取失败时，运行 `npm run discover:builders -- --date YYYY-MM-DD --limit 20`，用固定原始 RSS/Atom 源生成可审计 Builder 候选。
+- `statuspage-incidents`：运行 `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20`，把 OpenAI/Claude 等 Statuspage Atom/RSS 的近期 incident 转成候选池条目；这些条目仍需通过去重、新鲜度和 `candidate_id` 回指门禁后才能进入正文。
 
 结构化草稿必须包含 `source_audit.github_trending` 与 `source_audit.builder_sources`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因。GitHub trending 项目进入 `projects` 时应填写 `event_date`、`source`、`signal`、`evidence`；如果 shell 网络受限但浏览器能保存 GitHub Trending HTML 或采样 JSON，可运行 `npm run discover:github-trending -- --browser-export <path>` 复用同一解析器。Builder 来源受阻时必须在 `source_audit.builder_sources` 填写 `blocked_reason` 与 `last_successful_feed_at`，不要只写进 notes。Builder 条目进入 `builder_observations` 时应填写 `role`、`event_date`、`source`、`evidence`。没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。

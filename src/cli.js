@@ -10,7 +10,11 @@ import {
   publishGeneratedArtifacts
 } from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
-import { collectGitHubTrending } from "./discovery.js";
+import {
+  collectBuilderFallbacks,
+  collectGitHubTrending,
+  collectStatuspageIncidents
+} from "./discovery.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
 
@@ -123,12 +127,37 @@ try {
     const args = parseArgs(argv);
     const positional = positionalArgs(argv);
     const result = await collectGitHubTrending({
-      limit: Number.parseInt(args.limit || positional[0] || "50", 10),
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "50", 10),
+      reportDate: args.date || firstPositionalDate(argv),
       browserExportPath: args["browser-export"],
       browserExportName: args["browser-export-name"],
       browserExportUrl: args["browser-export-url"],
       browserExportLanguage: args["browser-export-language"],
       browserExportWindow: args["browser-export-window"]
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "discover:builders") {
+    const args = parseArgs(argv);
+    const result = await collectBuilderFallbacks({
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      sourcesPath: args.sources,
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "discover:statuspage-incidents") {
+    const args = parseArgs(argv);
+    const result = await collectStatuspageIncidents({
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      sourcesPath: args.sources,
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
     });
     printJson({
       ok: true,
@@ -235,6 +264,10 @@ function firstPositionalDate(args) {
 
 function firstPositionalDateTime(args) {
   return args.find((token) => /^\d{4}-\d{2}-\d{2}T/.test(token));
+}
+
+function firstPositiveInteger(args) {
+  return args.find((token) => /^[1-9]\d*$/.test(token));
 }
 
 function positionalArgs(args) {

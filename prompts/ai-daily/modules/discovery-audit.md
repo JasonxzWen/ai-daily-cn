@@ -56,3 +56,9 @@
 ```
 
 `sources[].status` 只能使用 `checked`、`blocked`、`no_signal`。没有合格候选时不要凑数，但必须在 `source_audit` 里说明已经检查过什么以及为什么未收录。
+
+### 固定兜底命令
+
+- `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50` 现在会先抓 GitHub Trending daily/weekly 与 Python/TypeScript/Rust/Go 页面；如果这些页面全部失败或没有解析出仓库，会自动调用 OSSInsight `List trending repos` API 作为机器可复现的项目候选兜底。浏览器导出仍使用 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>`。
+- `npm run discover:builders -- --date YYYY-MM-DD --limit 20` 用少量固定原始 RSS/Atom 源补充 Builder 候选。它只产生带原始 URL 的 `builder_observation` 候选；没有近期条目时记录 `no_signal`，不要手工改写成入选。
+- `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `main_item` 候选。状态页候选仍必须和其他候选一起走去重、新鲜度和 `candidate_id` 回指门禁。
