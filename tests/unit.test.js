@@ -6,7 +6,12 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
-import { collectGitHubTrending, parseGitHubTrendingHtml } from "../src/discovery.js";
+import {
+  collectBuilderFallbacks,
+  collectGitHubTrending,
+  collectStatuspageIncidents,
+  parseGitHubTrendingHtml
+} from "../src/discovery.js";
 import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { mergeFeed, buildSite } from "../src/site.js";
@@ -381,6 +386,94 @@ test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () =>
   assert.match(collected.source_audit.github_trending.sources[0].notes, /browser export/);
   assert.equal(collected.source_audit.github_trending.candidates_found, 2);
   assert.equal(collected.candidates[0].repo, "example/trending-agent");
+});
+
+test("GitHub trending discovery falls back to OSSInsight API", async () => {
+  const source = {
+    name: "GitHub Trending daily",
+    url: "https://github.com/trending?since=daily",
+    language: "all",
+    window: "daily"
+  };
+
+  const collected = await collectGitHubTrending({
+    reportDate: "2026-05-26",
+    sources: [source],
+    fetchImpl: async (url) => {
+      if (String(url).startsWith("https://api.ossinsight.io/")) {
+        return jsonResponse({
+          data: {
+            rows: [
+              {
+                repo_name: "example/agent-runtime",
+                description: "Agent runtime with deterministic workflows.",
+                primary_language: "TypeScript",
+                total_score: 42
+              }
+            ]
+          }
+        });
+      }
+      throw new Error("fetch failed");
+    }
+  });
+
+  assert.equal(collected.source_audit.github_trending.sources[0].status, "blocked");
+  assert.equal(collected.source_audit.github_trending.sources[1].name, "OSSInsight Trending Repos API");
+  assert.equal(collected.source_audit.github_trending.sources[1].status, "checked");
+  assert.equal(collected.source_audit.github_trending.candidates_found, 1);
+  assert.equal(collected.candidates[0].repo, "example/agent-runtime");
+  assert.equal(collected.candidates[0].category, "project");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+});
+
+test("builder fallback discovery parses fixed original feeds", async () => {
+  const collected = await collectBuilderFallbacks({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "builder-simon-willison",
+        name: "Simon Willison Weblog",
+        url: "https://example.com/simon.atom",
+        author: "Simon Willison",
+        role: "builder"
+      }
+    ],
+    fetchImpl: async () => textResponse(builderAtomFixture())
+  });
+
+  assert.equal(collected.source_audit.builder_sources.checked, true);
+  assert.equal(collected.source_audit.builder_sources.sources[0].status, "checked");
+  assert.equal(collected.source_audit.builder_sources.candidates_found, 1);
+  assert.equal(collected.sources[0].category, "builder");
+  assert.equal(collected.candidates[0].category, "builder_observation");
+  assert.equal(collected.candidates[0].source_id, "builder-simon-willison");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].url, "https://example.com/builder-post");
+});
+
+test("statuspage discovery parses Atom incidents into candidates", async () => {
+  const collected = await collectStatuspageIncidents({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "status-claude",
+        name: "Claude Status",
+        url: "https://status.claude.com/history.atom"
+      }
+    ],
+    fetchImpl: async () => textResponse(statuspageAtomFixture())
+  });
+
+  assert.equal(collected.sources[0].category, "other");
+  assert.equal(collected.sources[0].status, "checked");
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].category, "main_item");
+  assert.equal(collected.candidates[0].source_id, "status-claude");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].url, "https://status.claude.com/incidents/abc123");
 });
 
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
@@ -761,6 +854,8 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("GitHub Trending"));
   assert(prompt.includes("npm run discover:github-trending"));
   assert(prompt.includes("--browser-export"));
+  assert(prompt.includes("npm run discover:builders"));
+  assert(prompt.includes("npm run discover:statuspage-incidents"));
   assert(prompt.includes("release_scope"));
   assert(prompt.includes("follow-builders"));
   assert(prompt.includes("source_audit"));
@@ -846,4 +941,45 @@ function githubTrendingFixture() {
   </h2>
   <p class="col-9 color-fg-muted my-1 pr-4">RAG eval toolkit.</p>
 </article>`;
+}
+
+function builderAtomFixture() {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Agent notes from the field</title>
+    <link href="https://example.com/builder-post" />
+    <updated>2026-05-26T01:00:00Z</updated>
+    <summary>Practical notes about shipping agent workflows.</summary>
+  </entry>
+</feed>`;
+}
+
+function statuspageAtomFixture() {
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Elevated error rates on Opus 4.7</title>
+    <link href="https://status.claude.com/incidents/abc123" />
+    <updated>2026-05-26T02:00:00Z</updated>
+    <content>Resolved after elevated API errors.</content>
+  </entry>
+</feed>`;
+}
+
+function textResponse(text, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => text
+  };
+}
+
+function jsonResponse(value, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => JSON.stringify(value),
+    json: async () => value
+  };
 }
