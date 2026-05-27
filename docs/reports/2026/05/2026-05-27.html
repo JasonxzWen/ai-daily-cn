@@ -1,0 +1,1891 @@
+<!doctype html>
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-template="research-explainer" data-runtime-state="not-runtime">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="effective-interact create-interaction.mjs">
+  <meta name="generated-at" content="2026-05-26T18:45:00.000Z">
+  <meta name="render-mode" content="pre-rendered">
+  <title>AI 日报 2026-05-27</title>
+  <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
+:root {
+  color-scheme: light;
+  --bg: #faf9f5;
+  --panel: #ffffff;
+  --panel-soft: #f0eee6;
+  --ink: #3d3d3a;
+  --muted: #87867f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757; /* visual token reference: #D97757 */
+  --accent-soft: #fbf1ec;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --code-bg: #141413;
+  --code-panel: #1f1e1b;
+  --code-line: #e8e6de;
+  --code-muted: #9c9a93;
+  --code-border: #3d3d3a;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+a {
+  color: var(--accent);
+}
+
+p,
+ul,
+ol {
+  margin-block: 8px;
+}
+
+.rendered-markdown ul,
+.rendered-markdown ol,
+.panel > ul,
+.action-list,
+.claim-limits {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  line-height: 1.62;
+}
+
+.rendered-markdown li + li,
+.panel > ul li + li,
+.action-list li + li,
+.claim-limits li + li {
+  margin-top: 4px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 680;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+.report-hero strong,
+.rendered-markdown strong,
+.report-data-table strong,
+.evidence-card > strong {
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.rendered-markdown em,
+.report-data-table em {
+  color: #5f5d57;
+  font-style: italic;
+  font-weight: 520;
+}
+
+.rendered-markdown mark.text-highlight,
+.report-data-table mark.text-highlight,
+.report-hero mark.text-highlight {
+  padding: 0 0.18em;
+  border-radius: 4px;
+  background: #f7dfae;
+  color: #3d2a12;
+  box-decoration-break: clone;
+}
+
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 40px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.report-hero,
+.panel,
+.finding,
+.evidence-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.panel {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.section-focus {
+  animation: section-focus-pulse 900ms ease-out 1;
+}
+
+@keyframes section-focus-pulse {
+  from {
+    box-shadow: 0 0 0 7px rgba(217, 119, 87, 0.22), var(--shadow);
+  }
+
+  to {
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+  }
+}
+
+.report-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.eyebrow,
+.meta,
+.chip,
+.status-pill {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.title-row,
+.toolbar,
+.split-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  font-size: 34px;
+  line-height: 1.08;
+  max-width: 920px;
+  overflow-wrap: anywhere;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.hero-summary-text {
+  min-height: 72px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  color: #8a3b1e;
+  font-size: 17px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+p.hero-summary-text {
+  display: flex;
+  align-items: center;
+}
+
+.hero-summary-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  list-style: none;
+}
+
+.hero-summary-list li {
+  position: relative;
+  max-width: 78ch;
+  padding-left: 17px;
+}
+
+.hero-summary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: start;
+}
+
+.hero-stat {
+  display: grid;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.hero-stat span,
+.hero-stat small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.hero-decision-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 10px;
+}
+
+.hero-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.hero-decision-card strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.hero-criteria-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-criteria-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3b1e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.eyebrow,
+.meta,
+.panel,
+.finding,
+.evidence-card,
+.hero-brief,
+.hero-decision-card,
+.lede-grid > *,
+.metric-grid > *,
+.section-heading,
+.section-summary {
+  overflow-wrap: anywhere;
+}
+
+.lede-grid,
+.metric-grid,
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.supplemental-panel {
+  padding: 20px;
+}
+
+.supplemental-panel > .section-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.claims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel,
+.finding,
+.evidence-card {
+  padding: 16px;
+}
+
+.section-heading {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.section-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.evidence-card h3 {
+  line-height: 1.42;
+}
+
+.evidence-card p {
+  margin: 0;
+  color: #5f5d57;
+  line-height: 1.52;
+}
+
+.interactive-card {
+  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.evidence-spotlight {
+  position: relative;
+  overflow: hidden;
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+}
+
+.evidence-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), rgba(217, 119, 87, 0.12), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.evidence-spotlight:hover::before,
+.evidence-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
+.focus-field.has-filter .interactive-card[hidden] {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+}
+
+.chip,
+.status-pill,
+.file-chip,
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  text-transform: none;
+  white-space: normal;
+}
+
+.card-tags,
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.swatch-chip > span {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line));
+  border-radius: 999px;
+  background: var(--swatch, var(--accent));
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.mini-metrics div {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mini-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.mini-metrics dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-ok,
+.rich-status[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  color: var(--ok);
+  background: #e4e9dc;
+}
+
+.status-warn,
+.rich-status[data-state="pending"],
+.rich-status[data-state="degraded"],
+.rich-status[data-state="fallback"] {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: var(--warn);
+  background: #fbf1ec;
+}
+
+.status-danger,
+.rich-status[data-state="failed"],
+.rich-status[data-state="error"] {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  color: var(--danger);
+  background: #f3d9cc;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  color: var(--info);
+  background: #e8efeb;
+}
+
+.source-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: inherit;
+  font-family: var(--code-font);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.source-link::before {
+  content: "#";
+  color: var(--accent);
+}
+
+button,
+.button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.button:hover,
+button[aria-pressed="true"],
+button[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+button[data-copy-state="success"] {
+  border-color: color-mix(in srgb, var(--ok) 58%, var(--line));
+  background: #e4e9dc;
+  color: var(--ok);
+}
+
+button[data-copy-state="failed"] {
+  border-color: color-mix(in srgb, var(--danger) 58%, var(--line));
+  background: #f3d9cc;
+  color: var(--danger);
+}
+
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group:first-of-type {
+  border-top: 0;
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.report-nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-nav a small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.code-panel,
+.diff-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: var(--code-line);
+}
+
+.code-panel header,
+.diff-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: #d1cfc5;
+}
+
+.code-panel header > div,
+.diff-panel header > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.diff-panel h2 {
+  color: #faf9f5;
+  font-size: 16px;
+}
+
+.code-panel pre,
+.diff-panel pre,
+.fallback-source-block,
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--code-line);
+  font: 500 13px/1.35 var(--code-font);
+  tab-size: 2;
+}
+
+.rich-render-source,
+.mermaid-source {
+  margin-top: 10px;
+}
+
+.rich-render-source summary,
+.mermaid-source summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.code-line,
+.line-hot,
+.diff-line {
+  display: block;
+  min-width: max-content;
+  margin-inline: -12px;
+  padding-inline: 58px 12px;
+  position: relative;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.code-line::before,
+.line-hot::before,
+.diff-line::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 12px;
+  width: 36px;
+  color: var(--code-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.line-hot {
+  background: rgba(217, 119, 87, 0.24);
+}
+
+.diff-added {
+  background: rgba(120, 140, 93, 0.24);
+  color: #dce4d2;
+}
+
+.diff-removed {
+  background: rgba(176, 74, 63, 0.25);
+  color: #f3d9cc;
+}
+
+.diff-hunk {
+  color: #f3d9cc;
+  background: rgba(217, 119, 87, 0.22);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #e0897a;
+  font-weight: 750;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section {
+  color: #b8c99d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9c9a93;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-attr {
+  color: #f0c36d;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e8c9ba;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c9b98a;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #8cb6a3;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #d97757;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #a67c52;
+}
+
+.hljs-addition {
+  color: #b8c99d;
+}
+
+.hljs-deletion {
+  color: #e0897a;
+}
+
+.diagram-panel,
+.mermaid-evidence {
+  border-left: 4px solid var(--accent);
+}
+
+.mermaid-rendered,
+[data-rich-mermaid-target] {
+  display: block;
+  min-height: 180px;
+  max-height: 620px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.diagram-panel svg,
+.mermaid-rendered svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.table-caption {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.report-data-table {
+  width: 100%;
+  min-width: 640px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.report-data-table th,
+.report-data-table td {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.report-data-table thead th {
+  z-index: 2;
+  background: #f0eee6;
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-data-table [data-align="center"] {
+  text-align: center;
+}
+
+.report-data-table [data-align="right"] {
+  text-align: right;
+}
+
+.report-data-table [data-table-cell] {
+  outline: 0;
+}
+
+.report-data-table [data-table-cell]:focus-visible {
+  box-shadow: var(--focus);
+  z-index: 4;
+}
+
+.report-data-table .table-row-highlight {
+  background: color-mix(in srgb, var(--accent-soft) 58%, #ffffff);
+}
+
+.report-data-table .table-column-highlight {
+  background: color-mix(in srgb, #d9f7f1 62%, #ffffff);
+}
+
+.report-data-table .table-row-highlight.table-column-highlight {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.16), rgba(61, 110, 110, 0.16)),
+    #ffffff;
+}
+
+.report-data-table .table-cell-highlight {
+  z-index: 5;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  transform: scale(1.045);
+  box-shadow: 0 10px 24px rgba(61, 61, 58, 0.16);
+}
+
+.table-cell-list,
+.table-cell-map {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.table-cell-map {
+  display: grid;
+  gap: 5px;
+  padding-left: 0;
+}
+
+.table-cell-map div {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.table-cell-map dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.table-cell-map dd {
+  margin: 0;
+}
+
+.claim-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.claim-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-card-title {
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.46;
+}
+
+.claim-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.claim-evidence-links a,
+.chart-bar-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.chart-panel figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chart-panel figcaption {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.chart-panel figcaption strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.7fr) minmax(120px, 2fr) minmax(42px, auto) minmax(72px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-bar-label,
+.chart-bar-value {
+  font-weight: 650;
+}
+
+.chart-bar-track {
+  display: block;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.chart-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.chart-line {
+  width: 100%;
+  min-height: 160px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.chart-line text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.chart-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.chart-matrix-cell,
+.chart-degraded {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.chart-degraded {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.chart-source-row {
+  margin: 0;
+}
+
+.chart-table-fallback {
+  margin-top: 2px;
+}
+
+.runtime-panel .source-link::before {
+  content: "";
+}
+
+.tab-panel[hidden],
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero-brief,
+  .hero-decision-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .report-shell {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
+  .split-row,
+  .code-panel header,
+  .diff-panel header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-hero {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 24px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-stat {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .hero-stat strong {
+    font-size: 19px;
+  }
+
+  .hero-decision-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .hero-decision-card strong {
+    font-size: 13px;
+  }
+
+  .chip,
+  .status-pill,
+  .file-chip {
+    white-space: normal;
+  }
+
+  .report-data-table {
+    min-width: 560px;
+  }
+
+  .chart-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .report-data-table .table-cell-highlight {
+    transform: none;
+  }
+}
+
+
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
+</head>
+<body>
+  <main class="report-shell">
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-27 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
+          <h1 class="report-title">AI 日报 2026-05-27</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
+      </div>
+      <div class="hero-brief">
+        <ul class="hero-summary-text hero-summary-list"><li>2026-05-27 这版只保留 3 条主体信息：Microsoft Copilot Studio 在 2026-05-26 公布 computer-using agents…</li><li>OpenAI Status 显示 FedRAMP 用户登录问题仍在处理</li><li>Check Point 把 frontier AI 扫描和验证结果落到 Jumbo Security Release</li><li>其余条目见后文。</li></ul>
+
+      </div>
+      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-27 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <article class="hero-decision-card">
+      <div class="meta">关注点</div>
+      <strong>2026-05-27 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">处理原则</div>
+      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
+    </article>
+    <article class="hero-decision-card">
+      <div class="meta">收录标准</div>
+      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
+    </article>
+  </div>
+    </header>
+
+    <div class="report-layout">
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
+<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
+<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
+<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
+<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+    </div>
+  </nav>
+      <div class="report-section-stack" data-report-region="sections">
+        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">摘要</p>
+      <h2>日报概览</h2>
+
+    </div>
+
+  </div>
+    <div class="metric-grid focus-field">
+      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-27</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>3</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>1</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>1</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>1</strong></article>
+<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>0</strong></article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+
+      <h2>主线摘要</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>概览</strong>：2026-05-27 这版只保留 3 条主体信息：Microsoft Copilot Studio 在 2026-05-26 公布 computer-using agents GA 与工作流、Work IQ …</li><li><strong>概览</strong>：OpenAI Status 显示 FedRAMP 用户登录问题仍在处理</li><li><strong>概览</strong>：Check Point 把 frontier AI 扫描和验证结果落到 Jumbo Security Release</li><li><strong>安全扫描</strong>：模型区收录 Borealis-5B-IT，博客区收录 Hugging Face 的 agent 术语文章，项目区记录 anthropics/knowledge-work-plugins 的趋势线索与 GitH…</li></ul></div>
+    <template data-rich-source data-source-fallback>- **概览**：2026-05-27 这版只保留 3 条主体信息：Microsoft Copilot Studio 在 2026-05-26 公布 computer-using agents GA 与工作流、Work IQ …
+- **概览**：OpenAI Status 显示 FedRAMP 用户登录问题仍在处理
+- **概览**：Check Point 把 frontier AI 扫描和验证结果落到 Jumbo Security Release
+- **安全扫描**：模型区收录 Borealis-5B-IT，博客区收录 Hugging Face 的 agent 术语文章，项目区记录 anthropics/knowledge-work-plugins 的趋势线索与 GitH…</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>主体信息</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><p>1. <strong>Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新</strong>（2026-05-26，T0）</p>
+<ul><li>Computer-using agents 面向没有稳定 API 的网页和桌面应用，重点是让代理通过 UI 完成任务；Microsoft 同时提到凭据管理、模型选择和界面变化下的韧性。</li><li>新的 workflows 体验把 agent node、审批、业务逻辑和 AI-powered actions 放到统一画布，并提供 node-level testing，适合把非确定性代理动作放回可审计流程。</li><li>Work IQ REST API、CLI、remote MCP servers 和 Copilot Studio 的 A2A GA 说明 Microsoft 正在把企业上下文、工具接入和多代理协作放到同一套低代码平台里。</li><li>来源：<a href="https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/" rel="noopener noreferrer">Microsoft Copilot Blog</a></li></ul>
+<p>2. <strong>OpenAI Status 显示 FedRAMP 用户登录问题仍在处理</strong>（2026-05-26，T0）</p>
+<ul><li>这类问题不等同于模型 API 质量下降；面向政府或受监管客户的支持团队应先把身份登录、ChatGPT 前端和 API 调用失败分开排查。</li><li>状态页同屏列出 APIs、ChatGPT、Codex 和 FedRAMP 的聚合可用性，适合作为 incident runbook 中的供应商状态检查入口。</li><li>如果内部监控只记录应用侧登录失败而没有关联供应商状态页，排障人员容易把外部身份链路问题误判成本地配置或权限变更。</li><li>来源：<a href="https://status.openai.com/" rel="noopener noreferrer">OpenAI Status</a></li></ul>
+<p>3. <strong>Check Point 把 frontier AI 扫描结果落到安全发布流程</strong>（2026-05-26，T0）</p>
+<ul><li>这不是单纯的研究演示；厂商把模型辅助发现、真实可利用性判断和补丁发版放在同一个流程里，安全团队可以据此检查自己的 AI 扫描闭环。</li><li>文中提到 BLAST 会按部署条件、可达攻击面、认证要求和现实攻击能力过滤发现项；这比只看扫描器告警数量更接近补丁优先级排序。</li><li>对内部平台团队来说，重点是把 AI 发现项接入复现、确认、修复、补偿控制和发布说明，而不是把模型输出直接当成漏洞清单。</li><li>来源：<a href="https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/" rel="noopener noreferrer">Check Point Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>1. **Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新**（2026-05-26，T0）
+  - Computer-using agents 面向没有稳定 API 的网页和桌面应用，重点是让代理通过 UI 完成任务；Microsoft 同时提到凭据管理、模型选择和界面变化下的韧性。
+  - 新的 workflows 体验把 agent node、审批、业务逻辑和 AI-powered actions 放到统一画布，并提供 node-level testing，适合把非确定性代理动作放回可审计流程。
+  - Work IQ REST API、CLI、remote MCP servers 和 Copilot Studio 的 A2A GA 说明 Microsoft 正在把企业上下文、工具接入和多代理协作放到同一套低代码平台里。
+  - 来源：[Microsoft Copilot Blog](https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/)
+
+2. **OpenAI Status 显示 FedRAMP 用户登录问题仍在处理**（2026-05-26，T0）
+  - 这类问题不等同于模型 API 质量下降；面向政府或受监管客户的支持团队应先把身份登录、ChatGPT 前端和 API 调用失败分开排查。
+  - 状态页同屏列出 APIs、ChatGPT、Codex 和 FedRAMP 的聚合可用性，适合作为 incident runbook 中的供应商状态检查入口。
+  - 如果内部监控只记录应用侧登录失败而没有关联供应商状态页，排障人员容易把外部身份链路问题误判成本地配置或权限变更。
+  - 来源：[OpenAI Status](https://status.openai.com/)
+
+3. **Check Point 把 frontier AI 扫描结果落到安全发布流程**（2026-05-26，T0）
+  - 这不是单纯的研究演示；厂商把模型辅助发现、真实可利用性判断和补丁发版放在同一个流程里，安全团队可以据此检查自己的 AI 扫描闭环。
+  - 文中提到 BLAST 会按部署条件、可达攻击面、认证要求和现实攻击能力过滤发现项；这比只看扫描器告警数量更接近补丁优先级排序。
+  - 对内部平台团队来说，重点是把 AI 发现项接入复现、确认、修复、补偿控制和发布说明，而不是把模型输出直接当成漏洞清单。
+  - 来源：[Check Point Blog](https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>模型发布</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong>Borealis-5B-IT</strong> <mark class="text-highlight">模型卡更新</mark>（VikhrModels / Hugging Face，open_weights，2026-05-25）：Borealis-5B-IT 是一个 Apache-2.0 的 audio-language model：Whisper Large V3 作为冻结音频编码器，Qwen3-4B 作为语言模型，中间用 adapter 对齐音频嵌入，并提供 transformers 与 vLLM 插件路径。 <a href="https://huggingface.co/Vikhrmodels/Borealis-5b-it" rel="noopener noreferrer">Hugging Face Model Card</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Borealis-5B-IT** ==模型卡更新==（VikhrModels / Hugging Face，open_weights，2026-05-25）：Borealis-5B-IT 是一个 Apache-2.0 的 audio-language model：Whisper Large V3 作为冻结音频编码器，Qwen3-4B 作为语言模型，中间用 adapter 对齐音频嵌入，并提供 transformers 与 vLLM 插件路径。 [Hugging Face Model Card](https://huggingface.co/Vikhrmodels/Borealis-5b-it)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">正文</p>
+      <h2>热门技术博客</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://huggingface.co/blog/agent-glossary" rel="noopener noreferrer">Harness, Scaffold, and the AI Agent Terms Worth Getting Right</a></strong>（Hugging Face / Sergio Paniego, Aritra Roy Gosthipaty，2026-05-25）：文章把 model、scaffolding、harness、agent、context engineering、tool use、skills、sub-agents 和 training 术语分开解释，适合团队在评估 coding agent 或训练 agent 时先统一词义。</li><li>为什么重要：很多争论来自把模型能力、产品体验和执行 harness 混在一起；先拆清这些层次，有助于写评测、选工具和定位问题。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[Harness, Scaffold, and the AI Agent Terms Worth Getting Right](https://huggingface.co/blog/agent-glossary)**（Hugging Face / Sergio Paniego, Aritra Roy Gosthipaty，2026-05-25）：文章把 model、scaffolding、harness、agent、context engineering、tool use、skills、sub-agents 和 training 术语分开解释，适合团队在评估 coding agent 或训练 agent 时先统一词义。
+  - 为什么重要：很多争论来自把模型能力、产品体验和执行 harness 混在一起；先拆清这些层次，有助于写评测、选工具和定位问题。</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">projects</p>
+      <h2>今日值得关注的项目</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/anthropics/knowledge-work-plugins" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong>：Anthropic 的 GitHub 仓库提供面向 Claude Cowork 和 Claude Code 的角色插件，插件由 skill、connector、slash command 和 sub-agent 组成；本轮通过趋势线索发现，再用 GitHub 页面确认仓库内容和 Apache-2.0 许可。</li></ul></div>
+    <template data-rich-source data-source-fallback>- **[anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)**：Anthropic 的 GitHub 仓库提供面向 Claude Cowork 和 Claude Code 的角色插件，插件由 skill、connector、slash command 和 sub-agent 组成；本轮通过趋势线索发现，再用 GitHub 页面确认仓库内容和 Apache-2.0 许可。</template>
+  </section>
+<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">signals</p>
+      <h2>Builder 观察与社区线索</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><h4>Builder 观察</h4>
+<p>暂无 Builder 观察。</p>
+<h4>社区线索</h4>
+<ul><li>Claude Status 在 2026-05-26 记录了 Claude Code in Slack elevated errors，并在 05:19 UTC 标记 resolved；因为 status.claude.com 已在前一日作为主体来源使用，本轮只作为 Slack 集成排障线索。 <a href="https://status.claude.com/" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>### Builder 观察
+
+暂无 Builder 观察。
+
+### 社区线索
+
+- Claude Status 在 2026-05-26 记录了 Claude Code in Slack elevated errors，并在 05:19 UTC 标记 resolved；因为 status.claude.com 已在前一日作为主体来源使用，本轮只作为 Slack 集成排障线索。 [来源](https://status.claude.com/)</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>信源审计</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><h4>GitHub Trending</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：1 / 1</li><li>说明：项目区只收录了能打开 GitHub 仓库并解释用途的 anthropics/knowledge-work-plugins；没有把无法确认 event_date 的排行条目写成项目。</li></ul>
+<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending discovery command</a>：blocked，npm run discover:github-trending -- --date 2026-05-27 --limit 50 returned fetch failed for GitHub Trending pages and OSSInsight API.</li><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending web check</a>：checked，Web open confirmed the page but did not reliably expose repo rows in the captured text.</li><li><a href="https://trendingrepo.com/repo/anthropics/knowledge-work-plugins" rel="noopener noreferrer">TrendingRepo anthropics/knowledge-work-plugins</a>：checked，Used as discovery evidence, then verified the repository directly on GitHub before including it in projects.</li></ul>
+<h4>Builder 原始源</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>阻塞原因：fetch_failed</li><li>说明：固定 Builder RSS/Atom 兜底在 shell 中失败；本轮没有使用旧缓存或二手转述补齐 Builder 观察。</li></ul>
+<ul><li><a href="https://simonwillison.net/atom/everything/" rel="noopener noreferrer">Simon Willison Weblog</a>：blocked，discover:builders reported fetch failed.</li><li><a href="https://huyenchip.com/feed.xml" rel="noopener noreferrer">Chip Huyen Blog</a>：blocked，discover:builders reported fetch failed.</li><li><a href="https://karpathy.github.io/feed.xml" rel="noopener noreferrer">Andrej Karpathy Blog</a>：blocked，discover:builders reported fetch failed.</li></ul></div>
+    <template data-rich-source data-source-fallback>### GitHub Trending
+
+- 检查状态：已检查
+- 候选 / 入选：1 / 1
+- 说明：项目区只收录了能打开 GitHub 仓库并解释用途的 anthropics/knowledge-work-plugins；没有把无法确认 event_date 的排行条目写成项目。
+
+- [GitHub Trending discovery command](https://github.com/trending?since=daily)：blocked，npm run discover:github-trending -- --date 2026-05-27 --limit 50 returned fetch failed for GitHub Trending pages and OSSInsight API.
+- [GitHub Trending web check](https://github.com/trending?since=daily)：checked，Web open confirmed the page but did not reliably expose repo rows in the captured text.
+- [TrendingRepo anthropics/knowledge-work-plugins](https://trendingrepo.com/repo/anthropics/knowledge-work-plugins)：checked，Used as discovery evidence, then verified the repository directly on GitHub before including it in projects.
+
+### Builder 原始源
+
+- 检查状态：已检查
+- 候选 / 入选：0 / 0
+- 阻塞原因：fetch_failed
+- 说明：固定 Builder RSS/Atom 兜底在 shell 中失败；本轮没有使用旧缓存或二手转述补齐 Builder 观察。
+
+- [Simon Willison Weblog](https://simonwillison.net/atom/everything/)：blocked，discover:builders reported fetch failed.
+- [Chip Huyen Blog](https://huyenchip.com/feed.xml)：blocked，discover:builders reported fetch failed.
+- [Andrej Karpathy Blog](https://karpathy.github.io/feed.xml)：blocked，discover:builders reported fetch failed.</template>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>自检与产物</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮没有补入 2026-05-24 以前内容。GitHub Trending、Builder RSS 和 Statuspage Atom 命令在 shell 中失败，网页侧补核验了可公开来源；Builder 观察为空是筛选结果，不用旧缓存补页面。</li></ul>
+<h4>提示词与规则迭代建议</h4>
+<ul><li><strong>发布前工作树整理在切回 main 时被本地 Git 元数据写权限挡住，当前环境也不能改 ACL。</strong></li><li>为什么要改：把发布环境分成可自动修复、需要 token 兜底、需要人工修复三类，避免每天重复到真实发布阶段才暴露同一类问题。</li><li><strong>shell 中 GitHub Trending 和 OSSInsight API 都 fetch failed，只能靠网页与第三方趋势页人工交叉确认项目候选。</strong></li><li>为什么要改：允许自动化在 shell 抓取失败时消费浏览器导出的 HTML 或搜索结果快照，项目区仍能保留可复现候选来源。</li><li><strong>Statuspage Atom 命令在 shell 中失败，但网页状态页可以读到 OpenAI 与 Claude 的当前 incident。</strong></li><li>为什么要改：给 Statuspage 增加网页文本兜底解析后，供应商 incident 可以继续进入候选池，而不是依赖人工摘录。</li></ul>
+<ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-27.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- 主体信息：3
+- Builder 观察：0
+- 一手链接：通过
+- 无禁用表达：通过
+- 无无源数字：通过
+- 说明：本轮没有补入 2026-05-24 以前内容。GitHub Trending、Builder RSS 和 Statuspage Atom 命令在 shell 中失败，网页侧补核验了可公开来源；Builder 观察为空是筛选结果，不用旧缓存补页面。
+
+### 提示词与规则迭代建议
+
+- **发布前工作树整理在切回 main 时被本地 Git 元数据写权限挡住，当前环境也不能改 ACL。**
+  - 为什么要改：把发布环境分成可自动修复、需要 token 兜底、需要人工修复三类，避免每天重复到真实发布阶段才暴露同一类问题。
+- **shell 中 GitHub Trending 和 OSSInsight API 都 fetch failed，只能靠网页与第三方趋势页人工交叉确认项目候选。**
+  - 为什么要改：允许自动化在 shell 抓取失败时消费浏览器导出的 HTML 或搜索结果快照，项目区仍能保留可复现候选来源。
+- **Statuspage Atom 命令在 shell 中失败，但网页状态页可以读到 OpenAI 与 Claude 的当前 incident。**
+  - 为什么要改：给 Statuspage 增加网页文本兜底解析后，供应商 incident 可以继续进入候选池，而不是依赖人工摘录。
+
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-27.json)</template>
+  </section>
+
+
+
+
+
+      </div>
+    </div>
+  </main>
+
+  <script>/* Use case: small local interactions for self-contained Effective reports. The generator inlines this into the final <script> block. */
+(function () {
+  var sectionFocusTimer = null;
+  var lastActiveNavId = "";
+
+  function setCopyButtonState(button, label, state) {
+    if (!button) return;
+    if (!button.getAttribute("data-copy-label")) {
+      button.setAttribute("data-copy-label", button.textContent);
+    }
+    if (button.getAttribute("data-copy-timer")) {
+      clearTimeout(Number(button.getAttribute("data-copy-timer")));
+    }
+    button.textContent = label;
+    button.setAttribute("data-copy-state", state);
+    button.setAttribute("aria-live", "polite");
+    var timer = setTimeout(function () {
+      button.textContent = button.getAttribute("data-copy-label") || label;
+      button.removeAttribute("data-copy-state");
+      button.removeAttribute("data-copy-timer");
+    }, 1100);
+    button.setAttribute("data-copy-timer", String(timer));
+  }
+
+  function fallbackCopyText(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(area);
+    }
+  }
+
+  function copyText(text, button) {
+    var value = String(text || "").trim();
+    if (!value) {
+      setCopyButtonState(button, "无内容", "empty");
+      return;
+    }
+    var done = function () {
+      setCopyButtonState(button, "已复制", "success");
+    };
+    var fail = function () {
+      setCopyButtonState(button, "复制失败", "failed");
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done, function () {
+        if (fallbackCopyText(value)) done();
+        else fail();
+      });
+      return;
+    }
+
+    if (fallbackCopyText(value)) done();
+    else fail();
+  }
+
+  function copySourceText(source) {
+    if (!source) return "";
+    if (source.matches("ul, ol")) {
+      return Array.prototype.slice.call(source.querySelectorAll("li"))
+        .map(function (item) { return "- " + (item.innerText || item.textContent || "").trim(); })
+        .filter(Boolean)
+        .join("\n");
+    }
+    return (source.innerText || source.textContent || "").trim();
+  }
+
+  function applyFilter(button) {
+    var target = button.getAttribute("data-filter-target");
+    var value = button.getAttribute("data-filter-value");
+    if (!target || !value) return;
+
+    document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      var match = value === "all" || item.getAttribute("data-filter-value") === value;
+      item.hidden = !match;
+    });
+
+    document.querySelectorAll("button[data-filter-target='" + target + "']").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+
+    var field = document.querySelector("[data-focus-field='" + target + "']");
+    if (field) {
+      field.classList.toggle("has-filter", value !== "all");
+    }
+  }
+
+  function activateTab(button) {
+    var group = button.getAttribute("data-tab-group");
+    var panel = button.getAttribute("data-tab");
+    if (!group || !panel) return;
+
+    document.querySelectorAll("[data-tab-group='" + group + "'][data-tab]").forEach(function (peer) {
+      peer.setAttribute("aria-selected", String(peer === button));
+    });
+
+    document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
+      item.hidden = item.id !== panel;
+    });
+  }
+
+  function applySearch(input) {
+    var target = input.getAttribute("data-search-for");
+    var query = input.value.trim().toLowerCase();
+    if (!target) return;
+
+    document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
+      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+    });
+  }
+
+  function updateEvidenceSpotlight(card, event) {
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
+    card.style.setProperty("--spotlight-y", event.clientY - rect.top + "px");
+  }
+
+  function clearDataTableHighlight(table) {
+    if (!table) return;
+    table.removeAttribute("data-hover-row");
+    table.removeAttribute("data-hover-column");
+    table.querySelectorAll(".table-row-highlight, .table-column-highlight, .table-cell-highlight").forEach(function (cell) {
+      cell.classList.remove("table-row-highlight", "table-column-highlight", "table-cell-highlight");
+    });
+  }
+
+  function applyDataTableHighlight(cell) {
+    var table = cell.closest("[data-report-data-table]");
+    if (!table) return;
+    var row = cell.getAttribute("data-table-row");
+    var column = cell.getAttribute("data-table-column");
+    clearDataTableHighlight(table);
+    if (!row || !column) return;
+
+    table.setAttribute("data-hover-row", row);
+    table.setAttribute("data-hover-column", column);
+
+    table.querySelectorAll("[data-table-row='" + row + "']").forEach(function (peer) {
+      peer.classList.add("table-row-highlight");
+    });
+    table.querySelectorAll("[data-table-column='" + column + "']").forEach(function (peer) {
+      peer.classList.add("table-column-highlight");
+    });
+    cell.classList.add("table-cell-highlight");
+  }
+
+  function hashTargetId() {
+    if (!window.location.hash || window.location.hash === "#") return "";
+    var raw = window.location.hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function reportSectionForId(id) {
+    if (!id) return null;
+    var target = document.getElementById(id);
+    if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
+    if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
+      return target;
+    }
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
+  }
+
+  function sectionIsVisible(section) {
+    if (!section) return false;
+    var rect = section.getBoundingClientRect();
+    return rect.bottom > 80 && rect.top < window.innerHeight;
+  }
+
+  function highlightTargetSection(id) {
+    document.querySelectorAll(".section-focus").forEach(function (section) {
+      section.classList.remove("section-focus");
+    });
+    if (sectionFocusTimer) {
+      clearTimeout(sectionFocusTimer);
+      sectionFocusTimer = null;
+    }
+
+    var section = reportSectionForId(id);
+    if (!section) return;
+    section.classList.add("section-focus");
+    sectionFocusTimer = setTimeout(function () {
+      section.classList.remove("section-focus");
+      sectionFocusTimer = null;
+    }, 1600);
+  }
+
+  function updateActiveNavigation() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
+    var hashSection = reportSectionForId(hashTargetId());
+    var active = sections
+      .map(function (section) {
+        var rect = section.getBoundingClientRect();
+        return { id: section.id, section: section, top: Math.abs(rect.top - 96), visible: sectionIsVisible(section) };
+      })
+      .filter(function (item) { return item.visible; })
+      .sort(function (a, b) { return a.top - b.top; })[0];
+    if (hashSection && sectionIsVisible(hashSection)) {
+      active = { id: hashSection.id, section: hashSection, top: 0, visible: true };
+    }
+
+    var activeLink = null;
+    document.querySelectorAll("[data-nav-link]").forEach(function (link) {
+      var isActive = Boolean(active && link.getAttribute("href") === "#" + active.id);
+      link.setAttribute("aria-current", isActive ? "true" : "false");
+      if (isActive) activeLink = link;
+    });
+
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
+    }
+    lastActiveNavId = active ? active.id : "";
+  }
+
+  document.addEventListener("click", function (event) {
+    var navLink = event.target.closest("[data-nav-link]");
+    if (navLink) {
+      var href = navLink.getAttribute("href") || "";
+      if (href.charAt(0) === "#") {
+        window.setTimeout(function () {
+          highlightTargetSection(hashTargetId());
+          updateActiveNavigation();
+        }, 80);
+      }
+    }
+
+    var button = event.target.closest("button");
+    if (!button) return;
+
+    if (button.matches("[data-copy-text]")) {
+      copyText(button.getAttribute("data-copy-text"), button);
+    }
+
+    if (button.matches("[data-copy-from]")) {
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      copyText(source ? (source.content ? source.content.textContent : copySourceText(source)) : "", button);
+    }
+
+    if (button.matches("[data-filter-target][data-filter-value]")) {
+      applyFilter(button);
+    }
+
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
+    }
+  });
+
+  document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-search-for]")) {
+      applySearch(event.target);
+    }
+  });
+
+  document.addEventListener("pointermove", function (event) {
+    var card = event.target.closest("[data-evidence-spotlight]");
+    if (card) {
+      updateEvidenceSpotlight(card, event);
+    }
+  });
+
+  document.addEventListener("pointerover", function (event) {
+    var cell = event.target.closest("[data-table-cell]");
+    if (cell) {
+      applyDataTableHighlight(cell);
+    }
+  });
+
+  document.addEventListener("pointerout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches("[data-table-cell]")) {
+      applyDataTableHighlight(event.target);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("scroll", updateActiveNavigation, { passive: true });
+  window.addEventListener("resize", updateActiveNavigation);
+  window.addEventListener("hashchange", function () {
+    highlightTargetSection(hashTargetId());
+    updateActiveNavigation();
+  });
+  highlightTargetSection(hashTargetId());
+  updateActiveNavigation();
+})();
+
+</script>
+</body>
+</html>
