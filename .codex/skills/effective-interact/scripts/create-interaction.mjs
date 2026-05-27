@@ -430,8 +430,49 @@ function parseHeroSummaryItems(value) {
     .slice(0, 4);
 }
 
+function parseHeroHighlights(value) {
+  const lines = String(value || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) {
+    return [];
+  }
+
+  const highlights = lines.map((line) => {
+    const match = line.match(/^\s*[-*]\s+\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*\s*[:\uFF1A]\s*(.+)$/);
+    if (!match) {
+      return null;
+    }
+    return {
+      label: match[1].trim(),
+      href: match[2].trim(),
+      reason: match[3].trim()
+    };
+  });
+
+  return highlights.every(Boolean) ? highlights : [];
+}
+
+function renderHeroHighlights(items) {
+  return `<ul class="hero-summary-text hero-summary-list hero-highlight-list">${items.map((item) => {
+    const safe = safeLink(item.href);
+    const label = renderInlineEmphasis(escapeHtml(stripRawHtml(item.label)));
+    const link = safe
+      ? `<a class="hero-highlight-link" href="${escapeAttr(safe)}" rel="noreferrer">${label}</a>`
+      : `<span class="hero-highlight-link unsafe-link">${label}</span>`;
+    return `<li>${link}<span class="hero-highlight-reason">${inlineMarkdown(item.reason)}</span></li>`;
+  }).join("")}</ul>`;
+}
+
 function renderHeroSummary(value) {
   const conclusion = trimLeadingConclusion(value);
+  const highlights = parseHeroHighlights(conclusion);
+  if (highlights.length > 0) {
+    return renderHeroHighlights(highlights);
+  }
+
   const items = parseHeroSummaryItems(conclusion);
   if (items.length >= 2) {
     return `<ul class="hero-summary-text hero-summary-list">${items.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`;
@@ -999,21 +1040,64 @@ function renderDiffSection(section, index) {
   </section>`;
 }
 
+function safeClassList(value) {
+  return String(value || "")
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter((item) => /^[A-Za-z0-9_-]+$/.test(item))
+    .join(" ");
+}
+
+function renderCardTags(tags) {
+  const values = Array.isArray(tags) ? tags.filter(Boolean) : [];
+  if (values.length === 0) {
+    return "";
+  }
+  return `<div class="card-tags">${values.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>`;
+}
+
+function renderCardTitle(item) {
+  const title = escapeHtml(item.title || "Untitled");
+  const href = safeLink(item.href || item.url || "");
+  if (!href) {
+    return `<h3>${title}</h3>`;
+  }
+  return `<h3><a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a></h3>`;
+}
+
+function renderCardDetails(points) {
+  const items = Array.isArray(points) ? points.filter((point) => point && (point.label || point.value)) : [];
+  if (items.length === 0) {
+    return "";
+  }
+  return `<dl class="card-detail-list">${items.map((point) => `<div><dt>${escapeHtml(point.label || "Detail")}</dt><dd>${escapeHtml(point.value || "")}</dd></div>`).join("")}</dl>`;
+}
+
+function renderFilterableCard(item, target, cardClass) {
+  const group = item.group || "item";
+  const className = ["interactive-card", "evidence-card", "evidence-spotlight", cardClass].filter(Boolean).join(" ");
+  return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}">
+    <div class="meta">${escapeHtml(group)}</div>
+    ${renderCardTitle(item)}
+    ${renderCardTags(item.tags)}
+    <p>${escapeHtml(item.body || "")}</p>
+    ${renderCardDetails(item.points)}
+  </article>`;
+}
+
 function renderFilterableCards(section) {
   const target = slugify(section.title);
   const items = Array.isArray(section.items) ? section.items : [];
   const groups = ["all", ...new Set(items.map((item) => item.group || "item"))];
+  const cardClass = safeClassList(section.cardClass);
+  const showFilters = section.showFilters !== false && groups.length > 2;
   return `<section class="panel" ${sectionAttrs(section)}>
     ${renderSectionHeader(section)}
-    <div class="toolbar" role="toolbar" aria-label="${escapeAttr(section.filterLabel || section.title)} filters">
+    ${showFilters ? `<div class="toolbar" role="toolbar" aria-label="${escapeAttr(section.filterLabel || section.title)} filters">
       ${groups.map((group, index) => `<button data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" aria-pressed="${index === 0 ? "true" : "false"}">${escapeHtml(group === "all" ? "全部" : group)}</button>`).join("")}
-    </div>
+    </div>` : ""}
     <div class="evidence-grid focus-field" data-focus-field="${target}">
-      ${items.map((item) => `<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(item.group || "item")}" data-search-target="${target}">
-        <div class="meta">${escapeHtml(item.group || "item")}</div>
-        <h3>${escapeHtml(item.title)}</h3>
-        <p>${escapeHtml(item.body)}</p>
-      </article>`).join("\n")}
+      ${items.map((item) => renderFilterableCard(item, target, cardClass)).join("\n")}
     </div>
   </section>`;
 }
@@ -1323,6 +1407,7 @@ async function createInteraction(input, options = {}) {
   const nav = renderGroupedNav([...normalizedSections, ...extras]);
   const heroSummary = renderHeroSummary(input.summary);
   const heroStats = renderHeroStats(input, normalizedSections.length + extras.length);
+  const heroBriefClass = heroStats ? "hero-brief" : "hero-brief hero-brief-single";
   const heroDecisionGrid = renderHeroDecisionGrid(intent);
   const compatibilityBadge = compatibility ? `<span class="status-pill status-warn" data-render-compatibility="${escapeAttr(compatibility)}">${escapeHtml(compatibility)}</span>` : "";
   const claimsSection = (input.claims || []).length > 0
@@ -1359,7 +1444,7 @@ async function createInteraction(input, options = {}) {
         </div>
         <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">状态：${escapeHtml(statusLabel(input.status))}</span>${compatibilityBadge}</div>
       </div>
-      <div class="hero-brief">
+      <div class="${heroBriefClass}">
         ${heroSummary}
         ${heroStats}
       </div>

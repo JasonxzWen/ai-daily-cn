@@ -66,17 +66,23 @@ export function reportToInteractionInput(report) {
   }
   if (projects.length > 0) {
     sections.push({
-      type: "markdown",
+      type: "filterable-cards",
       title: "今日值得关注的项目",
       group: "projects",
-      content: formatProjects(projects)
+      cardClass: "project-card",
+      filterLabel: "项目领域筛选",
+      showFilters: false,
+      content: formatProjects(projects),
+      items: formatProjectCards(projects)
     });
   }
-  const signalSections = [formatBuilderObservations(builderObservations), formatCommunityLeads(communityLeads)].filter(Boolean);
+  const builderSection = formatBuilderObservations(builderObservations);
+  const communitySection = formatCommunityLeads(communityLeads);
+  const signalSections = [builderSection, communitySection].filter(Boolean);
   if (signalSections.length > 0) {
     sections.push({
       type: "markdown",
-      title: "Builder 观察与社区线索",
+      title: signalSectionTitle(builderSection, communitySection),
       group: "signals",
       content: signalSections.join("\n\n")
     });
@@ -321,6 +327,28 @@ function formatProjects(items) {
     .join("\n");
 }
 
+function formatProjectCards(items) {
+  return items.map((item) => {
+    const domains = Array.isArray(item.domains) ? item.domains.filter(Boolean) : [];
+    const points = [];
+    if (domains.length > 0) {
+      points.push({ label: "领域", value: domains.join("、") });
+    }
+    if (item.use_case) {
+      points.push({ label: "作用", value: item.use_case });
+    }
+
+    return {
+      group: domains[0] || "PROJECTS",
+      title: item.name,
+      href: item.url,
+      body: cleanProjectDescription(item.description),
+      tags: projectHeatTags(item),
+      points
+    };
+  });
+}
+
 function formatHighlightTags(tags) {
   return tags.length > 0 ? ` ${tags.map((tag) => `==${tag}==`).join(" ")}` : "";
 }
@@ -331,16 +359,43 @@ function formatBuilderObservations(items) {
   }
 
   return `### Builder 观察\n\n${items
-    .map((item) => `- **${item.author}**${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "来源")}${item.evidence ? `\n  - 证据：${item.evidence}` : ""}`)
+    .map((item) => `- **${item.author}**${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "来源")}`)
     .join("\n")}`;
 }
 
 function formatCommunityLeads(items) {
-  if (items.length === 0) {
+  const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
+  if (leads.length === 0) {
     return "";
   }
 
-  return `### 社区线索\n\n${items.map((item) => `- ${item.content} ${markdownLink(item.url, "来源")}`).join("\n")}`;
+  return `### 社区线索\n\n${leads.map((item) => `- ${item.content} ${markdownLink(item.url, "来源")}`).join("\n")}`;
+}
+
+function signalSectionTitle(builderSection, communitySection) {
+  if (builderSection && communitySection) {
+    return "Builder 观察与社区线索";
+  }
+  return builderSection ? "Builder 观察" : "社区线索";
+}
+
+function isLowSignalStatuspageLead(item) {
+  const content = String(item?.content || "").toLowerCase();
+  const url = String(item?.url || "");
+  if (!isStatuspageUrl(url)) {
+    return false;
+  }
+
+  return /elevated errors|resolved|troubleshooting|incident|degraded|outage|error rate|\berrors\b|排障|故障|已恢复|已解决|标记 resolved/i.test(content);
+}
+
+function isStatuspageUrl(value) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase();
+    return hostname.startsWith("status.") || hostname.includes("statuspage");
+  } catch {
+    return false;
+  }
 }
 
 function formatSourceAudit(audit) {

@@ -96,7 +96,8 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 
 后续定时任务生成日报时，除了官方发布、模型、论文和工程博客，还必须固定检查：
 
-- `github-ai-trending`：先运行 `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending；该命令在 GitHub Trending 全部抓取失败或没有解析出仓库时，会自动用 OSSInsight `List trending repos` API 兜底。浏览器可保存 HTML/JSON 时，运行 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>` 复用同一解析器。
+- `github-ai-trending`：先运行 `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50`，再检查 GitHub Trending daily/weekly、Python/TypeScript/Rust/Go trending；这些榜单前列项目是每日必查路径。命令会默认读取 `reports-data` 中近 7 天本地历史，为每个候选补充 `github_trending_history` 备注，标出是新进入观察池还是过去一周反复出现；需要调试其他历史目录时使用 `--history-root <path>`，需要调整窗口时使用 `--history-lookback-days <n>`。该命令在 GitHub Trending 全部抓取失败或没有解析出仓库时，会自动用 OSSInsight `List trending repos` API 兜底。浏览器可保存 HTML/JSON 时，运行 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>` 复用同一解析器。
+- `content-sources`：运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 20` 检查官方博客、工程博客、访谈源和 Product Hunt developer-tools feed。Product Hunt 项目候选会自动打开产品页，并优先用 GitHub、docs、README 或官网确认用途；确认成功时候选 `url` 指向确认页，`notes` 保留原始 Product Hunt URL 与确认链接，确认失败时不得把 Product Hunt 条目直接写入项目区。
 - `follow-builders`：只把 builder/researcher/founder/maintainer 的原始帖子、个人博客、公开视频或播客片段写入 `builder_observations`；没有原始 URL 时不得收录。中心 feed 抓取失败时，运行 `npm run discover:builders -- --date YYYY-MM-DD --limit 20`，用固定原始 RSS/Atom 源生成可审计 Builder 候选。
 - `statuspage-incidents`：运行 `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20`，把 OpenAI/Claude 等 Statuspage Atom/RSS 的近期 incident 转成候选池条目；这些条目仍需通过去重、新鲜度和 `candidate_id` 回指门禁后才能进入正文。
 
