@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1361,7 +1433,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
 <a href="#next-actions" title="下一步" data-nav-link data-nav-index="8" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
@@ -1484,7 +1556,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。
   - 来源：[GitHub Releases](https://github.com/langchain-ai/langchain/releases)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1493,17 +1565,43 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/ollama/ollama/releases/tag/v0.23.3" rel="noopener noreferrer">Ollama</a></strong>：v0.23.3 在 2026-05-12 发布，主要修复 MLX、本地 imagegen runner 和更新流程；本地推理用户应关注 macOS/Apple Silicon 运行稳定性。</li><li><strong><a href="https://github.com/vllm-project/vllm/releases/tag/v0.20.2" rel="noopener noreferrer">vLLM</a></strong>：v0.20.2 在 2026-05-10 发布，小补丁覆盖 DeepSeek V4、gpt-oss 和 Qwen3-VL 的推理稳定性问题。</li><li><strong><a href="https://github.com/openai/codex/releases/tag/rust-v0.130.0" rel="noopener noreferrer">OpenAI Codex</a></strong>：0.130.0 在 2026-05-08 发布，remote-control、插件元数据和 Windows sandbox 修复对自动化编码工作流有参考价值。</li><li><strong><a href="https://github.com/langchain-ai/langchain/releases" rel="noopener noreferrer">LangChain</a></strong>：2026-05-07 相关发布回补反序列化和路径遍历安全修复；依赖旧版本线的 Agent/RAG 服务应安排升级。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Ollama](https://github.com/ollama/ollama/releases/tag/v0.23.3)**：v0.23.3 在 2026-05-12 发布，主要修复 MLX、本地 imagegen runner 和更新流程；本地推理用户应关注 macOS/Apple Silicon 运行稳定性。
-- **[vLLM](https://github.com/vllm-project/vllm/releases/tag/v0.20.2)**：v0.20.2 在 2026-05-10 发布，小补丁覆盖 DeepSeek V4、gpt-oss 和 Qwen3-VL 的推理稳定性问题。
-- **[OpenAI Codex](https://github.com/openai/codex/releases/tag/rust-v0.130.0)**：0.130.0 在 2026-05-08 发布，remote-control、插件元数据和 Windows sandbox 修复对自动化编码工作流有参考价值。
-- **[LangChain](https://github.com/langchain-ai/langchain/releases)**：2026-05-07 相关发布回补反序列化和路径遍历安全修复；依赖旧版本线的 Agent/RAG 服务应安排升级。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/ollama/ollama/releases/tag/v0.23.3" rel="noopener noreferrer">Ollama</a></h3>
+
+    <p>v0.23.3 在 2026-05-12 发布，主要修复 MLX、本地 imagegen runner 和更新流程；本地推理用户应关注 macOS/Apple Silicon 运行稳定性。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/vllm-project/vllm/releases/tag/v0.20.2" rel="noopener noreferrer">vLLM</a></h3>
+
+    <p>v0.20.2 在 2026-05-10 发布，小补丁覆盖 DeepSeek V4、gpt-oss 和 Qwen3-VL 的推理稳定性问题。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/openai/codex/releases/tag/rust-v0.130.0" rel="noopener noreferrer">OpenAI Codex</a></h3>
+
+    <p>0.130.0 在 2026-05-08 发布，remote-control、插件元数据和 Windows sandbox 修复对自动化编码工作流有参考价值。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/langchain-ai/langchain/releases" rel="noopener noreferrer">LangChain</a></h3>
+
+    <p>2026-05-07 相关发布回补反序列化和路径遍历安全修复；依赖旧版本线的 Agent/RAG 服务应安排升级。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

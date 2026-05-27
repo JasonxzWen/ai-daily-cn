@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天可回源的 AI 工程动态集中在 2026-05-19 的官方发布</li><li>主体信息保留 6 条：Google I/O 把 Gemini 3.5 Flash、Antigravity 2.0、Managed Agents 和 AI Studio 连成 …</li><li>GitHub Copilot 同日接入 Gemini 3.5 Flash 并强化评审到修复的 handoff</li></ul>
 
       </div>
@@ -1361,7 +1433,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
 <a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
 <a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-7" title="社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1489,7 +1561,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。
 - **[What&#39;s shipped in dbt — May 2026](https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026)**（dbt Labs / Corinne Hallander，2026-05-19）：dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1498,19 +1570,57 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/" rel="noopener noreferrer">Gemini API Managed Agents</a></strong>：Gemini API preview 能创建运行工具和代码的隔离 Linux 环境，并支持以 AGENTS.md 和 SKILL.md 定义 custom managed agents。</li><li><strong><a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/" rel="noopener noreferrer">Google Antigravity 2.0</a></strong>：Google 的 agent-first 开发平台新增桌面应用、CLI、SDK、多 agent 编排、动态 subagents 和定时后台任务。</li><li><strong><a href="https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en" rel="noopener noreferrer">Chrome DevTools for agents</a></strong>：稳定 1.0 版本提供 MCP server、CLI、agent skills、Lighthouse、WebMCP 调试和浏览器上下文 handoff。</li><li><strong><a href="https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026" rel="noopener noreferrer">dbt Developer Agent</a></strong>：dbt 的 AI-native developer 预览，面向 dbt project graph、lineage、校验和模型构建工作流。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Ettin rerankers</a></strong>：6 个 Sentence Transformers CrossEncoder reranker，覆盖 17M、32M、68M、150M、400M 和 1B 参数。</li><li><strong><a href="https://huggingface.co/blog/allenai/olmoearth-v1-1" rel="noopener noreferrer">OlmoEarth v1.1</a></strong>：Ai2 的地球观测模型家族更新，提供 Hugging Face collection、tech report 和训练代码。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Gemini API Managed Agents](https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/)**：Gemini API preview 能创建运行工具和代码的隔离 Linux 环境，并支持以 AGENTS.md 和 SKILL.md 定义 custom managed agents。
-- **[Google Antigravity 2.0](https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/)**：Google 的 agent-first 开发平台新增桌面应用、CLI、SDK、多 agent 编排、动态 subagents 和定时后台任务。
-- **[Chrome DevTools for agents](https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en)**：稳定 1.0 版本提供 MCP server、CLI、agent skills、Lighthouse、WebMCP 调试和浏览器上下文 handoff。
-- **[dbt Developer Agent](https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026)**：dbt 的 AI-native developer 预览，面向 dbt project graph、lineage、校验和模型构建工作流。
-- **[Ettin rerankers](https://huggingface.co/blog/ettin-reranker)**：6 个 Sentence Transformers CrossEncoder reranker，覆盖 17M、32M、68M、150M、400M 和 1B 参数。
-- **[OlmoEarth v1.1](https://huggingface.co/blog/allenai/olmoearth-v1-1)**：Ai2 的地球观测模型家族更新，提供 Hugging Face collection、tech report 和训练代码。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/" rel="noopener noreferrer">Gemini API Managed Agents</a></h3>
+
+    <p>Gemini API preview 能创建运行工具和代码的隔离 Linux 环境，并支持以 AGENTS.md 和 SKILL.md 定义 custom managed agents。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/" rel="noopener noreferrer">Google Antigravity 2.0</a></h3>
+
+    <p>Google 的 agent-first 开发平台新增桌面应用、CLI、SDK、多 agent 编排、动态 subagents 和定时后台任务。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en" rel="noopener noreferrer">Chrome DevTools for agents</a></h3>
+
+    <p>稳定 1.0 版本提供 MCP server、CLI、agent skills、Lighthouse、WebMCP 调试和浏览器上下文 handoff。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026" rel="noopener noreferrer">dbt Developer Agent</a></h3>
+
+    <p>dbt 的 AI-native developer 预览，面向 dbt project graph、lineage、校验和模型构建工作流。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Ettin rerankers</a></h3>
+
+    <p>6 个 Sentence Transformers CrossEncoder reranker，覆盖 17M、32M、68M、150M、400M 和 1B 参数。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/allenai/olmoearth-v1-1" rel="noopener noreferrer">OlmoEarth v1.1</a></h3>
+
+    <p>Ai2 的地球观测模型家族更新，提供 Hugging Face collection、tech report 和训练代码。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1482,7 +1554,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。
 - **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1491,13 +1563,51 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></strong> <mark class="text-highlight">Weekly trending</mark>：为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。</li><li><strong><a href="https://github.com/volcengine/OpenViking" rel="noopener noreferrer">volcengine/OpenViking</a></strong>：面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。</li><li><strong><a href="https://github.com/humanlayer/12-factor-agents" rel="noopener noreferrer">humanlayer/12-factor-agents</a></strong>：把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。</li><li><strong><a href="https://github.com/InsForge/InsForge" rel="noopener noreferrer">InsForge/InsForge</a></strong>：面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。</li><li><strong><a href="https://github.com/code-yeongyu/oh-my-openagent" rel="noopener noreferrer">code-yeongyu/oh-my-openagent</a></strong>：以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong>：为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)** ==Weekly trending==：为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。
-- **[volcengine/OpenViking](https://github.com/volcengine/OpenViking)**：面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。
-- **[humanlayer/12-factor-agents](https://github.com/humanlayer/12-factor-agents)**：把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。
-- **[InsForge/InsForge](https://github.com/InsForge/InsForge)**：面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。
-- **[code-yeongyu/oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent)**：以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。
-- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)**：为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></h3>
+    <div class="card-tags"><span class="chip">Weekly trending</span></div>
+    <p>为 Claude Code、Codex、Cursor 和 OpenCode 构建预索引代码知识图谱的项目，GitHub Trending 中出现，指向 coding agent 长上下文外部化趋势。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/volcengine/OpenViking" rel="noopener noreferrer">volcengine/OpenViking</a></h3>
+
+    <p>面向 AI agents 的 open-source context database / openclaw project，在 Trending 候选中出现。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/humanlayer/12-factor-agents" rel="noopener noreferrer">humanlayer/12-factor-agents</a></h3>
+
+    <p>把生产级 LLM / agent 软件整理成 12-factor 风格原则的开源资料，适合作为 agent 工程化方法论观察项。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/InsForge/InsForge" rel="noopener noreferrer">InsForge/InsForge</a></h3>
+
+    <p>面向 agentic coding 的 all-in-one backend platform，覆盖 auth、database、storage 等应用后端要素。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/code-yeongyu/oh-my-openagent" rel="noopener noreferrer">code-yeongyu/oh-my-openagent</a></h3>
+
+    <p>以 awesome-list 方式聚合 open-source AI agents、MCP、A2A、agentic coding、RAG 和 workflow automation 项目。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></h3>
+
+    <p>为 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 生成 code graphs 的工具，反映 coding agent 对结构化代码地图的需求。</p>
+
+  </article>
+    </div>
   </section>
 <section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -1509,19 +1619,15 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
   </div>
     <div class="rendered-markdown"><h4>Builder 观察</h4>
-<ul><li><strong>Andrej Karpathy</strong>（Anthropic researcher / AI educator）：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 <a href="https://x.com/karpathy/status/2056753169888334312" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I&#39;ve joined Anthropic...</li><li><strong>Josh Woodward</strong>（Google Labs / Gemini App / AI Studio product lead）：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 <a href="https://x.com/joshwoodward/status/2056873495116845485" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...</li><li><strong>Guillermo Rauch</strong>（Vercel CEO）：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 <a href="https://x.com/rauchg/status/2056735989830471977" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。</li><li><strong>Swyx</strong>（AI Engineer / Latent Space）：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 <a href="https://x.com/swyx/status/2056877529991205072" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：prepare-digest.js 抓取原始 X 链接，文本开头为 there&#39;s 4 parts to this AI SDLC...</li></ul>
+<ul><li><strong>Andrej Karpathy</strong>（Anthropic researcher / AI educator）：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 <a href="https://x.com/karpathy/status/2056753169888334312" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Josh Woodward</strong>（Google Labs / Gemini App / AI Studio product lead）：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 <a href="https://x.com/joshwoodward/status/2056873495116845485" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Guillermo Rauch</strong>（Vercel CEO）：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 <a href="https://x.com/rauchg/status/2056735989830471977" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Swyx</strong>（AI Engineer / Latent Space）：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 <a href="https://x.com/swyx/status/2056877529991205072" rel="noopener noreferrer">follow-builders X feed</a></li></ul>
 <h4>社区线索</h4>
 <ul><li>karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 <a href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">来源</a></li><li>anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 <a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">来源</a></li><li>HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 <a href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">来源</a></li><li>Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 <a href="https://x.com/GoogleLabs/status/2056872996988756228" rel="noopener noreferrer">来源</a></li></ul></div>
     <template data-rich-source data-source-fallback>### Builder 观察
 
 - **Andrej Karpathy**（Anthropic researcher / AI educator）：公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。 [follow-builders X feed](https://x.com/karpathy/status/2056753169888334312)
-  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I&#39;ve joined Anthropic...
 - **Josh Woodward**（Google Labs / Gemini App / AI Studio product lead）：介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。 [follow-builders X feed](https://x.com/joshwoodward/status/2056873495116845485)
-  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...
 - **Guillermo Rauch**（Vercel CEO）：把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。 [follow-builders X feed](https://x.com/rauchg/status/2056735989830471977)
-  - 证据：prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。
 - **Swyx**（AI Engineer / Latent Space）：把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。 [follow-builders X feed](https://x.com/swyx/status/2056877529991205072)
-  - 证据：prepare-digest.js 抓取原始 X 链接，文本开头为 there&#39;s 4 parts to this AI SDLC...
 
 ### 社区线索
 

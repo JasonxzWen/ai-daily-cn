@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Ma…</li><li>上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conve…</li></ul>
 
       </div>
@@ -1359,7 +1431,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1450,7 +1522,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。
   - 来源：[Palantir Foundry Announcements](https://www.palantir.com/docs/foundry/announcements/2026-05)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1459,17 +1531,43 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://x.ai/news/grok-hermes" rel="noopener noreferrer">Grok-Hermes OAuth provider</a></strong>：xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。</li><li><strong><a href="https://pi.dev/news/releases/0.74.1" rel="noopener noreferrer">Pi Coding Agent 0.74.1</a></strong>：Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。</li><li><strong><a href="https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/" rel="noopener noreferrer">Copilot Memory user preferences</a></strong>：GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。</li><li><strong><a href="https://www.palantir.com/docs/foundry/announcements/2026-05" rel="noopener noreferrer">Palantir Global Branching</a></strong>：Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Grok-Hermes OAuth provider](https://x.ai/news/grok-hermes)**：xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。
-- **[Pi Coding Agent 0.74.1](https://pi.dev/news/releases/0.74.1)**：Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。
-- **[Copilot Memory user preferences](https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/)**：GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。
-- **[Palantir Global Branching](https://www.palantir.com/docs/foundry/announcements/2026-05)**：Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://x.ai/news/grok-hermes" rel="noopener noreferrer">Grok-Hermes OAuth provider</a></h3>
+
+    <p>xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://pi.dev/news/releases/0.74.1" rel="noopener noreferrer">Pi Coding Agent 0.74.1</a></h3>
+
+    <p>Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/" rel="noopener noreferrer">Copilot Memory user preferences</a></h3>
+
+    <p>GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://www.palantir.com/docs/foundry/announcements/2026-05" rel="noopener noreferrer">Palantir Global Branching</a></h3>
+
+    <p>Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

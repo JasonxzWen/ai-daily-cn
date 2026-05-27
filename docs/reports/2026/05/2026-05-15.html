@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <p class="hero-summary-text">今天的主体信息保持在 2026-05-14 至 2026-05-15 窗口内，通过拓展官方发布页、开发者博客、云厂商公告和 Hugging Face 工程博客补齐：OpenAI 推进 Codex 移动端与 Windows sandbox，GitHub 合并呈现 Copilot app 和 cloud agent 自动选模，Anthropic 把 Claude 投入 Gates Foundation 合作，Google 发布 Genkit middleware，AWS 扩展 SageMaker Qwen3.6 定制，Hugging Face 解释连续批处理异步化。</p>
 
       </div>
@@ -1359,7 +1431,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1449,7 +1521,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。
   - 来源：[Hugging Face Blog](https://huggingface.co/blog/continuous_async)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1458,18 +1530,50 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://openai.com/index/work-with-codex-from-anywhere/" rel="noopener noreferrer">Codex mobile preview</a></strong>：ChatGPT mobile app 内的 Codex preview，可远程查看和推进仍在主机或 devbox 上运行的 coding agent session。</li><li><strong><a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Copilot app</a></strong>：GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面中。</li><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Genkit Middleware</a></strong>：用于 Genkit generation/tool loop 的 composable middleware，覆盖 retries、fallbacks、approval 和 observability。</li><li><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">SageMaker Qwen3.6 customization</a></strong>：Amazon SageMaker AI 对 Qwen3.6 27B 支持 serverless SFT/RFT，适合观察云厂商如何产品化开放模型定制。</li><li><strong><a href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">Continuous async batching</a></strong>：Hugging Face 的推理服务工程文章，聚焦 CPU/GPU 工作负载解耦与 continuous batching 利用率问题。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Codex mobile preview](https://openai.com/index/work-with-codex-from-anywhere/)**：ChatGPT mobile app 内的 Codex preview，可远程查看和推进仍在主机或 devbox 上运行的 coding agent session。
-- **[GitHub Copilot app](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)**：GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面中。
-- **[Genkit Middleware](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)**：用于 Genkit generation/tool loop 的 composable middleware，覆盖 retries、fallbacks、approval 和 observability。
-- **[SageMaker Qwen3.6 customization](https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/)**：Amazon SageMaker AI 对 Qwen3.6 27B 支持 serverless SFT/RFT，适合观察云厂商如何产品化开放模型定制。
-- **[Continuous async batching](https://huggingface.co/blog/continuous_async)**：Hugging Face 的推理服务工程文章，聚焦 CPU/GPU 工作负载解耦与 continuous batching 利用率问题。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://openai.com/index/work-with-codex-from-anywhere/" rel="noopener noreferrer">Codex mobile preview</a></h3>
+
+    <p>ChatGPT mobile app 内的 Codex preview，可远程查看和推进仍在主机或 devbox 上运行的 coding agent session。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Copilot app</a></h3>
+
+    <p>GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面中。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Genkit Middleware</a></h3>
+
+    <p>用于 Genkit generation/tool loop 的 composable middleware，覆盖 retries、fallbacks、approval 和 observability。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">SageMaker Qwen3.6 customization</a></h3>
+
+    <p>Amazon SageMaker AI 对 Qwen3.6 27B 支持 serverless SFT/RFT，适合观察云厂商如何产品化开放模型定制。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">Continuous async batching</a></h3>
+
+    <p>Hugging Face 的推理服务工程文章，聚焦 CPU/GPU 工作负载解耦与 continuous batching 利用率问题。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

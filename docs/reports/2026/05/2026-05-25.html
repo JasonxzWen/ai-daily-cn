@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>2026-05-25 这版日报只保留 3 条主体信息：OpenAI Codex 速率限制 incident 在 2026-05-23 恢复，Hugging Face 社区在 …</li><li>模型发布区为空，没有把旧发布重新包装成今日内容</li></ul>
 
       </div>
@@ -1359,7 +1431,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-builder-5" title="Builder 观察" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1427,7 +1499,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 这一组更像工程工作流温度计，不等同于官方产品发布。
   - 来源：[GitHub Trending daily](https://github.com/trending?since=daily)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1436,29 +1508,53 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/earendil-works/pi/releases/tag/v0.75.5" rel="noopener noreferrer">earendil-works/pi</a></strong>：AI agent toolkit 的 v0.75.5 发布，包含 read tool 展示、Windows 文件工具、package update 和 provider 配置相关修复。</li><li><strong><a href="https://github.com/anthropics/knowledge-work-plugins/commits/main/" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong>：Anthropic 管理的 Claude Cowork knowledge-work plugin 仓库；2026-05-24 有 Workload Identity Federation 相关 CI 迁移提交。</li><li><strong><a href="https://github.com/NVlabs/LongLive/commits/main/" rel="noopener noreferrer">NVlabs/LongLive</a></strong>：Long-video generation infra 项目；2026-05-25 提交更新 NVFP4 inference path 和 README throughput 描述。</li><li><strong><a href="https://github.com/666ghj/MiroFish" rel="noopener noreferrer">666ghj/MiroFish</a></strong>：面向预测任务的 swarm intelligence engine；GitHub metadata 显示 2026-05-24 有仓库更新，进入项目区但不写成 release。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[earendil-works/pi](https://github.com/earendil-works/pi/releases/tag/v0.75.5)**：AI agent toolkit 的 v0.75.5 发布，包含 read tool 展示、Windows 文件工具、package update 和 provider 配置相关修复。
-- **[anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins/commits/main/)**：Anthropic 管理的 Claude Cowork knowledge-work plugin 仓库；2026-05-24 有 Workload Identity Federation 相关 CI 迁移提交。
-- **[NVlabs/LongLive](https://github.com/NVlabs/LongLive/commits/main/)**：Long-video generation infra 项目；2026-05-25 提交更新 NVFP4 inference path 和 README throughput 描述。
-- **[666ghj/MiroFish](https://github.com/666ghj/MiroFish)**：面向预测任务的 swarm intelligence engine；GitHub metadata 显示 2026-05-24 有仓库更新，进入项目区但不写成 release。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/earendil-works/pi/releases/tag/v0.75.5" rel="noopener noreferrer">earendil-works/pi</a></h3>
+
+    <p>AI agent toolkit 的 v0.75.5 发布，包含 read tool 展示、Windows 文件工具、package update 和 provider 配置相关修复。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/anthropics/knowledge-work-plugins/commits/main/" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></h3>
+
+    <p>Anthropic 管理的 Claude Cowork knowledge-work plugin 仓库；2026-05-24 有 Workload Identity Federation 相关 CI 迁移提交。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/NVlabs/LongLive/commits/main/" rel="noopener noreferrer">NVlabs/LongLive</a></h3>
+
+    <p>Long-video generation infra 项目；2026-05-25 提交更新 NVFP4 inference path 和 README throughput 描述。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/666ghj/MiroFish" rel="noopener noreferrer">666ghj/MiroFish</a></h3>
+
+    <p>面向预测任务的 swarm intelligence engine；GitHub metadata 显示 2026-05-24 有仓库更新，进入项目区但不写成 release。</p>
+
+  </article>
+    </div>
   </section>
 <section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>Builder 观察</h2>
 
     </div>
 
   </div>
     <div class="rendered-markdown"><h4>Builder 观察</h4>
-<ul><li><strong>Thariq</strong>（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 <a href="https://x.com/trq212/status/2058377974882210096" rel="noopener noreferrer">X</a></li><li>证据：follow-builders feed includes original X post and follow-up about cleaning leftover services.</li><li><strong>Peter Steinberger</strong>（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 <a href="https://x.com/steipete/status/2058308112134635528" rel="noopener noreferrer">X</a></li><li>证据：Original X post is included in follow-builders feed.</li></ul></div>
+<ul><li><strong>Thariq</strong>（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 <a href="https://x.com/trq212/status/2058377974882210096" rel="noopener noreferrer">X</a></li><li><strong>Peter Steinberger</strong>（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 <a href="https://x.com/steipete/status/2058308112134635528" rel="noopener noreferrer">X</a></li></ul></div>
     <template data-rich-source data-source-fallback>### Builder 观察
 
 - **Thariq**（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 [X](https://x.com/trq212/status/2058377974882210096)
-  - 证据：follow-builders feed includes original X post and follow-up about cleaning leftover services.
-- **Peter Steinberger**（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 [X](https://x.com/steipete/status/2058308112134635528)
-  - 证据：Original X post is included in follow-builders feed.</template>
+- **Peter Steinberger**（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 [X](https://x.com/steipete/status/2058308112134635528)</template>
   </section>
 <section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
