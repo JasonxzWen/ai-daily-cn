@@ -69,8 +69,34 @@ export async function preparePublishWorktree(options = {}) {
   const branchAfterCommit = await git.branch();
   let switchedBranch = false;
   if (branchAfterCommit !== allowedBranch) {
-    await git.checkout(allowedBranch);
-    switchedBranch = true;
+    try {
+      await git.checkout(allowedBranch);
+      switchedBranch = true;
+    } catch (error) {
+      if (!isGitMetadataWriteFailure(error)) {
+        throw error;
+      }
+
+      return prepareResultWithBlocker({
+        repoRoot,
+        startingBranch,
+        currentBranch: branchAfterCommit,
+        allowedBranch,
+        statusEntries,
+        commitMessage,
+        commitOutput,
+        switchedBranch,
+        blocker: new PublisherError(
+          "git_not_writable",
+          `切换到发布分支失败，本机 Git 元数据不可写或无法创建 index.lock：${error.message}`,
+          {
+            branch: branchAfterCommit,
+            allowedBranch,
+            cause: error.message
+          }
+        )
+      });
+    }
   }
 
   let preflight = null;
@@ -268,13 +294,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
-  const currentBranch = await git.branch();
-  if (currentBranch !== branch) {
-    throw new PublisherError("wrong_branch", `当前分支是 ${currentBranch || "(detached)"}，允许发布分支是 ${branch}。`, {
-      branch: currentBranch,
-      allowedBranch: branch
-    });
-  }
+  const sourceBranch = await git.branch();
 
   const statusEntries = parsePorcelain(await git.status());
   const publishFiles = uniqueSorted(
@@ -294,15 +314,16 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     return {
       mode: "publish-github-api",
       branch,
+      source_branch: sourceBranch,
       committed: false,
       pushed: false,
       message: "没有发布产物变更需要提交。"
     };
   }
 
-  const token = options.token || process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+  const token = await resolveGitHubToken(options, repoRoot);
   if (!token) {
-    throw new PublisherError("github_token_missing", "GitHub API 发布需要 GH_TOKEN 或 GITHUB_TOKEN。");
+    throw new PublisherError("github_token_missing", "GitHub API 发布需要 GH_TOKEN、GITHUB_TOKEN 或可用的 gh auth token。");
   }
 
   const repository = options.repository || process.env.GITHUB_REPOSITORY || parseGitHubRepository(await git.remoteUrl());
@@ -349,6 +370,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     return {
       mode: "publish-github-api",
       branch,
+      source_branch: sourceBranch,
       repository,
       base_commit_sha: baseCommitSha,
       committed: false,
@@ -388,6 +410,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   return {
     mode: "publish-github-api",
     branch,
+    source_branch: sourceBranch,
     repository,
     base_commit_sha: baseCommitSha,
     commit_sha: newCommit.sha,
@@ -744,12 +767,65 @@ function isDeferredPrepareBlocker(error) {
   return error instanceof PublisherError && ["git_not_writable", "remote_ahead"].includes(error.code);
 }
 
+function isGitMetadataWriteFailure(error) {
+  if (error instanceof PublisherError && error.code === "git_not_writable") {
+    return true;
+  }
+  const message = String(error?.message || "");
+  return /index\.lock|permission denied|cannot lock ref|unable to create/i.test(message);
+}
+
+function prepareResultWithBlocker(options) {
+  const blocker = toPrepareBlocker(options.blocker);
+  return {
+    mode: "prepare-worktree",
+    repo_root: options.repoRoot,
+    starting_branch: options.startingBranch,
+    current_branch: options.currentBranch,
+    allowed_branch: options.allowedBranch,
+    committed_local_changes: options.statusEntries.length > 0,
+    commit_message: options.statusEntries.length > 0 ? options.commitMessage : "",
+    commit_output: options.commitOutput,
+    saved_dirty_files: options.statusEntries.map((entry) => `${entry.code} ${entry.path}`),
+    switched_branch: options.switchedBranch,
+    publish_ready: false,
+    publish_blocker: blocker,
+    preflight: null
+  };
+}
+
 function toPrepareBlocker(error) {
   return {
     code: error instanceof PublisherError ? error.code : "unexpected_error",
     message: error.message,
     details: error.details || {}
   };
+}
+
+async function resolveGitHubToken(options, repoRoot) {
+  if (options.token) {
+    return options.token;
+  }
+  if (process.env.GH_TOKEN) {
+    return process.env.GH_TOKEN;
+  }
+  if (process.env.GITHUB_TOKEN) {
+    return process.env.GITHUB_TOKEN;
+  }
+  if (typeof options.tokenResolver === "function") {
+    return String((await options.tokenResolver()) || "").trim();
+  }
+
+  try {
+    const { stdout } = await execFileAsync("gh", ["auth", "token"], {
+      cwd: repoRoot,
+      windowsHide: true,
+      timeout: 10000
+    });
+    return stdout.trim();
+  } catch {
+    return "";
+  }
 }
 
 function delay(ms) {

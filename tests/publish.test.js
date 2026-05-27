@@ -135,6 +135,30 @@ test("publish prepare-worktree defers git_not_writable so report generation can 
   assert.equal(result.current_branch, "main");
 });
 
+test("publish prepare-worktree defers checkout index.lock failure so generation can continue", async () => {
+  let branch = "codex/discovery-fallbacks";
+
+  const result = await preparePublishWorktree({
+    git: {
+      async status() {
+        return "";
+      },
+      async branch() {
+        return branch;
+      },
+      async checkout() {
+        throw new Error("fatal: Unable to create 'D:/repo/.git/index.lock': Permission denied");
+      }
+    }
+  });
+
+  assert.equal(result.publish_ready, false);
+  assert.equal(result.publish_blocker.code, "git_not_writable");
+  assert.match(result.publish_blocker.message, /index\.lock/);
+  assert.equal(result.current_branch, "codex/discovery-fallbacks");
+  assert.equal(result.switched_branch, false);
+});
+
 test("publish prepare-worktree 先提交本地改动再切回发布分支", async () => {
   const calls = [];
   let branch = "feature/report-sections";
@@ -221,6 +245,48 @@ test("github api publish 通过远端 API 提交发布产物且不写本机 git 
     calls.find((call) => call.url.endsWith("/git/trees")).body.tree[0].content,
     "<!doctype html><title>AI 日报 2026-05-13</title>"
   );
+});
+
+test("github api publish 允许从非 main 工作树发布到远端 main", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), "<!doctype html><title>AI 日报 2026-05-13</title>");
+
+  const calls = [];
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({ branch: "codex/discovery-fallbacks", status: " M docs/index.html" }),
+    fetchImpl: fakeGitHubFetch({ calls })
+  });
+
+  assert.equal(result.branch, "main");
+  assert.equal(result.source_branch, "codex/discovery-fallbacks");
+  assert.equal(result.committed, true);
+  assert.equal(calls.find((call) => call.method === "PATCH").body.force, false);
+});
+
+test("github api publish 可从 token resolver 读取凭据", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), "<!doctype html><title>AI 日报 2026-05-13</title>");
+
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    repository: "owner/repo",
+    verifyPages: false,
+    tokenResolver: async () => "resolved-token",
+    git: fakeGit({ status: " M docs/index.html" }),
+    fetchImpl: fakeGitHubFetch()
+  });
+
+  assert.equal(result.committed, true);
+  assert.equal(result.pushed, true);
 });
 
 test("github api publish 跳过远端已一致的发布产物", async () => {
