@@ -24,4 +24,4 @@
 
 真实 `publish` 已实现为需要显式 `--confirm-push` 的普通 commit/push 命令。它只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在非发布器管理改动，会停止并返回错误。`publish:dry-run` 仍用于发布前计划检查。
 
-为避免本机定时任务再次被 `.git/index.lock` 或 ACL 问题阻断，仓库同时提供 `publish:github-api` 兜底通道。它同样需要显式 `confirm-push`，并要求 `GH_TOKEN` 或 `GITHUB_TOKEN` 具备 `contents:write` 权限；实现上直接通过 GitHub API 比较远端 `main` 的 tree，只写入远端缺失或内容不同的 `docs/` 与 `reports-data/` 发布产物，并用 `force:false` 更新分支。该通道不会写本机 `.git`，因此适合本机 Git 元数据不可写但本地产物已经生成并验证通过的场景。
+为避免本机定时任务再次被 `.git/index.lock`、ACL 或无法切回 `main` 阻断，仓库同时提供 `publish:github-api` 兜底通道。它同样需要显式 `confirm-push`，并要求 `GH_TOKEN`、`GITHUB_TOKEN` 或当前机器可用的 `gh auth token` 具备 `contents:write` 权限；实现上直接通过 GitHub API 比较远端 `main` 的 tree，只写入远端缺失或内容不同的 `docs/` 与 `reports-data/` 发布产物，并用 `force:false` 更新分支。该通道不会写本机 `.git`，因此适合本机 Git 元数据不可写、无法创建 `index.lock` 或当前工作树没能切回 `main` 但本地产物已经生成并验证通过的场景。

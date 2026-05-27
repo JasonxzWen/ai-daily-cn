@@ -41,7 +41,7 @@
 13. 运行 `npm run validate`。
 14. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。
 15. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。该命令只允许提交 `docs/` 与 `reports-data/` 发布产物，并执行普通 push；push 到 `main` 后，仓库内 `.github/workflows/deploy-pages.yml` 会运行 `npm run build`，上传 `docs/` artifact，并通过 GitHub Actions 发布 GitHub Pages。发布后必须验证当日 Pages URL 返回 HTTP 200 且页面内容包含当日 `YYYY-MM-DD`。
-16. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock` 或本机 Git 元数据权限问题，并且环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN` 可用，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，只通过 GitHub API 把发布产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。用于兜底的 token 必须能触发仓库 workflow；如果使用的是 GitHub Actions 自带的 `GITHUB_TOKEN`，不要假设它会触发新的 workflow。
+16. 如果真实发布失败原因是 `.git` 不可写、无法创建 `index.lock`、无法切回 `main` 或本机 Git 元数据权限问题，运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 作为兜底发布。该命令不写本机 `.git`，允许从当前工作树把发布器管理的 `docs/` 与 `reports-data/` 产物写入远端 `main`，并使用 `force:false`，不得用于提交非发布器管理文件。它优先使用 `GH_TOKEN` 或 `GITHUB_TOKEN`，环境变量缺失时会尝试 `gh auth token`；用于兜底的 token 必须能触发仓库 workflow。
 17. 如果 validate、真实 publish 或 API 兜底发布失败，只报告 `publish_error`、失败原因和修复建议，不做破坏性恢复；如果 prepare-worktree 或 dry-run 只暴露发布环境不可用，继续保留本地日报 HTML/JSON 产物。
 18. 根据今日采样、入选/降级内容、自检结果和 repo 内提示词模块，输出最多 3 条提示词或规则迭代建议。建议只给用户人工确认，不自动写回提示词模块；这些建议必须同时进入 `self_check.optimization_suggestions`，并在最终回复的“反思与自动化迭代建议”小节单独列出。
 
@@ -90,7 +90,7 @@ push 成功后，`.github/workflows/deploy-pages.yml` 会在 `main` 上自动执
 npm run publish:github-api -- confirm-push YYYY-MM-DD
 ```
 
-该命令需要 `GH_TOKEN` 或 `GITHUB_TOKEN` 具备当前仓库 `contents:write` 权限。它读取本地生成的发布产物，比较远端 `main` 当前 tree，只把远端缺失或内容不同的 `docs/` 与 `reports-data/` 文件写成一个远端提交，并用 `force:false` 更新分支；本机 `.git` 不会被写入。
+该命令需要 `GH_TOKEN`、`GITHUB_TOKEN` 或当前机器可用的 `gh auth token` 具备当前仓库 `contents:write` 权限。它读取本地生成的发布产物，比较远端 `main` 当前 tree，只把远端缺失或内容不同的 `docs/` 与 `reports-data/` 文件写成一个远端提交，并用 `force:false` 更新分支；本机 `.git` 不会被写入，因此即使当前工作树没能切回 `main`，也可以作为发布兜底。
 
 ## 发现源与审计补充
 
