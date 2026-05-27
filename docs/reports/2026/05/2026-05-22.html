@@ -1330,7 +1330,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
       <div class="hero-brief">
-        <ul class="hero-summary-text hero-summary-list"><li>本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li>Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li>GitHub Copilot 加强任务路由与语义 issue 检索</li><li>其余条目见后文。</li></ul>
+        <ul class="hero-summary-text hero-summary-list"><li>本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li>Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li>GitHub Copilot 加强任务路由与语义 issue 检索</li></ul>
 
       </div>
       <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-22 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
@@ -1382,7 +1382,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>4</strong></article>
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>4</strong></article>
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>0</strong></article>
     </div>
   </section>
 <section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
@@ -1492,15 +1491,11 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">All the news from the Google I/O 2026 Developer keynote</a></strong>（Google Developers Blog / The Google I/O team，2026-05-19）：Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。</li><li>为什么重要：这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。</li><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></strong>（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。</li><li>为什么重要：它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。</li><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></strong>（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。</li><li>为什么重要：文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</li><li>为什么重要：RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。</li></ul></div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">All the news from the Google I/O 2026 Developer keynote</a></strong>（Google Developers Blog / The Google I/O team，2026-05-19）：Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。</li><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></strong>（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。</li><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></strong>（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</li></ul></div>
     <template data-rich-source data-source-fallback>- **[All the news from the Google I/O 2026 Developer keynote](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)**（Google Developers Blog / The Google I/O team，2026-05-19）：Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。
-  - 为什么重要：这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。
 - **[Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)**（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。
-  - 为什么重要：它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。
 - **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。
-  - 为什么重要：文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。
-- **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。
-  - 为什么重要：RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。</template>
+- **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</template>
   </section>
 <section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -1528,15 +1523,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>Builder 观察</h4>
-<p>暂无 Builder 观察。</p>
-<h4>社区线索</h4>
+    <div class="rendered-markdown"><h4>社区线索</h4>
 <ul><li>karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。 <a href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">来源</a></li><li>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。 <a href="https://github.com/multica-ai/andrej-karpathy-skills" rel="noopener noreferrer">来源</a></li><li>can1357/oh-my-pi 出现在 TypeScript daily trending，描述为 terminal AI coding agent；本轮缺少 release 或维护者原文，先作为 agent harness 观察线索。 <a href="https://github.com/can1357/oh-my-pi" rel="noopener noreferrer">来源</a></li><li>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。 <a href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### Builder 观察
-
-暂无 Builder 观察。
-
-### 社区线索
+    <template data-rich-source data-source-fallback>### 社区线索
 
 - karpathy/autoresearch 出现在 Python daily trending，描述为 AI agents running research on single-GPU nanochat training automatically；本轮未找到新的官方 release 或原始长文，因此保留为研究自动化复核线索。 [来源](https://github.com/karpathy/autoresearch)
 - multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。 [来源](https://github.com/multica-ai/andrej-karpathy-skills)

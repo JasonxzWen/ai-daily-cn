@@ -1330,7 +1330,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
       <div class="hero-brief">
-        <ul class="hero-summary-text hero-summary-list"><li>今天可回源的 AI 工程动态集中在 2026-05-19 的官方发布</li><li>主体信息保留 6 条：Google I/O 把 Gemini 3.5 Flash、Antigravity 2.0、Managed Agents 和 AI Studio 连成 …</li><li>GitHub Copilot 同日接入 Gemini 3.5 Flash 并强化评审到修复的 handoff</li><li>其余条目见后文。</li></ul>
+        <ul class="hero-summary-text hero-summary-list"><li>今天可回源的 AI 工程动态集中在 2026-05-19 的官方发布</li><li>主体信息保留 6 条：Google I/O 把 Gemini 3.5 Flash、Antigravity 2.0、Managed Agents 和 AI Studio 连成 …</li><li>GitHub Copilot 同日接入 Gemini 3.5 Flash 并强化评审到修复的 handoff</li></ul>
 
       </div>
       <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-20 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
@@ -1382,7 +1382,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>4</strong></article>
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>3</strong></article>
 <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>0</strong></article>
     </div>
   </section>
 <section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
@@ -1485,13 +1484,10 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en" rel="noopener noreferrer">Streamline your AI coding workflow with Chrome DevTools for agents 1.0</a></strong>（Chrome for Developers / Matthias Rohmer, José Luis Zapata，2026-05-19）：Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。</li><li>为什么重要：这篇文章提供了 agent 端到端验证的具体接口清单，可直接影响前端 coding agent 的验收和调试方式。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。</li><li>为什么重要：RAG 工程里重排常是质量与成本的折中点；该文给了可复现训练路径和不同尺寸模型选择。</li><li><strong><a href="https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026" rel="noopener noreferrer">What&#39;s shipped in dbt — May 2026</a></strong>（dbt Labs / Corinne Hallander，2026-05-19）：dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。</li><li>为什么重要：它展示了数据平台厂商如何把 AI assistant 接入身份、lineage、文档和作业排错，而不是只做 SQL 自动补全。</li></ul></div>
+    <div class="rendered-markdown"><ul><li><strong><a href="https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en" rel="noopener noreferrer">Streamline your AI coding workflow with Chrome DevTools for agents 1.0</a></strong>（Chrome for Developers / Matthias Rohmer, José Luis Zapata，2026-05-19）：Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。</li><li><strong><a href="https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026" rel="noopener noreferrer">What&#39;s shipped in dbt — May 2026</a></strong>（dbt Labs / Corinne Hallander，2026-05-19）：dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。</li></ul></div>
     <template data-rich-source data-source-fallback>- **[Streamline your AI coding workflow with Chrome DevTools for agents 1.0](https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en)**（Chrome for Developers / Matthias Rohmer, José Luis Zapata，2026-05-19）：Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。
-  - 为什么重要：这篇文章提供了 agent 端到端验证的具体接口清单，可直接影响前端 coding agent 的验收和调试方式。
 - **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。
-  - 为什么重要：RAG 工程里重排常是质量与成本的折中点；该文给了可复现训练路径和不同尺寸模型选择。
-- **[What&#39;s shipped in dbt — May 2026](https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026)**（dbt Labs / Corinne Hallander，2026-05-19）：dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。
-  - 为什么重要：它展示了数据平台厂商如何把 AI assistant 接入身份、lineage、文档和作业排错，而不是只做 SQL 自动补全。</template>
+- **[What&#39;s shipped in dbt — May 2026](https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026)**（dbt Labs / Corinne Hallander，2026-05-19）：dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。</template>
   </section>
 <section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -1519,15 +1515,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>Builder 观察</h4>
-<p>暂无 Builder 观察。</p>
-<h4>社区线索</h4>
+    <div class="rendered-markdown"><h4>社区线索</h4>
 <ul><li>Mistral 3 官方页披露 Mistral Large 3、Ministral 3 系列、Apache 2.0、vLLM/Hugging Face/AWS Bedrock 等可用路径，但本轮页面未暴露稳定 published date；按规则暂不写入主体或 model_releases。 <a href="https://mistral.ai/news/mistral-3" rel="noopener noreferrer">来源</a></li><li>Anthropic 在 2026-05-18 宣布收购 Stainless，强化 SDK、CLI 和 MCP server tooling；该事件高信号但超出本轮 24 小时主体窗口，未扩窗补入。 <a href="https://www.anthropic.com/news/anthropic-acquires-stainless?s=09" rel="noopener noreferrer">来源</a></li><li>WordPress 7.0 release schedule 显示 2026-05-20 发布，Beta 1 文档曾说明 Web Client AI API 会进入 Core；待最终 release post 出现后可复核是否进入主体。 <a href="https://make.wordpress.org/core/7-0/" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### Builder 观察
-
-暂无 Builder 观察。
-
-### 社区线索
+    <template data-rich-source data-source-fallback>### 社区线索
 
 - Mistral 3 官方页披露 Mistral Large 3、Ministral 3 系列、Apache 2.0、vLLM/Hugging Face/AWS Bedrock 等可用路径，但本轮页面未暴露稳定 published date；按规则暂不写入主体或 model_releases。 [来源](https://mistral.ai/news/mistral-3)
 - Anthropic 在 2026-05-18 宣布收购 Stainless，强化 SDK、CLI 和 MCP server tooling；该事件高信号但超出本轮 24 小时主体窗口，未扩窗补入。 [来源](https://www.anthropic.com/news/anthropic-acquires-stainless?s=09)

@@ -103,6 +103,15 @@
       "notes": "npm run discover:builders -- --date 2026-05-27 --limit 20 returned fetch failed for Simon Willison, Chip Huyen and Andrej Karpathy feeds."
     },
     {
+      "id": "follow-builders-x",
+      "name": "follow-builders X feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-27T04:28:44.802Z",
+      "notes": "discover:builders parsed 18 recent original X entries from the central follow-builders feed."
+    },
+    {
       "id": "claude-status",
       "name": "Claude Status",
       "url": "https://status.claude.com/",
@@ -184,6 +193,30 @@
       "status": "included",
       "included_in": "projects",
       "evidence": "GitHub confirms the repo contents and license; TrendingRepo supplied the 2026-05-26 momentum cue used only as discovery evidence."
+    },
+    {
+      "id": "builder-peter-yang-codex-browser-test",
+      "source_id": "follow-builders-x",
+      "category": "builder_observation",
+      "title": "Peter Yang: Codex uses browser to test its own work",
+      "url": "https://x.com/petergyang/status/2059099566377693305",
+      "source": "follow-builders X feed",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Peter Yang said Codex is very good and especially impressive because it uses the browser to test its own work, while Claude still wins on design and frontend tasks."
+    },
+    {
+      "id": "builder-garry-tan-agent-evals",
+      "source_id": "follow-builders-x",
+      "category": "builder_observation",
+      "title": "Garry Tan: use several frontier models to judge agent skill runs",
+      "url": "https://x.com/garrytan/status/2059148823403082154",
+      "source": "follow-builders X feed",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Garry Tan described an eval pattern where an agent asks three frontier models to review the inputs and outputs of a skill file call and rate effectiveness."
     },
     {
       "id": "community-claude-code-slack-errors",
