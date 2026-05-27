@@ -36,6 +36,13 @@
       "type": "string",
       "minLength": 1
     },
+    "hero_highlights": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hero_highlight"
+      },
+      "default": []
+    },
     "canonical_url": {
       "type": "string",
       "format": "uri"
@@ -194,6 +201,24 @@
         }
       }
     },
+    "hero_highlight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "url", "reason"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "model_release": {
       "type": "object",
       "additionalProperties": false,
@@ -255,8 +280,7 @@
         "author",
         "event_date",
         "topic",
-        "summary",
-        "why_it_matters"
+        "summary"
       ],
       "properties": {
         "title": {
@@ -289,6 +313,9 @@
           "type": "string",
           "minLength": 1
         },
+        "content_type": {
+          "enum": ["blog", "interview", "podcast", "engineering_note"]
+        },
         "why_it_matters": {
           "type": "string",
           "minLength": 1
@@ -311,6 +338,18 @@
           "type": "string",
           "minLength": 1
         },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "use_case": {
+          "type": "string",
+          "minLength": 1
+        },
         "url": {
           "$ref": "#/$defs/absolute_url"
         },
@@ -323,7 +362,7 @@
           "minLength": 1
         },
         "signal": {
-          "enum": ["release", "star_velocity", "trending", "notable_pr", "ecosystem", "official_update"]
+          "enum": ["release", "star_velocity", "trending", "notable_pr", "ecosystem", "official_update", "product_hunt"]
         },
         "evidence": {
           "type": "string",
@@ -457,6 +496,9 @@
           "$ref": "#/$defs/source_audit_group"
         },
         "builder_sources": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "content_sources": {
           "$ref": "#/$defs/source_audit_group"
         }
       }

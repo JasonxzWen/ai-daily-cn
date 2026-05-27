@@ -8,6 +8,11 @@ const OSSINSIGHT_TRENDING_SOURCE = source(
   "all",
   "past_24_hours"
 );
+const DEFAULT_FOLLOW_BUILDERS_FEEDS = {
+  x: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+  podcasts: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+  blogs: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json"
+};
 
 export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending daily", "https://github.com/trending?since=daily", "all", "daily"),
@@ -43,6 +48,77 @@ export const DEFAULT_BUILDER_FALLBACK_SOURCES = [
     url: "https://karpathy.github.io/feed.xml",
     author: "Andrej Karpathy",
     role: "researcher"
+  }
+];
+
+export const DEFAULT_CONTENT_SOURCES = [
+  {
+    id: "content-openai-news",
+    name: "OpenAI News RSS",
+    url: "https://openai.com/news/rss.xml"
+  },
+  {
+    id: "content-anthropic-news",
+    name: "Anthropic News",
+    url: "https://www.anthropic.com/news",
+    format: "html_index",
+    linkPattern: "/news/"
+  },
+  {
+    id: "content-hugging-face-blog",
+    name: "Hugging Face Blog",
+    url: "https://huggingface.co/blog/feed.xml"
+  },
+  {
+    id: "content-google-research",
+    name: "Google Research Blog",
+    url: "https://research.google/blog/rss/"
+  },
+  {
+    id: "content-google-deepmind-blog",
+    name: "Google DeepMind Blog",
+    url: "https://deepmind.google/discover/blog/",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-meta-ai-blog",
+    name: "Meta AI Blog",
+    url: "https://ai.meta.com/blog/",
+    format: "html_index",
+    linkPattern: "https://ai.meta.com/blog/"
+  },
+  {
+    id: "content-microsoft-research",
+    name: "Microsoft Research Blog",
+    url: "https://www.microsoft.com/en-us/research/feed/"
+  },
+  {
+    id: "content-latent-space",
+    name: "Latent.Space",
+    url: "https://www.latent.space/feed"
+  },
+  {
+    id: "content-interconnects",
+    name: "Interconnects",
+    url: "https://www.interconnects.ai/feed"
+  },
+  {
+    id: "content-product-hunt-devtools",
+    name: "Product Hunt Developer Tools Feed",
+    url: "https://www.producthunt.com/feed?category=developer-tools",
+    category: "project",
+    signal: "product_hunt"
+  },
+  {
+    id: "content-planet-ai",
+    name: "Planet AI",
+    url: "https://www.planet-ai.net/rss.xml"
+  },
+  {
+    id: "content-bair",
+    name: "BAIR Blog",
+    url: "https://bair.berkeley.edu/blog/feed.xml"
   }
 ];
 
@@ -272,6 +348,23 @@ export async function collectBuilderFallbacks(options = {}) {
   const candidates = [];
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
   const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
+  const followBuildersFeeds = options.followBuildersFeeds === false
+    ? null
+    : normalizeFollowBuildersFeeds(options.followBuildersFeeds || DEFAULT_FOLLOW_BUILDERS_FEEDS);
+
+  if (followBuildersFeeds) {
+    await collectFollowBuildersCentralFeeds({
+      feeds: followBuildersFeeds,
+      fetchImpl,
+      reportDate,
+      lookbackDays,
+      generatedAt,
+      sourceResults,
+      candidateSources,
+      candidates,
+      limit
+    });
+  }
 
   for (const rawSource of sources) {
     const currentSource = normalizeBuilderSource(rawSource);
@@ -324,9 +417,237 @@ export async function collectBuilderFallbacks(options = {}) {
         sources: sourceResults,
         candidates_found: candidates.length,
         included: 0,
-        blocked_reason: candidates.length > 0 ? "" : "no_recent_signal",
+        blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
-        notes: "Fixed original-source fallback; each candidate comes from a directly fetched RSS/Atom feed."
+        notes: followBuildersFeeds
+          ? "follow-builders central feed is checked before fixed RSS/Atom fallback; each candidate keeps an original URL."
+          : "Fixed original-source fallback; each candidate comes from a directly fetched RSS/Atom feed."
+      }
+    },
+    sources: candidateSources,
+    candidates: candidates.slice(0, limit)
+  };
+}
+
+async function collectFollowBuildersCentralFeeds(context) {
+  await collectSingleFollowBuildersFeed({
+    ...context,
+    key: "x",
+    sourceItem: {
+      id: "follow-builders-x",
+      name: "follow-builders X feed",
+      url: context.feeds.x,
+      category: "builder"
+    },
+    parser: parseFollowBuildersXFeed
+  });
+  await collectSingleFollowBuildersFeed({
+    ...context,
+    key: "podcasts",
+    sourceItem: {
+      id: "follow-builders-podcasts",
+      name: "follow-builders podcast feed",
+      url: context.feeds.podcasts,
+      category: "builder"
+    },
+    parser: parseFollowBuildersPodcastFeed
+  });
+  await collectSingleFollowBuildersFeed({
+    ...context,
+    key: "blogs",
+    sourceItem: {
+      id: "follow-builders-blogs",
+      name: "follow-builders blog feed",
+      url: context.feeds.blogs,
+      category: "blog"
+    },
+    parser: parseFollowBuildersBlogFeed
+  });
+}
+
+async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, reportDate, lookbackDays, generatedAt, sourceResults, candidateSources, candidates, limit }) {
+  if (!sourceItem.url) {
+    return;
+  }
+
+  candidateSources.push(toCandidateSource(sourceItem, sourceItem.category, generatedAt, "blocked", ""));
+  try {
+    const response = await fetchImpl(sourceItem.url, {
+      headers: {
+        accept: "application/json, */*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      }
+    });
+    if (!response.ok) {
+      markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
+      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", `HTTP ${response.status}`));
+      return;
+    }
+
+    const allParsed = parser(await readJsonResponse(response), {
+      sourceItem,
+      reportDate,
+      lookbackDays
+    });
+    const parsed = allParsed.slice(0, Math.max(limit - candidates.length, 0));
+    const status = allParsed.length > 0 ? "checked" : "no_signal";
+    const notes = `${allParsed.length} recent original entries parsed`;
+    markSource(candidateSources.at(-1), status, notes);
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes));
+
+    for (const entry of parsed) {
+      candidates.push({
+        ...entry,
+        id: uniqueCandidateId(candidates, entry.id || `${sourceItem.id}-${entry.title}`)
+      });
+    }
+  } catch (error) {
+    markSource(candidateSources.at(-1), "blocked", error.message);
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", error.message));
+  }
+}
+
+function parseFollowBuildersXFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+  const builders = Array.isArray(payload?.x) ? payload.x : Array.isArray(payload?.builders) ? payload.builders : [];
+  const entries = [];
+  for (const builder of builders) {
+    const tweets = Array.isArray(builder?.tweets) ? builder.tweets : [];
+    for (const tweet of tweets) {
+      const eventDate = dateOnly(tweet.createdAt || tweet.created_at || tweet.date);
+      if (!tweet.url || !tweet.text || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+        continue;
+      }
+      const author = builder.name || builder.handle || "Builder";
+      entries.push({
+        source_id: sourceItem.id,
+        category: "builder_observation",
+        title: `${author}: ${shortenCandidateTitle(tweet.text)}`,
+        url: tweet.url,
+        source: sourceItem.name,
+        event_date: eventDate,
+        status: "excluded",
+        evidence: summarizeEvidence(tweet.text, `${author} posted this original X update.`)
+      });
+    }
+  }
+  return entries;
+}
+
+function parseFollowBuildersPodcastFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+  const episodes = arrayFromPossibleKeys(payload, ["podcasts", "episodes"]);
+  return episodes
+    .map((episode) => {
+      const eventDate = dateOnly(episode.publishedAt || episode.published_at || episode.pubDate || episode.date);
+      if (!episode.url || !episode.title || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+        return null;
+      }
+      return {
+        source_id: sourceItem.id,
+        category: "builder_observation",
+        title: episode.name ? `${episode.name}: ${episode.title}` : episode.title,
+        url: episode.url,
+        source: sourceItem.name,
+        event_date: eventDate,
+        status: "excluded",
+        evidence: summarizeEvidence(episode.summary || episode.description || episode.transcript, "follow-builders podcast episode.")
+      };
+    })
+    .filter(Boolean);
+}
+
+function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+  const posts = arrayFromPossibleKeys(payload, ["blogs", "posts", "articles"]);
+  return posts
+    .map((post) => {
+      const eventDate = dateOnly(post.publishedAt || post.published_at || post.pubDate || post.date || post.event_date);
+      if (!post.url || !post.title || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+        return null;
+      }
+      return {
+        source_id: sourceItem.id,
+        category: "hot_blog",
+        title: post.title,
+        url: post.url,
+        source: post.source || post.publisher || sourceItem.name,
+        event_date: eventDate,
+        status: "excluded",
+        evidence: summarizeEvidence(post.summary || post.description || post.content, "follow-builders blog entry.")
+      };
+    })
+    .filter(Boolean);
+}
+
+export async function collectContentSources(options = {}) {
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  if (typeof fetchImpl !== "function") {
+    throw new Error("fetch is not available in this runtime");
+  }
+
+  const reportDate = requireReportDate(options.reportDate);
+  const generatedAt = options.generatedAt || new Date().toISOString();
+  const sources = await loadSources(options.sources, options.sourcesPath, DEFAULT_CONTENT_SOURCES);
+  const sourceResults = [];
+  const candidateSources = [];
+  const candidates = [];
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
+  const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
+
+  for (const rawSource of sources) {
+    const currentSource = normalizeGenericSource(rawSource, "content");
+    const sourceCategory = currentSource.category === "project" ? "project" : "blog";
+    const candidateCategory = currentSource.category === "project" ? "project" : "hot_blog";
+    candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
+
+    try {
+      const response = await fetchImpl(currentSource.url, {
+        headers: {
+          accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
+          "user-agent": "ai-daily-cn-static-publisher"
+        }
+      });
+      if (!response.ok) {
+        markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", `HTTP ${response.status}`));
+        continue;
+      }
+
+      const entries = parseContentSourceEntries(await response.text(), currentSource)
+        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
+      const status = entries.length > 0 ? "checked" : "no_signal";
+      const notes = `${entries.length} recent ${candidateCategory === "project" ? "product/project" : "blog/interview"} entries parsed`;
+      markSource(candidateSources.at(-1), status, notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
+
+      for (const entry of entries.slice(0, Math.max(limit - candidates.length, 0))) {
+        candidates.push({
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          source_id: currentSource.id,
+          category: candidateCategory,
+          title: entry.title,
+          url: entry.url,
+          source: currentSource.name,
+          event_date: entry.event_date,
+          status: "excluded",
+          evidence: summarizeEvidence(entry.summary, `${currentSource.name} published this ${candidateCategory === "project" ? "product/project" : "blog/interview"} entry.`),
+          ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
+        });
+      }
+    } catch (error) {
+      markSource(candidateSources.at(-1), "blocked", error.message);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", error.message));
+    }
+  }
+
+  return {
+    source_audit: {
+      content_sources: {
+        checked: true,
+        sources: sourceResults,
+        candidates_found: candidates.length,
+        included: 0,
+        blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
+        last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
+        notes: "Official labs, engineering blogs, high-quality newsletters, interviews, aggregators, and product feeds are checked as content/project candidates."
       }
     },
     sources: candidateSources,
@@ -526,6 +847,17 @@ function normalizeBuilderSource(sourceItem) {
   };
 }
 
+function normalizeFollowBuildersFeeds(feeds) {
+  if (!feeds || typeof feeds !== "object") {
+    return DEFAULT_FOLLOW_BUILDERS_FEEDS;
+  }
+  return {
+    x: isHttpUrl(feeds.x) ? feeds.x : "",
+    podcasts: isHttpUrl(feeds.podcasts) ? feeds.podcasts : "",
+    blogs: isHttpUrl(feeds.blogs) ? feeds.blogs : ""
+  };
+}
+
 function normalizeGenericSource(sourceItem, prefix) {
   if (!sourceItem || !isHttpUrl(sourceItem.url)) {
     throw new Error(`${prefix} source must include an absolute url`);
@@ -560,12 +892,57 @@ function auditSource(name, url, status, notes) {
   return { name, url, status, notes };
 }
 
+function inferBuilderBlockedReason(sourceResults) {
+  if (sourceResults.some((sourceResult) => sourceResult.status === "blocked")) {
+    return "fetch_failed";
+  }
+  return "no_recent_signal";
+}
+
 function parseFeedEntries(xml) {
   const entryBlocks = matchXmlBlocks(xml, "entry");
   if (entryBlocks.length > 0) {
     return entryBlocks.map(parseAtomEntry);
   }
   return matchXmlBlocks(xml, "item").map(parseRssItem);
+}
+
+function parseContentSourceEntries(content, sourceInfo) {
+  if (sourceInfo.format === "html_index") {
+    return parseHtmlIndexEntries(content, sourceInfo);
+  }
+  return parseFeedEntries(content);
+}
+
+function parseHtmlIndexEntries(html, sourceInfo = {}) {
+  const entries = [];
+  const seenUrls = new Set();
+  const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
+
+  for (const match of html.matchAll(anchorPattern)) {
+    const rawHref = decodeXml(match[1] || match[2] || match[3] || "");
+    const url = absoluteUrl(rawHref, sourceInfo.url);
+    if (!url || seenUrls.has(url) || !matchesSourceLink(rawHref, url, sourceInfo)) {
+      continue;
+    }
+
+    const block = html.slice(match.index, Math.min(html.length, match.index + 1800));
+    const title = extractHtmlTitle(match[4]) || extractHtmlTitle(block);
+    const eventDate = extractHtmlDate(block);
+    if (!title || !eventDate) {
+      continue;
+    }
+
+    seenUrls.add(url);
+    entries.push({
+      title,
+      url,
+      event_date: eventDate,
+      summary: extractHtmlSummary(block)
+    });
+  }
+
+  return entries;
 }
 
 function parseAtomEntry(block) {
@@ -621,6 +998,8 @@ function decodeXml(value) {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number.parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
     .replace(/&#x2F;/g, "/")
     .replace(/&mdash;/g, "—")
     .replace(/&ndash;/g, "–")
@@ -632,11 +1011,43 @@ function cleanText(value) {
 }
 
 function dateOnly(value) {
+  const rawValue = String(value || "").trim();
+  const ymdMatch = rawValue.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+  if (ymdMatch) {
+    return `${ymdMatch[1]}-${ymdMatch[2]}-${ymdMatch[3]}`;
+  }
+
+  const monthDateMatch = rawValue.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),\s+(\d{4})\b/i);
+  if (monthDateMatch) {
+    const month = monthNumber(monthDateMatch[1]);
+    const day = monthDateMatch[2].padStart(2, "0");
+    return month ? `${monthDateMatch[3]}-${month}-${day}` : "";
+  }
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return "";
   }
   return date.toISOString().slice(0, 10);
+}
+
+function monthNumber(value) {
+  const month = String(value || "").slice(0, 3).toLowerCase();
+  const months = {
+    jan: "01",
+    feb: "02",
+    mar: "03",
+    apr: "04",
+    may: "05",
+    jun: "06",
+    jul: "07",
+    aug: "08",
+    sep: "09",
+    oct: "10",
+    nov: "11",
+    dec: "12"
+  };
+  return months[month] || "";
 }
 
 function isWithinReportWindow(eventDate, reportDate, lookbackDays) {
@@ -655,6 +1066,23 @@ function isWithinReportWindow(eventDate, reportDate, lookbackDays) {
 function summarizeEvidence(summary, fallback) {
   const cleaned = cleanText(summary);
   return cleaned ? cleaned.slice(0, 240) : fallback;
+}
+
+function shortenCandidateTitle(value) {
+  const text = cleanText(value);
+  return text.length > 80 ? `${text.slice(0, 79)}…` : text;
+}
+
+function arrayFromPossibleKeys(payload, keys) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  for (const key of keys) {
+    if (Array.isArray(payload?.[key])) {
+      return payload[key];
+    }
+  }
+  return [];
 }
 
 function uniqueCandidateId(existingCandidates, rawValue) {
@@ -704,4 +1132,63 @@ async function readJsonResponse(response) {
 function extractFirstParagraph(block) {
   const paragraph = block.match(/<p[^>]*>([\s\S]*?)<\/p>/i)?.[1] || "";
   return cleanText(paragraph);
+}
+
+function absoluteUrl(value, baseUrl) {
+  try {
+    return new URL(value, baseUrl).toString();
+  } catch {
+    return "";
+  }
+}
+
+function matchesSourceLink(rawHref, url, sourceInfo) {
+  const patterns = Array.isArray(sourceInfo.linkPattern)
+    ? sourceInfo.linkPattern
+    : sourceInfo.linkPattern
+      ? [sourceInfo.linkPattern]
+      : [];
+  if (patterns.length > 0) {
+    return patterns.some((pattern) => rawHref.includes(pattern) || url.includes(pattern));
+  }
+
+  try {
+    const sourceUrl = new URL(sourceInfo.url);
+    const candidateUrl = new URL(url);
+    return candidateUrl.origin === sourceUrl.origin && candidateUrl.pathname !== sourceUrl.pathname;
+  } catch {
+    return false;
+  }
+}
+
+function extractHtmlTitle(block) {
+  const heading = block.match(/<h[1-4]\b[^>]*>([\s\S]*?)<\/h[1-4]>/i)?.[1];
+  if (heading) {
+    return cleanHtmlTitle(cleanText(heading));
+  }
+  return cleanHtmlTitle(cleanText(block));
+}
+
+function cleanHtmlTitle(value) {
+  return String(value || "")
+    .replace(/^(?:[A-Z][a-z]+\.?\s+\d{1,2},\s+\d{4}\s+)?(?:Announcements|Blog|Company|Featured|Product|Research)\s+/i, "")
+    .trim();
+}
+
+function extractHtmlDate(block) {
+  const datetime = block.match(/<time\b[^>]*datetime=["']([^"']+)["'][^>]*>/i)?.[1];
+  const dateFromDatetime = dateOnly(datetime);
+  if (dateFromDatetime) {
+    return dateFromDatetime;
+  }
+
+  const text = cleanText(block);
+  const explicitDate =
+    text.match(/\b\d{4}-\d{2}-\d{2}\b/)?.[0] ||
+    text.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},\s+\d{4}\b/i)?.[0];
+  return dateOnly(explicitDate);
+}
+
+function extractHtmlSummary(block) {
+  return extractFirstParagraph(block) || cleanText(block).slice(0, 240);
 }

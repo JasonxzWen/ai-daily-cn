@@ -14,6 +14,10 @@
 
 本文件是开发前规格，不包含实现代码。
 
+相关扩展规格：
+
+- [AI 日报信源扩展与内容质量规格](ai-daily-source-expansion-spec.md)：定义 Builder/X、热门博客、访谈/播客、Product Hunt、新产品和空板块处理的后续实现规则。
+
 ## 范围
 
 包含：

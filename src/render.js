@@ -30,12 +30,19 @@ export function renderReportHtml(report) {
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     modelReleases.length > 0 ? `<span><strong>${modelReleases.length}</strong> 模型发布</span>` : "",
     hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技术博客</span>` : "",
-    `<span><strong>${builderObservations.length}</strong> Builder 观察</span>`,
-    `<span><strong>${communityLeads.length}</strong> 社区线索</span>`
+    projects.length > 0 ? `<span><strong>${projects.length}</strong> 项目</span>` : "",
+    builderObservations.length > 0 ? `<span><strong>${builderObservations.length}</strong> Builder 观察</span>` : "",
+    communityLeads.length > 0 ? `<span><strong>${communityLeads.length}</strong> 社区线索</span>` : ""
   ]
     .filter(Boolean)
     .join("\n        ");
-  const optionalSections = [renderModelReleasesSection(modelReleases), renderHotBlogsSection(hotBlogs)].filter(Boolean).join("\n\n");
+  const optionalSections = [
+    renderModelReleasesSection(modelReleases),
+    renderHotBlogsSection(hotBlogs),
+    renderProjectsSection(projects),
+    renderBuilderObservationsSection(builderObservations),
+    renderCommunityLeadsSection(communityLeads)
+  ].filter(Boolean).join("\n\n");
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -56,7 +63,7 @@ ${defaultStyleCss}
     <section class="report-hero">
       <p class="eyebrow">每日 AI 技术观察</p>
       <h1>${escapeHtml(report.title)}</h1>
-      <p class="summary">${escapeHtml(report.summary)}</p>
+      ${renderHeroSummary(report)}
       <div class="meta-grid" aria-label="日报统计">
         ${metaItems}
       </div>
@@ -67,21 +74,6 @@ ${defaultStyleCss}
       ${mainItems.map(renderMainItem).join("\n")}
     </section>
 ${optionalSections ? `\n    ${optionalSections}\n` : ""}
-    <section class="section" id="projects">
-      <h2>今日值得关注的项目</h2>
-      ${renderProjects(projects)}
-    </section>
-
-    <section class="section" id="builder-observations">
-      <h2>Builder 观察</h2>
-      ${renderBuilderObservations(builderObservations)}
-    </section>
-
-    <section class="section" id="community-leads">
-      <h2>社区线索</h2>
-      ${renderCommunityLeads(communityLeads)}
-    </section>
-
 ${sourceAuditSection}
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
@@ -104,6 +96,17 @@ ${sourceAuditSection}
 </body>
 </html>
 `;
+}
+
+function renderHeroSummary(report) {
+  const highlights = Array.isArray(report.hero_highlights) ? report.hero_highlights.filter((item) => item?.title && item?.url).slice(0, 3) : [];
+  if (highlights.length === 0) {
+    return `<p class="summary">${escapeHtml(report.summary)}</p>`;
+  }
+
+  return `<ul class="summary">${highlights
+    .map((item) => `<li><a href="${escapeAttribute(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>${item.reason ? `：${escapeHtml(item.reason)}` : ""}</li>`)
+    .join("\n")}</ul>`;
 }
 
 export function renderIndexHtml(feed) {
@@ -442,7 +445,6 @@ function renderHotBlog(item) {
     <span>${escapeHtml(item.topic)}</span>
   </div>
   <p>${escapeHtml(item.summary)}</p>
-  <p><strong>为什么重要：</strong>${escapeHtml(item.why_it_matters)}</p>
 </article>`;
 }
 
@@ -457,9 +459,20 @@ function renderAvailability(value) {
   return label ? `${label} (${value})` : value;
 }
 
+function renderProjectsSection(projects) {
+  if (projects.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="projects">
+      <h2>今日值得关注的项目</h2>
+      ${renderProjects(projects)}
+    </section>`;
+}
+
 function renderProjects(projects) {
   if (projects.length === 0) {
-    return "<p>暂无项目条目。</p>";
+    return "";
   }
 
   return `<table class="project-table">
@@ -478,16 +491,31 @@ function renderProjects(projects) {
 function renderProjectDetails(project) {
   const tags = projectHeatTags(project);
   const tagsHtml = tags.length > 0 ? `<div class="item-meta">${renderTags(tags)}</div>` : "";
-  return `${tagsHtml}<p>${escapeHtml(cleanProjectDescription(project.description))}</p>`;
+  const domains = Array.isArray(project.domains) && project.domains.length > 0
+    ? `<p><strong>领域：</strong>${escapeHtml(project.domains.join("、"))}</p>`
+    : "";
+  const useCase = project.use_case ? `<p><strong>作用：</strong>${escapeHtml(project.use_case)}</p>` : "";
+  return `${tagsHtml}<p>${escapeHtml(cleanProjectDescription(project.description))}</p>${domains}${useCase}`;
 }
 
 function renderTags(tags) {
   return tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
 }
 
+function renderBuilderObservationsSection(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="builder-observations">
+      <h2>Builder 观察</h2>
+      ${renderBuilderObservations(items)}
+    </section>`;
+}
+
 function renderBuilderObservations(items) {
   if (items.length === 0) {
-    return "<p>暂无 Builder 观察。</p>";
+    return "";
   }
 
   return `<ul class="compact-list">${items
@@ -506,9 +534,20 @@ function renderBuilderObservation(item) {
   return `<strong>${escapeHtml(item.author)}</strong>：${escapeHtml(item.content)} ${externalLink(item.url, "来源")}${metaHtml}${evidence}`;
 }
 
+function renderCommunityLeadsSection(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="community-leads">
+      <h2>社区线索</h2>
+      ${renderCommunityLeads(items)}
+    </section>`;
+}
+
 function renderCommunityLeads(items) {
   if (items.length === 0) {
-    return "<p>暂无社区线索。</p>";
+    return "";
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
@@ -520,6 +559,7 @@ function renderSourceAudit(audit) {
       <div class="audit-grid">
         ${renderAuditGroup("GitHub Trending", audit.github_trending)}
         ${renderAuditGroup("Builder 原始源", audit.builder_sources)}
+        ${audit.content_sources ? renderAuditGroup("热门博客与访谈源", audit.content_sources) : ""}
       </div>
     </section>`;
 }

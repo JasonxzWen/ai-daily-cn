@@ -8,6 +8,7 @@ import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
 import {
   collectBuilderFallbacks,
+  collectContentSources,
   collectGitHubTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml
@@ -77,7 +78,7 @@ test("schema 能校验日期、URL 和 required fields", async () => {
   assert(validation.errors.length >= 3);
 });
 
-test("schema 支持模型发布和热门技术博客，并为旧日报默认空数组", async () => {
+test("schema 支持模型发布、hero 精选、博客新契约和项目用途字段，并为旧日报默认空数组", async () => {
   const markdown = await readFixture("reports/good/official-release.md");
   const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
 
@@ -106,8 +107,25 @@ test("schema 支持模型发布和热门技术博客，并为旧日报默认空�
       author: "Example Author",
       event_date: "2026-05-13",
       topic: "agent harness",
-      summary: "该博客说明长任务 agent harness 的工程设计。",
-      why_it_matters: "它是工程实践读物，不应计入主体信息数量。"
+      summary: "该博客说明长任务 agent harness 的工程设计。"
+    }
+  ];
+  enriched.hero_highlights = [
+    {
+      title: "Harness 成为今日主线",
+      url: "https://example.com/blog/harness-engineering",
+      reason: "同一天的模型、项目和工程博客都指向 agent harness。"
+    }
+  ];
+  enriched.projects = [
+    {
+      name: "Example Agent Memory",
+      description: "面向 coding agents 的 persistent memory 项目。",
+      url: "https://github.com/example/agent-memory",
+      domains: ["coding_agent", "agent_memory"],
+      use_case: "给 coding agent 提供跨会话持久记忆。",
+      signal: "product_hunt",
+      evidence: "Product Hunt 上榜后，项目 README 提供可运行示例。"
     }
   ];
 
@@ -301,12 +319,23 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
   report.summary = "Google 把模型和 agent 工具放进同一条链路；Vercel AI Gateway 接入更多模型；GitHub Copilot 加强任务路由；GitHub Trending 显示 agent memory 升温。";
+  report.hero_highlights = [
+    {
+      title: "Agent harness 成为今日主线",
+      url: "https://example.com/blog/harness-engineering",
+      reason: "模型入口、项目趋势和工程博客都指向 harness 设计。"
+    }
+  ];
   report.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
+  report.hot_blogs[0].summary = "这篇文章把长运行 agent 的 harness 拆成任务规划、上下文治理、工具执行、结果校验和恢复路径几层，重点不是再发明一个模型包装器，而是把每一步都变成可观测、可重放、可回滚的工程边界。作者用 coding agent 和研究代理的例子说明，真正影响稳定性的往往是文件系统隔离、权限提示、失败重试、上下文压缩和评估回放，而不是单次补全质量。对研发团队来说，它适合作为设计 agent 平台、评估 Claude Code/Codex 类工具、或制定内部自动化安全门时的术语和架构参考。";
+  report.hot_blogs[0].why_it_matters = "旧字段保留兼容，但公开页面不再渲染。";
   report.projects = [
     {
       name: "Example Agent Memory",
       description: "面向 coding agents 的 persistent memory 项目，在 GitHub Trending weekly 中出现。",
       url: "https://github.com/example/agent-memory",
+      domains: ["coding_agent", "agent_memory"],
+      use_case: "给 coding agent 提供跨会话持久记忆，让自动化任务能复用用户偏好、项目约束和历史决策。",
       event_date: "2026-05-15",
       source: "GitHub Trending weekly",
       signal: "star_velocity",
@@ -317,18 +346,22 @@ test("日报可以转换为 effective-interact 输入", async () => {
 
   assert.equal(input.template, "research-explainer");
   assert.equal(input.renderMode, "pre-rendered");
-  assert(input.summary.includes("- Google 把模型和 agent 工具放进同一条链路"));
-  assert(input.summary.includes("- 其余条目见后文。"));
+  assert(input.summary.includes("Agent harness 成为今日主线"));
+  assert(!input.summary.includes("其余条目见后文"));
   const mainlineSection = input.sections.find((section) => section.title === "主线摘要");
   assert(mainlineSection.content.includes("**Google I/O**"));
   assert(mainlineSection.content.includes("**模型入口**"));
+  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  assert(hotBlogsSection.content.includes("这篇文章把长运行 agent 的 harness"));
+  assert(!hotBlogsSection.content.includes("为什么重要"));
   const modelSection = input.sections.find((section) => section.title === "模型发布");
   assert(modelSection.content.includes("==多平台可见=="));
   assert(modelSection.content.includes("==官方可用性=="));
   assert(!modelSection.content.includes("备注："));
   const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
   assert(projectsSection.content.includes("==本周 +456 stars=="));
-  assert(projectsSection.content.includes("面向 coding agents 的 persistent memory 项目。"));
+  assert(projectsSection.content.includes("领域：coding_agent、agent_memory"));
+  assert(projectsSection.content.includes("作用：给 coding agent 提供跨会话持久记忆"));
   assert(!projectsSection.content.includes("信号："));
   assert(!projectsSection.content.includes("证据："));
   assert(!projectsSection.content.includes("GitHub Trending weekly 中出现"));
@@ -337,6 +370,27 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(input.sections.some((section) => section.title === "信源审计"));
   assert(input.sections.some((section) => typeof section.content === "string" && section.content.includes("结构化 JSON")));
   assert.equal(input.evidence, undefined);
+});
+
+test("effective-interact 输入不会渲染空的可选板块", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.model_releases = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.community_leads = [];
+  report.self_check.builder_observations = 0;
+
+  const input = reportToInteractionInput(report);
+  const titles = input.sections.map((section) => section.title);
+
+  assert(!titles.includes("模型发布"));
+  assert(!titles.includes("热门技术博客"));
+  assert(!titles.includes("今日值得关注的项目"));
+  assert(!titles.includes("Builder 观察与社区线索"));
+  assert(!JSON.stringify(input).includes("暂无 Builder 观察"));
+  assert(!JSON.stringify(input).includes("暂无社区线索"));
+  assert(!JSON.stringify(input).includes("暂无热门技术博客"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -431,6 +485,7 @@ test("builder fallback discovery parses fixed original feeds", async () => {
   const collected = await collectBuilderFallbacks({
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
+    followBuildersFeeds: false,
     sources: [
       {
         id: "builder-simon-willison",
@@ -451,6 +506,106 @@ test("builder fallback discovery parses fixed original feeds", async () => {
   assert.equal(collected.candidates[0].source_id, "builder-simon-willison");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].url, "https://example.com/builder-post");
+});
+
+test("builder discovery 优先解析 follow-builders central X feed", async () => {
+  const collected = await collectBuilderFallbacks({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [],
+    followBuildersFeeds: {
+      x: "https://example.com/feed-x.json",
+      podcasts: "https://example.com/feed-podcasts.json",
+      blogs: "https://example.com/feed-blogs.json"
+    },
+    fetchImpl: async (url) => {
+      if (String(url).endsWith("feed-x.json")) {
+        return jsonResponse(followBuildersXFixture());
+      }
+      return jsonResponse({ generatedAt: "2026-05-26T01:00:00Z" });
+    }
+  });
+
+  assert.equal(collected.source_audit.builder_sources.checked, true);
+  assert.equal(collected.source_audit.builder_sources.sources[0].name, "follow-builders X feed");
+  assert.equal(collected.source_audit.builder_sources.sources[0].status, "checked");
+  assert.equal(collected.source_audit.builder_sources.candidates_found, 1);
+  assert.equal(collected.source_audit.builder_sources.blocked_reason, "");
+  assert.equal(collected.sources[0].id, "follow-builders-x");
+  assert.equal(collected.candidates[0].category, "builder_observation");
+  assert.equal(collected.candidates[0].source_id, "follow-builders-x");
+  assert.equal(collected.candidates[0].source, "follow-builders X feed");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].url, "https://x.com/swyx/status/2059000000000000000");
+  assert.match(collected.candidates[0].evidence, /model alone is no longer the product/i);
+});
+
+test("content source discovery parses hot blog and interview feeds", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "latent-space",
+        name: "Latent.Space",
+        url: "https://example.com/latent-space.xml"
+      }
+    ],
+    fetchImpl: async () => textResponse(contentSourceRssFixture())
+  });
+
+  assert.equal(collected.source_audit.content_sources.checked, true);
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.source_audit.content_sources.candidates_found, 1);
+  assert.equal(collected.sources[0].category, "blog");
+  assert.equal(collected.candidates[0].category, "hot_blog");
+  assert.equal(collected.candidates[0].source_id, "latent-space");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].url, "https://example.com/interview");
+  assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
+});
+
+test("content source discovery parses official HTML pages and Product Hunt project feeds", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "anthropic-news",
+        name: "Anthropic News",
+        url: "https://example.com/news",
+        format: "html_index",
+        linkPattern: "/news/"
+      },
+      {
+        id: "product-hunt-devtools",
+        name: "Product Hunt Developer Tools Feed",
+        url: "https://example.com/product-hunt.xml",
+        category: "project",
+        signal: "product_hunt"
+      }
+    ],
+    fetchImpl: async (url) => {
+      if (String(url).endsWith("product-hunt.xml")) {
+        return textResponse(productHuntAtomFixture());
+      }
+      return textResponse(anthropicNewsHtmlFixture());
+    }
+  });
+
+  assert.equal(collected.source_audit.content_sources.sources.length, 2);
+  assert.equal(collected.source_audit.content_sources.candidates_found, 2);
+  assert.equal(collected.sources[0].category, "blog");
+  assert.equal(collected.candidates[0].category, "hot_blog");
+  assert.equal(collected.candidates[0].source_id, "anthropic-news");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].url, "https://example.com/news/claude-code-internals");
+  assert.match(collected.candidates[0].evidence, /Claude Code team explained/);
+  assert.equal(collected.sources[1].category, "project");
+  assert.equal(collected.candidates[1].category, "project");
+  assert.equal(collected.candidates[1].source_id, "product-hunt-devtools");
+  assert.equal(collected.candidates[1].signal, "product_hunt");
+  assert.equal(collected.candidates[1].url, "https://www.producthunt.com/products/agent-debugger");
 });
 
 test("statuspage discovery parses Atom incidents into candidates", async () => {
@@ -855,6 +1010,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("npm run discover:github-trending"));
   assert(prompt.includes("--browser-export"));
   assert(prompt.includes("npm run discover:builders"));
+  assert(prompt.includes("npm run discover:content-sources"));
   assert(prompt.includes("npm run discover:statuspage-incidents"));
   assert(prompt.includes("release_scope"));
   assert(prompt.includes("follow-builders"));
@@ -862,6 +1018,13 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("builder_sources"));
   assert(prompt.includes("blocked_reason"));
   assert(prompt.includes("last_successful_feed_at"));
+  assert(prompt.includes("hero_highlights"));
+  assert(prompt.includes("300-500"));
+  assert(prompt.includes("follow-builders central feed"));
+  assert(prompt.includes("Product Hunt"));
+  assert(prompt.includes("领域"));
+  assert(prompt.includes("作用"));
+  assert(prompt.includes("空数组对应板块不要渲染"));
   assert(prompt.includes("2026-05-15"));
 });
 
@@ -951,6 +1114,70 @@ function builderAtomFixture() {
     <link href="https://example.com/builder-post" />
     <updated>2026-05-26T01:00:00Z</updated>
     <summary>Practical notes about shipping agent workflows.</summary>
+  </entry>
+</feed>`;
+}
+
+function followBuildersXFixture() {
+  return {
+    generatedAt: "2026-05-26T03:00:00Z",
+    lookbackHours: 24,
+    x: [
+      {
+        source: "x",
+        name: "Swyx",
+        handle: "swyx",
+        bio: "AI engineer and Latent.Space co-host",
+        tweets: [
+          {
+            id: "2059000000000000000",
+            text: "The model alone is no longer the product; the harness, memory, eval loop, and workflow are the product surface now.",
+            createdAt: "2026-05-26T02:00:00.000Z",
+            url: "https://x.com/swyx/status/2059000000000000000",
+            likes: 1200,
+            retweets: 90,
+            replies: 30,
+            isQuote: false
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function contentSourceRssFixture() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>How OpenAI engineers build coding agents</title>
+      <link>https://example.com/interview</link>
+      <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
+      <description>OpenAI engineer interview about harnesses, evals, and workflow design.</description>
+    </item>
+  </channel>
+</rss>`;
+}
+
+function anthropicNewsHtmlFixture() {
+  return `<!doctype html>
+<main>
+  <a href="/news/claude-code-internals">
+    <h2>Inside Claude Code's agent harness</h2>
+    <time>May 26, 2026</time>
+    <p>Claude Code team explained how they isolate tools, replay evaluations, and keep coding agents observable.</p>
+  </a>
+</main>`;
+}
+
+function productHuntAtomFixture() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Agent Debugger</title>
+    <link rel="alternate" type="text/html" href="https://www.producthunt.com/products/agent-debugger" />
+    <published>2026-05-26T08:00:00-07:00</published>
+    <content type="html">&lt;p&gt;Debug and replay production AI agent incidents.&lt;/p&gt;</content>
   </entry>
 </feed>`;
 }

@@ -14,6 +14,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `report_date`
 - `title`
 - `summary`
+- `hero_highlights`
 - `canonical_url`
 - `html_path`
 - `source_window`
@@ -49,7 +50,17 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `event_date`
 - `topic`
 - `summary`
-- `why_it_matters`
+- 可选 `content_type`：`blog`、`interview`、`podcast`、`engineering_note`
+
+`hot_blogs[*].summary` 必须是 300-500 字中文内容摘要，不要另写 `why_it_matters`；历史数据可保留该字段，但新草稿不需要填写。
+
+`hero_highlights` 用于公开页面 header，最多 1-3 条。每项包含：
+
+- `title`
+- `url`
+- `reason`
+
+只放当天最重磅的消息、项目或观点。没有特大新闻时写 1 条今日主线，禁止写“其余条目见后文”或“本版只保留 N 条”。
 
 没有模型发布、热门博客、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
@@ -68,7 +79,8 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `builder_sources.blocked_reason`：当 Builder 来源被阻塞或为空时填写机器可读原因，例如 `fetch_failed`、`auth_required`、`empty_feed`、`rate_limited`、`no_recent_signal`
 - `builder_sources.last_successful_feed_at`：记录上次成功获取中心 feed 的 ISO 时间；没有历史记录时用 `null`
 - `builder_sources.notes`
+- 可选 `content_sources`：记录热门博客、访谈、播客、Product Hunt 或聚合站检查结果，结构与其他审计组一致。
 
 `main_items`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
-`projects` 可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。
+`projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。

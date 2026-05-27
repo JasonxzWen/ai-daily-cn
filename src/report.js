@@ -74,6 +74,7 @@ export function normalizeReportDraft(draft, options = {}) {
       fallback_window_used: false,
       notes: ""
     },
+    hero_highlights: Array.isArray(draft.hero_highlights) ? draft.hero_highlights : [],
     candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],

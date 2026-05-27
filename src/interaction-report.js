@@ -16,12 +16,89 @@ export function reportToInteractionInput(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const heroHighlights = Array.isArray(report.hero_highlights) ? report.hero_highlights : [];
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
+  const summaryCards = [
+    { label: "报告日期", value: report.report_date },
+    { label: "主体信息", value: String(mainItems.length) },
+    modelReleases.length > 0 ? { label: "模型发布", value: String(modelReleases.length) } : null,
+    hotBlogs.length > 0 ? { label: "热门技术博客", value: String(hotBlogs.length) } : null,
+    projects.length > 0 ? { label: "项目", value: String(projects.length) } : null,
+    builderObservations.length > 0 ? { label: "Builder 观察", value: String(builderObservations.length) } : null
+  ].filter(Boolean);
+  const sections = [
+    {
+      type: "summary-cards",
+      title: "日报概览",
+      group: "summary",
+      cards: summaryCards
+    },
+    {
+      type: "markdown",
+      title: "主线摘要",
+      group: "summary",
+      content: formatMainlineSummary(report.summary)
+    },
+    {
+      type: "markdown",
+      title: "主体信息",
+      group: "main",
+      content: formatMainItems(mainItems)
+    }
+  ];
+
+  if (modelReleases.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "模型发布",
+      group: "main",
+      content: formatModelReleases(modelReleases)
+    });
+  }
+  if (hotBlogs.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "热门技术博客",
+      group: "main",
+      content: formatHotBlogs(hotBlogs)
+    });
+  }
+  if (projects.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "今日值得关注的项目",
+      group: "projects",
+      content: formatProjects(projects)
+    });
+  }
+  const signalSections = [formatBuilderObservations(builderObservations), formatCommunityLeads(communityLeads)].filter(Boolean);
+  if (signalSections.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "Builder 观察与社区线索",
+      group: "signals",
+      content: signalSections.join("\n\n")
+    });
+  }
+  sections.push(
+    {
+      type: "markdown",
+      title: "信源审计",
+      group: "verification",
+      content: formatSourceAudit(report.source_audit)
+    },
+    {
+      type: "markdown",
+      title: "自检与产物",
+      group: "verification",
+      content: `${formatSelfCheck(report.self_check)}\n\n- ${markdownLink(dataHref, "结构化 JSON")}`
+    }
+  );
 
   return {
     title: report.title,
-    summary: formatHeroSummary(report.summary),
+    summary: formatHeroSummary(report.summary, heroHighlights),
     status: "complete",
     template: "research-explainer",
     renderMode: "pre-rendered",
@@ -39,86 +116,27 @@ export function reportToInteractionInput(report) {
         "结构化 JSON 可追溯"
       ]
     },
-    sections: [
-      {
-        type: "summary-cards",
-        title: "日报概览",
-        group: "summary",
-        cards: [
-          { label: "报告日期", value: report.report_date },
-          { label: "主体信息", value: String(mainItems.length) },
-          { label: "模型发布", value: String(modelReleases.length) },
-          { label: "热门技术博客", value: String(hotBlogs.length) },
-          { label: "项目", value: String(projects.length) },
-          { label: "Builder 观察", value: String(builderObservations.length) }
-        ]
-      },
-      {
-        type: "markdown",
-        title: "主线摘要",
-        group: "summary",
-        content: formatMainlineSummary(report.summary)
-      },
-      {
-        type: "markdown",
-        title: "主体信息",
-        group: "main",
-        content: formatMainItems(mainItems)
-      },
-      {
-        type: "markdown",
-        title: "模型发布",
-        group: "main",
-        content: formatModelReleases(modelReleases)
-      },
-      {
-        type: "markdown",
-        title: "热门技术博客",
-        group: "main",
-        content: formatHotBlogs(hotBlogs)
-      },
-      {
-        type: "markdown",
-        title: "今日值得关注的项目",
-        group: "projects",
-        content: formatProjects(projects)
-      },
-      {
-        type: "markdown",
-        title: "Builder 观察与社区线索",
-        group: "signals",
-        content: `${formatBuilderObservations(builderObservations)}\n\n${formatCommunityLeads(communityLeads)}`
-      },
-      {
-        type: "markdown",
-        title: "信源审计",
-        group: "verification",
-        content: formatSourceAudit(report.source_audit)
-      },
-      {
-        type: "markdown",
-        title: "自检与产物",
-        group: "verification",
-        content: `${formatSelfCheck(report.self_check)}\n\n- ${markdownLink(dataHref, "结构化 JSON")}`
-      }
-    ],
+    sections,
     nextActions: Array.isArray(report.self_check?.optimization_suggestions)
       ? report.self_check.optimization_suggestions.map((item) => item.suggestion).filter(Boolean).slice(0, 3)
       : []
   };
 }
 
-function formatHeroSummary(summary) {
+function formatHeroSummary(summary, heroHighlights = []) {
+  const highlights = Array.isArray(heroHighlights) ? heroHighlights.filter((item) => item?.title && item?.url).slice(0, 3) : [];
+  if (highlights.length > 0) {
+    return highlights
+      .map((item) => `- **${markdownLink(item.url, item.title)}**：${item.reason || ""}`.trim())
+      .join("\n");
+  }
+
   const clauses = splitSummaryClauses(summary).slice(0, 3);
   if (clauses.length < 2) {
     return String(summary || "").trim();
   }
 
-  const bullets = clauses.map((clause) => `- ${shortenText(clause, 88)}`);
-  if (splitSummaryClauses(summary).length > clauses.length) {
-    bullets.push("- 其余条目见后文。");
-  }
-  return bullets.join("\n");
+  return clauses.map((clause) => `- ${shortenText(clause, 88)}`).join("\n");
 }
 
 function formatMainlineSummary(summary) {
@@ -281,21 +299,25 @@ function formatModelReleases(items) {
 
 function formatHotBlogs(items) {
   if (items.length === 0) {
-    return "暂无热门技术博客。";
+    return "";
   }
 
   return items
-    .map((item) => `- **${markdownLink(item.url, item.title)}**（${item.publisher} / ${item.author}，${item.event_date}）：${item.summary}\n  - 为什么重要：${item.why_it_matters}`)
+    .map((item) => `- **${markdownLink(item.url, item.title)}**（${item.publisher} / ${item.author}，${item.event_date}）：${item.summary}`)
     .join("\n");
 }
 
 function formatProjects(items) {
   if (items.length === 0) {
-    return "暂无项目条目。";
+    return "";
   }
 
   return items
-    .map((item) => `- **${markdownLink(item.url, item.name)}**${formatHighlightTags(projectHeatTags(item))}：${cleanProjectDescription(item.description)}`)
+    .map((item) => {
+      const domains = Array.isArray(item.domains) && item.domains.length > 0 ? `\n  - 领域：${item.domains.join("、")}` : "";
+      const useCase = item.use_case ? `\n  - 作用：${item.use_case}` : "";
+      return `- **${markdownLink(item.url, item.name)}**${formatHighlightTags(projectHeatTags(item))}：${cleanProjectDescription(item.description)}${domains}${useCase}`;
+    })
     .join("\n");
 }
 
@@ -305,7 +327,7 @@ function formatHighlightTags(tags) {
 
 function formatBuilderObservations(items) {
   if (items.length === 0) {
-    return "### Builder 观察\n\n暂无 Builder 观察。";
+    return "";
   }
 
   return `### Builder 观察\n\n${items
@@ -315,7 +337,7 @@ function formatBuilderObservations(items) {
 
 function formatCommunityLeads(items) {
   if (items.length === 0) {
-    return "### 社区线索\n\n暂无社区线索。";
+    return "";
   }
 
   return `### 社区线索\n\n${items.map((item) => `- ${item.content} ${markdownLink(item.url, "来源")}`).join("\n")}`;
@@ -328,8 +350,9 @@ function formatSourceAudit(audit) {
 
   return [
     formatAuditGroup("GitHub Trending", audit.github_trending),
-    formatAuditGroup("Builder 原始源", audit.builder_sources)
-  ].join("\n\n");
+    formatAuditGroup("Builder 原始源", audit.builder_sources),
+    audit.content_sources ? formatAuditGroup("热门博客与访谈源", audit.content_sources) : ""
+  ].filter(Boolean).join("\n\n");
 }
 
 function formatAuditGroup(title, group) {

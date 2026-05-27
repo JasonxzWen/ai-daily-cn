@@ -12,6 +12,7 @@ import {
 import { assemblePrompt } from "./prompt.js";
 import {
   collectBuilderFallbacks,
+  collectContentSources,
   collectGitHubTrending,
   collectStatuspageIncidents
 } from "./discovery.js";
@@ -142,6 +143,18 @@ try {
   } else if (command === "discover:builders") {
     const args = parseArgs(argv);
     const result = await collectBuilderFallbacks({
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      sourcesPath: args.sources,
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "discover:content-sources") {
+    const args = parseArgs(argv);
+    const result = await collectContentSources({
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
