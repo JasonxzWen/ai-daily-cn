@@ -134,7 +134,9 @@ try {
       browserExportName: args["browser-export-name"],
       browserExportUrl: args["browser-export-url"],
       browserExportLanguage: args["browser-export-language"],
-      browserExportWindow: args["browser-export-window"]
+      browserExportWindow: args["browser-export-window"],
+      historyRoot: args["history-root"],
+      historyLookbackDays: Number.parseInt(args["history-lookback-days"] || "7", 10)
     });
     printJson({
       ok: true,

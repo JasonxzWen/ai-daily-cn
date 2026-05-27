@@ -372,6 +372,99 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.evidence, undefined);
 });
 
+test("project interaction section uses one card per project", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.projects = [
+    {
+      name: "Project Alpha",
+      description: "A reusable plugin set for agent workflows.",
+      url: "https://github.com/example/project-alpha",
+      domains: ["agent", "workflow"],
+      use_case: "Use for packaging repeatable research and writing workflows.",
+      event_date: "2026-05-15",
+      source: "GitHub",
+      signal: "star_velocity",
+      evidence: "GitHub Trending weekly appeared in discovery."
+    },
+    {
+      name: "Project Beta",
+      description: "A dashboard toolkit for eval review.",
+      url: "https://github.com/example/project-beta",
+      domains: ["eval"],
+      use_case: "Use for eval dashboards and review handoff.",
+      event_date: "2026-05-15",
+      source: "GitHub",
+      signal: "release",
+      evidence: "GitHub release page."
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.group === "projects");
+
+  assert.equal(section.type, "filterable-cards");
+  assert.equal(section.items.length, 2);
+  assert.equal(section.items[0].title, "Project Alpha");
+  assert.equal(section.items[0].href, "https://github.com/example/project-alpha");
+  assert(section.items[0].body.includes("agent workflows"));
+  assert(section.items[0].points.some((point) => point.value.includes("agent")));
+  assert(section.items[1].points.some((point) => point.value.includes("eval dashboards")));
+});
+
+test("builder interaction section omits explicit evidence bullets", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      role: "maintainer",
+      content: "Shared a concrete coding-agent workflow observation.",
+      url: "https://example.com/builder-post",
+      event_date: "2026-05-15",
+      source: "follow-builders X feed",
+      evidence: "Original X URL was collected from follow-builders central feed on 2026-05-15."
+    }
+  ];
+  report.self_check.builder_observations = 1;
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.group === "signals");
+
+  assert(section.content.includes("Example Builder"));
+  assert(section.content.includes("follow-builders X feed"));
+  assert(!section.content.includes("Original X URL was collected"));
+  assert(!section.content.includes("证据："));
+});
+
+test("community leads omit low-signal statuspage troubleshooting items", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      role: "maintainer",
+      content: "Shared a concrete coding-agent workflow observation.",
+      url: "https://example.com/builder-post",
+      event_date: "2026-05-15",
+      source: "follow-builders X feed"
+    }
+  ];
+  report.community_leads = [
+    {
+      content: "Claude Status recorded Claude Code in Slack elevated errors and marked it resolved; troubleshooting note only.",
+      url: "https://status.claude.com/"
+    }
+  ];
+  report.self_check.builder_observations = 1;
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.group === "signals");
+
+  assert.equal(section.title, "Builder 观察");
+  assert(section.content.includes("Example Builder"));
+  assert(!section.content.includes("Claude Status"));
+  assert(!section.content.includes("elevated errors"));
+  assert(!section.content.includes("社区线索"));
+});
+
 test("effective-interact 输入不会渲染空的可选板块", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.model_releases = [];
@@ -479,6 +572,82 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   assert.equal(collected.candidates[0].repo, "example/agent-runtime");
   assert.equal(collected.candidates[0].category, "project");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
+});
+
+test("GitHub trending discovery compares candidates against recent local history", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-trending-history-"));
+  const historyDir = path.join(tmp, "2026", "05");
+  await fs.mkdir(historyDir, { recursive: true });
+  await fs.writeFile(
+    path.join(historyDir, "2026-05-25.json"),
+    JSON.stringify({
+      report_date: "2026-05-25",
+      projects: [
+        {
+          name: "example/trending-agent",
+          url: "https://github.com/example/trending-agent/commits/main/",
+          source: "GitHub Trending daily"
+        }
+      ]
+    }),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(historyDir, "2026-05-24.candidates.json"),
+    JSON.stringify({
+      report_date: "2026-05-24",
+      sources: [
+        {
+          id: "github-trending-daily",
+          name: "GitHub Trending daily",
+          url: "https://github.com/trending?since=daily",
+          category: "github_trending",
+          status: "checked"
+        }
+      ],
+      candidates: [
+        {
+          id: "project-trending-agent",
+          source_id: "github-trending-daily",
+          category: "project",
+          title: "example/trending-agent",
+          url: "https://github.com/example/trending-agent",
+          source: "GitHub Trending daily",
+          event_date: "2026-05-24",
+          status: "included"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const collected = await collectGitHubTrending({
+    reportDate: "2026-05-27",
+    historyRoot: tmp,
+    sources: [
+      {
+        name: "GitHub Trending daily",
+        url: "https://github.com/trending?since=daily",
+        language: "all",
+        window: "daily"
+      }
+    ],
+    fetchImpl: async () => ({
+      ok: true,
+      text: async () => githubTrendingFixture()
+    })
+  });
+
+  const repeated = collected.candidates.find((candidate) => candidate.repo === "example/trending-agent");
+  const fresh = collected.candidates.find((candidate) => candidate.repo === "example/rag-eval");
+
+  assert.match(collected.source_audit.github_trending.notes, /每日必查/);
+  assert.match(collected.source_audit.github_trending.notes, /近 7 天/);
+  assert.match(repeated.evidence, /2026-05-24/);
+  assert.match(repeated.evidence, /2026-05-25/);
+  assert.match(repeated.notes, /seen_2_days_in_7d/);
+  assert.match(fresh.evidence, /近 7 天本地记录未见/);
+  assert.match(fresh.notes, /new_in_7d/);
 });
 
 test("builder fallback discovery parses fixed original feeds", async () => {
@@ -606,6 +775,151 @@ test("content source discovery parses official HTML pages and Product Hunt proje
   assert.equal(collected.candidates[1].source_id, "product-hunt-devtools");
   assert.equal(collected.candidates[1].signal, "product_hunt");
   assert.equal(collected.candidates[1].url, "https://www.producthunt.com/products/agent-debugger");
+});
+
+test("content source discovery cross-checks Product Hunt candidates with GitHub or docs", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "product-hunt-devtools",
+        name: "Product Hunt Developer Tools Feed",
+        url: "https://example.com/product-hunt.xml",
+        category: "project",
+        signal: "product_hunt"
+      }
+    ],
+    fetchImpl: async (url) => {
+      const value = String(url);
+      if (value.endsWith("product-hunt.xml")) {
+        return textResponse(productHuntAtomFixture());
+      }
+      if (value === "https://www.producthunt.com/products/agent-debugger") {
+        return textResponse(productHuntProductPageFixture());
+      }
+      if (value === "https://github.com/acme/agent-debugger") {
+        return textResponse(githubProductReadmeFixture());
+      }
+      throw new Error(`unexpected url ${value}`);
+    }
+  });
+
+  const candidate = collected.candidates[0];
+
+  assert.equal(candidate.category, "project");
+  assert.equal(candidate.signal, "product_hunt");
+  assert.equal(candidate.url, "https://github.com/acme/agent-debugger");
+  assert.match(candidate.evidence, /已打开 GitHub/);
+  assert.match(candidate.evidence, /Replay production AI agent incidents/i);
+  assert.match(candidate.notes, /product_cross_check=confirmed/);
+  assert.match(candidate.notes, /product_hunt_url=https:\/\/www\.producthunt\.com\/products\/agent-debugger/);
+  assert.match(candidate.notes, /confirmation_url=https:\/\/github\.com\/acme\/agent-debugger/);
+  assert.match(collected.source_audit.content_sources.sources[0].notes, /1 product cross-checks confirmed/);
+  assert.match(collected.source_audit.content_sources.notes, /Product Hunt project candidates are cross-checked/);
+});
+
+test("content source discovery follows Product Hunt RSS link redirects for product cross-check", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "product-hunt-devtools",
+        name: "Product Hunt Developer Tools Feed",
+        url: "https://example.com/product-hunt.xml",
+        category: "project",
+        signal: "product_hunt"
+      }
+    ],
+    fetchImpl: async (url) => {
+      const value = String(url);
+      if (value.endsWith("product-hunt.xml")) {
+        return textResponse(productHuntAtomWithRedirectFixture());
+      }
+      if (value === "https://www.producthunt.com/r/p/123?app_id=339") {
+        return textResponse(githubProductReadmeFixture(), 200, "https://github.com/acme/agent-debugger");
+      }
+      throw new Error(`unexpected url ${value}`);
+    }
+  });
+
+  const candidate = collected.candidates[0];
+
+  assert.equal(candidate.url, "https://github.com/acme/agent-debugger");
+  assert.match(candidate.evidence, /已打开 GitHub/);
+  assert.match(candidate.notes, /confirmation_url=https:\/\/github\.com\/acme\/agent-debugger/);
+});
+
+test("content source discovery ignores Product Hunt internal help links during product cross-check", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "product-hunt-devtools",
+        name: "Product Hunt Developer Tools Feed",
+        url: "https://example.com/product-hunt.xml",
+        category: "project",
+        signal: "product_hunt"
+      }
+    ],
+    fetchImpl: async (url) => {
+      const value = String(url);
+      if (value.endsWith("product-hunt.xml")) {
+        return textResponse(productHuntAtomFixture());
+      }
+      if (value === "https://www.producthunt.com/products/agent-debugger") {
+        return textResponse(productHuntInternalOnlyPageFixture());
+      }
+      throw new Error(`unexpected url ${value}`);
+    }
+  });
+
+  const candidate = collected.candidates[0];
+
+  assert.equal(candidate.url, "https://www.producthunt.com/products/agent-debugger");
+  assert.match(candidate.notes, /product_cross_check=unresolved/);
+  assert.match(candidate.notes, /no_external_confirmation_link/);
+  assert.match(collected.source_audit.content_sources.sources[0].notes, /0 product cross-checks confirmed/);
+});
+
+test("content source discovery rejects low-quality Product Hunt confirmation pages", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "product-hunt-devtools",
+        name: "Product Hunt Developer Tools Feed",
+        url: "https://example.com/product-hunt.xml",
+        category: "project",
+        signal: "product_hunt"
+      }
+    ],
+    fetchImpl: async (url) => {
+      const value = String(url);
+      if (value.endsWith("product-hunt.xml")) {
+        return textResponse(productHuntAtomFixture());
+      }
+      if (value === "https://www.producthunt.com/products/agent-debugger") {
+        return textResponse(productHuntLowQualityPageFixture());
+      }
+      if (value === "https://example.com/flutter-template") {
+        return textResponse("<p>A new Flutter project.</p>");
+      }
+      if (value === "https://circle.ci/demo") {
+        return textResponse("<p>Enjoy the videos and music you love on YouTube.</p>", 200, "https://www.youtube.com/watch?v=abc");
+      }
+      throw new Error(`unexpected url ${value}`);
+    }
+  });
+
+  const candidate = collected.candidates[0];
+
+  assert.equal(candidate.url, "https://www.producthunt.com/products/agent-debugger");
+  assert.match(candidate.notes, /product_cross_check=unresolved/);
+  assert.match(candidate.notes, /low_quality_summary|low_value_final_url/);
 });
 
 test("statuspage discovery parses Atom incidents into candidates", async () => {
@@ -1182,6 +1496,58 @@ function productHuntAtomFixture() {
 </feed>`;
 }
 
+function productHuntAtomWithRedirectFixture() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>Agent Debugger</title>
+    <link rel="alternate" type="text/html" href="https://www.producthunt.com/products/agent-debugger" />
+    <published>2026-05-26T08:00:00-07:00</published>
+    <content type="html">&lt;p&gt;Debug and replay production AI agent incidents.&lt;/p&gt;
+      &lt;p&gt;&lt;a href="https://www.producthunt.com/products/agent-debugger"&gt;Discussion&lt;/a&gt; |
+      &lt;a href="https://www.producthunt.com/r/p/123?app_id=339"&gt;Link&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+</feed>`;
+}
+
+function productHuntProductPageFixture() {
+  return `<!doctype html>
+<main>
+  <a href="https://help.producthunt.com/">Product Hunt Help</a>
+  <a href="https://agentdebugger.dev">Website</a>
+  <a href="https://github.com/acme/agent-debugger">GitHub</a>
+</main>`;
+}
+
+function productHuntInternalOnlyPageFixture() {
+  return `<!doctype html>
+<main>
+  <a href="https://help.producthunt.com/">Product Hunt Help</a>
+  <a href="https://lu.ma/producthunt">Product Hunt Events</a>
+  <a href="https://www.producthunt.com/discussions/agent-debugger">Discussion</a>
+</main>`;
+}
+
+function productHuntLowQualityPageFixture() {
+  return `<!doctype html>
+<main>
+  <a href="https://example.com/flutter-template">Website</a>
+  <a href="https://circle.ci/demo">Demo video</a>
+</main>`;
+}
+
+function githubProductReadmeFixture() {
+  return `<!doctype html>
+<head>
+  <title>GitHub - acme/agent-debugger: Replay production AI agent incidents</title>
+  <meta name="description" content="Replay production AI agent incidents, inspect tool traces, and compare model outputs.">
+</head>
+<article class="markdown-body">
+  <p>Replay production AI agent incidents, inspect tool traces, and compare model outputs.</p>
+  <a href="https://agentdebugger.dev/docs">Docs</a>
+</article>`;
+}
+
 function statuspageAtomFixture() {
   return `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -1194,10 +1560,11 @@ function statuspageAtomFixture() {
 </feed>`;
 }
 
-function textResponse(text, status = 200) {
+function textResponse(text, status = 200, finalUrl = "") {
   return {
     ok: status >= 200 && status < 300,
     status,
+    url: finalUrl,
     text: async () => text
   };
 }

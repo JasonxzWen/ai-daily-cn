@@ -78,6 +78,108 @@ test("effective-interact generator creates a validated self-contained interactio
   assert(result.checks.includes("source-linked-code-evidence"));
 });
 
+test("effective-interact hero highlight renders link and reason as full-width stacked lines", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hero-layout-"));
+  const inputPath = path.join(tmp, "hero-layout.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-05-27",
+      summary: "- **[Copilot Studio computer-using agents GA](https://example.com/copilot)**：这是今天最值得放在 header 的产品消息。",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "主体信息",
+          content: "- 已验证的主体信息。"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "hero-layout", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /class="hero-brief hero-brief-single"/);
+  assert.match(html, /hero-highlight-list/);
+  assert.match(html, /hero-highlight-link/);
+  assert.match(html, /hero-highlight-reason/);
+  assert.doesNotMatch(html, /<p class="hero-summary-text">-\s*<strong>/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
+test("effective-interact filterable cards render linked project subcards", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-project-cards-"));
+  const inputPath = path.join(tmp, "project-cards.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-05-27",
+      summary: "Project cards layout check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "今日值得关注的项目",
+          group: "projects",
+          cardClass: "project-card",
+          items: [
+            {
+              group: "PROJECTS",
+              title: "Project Alpha",
+              href: "https://example.com/project-alpha",
+              body: "A reusable plugin set for agent workflows.",
+              tags: ["daily signal"],
+              points: [
+                { label: "领域", value: "agent、workflow" },
+                { label: "作用", value: "Use for repeatable workflows." }
+              ]
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "project-cards", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /project-card/);
+  assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
+  assert.match(html, /card-detail-list/);
+  assert.match(html, /<dt>领域<\/dt>/);
+  assert.match(html, /Use for repeatable workflows\./);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("GitHub Pages deployment workflow publishes the generated docs artifact", async () => {
   const workflow = await fsp.readFile(path.join(rootDir, ".github", "workflows", "deploy-pages.yml"), "utf8");
 
