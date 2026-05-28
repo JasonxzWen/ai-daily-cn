@@ -45,6 +45,18 @@ Default visual language should feel like a dense engineering workbench, not a ma
 - Cards stay compact with 8px radius or less, clear borders, restrained shadows, and hover focus only when it improves scanning.
 - Use color to encode status, severity, grouping, ownership, or selected state. Do not use decorative gradients or color-only meaning.
 
+## Taste-Derived Aesthetic Preflight
+
+Selective source: `Leonxlnx/taste-skill` at `3c7017d636c3a4aad378433ea6d0cfa6c921da4a` (MIT). Use only the report-safe checks below for `effective-interact`; anti-template frontend visual direction now routes separately to `design-taste-frontend`.
+
+- Anti-default check: no generic AI-purple, blue glow, mesh-gradient hero, or default card grid unless the artifact subject or brand evidence requires it.
+- Layout diversity check: long reports should vary section shapes. Avoid six repeated card stacks when a table, timeline, diagram, code block, evidence rail, or action list would scan faster.
+- Hero discipline: the hero should answer the reader's first question in compact form. Do not turn report pages into landing-page billboard layouts.
+- Section discipline: avoid decorative split headers, redundant eyebrows, scroll cues, fake version labels, and decorative dots. Use labels only when they encode state, group, severity, or ownership.
+- Spacing and typography check: compact sections, stable grid tracks, readable line height, no viewport-scaled type, no clipped code rows, and no button or chip text overflow.
+- Motion check: motion must explain focus, state, filtering, navigation, or copy feedback. Provide `prefers-reduced-motion`; avoid spectacle-only animation.
+- Pre-flight before handoff: palette, card purpose, section repetition, hero density, contrast, reduced motion, mobile collapse, overflow, and visible copy/export path.
+
 ## Template Mapping
 
 | Template | Best source families | Notes |

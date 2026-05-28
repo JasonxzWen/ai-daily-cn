@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## Codex Harness
+
+- Treat this repository as the active Codex worktree for AI daily publishing work.
+- Keep task state in `tasks/current-task.md`, `progress.md`, and `session-handoff.md` when work is non-trivial.
+- Run `node scripts/harness-validate.mjs` before handoff when harness files change.
+- For daily publish runs, follow `tasks/daily-publish-runbook.md`; capture `publish:dry-run` before any real publish.
+
 ## 语言
 
 始终使用中文回复用户。技术标识符、命令、路径、schema 字段名和 URL 保持原文。

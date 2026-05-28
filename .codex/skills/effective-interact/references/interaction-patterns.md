@@ -399,12 +399,12 @@ The validator emits non-blocking rich-content opportunity warnings when it sees 
 
 ## Runtime Rendering Support
 
-Use `runtime-cdn` as the default Codex-visible artifact path. It keeps the artifact as one static HTML file, but lets the browser use pinned libraries for rich rendering. Use `pre-rendered` only when primary rich content must not depend on CDN scripts. Use `fallback-only` only for constrained environments where readable source is acceptable.
+Use `pre-rendered` as the default handoff artifact path. It keeps Markdown and code rendering deterministic and avoids browser/CDN dependency for primary content. Use `runtime-cdn` only when browser-required validation is available and dynamic rich rendering is worth the tradeoff. Use `fallback-only` only for constrained environments where readable source is acceptable.
 
 Render modes:
 
-- `runtime-cdn` is the default. It declares pinned runtime dependencies in a hidden machine-readable manifest, keeps hidden source fallback data, and exposes ready/degraded/failed state through attributes rather than visible effect tags. Set `showRuntimeDependencies: true` only when dependency loading is part of the artifact.
-- `pre-rendered` is explicit. Critical CSS/JS is inlined, Markdown becomes semantic HTML, Mermaid should become real inline SVG, and code gets static highlight spans. If Mermaid cannot render, do not treat the fallback as a successful diagram.
+- `pre-rendered` is the default. Critical CSS/JS is inlined, Markdown becomes semantic HTML, Mermaid should become real inline SVG, and code gets static highlight spans. If Mermaid cannot render, do not treat the fallback as a successful diagram.
+- `runtime-cdn` is explicit. It declares pinned runtime dependencies in a hidden machine-readable manifest, keeps hidden source fallback data, and exposes ready/degraded/failed state through attributes rather than visible effect tags. Set `showRuntimeDependencies: true` only when dependency loading is part of the artifact. Browser-required validation must pass before handoff.
 - `fallback-only` is explicit degraded output. It keeps source text readable without claiming rich rendering success.
 - `runtime` is a legacy alias accepted by the generator and normalized to `runtime-cdn`.
 

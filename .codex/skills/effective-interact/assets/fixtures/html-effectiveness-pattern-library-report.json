@@ -43,6 +43,13 @@
       "content": "flowchart LR\n  A[来源页面] --> B[识别 reader need]\n  B --> C{是否降低决策成本?}\n  C -- 否 --> D[plain text / Markdown]\n  C -- 是 --> E[visual Markdown / HTML]\n  E --> F[pattern + template + validation]"
     },
     {
+      "type": "markdown",
+      "title": "Taste-derived aesthetic preflight",
+      "group": "verification",
+      "summary": "Selective anti-template checks for generated HTML reports only.",
+      "content": "Use the `html-aesthetic-preflight.md` reference to keep interaction artifacts from drifting into generic AI frontend output. Check AI-purple/glow, default-card grids, repeated section shapes, billboard heroes, decorative split headers, spacing, typography, motion purpose, reduced motion, mobile collapse, overflow, and copy/export clarity. This is not a new production UI skill."
+    },
+    {
       "type": "data-table",
       "title": "来源场景到触发模式",
       "group": "patterns",
