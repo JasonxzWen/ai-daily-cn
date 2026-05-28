@@ -128,6 +128,24 @@ test("schema 支持模型发布、hero 精选、博客新契约和项目用途�
       evidence: "Product Hunt 上榜后，项目 README 提供可运行示例。"
     }
   ];
+  enriched.github_trending = [
+    {
+      candidate_id: "trend-example-agent-memory",
+      repo: "example/agent-memory",
+      name: "example/agent-memory",
+      description: "面向 coding agents 的 persistent memory 项目。",
+      url: "https://github.com/example/agent-memory",
+      event_date: "2026-05-13",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 3,
+      previous_rank: 7,
+      rank_delta: 4,
+      trend: "up",
+      evidence: "GitHub Trending daily rank #3, yesterday #7."
+    }
+  ];
 
   const validation = validateReport(enriched);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
@@ -274,6 +292,23 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   report.source_audit = sourceAuditFixture();
   report.source_audit.builder_sources.blocked_reason = "fetch_failed";
   report.source_audit.builder_sources.last_successful_feed_at = "2026-05-14T02:35:00+08:00";
+  report.github_trending = [
+    {
+      name: "example/trending-agent",
+      repo: "example/trending-agent",
+      description: "用于验证 GitHub trending 项目展示。",
+      url: "https://github.com/example/trending-agent",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 2,
+      previous_rank: 9,
+      rank_delta: 7,
+      trend: "up",
+      evidence: "GitHub Trending daily rank #2, yesterday #9."
+    }
+  ];
   report.projects = [
     {
       name: "Example Trending Agent",
@@ -302,6 +337,11 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
   const html = renderReportHtml(validation.value);
+  assert(html.includes('id="github-trending"'));
+  assert(html.includes("GitHub Trending"));
+  assert(html.includes("#2"));
+  assert(html.includes("上升 7 名"));
+  assert(html.includes("example/trending-agent"));
   assert(html.includes('id="source-audit"'));
   assert(html.includes("信源审计"));
   assert(html.includes("GitHub Trending"));
@@ -342,6 +382,24 @@ test("日报可以转换为 effective-interact 输入", async () => {
       evidence: "GitHub Trending weekly 显示 456 stars this week。"
     }
   ];
+  report.github_trending = [
+    {
+      candidate_id: "trend-example-agent-memory",
+      name: "example/agent-memory",
+      repo: "example/agent-memory",
+      description: "面向 coding agents 的 persistent memory 项目。",
+      url: "https://github.com/example/agent-memory",
+      event_date: "2026-05-15",
+      source: "GitHub Trending weekly",
+      language: "TypeScript",
+      window: "weekly",
+      rank: 1,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending weekly rank #1; not present yesterday."
+    }
+  ];
   const input = reportToInteractionInput(report);
 
   assert.equal(input.template, "research-explainer");
@@ -365,6 +423,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!projectsSection.content.includes("信号："));
   assert(!projectsSection.content.includes("证据："));
   assert(!projectsSection.content.includes("GitHub Trending weekly 中出现"));
+  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending 趋势");
+  assert(trendingSection.content.includes("example/agent-memory"));
+  assert(trendingSection.content.includes("#1"));
+  assert(trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
   assert(input.sections.some((section) => section.title === "信源审计"));
@@ -377,6 +439,7 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
   report.model_releases = [];
   report.hot_blogs = [];
   report.projects = [];
+  report.github_trending = [];
   report.builder_observations = [];
   report.community_leads = [];
   report.self_check.builder_observations = 0;
@@ -386,6 +449,7 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
 
   assert(!titles.includes("模型发布"));
   assert(!titles.includes("热门技术博客"));
+  assert(!titles.includes("GitHub Trending 趋势"));
   assert(!titles.includes("今日值得关注的项目"));
   assert(!titles.includes("Builder 观察与社区线索"));
   assert(!JSON.stringify(input).includes("暂无 Builder 观察"));
@@ -407,10 +471,18 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
   assert.equal(candidates[0].repo, "example/trending-agent");
   assert.equal(candidates[0].signal, "trending");
   assert.equal(candidates[0].language, "typescript");
+  assert.equal(candidates[0].rank, 1);
   assert.equal(candidates[0].description, "Agent workbench with a runnable demo.");
 
   const collected = await collectGitHubTrending({
     sources: [source],
+    reportDate: "2026-05-16",
+    previousTrending: [
+      {
+        repo: "example/trending-agent",
+        rank: 4
+      }
+    ],
     fetchImpl: async () => ({
       ok: true,
       text: async () => html
@@ -420,6 +492,10 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
   assert.equal(collected.source_audit.github_trending.checked, true);
   assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
   assert.equal(collected.source_audit.github_trending.candidates_found, 2);
+  assert.equal(collected.candidates[0].trend, "up");
+  assert.equal(collected.candidates[0].previous_rank, 4);
+  assert.equal(collected.candidates[0].rank_delta, 3);
+  assert.equal(collected.candidates[1].trend, "new");
   assert.equal(collected.candidates[1].repo, "example/rag-eval");
 });
 
@@ -1007,6 +1083,8 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("GitHub Trending"));
+  assert(prompt.includes("github_trending"));
+  assert(prompt.includes("排名变化"));
   assert(prompt.includes("npm run discover:github-trending"));
   assert(prompt.includes("--browser-export"));
   assert(prompt.includes("npm run discover:builders"));
@@ -1022,6 +1100,9 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("300-500"));
   assert(prompt.includes("follow-builders central feed"));
   assert(prompt.includes("Product Hunt"));
+  assert(prompt.includes("TechCrunch AI"));
+  assert(prompt.includes("热点讨论"));
+  assert(prompt.includes("融资"));
   assert(prompt.includes("领域"));
   assert(prompt.includes("作用"));
   assert(prompt.includes("空数组对应板块不要渲染"));

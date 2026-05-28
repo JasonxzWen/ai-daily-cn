@@ -57,6 +57,43 @@ export function projectHeatTags(item) {
   return unique(tags).slice(0, 2);
 }
 
+export function githubTrendTags(item) {
+  const tags = [];
+  const rank = Number.isInteger(item?.rank) ? `#${item.rank}` : "";
+  const movement = githubTrendMovementLabel(item);
+
+  if (rank) {
+    tags.push(rank);
+  }
+  if (movement) {
+    tags.push(movement);
+  }
+  if (item?.window) {
+    tags.push(item.window === "weekly" ? "weekly" : "daily");
+  }
+  if (item?.language && item.language !== "all") {
+    tags.push(item.language);
+  }
+
+  return unique(tags).slice(0, 4);
+}
+
+export function githubTrendMovementLabel(item) {
+  if (!item || item.trend === "new" || item.previous_rank === null) {
+    return "新上榜";
+  }
+  if (item.trend === "up" && Number.isInteger(item.rank_delta)) {
+    return `上升 ${Math.abs(item.rank_delta)} 名`;
+  }
+  if (item.trend === "down" && Number.isInteger(item.rank_delta)) {
+    return `下降 ${Math.abs(item.rank_delta)} 名`;
+  }
+  if (item.trend === "same") {
+    return "持平";
+  }
+  return "";
+}
+
 export function cleanProjectDescription(value) {
   const text = String(value || "")
     .trim()

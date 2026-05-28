@@ -5,7 +5,13 @@ import { promisify } from "node:util";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { relativeAssetHref, reportRelativePaths } from "./paths.js";
-import { cleanProjectDescription, modelReleaseTags, projectHeatTags } from "./presentation.js";
+import {
+  cleanProjectDescription,
+  githubTrendMovementLabel,
+  githubTrendTags,
+  modelReleaseTags,
+  projectHeatTags
+} from "./presentation.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -13,6 +19,7 @@ export function reportToInteractionInput(report) {
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
+  const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
@@ -22,6 +29,7 @@ export function reportToInteractionInput(report) {
   const summaryCards = [
     { label: "报告日期", value: report.report_date },
     { label: "主体信息", value: String(mainItems.length) },
+    githubTrending.length > 0 ? { label: "GitHub Trending", value: String(githubTrending.length) } : null,
     modelReleases.length > 0 ? { label: "模型发布", value: String(modelReleases.length) } : null,
     hotBlogs.length > 0 ? { label: "热门技术博客", value: String(hotBlogs.length) } : null,
     projects.length > 0 ? { label: "项目", value: String(projects.length) } : null,
@@ -62,6 +70,14 @@ export function reportToInteractionInput(report) {
       title: "热门技术博客",
       group: "main",
       content: formatHotBlogs(hotBlogs)
+    });
+  }
+  if (githubTrending.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "GitHub Trending 趋势",
+      group: "projects",
+      content: formatGithubTrending(githubTrending)
     });
   }
   if (projects.length > 0) {
@@ -304,6 +320,23 @@ function formatHotBlogs(items) {
 
   return items
     .map((item) => `- **${markdownLink(item.url, item.title)}**（${item.publisher} / ${item.author}，${item.event_date}）：${item.summary}`)
+    .join("\n");
+}
+
+function formatGithubTrending(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return items
+    .slice(0, 8)
+    .map((item) => {
+      const tags = formatHighlightTags(githubTrendTags(item));
+      const previous = item.previous_rank ? `，昨日 #${item.previous_rank}` : "";
+      const movement = githubTrendMovementLabel(item);
+      const movementText = movement ? `，${movement}` : "";
+      return `- **${markdownLink(item.url, item.name || item.repo)}**${tags}：${cleanProjectDescription(item.description)}\n  - 排名：#${item.rank}${previous}${movementText}；来源：${item.source}${item.language ? `；语言：${item.language}` : ""}`;
+    })
     .join("\n");
 }
 

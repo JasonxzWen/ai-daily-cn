@@ -1,5 +1,11 @@
 import { reportRelativePaths, relativeAssetHref } from "./paths.js";
-import { cleanProjectDescription, modelReleaseTags, projectHeatTags } from "./presentation.js";
+import {
+  cleanProjectDescription,
+  githubTrendMovementLabel,
+  githubTrendTags,
+  modelReleaseTags,
+  projectHeatTags
+} from "./presentation.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -21,6 +27,7 @@ export function renderReportHtml(report) {
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
+  const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
@@ -28,6 +35,7 @@ export function renderReportHtml(report) {
   const sourceAuditSection = sourceAudit ? `\n    ${renderSourceAudit(sourceAudit)}\n` : "";
   const metaItems = [
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
+    githubTrending.length > 0 ? `<span><strong>${githubTrending.length}</strong> GitHub Trending</span>` : "",
     modelReleases.length > 0 ? `<span><strong>${modelReleases.length}</strong> 模型发布</span>` : "",
     hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技术博客</span>` : "",
     projects.length > 0 ? `<span><strong>${projects.length}</strong> 项目</span>` : "",
@@ -39,6 +47,7 @@ export function renderReportHtml(report) {
   const optionalSections = [
     renderModelReleasesSection(modelReleases),
     renderHotBlogsSection(hotBlogs),
+    renderGithubTrendingSection(githubTrending),
     renderProjectsSection(projects),
     renderBuilderObservationsSection(builderObservations),
     renderCommunityLeadsSection(communityLeads)
@@ -457,6 +466,47 @@ function renderAvailability(value) {
   };
   const label = labels[value];
   return label ? `${label} (${value})` : value;
+}
+
+function renderGithubTrendingSection(items) {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="github-trending">
+      <h2>GitHub Trending 趋势</h2>
+      ${renderGithubTrending(items)}
+    </section>`;
+}
+
+function renderGithubTrending(items) {
+  return `<table class="project-table">
+  <thead><tr><th>排名</th><th>项目</th><th>趋势</th><th>说明</th></tr></thead>
+  <tbody>
+    ${items
+      .slice(0, 8)
+      .map(
+        (item) =>
+          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}${renderTrendTags(item)}</td><td>${escapeHtml(githubTrendMovementLabel(item))}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
+      )
+      .join("\n")}
+  </tbody>
+</table>`;
+}
+
+function renderTrendTags(item) {
+  const tags = githubTrendTags(item).filter((tag) => !String(tag).startsWith("#"));
+  if (tags.length === 0) {
+    return "";
+  }
+  return `<div class="tag-row">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>`;
+}
+
+function renderGithubTrendDetails(item) {
+  const previous = item.previous_rank ? `昨日 #${item.previous_rank}。` : "";
+  const source = item.source ? `来源：${item.source}。` : "";
+  const language = item.language ? `语言：${item.language}。` : "";
+  return `<p>${escapeHtml(cleanProjectDescription(item.description))}</p><p class="muted">${escapeHtml(`${previous}${source}${language}`)}</p>`;
 }
 
 function renderProjectsSection(projects) {

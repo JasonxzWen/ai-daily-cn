@@ -79,7 +79,7 @@
           "$ref": "#/$defs/id"
         },
         "category": {
-          "enum": ["main_item", "model_release", "hot_blog", "project", "builder_observation", "community_lead"]
+          "enum": ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead"]
         },
         "title": {
           "type": "string",
@@ -100,7 +100,7 @@
           "enum": ["included", "excluded"]
         },
         "included_in": {
-          "enum": ["main_items", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads"]
+          "enum": ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads"]
         },
         "exclusion_reason": {
           "type": "string"

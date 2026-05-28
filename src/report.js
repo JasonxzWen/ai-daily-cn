@@ -76,6 +76,7 @@ export function normalizeReportDraft(draft, options = {}) {
     },
     hero_highlights: Array.isArray(draft.hero_highlights) ? draft.hero_highlights : [],
     candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
+    github_trending: Array.isArray(draft.github_trending) ? draft.github_trending : [],
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
     projects: Array.isArray(draft.projects) ? draft.projects : [],

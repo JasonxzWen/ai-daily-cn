@@ -80,6 +80,13 @@
     "candidate_pool_path": {
       "$ref": "#/$defs/relative_path"
     },
+    "github_trending": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/github_trending_item"
+      },
+      "default": []
+    },
     "main_items": {
       "type": "array",
       "minItems": 1,
@@ -363,6 +370,77 @@
         },
         "signal": {
           "enum": ["release", "star_velocity", "trending", "notable_pr", "ecosystem", "official_update", "product_hunt"]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "github_trending_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "repo", "description", "url", "event_date", "source", "rank", "trend"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string"
+        },
+        "window": {
+          "enum": ["daily", "weekly", "past_24_hours", ""]
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "previous_rank": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rank_delta": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trend": {
+          "enum": ["new", "up", "down", "same"]
         },
         "evidence": {
           "type": "string",

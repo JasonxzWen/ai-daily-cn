@@ -3,7 +3,7 @@ import path from "node:path";
 import { PublisherError } from "./errors.js";
 
 const CURRENT_SECTIONS = ["main_items", "model_releases", "hot_blogs"];
-const HISTORY_SECTIONS = ["main_items", "model_releases", "hot_blogs", "projects", "builder_observations"];
+const HISTORY_SECTIONS = ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations"];
 
 export async function requireFreshReport(report, options = {}) {
   const errors = [

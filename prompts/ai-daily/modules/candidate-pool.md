@@ -10,7 +10,7 @@
 
 硬规则：
 
-- `main_items`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 中的每个入选条目都必须填写 `candidate_id`。
+- `main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 中的每个入选条目都必须填写 `candidate_id`。
 - `candidate_id` 必须指向候选池中 `status: "included"` 的候选。
 - 条目的 `url` 和 `event_date` 必须与候选池一致。
 - 允许板块为空；不允许为了补满页面绕过候选池。

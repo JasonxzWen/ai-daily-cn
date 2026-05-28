@@ -6,6 +6,7 @@ import { validateCandidatePool } from "./schema.js";
 
 const REQUIRED_SECTIONS = {
   main_items: "main_item",
+  github_trending: "github_trending",
   model_releases: "model_release",
   hot_blogs: "hot_blog",
   projects: "project",

@@ -130,6 +130,7 @@ try {
     const result = await collectGitHubTrending({
       limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "50", 10),
       reportDate: args.date || firstPositionalDate(argv),
+      historyDir: args["history-dir"] || "reports-data",
       browserExportPath: args["browser-export"],
       browserExportName: args["browser-export-name"],
       browserExportUrl: args["browser-export-url"],

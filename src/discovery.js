@@ -70,6 +70,21 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://huggingface.co/blog/feed.xml"
   },
   {
+    id: "content-github-changelog",
+    name: "GitHub Changelog",
+    url: "https://github.blog/changelog/feed/"
+  },
+  {
+    id: "content-techcrunch-ai",
+    name: "TechCrunch AI",
+    url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+  },
+  {
+    id: "content-the-verge-ai",
+    name: "The Verge AI",
+    url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+  },
+  {
     id: "content-google-research",
     name: "Google Research Blog",
     url: "https://research.google/blog/rss/"
@@ -147,6 +162,7 @@ export async function collectGitHubTrending(options = {}) {
 
   const sources = options.sources || DEFAULT_GITHUB_TRENDING_SOURCES;
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
+  const previousTrending = options.previousTrending || await readPreviousGitHubTrending(options);
   const sourceResults = [];
   const byRepo = new Map();
 
@@ -201,7 +217,7 @@ export async function collectGitHubTrending(options = {}) {
     });
   }
 
-  const candidates = [...byRepo.values()].slice(0, limit);
+  const candidates = applyGitHubTrendMovements([...byRepo.values()], previousTrending).slice(0, limit);
   return {
     source_audit: {
       github_trending: {
@@ -224,6 +240,7 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
     window: options.browserExportWindow || DEFAULT_GITHUB_TRENDING_SOURCES[0].window
   });
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
+  const previousTrending = options.previousTrending || await readPreviousGitHubTrending(options);
   const sourceResults = [];
   const byRepo = new Map();
 
@@ -253,7 +270,7 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
         notes: "Candidates parsed from browser-export input; still require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion."
       }
     },
-    candidates: [...byRepo.values()].slice(0, limit)
+    candidates: applyGitHubTrendMovements([...byRepo.values()], previousTrending).slice(0, limit)
   };
 }
 
@@ -327,6 +344,7 @@ export function parseOssInsightTrendingPayload(payload, sourceInfo = OSSINSIGHT_
       signal: "trending",
       language,
       window: sourceInfo.window || "past_24_hours",
+      rank: candidates.length + 1,
       description,
       evidence: score ? `${repo} appeared in OSSInsight trending with score ${score}.` : `${repo} appeared in OSSInsight trending.`
     });
@@ -777,6 +795,7 @@ export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
     const nextIndex = matches[index + 1]?.index || html.length;
     const block = html.slice(match.index, nextIndex);
     const description = extractFirstParagraph(block);
+    const stars = extractTrendingStarCount(block);
     candidates.push({
       repo,
       url: `${GITHUB_BASE_URL}/${repo}`,
@@ -785,8 +804,12 @@ export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
       signal: "trending",
       language: sourceInfo.language || "",
       window: sourceInfo.window || "",
+      rank: candidates.length + 1,
       description,
-      evidence: `${repo} appeared on ${sourceInfo.name || "GitHub Trending"}.`
+      evidence: stars
+        ? `${repo} appeared on ${sourceInfo.name || "GitHub Trending"} with ${stars} stars ${sourceInfo.window === "weekly" ? "this week" : "today"}.`
+        : `${repo} appeared on ${sourceInfo.name || "GitHub Trending"}.`,
+      ...(stars ? sourceInfo.window === "weekly" ? { stars_this_week: stars } : { stars_today: stars } : {})
     });
   }
 
@@ -800,8 +823,75 @@ function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
     source_id: candidate.source_id || `github-${slugId(sourceInfo.name || sourceInfo.url || "trending")}`,
     category: candidate.category || "project",
     event_date: candidate.event_date || reportDate,
-    status: candidate.status || "excluded"
+    status: candidate.status || "excluded",
+    name: candidate.name || candidate.repo,
+    trend: candidate.trend || "new"
   };
+}
+
+function applyGitHubTrendMovements(candidates, previousItems = []) {
+  const previousByRepo = new Map();
+  for (const item of previousItems || []) {
+    const repo = normalizeRepo(item.repo || repoFromUrl(item.url) || item.name || "");
+    if (repo && Number.isInteger(item.rank)) {
+      previousByRepo.set(repo.toLowerCase(), item.rank);
+    }
+  }
+
+  return candidates.map((candidate) => {
+    const repoKey = normalizeRepo(candidate.repo || repoFromUrl(candidate.url)).toLowerCase();
+    const previousRank = previousByRepo.get(repoKey) || null;
+    const rankDelta = previousRank ? previousRank - candidate.rank : null;
+    return {
+      ...candidate,
+      previous_rank: previousRank,
+      rank_delta: rankDelta,
+      trend: previousRank === null ? "new" : rankDelta > 0 ? "up" : rankDelta < 0 ? "down" : "same"
+    };
+  });
+}
+
+async function readPreviousGitHubTrending(options = {}) {
+  if (!options.historyDir || !options.reportDate) {
+    return [];
+  }
+  const previousDate = offsetDate(options.reportDate, -1);
+  if (!previousDate) {
+    return [];
+  }
+  const [year, month] = previousDate.split("-");
+  const previousPath = path.resolve(options.historyDir, year, month, `${previousDate}.json`);
+  try {
+    const previousReport = JSON.parse(await fs.readFile(previousPath, "utf8"));
+    if (Array.isArray(previousReport.github_trending)) {
+      return previousReport.github_trending;
+    }
+    return Array.isArray(previousReport.projects)
+      ? previousReport.projects
+          .filter((item) => /GitHub Trending/i.test(item.source || ""))
+          .map((item, index) => ({ repo: repoFromUrl(item.url) || item.name, url: item.url, rank: index + 1 }))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function offsetDate(value, days) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function repoFromUrl(value) {
+  try {
+    const url = new URL(value);
+    return normalizeRepo(url.pathname);
+  } catch {
+    return "";
+  }
 }
 
 function source(name, url, language, window) {
@@ -1132,6 +1222,12 @@ async function readJsonResponse(response) {
 function extractFirstParagraph(block) {
   const paragraph = block.match(/<p[^>]*>([\s\S]*?)<\/p>/i)?.[1] || "";
   return cleanText(paragraph);
+}
+
+function extractTrendingStarCount(block) {
+  const text = cleanText(block);
+  const match = text.match(/([\d,]+)\s+stars?\s+(?:today|this week)/i);
+  return match ? match[1] : "";
 }
 
 function absoluteUrl(value, baseUrl) {
