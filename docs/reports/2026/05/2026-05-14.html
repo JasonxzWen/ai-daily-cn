@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1361,7 +1433,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
 <a href="#next-actions" title="下一步" data-nav-link data-nav-index="8" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
@@ -1444,7 +1516,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。
   - 来源：[Thinking Machines Lab](https://thinkingmachines.ai/blog/interaction-models/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1453,17 +1525,43 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api" rel="noopener noreferrer">Copilot Agent tasks REST API</a></strong>：GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。</li><li><strong><a href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" rel="noopener noreferrer">SAP Business AI Platform</a></strong>：SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。</li><li><strong><a href="https://thinkingmachines.ai/blog/interaction-models/" rel="noopener noreferrer">TML-Interaction-Small</a></strong>：Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。</li><li><strong><a href="https://openai.com/index/what-parameter-golf-taught-us/" rel="noopener noreferrer">Parameter Golf</a></strong>：OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Copilot Agent tasks REST API](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api)**：GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。
-- **[SAP Business AI Platform](https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/)**：SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。
-- **[TML-Interaction-Small](https://thinkingmachines.ai/blog/interaction-models/)**：Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。
-- **[Parameter Golf](https://openai.com/index/what-parameter-golf-taught-us/)**：OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api" rel="noopener noreferrer">Copilot Agent tasks REST API</a></h3>
+
+    <p>GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" rel="noopener noreferrer">SAP Business AI Platform</a></h3>
+
+    <p>SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://thinkingmachines.ai/blog/interaction-models/" rel="noopener noreferrer">TML-Interaction-Small</a></h3>
+
+    <p>Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://openai.com/index/what-parameter-golf-taught-us/" rel="noopener noreferrer">Parameter Golf</a></h3>
+
+    <p>OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

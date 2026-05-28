@@ -162,7 +162,6 @@ export async function collectGitHubTrending(options = {}) {
 
   const sources = options.sources || DEFAULT_GITHUB_TRENDING_SOURCES;
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
-  const previousTrending = options.previousTrending || await readPreviousGitHubTrending(options);
   const sourceResults = [];
   const byRepo = new Map();
 
@@ -217,7 +216,8 @@ export async function collectGitHubTrending(options = {}) {
     });
   }
 
-  const candidates = applyGitHubTrendMovements([...byRepo.values()], previousTrending).slice(0, limit);
+  const history = await loadGitHubTrendingHistory(options);
+  const candidates = annotateGitHubTrendingCandidates([...byRepo.values()].slice(0, limit), history);
   return {
     source_audit: {
       github_trending: {
@@ -225,7 +225,10 @@ export async function collectGitHubTrending(options = {}) {
         sources: sourceResults,
         candidates_found: byRepo.size,
         included: 0,
-        notes: "Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion."
+        notes: githubTrendingAuditNotes(
+          "Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion.",
+          history
+        )
       }
     },
     candidates
@@ -240,7 +243,6 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
     window: options.browserExportWindow || DEFAULT_GITHUB_TRENDING_SOURCES[0].window
   });
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
-  const previousTrending = options.previousTrending || await readPreviousGitHubTrending(options);
   const sourceResults = [];
   const byRepo = new Map();
 
@@ -260,6 +262,8 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
     }
   }
 
+  const history = await loadGitHubTrendingHistory(options);
+  const candidates = annotateGitHubTrendingCandidates([...byRepo.values()].slice(0, limit), history);
   return {
     source_audit: {
       github_trending: {
@@ -267,10 +271,13 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
         sources: sourceResults,
         candidates_found: byRepo.size,
         included: 0,
-        notes: "Candidates parsed from browser-export input; still require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion."
+        notes: githubTrendingAuditNotes(
+          "Candidates parsed from browser-export input; still require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion.",
+          history
+        )
       }
     },
-    candidates: applyGitHubTrendMovements([...byRepo.values()], previousTrending).slice(0, limit)
+    candidates
   };
 }
 
@@ -632,12 +639,12 @@ export async function collectContentSources(options = {}) {
       const entries = parseContentSourceEntries(await response.text(), currentSource)
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
-      const notes = `${entries.length} recent ${candidateCategory === "project" ? "product/project" : "blog/interview"} entries parsed`;
-      markSource(candidateSources.at(-1), status, notes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
+      let notes = `${entries.length} recent ${candidateCategory === "project" ? "product/project" : "blog/interview"} entries parsed`;
+      let confirmedProductCrossChecks = 0;
+      let unresolvedProductCrossChecks = 0;
 
       for (const entry of entries.slice(0, Math.max(limit - candidates.length, 0))) {
-        candidates.push({
+        let candidate = {
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
           category: candidateCategory,
@@ -648,8 +655,34 @@ export async function collectContentSources(options = {}) {
           status: "excluded",
           evidence: summarizeEvidence(entry.summary, `${currentSource.name} published this ${candidateCategory === "project" ? "product/project" : "blog/interview"} entry.`),
           ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
-        });
+        };
+
+        if (candidateCategory === "project" && shouldCrossCheckProductCandidate(currentSource, options)) {
+          const result = await crossCheckProductCandidate({
+            candidate,
+            productHuntUrl: entry.url,
+            feedLinks: entry.links,
+            fetchImpl
+          });
+          candidate = result.candidate;
+          if (result.status === "confirmed") {
+            confirmedProductCrossChecks += 1;
+          } else if (result.status !== "skipped") {
+            unresolvedProductCrossChecks += 1;
+          }
+        }
+
+        candidates.push(candidate);
       }
+
+      if (candidateCategory === "project" && shouldCrossCheckProductCandidate(currentSource, options)) {
+        notes = `${notes}; ${confirmedProductCrossChecks} product cross-checks confirmed`;
+        if (unresolvedProductCrossChecks > 0) {
+          notes = `${notes}; ${unresolvedProductCrossChecks} unresolved`;
+        }
+      }
+      markSource(candidateSources.at(-1), status, notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
     } catch (error) {
       markSource(candidateSources.at(-1), "blocked", error.message);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", error.message));
@@ -665,12 +698,244 @@ export async function collectContentSources(options = {}) {
         included: 0,
         blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
-        notes: "Official labs, engineering blogs, high-quality newsletters, interviews, aggregators, and product feeds are checked as content/project candidates."
+        notes: "Official labs, engineering blogs, high-quality newsletters, interviews, aggregators, and product feeds are checked as content/project candidates. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates."
       }
     },
     sources: candidateSources,
     candidates: candidates.slice(0, limit)
   };
+}
+
+function shouldCrossCheckProductCandidate(sourceInfo, options = {}) {
+  if (options.productCrossCheck === false) {
+    return false;
+  }
+  const sourceText = `${sourceInfo.name || ""} ${sourceInfo.url || ""} ${sourceInfo.signal || ""}`.toLowerCase();
+  return sourceInfo.signal === "product_hunt" || sourceText.includes("product hunt") || sourceText.includes("producthunt.com");
+}
+
+async function crossCheckProductCandidate({ candidate, productHuntUrl, feedLinks = [], fetchImpl }) {
+  try {
+    let confirmationLinks = normalizeProductConfirmationLinks(feedLinks);
+    if (confirmationLinks.length === 0) {
+      const productResponse = await fetchHtml(fetchImpl, productHuntUrl);
+      if (!productResponse.ok) {
+        return unresolvedProductCandidate(candidate, productHuntUrl, `product_page_http_${productResponse.status}`);
+      }
+
+      confirmationLinks = extractProductConfirmationLinks(await productResponse.text(), productHuntUrl);
+      if (confirmationLinks.length === 0) {
+        return unresolvedProductCandidate(candidate, productHuntUrl, "no_external_confirmation_link");
+      }
+    }
+
+    const fetchErrors = [];
+    for (const link of confirmationLinks.slice(0, 3)) {
+      try {
+        const confirmationResponse = await fetchHtml(fetchImpl, link.url);
+        if (!confirmationResponse.ok) {
+          fetchErrors.push(`${link.type}:HTTP_${confirmationResponse.status}`);
+          continue;
+        }
+        const finalUrl = typeof confirmationResponse.url === "string" && confirmationResponse.url
+          ? confirmationResponse.url
+          : link.url;
+        if (isLowValueProductLink(finalUrl)) {
+          fetchErrors.push(`${link.type}:low_value_final_url`);
+          continue;
+        }
+        const confirmationType = classifyProductConfirmationUrl(finalUrl) || link.type;
+        const summary = summarizeProductConfirmationHtml(await confirmationResponse.text());
+        if (!summary) {
+          fetchErrors.push(`${link.type}:empty_summary`);
+          continue;
+        }
+        if (!isUsefulProductConfirmationSummary(summary)) {
+          fetchErrors.push(`${link.type}:low_quality_summary`);
+          continue;
+        }
+        return {
+          status: "confirmed",
+          candidate: {
+            ...candidate,
+            url: finalUrl,
+            evidence: appendSentence(candidate.evidence, `已打开 ${productConfirmationLabel(confirmationType)} 确认用途：${summary}`),
+            notes: appendSentence(
+              candidate.notes,
+              `product_hunt_url=${productHuntUrl}; product_cross_check=confirmed; confirmation_url=${finalUrl}; confirmation_type=${confirmationType}`
+            )
+          }
+        };
+      } catch (error) {
+        fetchErrors.push(`${link.type}:${error.message}`);
+      }
+    }
+    return unresolvedProductCandidate(candidate, productHuntUrl, fetchErrors.join("|") || "confirmation_fetch_failed");
+  } catch (error) {
+    return unresolvedProductCandidate(candidate, productHuntUrl, error.message);
+  }
+}
+
+async function fetchHtml(fetchImpl, url) {
+  return fetchImpl(url, {
+    headers: {
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "user-agent": "ai-daily-cn-static-publisher"
+    }
+  });
+}
+
+function unresolvedProductCandidate(candidate, productHuntUrl, reason) {
+  return {
+    status: "unresolved",
+    candidate: {
+      ...candidate,
+      notes: appendSentence(candidate.notes, `product_hunt_url=${productHuntUrl}; product_cross_check=unresolved; reason=${sanitizeNoteValue(reason)}`)
+    }
+  };
+}
+
+function extractProductConfirmationLinks(html, baseUrl) {
+  const links = [];
+  const seen = new Set();
+  const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
+  for (const match of html.matchAll(anchorPattern)) {
+    const url = absoluteUrl(decodeXml(match[1] || match[2] || match[3] || ""), baseUrl);
+    if (!url || seen.has(url) || isLowValueProductLink(url)) {
+      continue;
+    }
+    const type = classifyProductConfirmationUrl(url);
+    if (!type) {
+      continue;
+    }
+    seen.add(url);
+    links.push({
+      url,
+      type,
+      score: productConfirmationScore(type)
+    });
+  }
+  return links.sort((left, right) => right.score - left.score || left.url.localeCompare(right.url));
+}
+
+function normalizeProductConfirmationLinks(urls = []) {
+  const links = [];
+  const seen = new Set();
+  for (const rawUrl of urls) {
+    const url = String(rawUrl || "").trim();
+    if (!url || seen.has(url) || isLowValueProductLink(url)) {
+      continue;
+    }
+    const type = classifyProductConfirmationUrl(url);
+    if (!type) {
+      continue;
+    }
+    seen.add(url);
+    links.push({
+      url,
+      type,
+      score: productConfirmationScore(type)
+    });
+  }
+  return links.sort((left, right) => right.score - left.score || left.url.localeCompare(right.url));
+}
+
+function classifyProductConfirmationUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const pathName = url.pathname.toLowerCase();
+    if (host === "producthunt.com" && pathName.startsWith("/r/")) {
+      return "redirect";
+    }
+    if (host === "github.com" && normalizeRepoFromGitHubUrl(value)) {
+      return "github";
+    }
+    if (host.includes("docs.") || /\/(docs|documentation|developers|api|readme)(\/|$)/i.test(pathName)) {
+      return "docs";
+    }
+    return "homepage";
+  } catch {
+    return "";
+  }
+}
+
+function productConfirmationScore(type) {
+  return {
+    github: 30,
+    redirect: 25,
+    docs: 20,
+    homepage: 10
+  }[type] || 0;
+}
+
+function isLowValueProductLink(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host === "producthunt.com" && url.pathname.toLowerCase().startsWith("/r/")) {
+      return false;
+    }
+    if (host === "producthunt.com" || host.endsWith(".producthunt.com")) {
+      return true;
+    }
+    if (host === "lu.ma" && url.pathname.toLowerCase().includes("producthunt")) {
+      return true;
+    }
+    return [
+      "x.com",
+      "twitter.com",
+      "facebook.com",
+      "linkedin.com",
+      "instagram.com",
+      "youtube.com",
+      "discord.gg",
+      "discord.com",
+      "t.me",
+      "reddit.com"
+    ].includes(host);
+  } catch {
+    return true;
+  }
+}
+
+function productConfirmationLabel(type) {
+  return {
+    github: "GitHub",
+    redirect: "跳转链接",
+    docs: "docs",
+    homepage: "官网"
+  }[type] || "产品页";
+}
+
+function summarizeProductConfirmationHtml(html) {
+  const metaDescription =
+    html.match(/<meta\b[^>]*(?:name|property)=["'](?:description|og:description)["'][^>]*content=["']([^"']+)["'][^>]*>/i)?.[1] ||
+    html.match(/<meta\b[^>]*content=["']([^"']+)["'][^>]*(?:name|property)=["'](?:description|og:description)["'][^>]*>/i)?.[1] ||
+    "";
+  const summary = cleanText(metaDescription) || extractFirstParagraph(html) || cleanText(html).slice(0, 240);
+  return summary.slice(0, 240);
+}
+
+function isUsefulProductConfirmationSummary(summary) {
+  const cleaned = cleanText(summary);
+  if (!cleaned || cleaned.length < 16) {
+    return false;
+  }
+  return ![
+    /^a new flutter project\.?$/i,
+    /^product hunt help center$/i,
+    /view and subscribe to events from product hunt/i,
+    /enjoy the videos and music you love on youtube/i,
+    /youtube .*動画.*音楽/i
+  ].some((pattern) => pattern.test(cleaned));
+}
+
+function sanitizeNoteValue(value) {
+  return String(value || "")
+    .replace(/[\r\n;]+/g, " ")
+    .replace(/\s+/g, "_")
+    .slice(0, 160);
 }
 
 export async function collectStatuspageIncidents(options = {}) {
@@ -829,71 +1094,281 @@ function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
   };
 }
 
-function applyGitHubTrendMovements(candidates, previousItems = []) {
-  const previousByRepo = new Map();
-  for (const item of previousItems || []) {
-    const repo = normalizeRepo(item.repo || repoFromUrl(item.url) || item.name || "");
-    if (repo && Number.isInteger(item.rank)) {
-      previousByRepo.set(repo.toLowerCase(), item.rank);
+async function loadGitHubTrendingHistory(options = {}) {
+  const lookbackDays = Number.isInteger(options.historyLookbackDays) && options.historyLookbackDays > 0
+    ? options.historyLookbackDays
+    : 7;
+  const reportDate = options.reportDate || "";
+  const empty = {
+    checked: false,
+    lookbackDays,
+    byRepo: new Map(),
+    dates: [],
+    repoCount: 0,
+    errors: []
+  };
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(reportDate) || options.history === false || options.trendingHistory === false) {
+    return empty;
+  }
+
+  const inlineHistory = Array.isArray(options.candidateHistory)
+    ? options.candidateHistory
+    : Array.isArray(options.trendingHistory)
+      ? options.trendingHistory
+      : Array.isArray(options.previousTrending)
+        ? [{ date: previousDateStrings(reportDate, 1)[0], payload: { github_trending: options.previousTrending } }]
+        : null;
+  const errors = [];
+  const records = inlineHistory
+    ? normalizeInlineGitHubTrendingHistory(inlineHistory)
+    : await loadGitHubTrendingHistoryRecordsFromRoot(
+      path.resolve(options.historyRoot || options.historyDir || path.join(process.cwd(), "reports-data")),
+      reportDate,
+      lookbackDays,
+      errors
+    );
+  const byRepo = new Map();
+  const dates = new Set();
+
+  for (const record of records) {
+    if (!isPreviousDateWithinWindow(record.date, reportDate, lookbackDays)) {
+      continue;
+    }
+    const entries = extractGitHubTrendingHistoryEntries(record.payload, record.date);
+    if (entries.length === 0) {
+      continue;
+    }
+    dates.add(record.date);
+    for (const entry of entries) {
+      const key = entry.repo.toLowerCase();
+      const existing = byRepo.get(key) || {
+        repo: entry.repo,
+        dates: new Set(),
+        ranks: new Map(),
+        sources: new Set()
+      };
+      existing.dates.add(record.date);
+      if (Number.isInteger(entry.rank)) {
+        existing.ranks.set(record.date, entry.rank);
+      }
+      if (entry.source) {
+        existing.sources.add(entry.source);
+      }
+      byRepo.set(key, existing);
     }
   }
 
+  return {
+    checked: true,
+    lookbackDays,
+    byRepo,
+    dates: [...dates].sort(),
+    repoCount: byRepo.size,
+    errors
+  };
+}
+
+async function loadGitHubTrendingHistoryRecordsFromRoot(historyRoot, reportDate, lookbackDays, errors) {
+  const records = [];
+  for (const date of previousDateStrings(reportDate, lookbackDays)) {
+    const [year, month] = date.split("-");
+    const baseDir = path.join(historyRoot, year, month);
+    for (const fileName of [`${date}.candidates.json`, `${date}.json`]) {
+      const filePath = path.join(baseDir, fileName);
+      try {
+        records.push({
+          date,
+          payload: JSON.parse(await fs.readFile(filePath, "utf8"))
+        });
+      } catch (error) {
+        if (error.code !== "ENOENT") {
+          errors.push(`${filePath}: ${error.message}`);
+        }
+      }
+    }
+  }
+  return records;
+}
+
+function normalizeInlineGitHubTrendingHistory(items) {
+  return items.map((item) => ({
+    date: dateOnly(item.report_date || item.date || item.payload?.report_date),
+    payload: item.payload || item
+  }));
+}
+
+function extractGitHubTrendingHistoryEntries(payload, fallbackDate) {
+  const sourceById = new Map((Array.isArray(payload?.sources) ? payload.sources : [])
+    .map((sourceItem) => [sourceItem.id, sourceItem]));
+  const entries = [];
+
+  for (const item of Array.isArray(payload?.github_trending) ? payload.github_trending : []) {
+    addGitHubTrendingHistoryEntry(entries, item, null, fallbackDate, {
+      acceptDailyProject: true,
+      acceptDirectTrending: true
+    });
+  }
+
+  for (const candidate of Array.isArray(payload?.candidates) ? payload.candidates : []) {
+    const sourceItem = sourceById.get(candidate.source_id);
+    addGitHubTrendingHistoryEntry(entries, candidate, sourceItem, fallbackDate, {
+      acceptDailyProject: candidate.category === "project" || candidate.included_in === "projects",
+      acceptDirectTrending: candidate.category === "github_trending" || candidate.included_in === "github_trending"
+    });
+  }
+
+  for (const project of Array.isArray(payload?.projects) ? payload.projects : []) {
+    addGitHubTrendingHistoryEntry(entries, project, null, fallbackDate, { acceptDailyProject: true });
+  }
+
+  return entries;
+}
+
+function addGitHubTrendingHistoryEntry(entries, item, sourceItem, fallbackDate, options = {}) {
+  const repo = repoFromHistoryItem(item);
+  if (!repo) {
+    return;
+  }
+  const text = [
+    item.source,
+    item.source_id,
+    item.evidence,
+    item.notes,
+    sourceItem?.name,
+    sourceItem?.category,
+    sourceItem?.notes
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (!options.acceptDirectTrending && !options.acceptDailyProject && !text.includes("github trending") && !text.includes("github_trending")) {
+    return;
+  }
+  entries.push({
+    repo,
+    date: dateOnly(item.event_date) || fallbackDate,
+    rank: Number.isInteger(item.rank) ? item.rank : null,
+    source: item.source || sourceItem?.name || ""
+  });
+}
+
+function annotateGitHubTrendingCandidates(candidates, history) {
+  if (!history.checked) {
+    return candidates.map((candidate) => applyGitHubTrendMovement(candidate, null));
+  }
   return candidates.map((candidate) => {
-    const repoKey = normalizeRepo(candidate.repo || repoFromUrl(candidate.url)).toLowerCase();
-    const previousRank = previousByRepo.get(repoKey) || null;
-    const rankDelta = previousRank ? previousRank - candidate.rank : null;
+    const key = (candidate.repo || repoFromHistoryItem(candidate)).toLowerCase();
+    if (!key) {
+      return applyGitHubTrendMovement(candidate, null);
+    }
+    const repoHistory = history.byRepo.get(key);
+    const dates = repoHistory ? [...repoHistory.dates].sort() : [];
+    const previousRank = repoHistory ? latestRank(repoHistory.ranks) : null;
+    const historySentence = dates.length > 0
+      ? `近 ${history.lookbackDays} 天本地记录曾在 ${dates.join("、")} 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。`
+      : `近 ${history.lookbackDays} 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。`;
+    const marker = dates.length > 0
+      ? `seen_${dates.length}_days_in_${history.lookbackDays}d`
+      : `new_in_${history.lookbackDays}d`;
+    const annotated = applyGitHubTrendMovement(candidate, previousRank);
     return {
-      ...candidate,
-      previous_rank: previousRank,
-      rank_delta: rankDelta,
-      trend: previousRank === null ? "new" : rankDelta > 0 ? "up" : rankDelta < 0 ? "down" : "same"
+      ...annotated,
+      evidence: appendSentence(annotated.evidence, historySentence),
+      notes: appendSentence(
+        annotated.notes,
+        `github_trending_history=${marker}; trend=${annotated.trend}${dates.length > 0 ? `; dates=${dates.join(",")}` : ""}`
+      )
     };
   });
 }
 
-async function readPreviousGitHubTrending(options = {}) {
-  if (!options.historyDir || !options.reportDate) {
-    return [];
-  }
-  const previousDate = offsetDate(options.reportDate, -1);
-  if (!previousDate) {
-    return [];
-  }
-  const [year, month] = previousDate.split("-");
-  const previousPath = path.resolve(options.historyDir, year, month, `${previousDate}.json`);
-  try {
-    const previousReport = JSON.parse(await fs.readFile(previousPath, "utf8"));
-    if (Array.isArray(previousReport.github_trending)) {
-      return previousReport.github_trending;
-    }
-    return Array.isArray(previousReport.projects)
-      ? previousReport.projects
-          .filter((item) => /GitHub Trending/i.test(item.source || ""))
-          .map((item, index) => ({ repo: repoFromUrl(item.url) || item.name, url: item.url, rank: index + 1 }))
-      : [];
-  } catch {
-    return [];
-  }
+function applyGitHubTrendMovement(candidate, previousRank) {
+  const rankDelta = Number.isInteger(previousRank) && Number.isInteger(candidate.rank)
+    ? previousRank - candidate.rank
+    : null;
+  return {
+    ...candidate,
+    previous_rank: Number.isInteger(previousRank) ? previousRank : null,
+    rank_delta: rankDelta,
+    trend: rankDelta === null ? "new" : rankDelta > 0 ? "up" : rankDelta < 0 ? "down" : "same"
+  };
 }
 
-function offsetDate(value, days) {
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) {
-    return "";
+function latestRank(ranks) {
+  if (!ranks || ranks.size === 0) {
+    return null;
   }
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
+  const latest = [...ranks.entries()].sort(([left], [right]) => right.localeCompare(left))[0];
+  return Number.isInteger(latest?.[1]) ? latest[1] : null;
 }
 
-function repoFromUrl(value) {
+function githubTrendingAuditNotes(baseNotes, history) {
+  const prefix = "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。";
+  if (!history.checked) {
+    return `${prefix} ${baseNotes} 近 7 天本地历史对比需要提供 --date YYYY-MM-DD 后运行。`;
+  }
+  const historyNotes = `近 ${history.lookbackDays} 天本地 reports-data 对比已运行，覆盖 ${history.dates.length} 个日期、${history.repoCount} 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。`;
+  const errorNotes = history.errors.length > 0 ? ` ${history.errors.length} 个历史文件读取失败，已跳过。` : "";
+  return `${prefix} ${baseNotes} ${historyNotes}${errorNotes}`;
+}
+
+function repoFromHistoryItem(item) {
+  const textMatch = firstString(item?.repo, item?.full_name, item?.name, item?.title).match(/([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)/);
+  if (textMatch) {
+    return normalizeRepo(textMatch[1]);
+  }
+  return normalizeRepoFromGitHubUrl(item?.url || item?.html_url || "");
+}
+
+function normalizeRepoFromGitHubUrl(value) {
   try {
     const url = new URL(value);
-    return normalizeRepo(url.pathname);
+    if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
+      return "";
+    }
+    const segments = url.pathname.split("/").filter(Boolean);
+    if (segments.length < 2 || ["trending", "topics", "marketplace", "features", "orgs"].includes(segments[0])) {
+      return "";
+    }
+    return normalizeRepo(`${segments[0]}/${segments[1]}`);
   } catch {
     return "";
   }
 }
 
+function previousDateStrings(reportDate, days) {
+  const base = new Date(`${reportDate}T00:00:00Z`);
+  if (Number.isNaN(base.getTime())) {
+    return [];
+  }
+  const dates = [];
+  for (let offset = 1; offset <= days; offset += 1) {
+    const current = new Date(base);
+    current.setUTCDate(base.getUTCDate() - offset);
+    dates.push(current.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+function isPreviousDateWithinWindow(date, reportDate, lookbackDays) {
+  if (!date) {
+    return false;
+  }
+  const dateTime = Date.parse(`${date}T00:00:00Z`);
+  const reportTime = Date.parse(`${reportDate}T00:00:00Z`);
+  if (Number.isNaN(dateTime) || Number.isNaN(reportTime)) {
+    return false;
+  }
+  const diffDays = Math.floor((reportTime - dateTime) / 86400000);
+  return diffDays > 0 && diffDays <= lookbackDays;
+}
+
+function appendSentence(value, sentence) {
+  const base = String(value || "").trim();
+  if (!base) {
+    return sentence;
+  }
+  const separator = /[。！？]$/.test(base) ? "" : /[.!?]$/.test(base) ? " " : "。";
+  return `${base}${separator}${sentence}`;
+}
 function source(name, url, language, window) {
   return { name, url, language, window };
 }
@@ -1054,12 +1529,30 @@ function parseRssItem(block) {
 }
 
 function normalizeFeedEntry(entry) {
+  const url = cleanText(entry.url);
+  const rawSummary = entry.summary || "";
   return {
     title: cleanText(entry.title),
-    url: cleanText(entry.url),
+    url,
     event_date: dateOnly(entry.date),
-    summary: cleanText(entry.summary)
+    summary: cleanText(rawSummary),
+    links: extractHtmlLinks(rawSummary, url)
   };
+}
+
+function extractHtmlLinks(html, baseUrl) {
+  const links = [];
+  const seen = new Set();
+  const decoded = decodeXml(html);
+  const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>/gi;
+  for (const match of decoded.matchAll(anchorPattern)) {
+    const url = absoluteUrl(decodeXml(match[1] || match[2] || match[3] || ""), baseUrl);
+    if (url && !seen.has(url)) {
+      seen.add(url);
+      links.push(url);
+    }
+  }
+  return links;
 }
 
 function matchXmlBlocks(xml, tagName) {

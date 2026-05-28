@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天可回源的新发布偏少，主体信息收敛为 5 条：ThreatConnect 8.0 把威胁情报工作台加入 Agentic AI，AWS Partner Central age…</li><li>本轮显式扩展到 2026-05-14，以补足 48 小时内不足 5 条的高质量一手来源，并把已在 2026-05-16 覆盖的条目降级为社区线索</li></ul>
 
       </div>
@@ -1359,7 +1431,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1442,7 +1514,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 对构建面向高风险对话的产品团队来说，关键变化是 safety state 成为运行时上下文的一部分；这会影响日志保留、风险升级、用户透明度和普通对话误触发评估。
   - 来源：[OpenAI](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1451,18 +1523,50 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" rel="noopener noreferrer">ThreatConnect Agentic AI</a></strong>：ThreatConnect 8.0 的四类安全运营代理，覆盖查询、STRIDE 建模、情报报告和 IR 创建。</li><li><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" rel="noopener noreferrer">AWS Partner Central agents MCP</a></strong>：AWS Partner Central agents 的可编程入口，可把 co-sell opportunity creation 接入现有销售工具。</li><li><strong><a href="https://www.firecrawl.dev/changelog" rel="noopener noreferrer">Firecrawl v2.10</a></strong>：面向 AI agents 的网页和文档提取版本，包含 `/parse`、Lockdown Mode、Question/Highlights format 和多语言 SDK。</li><li><strong><a href="https://x.ai/news/grok-build-cli" rel="noopener noreferrer">Grok Build</a></strong>：xAI 的终端 coding agent early beta，支持计划审批、diff、subagents、worktrees、MCP 和 headless mode。</li><li><strong><a href="https://www.mux.com/docs/changelog/robots-pricing-update-may-2026" rel="noopener noreferrer">Mux Robots usage update</a></strong>：Mux Robots 调整 workflow unit 计算并延长 free technical preview；本轮作为视频 AI 工作流商业化线索保留。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[ThreatConnect Agentic AI](https://knowledge.threatconnect.com/docs/8-0-release-notes)**：ThreatConnect 8.0 的四类安全运营代理，覆盖查询、STRIDE 建模、情报报告和 IR 创建。
-- **[AWS Partner Central agents MCP](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/)**：AWS Partner Central agents 的可编程入口，可把 co-sell opportunity creation 接入现有销售工具。
-- **[Firecrawl v2.10](https://www.firecrawl.dev/changelog)**：面向 AI agents 的网页和文档提取版本，包含 `/parse`、Lockdown Mode、Question/Highlights format 和多语言 SDK。
-- **[Grok Build](https://x.ai/news/grok-build-cli)**：xAI 的终端 coding agent early beta，支持计划审批、diff、subagents、worktrees、MCP 和 headless mode。
-- **[Mux Robots usage update](https://www.mux.com/docs/changelog/robots-pricing-update-may-2026)**：Mux Robots 调整 workflow unit 计算并延长 free technical preview；本轮作为视频 AI 工作流商业化线索保留。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://knowledge.threatconnect.com/docs/8-0-release-notes" rel="noopener noreferrer">ThreatConnect Agentic AI</a></h3>
+
+    <p>ThreatConnect 8.0 的四类安全运营代理，覆盖查询、STRIDE 建模、情报报告和 IR 创建。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" rel="noopener noreferrer">AWS Partner Central agents MCP</a></h3>
+
+    <p>AWS Partner Central agents 的可编程入口，可把 co-sell opportunity creation 接入现有销售工具。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://www.firecrawl.dev/changelog" rel="noopener noreferrer">Firecrawl v2.10</a></h3>
+
+    <p>面向 AI agents 的网页和文档提取版本，包含 `/parse`、Lockdown Mode、Question/Highlights format 和多语言 SDK。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://x.ai/news/grok-build-cli" rel="noopener noreferrer">Grok Build</a></h3>
+
+    <p>xAI 的终端 coding agent early beta，支持计划审批、diff、subagents、worktrees、MCP 和 headless mode。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://www.mux.com/docs/changelog/robots-pricing-update-may-2026" rel="noopener noreferrer">Mux Robots usage update</a></h3>
+
+    <p>Mux Robots 调整 workflow unit 计算并延长 free technical preview；本轮作为视频 AI 工作流商业化线索保留。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

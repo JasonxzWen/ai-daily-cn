@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1330,7 +1402,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
       <div class="hero-brief">
-        <ul class="hero-summary-text hero-summary-list"><li><strong><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending 改为独立板块</a></strong>：今天展示 daily 前 8 个仓库，并保留 rank、previous_rank、rank_delta 和 trend 字段；由于昨天没有结构化 trending 历史，本轮全部标记为 new。</li><li><strong><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer">follow-builders 已恢复并进入 Builder 观察</a></strong>：本轮成功读取 follow-builders X feed、podcast feed 和固定 RSS 兜底源，入选 3 条与 agent 使用方式或企业落地相关的观察。</li></ul>
+        <ul class="hero-summary-text hero-summary-list hero-highlight-list"><li><a class="hero-highlight-link" href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending 改为独立板块</a><span class="hero-highlight-reason">今天展示 daily 前 8 个仓库，并保留 rank、previous_rank、rank_delta 和 trend 字段；由于昨天没有结构化 trending 历史，本轮全部标记为 new。</span></li><li><a class="hero-highlight-link" href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer">follow-builders 已恢复并进入 Builder 观察</a><span class="hero-highlight-reason">本轮成功读取 follow-builders X feed、podcast feed 和固定 RSS 兜底源，入选 3 条与 agent 使用方式或企业落地相关的观察。</span></li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>行动</span><strong>3</strong><small>项</small></div>
   </div>
@@ -1466,7 +1538,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **[shiyu-coder/Kronos](https://github.com/shiyu-coder/Kronos)** ==#8== ==新上榜== ==daily==：shiyu-coder / Kronos Kronos: A Foundation Model for the Language of Financial Markets。
   - 排名：#8，新上榜；来源：GitHub Trending daily；语言：all</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1475,13 +1547,23 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/vllm-project/vllm-metal" rel="noopener noreferrer">vllm-project/vllm-metal</a></strong>：vllm-metal 是社区维护的 vLLM Apple Silicon 硬件插件，GitHub 页面显示 2026-05-27 latest release `v0.2.0-20260527-105045`。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 形态的开发者。</li><li>领域：inference_serving、apple_silicon、vllm_plugin</li><li>作用：在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。</li><li><strong><a href="https://github.com/infiniflow/ragflow/releases" rel="noopener noreferrer">RAGFlow v0.25.6</a></strong>：RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 `@tool` decorator、base64 image agent message 和 chat completion 参数控制。</li><li>领域：RAG、agent_builder、knowledge_base</li><li>作用：给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[vllm-project/vllm-metal](https://github.com/vllm-project/vllm-metal)**：vllm-metal 是社区维护的 vLLM Apple Silicon 硬件插件，GitHub 页面显示 2026-05-27 latest release `v0.2.0-20260527-105045`。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 形态的开发者。
-  - 领域：inference_serving、apple_silicon、vllm_plugin
-  - 作用：在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。
-- **[RAGFlow v0.25.6](https://github.com/infiniflow/ragflow/releases)**：RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 `@tool` decorator、base64 image agent message 和 chat completion 参数控制。
-  - 领域：RAG、agent_builder、knowledge_base
-  - 作用：给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="inference_serving" data-search-target="html-work-report">
+    <div class="meta">inference_serving</div>
+    <h3><a class="card-title-link" href="https://github.com/vllm-project/vllm-metal" rel="noopener noreferrer">vllm-project/vllm-metal</a></h3>
+
+    <p>vllm-metal 是社区维护的 vLLM Apple Silicon 硬件插件，GitHub 页面显示 2026-05-27 latest release `v0.2.0-20260527-105045`。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 形态的开发者。</p>
+    <dl class="card-detail-list"><div><dt>领域</dt><dd>inference_serving、apple_silicon、vllm_plugin</dd></div><div><dt>作用</dt><dd>在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。</dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="RAG" data-search-target="html-work-report">
+    <div class="meta">RAG</div>
+    <h3><a class="card-title-link" href="https://github.com/infiniflow/ragflow/releases" rel="noopener noreferrer">RAGFlow v0.25.6</a></h3>
+
+    <p>RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 `@tool` decorator、base64 image agent message 和 chat completion 参数控制。</p>
+    <dl class="card-detail-list"><div><dt>领域</dt><dd>RAG、agent_builder、knowledge_base</dd></div><div><dt>作用</dt><dd>给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</dd></div></dl>
+  </article>
+    </div>
   </section>
 <section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -1493,21 +1575,17 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
   </div>
     <div class="rendered-markdown"><h4>Builder 观察</h4>
-<ul><li><strong>Thariq</strong>（Builder）：Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。 <a href="https://x.com/trq212/status/2059363113963540788" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：the basic trick to using Claude Code for non-technical work is to put a bunch of files in a folder and tell it can write scripts + make HTML</li><li><strong>Aaron Levie</strong>（Founder / operator）：Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。 <a href="https://x.com/levie/status/2059482349977653619" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：A meaningful portion of enterprises I talk to outside of Silicon Valley generally are looking to hire while also adopting agents. There’s a huge wave of technical and engineering talent needed inside originations, building software or actin</li><li><strong>Zara Zhang</strong>（Builder）：Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。 <a href="https://x.com/zarazhangrui/status/2059354487823978586" rel="noopener noreferrer">follow-builders X feed</a></li><li>证据：How my own usage of coding agents has changed in the past month: 1. Moved from the terminal to the Codex/Claude Code desktop apps. The Codex Mac app is especially great. Now I rarely open the terminal 2. Transitioned from mostly Claude Code</li></ul>
+<ul><li><strong>Thariq</strong>（Builder）：Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。 <a href="https://x.com/trq212/status/2059363113963540788" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Aaron Levie</strong>（Founder / operator）：Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。 <a href="https://x.com/levie/status/2059482349977653619" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Zara Zhang</strong>（Builder）：Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。 <a href="https://x.com/zarazhangrui/status/2059354487823978586" rel="noopener noreferrer">follow-builders X feed</a></li></ul>
 <h4>社区线索</h4>
-<ul><li>Claude Status 记录 2026-05-27 两次 Claude Opus 4.7 elevated errors，其中 08:04 UTC 事件影响 claude.ai、Claude API、Claude Code 和 Claude Cowork，并在 09:41 UTC 解决；这适合进入 incident 复盘线索，不作为产品发布。 <a href="https://status.claude.com/incidents/rtr7z82cqmp9" rel="noopener noreferrer">来源</a></li><li>Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。 <a href="https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/" rel="noopener noreferrer">来源</a></li></ul></div>
+<ul><li>Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。 <a href="https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/" rel="noopener noreferrer">来源</a></li></ul></div>
     <template data-rich-source data-source-fallback>### Builder 观察
 
 - **Thariq**（Builder）：Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。 [follow-builders X feed](https://x.com/trq212/status/2059363113963540788)
-  - 证据：the basic trick to using Claude Code for non-technical work is to put a bunch of files in a folder and tell it can write scripts + make HTML
 - **Aaron Levie**（Founder / operator）：Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。 [follow-builders X feed](https://x.com/levie/status/2059482349977653619)
-  - 证据：A meaningful portion of enterprises I talk to outside of Silicon Valley generally are looking to hire while also adopting agents. There’s a huge wave of technical and engineering talent needed inside originations, building software or actin
 - **Zara Zhang**（Builder）：Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。 [follow-builders X feed](https://x.com/zarazhangrui/status/2059354487823978586)
-  - 证据：How my own usage of coding agents has changed in the past month: 1. Moved from the terminal to the Codex/Claude Code desktop apps. The Codex Mac app is especially great. Now I rarely open the terminal 2. Transitioned from mostly Claude Code
 
 ### 社区线索
 
-- Claude Status 记录 2026-05-27 两次 Claude Opus 4.7 elevated errors，其中 08:04 UTC 事件影响 claude.ai、Claude API、Claude Code 和 Claude Cowork，并在 09:41 UTC 解决；这适合进入 incident 复盘线索，不作为产品发布。 [来源](https://status.claude.com/incidents/rtr7z82cqmp9)
 - Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。 [来源](https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/)</template>
   </section>
 <section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>

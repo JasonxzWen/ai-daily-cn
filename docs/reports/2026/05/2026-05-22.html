@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li>Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li>GitHub Copilot 加强任务路由与语义 issue 检索</li></ul>
 
       </div>
@@ -1361,7 +1433,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
 <a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
 <a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-7" title="社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1497,7 +1569,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。
 - **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1506,19 +1578,57 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></strong> <mark class="text-highlight">今日 +891 stars</mark>：Anthropic-managed Claude Code plugins 官方目录。</li><li><strong><a href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></strong> <mark class="text-highlight">今日 +4,222 stars</mark> <mark class="text-highlight">本周 +6,731 stars</mark>：面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。</li><li><strong><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></strong> <mark class="text-highlight">今日 +132 stars</mark>：Chrome DevTools for coding agents，适合关注 browser debugging 与 MCP 化工具链。</li><li><strong><a href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">HKUDS/CLI-Anything</a></strong> <mark class="text-highlight">今日 +890 stars</mark>：宣称让所有软件 agent-native 的 CLI-Hub 项目。</li><li><strong><a href="https://github.com/rohitg00/agentmemory" rel="noopener noreferrer">rohitg00/agentmemory</a></strong> <mark class="text-highlight">本周 +7,976 stars</mark>：面向 AI coding agents 的 persistent memory 项目。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight">TypeScript daily</mark>：面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)** ==今日 +891 stars==：Anthropic-managed Claude Code plugins 官方目录。
-- **[colbymchenry/codegraph](https://github.com/colbymchenry/codegraph)** ==今日 +4,222 stars== ==本周 +6,731 stars==：面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。
-- **[ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp)** ==今日 +132 stars==：Chrome DevTools for coding agents，适合关注 browser debugging 与 MCP 化工具链。
-- **[HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything)** ==今日 +890 stars==：宣称让所有软件 agent-native 的 CLI-Hub 项目。
-- **[rohitg00/agentmemory](https://github.com/rohitg00/agentmemory)** ==本周 +7,976 stars==：面向 AI coding agents 的 persistent memory 项目。
-- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==TypeScript daily==：面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></h3>
+    <div class="card-tags"><span class="chip">今日 +891 stars</span></div>
+    <p>Anthropic-managed Claude Code plugins 官方目录。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></h3>
+    <div class="card-tags"><span class="chip">今日 +4,222 stars</span><span class="chip">本周 +6,731 stars</span></div>
+    <p>面向 Claude Code、Codex、Cursor 和 OpenCode 的本地预索引代码知识图谱，用于减少 token 和 tool call。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></h3>
+    <div class="card-tags"><span class="chip">今日 +132 stars</span></div>
+    <p>Chrome DevTools for coding agents，适合关注 browser debugging 与 MCP 化工具链。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">HKUDS/CLI-Anything</a></h3>
+    <div class="card-tags"><span class="chip">今日 +890 stars</span></div>
+    <p>宣称让所有软件 agent-native 的 CLI-Hub 项目。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/rohitg00/agentmemory" rel="noopener noreferrer">rohitg00/agentmemory</a></h3>
+    <div class="card-tags"><span class="chip">本周 +7,976 stars</span></div>
+    <p>面向 AI coding agents 的 persistent memory 项目。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></h3>
+    <div class="card-tags"><span class="chip">TypeScript daily</span></div>
+    <p>面向 Claude Code、Codex、Cursor、Copilot 和 Gemini CLI 的代码图谱探索工具。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 

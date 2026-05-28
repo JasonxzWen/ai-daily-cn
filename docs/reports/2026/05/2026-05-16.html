@@ -218,6 +218,10 @@ h3 {
   align-items: start;
 }
 
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
 .hero-summary-text {
   min-height: 72px;
   margin: 0;
@@ -258,6 +262,40 @@ p.hero-summary-text {
   height: 6px;
   border-radius: 999px;
   background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .hero-stat-grid {
@@ -412,6 +450,40 @@ p.hero-summary-text {
   margin: 0;
   color: #5f5d57;
   line-height: 1.52;
+}
+
+.project-card {
+  gap: 12px;
+}
+
+.card-title-link {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  line-height: 1.55;
 }
 
 .interactive-card {
@@ -1329,7 +1401,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         </div>
         <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
       </div>
-      <div class="hero-brief">
+      <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役…</li><li>由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险</li></ul>
 
       </div>
@@ -1359,7 +1431,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
 <a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
 <a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察与社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
 <a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
@@ -1442,7 +1514,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。
   - 来源：[Google Developers Blog](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1451,18 +1523,50 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">ChatGPT Finances</a></strong>：ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。</li><li><strong><a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">Grok model retirement guide</a></strong>：xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。</li><li><strong><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" rel="noopener noreferrer">Databricks Foundation Model APIs</a></strong>：Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。</li><li><strong><a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Copilot app</a></strong>：GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。</li><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Genkit Middleware</a></strong>：Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[ChatGPT Finances](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)**：ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。
-- **[Grok model retirement guide](https://docs.x.ai/developers/migration/may-15-retirement)**：xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。
-- **[Databricks Foundation Model APIs](https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models)**：Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。
-- **[GitHub Copilot app](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)**：GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。
-- **[Genkit Middleware](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)**：Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">ChatGPT Finances</a></h3>
+
+    <p>ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">Grok model retirement guide</a></h3>
+
+    <p>xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" rel="noopener noreferrer">Databricks Foundation Model APIs</a></h3>
+
+    <p>Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Copilot app</a></h3>
+
+    <p>GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
+    <div class="meta">PROJECTS</div>
+    <h3><a class="card-title-link" href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Genkit Middleware</a></h3>
+
+    <p>Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。</p>
+
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>社区线索</h2>
 
     </div>
 
