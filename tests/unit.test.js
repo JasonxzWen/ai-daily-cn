@@ -1668,6 +1668,32 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   assert.equal(await exists(path.join(outDir, "assets/style.css")), true);
 });
 
+test("buildSite skips unchanged files and avoids legacy shared scratch path", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-repeat-build-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+
+  const options = {
+    rootDir: tmp,
+    inputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  };
+  const first = await buildSite(options);
+  const second = await buildSite(options);
+
+  assert(first.writtenFiles.includes("data/2026/05/2026-05-13.json"));
+  assert(!second.writtenFiles.includes("data/2026/05/2026-05-13.json"));
+  assert(!second.writtenFiles.includes("reports/2026/05/2026-05-13.html"));
+  assert.equal(await exists(path.join(tmp, ".tmp", "effective-interact-daily")), false);
+});
+
 test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-json-build-"));
   const dataInputDir = path.join(tmp, "reports-data");

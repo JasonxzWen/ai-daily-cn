@@ -165,8 +165,10 @@ export async function renderReportWithEffectiveInteract(report, options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const skillDir = await resolveSkillDir(rootDir, options.skillDir);
   const createScript = path.join(skillDir, "scripts", "create-interaction.mjs");
-  const inputDir = path.join(rootDir, ".tmp", "effective-interact-daily", "inputs");
-  const outputDir = path.join(rootDir, ".tmp", "effective-interact-daily", "html");
+  const scratchDir =
+    options.scratchDir || path.join(rootDir, ".tmp", `effective-interact-daily-${process.pid}`);
+  const inputDir = path.join(scratchDir, "inputs");
+  const outputDir = path.join(scratchDir, "html");
   const inputPath = path.join(inputDir, `${report.report_date}.json`);
 
   await fs.mkdir(inputDir, { recursive: true });

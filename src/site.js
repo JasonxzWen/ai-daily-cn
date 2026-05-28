@@ -216,8 +216,19 @@ async function readExistingFeed(outDir, siteTitle, siteUrl, generatedAt) {
 async function writeFileTracked(outDir, relativePath, content, writtenFiles) {
   const target = path.join(outDir, ...relativePath.split("/"));
   await fs.mkdir(path.dirname(target), { recursive: true });
+  if ((await readExistingText(target)) === content) {
+    return;
+  }
   await fs.writeFile(target, content, "utf8");
   writtenFiles.push(relativePath);
+}
+
+async function readExistingText(target) {
+  try {
+    return await fs.readFile(target, "utf8");
+  } catch {
+    return null;
+  }
 }
 
 async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null) {
