@@ -1,0 +1,587 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-28",
+  "generated_at": "2026-05-28T03:28:12.041Z",
+  "sources": [
+    {
+      "id": "github-trending-discovery-command",
+      "name": "GitHub Trending discovery command",
+      "url": "https://github.com/trending?since=daily",
+      "category": "github_trending",
+      "status": "blocked",
+      "checked_at": "2026-05-28T02:12:01.999Z",
+      "notes": "npm run discover:github-trending -- --date 2026-05-28 --limit 50 checked daily, weekly and language trending pages, then OSSInsight; all fetches returned fetch failed in this shell."
+    },
+    {
+      "id": "builder-discovery-command",
+      "name": "Builder discovery command",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      "category": "builder",
+      "status": "blocked",
+      "checked_at": "2026-05-28T02:12:01.999Z",
+      "notes": "npm run discover:builders -- --date 2026-05-28 --limit 20 returned fetch failed for central feed and fixed RSS fallbacks."
+    },
+    {
+      "id": "content-discovery-command",
+      "name": "Content discovery command",
+      "url": "https://openai.com/news/rss.xml",
+      "category": "blog",
+      "status": "blocked",
+      "checked_at": "2026-05-28T02:12:02.154Z",
+      "notes": "npm run discover:content-sources -- --date 2026-05-28 --limit 20 returned fetch failed across configured RSS, lab blog and product sources."
+    },
+    {
+      "id": "statuspage-discovery-command",
+      "name": "Statuspage incident discovery command",
+      "url": "https://status.openai.com/history.atom",
+      "category": "other",
+      "status": "blocked",
+      "checked_at": "2026-05-28T02:12:02.185Z",
+      "notes": "npm run discover:statuspage-incidents -- --date 2026-05-28 --limit 20 returned fetch failed for OpenAI and Claude Atom feeds."
+    },
+    {
+      "id": "openai-codex-context-compaction",
+      "name": "OpenAI Status: Codex Context Compaction Latency",
+      "url": "https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "Status incident shows Codex context compaction latency identified on 2026-05-27 and still under investigation on 2026-05-28."
+    },
+    {
+      "id": "github-changelog-may26",
+      "name": "GitHub Changelog May 26 Copilot and Code Quality updates",
+      "url": "https://github.blog/changelog/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub Changelog lists May 26 entries for Copilot Memory controls, targeted Copilot model rules, Code Quality Repository Enablement API and PR code coverage preview."
+    },
+    {
+      "id": "github-copilot-memory-controls",
+      "name": "Copilot Memory controls",
+      "url": "https://github.blog/changelog/2026-05-26-copilot-memory-has-more-controls-for-deletion-scope-and-the-copilot-cli/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub says Copilot Memory now has deletion guidance, repository-level off switch, CLI /memory commands and clearer scope prompts."
+    },
+    {
+      "id": "github-copilot-model-rules",
+      "name": "Target Copilot models to organizations with model rules",
+      "url": "https://github.blog/changelog/2026-05-26-target-copilot-models-to-organizations-with-model-rules/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub says enterprise owners can allow specific Copilot models for selected organizations instead of relying only on enterprise defaults."
+    },
+    {
+      "id": "github-code-quality-api",
+      "name": "GitHub Code Quality Repository Enablement API",
+      "url": "https://github.blog/changelog/2026-05-26-github-code-quality-repository-enablement-api/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub added public preview API endpoints to enable or inspect Code Quality setup per repository."
+    },
+    {
+      "id": "github-code-coverage-pr-preview",
+      "name": "Code coverage on pull requests public preview",
+      "url": "https://github.blog/changelog/2026-05-26-code-coverage-in-pull-requests-is-now-in-public-preview/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub says Code Quality users can show aggregate coverage directly on pull requests after uploading Cobertura reports."
+    },
+    {
+      "id": "huggingface-reachy-mini-local",
+      "name": "Reachy Mini goes fully local",
+      "url": "https://huggingface.co/blog/local-reachy-mini-conversation",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "Hugging Face published a May 27 technical walkthrough for running Reachy Mini conversation locally with speech-to-speech, llama.cpp, STT and TTS components."
+    },
+    {
+      "id": "github-vllm-metal",
+      "name": "vllm-project/vllm-metal",
+      "url": "https://github.com/vllm-project/vllm-metal",
+      "category": "repository",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "GitHub page describes a community maintained vLLM plugin for Apple Silicon and shows release v0.2.0-20260527-105045 as latest on May 27."
+    },
+    {
+      "id": "github-ragflow-release",
+      "name": "RAGFlow v0.25.6 release",
+      "url": "https://github.com/infiniflow/ragflow/releases",
+      "category": "repository",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "RAGFlow v0.25.6 release page lists a May 26 release with Browser component for agents and RAG improvements."
+    },
+    {
+      "id": "claude-opus-status",
+      "name": "Claude Status: Elevated errors on Claude Opus 4.7",
+      "url": "https://status.claude.com/incidents/rtr7z82cqmp9",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "Claude Status shows a May 27 resolved incident affecting claude.ai, Claude API, Claude Code and Claude Cowork."
+    },
+    {
+      "id": "microsoft-ncii-ai-generated",
+      "name": "Microsoft NCII response update",
+      "url": "https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-28T02:18:00.000Z",
+      "notes": "Microsoft published a May 27 policy and product response update for real and AI-generated non-consensual intimate imagery."
+    },
+    {
+      "id": "github-github-trending-daily",
+      "name": "GitHub Trending daily",
+      "url": "https://github.com/trending?since=daily",
+      "category": "github_trending",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "GitHub Trending daily parsed during 2026-05-28 rerun."
+    },
+    {
+      "id": "follow-builders-x-feed",
+      "name": "follow-builders X feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "31 recent original entries parsed"
+    },
+    {
+      "id": "follow-builders-podcast-feed",
+      "name": "follow-builders podcast feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "1 recent original entries parsed"
+    },
+    {
+      "id": "follow-builders-blog-feed",
+      "name": "follow-builders blog feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
+      "category": "builder",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent original entries parsed"
+    },
+    {
+      "id": "simon-willison-weblog",
+      "name": "Simon Willison Weblog",
+      "url": "https://simonwillison.net/atom/everything/",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "7 recent original entries parsed"
+    },
+    {
+      "id": "chip-huyen-blog",
+      "name": "Chip Huyen Blog",
+      "url": "https://huyenchip.com/feed.xml",
+      "category": "builder",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent original entries parsed"
+    },
+    {
+      "id": "andrej-karpathy-blog",
+      "name": "Andrej Karpathy Blog",
+      "url": "https://karpathy.github.io/feed.xml",
+      "category": "builder",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent original entries parsed"
+    },
+    {
+      "id": "follow-builders-x",
+      "name": "follow-builders X feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "follow-builders X feed parsed during 2026-05-28 rerun."
+    },
+    {
+      "id": "openai-news-rss",
+      "name": "OpenAI News RSS",
+      "url": "https://openai.com/news/rss.xml",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "4 recent blog/interview entries parsed"
+    },
+    {
+      "id": "anthropic-news",
+      "name": "Anthropic News",
+      "url": "https://www.anthropic.com/news",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "1 recent blog/interview entries parsed"
+    },
+    {
+      "id": "hugging-face-blog",
+      "name": "Hugging Face Blog",
+      "url": "https://huggingface.co/blog/feed.xml",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "3 recent blog/interview entries parsed"
+    },
+    {
+      "id": "github-changelog",
+      "name": "GitHub Changelog",
+      "url": "https://github.blog/changelog/feed/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "7 recent blog/interview entries parsed"
+    },
+    {
+      "id": "techcrunch-ai",
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "20 recent blog/interview entries parsed"
+    },
+    {
+      "id": "the-verge-ai",
+      "name": "The Verge AI",
+      "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "10 recent blog/interview entries parsed"
+    },
+    {
+      "id": "google-research-blog",
+      "name": "Google Research Blog",
+      "url": "https://research.google/blog/rss/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "1 recent blog/interview entries parsed"
+    },
+    {
+      "id": "google-deepmind-blog",
+      "name": "Google DeepMind Blog",
+      "url": "https://deepmind.google/discover/blog/",
+      "category": "blog",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent blog/interview entries parsed"
+    },
+    {
+      "id": "meta-ai-blog",
+      "name": "Meta AI Blog",
+      "url": "https://ai.meta.com/blog/",
+      "category": "blog",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent blog/interview entries parsed"
+    },
+    {
+      "id": "microsoft-research-blog",
+      "name": "Microsoft Research Blog",
+      "url": "https://www.microsoft.com/en-us/research/feed/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "1 recent blog/interview entries parsed"
+    },
+    {
+      "id": "latent-space",
+      "name": "Latent.Space",
+      "url": "https://www.latent.space/feed",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "2 recent blog/interview entries parsed"
+    },
+    {
+      "id": "interconnects",
+      "name": "Interconnects",
+      "url": "https://www.interconnects.ai/feed",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "1 recent blog/interview entries parsed"
+    },
+    {
+      "id": "product-hunt-developer-tools-feed",
+      "name": "Product Hunt Developer Tools Feed",
+      "url": "https://www.producthunt.com/feed?category=developer-tools",
+      "category": "repository",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "50 recent product/project entries parsed"
+    },
+    {
+      "id": "planet-ai",
+      "name": "Planet AI",
+      "url": "https://www.planet-ai.net/rss.xml",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "50 recent blog/interview entries parsed"
+    },
+    {
+      "id": "bair-blog",
+      "name": "BAIR Blog",
+      "url": "https://bair.berkeley.edu/blog/feed.xml",
+      "category": "blog",
+      "status": "no_signal",
+      "checked_at": "2026-05-28T03:28:12.041Z",
+      "notes": "0 recent blog/interview entries parsed"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "main-openai-codex-context-compaction",
+      "source_id": "openai-codex-context-compaction",
+      "category": "main_item",
+      "title": "OpenAI Status：Codex context compaction latency 仍在调查",
+      "url": "https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7",
+      "source": "OpenAI Status",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "Incident page says OpenAI is investigating slower-than-expected Codex context compaction, with affected Codex components and updates on May 27 and May 28."
+    },
+    {
+      "id": "main-github-copilot-code-quality-controls",
+      "source_id": "github-changelog-may26",
+      "category": "main_item",
+      "title": "GitHub 把 Copilot 记忆、模型可用性和 Code Quality 控制继续前移",
+      "url": "https://github.blog/changelog/",
+      "source": "GitHub Changelog",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "The May 26 GitHub Changelog groups Copilot Memory controls, targeted model rules, Code Quality setup API and PR code coverage preview."
+    },
+    {
+      "id": "blog-hf-reachy-mini-local",
+      "source_id": "huggingface-reachy-mini-local",
+      "category": "hot_blog",
+      "title": "Reachy Mini goes fully local",
+      "url": "https://huggingface.co/blog/local-reachy-mini-conversation",
+      "source": "Hugging Face Blog",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "hot_blogs",
+      "evidence": "The May 27 article explains a local speech-to-speech stack with VAD, STT, LLM and TTS, including llama.cpp, vLLM and Responses API compatible backends."
+    },
+    {
+      "id": "project-vllm-metal",
+      "source_id": "github-vllm-metal",
+      "category": "project",
+      "title": "vllm-project/vllm-metal",
+      "url": "https://github.com/vllm-project/vllm-metal",
+      "source": "GitHub",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "GitHub page describes the project as a vLLM hardware plugin for Apple Silicon and lists release v0.2.0-20260527-105045 as latest."
+    },
+    {
+      "id": "project-ragflow-v0256",
+      "source_id": "github-ragflow-release",
+      "category": "project",
+      "title": "RAGFlow v0.25.6",
+      "url": "https://github.com/infiniflow/ragflow/releases",
+      "source": "GitHub Releases",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "Release notes say v0.25.6 was released on May 26 and adds a Browser component for AI agents plus RAG and agent improvements."
+    },
+    {
+      "id": "community-claude-opus-47-errors",
+      "source_id": "claude-opus-status",
+      "category": "community_lead",
+      "title": "Claude Opus 4.7 elevated errors resolved",
+      "url": "https://status.claude.com/incidents/rtr7z82cqmp9",
+      "source": "Claude Status",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "community_leads",
+      "evidence": "Claude Status says the incident affected claude.ai, Claude API, Claude Code and Claude Cowork, then was resolved on May 27 at 09:41 UTC."
+    },
+    {
+      "id": "community-microsoft-ncii-ai-generated",
+      "source_id": "microsoft-ncii-ai-generated",
+      "category": "community_lead",
+      "title": "Microsoft updates response to AI-generated NCII",
+      "url": "https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/",
+      "source": "Microsoft On the Issues",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "community_leads",
+      "evidence": "Microsoft says it is making reporting easier, taking steps to detect known NCII and improving enforcement across services as the US Take It Down Act comes into force."
+    },
+    {
+      "id": "project-omlx-v0312",
+      "source_id": "github-vllm-metal",
+      "category": "project",
+      "title": "jundot/omlx v0.3.12",
+      "url": "https://github.com/jundot/omlx",
+      "source": "GitHub",
+      "event_date": "2026-05-27",
+      "status": "excluded",
+      "exclusion_reason": "Not selected because vllm-metal and RAGFlow covered the local inference and agent-builder project slots with clearer source notes.",
+      "evidence": "GitHub page shows an Apple Silicon LLM inference server with release v0.3.12 latest on May 27."
+    },
+    {
+      "id": "trend-harry0703-moneyprinterturbo",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "harry0703/MoneyPrinterTurbo",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 1,742 stars today.",
+      "notes": "Rank #1; trend new."
+    },
+    {
+      "id": "trend-lum1104-understand-anything",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "Lum1104/Understand-Anything",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "Lum1104/Understand-Anything appeared on GitHub Trending daily with 4,465 stars today.",
+      "notes": "Rank #2; trend new."
+    },
+    {
+      "id": "trend-hardikpandya-stop-slop",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "hardikpandya/stop-slop",
+      "url": "https://github.com/hardikpandya/stop-slop",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "hardikpandya/stop-slop appeared on GitHub Trending daily with 664 stars today.",
+      "notes": "Rank #3; trend new."
+    },
+    {
+      "id": "trend-affaan-m-ecc",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "affaan-m/ECC appeared on GitHub Trending daily with 2,062 stars today.",
+      "notes": "Rank #4; trend new."
+    },
+    {
+      "id": "trend-anthropics-knowledge-work-plugins",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "anthropics/knowledge-work-plugins",
+      "url": "https://github.com/anthropics/knowledge-work-plugins",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "anthropics/knowledge-work-plugins appeared on GitHub Trending daily with 695 stars today.",
+      "notes": "Rank #5; trend new."
+    },
+    {
+      "id": "trend-leonxlnx-taste-skill",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "Leonxlnx/taste-skill",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "Leonxlnx/taste-skill appeared on GitHub Trending daily with 2,715 stars today.",
+      "notes": "Rank #6; trend new."
+    },
+    {
+      "id": "trend-p-e-w-heretic",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "p-e-w/heretic",
+      "url": "https://github.com/p-e-w/heretic",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 211 stars today.",
+      "notes": "Rank #7; trend new."
+    },
+    {
+      "id": "trend-shiyu-coder-kronos",
+      "source_id": "github-github-trending-daily",
+      "category": "github_trending",
+      "title": "shiyu-coder/Kronos",
+      "url": "https://github.com/shiyu-coder/Kronos",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "shiyu-coder/Kronos appeared on GitHub Trending daily with 401 stars today.",
+      "notes": "Rank #8; trend new."
+    },
+    {
+      "id": "follow-builders-x-thariq-the-basic-trick-to-using-claude-code-for-non-technical-",
+      "source_id": "follow-builders-x",
+      "category": "builder_observation",
+      "title": "Thariq: the basic trick to using Claude Code for non-technical work is to put a bunch o…",
+      "url": "https://x.com/trq212/status/2059363113963540788",
+      "source": "follow-builders X feed",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "the basic trick to using Claude Code for non-technical work is to put a bunch of files in a folder and tell it can write scripts + make HTML"
+    },
+    {
+      "id": "follow-builders-x-aaron-levie-a-meaningful-portion-of-enterprises-i-talk-to-outs",
+      "source_id": "follow-builders-x",
+      "category": "builder_observation",
+      "title": "Aaron Levie: A meaningful portion of enterprises I talk to outside of Silicon Valley general…",
+      "url": "https://x.com/levie/status/2059482349977653619",
+      "source": "follow-builders X feed",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "A meaningful portion of enterprises I talk to outside of Silicon Valley generally are looking to hire while also adopting agents. There’s a huge wave of technical and engineering talent needed inside originations, building software or actin"
+    },
+    {
+      "id": "follow-builders-x-zara-zhang-how-my-own-usage-of-coding-agents-has-changed-in-th",
+      "source_id": "follow-builders-x",
+      "category": "builder_observation",
+      "title": "Zara Zhang: How my own usage of coding agents has changed in the past month: 1. Moved from …",
+      "url": "https://x.com/zarazhangrui/status/2059354487823978586",
+      "source": "follow-builders X feed",
+      "event_date": "2026-05-26",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "How my own usage of coding agents has changed in the past month: 1. Moved from the terminal to the Codex/Claude Code desktop apps. The Codex Mac app is especially great. Now I rarely open the terminal 2. Transitioned from mostly Claude Code"
+    }
+  ]
+}
