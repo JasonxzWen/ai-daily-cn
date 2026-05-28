@@ -120,12 +120,11 @@ function collectReadabilityWarnings(documentMarkup) {
 function collectDecisionBriefWarnings(documentMarkup) {
   const warnings = [];
   const hero = documentMarkup.match(/<header\b(?=[^>]*report-hero)[\s\S]*?<\/header>/i)?.[0] || "";
-  const summaryBlock = hero.match(/<(?:p|ul|ol)\b(?=[^>]*hero-summary-text)[^>]*>[\s\S]*?<\/(?:p|ul|ol)>/i)?.[0]
+  const summaryBlock = hero.match(/<p\b(?=[^>]*hero-summary-text)[^>]*>[\s\S]*?<\/p>/i)?.[0]
     || hero.match(/<p\b[^>]*>[\s\S]*?<\/p>/i)?.[0]
     || "";
-  const summaryItem = summaryBlock.match(/<li\b[^>]*>[\s\S]*?<\/li>/i)?.[0] || summaryBlock;
-  const summaryText = textFromHtml(summaryItem);
-  const blufPattern = /^(?:结论|判断|决定|建议|风险|状态|重点|本轮重点|完成|通过|阻塞|需要|已|未|可以|不能|Conclusion|Decision|Recommendation|Status|Focus|Done|Blocked)|^(?:\*\*)?(?:结论|判断|决定|建议|风险|状态|重点|本轮重点)[：:]/i;
+  const summaryText = textFromHtml(summaryBlock);
+  const blufPattern = /^(?:结论|判断|决定|建议|风险|状态|完成|通过|阻塞|需要|已|未|可以|不能|Conclusion|Decision|Recommendation|Status|Done|Blocked)\b|^(?:\*\*)?(?:结论|判断|决定|建议|风险|状态)[：:]/i;
   const claimIds = new Set([...documentMarkup.matchAll(/data-claim-id="([^"]+)"/gi)].map((match) => match[1]));
   const hasNextAction = /id="next-actions"|data-section-type="actions"|data-copy-from="#next-action-list"/i.test(documentMarkup);
 
@@ -149,6 +148,7 @@ function collectRichContentOpportunityWarnings(documentMarkup) {
   const text = textFromHtml(documentMarkup);
   const lower = text.toLowerCase();
   const hasMermaid = documentMarkup.includes('data-section-type="mermaid"');
+  const hasStructuredFlow = hasMermaid || /data-section-type="(?:data-table|chart|timeline|decision-matrix|tabs|filterable-cards)"/.test(documentMarkup);
   const hasCodeOrDiff = /data-section-type="(?:code|diff)"/.test(documentMarkup);
   const flowTerms = [
     "流程", "链路", "路由", "触发", "调用", "架构", "数据流", "状态机", "依赖关系", "决策链路",
@@ -159,12 +159,83 @@ function collectRichContentOpportunityWarnings(documentMarkup) {
     || /data-source-link/i.test(documentMarkup)
     || fileLinePattern.test(text);
 
-  if (!hasMermaid && flowTerms.some((term) => lower.includes(term.toLowerCase()))) {
+  if (!hasStructuredFlow && flowTerms.some((term) => lower.includes(term.toLowerCase()))) {
     warnings.push("advisory: rich content opportunity: consider Mermaid only when flow, routing, call-path, architecture, or trigger sequences would be faster than prose");
   }
 
   if (!hasCodeOrDiff && hasFileLineEvidence) {
     warnings.push("advisory: rich content opportunity: consider code or diff only when file-and-line evidence is central to the report");
+  }
+
+  return warnings;
+}
+
+function collectRichRenderWarnings(html, mode) {
+  const warnings = [];
+  const value = String(html || "");
+
+  if (value.includes('data-mermaid-renderer="fallback"')) {
+    warnings.push("advisory: mermaid fallback: regenerate with --browser-mermaid, use runtime-cdn with --require-browser, or replace the diagram with a table/timeline before handoff");
+  }
+
+  if (/data-rich-kind="(?:markdown|code|mermaid)"[^>]*data-render-state="(?:degraded|failed)"|data-render-state="(?:degraded|failed)"[^>]*data-rich-kind="(?:markdown|code|mermaid)"/i.test(value)) {
+    warnings.push("advisory: rich render degraded: markdown, code, or Mermaid section is not handoff-ready");
+  }
+
+  if (mode === "runtime-cdn" && /data-rich-kind="(?:markdown|code|mermaid)"[^>]*data-render-state="pending"|data-render-state="pending"[^>]*data-rich-kind="(?:markdown|code|mermaid)"/i.test(value)) {
+    warnings.push("advisory: runtime rich render pending: run validate-interaction.mjs --require-browser before handoff");
+  }
+
+  return warnings;
+}
+
+function collectStyleBlocks(html) {
+  return [...String(html || "").matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)]
+    .map((match) => match[1] || "");
+}
+
+function collectAestheticPreflightWarnings(html, documentMarkup) {
+  const warnings = [];
+  const styleText = collectStyleBlocks(html).join("\n");
+  const styleLower = styleText.toLowerCase();
+  const documentLower = String(documentMarkup || "").toLowerCase();
+  const fullLower = `${styleLower}\n${documentLower}`;
+  const purpleTell = /#(?:a855f7|8b5cf6|7c3aed|6d28d9|9333ea|4f46e5)\b|\b(?:ai-purple|purple-\d+|violet-\d+|from-purple|to-purple|blue glow|mesh gradient)\b/i;
+  const defaultCardTell = /\b(?:default-card|feature-card|pricing-card|card-grid|three equal feature cards)\b/i;
+  const splitHeaderTell = /\b(?:split-header|section-numbering|scroll to explore|version footer)\b/i;
+  const sectionTags = [...String(documentMarkup || "").matchAll(/<section\b[^>]*>/gi)].map((match) => match[0]);
+  const sectionTypes = sectionTags.map((tag) => attrValue(tag, "data-section-type")).filter(Boolean);
+  const typeCounts = new Map();
+
+  for (const type of sectionTypes) {
+    typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
+  }
+
+  const dominantTypeCount = Math.max(0, ...typeCounts.values());
+  if (purpleTell.test(fullLower)) {
+    warnings.push("advisory: aesthetic preflight: avoid AI-purple or default blue/purple glow unless brand or source evidence requires it");
+  }
+
+  if (defaultCardTell.test(fullLower)) {
+    warnings.push("advisory: aesthetic preflight: audit default-card grids; cards should clarify hierarchy, status, evidence, or options");
+  }
+
+  if (splitHeaderTell.test(fullLower)) {
+    warnings.push("advisory: aesthetic preflight: avoid decorative split headers, scroll cues, version footers, and section-numbering labels in report artifacts");
+  }
+
+  if (sectionTypes.length >= 6 && typeCounts.size <= 2 && dominantTypeCount >= sectionTypes.length - 1) {
+    warnings.push("advisory: aesthetic preflight: vary section layout families in long HTML reports instead of repeating one section shape");
+  }
+
+  const hero = String(documentMarkup || "").match(/<header\b(?=[^>]*report-hero)[\s\S]*?<\/header>/i)?.[0] || "";
+  const heroTitle = collectTagText(hero, "h1")[0] || "";
+  if (heroTitle.length > 120 || heroTitle.split(/\s+/).filter(Boolean).length > 18) {
+    warnings.push("advisory: aesthetic preflight: keep report hero titles compact; use sections for nuance instead of billboard-scale copy");
+  }
+
+  if (/(?:transition|animation|@keyframes|scroll-behavior:\s*smooth)/i.test(styleText) && !/prefers-reduced-motion/i.test(styleText)) {
+    warnings.push("advisory: aesthetic preflight: motion or smooth scrolling needs prefers-reduced-motion coverage");
   }
 
   return warnings;
@@ -286,6 +357,8 @@ function validateStatic(html) {
   const warnings = collectReadabilityWarnings(documentMarkup);
   warnings.push(...collectDecisionBriefWarnings(documentMarkup));
   warnings.push(...collectRichContentOpportunityWarnings(documentMarkup));
+  warnings.push(...collectRichRenderWarnings(html, mode));
+  warnings.push(...collectAestheticPreflightWarnings(html, documentMarkup));
 
   add(checks, "report-root", html.includes("data-html-work-report"), "missing data-html-work-report root", issues);
   add(checks, "render-mode", ["runtime-cdn", "pre-rendered", "fallback-only"].includes(mode), `unexpected render mode: ${mode}`, issues);
@@ -299,6 +372,7 @@ function validateStatic(html) {
   add(checks, "navigation-order", navigationOrderIssues.length === 0, navigationOrderIssues.join("; "), issues);
   checks.push("decision-brief-scan");
   checks.push("rich-content-opportunity-scan");
+  checks.push("aesthetic-preflight-scan");
   add(checks, "section-groups", html.includes("data-section-group="), "sections lack group metadata", issues);
   add(checks, "intent-metadata", html.includes("data-report-intent") && html.includes("data-primary-question=") && html.includes("data-time-budget="), "missing report intent metadata", issues);
   if (hasRichSections) add(checks, "source-fallbacks", html.includes("data-source-fallback"), "rich sections lack source fallback markers", issues);

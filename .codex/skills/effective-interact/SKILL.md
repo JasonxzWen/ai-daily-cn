@@ -1,7 +1,6 @@
 ---
 name: effective-interact
-description: Load when Chinese-first clear complex communication, alignment, multi-option choice, status/incident reporting, long-task fact ledgers, implementation plans, reviews, architecture/dependency/milestone maps, explainer/design/editor artifacts, or handoff needs first-principles structure; choose plain text, Markdown, visual Markdown, or HTML by decision cost; do not load merely because an answer is long; skip trivial chat, production UI, decks, bundled apps.
-license: Apache-2.0
+description: Load when agent pauses to report relatively complex information needing Chinese-first clear complex communication, alignment, multi-option choice, status/incident, long-task fact ledgers, implementation plans, reviews, maps, explainers, evidence, risks, validation, or handoff; choose plain text/Markdown/visual Markdown/HTML by decision cost; do not load merely because answer is long; skip trivial chat/bundled apps.
 ---
 
 # Effective Interact
@@ -10,11 +9,11 @@ Help complex communication: understand, compare, decide, continue. HTML is an es
 
 ## Default Load And Communication Gate
 
-Default: do not load this skill merely because the answer may exceed roughly 200 Chinese characters. 200 Chinese characters and 3 or more independent points are auxiliary signals. The primary trigger is the user decision need: understand, compare, choose, verify, approve, continue, or take over. Loading runs a communication-worthiness check.
+Default: load this skill whenever the agent is about to pause and report relatively complex information if structure lowers cost. It does not have to wait for an owner workflow to select it. It does not replace the owner workflow or decide substantive scope. Do not load merely because the answer may exceed roughly 200 Chinese characters. 200 Chinese characters and 3 or more independent points are auxiliary signals. The primary trigger is the user decision need: understand, compare, choose, verify, approve, continue, or take over. Loading runs a communication-worthiness check.
 
 Use the skill only when linear reply raises decision cost:
 
-- material repo/skill implementation, review, migration, OpenSpec, research, or validation needs evidence, risks, and next actions.
+- the agent is stopping to report material repo/skill implementation, review, migration, OpenSpec, research, or validation facts that need evidence, risks, and next actions.
 - 2 or more comparable options, findings, files, statuses, or scenarios have tradeoffs.
 - flow, state, timeline, map, call path, or architecture needs spatial structure.
 - user must choose, tune, sort, filter, copy, export, or inspect source anchors, code, diff, citations, evidence, or validation.
@@ -50,7 +49,7 @@ HTML escalation is forbidden when one compact Markdown table, one Mermaid diagra
 
 ## Trigger Examples
 
-Use for: 复杂状态汇报; long-task fact ledger; changed skill/repo behavior needing a plain-text handoff, file evidence, tests, risks, and validation gates; "Show the options so I can choose before you implement"; implementation plan with milestones; OpenSpec apply; PR review/PR writeup; HTML architecture walkthrough; side-by-side option gallery; design-system reference; component variant matrix; incident timeline; skill/repo structure tree; milestone dependency map; visual style option board; temporary triage, feature-flag, or prompt editor that exports Markdown, JSON, or diff.
+Use for: 复杂状态汇报; long-task fact ledger; changed skill/repo behavior needing a plain-text handoff, file evidence, tests, risks, and validation gates; "Show the options so I can choose before you implement"; implementation plan with milestones; OpenSpec apply; PR review/PR writeup; HTML architecture walkthrough; side-by-side option gallery; design-system reference; component variant matrix; incident timeline; temporary triage, feature-flag, or prompt editor that exports Markdown, JSON, or diff.
 
 Do not use this skill for:
 
@@ -61,13 +60,13 @@ Do not use this skill for:
 
 ## First-Principles Communication Contract
 
-Before choosing output shape, identify Reader need, Decision frame, first principles, and Evidence boundary. Rebuild from goal, audience, constraints, facts, inferences, assumptions, tradeoffs, and next action; important claims trace to source, command, file, or explicit assumption.
+Before choosing output shape, identify Reader need, Decision frame, first principles, and Evidence boundary. Rebuild from goal, audience, constraints, facts, inferences, assumptions, tradeoffs, and next action; important claims trace to source, command, file, or assumption.
 
-All modes start with BLUF: one-sentence conclusion plus reader intent, then the smallest structure that preserves reasoning. SCQA/PREP may shape reasoning, but the first visible sentence answers directly.
+All modes start with BLUF and the smallest structure that preserves reasoning. SCQA/PREP may shape reasoning, but the first visible sentence answers directly.
 
 ## Output Contract
 
-Start with the direct answer, not background. Keep top-level support to Top 3 mutually distinct points. Mark important claims as 事实 / 推断 / 假设 when uncertainty matters. Explain tradeoffs, include recommendation and rejected path, and end with a CTA or next action when the reader must approve, review, unblock, choose, or continue. Treat validator warnings as advisory: fix only when it lowers decision cost.
+Start with the direct answer, not background. Keep support to Top 3 mutually distinct points. Mark important claims as 事实 / 推断 / 假设 when uncertainty matters. Explain tradeoffs, recommendation, rejected path, and a CTA or next action when approval, review, unblock, choice, or continuation is needed. Treat validator warnings as advisory: fix only when it lowers decision cost.
 
 Handoff obligation exists only when changed behavior, multiple surfaces, validation evidence, remaining risk, or reviewer/user continuation matters. Tiny local work with one obvious command result stays brief.
 
@@ -83,7 +82,7 @@ Use grouped navigation with a return-to-overview path. 流程、路由、调用�
 
 ## Long Task Fact Ledger
 
-For long work where state may drift, keep optional JSONL at `skills/effective-interact/artifacts/session-ledgers/<task-slug>.jsonl`. Record checkpoints, data/status, tool-result summaries, decisions, assumptions, verification, blockers, and next actions. Use it for claims, evidence, timelines, status, handoff, or HTML artifacts. Never record secrets, credentials, raw large logs, copyrighted text, hidden persistence, or artifact writes. See `references/session-ledger-schema.json`.
+For long work where state may drift, keep optional JSONL at `skills/effective-interact/artifacts/session-ledgers/<task-slug>.jsonl`. Record checkpoints, data/status, tool-result summaries, decisions, assumptions, verification, blockers, and next actions for claims, evidence, timelines, status, handoff, or HTML artifacts. Never record secrets, credentials, raw large logs, copyrighted text, hidden persistence, or artifact writes. See `references/session-ledger-schema.json`.
 
 ## Generator First Workflow
 
@@ -103,4 +102,4 @@ Hand-write HTML only when the generator cannot express the needed local editor o
 
 ## Verification
 
-Before HTML handoff, run `scripts/validate-interaction.mjs`; prefer `--require-browser`. Report degradation honestly. Read `references/interaction-patterns.md`, `references/html-effectiveness-patterns.md`, `references/session-ledger-schema.json`, and `evals/routing-cases.json` before changing trigger or HTML escalation rules.
+Before HTML handoff, run `scripts/validate-interaction.mjs`; report degradation. Read `references/interaction-patterns.md`, `references/html-effectiveness-patterns.md`, `references/html-aesthetic-preflight.md`, `references/session-ledger-schema.json`, and `evals/routing-cases.json` before changing trigger or HTML rules.

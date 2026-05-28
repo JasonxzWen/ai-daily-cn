@@ -30,8 +30,8 @@
     "renderMode": {
       "type": "string",
       "enum": ["runtime-cdn", "pre-rendered", "fallback-only", "runtime"],
-      "default": "runtime-cdn",
-      "description": "`runtime` is a legacy alias accepted by the generator and normalized to `runtime-cdn`."
+      "default": "pre-rendered",
+      "description": "`runtime` is a legacy alias accepted by the generator and normalized to `runtime-cdn`. Use `runtime-cdn` only when browser-required validation is available."
     },
     "showRuntimeDependencies": {
       "type": "boolean",

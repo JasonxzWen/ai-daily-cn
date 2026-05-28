@@ -1,0 +1,89 @@
+{
+  "title": "Codex self-improving loop and Skill Hub",
+  "summary": "A source-backed insight post should convert external material into project-specific iteration evidence.",
+  "status": "draft",
+  "template": "research-explainer",
+  "renderMode": "fallback-only",
+  "intent": {
+    "audience": "Skill Hub maintainer",
+    "primaryQuestion": "How should external material change Skill Hub iteration?",
+    "decision": "Publish source-backed project insight and iteration records.",
+    "artifactKind": "research",
+    "successCriteria": [
+      "Facts and inferences are separated.",
+      "Every public claim links back to source metadata.",
+      "Project actions are bounded to the current iteration."
+    ]
+  },
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "Source Claims",
+      "group": "evidence",
+      "status": "info",
+      "content": "- **fact** `claim-trace-to-eval`: Production traces can become structured evidence for iterative agent improvements."
+    },
+    {
+      "type": "markdown",
+      "title": "Viewpoint Extraction",
+      "group": "main",
+      "status": "info",
+      "content": "- `view-evidence-loop`: External reading should become evidence-backed iteration, not a detached summary. Trace: `claim-trace-to-eval`."
+    },
+    {
+      "type": "markdown",
+      "title": "Project Mapping",
+      "group": "impact",
+      "status": "ready",
+      "content": "- **effective-interact**: Use it as the first draft layer for public insight posts. Action: generate a publishable HTML draft from a structured insight input."
+    },
+    {
+      "type": "markdown",
+      "title": "Iteration Record",
+      "group": "changes",
+      "status": "ready",
+      "content": "### Changed\n- Treat insight posts as durable project iteration records.\n\n### Confirmed\n- Do not turn source material into rewritten source summaries."
+    },
+    {
+      "type": "markdown",
+      "title": "Action Boundary",
+      "group": "next",
+      "status": "ready",
+      "content": "### Now\n- Add source-ledger and Pages preflight.\n\n### Not Now\n- Do not build a broad CMS."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "openai-tax-agents",
+      "kind": "source",
+      "label": "Building self-improving tax agents with Codex",
+      "value": "Used as product inspiration, not copied as article text.",
+      "status": "info",
+      "sourceUrl": "https://openai.com/index/building-self-improving-tax-agents-with-codex/",
+      "sourceTitle": "Building self-improving tax agents with Codex",
+      "sourceType": "blog",
+      "accessedAt": "2026-05-28",
+      "trustLevel": "mixed-trust",
+      "knownLimits": [
+        "Source text is used for attribution and bounded excerpts only."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-trace-to-eval",
+      "statement": "[fact] Production traces can become structured evidence for iterative agent improvements.",
+      "kind": "conclusion",
+      "evidenceIds": [
+        "openai-tax-agents"
+      ],
+      "confidence": "high",
+      "knownLimits": [
+        "Original claim kind: fact"
+      ]
+    }
+  ],
+  "nextActions": [
+    "Add source-ledger and Pages preflight."
+  ]
+}
