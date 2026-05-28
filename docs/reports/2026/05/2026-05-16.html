@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,79 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-16 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-16</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <ul class="hero-summary-text hero-summary-list"><li>今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役…</li><li>由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险</li></ul>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-16 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-16 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-16</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-16</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>5</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>5</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>Google I/O</strong>：今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役和替换节点，GitHub 继续把 …</li><li><strong>日期范围</strong>：由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险</li></ul></div>
-    <template data-rich-source data-source-fallback>- **Google I/O**：今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役和替换节点，GitHub 继续把 …
-- **日期范围**：由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1474,47 +1579,42 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI 在 ChatGPT 中推出个人财务体验</strong>（2026-05-15，T0）</p>
-<ul><li>该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。</li><li>OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。</li><li>对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。</li><li>来源：<a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">OpenAI Help Center</a></li></ul>
-<p>2. <strong>xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3</strong>（2026-05-15，T0）</p>
-<ul><li>退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。</li><li>reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。</li><li>文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。</li><li>来源：<a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">xAI Docs</a></li></ul>
-<p>3. <strong>Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点</strong>（2026-05-15，T0）</p>
-<ul><li>该模型原本作为 Public Preview 暴露为 `databricks-meta-llama-3-1-405b-instruct`，上下文窗口为 128K，适合多步推理和合成数据等任务。</li><li>Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。</li><li>使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。</li><li>来源：<a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" rel="noopener noreferrer">Databricks Docs</a></li></ul>
-<p>4. <strong>GitHub 合并推进 Copilot app 和 cloud agent 自动选模</strong>（2026-05-14，T0）</p>
-<ul><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。</li><li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。</li><li>对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。</li><li>来源：<a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
-<p>5. <strong>Google 为 Genkit 发布 middleware 控制层</strong>（2026-05-14，T0）</p>
-<ul><li>Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。</li><li>首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。</li><li>这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。</li><li>来源：<a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Google Developers Blog</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI 在 ChatGPT 中推出个人财务体验**（2026-05-15，T0）
+    <div class="rendered-markdown"><ol><li><strong><a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">OpenAI Help Center：OpenAI 在 ChatGPT 中推出个人财务体验</a></strong>（2026-05-15，T0）</li></ol>
+<ul><li>该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。</li><li>OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。</li><li>对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。</li></ul>
+<ol start="2"><li><strong><a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">xAI Docs：xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3</a></strong>（2026-05-15，T0）</li></ol>
+<ul><li>退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。</li><li>reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。</li><li>文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。</li></ul>
+<ol start="3"><li><strong><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" rel="noopener noreferrer">Databricks Docs：Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点</a></strong>（2026-05-15，T0）</li></ol>
+<ul><li>该模型原本作为 Public Preview 暴露为 `databricks-meta-llama-3-1-405b-instruct`，上下文窗口为 128K，适合多步推理和合成数据等任务。</li><li>Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。</li><li>使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。</li></ul>
+<ol start="4"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC" alt="GitHub Changelog" loading="lazy" decoding="async"> <strong><a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Changelog：GitHub 合并推进 Copilot app 和 cloud agent 自动选模</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。</li><li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。</li><li>对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。</li></ul>
+<ol start="5"><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Google Developers Blog：Google 为 Genkit 发布 middleware 控制层</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。</li><li>首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。</li><li>这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. **[OpenAI Help Center：OpenAI 在 ChatGPT 中推出个人财务体验](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)**（2026-05-15，T0）
   - 该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。
   - OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。
   - 对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。
-  - 来源：[OpenAI Help Center](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)
 
-2. **xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3**（2026-05-15，T0）
+2. **[xAI Docs：xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3](https://docs.x.ai/developers/migration/may-15-retirement)**（2026-05-15，T0）
   - 退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。
   - reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。
   - 文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。
-  - 来源：[xAI Docs](https://docs.x.ai/developers/migration/may-15-retirement)
 
-3. **Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点**（2026-05-15，T0）
+3. **[Databricks Docs：Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点](https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models)**（2026-05-15，T0）
   - 该模型原本作为 Public Preview 暴露为 `databricks-meta-llama-3-1-405b-instruct`，上下文窗口为 128K，适合多步推理和合成数据等任务。
   - Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。
   - 使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。
-  - 来源：[Databricks Docs](https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models)
 
-4. **GitHub 合并推进 Copilot app 和 cloud agent 自动选模**（2026-05-14，T0）
+4. ![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC) **[GitHub Changelog：GitHub 合并推进 Copilot app 和 cloud agent 自动选模](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)**（2026-05-14，T0）
   - Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。
   - Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。
   - 对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。
-  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)
 
-5. **Google 为 Genkit 发布 middleware 控制层**（2026-05-14，T0）
+5. **[Google Developers Blog：Google 为 Genkit 发布 middleware 控制层](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)**（2026-05-14，T0）
   - Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。
   - 首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。
-  - 这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。
-  - 来源：[Google Developers Blog](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)</template>
+  - 这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1562,7 +1662,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1571,36 +1671,35 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。 <a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">来源</a></li><li>Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。 <a href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">来源</a></li><li>Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。 <a href="https://www.anthropic.com/news/gates-foundation-partnership" rel="noopener noreferrer">来源</a></li><li>AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。 <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。 [来源](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)
+    <div class="rendered-markdown"><ul><li>OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。 <a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">来源</a></li><li>Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。 <a href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">来源</a></li><li>Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。 <a href="https://www.anthropic.com/news/gates-foundation-partnership" rel="noopener noreferrer">来源</a></li><li>AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。 <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。 [来源](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)
 - Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。 [来源](https://huggingface.co/blog/continuous_async)
 - Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。 [来源](https://www.anthropic.com/news/gates-foundation-partnership)
 - AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。 [来源](https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><p>未记录信源审计。</p></div>
-    <template data-rich-source data-source-fallback>未记录信源审计。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+    <template data-rich-source data-source-fallback>未记录信源审计。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：5</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮 2026-05-15 新增 T0 工程/产品条目不足 5 条，扩展到 2026-05-14..2026-05-16。xAI 在上一期仅因缺少 dated changelog 被列为社区线索，本轮迁移页 last updated 2026-05-14 且明确 2026-05-15 生效，升级为主体。GitHub Copilot app 与 Genkit Middleware 与上一期重叠，因仍在 48 小时窗口内且主体数量不足而保留；OpenAI Codex remote、Hugging Face、Anthropic、AWS 等上一期主体降级为社区线索。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>48 小时扩展会把上一期主体重新带入候选集，容易形成跨日报重复。</strong></li><li>为什么要改：在主体不足时优先补入未覆盖的 dated official docs 或模型生命周期节点，减少重复阅读负担。</li><li><strong>模型退役和重定向通常出现在官方 docs，而不是 blog 或 changelog，现有规则容易把它们降级。</strong></li><li>为什么要改：把带生效日期和 last updated 的官方迁移文档纳入可入主体的 T0 来源，提升模型生命周期覆盖。</li><li><strong>搜索摘要中的发布日期可能与源页面正文日期不一致。</strong></li><li>为什么要改：要求最终日期以源页面正文或机器可解析元数据为准，降低旧事件被包装成新事件的风险。</li></ul>
@@ -1621,8 +1720,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **搜索摘要中的发布日期可能与源页面正文日期不一致。**
   - 为什么要改：要求最终日期以源页面正文或机器可解析元数据为准，降低旧事件被包装成新事件的风险。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-16.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-16.json)</template></div>
+  </details>
 
 
 

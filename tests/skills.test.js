@@ -122,6 +122,199 @@ test("effective-interact hero highlight renders link and reason as full-width st
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
+test("effective-interact can hide hero summary and navigation while keeping report stats", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hide-hero-summary-"));
+  const inputPath = path.join(tmp, "hide-hero-summary.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-05-28",
+      summary: "- **[Hidden highlight](https://example.com)**: this should not render in the hero.",
+      hideHeroSummary: true,
+      hideNavigation: true,
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      intent: {
+        primaryQuestion: "What changed?",
+        decision: "Keep the hero concise.",
+        successCriteria: ["Hero summary is suppressed."]
+      },
+      nextActions: ["Follow up"],
+      sections: [
+        {
+          type: "markdown",
+          title: "Main",
+          content: "- Verified item."
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "hide-hero-summary", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const body = html.slice(html.indexOf("<body>"));
+  assert.match(body, /class="hero-brief hero-brief-single"/);
+  assert.match(body, /hero-stat-grid/);
+  assert.doesNotMatch(body, /hero-summary-text/);
+  assert.doesNotMatch(body, /hero-highlight-list/);
+  assert.doesNotMatch(body, /Hidden highlight/);
+  assert.doesNotMatch(body, /report-nav/);
+  assert.doesNotMatch(body, /速览/);
+});
+
+test("effective-interact date-only hero renders only the visible date", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-date-only-hero-"));
+  const inputPath = path.join(tmp, "date-only-hero.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-05-28",
+      summary: "This summary should stay outside the hero.",
+      heroMode: "date-only",
+      heroTitle: "2026-05-28",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      intent: {
+        primaryQuestion: "What changed?",
+        decision: "Keep only the date in the hero.",
+        successCriteria: ["No status or intent cards."]
+      },
+      nextActions: ["Follow up"],
+      sections: [
+        {
+          type: "markdown",
+          title: "Main",
+          content: "- Verified item."
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "date-only-hero", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const start = html.indexOf('<header id="report-top"');
+  const end = html.indexOf("</header>", start) + "</header>".length;
+  const header = html.slice(start, end);
+  assert.match(header, /report-hero-minimal/);
+  assert.match(header, /class="report-title report-date-title">2026-05-28<\/h1>/);
+  assert.doesNotMatch(header, /AI Daily/);
+  assert.doesNotMatch(header, /eyebrow/);
+  assert.doesNotMatch(header, /status-pill/);
+  assert.doesNotMatch(header, /hero-stat-grid/);
+  assert.doesNotMatch(header, /hero-decision-grid/);
+  assert.doesNotMatch(header, /What changed\?/);
+  assert.doesNotMatch(header, /Follow up/);
+});
+
+test("effective-interact can collapse appendix sections and next actions by default", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-collapsed-appendix-"));
+  const inputPath = path.join(tmp, "collapsed-appendix.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-05-28",
+      summary: "Collapsed appendix check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      nextActionsCollapsed: true,
+      nextActions: ["Tighten source checks"],
+      sections: [
+        {
+          type: "markdown",
+          title: "Source Audit",
+          group: "verification",
+          appendix: true,
+          appendixLabel: "Appendix",
+          collapsed: true,
+          summary: "Trace details only.",
+          content: "- Retried discovery once."
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "collapsed-appendix", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const appendix = html.match(/<details class="panel rich-section collapsible-panel appendix-panel"[^>]*id="section-source-audit-1"[\s\S]*?<\/details>/)?.[0] || "";
+  assert(appendix);
+  assert.match(appendix, /data-section-collapsed="true"/);
+  assert.match(appendix, /data-section-appendix="true"/);
+  assert.match(appendix, /<span class="meta">Appendix<\/span>/);
+  assert.match(appendix, /<span class="collapsible-title">Source Audit<\/span>/);
+  assert.match(appendix, /Retried discovery once/);
+  assert.doesNotMatch(appendix.match(/^<details[^>]+>/)?.[0] || "", /\sopen(?:\s|>)/);
+
+  const nextActions = html.match(/<details class="panel supplemental-panel collapsible-panel appendix-panel"[^>]*id="next-actions"[\s\S]*?<\/details>/)?.[0] || "";
+  assert(nextActions);
+  assert.match(nextActions, /<span class="collapsible-title">下一步<\/span>/);
+  assert.match(nextActions, /Tighten source checks/);
+  assert.doesNotMatch(nextActions.match(/^<details[^>]+>/)?.[0] || "", /\sopen(?:\s|>)/);
+});
+
+test("effective-interact pre-rendered markdown keeps ordered lists and highlight tags", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-ordered-list-"));
+  const inputPath = path.join(tmp, "ordered-list.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-05-28",
+      summary: "Ordered list check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "GitHub Trending",
+          content: "1. ![GitHub](data:image/png;base64,iVBORw0KGgo=) **[example/repo](https://github.com/example/repo)** ==new==：示例项目。"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "ordered-list", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /<ol><li><img class="inline-site-icon"/);
+  assert.match(html, /<strong><a href="https:\/\/github\.com\/example\/repo"/);
+  assert.match(html, /<mark class="text-highlight">new<\/mark>/);
+  assert.doesNotMatch(html, /<ul><li>1\./);
+});
+
 test("effective-interact filterable cards render linked project subcards", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-project-cards-"));
   const inputPath = path.join(tmp, "project-cards.json");
@@ -144,9 +337,14 @@ test("effective-interact filterable cards render linked project subcards", async
               group: "PROJECTS",
               title: "Project Alpha",
               href: "https://example.com/project-alpha",
-              body: "A reusable plugin set for agent workflows.",
+              body: "A **reusable** plugin set for ==agent workflows==. <script>alert(1)</script>",
               tags: ["daily signal"],
               points: [
+                {
+                  label: "Publisher",
+                  value: "Hugging Face",
+                  icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4="
+                },
                 { label: "领域", value: "agent、workflow" },
                 { label: "作用", value: "Use for repeatable workflows." }
               ]
@@ -170,7 +368,10 @@ test("effective-interact filterable cards render linked project subcards", async
   assert.match(html, /project-card/);
   assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
   assert.match(html, /card-detail-list/);
+  assert.match(html, /card-detail-icon/);
   assert.match(html, /<dt>领域<\/dt>/);
+  assert.match(html, /A <strong>reusable<\/strong> plugin set for <mark class="text-highlight">agent workflows<\/mark>\./);
+  assert.doesNotMatch(html, /<script>alert/);
   assert.match(html, /Use for repeatable workflows\./);
 
   const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
@@ -178,6 +379,57 @@ test("effective-interact filterable cards render linked project subcards", async
     encoding: "utf8"
   });
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
+test("effective-interact filterable cards can hide visual group labels", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hidden-card-group-"));
+  const inputPath = path.join(tmp, "hidden-card-group.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-05-28",
+      summary: "Blog card hierarchy check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "热门技术博客",
+          group: "main",
+          cardClass: "blog-card",
+          showFilters: false,
+          items: [
+            {
+              group: "LOCAL SPEECH-TO-SPEECH AGENT STACK",
+              showGroup: false,
+              title: "Reachy Mini goes fully local",
+              href: "https://huggingface.co/blog/reachy-mini",
+              tags: ["LOCAL SPEECH-TO-SPEECH AGENT STACK"],
+              body: "这篇文章说明本地语音 agent 栈。"
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "hidden-card-group", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const card = html.match(/<article class="interactive-card evidence-card evidence-spotlight blog-card"[\s\S]*?<\/article>/)?.[0] || "";
+  assert(card);
+  assert.match(card, /data-filter-value="LOCAL SPEECH-TO-SPEECH AGENT STACK"/);
+  assert.doesNotMatch(card, /<div class="meta">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/div>/);
+  assert.match(card, /<h3><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
+  assert.match(card, /<span class="chip">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/span>/);
 });
 
 test("GitHub Pages deployment workflow publishes the generated docs artifact", async () => {

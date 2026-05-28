@@ -131,6 +131,12 @@ export function requireCandidateCoverage(report, candidatePool) {
           message: `条目 event_date 必须与候选 event_date 一致：${item.candidate_id}`
         });
       }
+      if (requiresPrimaryVerification(sectionName, candidate) && !hasPrimaryVerification(candidate)) {
+        errors.push({
+          path: `${pathName}.candidate_id`,
+          message: `candidate_id 未完成一手或多源核验，不能进入 ${sectionName}：${item.candidate_id}`
+        });
+      }
     });
   }
 
@@ -139,6 +145,17 @@ export function requireCandidateCoverage(report, candidatePool) {
       errors
     });
   }
+}
+
+function requiresPrimaryVerification(sectionName, candidate) {
+  if (!["main_items", "model_releases", "hot_blogs", "projects"].includes(sectionName)) {
+    return false;
+  }
+  return Boolean(candidate.verification_status || candidate.intermediary_url || candidate.original_url);
+}
+
+function hasPrimaryVerification(candidate) {
+  return ["primary_confirmed", "multi_source_confirmed"].includes(candidate.verification_status);
 }
 
 export async function writeCandidatePool(outputDir, reportDate, candidatePool) {

@@ -1,8 +1,8 @@
 import { reportRelativePaths, relativeAssetHref } from "./paths.js";
 import {
+  cleanGithubTrendDescription,
   cleanProjectDescription,
-  githubTrendMovementLabel,
-  githubTrendTags,
+  githubTrendStatusTag,
   modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
@@ -474,39 +474,28 @@ function renderGithubTrendingSection(items) {
   }
 
   return `<section class="section" id="github-trending">
-      <h2>GitHub Trending 趋势</h2>
+      <h2>GitHub Trending</h2>
       ${renderGithubTrending(items)}
     </section>`;
 }
 
 function renderGithubTrending(items) {
   return `<table class="project-table">
-  <thead><tr><th>排名</th><th>项目</th><th>趋势</th><th>说明</th></tr></thead>
+  <thead><tr><th>榜位</th><th>项目</th><th>变化</th><th>简介</th></tr></thead>
   <tbody>
     ${items
-      .slice(0, 8)
+      .slice(0, 10)
       .map(
         (item) =>
-          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}${renderTrendTags(item)}</td><td>${escapeHtml(githubTrendMovementLabel(item))}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
+          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([githubTrendStatusTag(item)])}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
       )
       .join("\n")}
   </tbody>
 </table>`;
 }
 
-function renderTrendTags(item) {
-  const tags = githubTrendTags(item).filter((tag) => !String(tag).startsWith("#"));
-  if (tags.length === 0) {
-    return "";
-  }
-  return `<div class="tag-row">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>`;
-}
-
 function renderGithubTrendDetails(item) {
-  const previous = item.previous_rank ? `昨日 #${item.previous_rank}。` : "";
-  const source = item.source ? `来源：${item.source}。` : "";
-  const language = item.language ? `语言：${item.language}。` : "";
-  return `<p>${escapeHtml(cleanProjectDescription(item.description))}</p><p class="muted">${escapeHtml(`${previous}${source}${language}`)}</p>`;
+  return `<p>${escapeHtml(cleanGithubTrendDescription(item))}</p>`;
 }
 
 function renderProjectsSection(projects) {
@@ -610,6 +599,8 @@ function renderSourceAudit(audit) {
         ${renderAuditGroup("GitHub Trending", audit.github_trending)}
         ${renderAuditGroup("Builder 原始源", audit.builder_sources)}
         ${audit.content_sources ? renderAuditGroup("热门博客与访谈源", audit.content_sources) : ""}
+        ${audit.search_sources ? renderAuditGroup("搜索 / 新闻影子源", audit.search_sources) : ""}
+        ${audit.sources_health ? renderAuditGroup("信源健康检查", audit.sources_health) : ""}
       </div>
     </section>`;
 }

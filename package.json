@@ -11,7 +11,7 @@
     "test": "node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js tests/openspec.test.js",
     "test:e2e": "node scripts/run-e2e.mjs",
     "validate:openspec": "node scripts/validate-openspec.mjs add-ai-daily-static-publishing",
-    "validate": "npm run test && npm run build && npm run test:e2e && npm run validate:openspec && git diff --check",
+    "validate": "npm run sources:validate && npm run test && npm run build && npm run test:e2e && npm run validate:openspec && git diff --check",
     "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
     "publish:preflight": "node src/cli.js publish:preflight",
     "publish:dry-run": "node src/cli.js publish:dry-run --data-input reports-data --input reports-source --out docs",
@@ -20,6 +20,11 @@
     "discover:github-trending": "node src/cli.js discover:github-trending",
     "discover:builders": "node src/cli.js discover:builders",
     "discover:content-sources": "node src/cli.js discover:content-sources",
+    "discover:search-news": "node src/cli.js discover:search-news",
+    "sources:validate": "node src/cli.js sources:validate",
+    "sources:health": "node src/cli.js sources:health",
+    "sources:audit-merge": "node src/cli.js sources:audit-merge",
+    "sources:phase5-audit": "node src/cli.js sources:phase5-audit",
     "discover:statuspage-incidents": "node src/cli.js discover:statuspage-incidents"
   },
   "devDependencies": {

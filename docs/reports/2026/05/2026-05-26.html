@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,79 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-26 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-26</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <ul class="hero-summary-text hero-summary-list"><li>2026-05-26 这版日报保留 3 条主体信息：Salesforce Agentforce 的 Claude Sonnet 4 路由切换今天生效，Google Works…</li><li>GitHub Trending 与 Builder feed 在当前环境抓取失败，没有用旧项目或旧帖子补齐页面</li></ul>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-26 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-26 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-26</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="热门技术博客" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
-<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-26</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>3</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>1</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>安全扫描</strong>：2026-05-26 这版日报保留 3 条主体信息：Salesforce Agentforce 的 Claude Sonnet 4 路由切换今天生效，Google Workspace 的 Gemini Cha…</li><li><strong>开源项目</strong>：GitHub Trending 与 Builder feed 在当前环境抓取失败，没有用旧项目或旧帖子补齐页面</li></ul></div>
-    <template data-rich-source data-source-fallback>- **安全扫描**：2026-05-26 这版日报保留 3 条主体信息：Salesforce Agentforce 的 Claude Sonnet 4 路由切换今天生效，Google Workspace 的 Gemini Cha…
-- **开源项目**：GitHub Trending 与 Builder feed 在当前环境抓取失败，没有用旧项目或旧帖子补齐页面</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1474,31 +1579,28 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6</strong>（2026-05-26，T0）</p>
-<ul><li>这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。</li><li>团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。</li><li>同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。</li><li>来源：<a href="https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;amp;language=en_US&amp;amp;type=5" rel="noopener noreferrer">Salesforce Help</a></li></ul>
-<p>2. <strong>Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力</strong>（2026-05-26，T0）</p>
-<ul><li>Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。</li><li>Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。</li><li>Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。</li><li>来源：<a href="https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html" rel="noopener noreferrer">Google Workspace Updates</a></li></ul>
-<p>3. <strong>Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident</strong>（2026-05-25，T0）</p>
-<ul><li>这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。</li><li>状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。</li><li>如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。</li><li>来源：<a href="https://status.claude.com/" rel="noopener noreferrer">Claude Status</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6**（2026-05-26，T0）
+    <div class="rendered-markdown"><ol><li><strong><a href="https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;amp;language=en_US&amp;amp;type=5" rel="noopener noreferrer">Salesforce Help：Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6</a></strong>（2026-05-26，T0）</li></ol>
+<ul><li>这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。</li><li>团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。</li><li>同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。</li></ul>
+<ol start="2"><li><strong><a href="https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html" rel="noopener noreferrer">Google Workspace Updates：Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力</a></strong>（2026-05-26，T0）</li></ol>
+<ul><li>Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。</li><li>Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。</li><li>Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。</li></ul>
+<ol start="3"><li><strong><a href="https://status.claude.com/" rel="noopener noreferrer">Claude Status：Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident</a></strong>（2026-05-25，T0）</li></ol>
+<ul><li>这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。</li><li>状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。</li><li>如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. **[Salesforce Help：Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6](https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;language=en_US&amp;type=5)**（2026-05-26，T0）
   - 这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。
   - 团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。
   - 同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。
-  - 来源：[Salesforce Help](https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;language=en_US&amp;type=5)
 
-2. **Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力**（2026-05-26，T0）
+2. **[Google Workspace Updates：Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力](https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html)**（2026-05-26，T0）
   - Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。
   - Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。
   - Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。
-  - 来源：[Google Workspace Updates](https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html)
 
-3. **Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident**（2026-05-25，T0）
+3. **[Claude Status：Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident](https://status.claude.com/)**（2026-05-25，T0）
   - 这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。
   - 状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。
-  - 如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。
-  - 来源：[Claude Status](https://status.claude.com/)</template>
+  - 如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1507,10 +1609,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/" rel="noopener noreferrer">AI Debt, Shadow AI Force a Platform Rethink</a></strong>（Platform Engineering / Nathan Eddy，2026-05-25）：文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[AI Debt, Shadow AI Force a Platform Rethink](https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/)**（Platform Engineering / Nathan Eddy，2026-05-25）：文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Platform governance for AI-generated code" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/" rel="noopener noreferrer">AI Debt, Shadow AI Force a Platform Rethink</a></h3>
+    <div class="card-tags"><span class="chip">Platform governance for AI-generated code</span></div>
+    <p>文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Platform Engineering</span></dd></div><div><dt>作者</dt><dd><span>Nathan Eddy</span></dd></div><div><dt>日期</dt><dd><span>2026-05-25</span></dd></div></dl>
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1519,21 +1629,19 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 <a href="https://www.benchflow.ai/blog" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 [来源](https://www.benchflow.ai/blog)</template>
+    <div class="rendered-markdown"><ul><li>BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 <a href="https://www.benchflow.ai/blog" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 [来源](https://www.benchflow.ai/blog)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><h4>GitHub Trending</h4>
 <ul><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>说明：项目区保持空数组；没有把无法确认 event_date 的趋势排名写成项目更新。</li></ul>
 <ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：blocked，npm run discover:github-trending -- 50 returned fetch failed.</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：blocked，npm run discover:github-trending -- 50 returned fetch failed.</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending Python/TypeScript/Rust/Go</a>：blocked，The discovery command could not fetch language trending pages in this shell.</li><li><a href="https://ossinsight.io/trending/ai" rel="noopener noreferrer">OSSInsight AI Trending</a>：checked，Web search showed 28-day movers, but no per-repo dated release or commit was suitable for today&#39;s project table.</li></ul>
@@ -1560,17 +1668,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - 说明：Builder 观察保持空数组；没有使用四周前的 X posts 或 podcast。
 
 - [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：blocked，node prepare-digest.js failed with fetch failed.
-- [follow-builders local cache](https://github.com/zarazhangrui/follow-builders)：no_signal，Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+- [follow-builders local cache](https://github.com/zarazhangrui/follow-builders)：no_signal，Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。</strong></li><li>为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。</li><li><strong>follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。</strong></li><li>为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。</li><li><strong>状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。</strong></li><li>为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。</li></ul>
@@ -1591,8 +1700,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。**
   - 为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json)</template></div>
+  </details>
 
 
 

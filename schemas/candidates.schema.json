@@ -53,7 +53,7 @@
           "$ref": "#/$defs/absolute_url"
         },
         "category": {
-          "enum": ["official_release", "github_trending", "builder", "blog", "community", "model_registry", "repository", "other"]
+          "enum": ["official_release", "github_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"]
         },
         "status": {
           "enum": ["checked", "blocked", "no_signal"]
@@ -64,6 +64,58 @@
         },
         "notes": {
           "type": "string"
+        },
+        "intermediary_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "primary_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "original_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "verification_status": {
+          "enum": ["primary_confirmed", "multi_source_confirmed", "intermediary_only", "original_social_only", "unverified"]
+        },
+        "verification_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
+        "signal": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "language": {
+          "type": "string"
+        },
+        "window": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        },
+        "previous_rank": {
+          "type": ["integer", "null"]
+        },
+        "rank_delta": {
+          "type": ["integer", "null"]
+        },
+        "trend": {
+          "enum": ["new", "up", "down", "same"]
         }
       }
     },
@@ -110,6 +162,25 @@
         },
         "notes": {
           "type": "string"
+        },
+        "intermediary_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "primary_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "original_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "verification_status": {
+          "enum": ["primary_confirmed", "multi_source_confirmed", "intermediary_only", "original_social_only", "unverified"]
+        },
+        "verification_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
         }
       }
     },

@@ -394,7 +394,17 @@ function renderInlineEmphasis(escaped) {
 function inlineMarkdown(text) {
   const escaped = escapeHtml(stripRawHtml(text));
   const links = [];
-  const withLinkTokens = escaped.replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, (_match, label, href) => {
+  const images = [];
+  const withImageTokens = escaped.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (_match, label, src) => {
+    const safe = safeDataImage(src);
+    const html = safe
+      ? `<img class="inline-site-icon" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}" loading="lazy" decoding="async">`
+      : "";
+    const token = `\u0000HTML_WORK_REPORT_IMAGE_${images.length}\u0000`;
+    images.push(html);
+    return token;
+  });
+  const withLinkTokens = withImageTokens.replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, (_match, label, href) => {
     const safe = safeLink(href);
     const renderedLabel = renderInlineEmphasis(label);
     const html = safe
@@ -404,7 +414,9 @@ function inlineMarkdown(text) {
     links.push(html);
     return token;
   });
-  return renderInlineEmphasis(withLinkTokens).replace(/\u0000HTML_WORK_REPORT_LINK_(\d+)\u0000/g, (_match, index) => links[Number(index)] || "");
+  return renderInlineEmphasis(withLinkTokens)
+    .replace(/\u0000HTML_WORK_REPORT_IMAGE_(\d+)\u0000/g, (_match, index) => images[Number(index)] || "")
+    .replace(/\u0000HTML_WORK_REPORT_LINK_(\d+)\u0000/g, (_match, index) => links[Number(index)] || "");
 }
 
 function parseHeroSummaryItems(value) {
@@ -510,6 +522,19 @@ function renderMarkdown(source) {
       continue;
     }
 
+    const orderedStart = line.match(/^\s*(\d+)[.)]\s+/);
+    if (orderedStart) {
+      const items = [];
+      const start = Number(orderedStart[1]);
+      while (index < lines.length && /^\s*\d+[.)]\s+/.test(lines[index])) {
+        items.push(`<li>${inlineMarkdown(lines[index].replace(/^\s*\d+[.)]\s+/, ""))}</li>`);
+        index += 1;
+      }
+      const startAttr = start > 1 ? ` start="${start}"` : "";
+      html.push(`<ol${startAttr}>${items.join("")}</ol>`);
+      continue;
+    }
+
     if (line.includes("|") && index + 1 < lines.length && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(lines[index + 1])) {
       const headers = splitTableRow(line);
       const rows = [];
@@ -528,6 +553,7 @@ function renderMarkdown(source) {
       lines[index].trim() &&
       !/^(#{1,3})\s+/.test(lines[index]) &&
       !/^\s*[-*]\s+/.test(lines[index]) &&
+      !/^\s*\d+[.)]\s+/.test(lines[index]) &&
       !(lines[index].includes("|") && index + 1 < lines.length && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(lines[index + 1]))
     ) {
       paragraph.push(lines[index]);
@@ -933,7 +959,39 @@ function fallbackMermaidSvg(source, title, message) {
 }
 
 function sectionAttrs(section) {
-  return `id="${escapeAttr(section.id)}" data-section-type="${escapeAttr(section.type)}" data-section-group="${escapeAttr(section.group)}" data-section-status="${escapeAttr(section.status)}" data-trust-level="${escapeAttr(normalizeTrustLevel(section.trustLevel))}"`;
+  const collapsed = isCollapsedSection(section) ? ' data-section-collapsed="true"' : "";
+  const appendix = section.appendix === true ? ' data-section-appendix="true"' : "";
+  return `id="${escapeAttr(section.id)}" data-section-type="${escapeAttr(section.type)}" data-section-group="${escapeAttr(section.group)}" data-section-status="${escapeAttr(section.status)}" data-trust-level="${escapeAttr(normalizeTrustLevel(section.trustLevel))}"${collapsed}${appendix}`;
+}
+
+function isCollapsedSection(section) {
+  return section.collapsed === true || section.defaultCollapsed === true;
+}
+
+function collapsedSectionLabel(section) {
+  if (section.appendixLabel) return section.appendixLabel;
+  if (section.appendix === true) return "附录";
+  return groupLabels[section.group] || section.group || "详情";
+}
+
+function renderCollapsiblePanel(section, className, attrs, contentHtml) {
+  const summary = section.summary ? `<span class="collapsible-subtitle">${escapeHtml(section.summary)}</span>` : "";
+  const status = showSectionStatus(section.status)
+    ? `<span class="status-pill ${statusClass(section.status)}">${escapeHtml(statusLabel(section.status))}</span>`
+    : "";
+  const openAttr = section.open === true ? " open" : "";
+  const panelClass = `${className} collapsible-panel${section.appendix === true ? " appendix-panel" : ""}`;
+  return `<details class="${panelClass}" ${sectionAttrs(section)} ${attrs} data-collapsed-section${openAttr}>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">${escapeHtml(collapsedSectionLabel(section))}</span>
+        <span class="collapsible-title">${escapeHtml(section.title)}</span>
+        ${summary}
+      </span>
+      <span class="collapsible-summary-side">${status}<span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">${contentHtml}</div>
+  </details>`;
 }
 
 function renderSummaryCards(section) {
@@ -951,7 +1009,13 @@ function renderRuntimeMarkdown(section, index) {
   const statusId = `markdown-status-${index}`;
   const trustLevel = normalizeTrustLevel(section.trustLevel);
   const trustedAttr = trustLevel === "trusted-generated" ? ' data-trusted="true"' : "";
-  return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="pending" data-source-fallback>
+  const attrs = `data-rich-section data-rich-kind="markdown" data-render-state="pending" data-source-fallback`;
+  if (isCollapsedSection(section)) {
+    return renderCollapsiblePanel(section, "panel rich-section", attrs, `
+      <div class="rich-target" data-rich-markdown data-rich-status-id="${statusId}" data-rich-section-id="${escapeAttr(section.id)}"${trustedAttr}>${escapeHtml(safeAuditText(section.content || ""))}</div>
+      <template id="${sourceId}" data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>`);
+  }
+  return `<section class="panel rich-section" ${sectionAttrs(section)} ${attrs}>
     ${renderSectionHeader(section)}
     <div class="rich-target" data-rich-markdown data-rich-status-id="${statusId}" data-rich-section-id="${escapeAttr(section.id)}"${trustedAttr}>${escapeHtml(safeAuditText(section.content || ""))}</div>
     <template id="${sourceId}" data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
@@ -961,7 +1025,14 @@ function renderRuntimeMarkdown(section, index) {
 async function renderMarkdownSection(section, mode, index) {
   if (isRuntimeMode(mode)) return renderRuntimeMarkdown(section, index);
   const rendered = mode === "pre-rendered";
-  return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback>
+  const attrs = `data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback`;
+  const contentHtml = `
+    ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
+    <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>`;
+  if (isCollapsedSection(section)) {
+    return renderCollapsiblePanel(section, "panel rich-section", attrs, contentHtml);
+  }
+  return `<section class="panel rich-section" ${sectionAttrs(section)} ${attrs}>
     ${renderSectionHeader(section, rendered ? "ready" : "degraded")}
     ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
     <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
@@ -1070,17 +1141,30 @@ function renderCardDetails(points) {
   if (items.length === 0) {
     return "";
   }
-  return `<dl class="card-detail-list">${items.map((point) => `<div><dt>${escapeHtml(point.label || "Detail")}</dt><dd>${escapeHtml(point.value || "")}</dd></div>`).join("")}</dl>`;
+  return `<dl class="card-detail-list">${items.map((point) => {
+    const icon = safeDataImage(point.icon || point.iconDataUri || point.icon_data_uri || "");
+    const iconHtml = icon ? `<img class="card-detail-icon" src="${escapeAttr(icon)}" alt="" loading="lazy" decoding="async">` : "";
+    return `<div><dt>${escapeHtml(point.label || "Detail")}</dt><dd>${iconHtml}<span>${escapeHtml(point.value || "")}</span></dd></div>`;
+  }).join("")}</dl>`;
+}
+
+function safeDataImage(value) {
+  const src = String(value || "").trim();
+  if (/^data:image\/(?:svg\+xml|png|jpe?g|webp|gif);base64,[a-z0-9+/=]+$/i.test(src)) {
+    return src;
+  }
+  return "";
 }
 
 function renderFilterableCard(item, target, cardClass) {
   const group = item.group || "item";
   const className = ["interactive-card", "evidence-card", "evidence-spotlight", cardClass].filter(Boolean).join(" ");
+  const groupMeta = item.showGroup === false ? "" : `<div class="meta">${escapeHtml(group)}</div>`;
   return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}">
-    <div class="meta">${escapeHtml(group)}</div>
+    ${groupMeta}
     ${renderCardTitle(item)}
     ${renderCardTags(item.tags)}
-    <p>${escapeHtml(item.body || "")}</p>
+    <p>${inlineMarkdown(item.body || "")}</p>
     ${renderCardDetails(item.points)}
   </article>`;
 }
@@ -1378,6 +1462,36 @@ function supplementalSections(input, mode) {
   return sections;
 }
 
+function renderNextActionsSection(input) {
+  const actions = input.nextActions || [];
+  if (actions.length === 0) {
+    return "";
+  }
+
+  const summary = "只保留后续会真正改变行为的动作。";
+  const list = `<ul id="next-action-list" class="action-list">${actions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  if (input.nextActionsCollapsed === true) {
+    return renderCollapsiblePanel(
+      {
+        id: "next-actions",
+        type: "actions",
+        title: "下一步",
+        group: "next",
+        status: "info",
+        summary,
+        appendix: true,
+        appendixLabel: "附录",
+        collapsed: true
+      },
+      "panel supplemental-panel",
+      'data-report-region="actions"',
+      `<div class="appendix-actions-toolbar"><button data-copy-from="#next-action-list">复制行动项</button></div>${list}`
+    );
+  }
+
+  return `<section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">${summary}</p></div><button data-copy-from="#next-action-list">复制行动项</button></div>${list}</section>`;
+}
+
 async function createInteraction(input, options = {}) {
   validateInput(input);
   const { mode, compatibility } = normalizeRenderMode(input.renderMode);
@@ -1404,12 +1518,38 @@ async function createInteraction(input, options = {}) {
   ].join("\n");
 
   const extras = supplementalSections(input, mode);
-  const nav = renderGroupedNav([...normalizedSections, ...extras]);
-  const heroSummary = renderHeroSummary(input.summary);
-  const heroStats = renderHeroStats(input, normalizedSections.length + extras.length);
-  const heroBriefClass = heroStats ? "hero-brief" : "hero-brief hero-brief-single";
-  const heroDecisionGrid = renderHeroDecisionGrid(intent);
+  const showNavigation = input.hideNavigation !== true;
+  const nav = showNavigation ? renderGroupedNav([...normalizedSections, ...extras]) : "";
+  const heroMode = input.heroMode || "";
+  const showDateOnlyHero = heroMode === "date-only";
+  const heroTitle = input.heroTitle || input.title;
+  const showHeroSummary = !showDateOnlyHero && input.hideHeroSummary !== true;
+  const heroSummary = showHeroSummary ? renderHeroSummary(input.summary) : "";
+  const heroStats = showDateOnlyHero ? "" : renderHeroStats(input, normalizedSections.length + extras.length);
+  const heroBriefClass = heroStats && showHeroSummary ? "hero-brief" : "hero-brief hero-brief-single";
+  const heroBrief = heroSummary || heroStats
+    ? `<div class="${heroBriefClass}">
+        ${heroSummary}
+        ${heroStats}
+      </div>`
+    : "";
+  const heroDecisionGrid = showDateOnlyHero ? "" : renderHeroDecisionGrid(intent);
   const compatibilityBadge = compatibility ? `<span class="status-pill status-warn" data-render-compatibility="${escapeAttr(compatibility)}">${escapeHtml(compatibility)}</span>` : "";
+  const heroMarkup = showDateOnlyHero
+    ? `<header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
+    </header>`
+    : `<header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">${escapeHtml(meta.label)} | ${escapeHtml(meta.useCase)}</div>
+          <h1 class="report-title">${escapeHtml(input.title)}</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">状态：${escapeHtml(statusLabel(input.status))}</span>${compatibilityBadge}</div>
+      </div>
+      ${heroBrief}
+      ${heroDecisionGrid}
+    </header>`;
   const claimsSection = (input.claims || []).length > 0
     ? `<section class="panel supplemental-panel" id="claims" data-section-type="claims" data-section-group="claims" data-report-region="claims">${renderSupplementalHeading({ group: "claims", title: "关键判断", summary: "每条判断都保留证据入口和可信度。", status: "info" })}${renderClaims(input.claims || [])}</section>`
     : "";
@@ -1419,9 +1559,7 @@ async function createInteraction(input, options = {}) {
   const verificationSection = (input.verification || []).length > 0
     ? `<section class="panel supplemental-panel" id="verification" data-section-type="verification" data-section-group="verification" data-report-region="verification">${renderSupplementalHeading({ group: "verification", title: "验证", summary: "命令级验收和降级项。", status: "info" })}${renderVerification(input.verification || [])}</section>`
     : "";
-  const nextActionsSection = (input.nextActions || []).length > 0
-    ? `<section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list">${(input.nextActions || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`
-    : "";
+  const nextActionsSection = renderNextActionsSection(input);
 
   return stripTrailingWhitespace(`<!doctype html>
 <html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-template="${escapeAttr(template)}" data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
@@ -1436,20 +1574,7 @@ async function createInteraction(input, options = {}) {
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">${escapeHtml(meta.label)} | ${escapeHtml(meta.useCase)}</div>
-          <h1 class="report-title">${escapeHtml(input.title)}</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">状态：${escapeHtml(statusLabel(input.status))}</span>${compatibilityBadge}</div>
-      </div>
-      <div class="${heroBriefClass}">
-        ${heroSummary}
-        ${heroStats}
-      </div>
-      ${heroDecisionGrid}
-    </header>
+    ${heroMarkup}
 
     <div class="report-layout">
       ${nav}

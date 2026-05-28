@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { loadSourceRegistry } from "./source-registry.js";
 
 const GITHUB_BASE_URL = "https://github.com";
+const FETCH_RETRY_NOTES = new WeakMap();
 const OSSINSIGHT_TRENDING_SOURCE = source(
   "OSSInsight Trending Repos API",
   "https://api.ossinsight.io/v1/trends/repos/?period=past_24_hours&language=All",
@@ -13,6 +15,16 @@ const DEFAULT_FOLLOW_BUILDERS_FEEDS = {
   podcasts: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
   blogs: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json"
 };
+const X_SNOWFLAKE_EPOCH_MS = 1288834974657n;
+const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
+const DEFAULT_X_BUILDER_SEARCH_TERMS = [
+  "Claude Code",
+  "coding agents",
+  "CI coding agents",
+  "MCP Claude",
+  "Codex agent",
+  "AI agents"
+];
 
 export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending daily", "https://github.com/trending?since=daily", "all", "daily"),
@@ -85,6 +97,26 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
   },
   {
+    id: "content-techcrunch-enterprise",
+    name: "TechCrunch Enterprise",
+    url: "https://techcrunch.com/category/enterprise/feed/"
+  },
+  {
+    id: "content-the-verge-main",
+    name: "The Verge",
+    url: "https://www.theverge.com/rss/index.xml"
+  },
+  {
+    id: "content-ars-technica",
+    name: "Ars Technica",
+    url: "https://feeds.arstechnica.com/arstechnica/index"
+  },
+  {
+    id: "content-google-keyword",
+    name: "Google Keyword Blog",
+    url: "https://blog.google/rss/"
+  },
+  {
     id: "content-google-research",
     name: "Google Research Blog",
     url: "https://research.google/blog/rss/"
@@ -109,6 +141,26 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://www.microsoft.com/en-us/research/feed/"
   },
   {
+    id: "content-microsoft-official-blog",
+    name: "Official Microsoft Blog",
+    url: "https://blogs.microsoft.com/feed/"
+  },
+  {
+    id: "content-apple-newsroom",
+    name: "Apple Newsroom",
+    url: "https://www.apple.com/newsroom/rss-feed.rss"
+  },
+  {
+    id: "content-meta-newsroom",
+    name: "Meta Newsroom",
+    url: "https://about.fb.com/news/feed/"
+  },
+  {
+    id: "content-amazon-news",
+    name: "Amazon News",
+    url: "https://www.aboutamazon.com/news/rss"
+  },
+  {
     id: "content-latent-space",
     name: "Latent.Space",
     url: "https://www.latent.space/feed"
@@ -122,6 +174,13 @@ export const DEFAULT_CONTENT_SOURCES = [
     id: "content-product-hunt-devtools",
     name: "Product Hunt Developer Tools Feed",
     url: "https://www.producthunt.com/feed?category=developer-tools",
+    category: "project",
+    signal: "product_hunt"
+  },
+  {
+    id: "content-product-hunt-trending",
+    name: "Product Hunt Trending Feed",
+    url: "https://www.producthunt.com/feed",
     category: "project",
     signal: "product_hunt"
   },
@@ -150,12 +209,100 @@ export const DEFAULT_STATUSPAGE_SOURCES = [
   }
 ];
 
+export function createDiscoveryFetch(fetchImpl, options = {}) {
+  if (typeof fetchImpl !== "function") {
+    return fetchImpl;
+  }
+  if (fetchImpl.__aiDailyRetryWrapped) {
+    return fetchImpl;
+  }
+
+  const retries = Number.isInteger(options.fetchRetries)
+    ? options.fetchRetries
+    : Number.isInteger(options.retryCount)
+      ? options.retryCount
+      : 1;
+  const retryDelayMs = Number.isInteger(options.retryDelayMs)
+    ? options.retryDelayMs
+    : Number.isInteger(options.fetchRetryDelayMs)
+      ? options.fetchRetryDelayMs
+      : 1500;
+
+  const wrapped = async (url, init) => {
+    let lastError = null;
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+      try {
+        const response = await fetchImpl(url, init);
+        const retryableHttpStatus = shouldRetryHttpStatus(response?.status);
+        if (response?.ok) {
+          setRetryNote(response, attempt > 0 ? `retry_succeeded_after_${attempt}` : "");
+          return response;
+        }
+        if (!retryableHttpStatus) {
+          return response;
+        }
+        if (attempt >= retries) {
+          setRetryNote(response, attempt > 0 ? `retry_failed_after_${attempt}` : "");
+          return response;
+        }
+        lastError = new Error(`HTTP ${response.status}`);
+      } catch (error) {
+        lastError = error;
+        if (attempt >= retries || !isRetryableFetchError(error)) {
+          setRetryNote(error, attempt > 0 ? `retry_failed_after_${attempt}` : "");
+          throw error;
+        }
+      }
+
+      await sleep(retryDelayMs);
+    }
+
+    if (lastError) {
+      setRetryNote(lastError, `retry_failed_after_${retries}`);
+      throw lastError;
+    }
+    return fetchImpl(url, init);
+  };
+
+  Object.defineProperty(wrapped, "__aiDailyRetryWrapped", {
+    value: true,
+    enumerable: false
+  });
+  return wrapped;
+}
+
+function shouldRetryHttpStatus(status) {
+  return status === 408 || status === 429 || (Number.isInteger(status) && status >= 500);
+}
+
+function isRetryableFetchError(error) {
+  return /fetch failed|network|timeout|timed out|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ENOTFOUND/i.test(String(error?.message || error));
+}
+
+function setRetryNote(target, note) {
+  if (target && typeof target === "object" && note) {
+    FETCH_RETRY_NOTES.set(target, note);
+  }
+}
+
+function withRetryNote(notes, target) {
+  const note = target && typeof target === "object" ? FETCH_RETRY_NOTES.get(target) : "";
+  return note ? `${notes}; ${note}` : notes;
+}
+
+function sleep(ms) {
+  if (!ms || ms <= 0) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function collectGitHubTrending(options = {}) {
   if (options.browserExportPath || options.browserExport) {
     return collectGitHubTrendingFromBrowserExport(options);
   }
 
-  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
   if (typeof fetchImpl !== "function") {
     throw new Error("fetch is not available in this runtime");
   }
@@ -177,7 +324,7 @@ export async function collectGitHubTrending(options = {}) {
           name: currentSource.name,
           url: currentSource.url,
           status: "blocked",
-          notes: `HTTP ${response.status}`
+          notes: withRetryNote(`HTTP ${response.status}`, response)
         });
         continue;
       }
@@ -188,7 +335,7 @@ export async function collectGitHubTrending(options = {}) {
         name: currentSource.name,
         url: currentSource.url,
         status: parsed.length > 0 ? "checked" : "no_signal",
-        notes: `${parsed.length} repositories parsed`
+        notes: withRetryNote(`${parsed.length} repositories parsed`, response)
       });
 
       for (const candidate of parsed) {
@@ -201,7 +348,7 @@ export async function collectGitHubTrending(options = {}) {
         name: currentSource.name,
         url: currentSource.url,
         status: "blocked",
-        notes: error.message
+        notes: withRetryNote(error.message, error)
       });
     }
   }
@@ -294,7 +441,7 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
         name: OSSINSIGHT_TRENDING_SOURCE.name,
         url: OSSINSIGHT_TRENDING_SOURCE.url,
         status: "blocked",
-        notes: `HTTP ${response.status}`
+        notes: withRetryNote(`HTTP ${response.status}`, response)
       });
       return;
     }
@@ -307,7 +454,7 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
       name: OSSINSIGHT_TRENDING_SOURCE.name,
       url: OSSINSIGHT_TRENDING_SOURCE.url,
       status: parsed.length > 0 ? "checked" : "no_signal",
-      notes: `${parsed.length} repositories parsed from OSSInsight API fallback`
+      notes: withRetryNote(`${parsed.length} repositories parsed from OSSInsight API fallback`, response)
     });
 
     for (const candidate of parsed) {
@@ -320,7 +467,7 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
       name: OSSINSIGHT_TRENDING_SOURCE.name,
       url: OSSINSIGHT_TRENDING_SOURCE.url,
       status: "blocked",
-      notes: error.message
+      notes: withRetryNote(error.message, error)
     });
   }
 }
@@ -360,7 +507,7 @@ export function parseOssInsightTrendingPayload(payload, sourceInfo = OSSINSIGHT_
 }
 
 export async function collectBuilderFallbacks(options = {}) {
-  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
   if (typeof fetchImpl !== "function") {
     throw new Error("fetch is not available in this runtime");
   }
@@ -391,6 +538,22 @@ export async function collectBuilderFallbacks(options = {}) {
     });
   }
 
+  if (followBuildersFeeds && options.xSearchFallback !== false && !hasXStatusCandidate(candidates)) {
+    await collectXBuilderSearchFallback({
+      fetchImpl,
+      reportDate,
+      lookbackDays,
+      generatedAt,
+      sourceResults,
+      candidateSources,
+      candidates,
+      limit,
+      apiKey: Object.hasOwn(options, "xSearchApiKey") ? options.xSearchApiKey : process.env.TAVILY_API_KEY,
+      queries: options.xSearchQueries,
+      perQueryLimit: Number.parseInt(options.xSearchPerQueryLimit || "8", 10)
+    });
+  }
+
   for (const rawSource of sources) {
     const currentSource = normalizeBuilderSource(rawSource);
     candidateSources.push(toCandidateSource(currentSource, "builder", generatedAt, "blocked", ""));
@@ -403,8 +566,9 @@ export async function collectBuilderFallbacks(options = {}) {
         }
       });
       if (!response.ok) {
-        markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", `HTTP ${response.status}`));
+        const notes = withRetryNote(`HTTP ${response.status}`, response);
+        markSource(candidateSources.at(-1), "blocked", notes);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
         continue;
       }
 
@@ -412,7 +576,7 @@ export async function collectBuilderFallbacks(options = {}) {
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays))
         .slice(0, limit);
       const status = entries.length > 0 ? "checked" : "no_signal";
-      const notes = `${entries.length} recent original entries parsed`;
+      const notes = withRetryNote(`${entries.length} recent original entries parsed`, response);
       markSource(candidateSources.at(-1), status, notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
 
@@ -430,8 +594,9 @@ export async function collectBuilderFallbacks(options = {}) {
         });
       }
     } catch (error) {
-      markSource(candidateSources.at(-1), "blocked", error.message);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", error.message));
+      const notes = withRetryNote(error.message, error);
+      markSource(candidateSources.at(-1), "blocked", notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
     }
   }
 
@@ -442,16 +607,130 @@ export async function collectBuilderFallbacks(options = {}) {
         sources: sourceResults,
         candidates_found: candidates.length,
         included: 0,
-        blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
+        blocked_reason: inferBuilderBlockedReason(sourceResults, candidates),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
         notes: followBuildersFeeds
-          ? "follow-builders central feed is checked before fixed RSS/Atom fallback; each candidate keeps an original URL."
+          ? "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
           : "Fixed original-source fallback; each candidate comes from a directly fetched RSS/Atom feed."
       }
     },
     sources: candidateSources,
     candidates: candidates.slice(0, limit)
   };
+}
+
+async function collectXBuilderSearchFallback({ fetchImpl, reportDate, lookbackDays, generatedAt, sourceResults, candidateSources, candidates, limit, apiKey, queries, perQueryLimit }) {
+  const sourceItem = {
+    id: "x-builder-search-tavily",
+    name: "Tavily X builder search fallback",
+    url: TAVILY_SEARCH_URL,
+    category: "builder"
+  };
+  candidateSources.push(toCandidateSource(sourceItem, "builder", generatedAt, "blocked", ""));
+
+  if (!apiKey) {
+    markSource(candidateSources.at(-1), "blocked", "skipped_missing_token");
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "skipped_missing_token", "skipped_missing_token"));
+    return;
+  }
+
+  const seenUrls = new Set(candidates.map((candidate) => candidate.url));
+  let hitCount = 0;
+  let blockedNote = "";
+  const searchQueries = Array.isArray(queries) && queries.length > 0
+    ? queries
+    : buildXBuilderSearchQueries(reportDate);
+
+  for (const query of searchQueries) {
+    if (candidates.length >= limit) {
+      break;
+    }
+    try {
+      const response = await fetchImpl(sourceItem.url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          api_key: apiKey,
+          query,
+          max_results: Math.max(1, perQueryLimit || 8),
+          include_answer: false,
+          include_raw_content: false,
+          search_depth: "advanced",
+          include_domains: ["x.com"]
+        })
+      });
+      if (!response.ok) {
+        blockedNote = withRetryNote(`HTTP ${response.status}`, response);
+        continue;
+      }
+
+      const payload = await readJsonResponse(response);
+      const parsed = parseXBuilderSearchResults(payload, {
+        sourceItem,
+        reportDate,
+        lookbackDays,
+        query
+      });
+      for (const entry of parsed) {
+        if (candidates.length >= limit || seenUrls.has(entry.url)) {
+          continue;
+        }
+        seenUrls.add(entry.url);
+        hitCount += 1;
+        candidates.push({
+          ...entry,
+          id: uniqueCandidateId(candidates, entry.id || `${sourceItem.id}-${entry.url}`)
+        });
+      }
+    } catch (error) {
+      blockedNote = withRetryNote(error.message, error);
+    }
+  }
+
+  const status = hitCount > 0 ? "checked" : blockedNote ? "blocked" : "no_signal";
+  const notes = hitCount > 0
+    ? `${hitCount} recent original X status entries parsed`
+    : blockedNote || "0 recent original X status entries parsed";
+  markSource(candidateSources.at(-1), status, notes);
+  sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes));
+}
+
+function buildXBuilderSearchQueries(reportDate) {
+  const dates = [reportDate, ...previousDateStrings(reportDate, 1)]
+    .map((date) => formatSearchDate(date))
+    .filter(Boolean);
+  return dates.flatMap((dateText) =>
+    DEFAULT_X_BUILDER_SEARCH_TERMS.map((term) => `site:x.com/*/status "${dateText}" "${term}"`)
+  );
+}
+
+function parseXBuilderSearchResults(payload, { sourceItem, reportDate, lookbackDays, query }) {
+  return arrayFromPossibleKeys(payload, ["results"])
+    .map((item) => {
+      const url = normalizeXStatusUrl(item.url);
+      const eventDate = xStatusDate(url);
+      const content = cleanText(item.content || item.raw_content || item.title);
+      if (!url || !content || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+        return null;
+      }
+      const handle = xStatusHandle(url);
+      const author = handle ? `@${handle}` : "X builder";
+      return {
+        source_id: sourceItem.id,
+        category: "builder_observation",
+        title: `${author}: ${shortenCandidateTitle(item.title || content)}`,
+        url,
+        source: sourceItem.name,
+        event_date: eventDate,
+        status: "excluded",
+        evidence: summarizeEvidence(content, `${author} posted this original X status.`),
+        original_url: url,
+        verification_status: "original_social_only",
+        verification_sources: [url],
+        notes: `x_search_query=${sanitizeNoteValue(query)}`
+      };
+    })
+    .filter(Boolean);
 }
 
 async function collectFollowBuildersCentralFeeds(context) {
@@ -504,19 +783,27 @@ async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, 
       }
     });
     if (!response.ok) {
-      markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
-      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", `HTTP ${response.status}`));
+      const notes = withRetryNote(`HTTP ${response.status}`, response);
+      markSource(candidateSources.at(-1), "blocked", notes);
+      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
       return;
     }
 
-    const allParsed = parser(await readJsonResponse(response), {
+    const payload = await readJsonResponse(response);
+    const allParsed = parser(payload, {
       sourceItem,
       reportDate,
       lookbackDays
     });
     const parsed = allParsed.slice(0, Math.max(limit - candidates.length, 0));
-    const status = allParsed.length > 0 ? "checked" : "no_signal";
-    const notes = `${allParsed.length} recent original entries parsed`;
+    const upstreamErrors = followBuildersPayloadErrors(payload);
+    const status = allParsed.length > 0 ? "checked" : upstreamErrors ? "blocked" : "no_signal";
+    const notes = withRetryNote(
+      upstreamErrors
+        ? `${allParsed.length} recent original entries parsed; upstream_error=${upstreamErrors}`
+        : `${allParsed.length} recent original entries parsed`,
+      response
+    );
     markSource(candidateSources.at(-1), status, notes);
     sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes));
 
@@ -527,9 +814,19 @@ async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, 
       });
     }
   } catch (error) {
-    markSource(candidateSources.at(-1), "blocked", error.message);
-    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", error.message));
+    const notes = withRetryNote(error.message, error);
+    markSource(candidateSources.at(-1), "blocked", notes);
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
   }
+}
+
+function followBuildersPayloadErrors(payload) {
+  const errors = Array.isArray(payload?.errors) ? payload.errors : [];
+  return errors
+    .map((error) => cleanText(typeof error === "string" ? error : error?.message || JSON.stringify(error)))
+    .filter(Boolean)
+    .join(" | ")
+    .slice(0, 240);
 }
 
 function parseFollowBuildersXFeed(payload, { sourceItem, reportDate, lookbackDays }) {
@@ -603,57 +900,77 @@ function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate, lookback
 }
 
 export async function collectContentSources(options = {}) {
-  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
   if (typeof fetchImpl !== "function") {
     throw new Error("fetch is not available in this runtime");
   }
 
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
-  const sources = await loadSources(options.sources, options.sourcesPath, DEFAULT_CONTENT_SOURCES);
+  const sources = await loadContentSources(options);
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
+  const perSourceLimit = Number.isInteger(options.perSourceLimit) && options.perSourceLimit > 0 ? options.perSourceLimit : 3;
   const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
+  const startedAt = Date.now();
+  const budgetMs = Number.isInteger(options.budgetMs) && options.budgetMs > 0 ? options.budgetMs : 300000;
 
   for (const rawSource of sources) {
     const currentSource = normalizeGenericSource(rawSource, "content");
-    const sourceCategory = currentSource.category === "project" ? "project" : "blog";
-    const candidateCategory = currentSource.category === "project" ? "project" : "hot_blog";
+    const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
     candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
+    if (Date.now() - startedAt > budgetMs) {
+      markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
+      continue;
+    }
 
     try {
       const response = await fetchImpl(currentSource.url, {
         headers: {
           accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
-        }
+        },
+        ...timeoutInit(currentSource.timeoutMs || currentSource.timeout_ms || 15000)
       });
       if (!response.ok) {
-        markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", `HTTP ${response.status}`));
+        const notes = withRetryNote(`HTTP ${response.status}`, response);
+        markSource(candidateSources.at(-1), "blocked", notes);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
         continue;
       }
 
       const entries = parseContentSourceEntries(await response.text(), currentSource)
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
-      let notes = `${entries.length} recent ${candidateCategory === "project" ? "product/project" : "blog/interview"} entries parsed`;
+      let notes = withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, response);
       let confirmedProductCrossChecks = 0;
       let unresolvedProductCrossChecks = 0;
+      let skippedOriginalUrlChecks = 0;
 
-      for (const entry of entries.slice(0, Math.max(limit - candidates.length, 0))) {
+      const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
+        ? currentSource.maxItemsPerRun
+        : perSourceLimit;
+      for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+        const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
+        if (requiresOriginalUrl(currentSource) && !originalUrl) {
+          skippedOriginalUrlChecks += 1;
+          continue;
+        }
         let candidate = {
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
           category: candidateCategory,
           title: entry.title,
-          url: entry.url,
+          url: originalUrl || entry.url,
           source: currentSource.name,
           event_date: entry.event_date,
           status: "excluded",
-          evidence: summarizeEvidence(entry.summary, `${currentSource.name} published this ${candidateCategory === "project" ? "product/project" : "blog/interview"} entry.`),
+          evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
+          notes: contentCandidateNotes(entry, currentSource, originalUrl),
+          ...contentVerificationFields(entry, currentSource, originalUrl),
           ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
         };
 
@@ -681,11 +998,15 @@ export async function collectContentSources(options = {}) {
           notes = `${notes}; ${unresolvedProductCrossChecks} unresolved`;
         }
       }
+      if (requiresOriginalUrl(currentSource)) {
+        notes = `${notes}; ${skippedOriginalUrlChecks} skipped without original URL`;
+      }
       markSource(candidateSources.at(-1), status, notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
     } catch (error) {
-      markSource(candidateSources.at(-1), "blocked", error.message);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", error.message));
+      const notes = withRetryNote(error.message, error);
+      markSource(candidateSources.at(-1), "blocked", notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
     }
   }
 
@@ -696,14 +1017,136 @@ export async function collectContentSources(options = {}) {
         sources: sourceResults,
         candidates_found: candidates.length,
         included: 0,
+        sources_checked: sourceResults.length,
+        enablement_counts: countBy(sources, "enablement"),
+        tier_counts: countBy(sources, "tier"),
+        source_kind_counts: countBy(sources, "source_kind"),
         blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
-        notes: "Official labs, engineering blogs, high-quality newsletters, interviews, aggregators, and product feeds are checked as content/project candidates. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates."
+        notes: "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
       }
     },
     sources: candidateSources,
     candidates: candidates.slice(0, limit)
   };
+}
+
+async function loadContentSources(options = {}) {
+  if (Array.isArray(options.sources) || options.sourcesPath) {
+    return loadSources(options.sources, options.sourcesPath, DEFAULT_CONTENT_SOURCES);
+  }
+
+  try {
+    const registry = await loadSourceRegistry({
+      rootDir: options.rootDir || process.cwd(),
+      sourcesPath: options.registryPath || path.join("config", "sources"),
+      includeEnablement: options.enablement || "core"
+    });
+    return registry.sources;
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+    return DEFAULT_CONTENT_SOURCES;
+  }
+}
+
+function contentSourceKinds(sourceInfo) {
+  if (sourceInfo.candidate_category === "project" || sourceInfo.category === "project") {
+    return { sourceCategory: "project", candidateCategory: "project", entryLabel: "product/project" };
+  }
+  if (sourceInfo.candidate_category === "community_lead" || sourceInfo.category === "intermediary") {
+    return { sourceCategory: "community", candidateCategory: "community_lead", entryLabel: "intermediary lead" };
+  }
+  if (sourceInfo.category === "x_hotspot") {
+    return { sourceCategory: "community", candidateCategory: "community_lead", entryLabel: "X hotspot" };
+  }
+  return { sourceCategory: "blog", candidateCategory: sourceInfo.candidate_category || "hot_blog", entryLabel: "blog/interview" };
+}
+
+function requiresOriginalUrl(sourceInfo) {
+  return sourceInfo.requiresOriginalUrl === true || sourceInfo.requires_original_url === true || sourceInfo.category === "x_hotspot";
+}
+
+function originalRequiredUrlForEntry(entry, sourceInfo) {
+  if (!requiresOriginalUrl(sourceInfo)) {
+    return "";
+  }
+  return [entry.url, ...(Array.isArray(entry.links) ? entry.links : [])].find(isOriginalXUrl) || "";
+}
+
+function isOriginalXUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return (host === "x.com" || host === "twitter.com") && /\/[^/]+\/status\/\d+/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function contentCandidateEvidence(entry, sourceInfo, candidateCategory, entryLabel) {
+  const fallback = `${sourceInfo.name} published this ${entryLabel} entry.`;
+  const evidence = summarizeEvidence(entry.summary, fallback);
+  if (sourceInfo.category === "intermediary" || sourceInfo.authority === "intermediary" || sourceInfo.verification_policy === "primary_required") {
+    return appendSentence(evidence, "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.");
+  }
+  if (sourceInfo.category === "x_hotspot") {
+    return appendSentence(evidence, "This X-hotspot lead keeps an original X URL and should not be used as a factual report without primary-source confirmation.");
+  }
+  if (candidateCategory === "community_lead") {
+    return appendSentence(evidence, "Treat this as a community lead unless it is backed by a primary source.");
+  }
+  return evidence;
+}
+
+function contentCandidateNotes(entry, sourceInfo, originalUrl) {
+  const parts = [];
+  if (sourceInfo.category === "intermediary" || sourceInfo.authority === "intermediary" || sourceInfo.verification_policy === "primary_required") {
+    parts.push(`intermediary_url=${entry.url}`, "primary_verification_required=true");
+  }
+  if (sourceInfo.category === "x_hotspot") {
+    parts.push(`feed_url=${entry.url}`, `original_url=${originalUrl}`, "primary_verification_required=true");
+  }
+  return parts.join("; ");
+}
+
+function contentVerificationFields(entry, sourceInfo, originalUrl) {
+  const status = contentVerificationStatus(sourceInfo, originalUrl);
+  const fields = {
+    verification_status: status,
+    verification_sources: []
+  };
+  if (sourceInfo.authority === "intermediary" || sourceInfo.authority === "secondary" || sourceInfo.authority === "aggregator" || sourceInfo.verification_policy === "primary_required") {
+    fields.intermediary_url = entry.url;
+  }
+  if (originalUrl) {
+    fields.original_url = originalUrl;
+  }
+  if (status === "primary_confirmed") {
+    fields.primary_url = originalUrl || entry.url;
+    fields.verification_sources = [fields.primary_url];
+  }
+  if (status === "original_social_only" && originalUrl) {
+    fields.verification_sources = [originalUrl];
+  }
+  return fields;
+}
+
+function contentVerificationStatus(sourceInfo, originalUrl) {
+  if (sourceInfo.category === "x_hotspot") {
+    return originalUrl ? "original_social_only" : "unverified";
+  }
+  if (sourceInfo.authority === "primary" && sourceInfo.verification_policy !== "primary_required") {
+    return "primary_confirmed";
+  }
+  if (sourceInfo.verification_policy === "community_only") {
+    return "original_social_only";
+  }
+  if (sourceInfo.verification_policy === "multi_source_required") {
+    return "unverified";
+  }
+  return "intermediary_only";
 }
 
 function shouldCrossCheckProductCandidate(sourceInfo, options = {}) {
@@ -759,6 +1202,9 @@ async function crossCheckProductCandidate({ candidate, productHuntUrl, feedLinks
           candidate: {
             ...candidate,
             url: finalUrl,
+            primary_url: finalUrl,
+            verification_status: "primary_confirmed",
+            verification_sources: [finalUrl],
             evidence: appendSentence(candidate.evidence, `已打开 ${productConfirmationLabel(confirmationType)} 确认用途：${summary}`),
             notes: appendSentence(
               candidate.notes,
@@ -781,7 +1227,8 @@ async function fetchHtml(fetchImpl, url) {
     headers: {
       accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "user-agent": "ai-daily-cn-static-publisher"
-    }
+    },
+    ...timeoutInit(15000)
   });
 }
 
@@ -790,6 +1237,7 @@ function unresolvedProductCandidate(candidate, productHuntUrl, reason) {
     status: "unresolved",
     candidate: {
       ...candidate,
+      verification_status: candidate.verification_status === "primary_confirmed" ? "primary_confirmed" : "intermediary_only",
       notes: appendSentence(candidate.notes, `product_hunt_url=${productHuntUrl}; product_cross_check=unresolved; reason=${sanitizeNoteValue(reason)}`)
     }
   };
@@ -939,7 +1387,7 @@ function sanitizeNoteValue(value) {
 }
 
 export async function collectStatuspageIncidents(options = {}) {
-  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
   if (typeof fetchImpl !== "function") {
     throw new Error("fetch is not available in this runtime");
   }
@@ -964,14 +1412,14 @@ export async function collectStatuspageIncidents(options = {}) {
         }
       });
       if (!response.ok) {
-        markSource(candidateSources.at(-1), "blocked", `HTTP ${response.status}`);
+        markSource(candidateSources.at(-1), "blocked", withRetryNote(`HTTP ${response.status}`, response));
         continue;
       }
 
       const entries = parseFeedEntries(await response.text())
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays))
         .slice(0, limit);
-      markSource(candidateSources.at(-1), entries.length > 0 ? "checked" : "no_signal", `${entries.length} recent incidents parsed`);
+      markSource(candidateSources.at(-1), entries.length > 0 ? "checked" : "no_signal", withRetryNote(`${entries.length} recent incidents parsed`, response));
 
       for (const entry of entries) {
         candidates.push({
@@ -987,7 +1435,7 @@ export async function collectStatuspageIncidents(options = {}) {
         });
       }
     } catch (error) {
-      markSource(candidateSources.at(-1), "blocked", error.message);
+      markSource(candidateSources.at(-1), "blocked", withRetryNote(error.message, error));
     }
   }
 
@@ -1369,6 +1817,23 @@ function appendSentence(value, sentence) {
   const separator = /[。！？]$/.test(base) ? "" : /[.!?]$/.test(base) ? " " : "。";
   return `${base}${separator}${sentence}`;
 }
+
+function countBy(items, key) {
+  const counts = {};
+  for (const item of items) {
+    const value = item?.[key] || "unspecified";
+    counts[value] = (counts[value] || 0) + 1;
+  }
+  return counts;
+}
+
+function timeoutInit(timeoutMs) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs <= 0 || typeof AbortSignal?.timeout !== "function") {
+    return {};
+  }
+  return { signal: AbortSignal.timeout(timeoutMs) };
+}
+
 function source(name, url, language, window) {
   return { name, url, language, window };
 }
@@ -1457,11 +1922,85 @@ function auditSource(name, url, status, notes) {
   return { name, url, status, notes };
 }
 
-function inferBuilderBlockedReason(sourceResults) {
+function inferBuilderBlockedReason(sourceResults, candidates = []) {
+  const xFeedBlocked = sourceResults.some((sourceResult) =>
+    isFollowBuildersXSource(sourceResult) && ["blocked", "skipped_missing_token"].includes(sourceResult.status)
+  );
+  if (xFeedBlocked && !hasXStatusCandidate(candidates)) {
+    return "x_feed_failed";
+  }
+  if (candidates.length > 0) {
+    return "";
+  }
   if (sourceResults.some((sourceResult) => sourceResult.status === "blocked")) {
     return "fetch_failed";
   }
   return "no_recent_signal";
+}
+
+function isFollowBuildersXSource(sourceResult) {
+  return /follow-builders x feed/i.test(sourceResult?.name || "") || /feed-x\.json/i.test(sourceResult?.url || "");
+}
+
+function hasXStatusCandidate(candidates) {
+  return candidates.some((candidate) => isXStatusUrl(candidate.url) || isXStatusUrl(candidate.original_url));
+}
+
+function normalizeXStatusUrl(value) {
+  if (!isXStatusUrl(value)) {
+    return "";
+  }
+  try {
+    const url = new URL(value);
+    url.protocol = "https:";
+    url.hostname = "x.com";
+    url.search = "";
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function isXStatusUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return (host === "x.com" || host === "twitter.com") && /\/[^/]+\/status\/\d+/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function xStatusHandle(value) {
+  try {
+    const [, handle] = new URL(value).pathname.match(/^\/([^/]+)\/status\/\d+/i) || [];
+    return handle || "";
+  } catch {
+    return "";
+  }
+}
+
+function xStatusDate(value) {
+  try {
+    const [, id] = new URL(value).pathname.match(/\/status\/(\d+)/i) || [];
+    if (!id) {
+      return "";
+    }
+    const timestampMs = Number((BigInt(id) >> 22n) + X_SNOWFLAKE_EPOCH_MS);
+    const date = new Date(timestampMs);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+  } catch {
+    return "";
+  }
+}
+
+function formatSearchDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return `${date.toLocaleString("en-US", { month: "long", timeZone: "UTC" })} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
 }
 
 function parseFeedEntries(xml) {

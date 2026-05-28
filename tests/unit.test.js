@@ -9,10 +9,16 @@ import { parseDailyMarkdown } from "../src/parser.js";
 import {
   collectBuilderFallbacks,
   collectContentSources,
+  DEFAULT_CONTENT_SOURCES,
   collectGitHubTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml
 } from "../src/discovery.js";
+import { collectSearchNews } from "../src/search-news.js";
+import { checkSourcesHealth } from "../src/source-health.js";
+import { auditSourceRunHistory } from "../src/source-phase5.js";
+import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
+import { normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { mergeFeed, buildSite } from "../src/site.js";
@@ -340,12 +346,14 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert(html.includes('id="github-trending"'));
   assert(html.includes("GitHub Trending"));
   assert(html.includes("#2"));
-  assert(html.includes("上升 7 名"));
+  assert(html.includes("up +7"));
   assert(html.includes("example/trending-agent"));
   assert(html.includes('id="source-audit"'));
   assert(html.includes("信源审计"));
   assert(html.includes("GitHub Trending"));
   assert(html.includes("Builder 原始源"));
+  assert(html.includes("搜索 / 新闻影子源"));
+  assert(html.includes("信源健康检查"));
   assert(html.includes("阻塞：fetch_failed"));
   assert(html.includes("上次成功：2026-05-14T02:35:00+08:00"));
   assert(html.includes("今日 +123 stars"));
@@ -359,6 +367,19 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
   report.summary = "Google 把模型和 agent 工具放进同一条链路；Vercel AI Gateway 接入更多模型；GitHub Copilot 加强任务路由；GitHub Trending 显示 agent memory 升温。";
+  report.main_items[0].title = "OpenAI Status：Example Agent Platform GA";
+  report.main_items[0].source = "OpenAI Status";
+  report.main_items[0].url = "https://status.openai.com/incidents/example-agent-platform";
+  report.main_items.push({
+    title: "Cisco and OpenAI redefine enterprise engineering with Codex",
+    event_date: "2026-05-15",
+    url: "https://openai.com/index/cisco",
+    source: "OpenAI News RSS",
+    tier: "T0",
+    entities: ["OpenAI", "Cisco", "Codex"],
+    summary: "OpenAI News RSS item for source icon coverage.",
+    bullets: ["OpenAI News RSS uses the same embedded OpenAI icon as other OpenAI-owned sources."]
+  });
   report.hero_highlights = [
     {
       title: "Agent harness 成为今日主线",
@@ -368,6 +389,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   ];
   report.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
   report.hot_blogs[0].summary = "这篇文章把长运行 agent 的 harness 拆成任务规划、上下文治理、工具执行、结果校验和恢复路径几层，重点不是再发明一个模型包装器，而是把每一步都变成可观测、可重放、可回滚的工程边界。作者用 coding agent 和研究代理的例子说明，真正影响稳定性的往往是文件系统隔离、权限提示、失败重试、上下文压缩和评估回放，而不是单次补全质量。对研发团队来说，它适合作为设计 agent 平台、评估 Claude Code/Codex 类工具、或制定内部自动化安全门时的术语和架构参考。";
+  report.hot_blogs[0].publisher = "Hugging Face";
   report.hot_blogs[0].why_it_matters = "旧字段保留兼容，但公开页面不再渲染。";
   report.projects = [
     {
@@ -404,14 +426,33 @@ test("日报可以转换为 effective-interact 输入", async () => {
 
   assert.equal(input.template, "research-explainer");
   assert.equal(input.renderMode, "pre-rendered");
-  assert(input.summary.includes("Agent harness 成为今日主线"));
+  assert.equal(input.heroMode, "date-only");
+  assert.equal(input.heroTitle, "2026-05-15");
+  assert.equal(input.hideHeroSummary, true);
+  assert.equal(input.hideNavigation, true);
+  assert(!input.summary.includes("Agent harness 成为今日主线"));
   assert(!input.summary.includes("其余条目见后文"));
-  const mainlineSection = input.sections.find((section) => section.title === "主线摘要");
-  assert(mainlineSection.content.includes("**Google I/O**"));
-  assert(mainlineSection.content.includes("**模型入口**"));
+  assert(!input.sections.some((section) => section.title === "日报概览"));
+  assert(!input.sections.some((section) => section.title === "主线摘要"));
+  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  assert(mainSection.content.includes("![OpenAI Status](data:image/png;base64,"));
+  assert(mainSection.content.includes("![OpenAI News RSS](data:image/png;base64,"));
+  assert(mainSection.content.includes("**[OpenAI Status：Example Agent Platform GA]"));
+  assert(!mainSection.content.includes("来源："));
   const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
-  assert(hotBlogsSection.content.includes("这篇文章把长运行 agent 的 harness"));
-  assert(!hotBlogsSection.content.includes("为什么重要"));
+  assert.equal(hotBlogsSection.type, "filterable-cards");
+  assert.equal(hotBlogsSection.cardClass, "blog-card");
+  assert.equal(hotBlogsSection.items.length, 1);
+  assert.equal(hotBlogsSection.items[0].title, "Harness Engineering for Long Running Agents");
+  assert.equal(hotBlogsSection.items[0].href, "https://example.com/blog/harness-engineering");
+  assert(hotBlogsSection.items[0].body.includes("这篇文章把长运行 agent 的 harness"));
+  assert.equal(hotBlogsSection.items[0].showGroup, false);
+  assert.deepEqual(hotBlogsSection.items[0].tags, ["agent harness"]);
+  const publisherPoint = hotBlogsSection.items[0].points.find((point) => point.label === "发布方");
+  assert.equal(publisherPoint.value, "Hugging Face");
+  assert.match(publisherPoint.icon, /^data:image\/svg\+xml;base64,/);
+  assert(hotBlogsSection.items[0].points.some((point) => point.label === "日期" && point.value === "2026-05-15"));
+  assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
   const modelSection = input.sections.find((section) => section.title === "模型发布");
   assert(modelSection.content.includes("==多平台可见=="));
   assert(modelSection.content.includes("==官方可用性=="));
@@ -423,14 +464,25 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!projectsSection.content.includes("信号："));
   assert(!projectsSection.content.includes("证据："));
   assert(!projectsSection.content.includes("GitHub Trending weekly 中出现"));
-  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending 趋势");
+  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending · Top 10 daily");
+  assert.equal(trendingSection.summary, undefined);
   assert(trendingSection.content.includes("example/agent-memory"));
-  assert(trendingSection.content.includes("#1"));
-  assert(trendingSection.content.includes("新上榜"));
+  assert(trendingSection.content.includes("1. **[example/agent-memory]"));
+  assert(trendingSection.content.includes("==new=="));
+  assert(!trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
-  assert(input.sections.some((section) => section.title === "信源审计"));
-  assert(input.sections.some((section) => typeof section.content === "string" && section.content.includes("结构化 JSON")));
+  const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
+  assert(sourceAuditSection);
+  assert.equal(sourceAuditSection.appendix, true);
+  assert.equal(sourceAuditSection.collapsed, true);
+  const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
+  assert(selfCheckSection);
+  assert.equal(selfCheckSection.appendix, true);
+  assert.equal(selfCheckSection.collapsed, true);
+  assert(typeof selfCheckSection.content === "string" && selfCheckSection.content.includes("结构化 JSON"));
+  assert.deepEqual(input.nextActions, []);
+  assert.equal(input.nextActionsCollapsed, undefined);
   assert.equal(input.evidence, undefined);
 });
 
@@ -491,8 +543,10 @@ test("builder interaction section omits explicit evidence bullets", async () => 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.group === "signals");
 
+  assert.equal(section.title, "Builder 观察");
   assert(section.content.includes("Example Builder"));
   assert(section.content.includes("follow-builders X feed"));
+  assert(!section.content.includes("### Builder 观察"));
   assert(!section.content.includes("Original X URL was collected"));
   assert(!section.content.includes("证据："));
 });
@@ -548,6 +602,50 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
   assert(!JSON.stringify(input).includes("暂无 Builder 观察"));
   assert(!JSON.stringify(input).includes("暂无社区线索"));
   assert(!JSON.stringify(input).includes("暂无热门技术博客"));
+});
+
+test("HTML renders GitHub Trending without noisy audit labels", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.projects = [];
+  report.builder_observations = [];
+  report.github_trending = [
+    {
+      name: "hardikpandya/stop-slop",
+      repo: "hardikpandya/stop-slop",
+      description: "A skill file for removing AI tells from prose",
+      url: "https://github.com/hardikpandya/stop-slop",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "all",
+      window: "daily",
+      rank: 3,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #3."
+    }
+  ];
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const html = renderReportHtml(validation.value);
+  const section = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="source-audit"'));
+  assert(section.includes("GitHub Trending"));
+  assert(!section.includes("GitHub Trending \u8d8b\u52bf"));
+  assert(section.includes("\u53bb\u9664"));
+  assert(!section.includes("A skill file for removing AI tells from prose"));
+  assert(!section.includes("\u6765\u6e90\uff1a"));
+  assert(!section.includes("\u8bed\u8a00\uff1a"));
+
+  const input = reportToInteractionInput(validation.value);
+  const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10 daily");
+  assert(trendingSection);
+  assert(trendingSection.content.includes("3. **[hardikpandya/stop-slop]"));
+  assert(trendingSection.content.includes("==new=="));
+  assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
+  assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -622,6 +720,7 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   const collected = await collectGitHubTrending({
     reportDate: "2026-05-26",
     sources: [source],
+    retryDelayMs: 0,
     fetchImpl: async (url) => {
       if (String(url).startsWith("https://api.ossinsight.io/")) {
         return jsonResponse({
@@ -648,6 +747,63 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   assert.equal(collected.candidates[0].repo, "example/agent-runtime");
   assert.equal(collected.candidates[0].category, "project");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
+});
+
+test("GitHub trending discovery retries transient fetch failures and records retry notes", async () => {
+  const source = {
+    name: "GitHub Trending daily",
+    url: "https://github.com/trending?since=daily",
+    language: "all",
+    window: "daily"
+  };
+  let calls = 0;
+  const collected = await collectGitHubTrending({
+    sources: [source],
+    reportDate: "2026-05-16",
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      calls += 1;
+      if (calls === 1) {
+        throw new Error("fetch failed");
+      }
+      return textResponse(githubTrendingFixture());
+    }
+  });
+
+  assert.equal(calls, 2);
+  assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
+  assert.match(collected.source_audit.github_trending.sources[0].notes, /retry_succeeded_after_1/);
+  assert.equal(collected.candidates.length, 2);
+});
+
+test("GitHub trending discovery records failed retry notes for retryable HTTP failures", async () => {
+  const source = {
+    name: "GitHub Trending daily",
+    url: "https://github.com/trending?since=daily",
+    language: "all",
+    window: "daily"
+  };
+  let calls = 0;
+  const collected = await collectGitHubTrending({
+    sources: [source],
+    reportDate: "2026-05-16",
+    retryDelayMs: 0,
+    ossInsightFallback: false,
+    fetchImpl: async () => {
+      calls += 1;
+      return {
+        ok: false,
+        status: 500,
+        text: async () => ""
+      };
+    }
+  });
+
+  assert.equal(calls, 2);
+  assert.equal(collected.source_audit.github_trending.sources[0].status, "blocked");
+  assert.match(collected.source_audit.github_trending.sources[0].notes, /HTTP 500/);
+  assert.match(collected.source_audit.github_trending.sources[0].notes, /retry_failed_after_1/);
+  assert.doesNotMatch(collected.source_audit.github_trending.sources[0].notes, /retry_succeeded_after_1/);
 });
 
 test("GitHub trending discovery compares candidates against recent local history", async () => {
@@ -785,6 +941,105 @@ test("builder discovery 优先解析 follow-builders central X feed", async () =
   assert.match(collected.candidates[0].evidence, /model alone is no longer the product/i);
 });
 
+test("builder discovery treats embedded follow-builders upstream errors as blocked", async () => {
+  const collected = await collectBuilderFallbacks({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [],
+    xSearchApiKey: "",
+    followBuildersFeeds: {
+      x: "https://example.com/feed-x.json",
+      podcasts: "",
+      blogs: ""
+    },
+    fetchImpl: async () =>
+      jsonResponse({
+        generatedAt: "2026-05-26T01:00:00Z",
+        x: [],
+        stats: { xBuilders: 0, totalTweets: 0 },
+        errors: ["X API: User lookup failed: HTTP 500"]
+      })
+  });
+
+  const source = collected.source_audit.builder_sources.sources[0];
+  assert.equal(source.name, "follow-builders X feed");
+  assert.equal(source.status, "blocked");
+  assert.match(source.notes, /upstream_error=X API: User lookup failed: HTTP 500/);
+  assert.equal(collected.source_audit.builder_sources.sources[1].name, "Tavily X builder search fallback");
+  assert.equal(collected.source_audit.builder_sources.sources[1].status, "skipped_missing_token");
+  assert.equal(collected.source_audit.builder_sources.blocked_reason, "x_feed_failed");
+  assert.equal(collected.source_audit.builder_sources.candidates_found, 0);
+});
+
+test("builder discovery falls back to Tavily X status search when central X feed is blocked", async () => {
+  const collected = await collectBuilderFallbacks({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [],
+    xSearchApiKey: "test-key",
+    xSearchQueries: ["site:x.com/*/status \"May 26, 2026\" \"coding agents\""],
+    followBuildersFeeds: {
+      x: "https://example.com/feed-x.json",
+      podcasts: "",
+      blogs: ""
+    },
+    fetchImpl: async (url) => {
+      if (String(url).endsWith("feed-x.json")) {
+        return jsonResponse({
+          generatedAt: "2026-05-26T01:00:00Z",
+          x: [],
+          stats: { xBuilders: 0, totalTweets: 0 },
+          errors: ["X API: User lookup failed: HTTP 500"]
+        });
+      }
+      return jsonResponse({
+        results: [
+          {
+            title: "Builder on X: Coding agents need eval loops",
+            url: "https://x.com/examplebuilder/status/2059094004961914880",
+            content: "Coding agents need eval loops, memory, and clear handoff boundaries before they can run unattended."
+          }
+        ]
+      });
+    }
+  });
+
+  const fallbackSource = collected.source_audit.builder_sources.sources.find((source) => source.name === "Tavily X builder search fallback");
+  assert.equal(fallbackSource.status, "checked");
+  assert.equal(collected.source_audit.builder_sources.blocked_reason, "");
+  assert.equal(collected.candidates[0].source_id, "x-builder-search-tavily");
+  assert.equal(collected.candidates[0].url, "https://x.com/examplebuilder/status/2059094004961914880");
+  assert.equal(collected.candidates[0].event_date, "2026-05-26");
+  assert.equal(collected.candidates[0].verification_status, "original_social_only");
+});
+
+test("builder discovery retries transient fetch failures and records retry notes", async () => {
+  let calls = 0;
+  const collected = await collectBuilderFallbacks({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [],
+    followBuildersFeeds: {
+      x: "https://example.com/feed-x.json",
+      podcasts: "",
+      blogs: ""
+    },
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      calls += 1;
+      if (calls === 1) {
+        throw new Error("fetch failed");
+      }
+      return jsonResponse(followBuildersXFixture());
+    }
+  });
+
+  assert.equal(calls, 2);
+  assert.equal(collected.source_audit.builder_sources.sources[0].status, "checked");
+  assert.match(collected.source_audit.builder_sources.sources[0].notes, /retry_succeeded_after_1/);
+  assert.equal(collected.source_audit.builder_sources.candidates_found, 1);
+});
+
 test("content source discovery parses hot blog and interview feeds", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
@@ -808,6 +1063,170 @@ test("content source discovery parses hot blog and interview feeds", async () =>
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].url, "https://example.com/interview");
   assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
+});
+
+test("default content sources cover broader tech, big-tech, and Product Hunt trending", () => {
+  const names = DEFAULT_CONTENT_SOURCES.map((source) => source.name);
+
+  assert(names.includes("TechCrunch Enterprise"));
+  assert(names.includes("The Verge"));
+  assert(names.includes("Ars Technica"));
+  assert(names.includes("Google Keyword Blog"));
+  assert(names.includes("Official Microsoft Blog"));
+  assert(names.includes("Apple Newsroom"));
+  assert(names.includes("Meta Newsroom"));
+  assert(names.includes("Amazon News"));
+  assert(names.includes("Product Hunt Trending Feed"));
+});
+
+test("source registry validates required source metadata", () => {
+  const valid = normalizeSourceRegistry({
+    schema_version: 1,
+    sources: [
+      {
+        id: "content-apple-machine-learning",
+        name: "Apple Machine Learning Research",
+        url: "https://machinelearning.apple.com/rss.xml",
+        source_kind: "rss",
+        candidate_category: "hot_blog",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed",
+        requires_original_url: false,
+        max_items_per_run: 3,
+        timeout_ms: 15000
+      }
+    ]
+  });
+
+  assert.equal(valid.sources[0].source_kind, "rss");
+  assert.equal(valid.sources[0].candidate_category, "hot_blog");
+
+  assert.throws(
+    () =>
+      normalizeSourceRegistry({
+        schema_version: 1,
+        sources: [
+          {
+            id: "missing-tier",
+            name: "Missing Tier",
+            url: "https://example.com/rss.xml",
+            source_kind: "rss",
+            candidate_category: "hot_blog",
+            authority: "primary",
+            enablement: "core",
+            verification_policy: "primary_allowed"
+          }
+        ]
+      }),
+    (error) => error instanceof PublisherError && error.code === "source_registry_schema_validation_failed"
+  );
+});
+
+test("content source discovery defaults to core registry and includes optional sources only when requested", async () => {
+  const checkedUrls = [];
+  const collectedCore = await collectContentSources({
+    rootDir,
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    limit: 200,
+    fetchImpl: async (url) => {
+      checkedUrls.push(String(url));
+      return textResponse(emptyRssFixture());
+    }
+  });
+
+  assert.equal(collectedCore.source_audit.content_sources.enablement_counts.core, collectedCore.source_audit.content_sources.sources.length);
+  assert(checkedUrls.some((url) => url.includes("machinelearning.apple.com")));
+  assert(!checkedUrls.some((url) => url.includes("producthunt.com/feed")));
+
+  const optionalUrls = [];
+  const collectedOptional = await collectContentSources({
+    rootDir,
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    enablement: "core,optional",
+    limit: 200,
+    fetchImpl: async (url) => {
+      optionalUrls.push(String(url));
+      return textResponse(emptyRssFixture());
+    }
+  });
+
+  assert(collectedOptional.source_audit.content_sources.enablement_counts.optional > 0);
+  assert(optionalUrls.some((url) => url.includes("producthunt.com/feed")));
+});
+
+test("content source discovery keeps self-media as intermediary leads requiring primary verification", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "wechat-tech-media",
+        name: "WeChat Tech Media Example",
+        url: "https://example.com/wechat.xml",
+        category: "intermediary"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <rss><channel>
+        <item>
+          <title>大厂模型产品化观察</title>
+          <link>https://mp.weixin.qq.com/s/example</link>
+          <pubDate>Tue, 26 May 2026 09:00:00 GMT</pubDate>
+          <description><![CDATA[文章引用了官方公告和公司博客，但公众号自身只作为中介线索。]]></description>
+        </item>
+      </channel></rss>
+    `)
+  });
+
+  const candidate = collected.candidates[0];
+  assert.equal(collected.sources[0].category, "community");
+  assert.equal(candidate.category, "community_lead");
+  assert.equal(candidate.url, "https://mp.weixin.qq.com/s/example");
+  assert.match(candidate.evidence, /intermediary\/self-media lead/);
+  assert.match(candidate.notes, /intermediary_url=https:\/\/mp\.weixin\.qq\.com\/s\/example/);
+  assert.match(candidate.notes, /primary_verification_required=true/);
+});
+
+test("content source discovery accepts X hotspot feeds only when original post URL is preserved", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "x-hotspots",
+        name: "Self-hosted X Hotspot RSS",
+        url: "https://example.com/x-hotspots.xml",
+        category: "x_hotspot"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <rss><channel>
+        <item>
+          <title>模型公司发布节奏讨论</title>
+          <link>https://x.com/example/status/1234567890</link>
+          <pubDate>Tue, 26 May 2026 09:00:00 GMT</pubDate>
+          <description>多位研究者讨论模型发布节奏。</description>
+        </item>
+        <item>
+          <title>缺少原帖的聚合摘要</title>
+          <link>https://example.com/summary</link>
+          <pubDate>Tue, 26 May 2026 10:00:00 GMT</pubDate>
+          <description>没有原始 X URL。</description>
+        </item>
+      </channel></rss>
+    `)
+  });
+
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.sources[0].category, "community");
+  assert.equal(collected.candidates[0].category, "community_lead");
+  assert.equal(collected.candidates[0].url, "https://x.com/example/status/1234567890");
+  assert.match(collected.candidates[0].notes, /original_url=https:\/\/x\.com\/example\/status\/1234567890/);
+  assert.match(collected.source_audit.content_sources.sources[0].notes, /1 skipped without original URL/);
 });
 
 test("content source discovery parses official HTML pages and Product Hunt project feeds", async () => {
@@ -998,6 +1417,208 @@ test("content source discovery rejects low-quality Product Hunt confirmation pag
   assert.match(candidate.notes, /low_quality_summary|low_value_final_url/);
 });
 
+test("search news discovery runs shadow providers and preserves verification fields", async () => {
+  const collected = await collectSearchNews({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    providers: "gdelt",
+    queries: [
+      {
+        id: "frontier-labs-release",
+        query: "OpenAI release",
+        candidate_category: "community_lead",
+        verification_policy: "primary_required",
+        allowed_primary_domains: ["openai.com"]
+      }
+    ],
+    fetchImpl: async () =>
+      jsonResponse({
+        articles: [
+          {
+            title: "OpenAI launches example agent feature",
+            url: "https://openai.com/news/example-agent-feature",
+            seendate: "20260526T120000Z",
+            sourceCountry: "US"
+          }
+        ]
+      })
+  });
+
+  assert.equal(collected.source_audit.search_sources.checked, true);
+  assert.equal(collected.source_audit.search_sources.shadow, true);
+  assert.equal(collected.source_audit.search_sources.sources[0].status, "checked");
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].category, "community_lead");
+  assert.equal(collected.candidates[0].verification_status, "primary_confirmed");
+  assert.equal(collected.candidates[0].primary_url, "https://openai.com/news/example-agent-feature");
+  assert.match(collected.candidates[0].notes, /shadow=true/);
+});
+
+test("search news discovery skips keyed providers without exposing tokens", async () => {
+  const collected = await collectSearchNews({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    providers: "brave",
+    queries: [{ id: "example", query: "OpenAI", candidate_category: "community_lead" }],
+    fetchImpl: async () => {
+      throw new Error("should not fetch without token");
+    }
+  });
+
+  assert.equal(collected.source_audit.search_sources.sources[0].status, "blocked");
+  assert.equal(collected.source_audit.search_sources.sources[0].notes, "skipped_missing_token");
+  assert.equal(collected.candidates.length, 0);
+});
+
+test("sources health checks feed shape and self-hosted base URL requirements", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-sources-health-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  await fs.writeFile(
+    sourcesPath,
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "health-feed",
+          name: "Health Feed",
+          url: "https://example.com/feed.xml",
+          source_kind: "rss",
+          candidate_category: "hot_blog",
+          tier: "T0",
+          authority: "primary",
+          enablement: "core",
+          verification_policy: "primary_allowed"
+        },
+        {
+          id: "health-rsshub",
+          name: "Health RSSHub X",
+          url: "https://rsshub.example.com/twitter/list/ai",
+          source_kind: "rsshub",
+          candidate_category: "community_lead",
+          tier: "T2",
+          authority: "community",
+          enablement: "optional",
+          verification_policy: "primary_required",
+          requires_original_url: true,
+          base_url_env: "AI_DAILY_TEST_RSSHUB_BASE_URL"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const health = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-05-26",
+    enablement: "core,optional",
+    fetchImpl: async () => textResponse(contentSourceRssFixture())
+  });
+
+  assert.equal(health.source_audit.sources_health.checked, true);
+  assert.equal(health.results[0].status, "checked");
+  assert.equal(health.results[0].feed_like, true);
+  assert.equal(health.results[0].recent_48h_entries, 1);
+  assert.equal(health.results[1].status, "skipped_missing_base_url");
+});
+
+test("sources audit merge writes discovery audit groups into the final report JSON", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-audit-merge-"));
+  const historyDir = path.join(tmp, "reports-data", "2026", "05");
+  await fs.mkdir(historyDir, { recursive: true });
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const reportPath = path.join(historyDir, "2026-05-15.json");
+  const searchPath = path.join(tmp, "search-news.json");
+  const healthPath = path.join(tmp, "sources-health.json");
+  await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(
+    searchPath,
+    `${JSON.stringify({
+      report_date: "2026-05-15",
+      source_audit: {
+        search_sources: {
+          ...auditGroupFixture("Search", 3, 0),
+          shadow: true,
+          provider_runtime_ms: { gdelt: 123 },
+          provider_cost_units: { gdelt: 1 }
+        }
+      }
+    }, null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    healthPath,
+    `${JSON.stringify({
+      report_date: "2026-05-15",
+      source_audit: {
+        sources_health: auditGroupFixture("Health", 2, 0)
+      }
+    }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const result = await mergeSourceAuditIntoReport({
+    rootDir: tmp,
+    reportDate: "2026-05-15",
+    historyDir: "reports-data",
+    inputPaths: [searchPath, healthPath]
+  });
+  const merged = JSON.parse(await fs.readFile(reportPath, "utf8"));
+
+  assert.deepEqual(result.merged_groups, ["search_sources", "sources_health"]);
+  assert.equal(merged.source_audit.search_sources.shadow, true);
+  assert.equal(merged.source_audit.search_sources.provider_runtime_ms.gdelt, 123);
+  assert.equal(merged.source_audit.sources_health.sources[0].name, "Health");
+});
+
+test("phase 5 audit reports missing continuous source audit groups", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-phase5-audit-"));
+  const historyDir = path.join(tmp, "reports-data");
+  await writePhase5Day(historyDir, "2026-05-24", {
+    includeSearch: true,
+    includeHealth: true,
+    candidateVerificationStatus: "primary_confirmed"
+  });
+  await writePhase5Day(historyDir, "2026-05-25", {
+    includeSearch: true,
+    includeHealth: true,
+    candidateVerificationStatus: "primary_confirmed"
+  });
+  await writePhase5Day(historyDir, "2026-05-26", {
+    includeSearch: false,
+    includeHealth: true,
+    candidateVerificationStatus: "primary_confirmed"
+  });
+
+  const incomplete = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "reports-data",
+    reportDate: "2026-05-26",
+    days: 3
+  });
+
+  assert.equal(incomplete.phase5_complete, false);
+  assert.equal(incomplete.summary.missing_days, 0);
+  assert(incomplete.days[0].missing_required_groups.includes("search_sources"));
+
+  await writePhase5Day(historyDir, "2026-05-26", {
+    includeSearch: true,
+    includeHealth: true,
+    candidateVerificationStatus: "primary_confirmed"
+  });
+  const complete = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "reports-data",
+    reportDate: "2026-05-26",
+    days: 3
+  });
+
+  assert.equal(complete.phase5_complete, true);
+  assert.equal(complete.summary.days_with_all_required_groups, 3);
+  assert.equal(complete.summary.t3_fact_leak_count, 0);
+  assert.equal(complete.summary.primary_verified, 3);
+});
+
 test("statuspage discovery parses Atom incidents into candidates", async () => {
   const collected = await collectStatuspageIncidents({
     reportDate: "2026-05-26",
@@ -1185,7 +1806,7 @@ test("report:write 缺少候选池时停止", async () => {
   );
 });
 
-test("report:write 要求结构化草稿记录 GitHub Trending 和 Builder 信源审计", async () => {
+test("report:write 要求结构化草稿记录完整固定发现面审计", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   delete draft.source_audit;
 
@@ -1196,6 +1817,17 @@ test("report:write 要求结构化草稿记录 GitHub Trending 和 Builder 信�
         generatedAt: fixedGeneratedAt
       }),
     "source_audit_missing"
+  );
+
+  const incompleteDraft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  delete incompleteDraft.source_audit.search_sources;
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(incompleteDraft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    "source_audit_incomplete"
   );
 });
 
@@ -1227,6 +1859,93 @@ test("report:write 要求入选条目回指候选池", async () => {
         candidatePool
       }),
     "candidate_pool_reference_invalid"
+  );
+});
+
+test("report:write 拒绝未回到一手来源的中介候选进入事实栏目", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  candidatePool.candidates[0].verification_status = "intermediary_only";
+  candidatePool.candidates[0].intermediary_url = candidatePool.candidates[0].url;
+  candidatePool.candidates[0].verification_sources = [];
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "candidate_pool_reference_invalid"
+  );
+
+  candidatePool.candidates[0].verification_status = "primary_confirmed";
+  candidatePool.candidates[0].primary_url = candidatePool.candidates[0].url;
+  candidatePool.candidates[0].verification_sources = [candidatePool.candidates[0].url];
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  assert.equal(report.main_items[0].candidate_id, candidatePool.candidates[0].id);
+});
+
+test("report:write 拒绝缺少原始 X status 的 Builder 观察", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.source_audit.builder_sources.sources = [
+    {
+      name: "follow-builders X feed",
+      url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      status: "blocked",
+      notes: "upstream_error=X API: User lookup failed: HTTP 500"
+    },
+    {
+      name: "Tavily X builder search fallback",
+      url: "https://api.tavily.com/search",
+      status: "skipped_missing_token",
+      notes: "skipped_missing_token"
+    }
+  ];
+  draft.builder_observations = [
+    {
+      candidate_id: "builder-non-x",
+      author: "Example Builder",
+      role: "maintainer",
+      content: "只来自博客的 builder 观察不能顶替 X status。",
+      url: "https://example.com/builder-post",
+      event_date: "2026-05-16",
+      source: "Example Blog"
+    }
+  ];
+  candidatePool.sources.push({
+    id: "builder-blog-source",
+    name: "Example Blog",
+    url: "https://example.com/builder-post",
+    category: "builder",
+    status: "checked"
+  });
+  candidatePool.candidates.push({
+    id: "builder-non-x",
+    source_id: "builder-blog-source",
+    category: "builder_observation",
+    title: "Example Builder blog post",
+    url: "https://example.com/builder-post",
+    source: "Example Blog",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "builder_observations",
+    evidence: "fixture"
+  });
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "builder_x_observation_missing"
   );
 });
 
@@ -1403,6 +2122,11 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("--browser-export"));
   assert(prompt.includes("npm run discover:builders"));
   assert(prompt.includes("npm run discover:content-sources"));
+  assert(prompt.includes("npm run sources:validate"));
+  assert(prompt.includes("npm run discover:search-news"));
+  assert(prompt.includes("npm run sources:health"));
+  assert(prompt.includes("npm run sources:audit-merge"));
+  assert(prompt.includes("npm run sources:phase5-audit"));
   assert(prompt.includes("npm run discover:statuspage-incidents"));
   assert(prompt.includes("release_scope"));
   assert(prompt.includes("follow-builders"));
@@ -1414,7 +2138,18 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("300-500"));
   assert(prompt.includes("follow-builders central feed"));
   assert(prompt.includes("Product Hunt"));
+  assert(prompt.includes("Product Hunt Trending"));
   assert(prompt.includes("TechCrunch AI"));
+  assert(prompt.includes("TechCrunch AI/Enterprise"));
+  assert(prompt.includes("大厂动态"));
+  assert(prompt.includes("行业趋势"));
+  assert(prompt.includes("公众号"));
+  assert(prompt.includes("自媒体"));
+  assert(prompt.includes("小宇宙"));
+  assert(prompt.includes("喜马拉雅"));
+  assert(prompt.includes("RSSHub"));
+  assert(prompt.includes("twscrape"));
+  assert(prompt.includes("--per-source-limit"));
   assert(prompt.includes("热点讨论"));
   assert(prompt.includes("融资"));
   assert(prompt.includes("领域"));
@@ -1476,6 +2211,49 @@ function sourceAuditFixture() {
       ],
       candidates_found: 1,
       included: 1,
+      notes: "fixture"
+    },
+    content_sources: {
+      checked: true,
+      sources: [
+        {
+          name: "Content Sources",
+          url: "https://example.com/content-feed.xml",
+          status: "checked",
+          notes: "fixture"
+        }
+      ],
+      candidates_found: 1,
+      included: 1,
+      notes: "fixture"
+    },
+    search_sources: {
+      checked: true,
+      shadow: true,
+      sources: [
+        {
+          name: "OpenAlex",
+          url: "https://api.openalex.org/works",
+          status: "checked",
+          notes: "fixture"
+        }
+      ],
+      candidates_found: 1,
+      included: 0,
+      notes: "fixture"
+    },
+    sources_health: {
+      checked: true,
+      sources: [
+        {
+          name: "Source Health",
+          url: "https://example.com/content-feed.xml",
+          status: "checked",
+          notes: "fixture"
+        }
+      ],
+      candidates_found: 0,
+      included: 0,
       notes: "fixture"
     }
   };
@@ -1552,6 +2330,10 @@ function contentSourceRssFixture() {
     </item>
   </channel>
 </rss>`;
+}
+
+function emptyRssFixture() {
+  return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel></channel></rss>`;
 }
 
 function anthropicNewsHtmlFixture() {
@@ -1639,6 +2421,77 @@ function statuspageAtomFixture() {
     <content>Resolved after elevated API errors.</content>
   </entry>
 </feed>`;
+}
+
+async function writePhase5Day(historyDir, reportDate, options = {}) {
+  const [year, month] = reportDate.split("-");
+  const dir = path.join(historyDir, year, month);
+  await fs.mkdir(dir, { recursive: true });
+  const sourceAudit = {
+    github_trending: auditGroupFixture("GitHub Trending", 2, 1),
+    builder_sources: auditGroupFixture("Builder", 1, 1),
+    content_sources: auditGroupFixture("Content", 3, 0),
+    ...(options.includeSearch ? { search_sources: auditGroupFixture("Search", 1, 0) } : {}),
+    ...(options.includeHealth ? { sources_health: auditGroupFixture("Health", 3, 0) } : {})
+  };
+  await fs.writeFile(
+    path.join(dir, `${reportDate}.json`),
+    `${JSON.stringify({
+      report_date: reportDate,
+      source_audit: sourceAudit
+    }, null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(dir, `${reportDate}.candidates.json`),
+    `${JSON.stringify({
+      schema_version: 1,
+      report_date: reportDate,
+      generated_at: `${reportDate}T00:00:00Z`,
+      sources: [
+        {
+          id: "source-main",
+          name: "Main Source",
+          url: "https://example.com/source",
+          category: "official_release",
+          status: "checked"
+        }
+      ],
+      candidates: [
+        {
+          id: "candidate-main",
+          source_id: "source-main",
+          category: "main_item",
+          title: "Main Item",
+          url: `https://example.com/${reportDate}`,
+          source: "Main Source",
+          event_date: reportDate,
+          status: "included",
+          included_in: "main_items",
+          verification_status: options.candidateVerificationStatus || "primary_confirmed",
+          verification_sources: [`https://example.com/${reportDate}`]
+        }
+      ]
+    }, null, 2)}\n`,
+    "utf8"
+  );
+}
+
+function auditGroupFixture(name, candidatesFound, included) {
+  return {
+    checked: true,
+    sources: [
+      {
+        name,
+        url: "https://example.com/feed",
+        status: "checked",
+        notes: "fixture"
+      }
+    ],
+    candidates_found: candidatesFound,
+    included,
+    notes: "fixture"
+  };
 }
 
 function textResponse(text, status = 200, finalUrl = "") {

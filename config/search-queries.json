@@ -1,0 +1,35 @@
+[
+  {
+    "id": "frontier-labs-release",
+    "query": "(OpenAI OR Anthropic OR Google DeepMind OR Meta AI OR xAI OR Mistral) (release OR launches OR announces)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "openai.com",
+      "anthropic.com",
+      "deepmind.google",
+      "ai.meta.com",
+      "x.ai",
+      "mistral.ai"
+    ]
+  },
+  {
+    "id": "ai-infra-business",
+    "query": "(NVIDIA OR AWS OR Azure OR Google Cloud OR Cloudflare) (AI OR agent OR inference OR GPU)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
+    "id": "ai-funding-ma",
+    "query": "(AI startup OR foundation model OR agent) (funding OR acquisition OR IPO)",
+    "candidate_category": "community_lead",
+    "verification_policy": "multi_source_required"
+  },
+  {
+    "id": "ai-papers-systems",
+    "query": "(LLM OR agent OR inference OR evaluation OR retrieval)",
+    "candidate_category": "community_lead",
+    "providers": ["arxiv", "openalex", "semantic_scholar"],
+    "verification_policy": "primary_allowed"
+  }
+]

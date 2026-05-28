@@ -58,24 +58,22 @@ export function projectHeatTags(item) {
 }
 
 export function githubTrendTags(item) {
-  const tags = [];
-  const rank = Number.isInteger(item?.rank) ? `#${item.rank}` : "";
-  const movement = githubTrendMovementLabel(item);
+  return unique([githubTrendStatusTag(item)]);
+}
 
-  if (rank) {
-    tags.push(rank);
-  }
-  if (movement) {
-    tags.push(movement);
-  }
-  if (item?.window) {
-    tags.push(item.window === "weekly" ? "weekly" : "daily");
-  }
-  if (item?.language && item.language !== "all") {
-    tags.push(item.language);
-  }
+export function githubTrendStatusTag(item) {
+  const trend = item?.trend === "up" || item?.trend === "down" || item?.trend === "same"
+    ? item.trend
+    : "new";
+  const delta = Number.isInteger(item?.rank_delta) ? Math.abs(item.rank_delta) : null;
 
-  return unique(tags).slice(0, 4);
+  if (trend === "up" && delta !== null) {
+    return `up +${delta}`;
+  }
+  if (trend === "down" && delta !== null) {
+    return `down -${delta}`;
+  }
+  return trend;
 }
 
 export function githubTrendMovementLabel(item) {
@@ -105,6 +103,67 @@ export function cleanProjectDescription(value) {
     return "";
   }
   return /[。！？.!?]$/.test(text) ? text : `${text}。`;
+}
+
+export function cleanGithubTrendDescription(item) {
+  const repo = typeof item === "object" ? item?.repo : "";
+  const raw = typeof item === "object" ? item?.description : item;
+  const withoutRepoPrefix = removeRepoPrefix(String(raw || ""), repo);
+  return cleanProjectDescription(translateKnownGithubDescription(withoutRepoPrefix, repo));
+}
+
+function translateKnownGithubDescription(value, repo) {
+  const text = value.trim();
+  const normalized = text.toLowerCase();
+
+  if (/moneyprinterturbo/i.test(repo) || /generate short videos with one click/i.test(normalized)) {
+    return "利用 AI 大模型一键生成高清短视频。";
+  }
+  if (/understand-anything/i.test(repo) || /turn any code into an interactive knowledge graph/i.test(normalized)) {
+    return "把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。";
+  }
+  if (/stop-slop/i.test(repo) || /removing ai tells from prose/i.test(normalized)) {
+    return "用于去除文章中常见 AI 痕迹的 skill 文件。";
+  }
+  if (/\/ecc$/i.test(repo) || /agent harness performance optimization system/i.test(normalized)) {
+    return "面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。";
+  }
+  if (/knowledge-work-plugins/i.test(repo) || /plugins primarily intended for knowledge workers/i.test(normalized)) {
+    return "Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。";
+  }
+  if (/taste-skill/i.test(repo) || /gives your ai good taste/i.test(normalized)) {
+    return "用于约束 AI 输出风格、减少空泛生成的 skill 文件。";
+  }
+  if (/\/heretic$/i.test(repo) || /censorship removal for language models/i.test(normalized)) {
+    return "用于自动移除语言模型审查限制的工具。";
+  }
+  if (/\/kronos$/i.test(repo) || /foundation model for the language of financial markets/i.test(normalized)) {
+    return "面向金融市场序列语言的基础模型。";
+  }
+  if (/anthropic-cybersecurity-skills/i.test(repo) || /structured cybersecurity skills for ai agents/i.test(normalized)) {
+    return "为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&CK、NIST CSF、MITRE ATLAS、D3FEND 与 NIST AI RMF，并面向 Claude Code、GitHub Copilot、Codex CLI、Cursor、Gemini CLI 等平台。";
+  }
+  if (/twentyhq\/twenty/i.test(repo) || /open alternative to salesforce/i.test(normalized)) {
+    return "面向 AI 场景设计的开源 Salesforce 替代方案。";
+  }
+
+  return text;
+}
+
+function removeRepoPrefix(value, repo) {
+  const text = value.trim();
+  if (!repo || !repo.includes("/")) {
+    return text;
+  }
+  const [owner, name] = repo.split("/");
+  return text
+    .replace(new RegExp(`^${escapeRegex(owner)}\\s*/\\s*${escapeRegex(name)}\\s*`, "i"), "")
+    .replace(new RegExp(`^${escapeRegex(owner)}\\s+\\/\\s+${escapeRegex(name)}\\s*`, "i"), "")
+    .trim();
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function unique(items) {

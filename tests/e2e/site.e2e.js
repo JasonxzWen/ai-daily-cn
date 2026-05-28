@@ -45,7 +45,8 @@ try {
   assert.equal(await page.locator("a[href='reports/2026/05/2026-05-13.html']").count(), 1);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
-  assert.match(await page.locator("h1").textContent(), /AI 日报 2026-05-13/);
+  assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
+  assert.equal((await page.locator("#report-top").textContent()).trim(), "2026-05-13");
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
   assert.match(await page.locator("body").textContent(), /主体信息/);
   assert.match(await page.locator("body").textContent(), /信源审计/);

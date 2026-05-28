@@ -568,7 +568,6 @@
     "source_audit": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["github_trending", "builder_sources"],
       "properties": {
         "github_trending": {
           "$ref": "#/$defs/source_audit_group"
@@ -577,6 +576,12 @@
           "$ref": "#/$defs/source_audit_group"
         },
         "content_sources": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "search_sources": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "sources_health": {
           "$ref": "#/$defs/source_audit_group"
         }
       }
@@ -604,6 +609,9 @@
           "type": "integer",
           "minimum": 0
         },
+        "shadow": {
+          "type": "boolean"
+        },
         "blocked_reason": {
           "type": "string"
         },
@@ -617,6 +625,20 @@
               "type": "null"
             }
           ]
+        },
+        "provider_runtime_ms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "provider_cost_units": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
         },
         "notes": {
           "type": "string"
@@ -636,7 +658,56 @@
           "$ref": "#/$defs/absolute_url"
         },
         "status": {
-          "enum": ["checked", "blocked", "no_signal"]
+          "enum": ["checked", "blocked", "no_signal", "skipped_missing_token", "skipped_missing_base_url"]
+        },
+        "id": {
+          "type": "string"
+        },
+        "source_kind": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "enablement": {
+          "type": "string"
+        },
+        "verification_policy": {
+          "type": "string"
+        },
+        "requires_original_url": {
+          "type": "boolean"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "feed_like": {
+          "type": "boolean"
+        },
+        "recent_48h_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "original_url_count": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "notes": {
           "type": "string"

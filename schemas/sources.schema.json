@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/sources.schema.json",
+  "title": "AI Daily Source Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    }
+  },
+  "$defs": {
+    "absolute_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "name",
+        "url",
+        "source_kind",
+        "candidate_category",
+        "tier",
+        "authority",
+        "enablement",
+        "verification_policy"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "source_kind": {
+          "enum": ["rss", "html_index", "rsshub", "rss_bridge", "aggregator", "search_api", "manual"]
+        },
+        "candidate_category": {
+          "enum": [
+            "main_item",
+            "github_trending",
+            "model_release",
+            "hot_blog",
+            "project",
+            "builder_observation",
+            "community_lead"
+          ]
+        },
+        "tier": {
+          "enum": ["T0", "T1", "T2", "T3"]
+        },
+        "authority": {
+          "enum": ["primary", "secondary", "intermediary", "aggregator", "community"]
+        },
+        "enablement": {
+          "enum": ["core", "optional", "manual"]
+        },
+        "verification_policy": {
+          "enum": ["primary_allowed", "primary_required", "multi_source_required", "community_only"]
+        },
+        "requires_original_url": {
+          "type": "boolean"
+        },
+        "max_items_per_run": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1000
+        }
+      }
+    }
+  }
+}

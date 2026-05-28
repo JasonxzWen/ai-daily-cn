@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,80 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-25 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-25</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <ul class="hero-summary-text hero-summary-list"><li>2026-05-25 这版日报只保留 3 条主体信息：OpenAI Codex 速率限制 incident 在 2026-05-23 恢复，Hugging Face 社区在 …</li><li>模型发布区为空，没有把旧发布重新包装成今日内容</li></ul>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-25 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-25 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-25</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-5" title="Builder 观察" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-25</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>3</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>4</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>2</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>Codex</strong>：2026-05-25 这版日报只保留 3 条主体信息：OpenAI Codex 速率限制 incident 在 2026-05-23 恢复，Hugging Face 社区在 2026-05-24 更新 Pap…</li><li><strong>概览</strong>：模型发布区为空，没有把旧发布重新包装成今日内容</li></ul></div>
-    <template data-rich-source data-source-fallback>- **Codex**：2026-05-25 这版日报只保留 3 条主体信息：OpenAI Codex 速率限制 incident 在 2026-05-23 恢复，Hugging Face 社区在 2026-05-24 更新 Pap…
-- **概览**：模型发布区为空，没有把旧发布重新包装成今日内容</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1475,31 +1579,28 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI Codex 速率限制 incident 已恢复</strong>（2026-05-23，T0）</p>
-<ul><li>这条不是产品发布，但会影响正在跑长任务、自动化任务或多人共享配额的 Codex 工作流。</li><li>如果团队最近看到 Codex 任务排队、失败或提前撞限，需要把平台 incident 与本地脚本问题分开排查。</li><li>状态页只给聚合可用性指标，不代表每个订阅层级或每种模型路径的体验完全一致。</li><li>来源：<a href="https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN" rel="noopener noreferrer">OpenAI Status</a></li></ul>
-<p>2. <strong>Hugging Face 社区更新 PapersWithCode 复刻站</strong>（2026-05-24，T1）</p>
-<ul><li>这类索引不是模型本身，但会影响研究对比、benchmark 追踪和 agent 选型时的证据质量。</li><li>外部论文和 GitHub repo 也能提交后，非 arXiv 工程成果更容易进入同一检索与评测视图。</li><li>对日报来说，这类来源适合进入研究/工具观察，不应和模型发布混写。</li><li>来源：<a href="https://huggingface.co/blog/nielsr/paperswithcode-launch" rel="noopener noreferrer">Hugging Face Blog</a></li></ul>
-<p>3. <strong>GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施</strong>（2026-05-25，T2）</p>
-<ul><li>earendil-works/pi 在 2026-05-23 发布 v0.75.5，改动包括 coding-agent 工具输出、Windows 文件工具和 provider 配置修复。</li><li>anthropics/knowledge-work-plugins 和 NVlabs/LongLive 都有 2026-05-24 之后的仓库活动，分别对应 Claude Cowork 插件目录和 long-video generation infra。</li><li>这一组更像工程工作流温度计，不等同于官方产品发布。</li><li>来源：<a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI Codex 速率限制 incident 已恢复**（2026-05-23，T0）
+    <div class="rendered-markdown"><ol><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI Status" loading="lazy" decoding="async"> <strong><a href="https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN" rel="noopener noreferrer">OpenAI Status：OpenAI Codex 速率限制 incident 已恢复</a></strong>（2026-05-23，T0）</li></ol>
+<ul><li>这条不是产品发布，但会影响正在跑长任务、自动化任务或多人共享配额的 Codex 工作流。</li><li>如果团队最近看到 Codex 任务排队、失败或提前撞限，需要把平台 incident 与本地脚本问题分开排查。</li><li>状态页只给聚合可用性指标，不代表每个订阅层级或每种模型路径的体验完全一致。</li></ul>
+<ol start="2"><li><strong><a href="https://huggingface.co/blog/nielsr/paperswithcode-launch" rel="noopener noreferrer">Hugging Face Blog：Hugging Face 社区更新 PapersWithCode 复刻站</a></strong>（2026-05-24，T1）</li></ol>
+<ul><li>这类索引不是模型本身，但会影响研究对比、benchmark 追踪和 agent 选型时的证据质量。</li><li>外部论文和 GitHub repo 也能提交后，非 arXiv 工程成果更容易进入同一检索与评测视图。</li><li>对日报来说，这类来源适合进入研究/工具观察，不应和模型发布混写。</li></ul>
+<ol start="3"><li><strong><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily：GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施</a></strong>（2026-05-25，T2）</li></ol>
+<ul><li>earendil-works/pi 在 2026-05-23 发布 v0.75.5，改动包括 coding-agent 工具输出、Windows 文件工具和 provider 配置修复。</li><li>anthropics/knowledge-work-plugins 和 NVlabs/LongLive 都有 2026-05-24 之后的仓库活动，分别对应 Claude Cowork 插件目录和 long-video generation infra。</li><li>这一组更像工程工作流温度计，不等同于官方产品发布。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. ![OpenAI Status](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI Status：OpenAI Codex 速率限制 incident 已恢复](https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN)**（2026-05-23，T0）
   - 这条不是产品发布，但会影响正在跑长任务、自动化任务或多人共享配额的 Codex 工作流。
   - 如果团队最近看到 Codex 任务排队、失败或提前撞限，需要把平台 incident 与本地脚本问题分开排查。
   - 状态页只给聚合可用性指标，不代表每个订阅层级或每种模型路径的体验完全一致。
-  - 来源：[OpenAI Status](https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN)
 
-2. **Hugging Face 社区更新 PapersWithCode 复刻站**（2026-05-24，T1）
+2. **[Hugging Face Blog：Hugging Face 社区更新 PapersWithCode 复刻站](https://huggingface.co/blog/nielsr/paperswithcode-launch)**（2026-05-24，T1）
   - 这类索引不是模型本身，但会影响研究对比、benchmark 追踪和 agent 选型时的证据质量。
   - 外部论文和 GitHub repo 也能提交后，非 arXiv 工程成果更容易进入同一检索与评测视图。
   - 对日报来说，这类来源适合进入研究/工具观察，不应和模型发布混写。
-  - 来源：[Hugging Face Blog](https://huggingface.co/blog/nielsr/paperswithcode-launch)
 
-3. **GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施**（2026-05-25，T2）
+3. **[GitHub Trending daily：GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施](https://github.com/trending?since=daily)**（2026-05-25，T2）
   - earendil-works/pi 在 2026-05-23 发布 v0.75.5，改动包括 coding-agent 工具输出、Windows 文件工具和 provider 配置修复。
   - anthropics/knowledge-work-plugins 和 NVlabs/LongLive 都有 2026-05-24 之后的仓库活动，分别对应 Claude Cowork 插件目录和 long-video generation infra。
-  - 这一组更像工程工作流温度计，不等同于官方产品发布。
-  - 来源：[GitHub Trending daily](https://github.com/trending?since=daily)</template>
+  - 这一组更像工程工作流温度计，不等同于官方产品发布。</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1540,7 +1641,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-builder-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1549,22 +1650,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>Builder 观察</h4>
-<ul><li><strong>Thariq</strong>（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 <a href="https://x.com/trq212/status/2058377974882210096" rel="noopener noreferrer">X</a></li><li><strong>Peter Steinberger</strong>（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 <a href="https://x.com/steipete/status/2058308112134635528" rel="noopener noreferrer">X</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### Builder 观察
-
-- **Thariq**（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 [X](https://x.com/trq212/status/2058377974882210096)
+    <div class="rendered-markdown"><ul><li><strong>Thariq</strong>（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 <a href="https://x.com/trq212/status/2058377974882210096" rel="noopener noreferrer">X</a></li><li><strong>Peter Steinberger</strong>（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 <a href="https://x.com/steipete/status/2058308112134635528" rel="noopener noreferrer">X</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Thariq**（Claude Code engineer）：Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。 [X](https://x.com/trq212/status/2058377974882210096)
 - **Peter Steinberger**（OpenClaw / OpenAI builder）：Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。 [X](https://x.com/steipete/status/2058308112134635528)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><h4>GitHub Trending</h4>
 <ul><li>检查状态：已检查</li><li>候选 / 入选：127 / 4</li><li>说明：只收录能用 release、commit page 或 gh api 交叉确认的项目；纯榜单热度不单独当作 release。</li></ul>
 <ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：checked，17 repositories parsed</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending Python daily</a>：checked，18 repositories parsed</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending TypeScript daily</a>：checked，16 repositories parsed</li><li><a href="https://api.github.com/" rel="noopener noreferrer">GitHub repo metadata via gh api</a>：checked，直接 REST 请求返回 403；gh api 可用，用于核对 selected repo 的 pushed_at、release 和描述。</li></ul>
@@ -1590,17 +1689,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - 上次成功获取：2026-05-24T07:25:51.477Z
 - 说明：只选保留原始 URL、与工程工作流直接相关、且不依赖二手转述的 Builder 内容。
 
-- [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：checked，feedGeneratedAt=2026-05-24T07:25:51.477Z；包含 8 位 X builder、18 条 X posts 和 1 个 podcast。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+- [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：checked，feedGeneratedAt=2026-05-24T07:25:51.477Z；包含 8 位 X builder、18 条 X posts 和 1 个 podcast。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：2</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息只有 3 条，这是新鲜度门禁下的正常结果。没有模型发布入选；没有把 2026-05-22 以前的旧发布放进主体。Kedro、Google I/O、GitHub Copilot web model list、No Priors Cerebras podcast 等内容已保留为候选池排除项。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>直接 GitHub REST 抓取 selected repos 时返回 403，但本机 gh api 可以成功读取 repo metadata。</strong></li><li>为什么要改：把 gh api 作为本地已登录环境的正式兜底，减少人工核对项目区的时间。</li><li><strong>follow-builders 输出需要人工摘取 Builder 条目并映射 candidate_id。</strong></li><li>为什么要改：自动把合格 Builder 原始链接转为候选，降低漏收和格式错误。</li><li><strong>当前硬门禁会拦截旧内容进入 main_items，但旧内容仍可手工进入 projects 或 hot_blogs。</strong></li><li>为什么要改：把 48 小时规则扩展到 projects 和 hot_blogs，避免旧内容换区出现。</li></ul>
@@ -1621,8 +1721,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **当前硬门禁会拦截旧内容进入 main_items，但旧内容仍可手工进入 projects 或 hot_blogs。**
   - 为什么要改：把 48 小时规则扩展到 projects 和 hot_blogs，避免旧内容换区出现。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-25.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-25.json)</template></div>
+  </details>
 
 
 

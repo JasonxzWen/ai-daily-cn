@@ -106,11 +106,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -172,6 +204,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -200,6 +236,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -395,6 +437,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -474,7 +612,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {

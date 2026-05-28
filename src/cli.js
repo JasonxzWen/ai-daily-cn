@@ -16,6 +16,11 @@ import {
   collectGitHubTrending,
   collectStatuspageIncidents
 } from "./discovery.js";
+import { collectSearchNews } from "./search-news.js";
+import { checkSourcesHealth } from "./source-health.js";
+import { auditSourceRunHistory } from "./source-phase5.js";
+import { mergeSourceAuditIntoReport } from "./source-audit.js";
+import { validateSourceRegistryPath } from "./source-registry.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
 
@@ -137,7 +142,9 @@ try {
       browserExportLanguage: args["browser-export-language"],
       browserExportWindow: args["browser-export-window"],
       historyRoot: args["history-root"],
-      historyLookbackDays: Number.parseInt(args["history-lookback-days"] || "7", 10)
+      historyLookbackDays: Number.parseInt(args["history-lookback-days"] || "7", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
     printJson({
       ok: true,
@@ -149,7 +156,10 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
+      perSourceLimit: Number.parseInt(args["per-source-limit"] || "3", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
     printJson({
       ok: true,
@@ -157,15 +167,93 @@ try {
     });
   } else if (command === "discover:content-sources") {
     const args = parseArgs(argv);
+    const positionalNumbers = positiveIntegers(argv);
     const result = await collectContentSources({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
+      registryPath: args.registry,
+      enablement: args.enablement || firstEnablement(argv) || "core",
+      limit: Number.parseInt(args.limit || positionalNumbers[0] || "20", 10),
+      perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
+      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
     printJson({
       ok: true,
       ...result
+    });
+  } else if (command === "discover:search-news") {
+    const args = parseArgs(argv);
+    const positionalNumbers = positiveIntegers(argv);
+    const result = await collectSearchNews({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      providers: args.providers || inferProviderList(argv),
+      queriesPath: args.queries || firstJsonPath(argv),
+      limit: Number.parseInt(args.limit || positionalNumbers[0] || "40", 10),
+      timeoutMs: Number.parseInt(args["timeout-ms"] || positionalNumbers[1] || "15000", 10),
+      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      shadow: args.shadow !== false,
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "sources:health") {
+    const args = parseArgs(argv);
+    const result = await checkSourcesHealth({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      sourcesPath: args.sources || firstSourcePath(argv),
+      enablement: args.enablement || firstEnablement(argv) || "core,optional,manual",
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "sources:phase5-audit") {
+    const args = parseArgs(argv);
+    const positionalNumbers = positiveIntegers(argv);
+    const result = await auditSourceRunHistory({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      historyDir: args["history-dir"] || firstHistoryPath(argv) || "reports-data",
+      days: Number.parseInt(args.days || positionalNumbers[0] || "3", 10)
+    });
+    printJson(result);
+  } else if (command === "sources:audit-merge") {
+    const args = parseArgs(argv);
+    const result = await mergeSourceAuditIntoReport({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      historyDir: args["history-dir"] || firstHistoryPath(argv) || "reports-data",
+      reportPath: args.report,
+      inputPaths: auditInputPaths(argv, args)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "sources:validate") {
+    const args = parseArgs(argv);
+    const registry = await validateSourceRegistryPath({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      sourcesPath: args.sources || firstSourcePath(argv)
+    });
+    printJson({
+      ok: true,
+      source_count: registry.sources.length,
+      enablement_counts: countBy(registry.sources, "enablement"),
+      tier_counts: countBy(registry.sources, "tier"),
+      source_kind_counts: countBy(registry.sources, "source_kind")
     });
   } else if (command === "discover:statuspage-incidents") {
     const args = parseArgs(argv);
@@ -173,7 +261,9 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10)
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
     printJson({
       ok: true,
@@ -286,6 +376,46 @@ function firstPositiveInteger(args) {
   return args.find((token) => /^[1-9]\d*$/.test(token));
 }
 
+function positiveIntegers(args) {
+  return args.filter((token) => /^[1-9]\d*$/.test(token));
+}
+
+function firstEnablement(args) {
+  return args.find((token) => /^(core|optional|manual)(,(core|optional|manual))*$/.test(token));
+}
+
+function firstJsonPath(args) {
+  return args.find((token) => /\.json$/i.test(token));
+}
+
+function firstSourcePath(args) {
+  return args.find((token) => /\.json$/i.test(token) || /(^|[\\/])sources([\\/]|$)/i.test(token));
+}
+
+function firstHistoryPath(args) {
+  return args.find((token) => /(^|[\\/])reports-data([\\/]|$)|^reports-data$/i.test(token));
+}
+
+function inferProviderList(args) {
+  const providerNames = new Set(["gdelt", "openalex", "arxiv", "brave", "tavily", "exa", "serpapi", "semantic_scholar"]);
+  const providers = args
+    .flatMap((token) => String(token).split(","))
+    .map((token) => token.trim())
+    .filter((token) => providerNames.has(token));
+  return providers.length > 0 ? providers.join(",") : undefined;
+}
+
+function auditInputPaths(args, parsed) {
+  const explicit = [parsed.input, parsed.inputs].filter(Boolean).flatMap(splitInputPathToken);
+  const positional = positionalArgs(args).flatMap(splitInputPathToken).filter((token) => /\.json$/i.test(token));
+  const excluded = new Set([parsed.report].filter(Boolean).map((value) => path.resolve(value)));
+  return [...explicit, ...positional].filter((value) => !excluded.has(path.resolve(value)));
+}
+
+function splitInputPathToken(value) {
+  return String(value).split(/[,\s]+/).map((token) => token.trim()).filter(Boolean);
+}
+
 function positionalArgs(args) {
   const values = [];
   for (let index = 0; index < args.length; index += 1) {
@@ -304,4 +434,13 @@ function positionalArgs(args) {
 
 function printJson(value) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+function countBy(items, key) {
+  const counts = {};
+  for (const item of items) {
+    const value = item?.[key] || "unspecified";
+    counts[value] = (counts[value] || 0) + 1;
+  }
+  return counts;
 }

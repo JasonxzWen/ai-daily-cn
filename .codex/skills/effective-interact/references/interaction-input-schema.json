@@ -38,6 +38,25 @@
       "default": false,
       "description": "When true, expose the runtime dependency manifest as a visible report section. The manifest remains machine-readable but hidden by default."
     },
+    "hideHeroSummary": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, suppress the hero summary block."
+    },
+    "hideNavigation": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, suppress the generated in-page navigation."
+    },
+    "heroMode": {
+      "type": "string",
+      "enum": ["date-only"],
+      "description": "Optional specialized hero layout. date-only renders only the heroTitle or title."
+    },
+    "heroTitle": {
+      "type": "string",
+      "description": "Visible title used by specialized hero modes."
+    },
     "intent": {
       "type": "object",
       "additionalProperties": false,
@@ -97,6 +116,30 @@
           "summary": {
             "type": "string",
             "description": "Optional one-line section summary used in grouped navigation or section headers."
+          },
+          "collapsed": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, render the section as a closed details panel by default."
+          },
+          "defaultCollapsed": {
+            "type": "boolean",
+            "default": false,
+            "description": "Legacy alias for collapsed."
+          },
+          "open": {
+            "type": "boolean",
+            "default": false,
+            "description": "When used with collapsed/defaultCollapsed, render the details panel initially open."
+          },
+          "appendix": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, style the collapsed section as low-priority appendix material."
+          },
+          "appendixLabel": {
+            "type": "string",
+            "description": "Visible label shown above a collapsed appendix section title."
           },
           "status": {
             "type": "string",
@@ -381,6 +424,11 @@
       "items": {
         "type": "string"
       }
+    },
+    "nextActionsCollapsed": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, render nextActions as a collapsed appendix panel."
     }
   }
 }

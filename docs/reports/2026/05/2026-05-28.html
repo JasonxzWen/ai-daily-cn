@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="effective-interact create-interaction.mjs">
-  <meta name="generated-at" content="2026-05-28T03:29:47.080Z">
+  <meta name="generated-at" content="2026-05-28T10:30:44.358Z">
   <meta name="render-mode" content="pre-rendered">
   <title>AI 日报 2026-05-28</title>
   <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,88 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-28 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-28</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief">
-        <ul class="hero-summary-text hero-summary-list hero-highlight-list"><li><a class="hero-highlight-link" href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending 改为独立板块</a><span class="hero-highlight-reason">今天展示 daily 前 8 个仓库，并保留 rank、previous_rank、rank_delta 和 trend 字段；由于昨天没有结构化 trending 历史，本轮全部标记为 new。</span></li><li><a class="hero-highlight-link" href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer">follow-builders 已恢复并进入 Builder 观察</a><span class="hero-highlight-reason">本轮成功读取 follow-builders X feed、podcast feed 和固定 RSS 兜底源，入选 3 条与 agent 使用方式或企业落地相关的观察。</span></li></ul>
-        <div class="hero-stat-grid" aria-label="报告摘要指标">
-    <div class="hero-stat"><span>行动</span><strong>3</strong><small>项</small></div>
-  </div>
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-28 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-28 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-28</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="热门技术博客" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
-<a href="#section-github-trending-5" title="GitHub Trending 趋势" data-nav-link data-nav-index="5" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending 趋势</span></a>
-<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
-<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-<a href="#next-actions" title="下一步" data-nav-link data-nav-index="10" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-28</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>2</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">GitHub Trending</div><strong>8</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>1</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>2</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>3</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>Codex</strong>：今天补齐三条线：运行可靠性上，OpenAI Status 仍把 Codex context compaction latency 标为调查中</li><li><strong>概览</strong>：企业控制面上，GitHub 继续把 Copilot 记忆、模型准入、Code Quality API 和 PR 覆盖率放进管理边界</li><li><strong>开源项目</strong>：发现面上，GitHub Trending 独立展示 daily 前 8 个仓库，并标注排名与 new 状态，Builder 观察则来自 follow-builders 的 3 条原始 X 记录</li></ul></div>
-    <template data-rich-source data-source-fallback>- **Codex**：今天补齐三条线：运行可靠性上，OpenAI Status 仍把 Codex context compaction latency 标为调查中
-- **概览**：企业控制面上，GitHub 继续把 Copilot 记忆、模型准入、Code Quality API 和 PR 覆盖率放进管理边界
-- **开源项目**：发现面上，GitHub Trending 独立展示 daily 前 8 个仓库，并标注排名与 new 状态，Builder 观察则来自 follow-builders 的 3 条原始 X 记录</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1483,23 +1579,28 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI Status：Codex context compaction latency 仍在调查</strong>（2026-05-28，T0）</p>
-<ul><li>事件最早在 2026-05-27 05:57 PM 标记 identified，随后在 2026-05-28 00:14 和 01:47 继续显示调查中；这类问题更像运行时延迟，不应和模型答复质量混在一起判断。</li><li>使用 Codex 做长上下文代码任务的团队，今天应把任务排队、上下文压缩、工具执行和网络失败分开记录，避免用单次慢请求直接判断 agent 配置错误。</li><li>如果 CI 或自动修复流程依赖 Codex，建议在 runbook 中加入供应商状态页检查，并为长任务设置可重放输入，等待事件恢复后再复跑。</li><li>来源：<a href="https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7" rel="noopener noreferrer">OpenAI Status</a></li></ul>
-<p>2. <strong>GitHub 把 Copilot 记忆、模型可用性和 Code Quality 控制继续前移</strong>（2026-05-26，T0）</p>
-<ul><li>Copilot Memory 的仓库级开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实；这会影响记忆内容是否能被全仓库贡献者复用。</li><li>组织级 model rules 把模型准入从企业全局设置拆到组织范围，适合多业务线分别做安全评审、成本边界和默认模型策略。</li><li>Code Quality setup API 与 PR 覆盖率预览把质量信号前移到 review 流程；对使用 AI 改代码的团队，覆盖率和静态质量配置更容易进入同一套合并门禁。</li><li>来源：<a href="https://github.blog/changelog/" rel="noopener noreferrer">GitHub Changelog</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI Status：Codex context compaction latency 仍在调查**（2026-05-28，T0）
-  - 事件最早在 2026-05-27 05:57 PM 标记 identified，随后在 2026-05-28 00:14 和 01:47 继续显示调查中；这类问题更像运行时延迟，不应和模型答复质量混在一起判断。
-  - 使用 Codex 做长上下文代码任务的团队，今天应把任务排队、上下文压缩、工具执行和网络失败分开记录，避免用单次慢请求直接判断 agent 配置错误。
-  - 如果 CI 或自动修复流程依赖 Codex，建议在 runbook 中加入供应商状态页检查，并为长任务设置可重放输入，等待事件恢复后再复跑。
-  - 来源：[OpenAI Status](https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7)
+    <div class="rendered-markdown"><ol><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI Status" loading="lazy" decoding="async"> <strong><a href="https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7" rel="noopener noreferrer">OpenAI Status：Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁</a></strong>（2026-05-28，T0）</li></ol>
+<ul><li><strong>状态已恢复</strong>：本次重新抓取的 Statuspage 输出显示 affected components 已回到 operational，不再沿用早些时候的 investigating 口径。</li><li><strong>运行分类</strong>：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。</li><li><strong>自动化处理</strong>：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。</li></ul>
+<ol start="2"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI News RSS" loading="lazy" decoding="async"> <strong><a href="https://openai.com/index/cisco" rel="noopener noreferrer">OpenAI News RSS：Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理</a></strong>（2026-05-27，T0）</li></ol>
+<ul><li><strong>落点更具体</strong>：官方文章提到 scale AI-native development、accelerate AI Defense work 和 automate defect remediation，说明 Codex 的叙事正在进入缺陷、测试和安全流程。</li><li><strong>团队门槛</strong>：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。</li><li><strong>可跟进项</strong>：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。</li></ul>
+<ol start="3"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC" alt="GitHub Changelog" loading="lazy" decoding="async"> <strong><a href="https://github.blog/changelog/" rel="noopener noreferrer">GitHub Changelog：GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界</a></strong>（2026-05-26，T0）</li></ol>
+<ul><li><strong>记忆边界</strong>：仓库级关闭开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实，减少错误记忆被全仓库复用。</li><li><strong>模型准入</strong>：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。</li><li><strong>合并门禁</strong>：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. ![OpenAI Status](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI Status：Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁](https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7)**（2026-05-28，T0）
+  - **状态已恢复**：本次重新抓取的 Statuspage 输出显示 affected components 已回到 operational，不再沿用早些时候的 investigating 口径。
+  - **运行分类**：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。
+  - **自动化处理**：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。
 
-2. **GitHub 把 Copilot 记忆、模型可用性和 Code Quality 控制继续前移**（2026-05-26，T0）
-  - Copilot Memory 的仓库级开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实；这会影响记忆内容是否能被全仓库贡献者复用。
-  - 组织级 model rules 把模型准入从企业全局设置拆到组织范围，适合多业务线分别做安全评审、成本边界和默认模型策略。
-  - Code Quality setup API 与 PR 覆盖率预览把质量信号前移到 review 流程；对使用 AI 改代码的团队，覆盖率和静态质量配置更容易进入同一套合并门禁。
-  - 来源：[GitHub Changelog](https://github.blog/changelog/)</template>
+2. ![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI News RSS：Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理](https://openai.com/index/cisco)**（2026-05-27，T0）
+  - **落点更具体**：官方文章提到 scale AI-native development、accelerate AI Defense work 和 automate defect remediation，说明 Codex 的叙事正在进入缺陷、测试和安全流程。
+  - **团队门槛**：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。
+  - **可跟进项**：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。
+
+3. ![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC) **[GitHub Changelog：GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界](https://github.blog/changelog/)**（2026-05-26，T0）
+  - **记忆边界**：仓库级关闭开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实，减少错误记忆被全仓库复用。
+  - **模型准入**：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。
+  - **合并门禁**：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1508,37 +1609,46 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://huggingface.co/blog/local-reachy-mini-conversation" rel="noopener noreferrer">Reachy Mini goes fully local</a></strong>（Hugging Face / Amir Mahla, Andres Marafioti，2026-05-27）：这篇 Hugging Face 文章把 Reachy Mini 的对话能力从托管后端迁到本地机器，给出一条可复现的级联语音路线：VAD 负责检测说话片段，STT 把语音转成文本，LLM 负责生成回复，TTS 再把文本读出来。文章用 speech-to-speech 提供兼容 Realtime API 的 WebSocket 后端，并展示 llama.cpp、vLLM、Transformers、MLX 和托管 Responses API 的切换方式。对做语音机器人或边缘 agent 的团队，最有用的是它把隐私、成本、延迟和可替换组件拆成清楚的部署选项：音频可以不出本地网络，模型服务可以独立进程运行，后续只要接口保持一致，就能替换 STT、LLM 或 TTS。局限也很明确：端到端体验取决于本地硬件、模型大小、TTS 延迟和网络绑定配置。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Reachy Mini goes fully local](https://huggingface.co/blog/local-reachy-mini-conversation)**（Hugging Face / Amir Mahla, Andres Marafioti，2026-05-27）：这篇 Hugging Face 文章把 Reachy Mini 的对话能力从托管后端迁到本地机器，给出一条可复现的级联语音路线：VAD 负责检测说话片段，STT 把语音转成文本，LLM 负责生成回复，TTS 再把文本读出来。文章用 speech-to-speech 提供兼容 Realtime API 的 WebSocket 后端，并展示 llama.cpp、vLLM、Transformers、MLX 和托管 Responses API 的切换方式。对做语音机器人或边缘 agent 的团队，最有用的是它把隐私、成本、延迟和可替换组件拆成清楚的部署选项：音频可以不出本地网络，模型服务可以独立进程运行，后续只要接口保持一致，就能替换 STT、LLM 或 TTS。局限也很明确：端到端体验取决于本地硬件、模型大小、TTS 延迟和网络绑定配置。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Agentic enterprise IT benchmark" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/ibm-research/itbench-aa" rel="noopener noreferrer">ITBench-AA: Frontier Models Score Below 50% on the First Benchmark for Agentic Enterprise IT Tasks</a></h3>
+    <div class="card-tags"><span class="chip">Agentic enterprise IT benchmark</span></div>
+    <p>这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><img class="card-detail-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NSIgaGVpZ2h0PSI4OCIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0ZGRDIxRSIgZD0iTTQ3LjIxIDc2LjVhMzQuNzUgMzQuNzUgMCAxIDAgMC02OS41IDM0Ljc1IDM0Ljc1IDAgMCAwIDAgNjkuNVoiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTgxLjk2IDQxLjc1YTM0Ljc1IDM0Ljc1IDAgMSAwLTY5LjUgMCAzNC43NSAzNC43NSAwIDAgMCA2OS41IDBabS03My41IDBhMzguNzUgMzguNzUgMCAxIDEgNzcuNSAwIDM4Ljc1IDM4Ljc1IDAgMCAxLTc3LjUgMFoiIC8+PHBhdGggZmlsbD0iIzNBM0I0NSIgZD0iTTU4LjUgMzIuM2MxLjI4LjQ0IDEuNzggMy4wNiAzLjA3IDIuMzhhNSA1IDAgMSAwLTYuNzYtMi4wN2MuNjEgMS4xNSAyLjU1LS43MiAzLjctLjMyWk0zNC45NSAzMi4zYy0xLjI4LjQ0LTEuNzkgMy4wNi0zLjA3IDIuMzhhNSA1IDAgMSAxIDYuNzYtMi4wN2MtLjYxIDEuMTUtMi41Ni0uNzItMy43LS4zMloiIC8+PHBhdGggZmlsbD0iI0ZGMzIzRCIgZD0iTTQ2Ljk2IDU2LjI5YzkuODMgMCAxMy04Ljc2IDEzLTEzLjI2IDAtMi4zNC0xLjU3LTEuNi00LjA5LS4zNi0yLjMzIDEuMTUtNS40NiAyLjc0LTguOSAyLjc0LTcuMTkgMC0xMy02Ljg4LTEzLTIuMzhzMy4xNiAxMy4yNiAxMyAxMy4yNloiIC8+PHBhdGggZmlsbD0iIzNBM0I0NSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzkuNDMgNTRhOC43IDguNyAwIDAgMSA1LjMtNC40OWMuNC0uMTIuODEuNTcgMS4yNCAxLjI4LjQuNjguODIgMS4zNyAxLjI0IDEuMzcuNDUgMCAuOS0uNjggMS4zMy0xLjM1LjQ1LS43Ljg5LTEuMzggMS4zMi0xLjI1YTguNjEgOC42MSAwIDAgMSA1IDQuMTdjMy43My0yLjk0IDUuMS03Ljc0IDUuMS0xMC43IDAtMi4zNC0xLjU3LTEuNi00LjA5LS4zNmwtLjE0LjA3Yy0yLjMxIDEuMTUtNS4zOSAyLjY3LTguNzcgMi42N3MtNi40NS0xLjUyLTguNzctMi42N2MtMi42LTEuMjktNC4yMy0yLjEtNC4yMy4yOSAwIDMuMDUgMS40NiA4LjA2IDUuNDcgMTAuOTdaIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTcwLjcxIDM3YTMuMjUgMy4yNSAwIDEgMCAwLTYuNSAzLjI1IDMuMjUgMCAwIDAgMCA2LjVaTTI0LjIxIDM3YTMuMjUgMy4yNSAwIDEgMCAwLTYuNSAzLjI1IDMuMjUgMCAwIDAgMCA2LjVaTTE3LjUyIDQ4Yy0xLjYyIDAtMy4wNi42Ni00LjA3IDEuODdhNS45NyA1Ljk3IDAgMCAwLTEuMzMgMy43NiA3LjEgNy4xIDAgMCAwLTEuOTQtLjNjLTEuNTUgMC0yLjk1LjU5LTMuOTQgMS42NmE1LjggNS44IDAgMCAwLS44IDcgNS4zIDUuMyAwIDAgMC0xLjc5IDIuODJjLS4yNC45LS40OCAyLjguOCA0Ljc0YTUuMjIgNS4yMiAwIDAgMC0uMzcgNS4wMmMxLjAyIDIuMzIgMy41NyA0LjE0IDguNTIgNi4xIDMuMDcgMS4yMiA1Ljg5IDIgNS45MSAyLjAxYTQ0LjMzIDQ0LjMzIDAgMCAwIDEwLjkzIDEuNmM1Ljg2IDAgMTAuMDUtMS44IDEyLjQ2LTUuMzQgMy44OC01LjY5IDMuMzMtMTAuOS0xLjctMTUuOTItMi43Ny0yLjc4LTQuNjItNi44Ny01LTcuNzctLjc4LTIuNjYtMi44NC01LjYyLTYuMjUtNS42MmE1LjcgNS43IDAgMCAwLTQuNiAyLjQ2Yy0xLTEuMjYtMS45OC0yLjI1LTIuODYtMi44MkE3LjQgNy40IDAgMCAwIDE3LjUyIDQ4Wm0wIDRjLjUxIDAgMS4xNC4yMiAxLjgyLjY1IDIuMTQgMS4zNiA2LjI1IDguNDMgNy43NiAxMS4xOC41LjkyIDEuMzcgMS4zMSAyLjE0IDEuMzEgMS41NSAwIDIuNzUtMS41My4xNS0zLjQ4LTMuOTItMi45My0yLjU1LTcuNzItLjY4LTguMDEuMDgtLjAyLjE3LS4wMi4yNC0uMDIgMS43IDAgMi40NSAyLjkzIDIuNDUgMi45M3MyLjIgNS41MiA1Ljk4IDkuM2MzLjc3IDMuNzcgMy45NyA2LjggMS4yMiAxMC44My0xLjg4IDIuNzUtNS40NyAzLjU4LTkuMTYgMy41OC0zLjgxIDAtNy43My0uOS05LjkyLTEuNDYtLjExLS4wMy0xMy40NS0zLjgtMTEuNzYtNyAuMjgtLjU0Ljc1LS43NiAxLjM0LS43NiAyLjM4IDAgNi43IDMuNTQgOC41NyAzLjU0LjQxIDAgLjctLjE3LjgzLS42Ljc5LTIuODUtMTIuMDYtNC4wNS0xMC45OC04LjE3LjItLjczLjcxLTEuMDIgMS40NC0xLjAyIDMuMTQgMCAxMC4yIDUuNTMgMTEuNjggNS41My4xMSAwIC4yLS4wMy4yNC0uMS43NC0xLjIuMzMtMi4wNC00LjktNS4yLTUuMjEtMy4xNi04Ljg4LTUuMDYtNi44LTcuMzMuMjQtLjI2LjU4LS4zOCAxLS4zOCAzLjE3IDAgMTAuNjYgNi44MiAxMC42NiA2LjgyczIuMDIgMi4xIDMuMjUgMi4xYy4yOCAwIC41Mi0uMS42OC0uMzguODYtMS40Ni04LjA2LTguMjItOC41Ni0xMS4wMS0uMzQtMS45LjI0LTIuODUgMS4zMS0yLjg1WiIgLz48cGF0aCBmaWxsPSIjRkZEMjFFIiBkPSJNMzguNiA3Ni42OWMyLjc1LTQuMDQgMi41NS03LjA3LTEuMjItMTAuODQtMy43OC0zLjc3LTUuOTgtOS4zLTUuOTgtOS4zcy0uODItMy4yLTIuNjktMi45Yy0xLjg3LjMtMy4yNCA1LjA4LjY4IDguMDEgMy45MSAyLjkzLS43OCA0LjkyLTIuMjkgMi4xNy0xLjUtMi43NS01LjYyLTkuODItNy43Ni0xMS4xOC0yLjEzLTEuMzUtMy42My0uNi0zLjEzIDIuMi41IDIuNzkgOS40MyA5LjU1IDguNTYgMTEtLjg3IDEuNDctMy45My0xLjcxLTMuOTMtMS43MXMtOS41Ny04LjcxLTExLjY2LTYuNDRjLTIuMDggMi4yNyAxLjU5IDQuMTcgNi44IDcuMzMgNS4yMyAzLjE2IDUuNjQgNCA0LjkgNS4yLS43NSAxLjItMTIuMjgtOC41My0xMy4zNi00LjQtMS4wOCA0LjExIDExLjc3IDUuMyAxMC45OCA4LjE1LS44IDIuODUtOS4wNi01LjM4LTEwLjc0LTIuMTgtMS43IDMuMjEgMTEuNjUgNi45OCAxMS43NiA3LjAxIDQuMyAxLjEyIDE1LjI1IDMuNDkgMTkuMDgtMi4xMloiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTc3LjQgNDhjMS42MiAwIDMuMDcuNjYgNC4wNyAxLjg3YTUuOTcgNS45NyAwIDAgMSAxLjMzIDMuNzYgNy4xIDcuMSAwIDAgMSAxLjk1LS4zYzEuNTUgMCAyLjk1LjU5IDMuOTQgMS42NmE1LjggNS44IDAgMCAxIC44IDcgNS4zIDUuMyAwIDAgMSAxLjc4IDIuODJjLjI0LjkuNDggMi44LS44IDQuNzRhNS4yMiA1LjIyIDAgMCAxIC4zNyA1LjAyYy0xLjAyIDIuMzItMy41NyA0LjE0LTguNTEgNi4xLTMuMDggMS4yMi01LjkgMi01LjkyIDIuMDFhNDQuMzMgNDQuMzMgMCAwIDEtMTAuOTMgMS42Yy01Ljg2IDAtMTAuMDUtMS44LTEyLjQ2LTUuMzQtMy44OC01LjY5LTMuMzMtMTAuOSAxLjctMTUuOTIgMi43OC0yLjc4IDQuNjMtNi44NyA1LjAxLTcuNzcuNzgtMi42NiAyLjgzLTUuNjIgNi4yNC01LjYyYTUuNyA1LjcgMCAwIDEgNC42IDIuNDZjMS0xLjI2IDEuOTgtMi4yNSAyLjg3LTIuODJBNy40IDcuNCAwIDAgMSA3Ny40IDQ4Wm0wIDRjLS41MSAwLTEuMTMuMjItMS44Mi42NS0yLjEzIDEuMzYtNi4yNSA4LjQzLTcuNzYgMTEuMThhMi40MyAyLjQzIDAgMCAxLTIuMTQgMS4zMWMtMS41NCAwLTIuNzUtMS41My0uMTQtMy40OCAzLjkxLTIuOTMgMi41NC03LjcyLjY3LTguMDFhMS41NCAxLjU0IDAgMCAwLS4yNC0uMDJjLTEuNyAwLTIuNDUgMi45My0yLjQ1IDIuOTNzLTIuMiA1LjUyLTUuOTcgOS4zYy0zLjc4IDMuNzctMy45OCA2LjgtMS4yMiAxMC44MyAxLjg3IDIuNzUgNS40NyAzLjU4IDkuMTUgMy41OCAzLjgyIDAgNy43My0uOSA5LjkzLTEuNDYuMS0uMDMgMTMuNDUtMy44IDExLjc2LTctLjI5LS41NC0uNzUtLjc2LTEuMzQtLjc2LTIuMzggMC02LjcxIDMuNTQtOC41NyAzLjU0LS40MiAwLS43MS0uMTctLjgzLS42LS44LTIuODUgMTIuMDUtNC4wNSAxMC45Ny04LjE3LS4xOS0uNzMtLjctMS4wMi0xLjQ0LTEuMDItMy4xNCAwLTEwLjIgNS41My0xMS42OCA1LjUzLS4xIDAtLjE5LS4wMy0uMjMtLjEtLjc0LTEuMi0uMzQtMi4wNCA0Ljg4LTUuMiA1LjIzLTMuMTYgOC45LTUuMDYgNi44LTcuMzMtLjIzLS4yNi0uNTctLjM4LS45OC0uMzgtMy4xOCAwLTEwLjY3IDYuODItMTAuNjcgNi44MnMtMi4wMiAyLjEtMy4yNCAyLjFhLjc0Ljc0IDAgMCAxLS42OC0uMzhjLS44Ny0xLjQ2IDguMDUtOC4yMiA4LjU1LTExLjAxLjM0LTEuOS0uMjQtMi44NS0xLjMxLTIuODVaIiAvPjxwYXRoIGZpbGw9IiNGRkQyMUUiIGQ9Ik01Ni4zMyA3Ni42OWMtMi43NS00LjA0LTIuNTYtNy4wNyAxLjIyLTEwLjg0IDMuNzctMy43NyA1Ljk3LTkuMyA1Ljk3LTkuM3MuODItMy4yIDIuNy0yLjljMS44Ni4zIDMuMjMgNS4wOC0uNjggOC4wMS0zLjkyIDIuOTMuNzggNC45MiAyLjI4IDIuMTcgMS41MS0yLjc1IDUuNjMtOS44MiA3Ljc2LTExLjE4IDIuMTMtMS4zNSAzLjY0LS42IDMuMTMgMi4yLS41IDIuNzktOS40MiA5LjU1LTguNTUgMTEgLjg2IDEuNDcgMy45Mi0xLjcxIDMuOTItMS43MXM5LjU4LTguNzEgMTEuNjYtNi40NGMyLjA4IDIuMjctMS41OCA0LjE3LTYuOCA3LjMzLTUuMjMgMy4xNi01LjYzIDQtNC45IDUuMi43NSAxLjIgMTIuMjgtOC41MyAxMy4zNi00LjQgMS4wOCA0LjExLTExLjc2IDUuMy0xMC45NyA4LjE1LjggMi44NSA5LjA1LTUuMzggMTAuNzQtMi4xOCAxLjY5IDMuMjEtMTEuNjUgNi45OC0xMS43NiA3LjAxLTQuMzEgMS4xMi0xNS4yNiAzLjQ5LTE5LjA4LTIuMTJaIiAvPjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span>Hugging Face</span></dd></div><div><dt>作者</dt><dd><span>Artificial Analysis, IBM</span></dd></div><div><dt>日期</dt><dd><span>2026-05-27</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Local speech-to-speech agent stack" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/local-reachy-mini-conversation" rel="noopener noreferrer">Reachy Mini goes fully local</a></h3>
+    <div class="card-tags"><span class="chip">Local speech-to-speech agent stack</span></div>
+    <p>文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><img class="card-detail-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NSIgaGVpZ2h0PSI4OCIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0ZGRDIxRSIgZD0iTTQ3LjIxIDc2LjVhMzQuNzUgMzQuNzUgMCAxIDAgMC02OS41IDM0Ljc1IDM0Ljc1IDAgMCAwIDAgNjkuNVoiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTgxLjk2IDQxLjc1YTM0Ljc1IDM0Ljc1IDAgMSAwLTY5LjUgMCAzNC43NSAzNC43NSAwIDAgMCA2OS41IDBabS03My41IDBhMzguNzUgMzguNzUgMCAxIDEgNzcuNSAwIDM4Ljc1IDM4Ljc1IDAgMCAxLTc3LjUgMFoiIC8+PHBhdGggZmlsbD0iIzNBM0I0NSIgZD0iTTU4LjUgMzIuM2MxLjI4LjQ0IDEuNzggMy4wNiAzLjA3IDIuMzhhNSA1IDAgMSAwLTYuNzYtMi4wN2MuNjEgMS4xNSAyLjU1LS43MiAzLjctLjMyWk0zNC45NSAzMi4zYy0xLjI4LjQ0LTEuNzkgMy4wNi0zLjA3IDIuMzhhNSA1IDAgMSAxIDYuNzYtMi4wN2MtLjYxIDEuMTUtMi41Ni0uNzItMy43LS4zMloiIC8+PHBhdGggZmlsbD0iI0ZGMzIzRCIgZD0iTTQ2Ljk2IDU2LjI5YzkuODMgMCAxMy04Ljc2IDEzLTEzLjI2IDAtMi4zNC0xLjU3LTEuNi00LjA5LS4zNi0yLjMzIDEuMTUtNS40NiAyLjc0LTguOSAyLjc0LTcuMTkgMC0xMy02Ljg4LTEzLTIuMzhzMy4xNiAxMy4yNiAxMyAxMy4yNloiIC8+PHBhdGggZmlsbD0iIzNBM0I0NSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzkuNDMgNTRhOC43IDguNyAwIDAgMSA1LjMtNC40OWMuNC0uMTIuODEuNTcgMS4yNCAxLjI4LjQuNjguODIgMS4zNyAxLjI0IDEuMzcuNDUgMCAuOS0uNjggMS4zMy0xLjM1LjQ1LS43Ljg5LTEuMzggMS4zMi0xLjI1YTguNjEgOC42MSAwIDAgMSA1IDQuMTdjMy43My0yLjk0IDUuMS03Ljc0IDUuMS0xMC43IDAtMi4zNC0xLjU3LTEuNi00LjA5LS4zNmwtLjE0LjA3Yy0yLjMxIDEuMTUtNS4zOSAyLjY3LTguNzcgMi42N3MtNi40NS0xLjUyLTguNzctMi42N2MtMi42LTEuMjktNC4yMy0yLjEtNC4yMy4yOSAwIDMuMDUgMS40NiA4LjA2IDUuNDcgMTAuOTdaIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTcwLjcxIDM3YTMuMjUgMy4yNSAwIDEgMCAwLTYuNSAzLjI1IDMuMjUgMCAwIDAgMCA2LjVaTTI0LjIxIDM3YTMuMjUgMy4yNSAwIDEgMCAwLTYuNSAzLjI1IDMuMjUgMCAwIDAgMCA2LjVaTTE3LjUyIDQ4Yy0xLjYyIDAtMy4wNi42Ni00LjA3IDEuODdhNS45NyA1Ljk3IDAgMCAwLTEuMzMgMy43NiA3LjEgNy4xIDAgMCAwLTEuOTQtLjNjLTEuNTUgMC0yLjk1LjU5LTMuOTQgMS42NmE1LjggNS44IDAgMCAwLS44IDcgNS4zIDUuMyAwIDAgMC0xLjc5IDIuODJjLS4yNC45LS40OCAyLjguOCA0Ljc0YTUuMjIgNS4yMiAwIDAgMC0uMzcgNS4wMmMxLjAyIDIuMzIgMy41NyA0LjE0IDguNTIgNi4xIDMuMDcgMS4yMiA1Ljg5IDIgNS45MSAyLjAxYTQ0LjMzIDQ0LjMzIDAgMCAwIDEwLjkzIDEuNmM1Ljg2IDAgMTAuMDUtMS44IDEyLjQ2LTUuMzQgMy44OC01LjY5IDMuMzMtMTAuOS0xLjctMTUuOTItMi43Ny0yLjc4LTQuNjItNi44Ny01LTcuNzctLjc4LTIuNjYtMi44NC01LjYyLTYuMjUtNS42MmE1LjcgNS43IDAgMCAwLTQuNiAyLjQ2Yy0xLTEuMjYtMS45OC0yLjI1LTIuODYtMi44MkE3LjQgNy40IDAgMCAwIDE3LjUyIDQ4Wm0wIDRjLjUxIDAgMS4xNC4yMiAxLjgyLjY1IDIuMTQgMS4zNiA2LjI1IDguNDMgNy43NiAxMS4xOC41LjkyIDEuMzcgMS4zMSAyLjE0IDEuMzEgMS41NSAwIDIuNzUtMS41My4xNS0zLjQ4LTMuOTItMi45My0yLjU1LTcuNzItLjY4LTguMDEuMDgtLjAyLjE3LS4wMi4yNC0uMDIgMS43IDAgMi40NSAyLjkzIDIuNDUgMi45M3MyLjIgNS41MiA1Ljk4IDkuM2MzLjc3IDMuNzcgMy45NyA2LjggMS4yMiAxMC44My0xLjg4IDIuNzUtNS40NyAzLjU4LTkuMTYgMy41OC0zLjgxIDAtNy43My0uOS05LjkyLTEuNDYtLjExLS4wMy0xMy40NS0zLjgtMTEuNzYtNyAuMjgtLjU0Ljc1LS43NiAxLjM0LS43NiAyLjM4IDAgNi43IDMuNTQgOC41NyAzLjU0LjQxIDAgLjctLjE3LjgzLS42Ljc5LTIuODUtMTIuMDYtNC4wNS0xMC45OC04LjE3LjItLjczLjcxLTEuMDIgMS40NC0xLjAyIDMuMTQgMCAxMC4yIDUuNTMgMTEuNjggNS41My4xMSAwIC4yLS4wMy4yNC0uMS43NC0xLjIuMzMtMi4wNC00LjktNS4yLTUuMjEtMy4xNi04Ljg4LTUuMDYtNi44LTcuMzMuMjQtLjI2LjU4LS4zOCAxLS4zOCAzLjE3IDAgMTAuNjYgNi44MiAxMC42NiA2LjgyczIuMDIgMi4xIDMuMjUgMi4xYy4yOCAwIC41Mi0uMS42OC0uMzguODYtMS40Ni04LjA2LTguMjItOC41Ni0xMS4wMS0uMzQtMS45LjI0LTIuODUgMS4zMS0yLjg1WiIgLz48cGF0aCBmaWxsPSIjRkZEMjFFIiBkPSJNMzguNiA3Ni42OWMyLjc1LTQuMDQgMi41NS03LjA3LTEuMjItMTAuODQtMy43OC0zLjc3LTUuOTgtOS4zLTUuOTgtOS4zcy0uODItMy4yLTIuNjktMi45Yy0xLjg3LjMtMy4yNCA1LjA4LjY4IDguMDEgMy45MSAyLjkzLS43OCA0LjkyLTIuMjkgMi4xNy0xLjUtMi43NS01LjYyLTkuODItNy43Ni0xMS4xOC0yLjEzLTEuMzUtMy42My0uNi0zLjEzIDIuMi41IDIuNzkgOS40MyA5LjU1IDguNTYgMTEtLjg3IDEuNDctMy45My0xLjcxLTMuOTMtMS43MXMtOS41Ny04LjcxLTExLjY2LTYuNDRjLTIuMDggMi4yNyAxLjU5IDQuMTcgNi44IDcuMzMgNS4yMyAzLjE2IDUuNjQgNCA0LjkgNS4yLS43NSAxLjItMTIuMjgtOC41My0xMy4zNi00LjQtMS4wOCA0LjExIDExLjc3IDUuMyAxMC45OCA4LjE1LS44IDIuODUtOS4wNi01LjM4LTEwLjc0LTIuMTgtMS43IDMuMjEgMTEuNjUgNi45OCAxMS43NiA3LjAxIDQuMyAxLjEyIDE1LjI1IDMuNDkgMTkuMDgtMi4xMloiIC8+PHBhdGggZmlsbD0iI0ZGOUQwQiIgZD0iTTc3LjQgNDhjMS42MiAwIDMuMDcuNjYgNC4wNyAxLjg3YTUuOTcgNS45NyAwIDAgMSAxLjMzIDMuNzYgNy4xIDcuMSAwIDAgMSAxLjk1LS4zYzEuNTUgMCAyLjk1LjU5IDMuOTQgMS42NmE1LjggNS44IDAgMCAxIC44IDcgNS4zIDUuMyAwIDAgMSAxLjc4IDIuODJjLjI0LjkuNDggMi44LS44IDQuNzRhNS4yMiA1LjIyIDAgMCAxIC4zNyA1LjAyYy0xLjAyIDIuMzItMy41NyA0LjE0LTguNTEgNi4xLTMuMDggMS4yMi01LjkgMi01LjkyIDIuMDFhNDQuMzMgNDQuMzMgMCAwIDEtMTAuOTMgMS42Yy01Ljg2IDAtMTAuMDUtMS44LTEyLjQ2LTUuMzQtMy44OC01LjY5LTMuMzMtMTAuOSAxLjctMTUuOTIgMi43OC0yLjc4IDQuNjMtNi44NyA1LjAxLTcuNzcuNzgtMi42NiAyLjgzLTUuNjIgNi4yNC01LjYyYTUuNyA1LjcgMCAwIDEgNC42IDIuNDZjMS0xLjI2IDEuOTgtMi4yNSAyLjg3LTIuODJBNy40IDcuNCAwIDAgMSA3Ny40IDQ4Wm0wIDRjLS41MSAwLTEuMTMuMjItMS44Mi42NS0yLjEzIDEuMzYtNi4yNSA4LjQzLTcuNzYgMTEuMThhMi40MyAyLjQzIDAgMCAxLTIuMTQgMS4zMWMtMS41NCAwLTIuNzUtMS41My0uMTQtMy40OCAzLjkxLTIuOTMgMi41NC03LjcyLjY3LTguMDFhMS41NCAxLjU0IDAgMCAwLS4yNC0uMDJjLTEuNyAwLTIuNDUgMi45My0yLjQ1IDIuOTNzLTIuMiA1LjUyLTUuOTcgOS4zYy0zLjc4IDMuNzctMy45OCA2LjgtMS4yMiAxMC44MyAxLjg3IDIuNzUgNS40NyAzLjU4IDkuMTUgMy41OCAzLjgyIDAgNy43My0uOSA5LjkzLTEuNDYuMS0uMDMgMTMuNDUtMy44IDExLjc2LTctLjI5LS41NC0uNzUtLjc2LTEuMzQtLjc2LTIuMzggMC02LjcxIDMuNTQtOC41NyAzLjU0LS40MiAwLS43MS0uMTctLjgzLS42LS44LTIuODUgMTIuMDUtNC4wNSAxMC45Ny04LjE3LS4xOS0uNzMtLjctMS4wMi0xLjQ0LTEuMDItMy4xNCAwLTEwLjIgNS41My0xMS42OCA1LjUzLS4xIDAtLjE5LS4wMy0uMjMtLjEtLjc0LTEuMi0uMzQtMi4wNCA0Ljg4LTUuMiA1LjIzLTMuMTYgOC45LTUuMDYgNi44LTcuMzMtLjIzLS4yNi0uNTctLjM4LS45OC0uMzgtMy4xOCAwLTEwLjY3IDYuODItMTAuNjcgNi44MnMtMi4wMiAyLjEtMy4yNCAyLjFhLjc0Ljc0IDAgMCAxLS42OC0uMzhjLS44Ny0xLjQ2IDguMDUtOC4yMiA4LjU1LTExLjAxLjM0LTEuOS0uMjQtMi44NS0xLjMxLTIuODVaIiAvPjxwYXRoIGZpbGw9IiNGRkQyMUUiIGQ9Ik01Ni4zMyA3Ni42OWMtMi43NS00LjA0LTIuNTYtNy4wNyAxLjIyLTEwLjg0IDMuNzctMy43NyA1Ljk3LTkuMyA1Ljk3LTkuM3MuODItMy4yIDIuNy0yLjljMS44Ni4zIDMuMjMgNS4wOC0uNjggOC4wMS0zLjkyIDIuOTMuNzggNC45MiAyLjI4IDIuMTcgMS41MS0yLjc1IDUuNjMtOS44MiA3Ljc2LTExLjE4IDIuMTMtMS4zNSAzLjY0LS42IDMuMTMgMi4yLS41IDIuNzktOS40MiA5LjU1LTguNTUgMTEgLjg2IDEuNDcgMy45Mi0xLjcxIDMuOTItMS43MXM5LjU4LTguNzEgMTEuNjYtNi40NGMyLjA4IDIuMjctMS41OCA0LjE3LTYuOCA3LjMzLTUuMjMgMy4xNi01LjYzIDQtNC45IDUuMi43NSAxLjIgMTIuMjgtOC41MyAxMy4zNi00LjQgMS4wOCA0LjExLTExLjc2IDUuMy0xMC45NyA4LjE1LjggMi44NSA5LjA1LTUuMzggMTAuNzQtMi4xOCAxLjY5IDMuMjEtMTEuNjUgNi45OC0xMS43NiA3LjAxLTQuMzEgMS4xMi0xNS4yNiAzLjQ5LTE5LjA4LTIuMTJaIiAvPjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span>Hugging Face</span></dd></div><div><dt>作者</dt><dd><span>Amir Mahla, Andres Marafioti</span></dd></div><div><dt>日期</dt><dd><span>2026-05-27</span></dd></div></dl>
+  </article>
+    </div>
   </section>
-<section class="panel rich-section" id="section-github-trending-5" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-github-trending-top-10-daily-3" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
-      <h2>GitHub Trending 趋势</h2>
+      <h2>GitHub Trending · Top 10 daily</h2>
 
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer">harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight">#1</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：harry0703 / MoneyPrinterTurbo 利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.</li><li>排名：#1，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight">#2</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：Lum1104 / Understand-Anything Graphs that teach &gt; graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.</li><li>排名：#2，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/hardikpandya/stop-slop" rel="noopener noreferrer">hardikpandya/stop-slop</a></strong> <mark class="text-highlight">#3</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：hardikpandya / stop-slop A skill file for removing AI tells from prose。</li><li>排名：#3，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/affaan-m/ECC" rel="noopener noreferrer">affaan-m/ECC</a></strong> <mark class="text-highlight">#4</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：affaan-m / ECC The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.</li><li>排名：#4，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/anthropics/knowledge-work-plugins" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong> <mark class="text-highlight">#5</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：anthropics / knowledge-work-plugins Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork。</li><li>排名：#5，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer">Leonxlnx/taste-skill</a></strong> <mark class="text-highlight">#6</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：Leonxlnx / taste-skill Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop。</li><li>排名：#6，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/p-e-w/heretic" rel="noopener noreferrer">p-e-w/heretic</a></strong> <mark class="text-highlight">#7</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：p-e-w / heretic Fully automatic censorship removal for language models。</li><li>排名：#7，新上榜；来源：GitHub Trending daily；语言：all</li><li><strong><a href="https://github.com/shiyu-coder/Kronos" rel="noopener noreferrer">shiyu-coder/Kronos</a></strong> <mark class="text-highlight">#8</mark> <mark class="text-highlight">新上榜</mark> <mark class="text-highlight">daily</mark>：shiyu-coder / Kronos Kronos: A Foundation Model for the Language of Financial Markets。</li><li>排名：#8，新上榜；来源：GitHub Trending daily；语言：all</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==#1== ==新上榜== ==daily==：harry0703 / MoneyPrinterTurbo 利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.
-  - 排名：#1，新上榜；来源：GitHub Trending daily；语言：all
-- **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==#2== ==新上榜== ==daily==：Lum1104 / Understand-Anything Graphs that teach &gt; graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.
-  - 排名：#2，新上榜；来源：GitHub Trending daily；语言：all
-- **[hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop)** ==#3== ==新上榜== ==daily==：hardikpandya / stop-slop A skill file for removing AI tells from prose。
-  - 排名：#3，新上榜；来源：GitHub Trending daily；语言：all
-- **[affaan-m/ECC](https://github.com/affaan-m/ECC)** ==#4== ==新上榜== ==daily==：affaan-m / ECC The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.
-  - 排名：#4，新上榜；来源：GitHub Trending daily；语言：all
-- **[anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)** ==#5== ==新上榜== ==daily==：anthropics / knowledge-work-plugins Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork。
-  - 排名：#5，新上榜；来源：GitHub Trending daily；语言：all
-- **[Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)** ==#6== ==新上榜== ==daily==：Leonxlnx / taste-skill Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop。
-  - 排名：#6，新上榜；来源：GitHub Trending daily；语言：all
-- **[p-e-w/heretic](https://github.com/p-e-w/heretic)** ==#7== ==新上榜== ==daily==：p-e-w / heretic Fully automatic censorship removal for language models。
-  - 排名：#7，新上榜；来源：GitHub Trending daily；语言：all
-- **[shiyu-coder/Kronos](https://github.com/shiyu-coder/Kronos)** ==#8== ==新上榜== ==daily==：shiyu-coder / Kronos Kronos: A Foundation Model for the Language of Financial Markets。
-  - 排名：#8，新上榜；来源：GitHub Trending daily；语言：all</template>
+    <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer">harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight">new</mark>：利用 AI 大模型一键生成高清短视频。</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight">new</mark>：把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。</li><li><strong><a href="https://github.com/hardikpandya/stop-slop" rel="noopener noreferrer">hardikpandya/stop-slop</a></strong> <mark class="text-highlight">new</mark>：用于去除文章中常见 AI 痕迹的 skill 文件。</li><li><strong><a href="https://github.com/affaan-m/ECC" rel="noopener noreferrer">affaan-m/ECC</a></strong> <mark class="text-highlight">new</mark>：面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。</li><li><strong><a href="https://github.com/anthropics/knowledge-work-plugins" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong> <mark class="text-highlight">new</mark>：Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。</li><li><strong><a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer">Leonxlnx/taste-skill</a></strong> <mark class="text-highlight">new</mark>：用于约束 AI 输出风格、减少空泛生成的 skill 文件。</li><li><strong><a href="https://github.com/p-e-w/heretic" rel="noopener noreferrer">p-e-w/heretic</a></strong> <mark class="text-highlight">new</mark>：用于自动移除语言模型审查限制的工具。</li><li><strong><a href="https://github.com/shiyu-coder/Kronos" rel="noopener noreferrer">shiyu-coder/Kronos</a></strong> <mark class="text-highlight">new</mark>：面向金融市场序列语言的基础模型。</li><li><strong><a href="https://github.com/mukul975/Anthropic-Cybersecurity-Skills" rel="noopener noreferrer">mukul975/Anthropic-Cybersecurity-Skills</a></strong> <mark class="text-highlight">new</mark>：为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK、NIST CSF、MITRE ATLAS、D3FEND 与 NIST AI RMF，并面向 Claude Code、GitHub Copilot、Codex CLI、Cursor、Gemini CLI 等平台。</li><li><strong><a href="https://github.com/twentyhq/twenty" rel="noopener noreferrer">twentyhq/twenty</a></strong> <mark class="text-highlight">new</mark>：面向 AI 场景设计的开源 Salesforce 替代方案。</li></ol></div>
+    <template data-rich-source data-source-fallback>1. **[harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==new==：利用 AI 大模型一键生成高清短视频。
+2. **[Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==new==：把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。
+3. **[hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop)** ==new==：用于去除文章中常见 AI 痕迹的 skill 文件。
+4. **[affaan-m/ECC](https://github.com/affaan-m/ECC)** ==new==：面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。
+5. **[anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)** ==new==：Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。
+6. **[Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)** ==new==：用于约束 AI 输出风格、减少空泛生成的 skill 文件。
+7. **[p-e-w/heretic](https://github.com/p-e-w/heretic)** ==new==：用于自动移除语言模型审查限制的工具。
+8. **[shiyu-coder/Kronos](https://github.com/shiyu-coder/Kronos)** ==new==：面向金融市场序列语言的基础模型。
+9. **[mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills)** ==new==：为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK、NIST CSF、MITRE ATLAS、D3FEND 与 NIST AI RMF，并面向 Claude Code、GitHub Copilot、Codex CLI、Cursor、Gemini CLI 等平台。
+10. **[twentyhq/twenty](https://github.com/twentyhq/twenty)** ==new==：面向 AI 场景设计的开源 Salesforce 替代方案。</template>
   </section>
-<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1553,70 +1663,71 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="meta">inference_serving</div>
     <h3><a class="card-title-link" href="https://github.com/vllm-project/vllm-metal" rel="noopener noreferrer">vllm-project/vllm-metal</a></h3>
 
-    <p>vllm-metal 是社区维护的 vLLM Apple Silicon 硬件插件，GitHub 页面显示 2026-05-27 latest release `v0.2.0-20260527-105045`。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 形态的开发者。</p>
-    <dl class="card-detail-list"><div><dt>领域</dt><dd>inference_serving、apple_silicon、vllm_plugin</dd></div><div><dt>作用</dt><dd>在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。</dd></div></dl>
+    <p>社区维护的 vLLM Apple Silicon 硬件插件，GitHub release 显示 2026-05-27 的 v0.2.0-20260527-105045。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 的开发者。</p>
+    <dl class="card-detail-list"><div><dt>领域</dt><dd><span>inference_serving、apple_silicon、vllm_plugin</span></dd></div><div><dt>作用</dt><dd><span>在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="RAG" data-search-target="html-work-report">
     <div class="meta">RAG</div>
     <h3><a class="card-title-link" href="https://github.com/infiniflow/ragflow/releases" rel="noopener noreferrer">RAGFlow v0.25.6</a></h3>
 
-    <p>RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 `@tool` decorator、base64 image agent message 和 chat completion 参数控制。</p>
-    <dl class="card-detail-list"><div><dt>领域</dt><dd>RAG、agent_builder、knowledge_base</dd></div><div><dt>作用</dt><dd>给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</dd></div></dl>
+    <p>RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 @tool decorator、base64 image agent message 和 chat completion 参数控制。</p>
+    <dl class="card-detail-list"><div><dt>领域</dt><dd><span>RAG、agent_builder、knowledge_base</span></dd></div><div><dt>作用</dt><dd><span>给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</span></dd></div></dl>
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
-      <h2>Builder 观察与社区线索</h2>
+      <h2>Builder 观察</h2>
 
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>Builder 观察</h4>
-<ul><li><strong>Thariq</strong>（Builder）：Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。 <a href="https://x.com/trq212/status/2059363113963540788" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Aaron Levie</strong>（Founder / operator）：Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。 <a href="https://x.com/levie/status/2059482349977653619" rel="noopener noreferrer">follow-builders X feed</a></li><li><strong>Zara Zhang</strong>（Builder）：Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。 <a href="https://x.com/zarazhangrui/status/2059354487823978586" rel="noopener noreferrer">follow-builders X feed</a></li></ul>
-<h4>社区线索</h4>
-<ul><li>Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。 <a href="https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### Builder 观察
-
-- **Thariq**（Builder）：Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。 [follow-builders X feed](https://x.com/trq212/status/2059363113963540788)
-- **Aaron Levie**（Founder / operator）：Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。 [follow-builders X feed](https://x.com/levie/status/2059482349977653619)
-- **Zara Zhang**（Builder）：Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。 [follow-builders X feed](https://x.com/zarazhangrui/status/2059354487823978586)
-
-### 社区线索
-
-- Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。 [来源](https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/)</template>
+    <div class="rendered-markdown"><ul><li><strong>Weights &amp; Biases</strong>（MLOps / eval platform builder）：W&amp;B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。 <a href="https://x.com/wandb/status/2059384552725025226" rel="noopener noreferrer">Tavily X builder search fallback</a></li><li><strong>Suryansh Tiwari</strong>（AI tool builder / curator）：Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。 <a href="https://x.com/Suryanshti777/status/2059555214294970631" rel="noopener noreferrer">Tavily X builder search fallback</a></li><li><strong>AI &amp; I by Every</strong>（Podcast）：Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。 <a href="https://www.youtube.com/watch?v=dCmOTURRf1Y" rel="noopener noreferrer">follow-builders podcast feed</a></li><li><strong>Simon Willison</strong>（Builder / researcher）：SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。 <a href="https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li><li><strong>Simon Willison</strong>（Builder / researcher）：Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。 <a href="https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li><li><strong>Simon Willison</strong>（Builder / researcher）：curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。 <a href="https://simonwillison.net/2026/May/26/the-pressure/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- **Weights &amp; Biases**（MLOps / eval platform builder）：W&amp;B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。 [Tavily X builder search fallback](https://x.com/wandb/status/2059384552725025226)
+- **Suryansh Tiwari**（AI tool builder / curator）：Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。 [Tavily X builder search fallback](https://x.com/Suryanshti777/status/2059555214294970631)
+- **AI &amp; I by Every**（Podcast）：Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。 [follow-builders podcast feed](https://www.youtube.com/watch?v=dCmOTURRf1Y)
+- **Simon Willison**（Builder / researcher）：SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。 [Simon Willison Weblog](https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything)
+- **Simon Willison**（Builder / researcher）：Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。 [Simon Willison Weblog](https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything)
+- **Simon Willison**（Builder / researcher）：curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。 [Simon Willison Weblog](https://simonwillison.net/2026/May/26/the-pressure/#atom-everything)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><h4>GitHub Trending</h4>
-<ul><li>检查状态：已检查</li><li>候选 / 入选：123 / 8</li><li>说明：GitHub Trending 现在作为独立板块展示，默认取 daily 前 8 个仓库；字段保留 rank、previous_rank、rank_delta 和 trend。昨天报告没有 github_trending 顶层历史，因此本轮趋势均为 new。</li></ul>
-<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：checked，17 repositories parsed</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：checked，20 repositories parsed</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending Python daily</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/python?since=weekly" rel="noopener noreferrer">GitHub Trending Python weekly</a>：checked，19 repositories parsed</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending TypeScript daily</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/typescript?since=weekly" rel="noopener noreferrer">GitHub Trending TypeScript weekly</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/rust?since=daily" rel="noopener noreferrer">GitHub Trending Rust daily</a>：checked，12 repositories parsed</li><li><a href="https://github.com/trending/rust?since=weekly" rel="noopener noreferrer">GitHub Trending Rust weekly</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/go?since=daily" rel="noopener noreferrer">GitHub Trending Go daily</a>：checked，19 repositories parsed</li><li><a href="https://github.com/trending/go?since=weekly" rel="noopener noreferrer">GitHub Trending Go weekly</a>：checked，18 repositories parsed</li></ul>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：124 / 10</li><li>说明：GitHub Trending 独立展示 daily Top 10；本轮与 reports-data 历史比较后生成 trend 字段，当前 Top 10 均按本地历史标记为 new。</li></ul>
+<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：checked，17 repositories parsed</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：checked，20 repositories parsed</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending Python daily</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/python?since=weekly" rel="noopener noreferrer">GitHub Trending Python weekly</a>：checked，19 repositories parsed</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending TypeScript daily</a>：checked，17 repositories parsed</li><li><a href="https://github.com/trending/typescript?since=weekly" rel="noopener noreferrer">GitHub Trending TypeScript weekly</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/rust?since=daily" rel="noopener noreferrer">GitHub Trending Rust daily</a>：checked，12 repositories parsed</li><li><a href="https://github.com/trending/rust?since=weekly" rel="noopener noreferrer">GitHub Trending Rust weekly</a>：checked，16 repositories parsed</li><li><a href="https://github.com/trending/go?since=daily" rel="noopener noreferrer">GitHub Trending Go daily</a>：checked，19 repositories parsed</li><li><a href="https://github.com/trending/go?since=weekly" rel="noopener noreferrer">GitHub Trending Go weekly</a>：checked，18 repositories parsed</li></ul>
 <h4>Builder 原始源</h4>
-<ul><li>检查状态：已检查</li><li>候选 / 入选：27 / 3</li><li>上次成功获取：2026-05-28T03:24:06.723Z</li><li>说明：follow-builders central feed 已运行；本轮从原始 X URL 中只选 agent 使用方式和企业落地相关内容，活动通知、短链接空内容和个人动态保留在候选池外。</li></ul>
-<ul><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer">follow-builders X feed</a>：checked，31 recent original entries parsed</li><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json" rel="noopener noreferrer">follow-builders podcast feed</a>：checked，1 recent original entries parsed</li><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json" rel="noopener noreferrer">follow-builders blog feed</a>：no_signal，0 recent original entries parsed</li><li><a href="https://simonwillison.net/atom/everything/" rel="noopener noreferrer">Simon Willison Weblog</a>：checked，7 recent original entries parsed</li><li><a href="https://huyenchip.com/feed.xml" rel="noopener noreferrer">Chip Huyen Blog</a>：no_signal，0 recent original entries parsed</li><li><a href="https://karpathy.github.io/feed.xml" rel="noopener noreferrer">Andrej Karpathy Blog</a>：no_signal，0 recent original entries parsed</li></ul>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：14 / 6</li><li>上次成功获取：2026-05-28T11:35:50.664Z</li><li>说明：follow-builders central feed is checked first; when its X feed is blocked, Tavily X status fallback must attempt original x.com status discovery before RSS/Atom fallback. Today the central X feed returned upstream X API 500, and the report includes original X status entries from the fallback.</li></ul>
+<ul><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer">follow-builders X feed</a>：blocked，0 recent original entries parsed; upstream_error=X API: User lookup failed: HTTP 500</li><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json" rel="noopener noreferrer">follow-builders podcast feed</a>：checked，1 recent original entries parsed</li><li><a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json" rel="noopener noreferrer">follow-builders blog feed</a>：no_signal，0 recent original entries parsed</li><li><a href="https://api.tavily.com/search" rel="noopener noreferrer">Tavily X builder search fallback</a>：checked，6 recent original X status entries parsed</li><li><a href="https://simonwillison.net/atom/everything/" rel="noopener noreferrer">Simon Willison Weblog</a>：checked，7 recent original entries parsed</li><li><a href="https://huyenchip.com/feed.xml" rel="noopener noreferrer">Chip Huyen Blog</a>：no_signal，0 recent original entries parsed</li><li><a href="https://karpathy.github.io/feed.xml" rel="noopener noreferrer">Andrej Karpathy Blog</a>：no_signal，0 recent original entries parsed</li></ul>
 <h4>热门博客与访谈源</h4>
-<ul><li>检查状态：已检查</li><li>候选 / 入选：20 / 4</li><li>上次成功获取：2026-05-28T03:24:06.723Z</li><li>说明：内容源已补充 GitHub Changelog、TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space、Interconnects 等发现面；热点讨论、播客和融资信息必须保留原始 URL 或一手/多源证据后才可入选。</li></ul>
-<ul><li><a href="https://openai.com/news/rss.xml" rel="noopener noreferrer">OpenAI News RSS</a>：checked，4 recent blog/interview entries parsed</li><li><a href="https://www.anthropic.com/news" rel="noopener noreferrer">Anthropic News</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://huggingface.co/blog/feed.xml" rel="noopener noreferrer">Hugging Face Blog</a>：checked，3 recent blog/interview entries parsed</li><li><a href="https://github.blog/changelog/feed/" rel="noopener noreferrer">GitHub Changelog</a>：checked，7 recent blog/interview entries parsed</li><li><a href="https://techcrunch.com/category/artificial-intelligence/feed/" rel="noopener noreferrer">TechCrunch AI</a>：checked，20 recent blog/interview entries parsed</li><li><a href="https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" rel="noopener noreferrer">The Verge AI</a>：checked，10 recent blog/interview entries parsed</li><li><a href="https://research.google/blog/rss/" rel="noopener noreferrer">Google Research Blog</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://deepmind.google/discover/blog/" rel="noopener noreferrer">Google DeepMind Blog</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://ai.meta.com/blog/" rel="noopener noreferrer">Meta AI Blog</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://www.microsoft.com/en-us/research/feed/" rel="noopener noreferrer">Microsoft Research Blog</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://www.latent.space/feed" rel="noopener noreferrer">Latent.Space</a>：checked，2 recent blog/interview entries parsed</li><li><a href="https://www.interconnects.ai/feed" rel="noopener noreferrer">Interconnects</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://www.producthunt.com/feed?category=developer-tools" rel="noopener noreferrer">Product Hunt Developer Tools Feed</a>：checked，50 recent product/project entries parsed</li><li><a href="https://www.planet-ai.net/rss.xml" rel="noopener noreferrer">Planet AI</a>：checked，50 recent blog/interview entries parsed</li><li><a href="https://bair.berkeley.edu/blog/feed.xml" rel="noopener noreferrer">BAIR Blog</a>：no_signal，0 recent blog/interview entries parsed</li></ul></div>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：33 / 5</li><li>上次成功获取：2026-05-28T10:19:15.268Z</li><li>说明：固定发现面覆盖 OpenAI、Anthropic、Hugging Face、GitHub Changelog、Google/Microsoft/NVIDIA/AWS/Cloudflare、TechCrunch/The Verge/Product Hunt/Planet AI/Latent.Space/Interconnects 等；公众号、自媒体和新闻聚合只作为线索，正文仍以一手或可追溯原始 URL 为准。</li></ul>
+<ul><li><a href="https://openai.com/news/rss.xml" rel="noopener noreferrer">OpenAI News RSS</a>：checked，4 recent blog/interview entries parsed</li><li><a href="https://www.anthropic.com/news" rel="noopener noreferrer">Anthropic News</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://huggingface.co/blog/feed.xml" rel="noopener noreferrer">Hugging Face Blog</a>：checked，3 recent blog/interview entries parsed</li><li><a href="https://github.blog/changelog/feed/" rel="noopener noreferrer">GitHub Changelog</a>：checked，7 recent blog/interview entries parsed</li><li><a href="https://research.google/blog/rss/" rel="noopener noreferrer">Google Research Blog</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://deepmind.google/discover/blog/" rel="noopener noreferrer">Google DeepMind Blog</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://ai.meta.com/blog/" rel="noopener noreferrer">Meta AI Blog</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://www.microsoft.com/en-us/research/feed/" rel="noopener noreferrer">Microsoft Research Blog</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://machinelearning.apple.com/rss.xml" rel="noopener noreferrer">Apple Machine Learning Research</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://developer.nvidia.com/blog/feed/" rel="noopener noreferrer">NVIDIA Developer Blog</a>：checked，8 recent blog/interview entries parsed</li><li><a href="https://aws.amazon.com/blogs/machine-learning/feed/" rel="noopener noreferrer">AWS Machine Learning Blog</a>：checked，12 recent blog/interview entries parsed</li><li><a href="https://azure.microsoft.com/en-us/blog/feed/" rel="noopener noreferrer">Azure Blog</a>：no_signal，0 recent blog/interview entries parsed</li><li><a href="https://engineering.fb.com/feed/" rel="noopener noreferrer">Meta Engineering</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://blog.cloudflare.com/rss/" rel="noopener noreferrer">Cloudflare Blog</a>：checked，1 recent blog/interview entries parsed</li><li><a href="https://www.nature.com/subjects/machine-learning.rss" rel="noopener noreferrer">Nature Machine Learning</a>：checked，11 recent intermediary lead entries parsed</li><li><a href="https://status.openai.com/history.atom" rel="noopener noreferrer">OpenAI Status</a>：checked，6 recent incidents parsed</li><li><a href="https://status.claude.com/history.atom" rel="noopener noreferrer">Claude Status</a>：checked，4 recent incidents parsed</li></ul>
+<h4>搜索 / 新闻影子源</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：40 / 0</li><li>说明：Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.</li></ul>
+<ul><li><a href="https://api.gdeltproject.org/" rel="noopener noreferrer">GDELT</a>：blocked，The_operation_was_aborted_due_to_timeout</li><li><a href="https://api.openalex.org/" rel="noopener noreferrer">OpenAlex</a>：checked，30 shadow candidates; The_operation_was_aborted_due_to_timeout</li><li><a href="https://export.arxiv.org/" rel="noopener noreferrer">arXiv</a>：checked，10 shadow candidates</li></ul>
+<h4>信源健康检查</h4>
+<ul><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>说明：Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.</li></ul>
+<ul><li><a href="https://openai.com/news/rss.xml" rel="noopener noreferrer">OpenAI News RSS</a>：checked，971 feed entries parsed; 4 within 48h</li><li><a href="https://www.anthropic.com/news" rel="noopener noreferrer">Anthropic News</a>：checked，html_index source is reachable; feed_like=false</li><li><a href="https://huggingface.co/blog/feed.xml" rel="noopener noreferrer">Hugging Face Blog</a>：checked，787 feed entries parsed; 3 within 48h</li><li><a href="https://github.blog/changelog/feed/" rel="noopener noreferrer">GitHub Changelog</a>：no_signal，10 feed entries parsed; 0 within 48h</li><li><a href="https://research.google/blog/rss/" rel="noopener noreferrer">Google Research Blog</a>：checked，100 feed entries parsed; 1 within 48h</li><li><a href="https://deepmind.google/discover/blog/" rel="noopener noreferrer">Google DeepMind Blog</a>：checked，html_index source is reachable; feed_like=false</li><li><a href="https://ai.meta.com/blog/" rel="noopener noreferrer">Meta AI Blog</a>：checked，html_index source is reachable; feed_like=false</li><li><a href="https://www.microsoft.com/en-us/research/feed/" rel="noopener noreferrer">Microsoft Research Blog</a>：checked，10 feed entries parsed; 1 within 48h</li><li><a href="https://machinelearning.apple.com/rss.xml" rel="noopener noreferrer">Apple Machine Learning Research</a>：no_signal，10 feed entries parsed; 0 within 48h</li><li><a href="https://developer.nvidia.com/blog/feed/" rel="noopener noreferrer">NVIDIA Developer Blog</a>：checked，100 feed entries parsed; 6 within 48h</li><li><a href="https://aws.amazon.com/blogs/machine-learning/feed/" rel="noopener noreferrer">AWS Machine Learning Blog</a>：checked，20 feed entries parsed; 5 within 48h</li><li><a href="https://azure.microsoft.com/en-us/blog/feed/" rel="noopener noreferrer">Azure Blog</a>：no_signal，10 feed entries parsed; 0 within 48h</li><li><a href="https://engineering.fb.com/feed/" rel="noopener noreferrer">Meta Engineering</a>：no_signal，9 feed entries parsed; 0 within 48h</li><li><a href="https://blog.cloudflare.com/rss/" rel="noopener noreferrer">Cloudflare Blog</a>：checked，20 feed entries parsed; 1 within 48h</li><li><a href="https://www.nature.com/subjects/machine-learning.rss" rel="noopener noreferrer">Nature Machine Learning</a>：checked，30 feed entries parsed; 7 within 48h</li><li><a href="https://techcrunch.com/category/artificial-intelligence/feed/" rel="noopener noreferrer">TechCrunch AI</a>：checked，20 feed entries parsed; 16 within 48h</li><li><a href="https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" rel="noopener noreferrer">The Verge AI</a>：checked，10 feed entries parsed; 7 within 48h</li><li><a href="https://techcrunch.com/category/enterprise/feed/" rel="noopener noreferrer">TechCrunch Enterprise</a>：checked，20 feed entries parsed; 2 within 48h</li><li><a href="https://www.theverge.com/rss/index.xml" rel="noopener noreferrer">The Verge</a>：checked，10 feed entries parsed; 10 within 48h</li><li><a href="https://feeds.arstechnica.com/arstechnica/index" rel="noopener noreferrer">Ars Technica</a>：checked，20 feed entries parsed; 18 within 48h</li><li><a href="https://www.producthunt.com/feed" rel="noopener noreferrer">Product Hunt Trending Feed</a>：checked，50 feed entries parsed; 50 within 48h</li><li><a href="https://www.producthunt.com/feed?category=developer-tools" rel="noopener noreferrer">Product Hunt Developer Tools Feed</a>：checked，50 feed entries parsed; 50 within 48h</li><li><a href="https://www.latent.space/feed" rel="noopener noreferrer">Latent.Space</a>：checked，20 feed entries parsed; 3 within 48h</li><li><a href="https://www.interconnects.ai/feed" rel="noopener noreferrer">Interconnects</a>：no_signal，20 feed entries parsed; 0 within 48h</li><li><a href="https://www.planet-ai.net/rss.xml" rel="noopener noreferrer">Planet AI</a>：checked，50 feed entries parsed; 50 within 48h</li><li><a href="https://hnrss.org/frontpage" rel="noopener noreferrer">HNRSS Frontpage</a>：checked，20 feed entries parsed; 20 within 48h</li><li><a href="https://www.36kr.com/feed" rel="noopener noreferrer">36Kr</a>：checked，30 feed entries parsed; 30 within 48h</li><li><a href="https://www.qbitai.com/feed" rel="noopener noreferrer">QbitAI</a>：checked，10 feed entries parsed; 10 within 48h</li><li><a href="https://www.leiphone.com/feed" rel="noopener noreferrer">Leiphone</a>：checked，20 feed entries parsed; 20 within 48h</li><li><a href="https://www.infoq.cn/feed" rel="noopener noreferrer">InfoQ CN</a>：checked，20 feed entries parsed; 20 within 48h</li><li><a href="https://sspai.com/feed" rel="noopener noreferrer">SSPAI</a>：checked，10 feed entries parsed; 6 within 48h</li><li><a href="https://www.ifanr.com/feed" rel="noopener noreferrer">iFanr</a>：checked，20 feed entries parsed; 12 within 48h</li></ul></div>
     <template data-rich-source data-source-fallback>### GitHub Trending
 
 - 检查状态：已检查
-- 候选 / 入选：123 / 8
-- 说明：GitHub Trending 现在作为独立板块展示，默认取 daily 前 8 个仓库；字段保留 rank、previous_rank、rank_delta 和 trend。昨天报告没有 github_trending 顶层历史，因此本轮趋势均为 new。
+- 候选 / 入选：124 / 10
+- 说明：GitHub Trending 独立展示 daily Top 10；本轮与 reports-data 历史比较后生成 trend 字段，当前 Top 10 均按本地历史标记为 new。
 
 - [GitHub Trending daily](https://github.com/trending?since=daily)：checked，17 repositories parsed
 - [GitHub Trending weekly](https://github.com/trending?since=weekly)：checked，20 repositories parsed
 - [GitHub Trending Python daily](https://github.com/trending/python?since=daily)：checked，16 repositories parsed
 - [GitHub Trending Python weekly](https://github.com/trending/python?since=weekly)：checked，19 repositories parsed
-- [GitHub Trending TypeScript daily](https://github.com/trending/typescript?since=daily)：checked，16 repositories parsed
+- [GitHub Trending TypeScript daily](https://github.com/trending/typescript?since=daily)：checked，17 repositories parsed
 - [GitHub Trending TypeScript weekly](https://github.com/trending/typescript?since=weekly)：checked，16 repositories parsed
 - [GitHub Trending Rust daily](https://github.com/trending/rust?since=daily)：checked，12 repositories parsed
 - [GitHub Trending Rust weekly](https://github.com/trending/rust?since=weekly)：checked，16 repositories parsed
@@ -1626,13 +1737,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 ### Builder 原始源
 
 - 检查状态：已检查
-- 候选 / 入选：27 / 3
-- 上次成功获取：2026-05-28T03:24:06.723Z
-- 说明：follow-builders central feed 已运行；本轮从原始 X URL 中只选 agent 使用方式和企业落地相关内容，活动通知、短链接空内容和个人动态保留在候选池外。
+- 候选 / 入选：14 / 6
+- 上次成功获取：2026-05-28T11:35:50.664Z
+- 说明：follow-builders central feed is checked first; when its X feed is blocked, Tavily X status fallback must attempt original x.com status discovery before RSS/Atom fallback. Today the central X feed returned upstream X API 500, and the report includes original X status entries from the fallback.
 
-- [follow-builders X feed](https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json)：checked，31 recent original entries parsed
+- [follow-builders X feed](https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json)：blocked，0 recent original entries parsed; upstream_error=X API: User lookup failed: HTTP 500
 - [follow-builders podcast feed](https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json)：checked，1 recent original entries parsed
 - [follow-builders blog feed](https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json)：no_signal，0 recent original entries parsed
+- [Tavily X builder search fallback](https://api.tavily.com/search)：checked，6 recent original X status entries parsed
 - [Simon Willison Weblog](https://simonwillison.net/atom/everything/)：checked，7 recent original entries parsed
 - [Chip Huyen Blog](https://huyenchip.com/feed.xml)：no_signal，0 recent original entries parsed
 - [Andrej Karpathy Blog](https://karpathy.github.io/feed.xml)：no_signal，0 recent original entries parsed
@@ -1640,62 +1752,109 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 ### 热门博客与访谈源
 
 - 检查状态：已检查
-- 候选 / 入选：20 / 4
-- 上次成功获取：2026-05-28T03:24:06.723Z
-- 说明：内容源已补充 GitHub Changelog、TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space、Interconnects 等发现面；热点讨论、播客和融资信息必须保留原始 URL 或一手/多源证据后才可入选。
+- 候选 / 入选：33 / 5
+- 上次成功获取：2026-05-28T10:19:15.268Z
+- 说明：固定发现面覆盖 OpenAI、Anthropic、Hugging Face、GitHub Changelog、Google/Microsoft/NVIDIA/AWS/Cloudflare、TechCrunch/The Verge/Product Hunt/Planet AI/Latent.Space/Interconnects 等；公众号、自媒体和新闻聚合只作为线索，正文仍以一手或可追溯原始 URL 为准。
 
 - [OpenAI News RSS](https://openai.com/news/rss.xml)：checked，4 recent blog/interview entries parsed
 - [Anthropic News](https://www.anthropic.com/news)：checked，1 recent blog/interview entries parsed
 - [Hugging Face Blog](https://huggingface.co/blog/feed.xml)：checked，3 recent blog/interview entries parsed
 - [GitHub Changelog](https://github.blog/changelog/feed/)：checked，7 recent blog/interview entries parsed
-- [TechCrunch AI](https://techcrunch.com/category/artificial-intelligence/feed/)：checked，20 recent blog/interview entries parsed
-- [The Verge AI](https://www.theverge.com/rss/ai-artificial-intelligence/index.xml)：checked，10 recent blog/interview entries parsed
 - [Google Research Blog](https://research.google/blog/rss/)：checked，1 recent blog/interview entries parsed
 - [Google DeepMind Blog](https://deepmind.google/discover/blog/)：no_signal，0 recent blog/interview entries parsed
 - [Meta AI Blog](https://ai.meta.com/blog/)：no_signal，0 recent blog/interview entries parsed
 - [Microsoft Research Blog](https://www.microsoft.com/en-us/research/feed/)：checked，1 recent blog/interview entries parsed
-- [Latent.Space](https://www.latent.space/feed)：checked，2 recent blog/interview entries parsed
-- [Interconnects](https://www.interconnects.ai/feed)：checked，1 recent blog/interview entries parsed
-- [Product Hunt Developer Tools Feed](https://www.producthunt.com/feed?category=developer-tools)：checked，50 recent product/project entries parsed
-- [Planet AI](https://www.planet-ai.net/rss.xml)：checked，50 recent blog/interview entries parsed
-- [BAIR Blog](https://bair.berkeley.edu/blog/feed.xml)：no_signal，0 recent blog/interview entries parsed</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
+- [Apple Machine Learning Research](https://machinelearning.apple.com/rss.xml)：no_signal，0 recent blog/interview entries parsed
+- [NVIDIA Developer Blog](https://developer.nvidia.com/blog/feed/)：checked，8 recent blog/interview entries parsed
+- [AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/feed/)：checked，12 recent blog/interview entries parsed
+- [Azure Blog](https://azure.microsoft.com/en-us/blog/feed/)：no_signal，0 recent blog/interview entries parsed
+- [Meta Engineering](https://engineering.fb.com/feed/)：checked，1 recent blog/interview entries parsed
+- [Cloudflare Blog](https://blog.cloudflare.com/rss/)：checked，1 recent blog/interview entries parsed
+- [Nature Machine Learning](https://www.nature.com/subjects/machine-learning.rss)：checked，11 recent intermediary lead entries parsed
+- [OpenAI Status](https://status.openai.com/history.atom)：checked，6 recent incidents parsed
+- [Claude Status](https://status.claude.com/history.atom)：checked，4 recent incidents parsed
 
-    </div>
+### 搜索 / 新闻影子源
 
-  </div>
-    <div class="rendered-markdown"><ul><li>主体信息：2</li><li>Builder 观察：3</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：二次运行后 GitHub Trending、follow-builders 和 content-sources 均可读取；GitHub Trending 已独立展示前 8，Builder 观察入选 3 条，其余候选因短链接空内容、活动通知或个人动态过滤。</li></ul>
+- 检查状态：已检查
+- 候选 / 入选：40 / 0
+- 说明：Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.
+
+- [GDELT](https://api.gdeltproject.org/)：blocked，The_operation_was_aborted_due_to_timeout
+- [OpenAlex](https://api.openalex.org/)：checked，30 shadow candidates; The_operation_was_aborted_due_to_timeout
+- [arXiv](https://export.arxiv.org/)：checked，10 shadow candidates
+
+### 信源健康检查
+
+- 检查状态：已检查
+- 候选 / 入选：0 / 0
+- 说明：Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.
+
+- [OpenAI News RSS](https://openai.com/news/rss.xml)：checked，971 feed entries parsed; 4 within 48h
+- [Anthropic News](https://www.anthropic.com/news)：checked，html_index source is reachable; feed_like=false
+- [Hugging Face Blog](https://huggingface.co/blog/feed.xml)：checked，787 feed entries parsed; 3 within 48h
+- [GitHub Changelog](https://github.blog/changelog/feed/)：no_signal，10 feed entries parsed; 0 within 48h
+- [Google Research Blog](https://research.google/blog/rss/)：checked，100 feed entries parsed; 1 within 48h
+- [Google DeepMind Blog](https://deepmind.google/discover/blog/)：checked，html_index source is reachable; feed_like=false
+- [Meta AI Blog](https://ai.meta.com/blog/)：checked，html_index source is reachable; feed_like=false
+- [Microsoft Research Blog](https://www.microsoft.com/en-us/research/feed/)：checked，10 feed entries parsed; 1 within 48h
+- [Apple Machine Learning Research](https://machinelearning.apple.com/rss.xml)：no_signal，10 feed entries parsed; 0 within 48h
+- [NVIDIA Developer Blog](https://developer.nvidia.com/blog/feed/)：checked，100 feed entries parsed; 6 within 48h
+- [AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/feed/)：checked，20 feed entries parsed; 5 within 48h
+- [Azure Blog](https://azure.microsoft.com/en-us/blog/feed/)：no_signal，10 feed entries parsed; 0 within 48h
+- [Meta Engineering](https://engineering.fb.com/feed/)：no_signal，9 feed entries parsed; 0 within 48h
+- [Cloudflare Blog](https://blog.cloudflare.com/rss/)：checked，20 feed entries parsed; 1 within 48h
+- [Nature Machine Learning](https://www.nature.com/subjects/machine-learning.rss)：checked，30 feed entries parsed; 7 within 48h
+- [TechCrunch AI](https://techcrunch.com/category/artificial-intelligence/feed/)：checked，20 feed entries parsed; 16 within 48h
+- [The Verge AI](https://www.theverge.com/rss/ai-artificial-intelligence/index.xml)：checked，10 feed entries parsed; 7 within 48h
+- [TechCrunch Enterprise](https://techcrunch.com/category/enterprise/feed/)：checked，20 feed entries parsed; 2 within 48h
+- [The Verge](https://www.theverge.com/rss/index.xml)：checked，10 feed entries parsed; 10 within 48h
+- [Ars Technica](https://feeds.arstechnica.com/arstechnica/index)：checked，20 feed entries parsed; 18 within 48h
+- [Product Hunt Trending Feed](https://www.producthunt.com/feed)：checked，50 feed entries parsed; 50 within 48h
+- [Product Hunt Developer Tools Feed](https://www.producthunt.com/feed?category=developer-tools)：checked，50 feed entries parsed; 50 within 48h
+- [Latent.Space](https://www.latent.space/feed)：checked，20 feed entries parsed; 3 within 48h
+- [Interconnects](https://www.interconnects.ai/feed)：no_signal，20 feed entries parsed; 0 within 48h
+- [Planet AI](https://www.planet-ai.net/rss.xml)：checked，50 feed entries parsed; 50 within 48h
+- [HNRSS Frontpage](https://hnrss.org/frontpage)：checked，20 feed entries parsed; 20 within 48h
+- [36Kr](https://www.36kr.com/feed)：checked，30 feed entries parsed; 30 within 48h
+- [QbitAI](https://www.qbitai.com/feed)：checked，10 feed entries parsed; 10 within 48h
+- [Leiphone](https://www.leiphone.com/feed)：checked，20 feed entries parsed; 20 within 48h
+- [InfoQ CN](https://www.infoq.cn/feed)：checked，20 feed entries parsed; 20 within 48h
+- [SSPAI](https://sspai.com/feed)：checked，10 feed entries parsed; 6 within 48h
+- [iFanr](https://www.ifanr.com/feed)：checked，20 feed entries parsed; 12 within 48h</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
+    <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：6</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮重新抓取后 follow-builders X feed 返回上游 X API 500，已按 blocked 写入审计；Tavily X status fallback 找到近期原始 X status，并已把 X builder 观察显式纳入正文。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>早间发现命令出现 fetch failed 后没有自动二次验证，导致 GitHub Trending 和 Builder 观察为空。</strong>：发现命令失败时增加一次延迟重试，并把重试结果写入 source_audit；只有重试仍失败时才允许空板块。</li><li>为什么要改：减少网络抖动造成的空板块。</li><li><strong>GitHub Trending 之前混在项目区，读者看不到榜单位置和变化。</strong>：保留 github_trending 独立字段和展示板块，每天与前一日结构化历史比较，展示 new、up、down 或 same。</li><li>为什么要改：让榜单观察和精选项目分开，便于追踪每日变化。</li><li><strong>热点讨论、播客访谈、融资和产品聚合源此前没有明确收录边界。</strong>：把 TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space 和 Interconnects 纳入固定发现面；X 热点只用可追溯原始 URL，融资只在官方或多源证据充分时入选。</li><li>为什么要改：扩大候选池，同时不牺牲来源可审计性。</li></ul>
+<ul><li>本轮无新增建议。</li></ul>
 <ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-28.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
-    <template data-rich-source data-source-fallback>- 主体信息：2
-- Builder 观察：3
+    <template data-rich-source data-source-fallback>- 主体信息：3
+- Builder 观察：6
 - 一手链接：通过
 - 无禁用表达：通过
 - 无无源数字：通过
-- 说明：二次运行后 GitHub Trending、follow-builders 和 content-sources 均可读取；GitHub Trending 已独立展示前 8，Builder 观察入选 3 条，其余候选因短链接空内容、活动通知或个人动态过滤。
+- 说明：本轮重新抓取后 follow-builders X feed 返回上游 X API 500，已按 blocked 写入审计；Tavily X status fallback 找到近期原始 X status，并已把 X builder 观察显式纳入正文。
 
 ### 提示词与规则迭代建议
 
-- **早间发现命令出现 fetch failed 后没有自动二次验证，导致 GitHub Trending 和 Builder 观察为空。**：发现命令失败时增加一次延迟重试，并把重试结果写入 source_audit；只有重试仍失败时才允许空板块。
-  - 为什么要改：减少网络抖动造成的空板块。
-- **GitHub Trending 之前混在项目区，读者看不到榜单位置和变化。**：保留 github_trending 独立字段和展示板块，每天与前一日结构化历史比较，展示 new、up、down 或 same。
-  - 为什么要改：让榜单观察和精选项目分开，便于追踪每日变化。
-- **热点讨论、播客访谈、融资和产品聚合源此前没有明确收录边界。**：把 TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space 和 Interconnects 纳入固定发现面；X 热点只用可追溯原始 URL，融资只在官方或多源证据充分时入选。
-  - 为什么要改：扩大候选池，同时不牺牲来源可审计性。
+- 本轮无新增建议。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-28.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-28.json)</template></div>
+  </details>
 
 
 
 
-        <section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list"><li>发现命令失败时增加一次延迟重试，并把重试结果写入 source_audit；只有重试仍失败时才允许空板块。</li><li>保留 github_trending 独立字段和展示板块，每天与前一日结构化历史比较，展示 new、up、down 或 same。</li><li>把 TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space 和 Interconnects 纳入固定发现面；X 热点只用可追溯原始 URL，融资只在官方或多源证据充分时入选。</li></ul></section>
+
       </div>
     </div>
   </main>

@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,81 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-13 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-13</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief">
-        <p class="hero-summary-text">今日一手大厂发布较少，日报保留近一周内对工程团队更可执行的模型、API、Agent 工具和开源发布：语音实时模型、默认模型升级、金融 Agent 模板、Grok 连接器、模型迁移提醒，以及 Ollama、vLLM、Codex、LangChain 的近期版本信号。</p>
-        <div class="hero-stat-grid" aria-label="报告摘要指标">
-    <div class="hero-stat"><span>行动</span><strong>3</strong><small>项</small></div>
-  </div>
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-13 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-13 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-13</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-<a href="#next-actions" title="下一步" data-nav-link data-nav-index="8" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-13</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>10</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>4</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>概览</strong>：今日一手大厂发布较少，日报保留近一周内对工程团队更可执行的模型、API、Agent 工具和开源发布：语音实时模型、默认模型升级、金融 Agent 模板、Grok 连接器、模型迁移提醒，以及 Ollama、vLLM、Codex、LangChain 的近期版本信号。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **概览**：今日一手大厂发布较少，日报保留近一周内对工程团队更可执行的模型、API、Agent 工具和开源发布：语音实时模型、默认模型升级、金融 Agent 模板、Grok 连接器、模型迁移提醒，以及 Ollama、vLLM、Codex、LangChain 的近期版本信号。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1476,87 +1579,77 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI 在 API 中发布新一代实时语音模型</strong>（2026-05-07，T0）</p>
-<ul><li>GPT-Realtime-2 面向实时语音 Agent，支持更长上下文、并行工具调用提示、可调 reasoning effort 和更强恢复行为。</li><li>GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。</li><li>价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。</li><li>来源：<a href="https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/" rel="noopener noreferrer">OpenAI</a></li></ul>
-<p>2. <strong>OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant</strong>（2026-05-05，T0）</p>
-<ul><li>原文称 GPT-5.5 Instant 正在替代 GPT-5.3 Instant 成为默认模型，并在 API 中通过 chat-latest 暴露。</li><li>增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。</li><li>对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。</li><li>来源：<a href="https://openai.com/index/gpt-5-5-instant/" rel="noopener noreferrer">OpenAI</a></li></ul>
-<p>3. <strong>Anthropic 提高 Claude Code 与 Claude API 使用限额</strong>（2026-05-06，T0）</p>
-<ul><li>Claude Code 的五小时限额面向 Pro、Max、Team 和 seat-based Enterprise 计划翻倍，并移除 Pro/Max 峰值时段限额下调。</li><li>Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。</li><li>算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。</li><li>来源：<a href="https://www.anthropic.com/news/higher-limits-spacex" rel="noopener noreferrer">Anthropic</a></li></ul>
-<p>4. <strong>Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成</strong>（2026-05-05，T0）</p>
-<ul><li>模板覆盖 pitchbook、KYC、月结、估值复核、财报审阅、市场研究等工作，可作为 Claude Cowork/Claude Code 插件或 Managed Agents cookbook 使用。</li><li>模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。</li><li>这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。</li><li>来源：<a href="https://www.anthropic.com/news/finance-agents" rel="noopener noreferrer">Anthropic</a></li></ul>
-<p>5. <strong>xAI 在 Grok Web、iOS 和 Android 上推出 Connectors</strong>（2026-05-06，T0）</p>
-<ul><li>连接器支持读取、搜索、综合和部分写入动作，让 Grok 直接处理邮件、文档、表格、日历、代码仓库和项目任务。</li><li>GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。</li><li>Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。</li><li>来源：<a href="https://x.ai/news/grok-connectors" rel="noopener noreferrer">xAI</a></li></ul>
-<p>6. <strong>xAI 公布 2026-05-15 API 模型退休迁移清单</strong>（2026-05-07，T0）</p>
-<ul><li>受影响模型包括 grok-4-1、grok-4、grok-code-fast-1、grok-3 和 grok-imagine-image-pro 等旧 API 名称。</li><li>文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。</li><li>使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。</li><li>来源：<a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">xAI Docs</a></li></ul>
-<p>7. <strong>Ollama v0.23.3 发布，继续修复 MLX 与更新流程</strong>（2026-05-12，T2）</p>
-<ul><li>发布说明列出 MLX 相关推送行为、线程亲和性和推理状态超时修复，影响 Apple Silicon 本地推理稳定性。</li><li>同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。</li><li>该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。</li><li>来源：<a href="https://github.com/ollama/ollama/releases/tag/v0.23.3" rel="noopener noreferrer">GitHub Releases</a></li></ul>
-<p>8. <strong>vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径</strong>（2026-05-10，T2）</p>
-<ul><li>DeepSeek V4 相关修复覆盖 Hopper persistent topk、CUDA graph capture 和 V1 engine KV cache manager。</li><li>gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。</li><li>线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。</li><li>来源：<a href="https://github.com/vllm-project/vllm/releases/tag/v0.20.2" rel="noopener noreferrer">GitHub Releases</a></li></ul>
-<p>9. <strong>OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复</strong>（2026-05-08，T2）</p>
-<ul><li>remote-control 提供更直接的 headless app-server 启动入口，适合自动化或远程控制场景试验。</li><li>插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。</li><li>Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。</li><li>来源：<a href="https://github.com/openai/codex/releases/tag/rust-v0.130.0" rel="noopener noreferrer">GitHub Releases</a></li></ul>
-<p>10. <strong>LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复</strong>（2026-05-07，T2）</p>
-<ul><li>langchain-core 0.3.86 明确回补 path-traversal 修复，LangChain 0.3.30 同步 harden loads/dumps 并弃用 hub 路径。</li><li>同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。</li><li>仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。</li><li>来源：<a href="https://github.com/langchain-ai/langchain/releases" rel="noopener noreferrer">GitHub Releases</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI 在 API 中发布新一代实时语音模型**（2026-05-07，T0）
+    <div class="rendered-markdown"><ol><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy" decoding="async"> <strong><a href="https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/" rel="noopener noreferrer">OpenAI 在 API 中发布新一代实时语音模型</a></strong>（2026-05-07，T0）</li></ol>
+<ul><li>GPT-Realtime-2 面向实时语音 Agent，支持更长上下文、并行工具调用提示、可调 reasoning effort 和更强恢复行为。</li><li>GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。</li><li>价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。</li></ul>
+<ol start="2"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy" decoding="async"> <strong><a href="https://openai.com/index/gpt-5-5-instant/" rel="noopener noreferrer">OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant</a></strong>（2026-05-05，T0）</li></ol>
+<ul><li>原文称 GPT-5.5 Instant 正在替代 GPT-5.3 Instant 成为默认模型，并在 API 中通过 chat-latest 暴露。</li><li>增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。</li><li>对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。</li></ul>
+<ol start="3"><li><strong><a href="https://www.anthropic.com/news/higher-limits-spacex" rel="noopener noreferrer">Anthropic 提高 Claude Code 与 Claude API 使用限额</a></strong>（2026-05-06，T0）</li></ol>
+<ul><li>Claude Code 的五小时限额面向 Pro、Max、Team 和 seat-based Enterprise 计划翻倍，并移除 Pro/Max 峰值时段限额下调。</li><li>Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。</li><li>算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。</li></ul>
+<ol start="4"><li><strong><a href="https://www.anthropic.com/news/finance-agents" rel="noopener noreferrer">Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成</a></strong>（2026-05-05，T0）</li></ol>
+<ul><li>模板覆盖 pitchbook、KYC、月结、估值复核、财报审阅、市场研究等工作，可作为 Claude Cowork/Claude Code 插件或 Managed Agents cookbook 使用。</li><li>模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。</li><li>这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。</li></ul>
+<ol start="5"><li><strong><a href="https://x.ai/news/grok-connectors" rel="noopener noreferrer">xAI 在 Grok Web、iOS 和 Android 上推出 Connectors</a></strong>（2026-05-06，T0）</li></ol>
+<ul><li>连接器支持读取、搜索、综合和部分写入动作，让 Grok 直接处理邮件、文档、表格、日历、代码仓库和项目任务。</li><li>GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。</li><li>Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。</li></ul>
+<ol start="6"><li><strong><a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">xAI Docs：xAI 公布 2026-05-15 API 模型退休迁移清单</a></strong>（2026-05-07，T0）</li></ol>
+<ul><li>受影响模型包括 grok-4-1、grok-4、grok-code-fast-1、grok-3 和 grok-imagine-image-pro 等旧 API 名称。</li><li>文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。</li><li>使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。</li></ul>
+<ol start="7"><li><strong><a href="https://github.com/ollama/ollama/releases/tag/v0.23.3" rel="noopener noreferrer">GitHub Releases：Ollama v0.23.3 发布，继续修复 MLX 与更新流程</a></strong>（2026-05-12，T2）</li></ol>
+<ul><li>发布说明列出 MLX 相关推送行为、线程亲和性和推理状态超时修复，影响 Apple Silicon 本地推理稳定性。</li><li>同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。</li><li>该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。</li></ul>
+<ol start="8"><li><strong><a href="https://github.com/vllm-project/vllm/releases/tag/v0.20.2" rel="noopener noreferrer">GitHub Releases：vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径</a></strong>（2026-05-10，T2）</li></ol>
+<ul><li>DeepSeek V4 相关修复覆盖 Hopper persistent topk、CUDA graph capture 和 V1 engine KV cache manager。</li><li>gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。</li><li>线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。</li></ul>
+<ol start="9"><li><strong><a href="https://github.com/openai/codex/releases/tag/rust-v0.130.0" rel="noopener noreferrer">GitHub Releases：OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复</a></strong>（2026-05-08，T2）</li></ol>
+<ul><li>remote-control 提供更直接的 headless app-server 启动入口，适合自动化或远程控制场景试验。</li><li>插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。</li><li>Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。</li></ul>
+<ol start="10"><li><strong><a href="https://github.com/langchain-ai/langchain/releases" rel="noopener noreferrer">GitHub Releases：LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复</a></strong>（2026-05-07，T2）</li></ol>
+<ul><li>langchain-core 0.3.86 明确回补 path-traversal 修复，LangChain 0.3.30 同步 harden loads/dumps 并弃用 hub 路径。</li><li>同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。</li><li>仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. ![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI 在 API 中发布新一代实时语音模型](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/)**（2026-05-07，T0）
   - GPT-Realtime-2 面向实时语音 Agent，支持更长上下文、并行工具调用提示、可调 reasoning effort 和更强恢复行为。
   - GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。
   - 价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。
-  - 来源：[OpenAI](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/)
 
-2. **OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant**（2026-05-05，T0）
+2. ![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant](https://openai.com/index/gpt-5-5-instant/)**（2026-05-05，T0）
   - 原文称 GPT-5.5 Instant 正在替代 GPT-5.3 Instant 成为默认模型，并在 API 中通过 chat-latest 暴露。
   - 增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。
   - 对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。
-  - 来源：[OpenAI](https://openai.com/index/gpt-5-5-instant/)
 
-3. **Anthropic 提高 Claude Code 与 Claude API 使用限额**（2026-05-06，T0）
+3. **[Anthropic 提高 Claude Code 与 Claude API 使用限额](https://www.anthropic.com/news/higher-limits-spacex)**（2026-05-06，T0）
   - Claude Code 的五小时限额面向 Pro、Max、Team 和 seat-based Enterprise 计划翻倍，并移除 Pro/Max 峰值时段限额下调。
   - Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。
   - 算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。
-  - 来源：[Anthropic](https://www.anthropic.com/news/higher-limits-spacex)
 
-4. **Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成**（2026-05-05，T0）
+4. **[Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成](https://www.anthropic.com/news/finance-agents)**（2026-05-05，T0）
   - 模板覆盖 pitchbook、KYC、月结、估值复核、财报审阅、市场研究等工作，可作为 Claude Cowork/Claude Code 插件或 Managed Agents cookbook 使用。
   - 模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。
   - 这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。
-  - 来源：[Anthropic](https://www.anthropic.com/news/finance-agents)
 
-5. **xAI 在 Grok Web、iOS 和 Android 上推出 Connectors**（2026-05-06，T0）
+5. **[xAI 在 Grok Web、iOS 和 Android 上推出 Connectors](https://x.ai/news/grok-connectors)**（2026-05-06，T0）
   - 连接器支持读取、搜索、综合和部分写入动作，让 Grok 直接处理邮件、文档、表格、日历、代码仓库和项目任务。
   - GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。
   - Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。
-  - 来源：[xAI](https://x.ai/news/grok-connectors)
 
-6. **xAI 公布 2026-05-15 API 模型退休迁移清单**（2026-05-07，T0）
+6. **[xAI Docs：xAI 公布 2026-05-15 API 模型退休迁移清单](https://docs.x.ai/developers/migration/may-15-retirement)**（2026-05-07，T0）
   - 受影响模型包括 grok-4-1、grok-4、grok-code-fast-1、grok-3 和 grok-imagine-image-pro 等旧 API 名称。
   - 文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。
   - 使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。
-  - 来源：[xAI Docs](https://docs.x.ai/developers/migration/may-15-retirement)
 
-7. **Ollama v0.23.3 发布，继续修复 MLX 与更新流程**（2026-05-12，T2）
+7. **[GitHub Releases：Ollama v0.23.3 发布，继续修复 MLX 与更新流程](https://github.com/ollama/ollama/releases/tag/v0.23.3)**（2026-05-12，T2）
   - 发布说明列出 MLX 相关推送行为、线程亲和性和推理状态超时修复，影响 Apple Silicon 本地推理稳定性。
   - 同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。
   - 该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。
-  - 来源：[GitHub Releases](https://github.com/ollama/ollama/releases/tag/v0.23.3)
 
-8. **vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径**（2026-05-10，T2）
+8. **[GitHub Releases：vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径](https://github.com/vllm-project/vllm/releases/tag/v0.20.2)**（2026-05-10，T2）
   - DeepSeek V4 相关修复覆盖 Hopper persistent topk、CUDA graph capture 和 V1 engine KV cache manager。
   - gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。
   - 线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。
-  - 来源：[GitHub Releases](https://github.com/vllm-project/vllm/releases/tag/v0.20.2)
 
-9. **OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复**（2026-05-08，T2）
+9. **[GitHub Releases：OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复](https://github.com/openai/codex/releases/tag/rust-v0.130.0)**（2026-05-08，T2）
   - remote-control 提供更直接的 headless app-server 启动入口，适合自动化或远程控制场景试验。
   - 插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。
   - Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。
-  - 来源：[GitHub Releases](https://github.com/openai/codex/releases/tag/rust-v0.130.0)
 
-10. **LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复**（2026-05-07，T2）
+10. **[GitHub Releases：LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复](https://github.com/langchain-ai/langchain/releases)**（2026-05-07，T2）
   - langchain-core 0.3.86 明确回补 path-traversal 修复，LangChain 0.3.30 同步 harden loads/dumps 并弃用 hub 路径。
   - 同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。
-  - 仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。
-  - 来源：[GitHub Releases](https://github.com/langchain-ai/langchain/releases)</template>
+  - 仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1597,7 +1690,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1606,33 +1699,32 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。 <a href="https://mistral.ai/news/mistral-3" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。 [来源](https://mistral.ai/news/mistral-3)</template>
+    <div class="rendered-markdown"><ul><li>Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。 <a href="https://mistral.ai/news/mistral-3" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。 [来源](https://mistral.ai/news/mistral-3)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><p>未记录信源审计。</p></div>
-    <template data-rich-source data-source-fallback>未记录信源审计。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+    <template data-rich-source data-source-fallback>未记录信源审计。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：10</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：24h/48h 内高质量 T0/T2 信息不足，因此扩展到 2026-05-05 至 2026-05-13；所有主体条目使用官方页面、官方文档或 GitHub Release，并保留真实事件日期。Mistral 3 因页面缺少明确发布日期降级为社区线索。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。</strong>：增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。</li><li>为什么要改：减少低质量硬凑，同时让窗口扩展可审计。</li><li><strong>官方页面没有显式发布日期时缺少统一处理规则。</strong>：要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。</li><li>为什么要改：避免把无法定日的发布写入日报主体。</li><li><strong>Builder 观察在无一手帖子时容易空缺。</strong>：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。</li><li>为什么要改：防止用二手转述填充 builder 区域。</li></ul>
@@ -1653,13 +1745,13 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **Builder 观察在无一手帖子时容易空缺。**：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。
   - 为什么要改：防止用二手转述填充 builder 区域。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json)</template></div>
+  </details>
 
 
 
 
-        <section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list"><li>增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。</li><li>要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。</li><li>保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。</li></ul></section>
+
       </div>
     </div>
   </main>

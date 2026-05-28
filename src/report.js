@@ -108,6 +108,7 @@ export function normalizeReportDraft(draft, options = {}) {
   requireSourceAudit(validation.value);
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
+  requireBuilderXObservation(validation.value, options.candidatePool);
 
   return validation.value;
 }
@@ -115,11 +116,12 @@ export function normalizeReportDraft(draft, options = {}) {
 function requireSourceAudit(report) {
   const audit = report.source_audit;
   if (!audit || typeof audit !== "object") {
-    throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录 GitHub Trending 和 Builder 原始源检查结果。");
+    throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录固定发现面和源健康检查结果。");
   }
 
-  requireAuditGroup(audit.github_trending, "source_audit.github_trending");
-  requireAuditGroup(audit.builder_sources, "source_audit.builder_sources");
+  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"]) {
+    requireAuditGroup(audit[groupName], `source_audit.${groupName}`);
+  }
 }
 
 function requireAuditGroup(group, pathName) {
@@ -131,5 +133,51 @@ function requireAuditGroup(group, pathName) {
   }
   if (!Array.isArray(group.sources) || group.sources.length === 0) {
     throw new PublisherError("source_audit_incomplete", `${pathName}.sources 必须至少记录一个已检查来源。`);
+  }
+}
+
+function requireBuilderXObservation(report, candidatePool) {
+  const builderSources = report.source_audit?.builder_sources?.sources || [];
+  const checksX = builderSources.some((source) => isFollowBuildersXSource(source) || isXSearchFallbackSource(source));
+  if (!checksX) {
+    return;
+  }
+
+  const hasXObservation = (report.builder_observations || []).some((item) => isXStatusUrl(item.url)) ||
+    (candidatePool?.candidates || []).some((candidate) =>
+      candidate.status === "included" &&
+      candidate.included_in === "builder_observations" &&
+      (isXStatusUrl(candidate.url) || isXStatusUrl(candidate.original_url))
+    );
+  if (hasXObservation) {
+    return;
+  }
+
+  const sourceState = builderSources
+    .filter((source) => isFollowBuildersXSource(source) || isXSearchFallbackSource(source))
+    .map((source) => `${source.name}:${source.status}${source.notes ? `:${source.notes}` : ""}`)
+    .join(" | ");
+  throw new PublisherError(
+    "builder_x_observation_missing",
+    "Builder 观察必须包含至少一条近期原始 X status；不能在 X 发现失败时只用博客或播客顶替。",
+    { sources: sourceState }
+  );
+}
+
+function isFollowBuildersXSource(source) {
+  return /follow-builders x feed/i.test(source?.name || "") || /feed-x\.json/i.test(source?.url || "");
+}
+
+function isXSearchFallbackSource(source) {
+  return /x builder search/i.test(source?.name || "") || /tavily\.com\/search/i.test(source?.url || "");
+}
+
+function isXStatusUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return (host === "x.com" || host === "twitter.com") && /\/[^/]+\/status\/\d+/i.test(url.pathname);
+  } catch {
+    return false;
   }
 }

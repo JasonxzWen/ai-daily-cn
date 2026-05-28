@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,87 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-21</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief">
-        <ul class="hero-summary-text hero-summary-list"><li>今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型…</li><li>本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</li></ul>
-        <div class="hero-stat-grid" aria-label="报告摘要指标">
-    <div class="hero-stat"><span>行动</span><strong>3</strong><small>项</small></div>
-  </div>
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-21 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-21</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
-<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
-<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-builder-7" title="Builder 观察与社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>Builder 观察与社区线索</span></a>
-<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-<a href="#next-actions" title="下一步" data-nav-link data-nav-index="10" data-nav-group-name="next" data-nav-status="info"><span>下一步</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-21</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>4</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>3</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">Builder 观察</div><strong>4</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>SageMaker</strong>：今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker Open…</li><li><strong>开源项目</strong>：本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</li></ul></div>
-    <template data-rich-source data-source-fallback>- **SageMaker**：今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker Open…
-- **开源项目**：本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1482,50 +1579,44 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上</strong>（2026-05-19，T0）</p>
-<ul><li>Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。</li><li>Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。</li><li>对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。</li><li>来源：<a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">Google Developers Blog</a></li></ul>
-<p>2. <strong>GitHub Copilot 在 VS Code 中推出按任务自动路由模型</strong>（2026-05-20，T0）</p>
-<ul><li>这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。</li><li>组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。</li><li>来源：<a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
-<p>3. <strong>Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</strong>（2026-05-20，T0）</p>
-<ul><li>这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。</li><li>对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。</li><li>来源：<a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">AWS Machine Learning Blog</a></li></ul>
-<p>4. <strong>Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels</strong>（2026-05-19，T0）</p>
-<ul><li>官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。</li><li>这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。</li><li>来源：<a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">Claude Blog</a></li></ul>
-<p>5. <strong>Vercel AI Gateway 上线 Gemini 3.5 Flash</strong>（2026-05-19，T0）</p>
-<ul><li>Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。</li><li>对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。</li><li>来源：<a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog</a></li></ul>
-<p>6. <strong>Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新</strong>（2026-05-19，T0）</p>
-<ul><li>Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。</li><li>Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。</li><li>来源：<a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog / Ai2 Blog</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上**（2026-05-19，T0）
+    <div class="rendered-markdown"><ol><li><strong><a href="https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/" rel="noopener noreferrer">Google Developers Blog：Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上</a></strong>（2026-05-19，T0）</li></ol>
+<ul><li>Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。</li><li>Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。</li><li>对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。</li></ul>
+<ol start="2"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC" alt="GitHub Changelog" loading="lazy" decoding="async"> <strong><a href="https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/" rel="noopener noreferrer">GitHub Changelog：GitHub Copilot 在 VS Code 中推出按任务自动路由模型</a></strong>（2026-05-20，T0）</li></ol>
+<ul><li>这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。</li><li>组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。</li></ul>
+<ol start="3"><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">AWS Machine Learning Blog：Amazon SageMaker AI endpoints 增加 OpenAI-compatible API</a></strong>（2026-05-20，T0）</li></ol>
+<ul><li>这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。</li><li>对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。</li></ul>
+<ol start="4"><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">Claude Blog：Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels</a></strong>（2026-05-19，T0）</li></ol>
+<ul><li>官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。</li><li>这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。</li></ul>
+<ol start="5"><li><strong><a href="https://vercel.com/changelog" rel="noopener noreferrer">Vercel Changelog：Vercel AI Gateway 上线 Gemini 3.5 Flash</a></strong>（2026-05-19，T0）</li></ol>
+<ul><li>Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。</li><li>对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。</li></ul>
+<ol start="6"><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Hugging Face Blog / Ai2 Blog：Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新</a></strong>（2026-05-19，T0）</li></ol>
+<ul><li>Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。</li><li>Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. **[Google Developers Blog：Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)**（2026-05-19，T0）
   - Google 官方开发者博客明确把 Gemini 3.5、Antigravity agent 编排能力和开发者工作流放在同一发布脉络中。
   - Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。
   - 对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。
-  - 来源：[Google Developers Blog](https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/)
 
-2. **GitHub Copilot 在 VS Code 中推出按任务自动路由模型**（2026-05-20，T0）
+2. ![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC) **[GitHub Changelog：GitHub Copilot 在 VS Code 中推出按任务自动路由模型](https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/)**（2026-05-20，T0）
   - 这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。
   - 组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。
-  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/)
 
-3. **Amazon SageMaker AI endpoints 增加 OpenAI-compatible API**（2026-05-20，T0）
+3. **[AWS Machine Learning Blog：Amazon SageMaker AI endpoints 增加 OpenAI-compatible API](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)**（2026-05-20，T0）
   - 这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。
   - 对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。
-  - 来源：[AWS Machine Learning Blog](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)
 
-4. **Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels**（2026-05-19，T0）
+4. **[Claude Blog：Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（2026-05-19，T0）
   - 官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。
   - 这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。
-  - 来源：[Claude Blog](https://claude.com/blog/claude-managed-agents-updates)
 
-5. **Vercel AI Gateway 上线 Gemini 3.5 Flash**（2026-05-19，T0）
+5. **[Vercel Changelog：Vercel AI Gateway 上线 Gemini 3.5 Flash](https://vercel.com/changelog)**（2026-05-19，T0）
   - Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。
   - 对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。
-  - 来源：[Vercel Changelog](https://vercel.com/changelog)
 
-6. **Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新**（2026-05-19，T0）
+6. **[Hugging Face Blog / Ai2 Blog：Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新](https://huggingface.co/blog/ettin-reranker)**（2026-05-19，T0）
   - Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。
-  - Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。
-  - 来源：[Hugging Face Blog / Ai2 Blog](https://huggingface.co/blog/ettin-reranker)</template>
+  - Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1540,7 +1631,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **Ettin Reranker Family** ==RAG 评估==（Hugging Face，open_weights，2026-05-19）：Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。 [Hugging Face Blog](https://huggingface.co/blog/ettin-reranker)
 - **OlmoEarth v1.1** ==官方可用性==（Ai2，open_weights，2026-05-19）：Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。 [Ai2 Blog](https://allenai.org/blog/olmoearth-v1-1)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-3" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1549,12 +1640,32 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></strong>（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。</li><li><strong><a href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></strong>（Claude Blog / Anthropic，2026-05-19）：Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。</li><li><strong><a href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></strong>（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints](https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/)**（AWS Machine Learning Blog / Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng，2026-05-20）：SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。
-- **[New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)**（Claude Blog / Anthropic，2026-05-19）：Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。
-- **[Introducing the Ettin Reranker Family](https://huggingface.co/blog/ettin-reranker)**（Hugging Face Blog / Tom Aarsen，2026-05-19）：Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="model serving / OpenAI-compatible API" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></h3>
+    <div class="card-tags"><span class="chip">model serving / OpenAI-compatible API</span></div>
+    <p>SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>AWS Machine Learning Blog</span></dd></div><div><dt>作者</dt><dd><span>Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng</span></dd></div><div><dt>日期</dt><dd><span>2026-05-20</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="managed agents / MCP / sandboxing" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></h3>
+    <div class="card-tags"><span class="chip">managed agents / MCP / sandboxing</span></div>
+    <p>Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Anthropic</span></dd></div><div><dt>日期</dt><dd><span>2026-05-19</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="reranker / RAG" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></h3>
+    <div class="card-tags"><span class="chip">reranker / RAG</span></div>
+    <p>Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Hugging Face Blog</span></dd></div><div><dt>作者</dt><dd><span>Tom Aarsen</span></dd></div><div><dt>日期</dt><dd><span>2026-05-19</span></dd></div></dl>
+  </article>
+    </div>
   </section>
-<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1609,7 +1720,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-builder-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-builder-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1636,15 +1747,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 [来源](https://github.com/HKUDS/CLI-Anything)
 - Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 [来源](https://x.com/GoogleLabs/status/2056872996988756228)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><h4>GitHub Trending</h4>
 <ul><li>检查状态：已检查</li><li>候选 / 入选：121 / 6</li><li>说明：本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。</li></ul>
 <ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily all</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly all</a>：checked，解析候选 14 个。</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending daily Python</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/python?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Python</a>：checked，解析候选 13 个。</li><li><a href="https://github.com/trending/typescript?since=daily" rel="noopener noreferrer">GitHub Trending daily TypeScript</a>：checked，解析候选 15 个。</li><li><a href="https://github.com/trending/typescript?since=weekly" rel="noopener noreferrer">GitHub Trending weekly TypeScript</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/rust?since=daily" rel="noopener noreferrer">GitHub Trending daily Rust</a>：checked，解析候选 18 个。</li><li><a href="https://github.com/trending/rust?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Rust</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/go?since=daily" rel="noopener noreferrer">GitHub Trending daily Go</a>：checked，解析候选 17 个。</li><li><a href="https://github.com/trending/go?since=weekly" rel="noopener noreferrer">GitHub Trending weekly Go</a>：checked，解析候选 15 个。</li></ul>
@@ -1677,17 +1789,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：checked，stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。
 - [follow-builders X feed](https://github.com/zarazhangrui/follow-builders)：checked，通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。
 - [Training Data podcast](https://www.youtube.com/watch?v=j7ypvRUFY7M)：checked，2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。
-- [Claude Managed Agents blog from builder feed](https://claude.com/blog/claude-managed-agents-updates)：checked，Builder feed 命中后回溯到 Claude 官方博客。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+- [Claude Managed Agents blog from builder feed](https://claude.com/blog/claude-managed-agents-updates)：checked，Builder feed 命中后回溯到 Claude 官方博客。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：4</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</strong>：把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</li><li><strong>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</strong>：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</li><li><strong>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</strong>：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</li></ul>
@@ -1705,13 +1818,13 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。**：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。
 - **为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。**：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json)</template></div>
+  </details>
 
 
 
 
-        <section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list"><li>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</li><li>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</li><li>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</li></ul></section>
+
       </div>
     </div>
   </main>

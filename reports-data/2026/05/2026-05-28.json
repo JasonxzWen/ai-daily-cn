@@ -1,24 +1,14 @@
 {
+  "schema_version": 1,
   "report_date": "2026-05-28",
   "title": "AI 日报 2026-05-28",
-  "summary": "今天补齐三条线：运行可靠性上，OpenAI Status 仍把 Codex context compaction latency 标为调查中；企业控制面上，GitHub 继续把 Copilot 记忆、模型准入、Code Quality API 和 PR 覆盖率放进管理边界；发现面上，GitHub Trending 独立展示 daily 前 8 个仓库，并标注排名与 new 状态，Builder 观察则来自 follow-builders 的 3 条原始 X 记录。",
-  "hero_highlights": [
-    {
-      "title": "GitHub Trending 改为独立板块",
-      "url": "https://github.com/trending?since=daily",
-      "reason": "今天展示 daily 前 8 个仓库，并保留 rank、previous_rank、rank_delta 和 trend 字段；由于昨天没有结构化 trending 历史，本轮全部标记为 new。"
-    },
-    {
-      "title": "follow-builders 已恢复并进入 Builder 观察",
-      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-      "reason": "本轮成功读取 follow-builders X feed、podcast feed 和固定 RSS 兜底源，入选 3 条与 agent 使用方式或企业落地相关的观察。"
-    }
-  ],
+  "summary": "今日重点收敛到三件事：Codex context compaction latency 已恢复，但长上下文任务仍需要把供应商状态页纳入 runbook；OpenAI/Cisco 与 GitHub Changelog 都在把 coding agent 的企业落地推到权限、记忆、模型准入和质量门禁层；GitHub Trending Top 10 与 Builder 观察显示 agent 工作流正在转向 repo 规则、skills 和团队流程。",
+  "hero_highlights": [],
   "source_window": {
     "date_from": "2026-05-26",
     "date_to": "2026-05-28",
     "fallback_window_used": true,
-    "notes": "24 小时内可确认的主体信息不足，扩展到 48 小时后保留 OpenAI Status 与 GitHub Changelog 两条主体信息；模型发布没有找到可确认的新条目，因此保持空数组。"
+    "notes": "主条目覆盖 2026-05-26 至 2026-05-28；状态页和 OpenAI News 使用 24 小时内来源，GitHub Changelog 作为 48 小时内企业控制面补充。"
   },
   "source_audit": {
     "github_trending": {
@@ -52,7 +42,7 @@
           "name": "GitHub Trending TypeScript daily",
           "url": "https://github.com/trending/typescript?since=daily",
           "status": "checked",
-          "notes": "16 repositories parsed"
+          "notes": "17 repositories parsed"
         },
         {
           "name": "GitHub Trending TypeScript weekly",
@@ -85,9 +75,9 @@
           "notes": "18 repositories parsed"
         }
       ],
-      "candidates_found": 123,
-      "included": 8,
-      "notes": "GitHub Trending 现在作为独立板块展示，默认取 daily 前 8 个仓库；字段保留 rank、previous_rank、rank_delta 和 trend。昨天报告没有 github_trending 顶层历史，因此本轮趋势均为 new。"
+      "candidates_found": 124,
+      "included": 10,
+      "notes": "GitHub Trending 独立展示 daily Top 10；本轮与 reports-data 历史比较后生成 trend 字段，当前 Top 10 均按本地历史标记为 new。"
     },
     "builder_sources": {
       "checked": true,
@@ -95,8 +85,8 @@
         {
           "name": "follow-builders X feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-          "status": "checked",
-          "notes": "31 recent original entries parsed"
+          "status": "blocked",
+          "notes": "0 recent original entries parsed; upstream_error=X API: User lookup failed: HTTP 500"
         },
         {
           "name": "follow-builders podcast feed",
@@ -109,6 +99,12 @@
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
           "status": "no_signal",
           "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Tavily X builder search fallback",
+          "url": "https://api.tavily.com/search",
+          "status": "checked",
+          "notes": "6 recent original X status entries parsed"
         },
         {
           "name": "Simon Willison Weblog",
@@ -129,11 +125,11 @@
           "notes": "0 recent original entries parsed"
         }
       ],
-      "candidates_found": 27,
-      "included": 3,
+      "candidates_found": 14,
+      "included": 6,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-05-28T03:24:06.723Z",
-      "notes": "follow-builders central feed 已运行；本轮从原始 X URL 中只选 agent 使用方式和企业落地相关内容，活动通知、短链接空内容和个人动态保留在候选池外。"
+      "last_successful_feed_at": "2026-05-28T11:35:50.664Z",
+      "notes": "follow-builders central feed is checked first; when its X feed is blocked, Tavily X status fallback must attempt original x.com status discovery before RSS/Atom fallback. Today the central X feed returned upstream X API 500, and the report includes original X status entries from the fallback."
     },
     "content_sources": {
       "checked": true,
@@ -163,18 +159,6 @@
           "notes": "7 recent blog/interview entries parsed"
         },
         {
-          "name": "TechCrunch AI",
-          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
-          "status": "checked",
-          "notes": "20 recent blog/interview entries parsed"
-        },
-        {
-          "name": "The Verge AI",
-          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-          "status": "checked",
-          "notes": "10 recent blog/interview entries parsed"
-        },
-        {
           "name": "Google Research Blog",
           "url": "https://research.google/blog/rss/",
           "status": "checked",
@@ -199,47 +183,814 @@
           "notes": "1 recent blog/interview entries parsed"
         },
         {
-          "name": "Latent.Space",
-          "url": "https://www.latent.space/feed",
-          "status": "checked",
-          "notes": "2 recent blog/interview entries parsed"
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
         },
         {
-          "name": "Interconnects",
-          "url": "https://www.interconnects.ai/feed",
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "status": "checked",
+          "notes": "8 recent blog/interview entries parsed"
+        },
+        {
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "checked",
+          "notes": "12 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
           "status": "checked",
           "notes": "1 recent blog/interview entries parsed"
         },
         {
-          "name": "Product Hunt Developer Tools Feed",
-          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
           "status": "checked",
-          "notes": "50 recent product/project entries parsed"
+          "notes": "1 recent blog/interview entries parsed"
         },
         {
-          "name": "Planet AI",
-          "url": "https://www.planet-ai.net/rss.xml",
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
           "status": "checked",
-          "notes": "50 recent blog/interview entries parsed"
+          "notes": "11 recent intermediary lead entries parsed"
         },
         {
-          "name": "BAIR Blog",
-          "url": "https://bair.berkeley.edu/blog/feed.xml",
-          "status": "no_signal",
-          "notes": "0 recent blog/interview entries parsed"
+          "name": "OpenAI Status",
+          "url": "https://status.openai.com/history.atom",
+          "status": "checked",
+          "notes": "6 recent incidents parsed"
+        },
+        {
+          "name": "Claude Status",
+          "url": "https://status.claude.com/history.atom",
+          "status": "checked",
+          "notes": "4 recent incidents parsed"
         }
       ],
-      "candidates_found": 20,
-      "included": 4,
+      "candidates_found": 33,
+      "included": 5,
+      "notes": "固定发现面覆盖 OpenAI、Anthropic、Hugging Face、GitHub Changelog、Google/Microsoft/NVIDIA/AWS/Cloudflare、TechCrunch/The Verge/Product Hunt/Planet AI/Latent.Space/Interconnects 等；公众号、自媒体和新闻聚合只作为线索，正文仍以一手或可追溯原始 URL 为准。",
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-05-28T03:24:06.723Z",
-      "notes": "内容源已补充 GitHub Changelog、TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space、Interconnects 等发现面；热点讨论、播客和融资信息必须保留原始 URL 或一手/多源证据后才可入选。"
+      "last_successful_feed_at": "2026-05-28T10:19:15.268Z"
+    },
+    "search_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GDELT",
+          "url": "https://api.gdeltproject.org/",
+          "status": "blocked",
+          "notes": "The_operation_was_aborted_due_to_timeout"
+        },
+        {
+          "name": "OpenAlex",
+          "url": "https://api.openalex.org/",
+          "status": "checked",
+          "notes": "30 shadow candidates; The_operation_was_aborted_due_to_timeout"
+        },
+        {
+          "name": "arXiv",
+          "url": "https://export.arxiv.org/",
+          "status": "checked",
+          "notes": "10 shadow candidates"
+        }
+      ],
+      "candidates_found": 40,
+      "included": 0,
+      "notes": "Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.",
+      "shadow": true,
+      "provider_runtime_ms": {},
+      "provider_cost_units": {}
+    },
+    "sources_health": {
+      "checked": true,
+      "sources": [
+        {
+          "id": "content-openai-news",
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 4,
+          "original_url_count": null,
+          "notes": "971 feed entries parsed; 4 within 48h"
+        },
+        {
+          "id": "content-anthropic-news",
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-hugging-face-blog",
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "787 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "content-github-changelog",
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-google-research",
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-google-deepmind-blog",
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-meta-ai-blog",
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-microsoft-research",
+          "name": "Microsoft Research Blog",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-apple-machine-learning",
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-nvidia-developer-blog",
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 6,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 6 within 48h"
+        },
+        {
+          "id": "content-aws-machine-learning",
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 5,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 5 within 48h"
+        },
+        {
+          "id": "content-azure-blog",
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-meta-engineering",
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "9 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-cloudflare-blog",
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-nature-machine-learning",
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "secondary",
+          "enablement": "core",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 7,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 7 within 48h"
+        },
+        {
+          "id": "content-techcrunch-ai",
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 16,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 16 within 48h"
+        },
+        {
+          "id": "content-the-verge-ai",
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 7,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 7 within 48h"
+        },
+        {
+          "id": "content-techcrunch-enterprise",
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-the-verge-main",
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 10,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "id": "content-ars-technica",
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 18,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 18 within 48h"
+        },
+        {
+          "id": "content-product-hunt-trending",
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-product-hunt-devtools",
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-latent-space",
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "content-interconnects",
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-planet-ai",
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-hn-frontpage",
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "community",
+          "enablement": "optional",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-36kr",
+          "name": "36Kr",
+          "url": "https://www.36kr.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 30,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 30 within 48h"
+        },
+        {
+          "id": "intermediary-qbitai",
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 10,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "id": "intermediary-leiphone",
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-infoq-cn",
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-sspai",
+          "name": "SSPAI",
+          "url": "https://sspai.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 6,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 6 within 48h"
+        },
+        {
+          "id": "intermediary-ifanr",
+          "name": "iFanr",
+          "url": "https://www.ifanr.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 12,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 12 within 48h"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
     }
   },
+  "github_trending": [
+    {
+      "candidate_id": "trend-harry0703-moneyprinterturbo",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "name": "harry0703/MoneyPrinterTurbo",
+      "description": "AI 大模型一键生成高清短视频的开源流水线。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 1,742 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-lum1104-understand-anything",
+      "repo": "Lum1104/Understand-Anything",
+      "name": "Lum1104/Understand-Anything",
+      "description": "把代码库转成交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "Lum1104/Understand-Anything appeared on GitHub Trending daily with 4,465 stars today. 近 7 天本地记录曾在 2026-05-21、2026-05-22、2026-05-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-hardikpandya-stop-slop",
+      "repo": "hardikpandya/stop-slop",
+      "name": "hardikpandya/stop-slop",
+      "description": "用于去除文章中常见 AI 痕迹的 skill 文件。",
+      "url": "https://github.com/hardikpandya/stop-slop",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "hardikpandya/stop-slop appeared on GitHub Trending daily with 664 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-affaan-m-ecc",
+      "repo": "affaan-m/ECC",
+      "name": "affaan-m/ECC",
+      "description": "面向 Claude Code、Codex、opencode、Cursor 的 agent harness 优化体系。",
+      "url": "https://github.com/affaan-m/ECC",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "affaan-m/ECC appeared on GitHub Trending daily with 2,062 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-anthropics-knowledge-work-plugins",
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "anthropics/knowledge-work-plugins",
+      "description": "Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。",
+      "url": "https://github.com/anthropics/knowledge-work-plugins",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "anthropics/knowledge-work-plugins appeared on GitHub Trending daily with 695 stars today. 近 7 天本地记录曾在 2026-05-25、2026-05-27 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-leonxlnx-taste-skill",
+      "repo": "Leonxlnx/taste-skill",
+      "name": "Leonxlnx/taste-skill",
+      "description": "约束 AI 输出风格、减少空泛生成的 skill 文件。",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "Leonxlnx/taste-skill appeared on GitHub Trending daily with 2,715 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-p-e-w-heretic",
+      "repo": "p-e-w/heretic",
+      "name": "p-e-w/heretic",
+      "description": "用于自动移除语言模型审查限制的工具。",
+      "url": "https://github.com/p-e-w/heretic",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 211 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-shiyu-coder-kronos",
+      "repo": "shiyu-coder/Kronos",
+      "name": "shiyu-coder/Kronos",
+      "description": "面向金融市场时间序列语言的基础模型。",
+      "url": "https://github.com/shiyu-coder/Kronos",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "shiyu-coder/Kronos appeared on GitHub Trending daily with 401 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-mukul975-anthropic-cybersecurity-skills",
+      "repo": "mukul975/Anthropic-Cybersecurity-Skills",
+      "name": "mukul975/Anthropic-Cybersecurity-Skills",
+      "description": "为 AI agents 准备的结构化网络安全 skills，映射 MITRE、NIST 等框架。",
+      "url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "mukul975/Anthropic-Cybersecurity-Skills appeared on GitHub Trending daily with 886 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-twentyhq-twenty",
+      "repo": "twentyhq/twenty",
+      "name": "twentyhq/twenty",
+      "description": "面向 AI 场景设计的开源 Salesforce 替代方案。",
+      "url": "https://github.com/twentyhq/twenty",
+      "event_date": "2026-05-28",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "twentyhq/twenty appeared on GitHub Trending daily with 519 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    }
+  ],
   "main_items": [
     {
-      "candidate_id": "main-openai-codex-context-compaction",
-      "title": "OpenAI Status：Codex context compaction latency 仍在调查",
+      "candidate_id": "main-openai-codex-context-compaction-resolved",
+      "title": "Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁",
       "event_date": "2026-05-28",
       "url": "https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7",
       "source": "OpenAI Status",
@@ -250,38 +1001,69 @@
         "Context compaction",
         "Statuspage"
       ],
-      "summary": "OpenAI Status 在 2026-05-28 01:47 AM 更新 Codex Context Compaction Latency incident，状态仍是 investigating/degraded performance；事件说明 Codex context compaction 比预期慢，受影响组件属于 Codex。",
+      "summary": "OpenAI Statuspage 本轮显示 Codex Context Compaction Latency incident 已恢复，受影响组件包括 Codex API、Codex Web、CLI、App 和 VS Code extension。",
       "bullets": [
-        "事件最早在 2026-05-27 05:57 PM 标记 identified，随后在 2026-05-28 00:14 和 01:47 继续显示调查中；这类问题更像运行时延迟，不应和模型答复质量混在一起判断。",
-        "使用 Codex 做长上下文代码任务的团队，今天应把任务排队、上下文压缩、工具执行和网络失败分开记录，避免用单次慢请求直接判断 agent 配置错误。",
-        "如果 CI 或自动修复流程依赖 Codex，建议在 runbook 中加入供应商状态页检查，并为长任务设置可重放输入，等待事件恢复后再复跑。"
+        "**状态已恢复**：本次重新抓取的 Statuspage 输出显示 affected components 已回到 operational，不再沿用早些时候的 investigating 口径。",
+        "**运行分类**：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。",
+        "**自动化处理**：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。"
+      ]
+    },
+    {
+      "candidate_id": "main-openai-cisco-codex-enterprise",
+      "title": "Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理",
+      "event_date": "2026-05-27",
+      "url": "https://openai.com/index/cisco",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Cisco",
+        "Codex",
+        "AI-native development"
+      ],
+      "summary": "OpenAI 在 Cisco 案例中把 Codex 放在企业工程、AI Defense 和缺陷修复流程里，而不是只展示单个开发者的编码辅助。",
+      "bullets": [
+        "**落点更具体**：官方文章提到 scale AI-native development、accelerate AI Defense work 和 automate defect remediation，说明 Codex 的叙事正在进入缺陷、测试和安全流程。",
+        "**团队门槛**：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。",
+        "**可跟进项**：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。"
       ]
     },
     {
       "candidate_id": "main-github-copilot-code-quality-controls",
-      "title": "GitHub 把 Copilot 记忆、模型可用性和 Code Quality 控制继续前移",
+      "title": "GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界",
       "event_date": "2026-05-26",
       "url": "https://github.blog/changelog/",
       "source": "GitHub Changelog",
       "tier": "T0",
       "entities": [
         "GitHub",
-        "Copilot",
         "Copilot Memory",
+        "Model rules",
         "Code Quality"
       ],
-      "summary": "GitHub 2026-05-26 Changelog 同日出现多条企业控制面更新：Copilot Memory 增加删除引导、仓库级关闭开关和 CLI `/memory` 控制；Copilot model rules 支持按组织开放模型；Code Quality 增加 repository setup API 和 PR 覆盖率预览。",
+      "summary": "GitHub 2026-05-26 Changelog 同日出现多条企业控制面更新：Copilot Memory 删除与 scope 控制、组织级 model rules、Code Quality setup API 和 PR 覆盖率预览。",
       "bullets": [
-        "Copilot Memory 的仓库级开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实；这会影响记忆内容是否能被全仓库贡献者复用。",
-        "组织级 model rules 把模型准入从企业全局设置拆到组织范围，适合多业务线分别做安全评审、成本边界和默认模型策略。",
-        "Code Quality setup API 与 PR 覆盖率预览把质量信号前移到 review 流程；对使用 AI 改代码的团队，覆盖率和静态质量配置更容易进入同一套合并门禁。"
+        "**记忆边界**：仓库级关闭开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实，减少错误记忆被全仓库复用。",
+        "**模型准入**：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。",
+        "**合并门禁**：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。"
       ]
     }
   ],
   "model_releases": [],
   "hot_blogs": [
     {
-      "candidate_id": "blog-hf-reachy-mini-local",
+      "candidate_id": "content-hugging-face-blog-itbench-aa-frontier-models-score-below-50-on-the-first",
+      "title": "ITBench-AA: Frontier Models Score Below 50% on the First Benchmark for Agentic Enterprise IT Tasks",
+      "url": "https://huggingface.co/blog/ibm-research/itbench-aa",
+      "publisher": "Hugging Face",
+      "author": "Artificial Analysis, IBM",
+      "event_date": "2026-05-27",
+      "topic": "Agentic enterprise IT benchmark",
+      "content_type": "blog",
+      "summary": "这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。"
+    },
+    {
+      "candidate_id": "content-hugging-face-blog-reachy-mini-goes-fully-local",
       "title": "Reachy Mini goes fully local",
       "url": "https://huggingface.co/blog/local-reachy-mini-conversation",
       "publisher": "Hugging Face",
@@ -289,14 +1071,14 @@
       "event_date": "2026-05-27",
       "topic": "Local speech-to-speech agent stack",
       "content_type": "blog",
-      "summary": "这篇 Hugging Face 文章把 Reachy Mini 的对话能力从托管后端迁到本地机器，给出一条可复现的级联语音路线：VAD 负责检测说话片段，STT 把语音转成文本，LLM 负责生成回复，TTS 再把文本读出来。文章用 speech-to-speech 提供兼容 Realtime API 的 WebSocket 后端，并展示 llama.cpp、vLLM、Transformers、MLX 和托管 Responses API 的切换方式。对做语音机器人或边缘 agent 的团队，最有用的是它把隐私、成本、延迟和可替换组件拆成清楚的部署选项：音频可以不出本地网络，模型服务可以独立进程运行，后续只要接口保持一致，就能替换 STT、LLM 或 TTS。局限也很明确：端到端体验取决于本地硬件、模型大小、TTS 延迟和网络绑定配置。"
+      "summary": "文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。"
     }
   ],
   "projects": [
     {
       "candidate_id": "project-vllm-metal",
       "name": "vllm-project/vllm-metal",
-      "description": "vllm-metal 是社区维护的 vLLM Apple Silicon 硬件插件，GitHub 页面显示 2026-05-27 latest release `v0.2.0-20260527-105045`。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 形态的开发者。",
+      "description": "社区维护的 vLLM Apple Silicon 硬件插件，GitHub release 显示 2026-05-27 的 v0.2.0-20260527-105045。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 的开发者。",
       "domains": [
         "inference_serving",
         "apple_silicon",
@@ -307,12 +1089,12 @@
       "event_date": "2026-05-27",
       "source": "GitHub",
       "signal": "release",
-      "evidence": "GitHub 页面列出项目用途、支持范围、Apache-2.0 license，以及 2026-05-27 latest release。"
+      "evidence": "GitHub release metadata lists v0.2.0-20260527-105045 as the latest release."
     },
     {
       "candidate_id": "project-ragflow-v0256",
       "name": "RAGFlow v0.25.6",
-      "description": "RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 `@tool` decorator、base64 image agent message 和 chat completion 参数控制。",
+      "description": "RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 @tool decorator、base64 image agent message 和 chat completion 参数控制。",
       "domains": [
         "RAG",
         "agent_builder",
@@ -323,102 +1105,100 @@
       "event_date": "2026-05-26",
       "source": "GitHub Releases",
       "signal": "release",
-      "evidence": "Release notes 标明 Released on May 26, 2026，并列出 Browser component 与 RAG/agent 改动。"
+      "evidence": "Release notes mark v0.25.6 as released on May 26, 2026 and list Browser component plus RAG/agent changes."
     }
   ],
   "builder_observations": [
     {
-      "author": "Thariq",
-      "candidate_id": "follow-builders-x-thariq-the-basic-trick-to-using-claude-code-for-non-technical-",
-      "role": "Builder",
-      "content": "Thariq 把 Claude Code 用在非技术工作上的做法总结成一条简单路径：把文件、PDF 或数据放进同一目录，让 agent 写脚本并输出 HTML。这里的重点不是只接 Gmail 或日历，而是把工作资料整理成 agent 可读写的本地上下文。",
-      "url": "https://x.com/trq212/status/2059363113963540788",
+      "candidate_id": "x-builder-search-tavily-x-com-wandb-status-2059384552725025226",
+      "author": "Weights & Biases",
+      "role": "MLOps / eval platform builder",
+      "content": "W&B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。",
+      "url": "https://x.com/wandb/status/2059384552725025226",
       "event_date": "2026-05-26",
-      "source": "follow-builders X feed",
-      "evidence": "the basic trick to using Claude Code for non-technical work is to put a bunch of files in a folder and tell it can write scripts + make HTML"
+      "source": "Tavily X builder search fallback"
     },
     {
-      "author": "Aaron Levie",
-      "candidate_id": "follow-builders-x-aaron-levie-a-meaningful-portion-of-enterprises-i-talk-to-outs",
-      "role": "Founder / operator",
-      "content": "Aaron Levie 提到，他接触到的很多非硅谷企业一边采用 agents，一边还在招聘技术和工程人才。这说明企业落地 agent 并不是替代工程能力，而是需要内部团队围绕 agent 建软件、接流程和维护业务系统。",
-      "url": "https://x.com/levie/status/2059482349977653619",
+      "candidate_id": "x-builder-search-tavily-x-com-suryanshti777-status-2059555214294970631",
+      "author": "Suryansh Tiwari",
+      "role": "AI tool builder / curator",
+      "content": "Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。",
+      "url": "https://x.com/Suryanshti777/status/2059555214294970631",
       "event_date": "2026-05-27",
-      "source": "follow-builders X feed",
-      "evidence": "A meaningful portion of enterprises I talk to outside of Silicon Valley generally are looking to hire while also adopting agents. There’s a huge wave of technical and engineering talent needed inside originations, building software or actin"
+      "source": "Tavily X builder search fallback"
     },
     {
-      "author": "Zara Zhang",
-      "candidate_id": "follow-builders-x-zara-zhang-how-my-own-usage-of-coding-agents-has-changed-in-th",
-      "role": "Builder",
-      "content": "Zara Zhang 记录了自己最近一个月 coding agent 使用方式的变化：从终端迁移到 Codex 和 Claude Code 桌面应用，并减少直接打开终端的次数。这条更像工具入口变化的观察，后续可以看桌面端是否会成为团队协作里的默认 agent 工作台。",
-      "url": "https://x.com/zarazhangrui/status/2059354487823978586",
+      "candidate_id": "follow-builders-podcasts-ai-i-by-every-we-automated-everything-with-ai-and-tripl",
+      "author": "AI & I by Every",
+      "role": "Podcast",
+      "content": "Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。",
+      "url": "https://www.youtube.com/watch?v=dCmOTURRf1Y",
+      "event_date": "2026-05-27",
+      "source": "follow-builders podcast feed"
+    },
+    {
+      "candidate_id": "builder-simon-willison-sqlite-agents-md",
+      "author": "Simon Willison",
+      "role": "Builder / researcher",
+      "content": "SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。",
+      "url": "https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything",
+      "event_date": "2026-05-27",
+      "source": "Simon Willison Weblog"
+    },
+    {
+      "candidate_id": "builder-simon-willison-i-think-anthropic-and-openai-have-found-product-market-fi",
+      "author": "Simon Willison",
+      "role": "Builder / researcher",
+      "content": "Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。",
+      "url": "https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything",
+      "event_date": "2026-05-27",
+      "source": "Simon Willison Weblog"
+    },
+    {
+      "candidate_id": "builder-simon-willison-the-pressure",
+      "author": "Simon Willison",
+      "role": "Builder / researcher",
+      "content": "curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。",
+      "url": "https://simonwillison.net/2026/May/26/the-pressure/#atom-everything",
       "event_date": "2026-05-26",
-      "source": "follow-builders X feed",
-      "evidence": "How my own usage of coding agents has changed in the past month: 1. Moved from the terminal to the Codex/Claude Code desktop apps. The Codex Mac app is especially great. Now I rarely open the terminal 2. Transitioned from mostly Claude Code"
+      "source": "Simon Willison Weblog"
     }
   ],
   "community_leads": [
     {
-      "content": "Claude Status 记录 2026-05-27 两次 Claude Opus 4.7 elevated errors，其中 08:04 UTC 事件影响 claude.ai、Claude API、Claude Code 和 Claude Cowork，并在 09:41 UTC 解决；这适合进入 incident 复盘线索，不作为产品发布。",
-      "url": "https://status.claude.com/incidents/rtr7z82cqmp9"
-    },
-    {
-      "content": "Microsoft 在 2026-05-27 更新对真实或 AI 生成 NCII 的处理方式，包括更容易报告、检测已知内容和加强跨服务执行；这属于安全治理线索，后续可观察开发者平台是否暴露更明确的检测或申诉接口。",
-      "url": "https://blogs.microsoft.com/on-the-issues/2026/05/27/strengthening-our-approach-to-tackling-non-consensual-intimate-imagery/"
+      "content": "Claude Status 记录 2026-05-28 一次 Claude Opus 4.7 elevated errors 已解决；如果日报自动化或 coding agent 流程同时依赖多个模型供应商，这类状态页应和 OpenAI Status 一样进入运行前检查。",
+      "url": "https://status.claude.com/incidents/0w1bqsc12lt8"
     }
   ],
   "self_check": {
     "report_date": "2026-05-28",
-    "main_items": 2,
-    "builder_observations": 3,
+    "main_items": 3,
+    "builder_observations": 6,
     "builder_skill_used": [
       "github-ai-trending",
       "follow-builders",
+      "official-ai-releases",
       "discover:github-trending",
       "discover:builders",
       "discover:content-sources",
-      "discover:statuspage-incidents"
+      "discover:search-news",
+      "sources:health",
+      "discover:statuspage-incidents",
+      "Tavily X status fallback"
     ],
     "fallback_sources": [
       "GitHub Trending daily/weekly/language pages",
-      "follow-builders X/podcast/blog feeds",
-      "Simon Willison Weblog and fixed builder RSS fallbacks",
-      "OpenAI, Anthropic, Hugging Face, GitHub Changelog, TechCrunch AI, The Verge AI feeds",
-      "OpenAI Status, Claude Status, Microsoft On the Issues, Product Hunt and Planet AI"
+      "follow-builders podcast feed plus Simon Willison RSS fallback",
+      "OpenAI News, Hugging Face Blog, GitHub Changelog and status pages",
+      "GDELT/OpenAlex/arXiv search shadow run and configured source health check"
     ],
     "primary_links": true,
     "no_banned_words": true,
     "no_unsourced_numbers": true,
-    "notes": "二次运行后 GitHub Trending、follow-builders 和 content-sources 均可读取；GitHub Trending 已独立展示前 8，Builder 观察入选 3 条，其余候选因短链接空内容、活动通知或个人动态过滤。",
-    "optimization_suggestions": [
-      {
-        "issue": "早间发现命令出现 fetch failed 后没有自动二次验证，导致 GitHub Trending 和 Builder 观察为空。",
-        "evidence": "同日 11:24 重新运行 discover:github-trending 和 discover:builders 后，GitHub Trending 返回 123 个候选，follow-builders 返回 27 个候选。",
-        "module": "docs/codex-automation-setup.md / prompts/ai-daily/modules/discovery-audit.md",
-        "suggestion": "发现命令失败时增加一次延迟重试，并把重试结果写入 source_audit；只有重试仍失败时才允许空板块。",
-        "expected_benefit": "减少网络抖动造成的空板块。",
-        "needs_user_confirmation": false
-      },
-      {
-        "issue": "GitHub Trending 之前混在项目区，读者看不到榜单位置和变化。",
-        "evidence": "2026-05-28 原报告只有 projects，没有 github_trending 顶层数组。",
-        "module": "schemas/report.schema.json / src/render.js / src/interaction-report.js",
-        "suggestion": "保留 github_trending 独立字段和展示板块，每天与前一日结构化历史比较，展示 new、up、down 或 same。",
-        "expected_benefit": "让榜单观察和精选项目分开，便于追踪每日变化。",
-        "needs_user_confirmation": false
-      },
-      {
-        "issue": "热点讨论、播客访谈、融资和产品聚合源此前没有明确收录边界。",
-        "evidence": "本轮参考的飞书文档强调多平台发现，但日报提示词只覆盖官方源、GitHub 和少量博客。",
-        "module": "prompts/ai-daily/modules/discovery-audit.md / src/discovery.js",
-        "suggestion": "把 TechCrunch AI、The Verge AI、Product Hunt、Planet AI、Latent.Space 和 Interconnects 纳入固定发现面；X 热点只用可追溯原始 URL，融资只在官方或多源证据充分时入选。",
-        "expected_benefit": "扩大候选池，同时不牺牲来源可审计性。",
-        "needs_user_confirmation": false
-      }
-    ]
+    "notes": "本轮重新抓取后 follow-builders X feed 返回上游 X API 500，已按 blocked 写入审计；Tavily X status fallback 找到近期原始 X status，并已把 X builder 观察显式纳入正文。",
+    "optimization_suggestions": []
   },
-  "schema_version": 1,
+  "generated_at": "2026-05-28T10:30:44.358Z",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-28.html",
   "html_path": "reports/2026/05/2026-05-28.html",
   "candidate_pool_path": "data/2026/05/2026-05-28.candidates.json",
@@ -428,136 +1208,5 @@
     "repo_pushed": false,
     "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-28.html",
     "publish_error": ""
-  },
-  "generated_at": "2026-05-28T03:29:47.080Z",
-  "github_trending": [
-    {
-      "name": "harry0703/MoneyPrinterTurbo",
-      "repo": "harry0703/MoneyPrinterTurbo",
-      "candidate_id": "trend-harry0703-moneyprinterturbo",
-      "description": "harry0703 / MoneyPrinterTurbo 利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
-      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 1,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 1,742 stars today."
-    },
-    {
-      "name": "Lum1104/Understand-Anything",
-      "repo": "Lum1104/Understand-Anything",
-      "candidate_id": "trend-lum1104-understand-anything",
-      "description": "Lum1104 / Understand-Anything Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
-      "url": "https://github.com/Lum1104/Understand-Anything",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 2,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "Lum1104/Understand-Anything appeared on GitHub Trending daily with 4,465 stars today."
-    },
-    {
-      "name": "hardikpandya/stop-slop",
-      "repo": "hardikpandya/stop-slop",
-      "candidate_id": "trend-hardikpandya-stop-slop",
-      "description": "hardikpandya / stop-slop A skill file for removing AI tells from prose",
-      "url": "https://github.com/hardikpandya/stop-slop",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 3,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "hardikpandya/stop-slop appeared on GitHub Trending daily with 664 stars today."
-    },
-    {
-      "name": "affaan-m/ECC",
-      "repo": "affaan-m/ECC",
-      "candidate_id": "trend-affaan-m-ecc",
-      "description": "affaan-m / ECC The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.",
-      "url": "https://github.com/affaan-m/ECC",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 4,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "affaan-m/ECC appeared on GitHub Trending daily with 2,062 stars today."
-    },
-    {
-      "name": "anthropics/knowledge-work-plugins",
-      "repo": "anthropics/knowledge-work-plugins",
-      "candidate_id": "trend-anthropics-knowledge-work-plugins",
-      "description": "anthropics / knowledge-work-plugins Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
-      "url": "https://github.com/anthropics/knowledge-work-plugins",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 5,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "anthropics/knowledge-work-plugins appeared on GitHub Trending daily with 695 stars today."
-    },
-    {
-      "name": "Leonxlnx/taste-skill",
-      "repo": "Leonxlnx/taste-skill",
-      "candidate_id": "trend-leonxlnx-taste-skill",
-      "description": "Leonxlnx / taste-skill Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop",
-      "url": "https://github.com/Leonxlnx/taste-skill",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 6,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "Leonxlnx/taste-skill appeared on GitHub Trending daily with 2,715 stars today."
-    },
-    {
-      "name": "p-e-w/heretic",
-      "repo": "p-e-w/heretic",
-      "candidate_id": "trend-p-e-w-heretic",
-      "description": "p-e-w / heretic Fully automatic censorship removal for language models",
-      "url": "https://github.com/p-e-w/heretic",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 7,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 211 stars today."
-    },
-    {
-      "name": "shiyu-coder/Kronos",
-      "repo": "shiyu-coder/Kronos",
-      "candidate_id": "trend-shiyu-coder-kronos",
-      "description": "shiyu-coder / Kronos Kronos: A Foundation Model for the Language of Financial Markets",
-      "url": "https://github.com/shiyu-coder/Kronos",
-      "event_date": "2026-05-28",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 8,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "shiyu-coder/Kronos appeared on GitHub Trending daily with 401 stars today."
-    }
-  ]
+  }
 }

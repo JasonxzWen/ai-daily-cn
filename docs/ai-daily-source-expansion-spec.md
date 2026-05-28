@@ -2,9 +2,11 @@
 
 ## 目标
 
-本规格把“拓展信源”和近期日报质量反馈转成可实现、可验证的规则。它只定义后续实现边界，不直接修改生产提示词、schema、渲染器或发布脚本。
+本规格把“拓展信源”和近期日报质量反馈转成可实现、可验证的规则。生产提示词和发现器应按本规格演进；旧历史日报保持兼容。
 
 目标不是照搬其他日报的栏目，而是吸收其高信号来源和行文方式：以事实、来源、可用场景和工程判断为核心，避免凑数、空板块和模板化“为什么重要”。
+
+三层信源接入的开发规范、阶段计划和验收标准见 [AI 日报三层信源接入开发计划](ai-daily-source-integration-plan.md)。
 
 ## 问题归因
 
@@ -40,6 +42,11 @@
 | Microsoft Research Blog | 研究与系统文章 | 热门技术博客、研究线索 | 原文可入选 |
 | BAIR Blog | 学术/agent/robotics/eval | 热门技术博客 | 原文可入选 |
 | Product Hunt | 新产品发现 | 新产品/项目线索 | 需要产品页或官网交叉确认，不直接写成事实 |
+| Product Hunt Trending | 新产品趋势 | 项目候选、产品趋势 | 必须和 developer-tools feed 一起看；上榜只说明热度，项目事实仍需官网/GitHub/文档确认 |
+| TechCrunch AI / Enterprise | 科技媒体、创业与企业软件 | 行业趋势、大厂动态、融资线索 | 作为发现源；事实尽量回到公司公告、监管文件、产品页或一手访谈 |
+| The Verge AI / main feed | 科技媒体、平台动态 | 大厂产品、平台政策、消费端 AI 分发 | 作为发现源；不直接替代官方来源 |
+| Ars Technica | 技术媒体 | 平台、安全、硬件、政策背景 | 只收录对 AI 工程或行业结构有影响的内容 |
+| Google Keyword Blog / Microsoft Official Blog / Apple Newsroom / Meta Newsroom / Amazon News | 大厂官方 newsroom | 大厂动态、云/硬件/平台政策、产品分发 | 官方来源可作为事实来源，但仍需筛掉无 AI 关联的普通公关稿 |
 
 ### P2：辅助聚合与交叉验证
 
@@ -47,9 +54,29 @@
 |---|---|---|---|
 | Planet AI | AI RSS 聚合 | 发现官方/博客条目 | 最终链接应回到原文 |
 | 0xSMW/rss-feeds 等 RSS 聚合仓库 | RSS 索引 | 补缺失 RSS | 只能作为抓取配置线索 |
-| 微信公众号/媒体号 | 二手或半一手报道 | 中文行业线索 | 若原始源不可回溯，不能当作 T0/T1；可以进入社区线索或观点综述 |
+| 微信公众号/媒体号/自媒体 | 二手或半一手报道 | 中文行业线索 | 重要中介源；必须先追溯其引用的一手来源。若原始源不可回溯，不能当作报道实体，只能进入社区线索或观点综述 |
+| 华尔街见闻/行业资讯站 | 财经与产业媒体 | 融资、商业化、大厂经营线索 | 作为中介或交叉验证；融资入选主体信息前需要官方公告、投资方公告、监管文件或多源确认 |
+| 小宇宙/喜马拉雅 | 播客平台 | 访谈、builder 观点、行业讨论 | 只接受具体节目/单集页、RSS episode、原始音频或 transcript；平台首页不作为来源 |
+| X 热点 feed | 社区讨论、builder 动态 | Builder 观察、社区线索、早期热点 | 默认不依赖不稳定公共 RSS；可接入自托管 RSSHub、twscrape、列表导出等工具，但必须保留原始 X status URL |
 
 ## 内容契约
+
+### 信息密度与重点标注
+
+近期页面反馈暴露出两个内容问题：正文容易出现“AI 味”和低信息熵，卡片里也缺少稳定的一眼重点。因此新日报公开文本必须按下面规则写：
+
+- 每条主体信息、博客、项目或 Builder 观察至少包含 2 个事实锚点：发布日期、版本号、仓库名、API/模型名、功能边界、性能/限制、价格/权限、发布方或原始链接。
+- 每条只保留一个判断句，且判断必须落到工程用途、迁移风险、成本/权限边界、部署限制或可复现实验；不要写泛泛的“值得关注”“体现趋势”“具有启发”。
+- 每条卡片最多标 1-3 个重点。优先加粗实体、变化和限制；高亮只用于状态、排名变化、关键门槛或结论，不用于整句铺色。
+- 允许的标记语法是 `**加粗**` 和 `==高亮==`。如果某个渲染区域还不支持安全 inline Markdown，只能先在开发计划中补渲染能力，不能要求日报草稿强行依赖。
+- 公开正文不展示执行痕迹：命令失败、扩窗、候选为空、审计组缺失只写入自检或默认折叠的附录。
+
+验收：
+
+- `summary`、`main_items[*].bullets`、`hot_blogs[*].summary`、`projects[*].description/use_case` 不出现“高信号”“核心信号”“可观察信号”“更多信号”“预期收益”等泛化词。
+- 每个 `main_items` 条目至少有日期/来源/实体/变化中的 2 类信息。
+- 热门博客和项目卡片在渲染支持后，至少能安全展示 `strong` 或 `mark.text-highlight`，且原始 `<script>` 等 HTML 仍会被转义。
+- 单条卡片高亮不超过 3 处，避免和正文混在一起。
 
 ### Header
 
@@ -219,27 +246,39 @@
 
 1. 提示词规格：更新 `source-policy`、`discovery-audit`、`structured-report-json`、`output-html`、`plain-language`，把本规格转成每日生成规则。
 2. 发现器：扩展 `discover:builders`，优先消费 `follow-builders` central JSON，再退到 raw feed、本地缓存和固定 RSS。
-3. 博客/访谈发现：新增或扩展 discover 命令，读取官方 RSS、Substack RSS、Hugging Face RSS、Google Research RSS、Microsoft Research RSS；对无 RSS 的 Anthropic News、Google DeepMind、Meta AI 使用页面解析；Product Hunt feed 只产生项目候选。
+3. 博客/访谈发现：`discover:content-sources` 从 `config/sources/*.json` 读取默认源，默认只跑 `core`，用 `--enablement core,optional` 显式打开 Product Hunt、广义科技媒体、Latent.Space、Interconnects、Planet AI 等候选源。
 4. 项目发现：扩展项目候选结构，补 `domains`、`use_case`、`signal`、`evidence`。
 5. Schema：新增向后兼容字段和新日报质量门。
 6. 渲染：动态生成 sections；空数组不渲染；header 使用 `hero_highlights`；博客不渲染“为什么重要”；项目展示领域/作用。
-7. 测试：添加 unit/golden/browser 断言覆盖本规格。
-8. 发布前验证：运行 `npm run validate`，必要时运行 `npm test`。
+7. 卡片重点标注：让热门博客、项目等卡片 body 使用安全 inline Markdown 渲染 `**加粗**` 与 `==高亮==`，同时保持 HTML 转义。
+8. 测试：添加 unit/golden/browser 断言覆盖本规格。
+9. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。
+10. 审计合并：把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON，而不是只保留临时命令输出。
+11. 发布前验证：运行 `npm run validate`；连续运行验收另跑 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
 
 ## 验收清单
 
 - `npm run validate` 通过。
+- `npm run sources:validate` 通过；缺少 `tier`、`authority`、`candidate_category` 或 `source_kind` 的信源会失败。
+- 最终日报 JSON 的 `source_audit` 包含 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health`；`phase5_complete:false` 时说明缺失项，但不冒充完成。
 - 新日报 HTML header 不包含“其余条目见后文”。
 - 新日报 HTML 不包含“为什么重要”。
 - 新日报 HTML 不包含空板块占位文案。
+- 新日报公开正文不包含“高信号”“核心信号”“可观察信号”“更多信号”“预期收益”等泛化词。
 - `hot_blogs[*].summary` 每条 300-500 中文字。
+- 热门博客和项目卡片支持安全加粗/高亮后，页面中重点标记能和正文区分，且 HTML 注入仍被转义。
 - 每个项目在 JSON 和 HTML 中都有领域和用途说明。
 - Builder 发现器在 `follow-builders` central feed 可用时能产出 X/播客/博客候选。
 - `source_audit.builder_sources` 记录 central feed 检查、候选数、入选数、失败原因和最近成功时间。
 - Product Hunt、新产品、访谈、X 热点讨论只作为候选源；最终事实尽量回到原始页面。
+- 微信公众号、自媒体、华尔街见闻等中介源不会被写成事实报道实体；无法回源时只进入社区线索。
+- 带 `verification_status:"intermediary_only"` 的候选不得进入 `main_items`、`model_releases`、事实性 `projects` 或 `hot_blogs`。
+- 搜索 provider 缺少 API key 时记录 `skipped_missing_token`，不导致日报失败。
+- X 热点候选必须有原始 `x.com/.../status/...` 或 `twitter.com/.../status/...` URL。
+- 广义科技、大厂动态和行业趋势只在影响 AI 生态、开发者工作流、算力/平台/监管/产业结构时入选。
 - 旧历史日报仍能构建和验证。
 
-## 待确认默认决策
+## 默认决策
 
 1. `follow-builders` central feed 中带原始 X URL 的内容，默认视为可审计 Builder 一手候选。
 2. 热门技术博客摘要对新日报执行 300-500 中文字门禁；旧日报不 retroactive 修复。

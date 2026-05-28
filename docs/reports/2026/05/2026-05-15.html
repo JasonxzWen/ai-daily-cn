@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,78 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-15 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-15</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <p class="hero-summary-text">今天的主体信息保持在 2026-05-14 至 2026-05-15 窗口内，通过拓展官方发布页、开发者博客、云厂商公告和 Hugging Face 工程博客补齐：OpenAI 推进 Codex 移动端与 Windows sandbox，GitHub 合并呈现 Copilot app 和 cloud agent 自动选模，Anthropic 把 Claude 投入 Gates Foundation 合作，Google 发布 Genkit middleware，AWS 扩展 SageMaker Qwen3.6 定制，Hugging Face 解释连续批处理异步化。</p>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-15 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-15 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-15</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-15</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>5</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>概览</strong>：今天的主体信息保持在 2026-05-14 至 2026-05-15 窗口内，通过拓展官方发布页、开发者博客、云厂商公告和 Hugging Face 工程博客补齐：OpenAI 推进 Codex 移动端与 Windows sandbox，GitHub 合并呈现 Copilot app 和 cloud agent 自动选模，Anthropic 把 Claude 投入 Gates Foundation 合作，Google 发布 Genkit middleware，AWS 扩展 SageMaker Qwen3.6 定制，Hugging Face 解释连续批处理异步化。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **概览**：今天的主体信息保持在 2026-05-14 至 2026-05-15 窗口内，通过拓展官方发布页、开发者博客、云厂商公告和 Hugging Face 工程博客补齐：OpenAI 推进 Codex 移动端与 Windows sandbox，GitHub 合并呈现 Copilot app 和 cloud agent 自动选模，Anthropic 把 Claude 投入 Gates Foundation 合作，Google 发布 Genkit middleware，AWS 扩展 SageMaker Qwen3.6 定制，Hugging Face 解释连续批处理异步化。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1473,55 +1579,49 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI 扩展 Codex 移动端协作和 Windows sandbox</strong>（2026-05-14，T0）</p>
-<ul><li>Codex mobile preview 覆盖 iOS 与 Android，可查看活跃线程、回答问题、改变方向、审批动作和跨主机切换，目标是支持长时间运行的 agentic coding session。</li><li>OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。</li><li>Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。</li><li>来源：<a href="https://openai.com/index/work-with-codex-from-anywhere/" rel="noopener noreferrer">OpenAI</a></li></ul>
-<p>2. <strong>GitHub 合并推进 Copilot app 与 cloud agent 自动选模</strong>（2026-05-14，T0）</p>
-<ul><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，session 内可查看计划、diff、命令、预览、测试结果并推进到 pull request。</li><li>Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。</li><li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。</li><li>来源：<a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
-<p>3. <strong>Anthropic 与 Gates Foundation 建立 2 亿美元合作</strong>（2026-05-14，T0）</p>
-<ul><li>合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。</li><li>健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。</li><li>教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。</li><li>来源：<a href="https://www.anthropic.com/news/gates-foundation-partnership" rel="noopener noreferrer">Anthropic</a></li></ul>
-<p>4. <strong>Google 发布 Genkit Middleware 用于加固 agentic apps</strong>（2026-05-14，T0）</p>
-<ul><li>每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。</li><li>首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。</li><li>这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。</li><li>来源：<a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Google Developers Blog</a></li></ul>
-<p>5. <strong>AWS SageMaker AI 支持 Qwen3.6 serverless model customization</strong>（2026-05-14，T0）</p>
-<ul><li>此前 SageMaker AI 已可部署 Qwen3.6 base model，本次新增用私有数据对模型做领域化定制，减少团队自建训练集群和调度基础设施的成本。</li><li>Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。</li><li>可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。</li><li>来源：<a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">AWS What&#39;s New</a></li></ul>
-<p>6. <strong>Hugging Face 解释 continuous batching 的异步化路径</strong>（2026-05-14，T2）</p>
-<ul><li>文章延续 KV cache、FlashAttention 和 attention masks 等基础概念，重点讨论 continuous batching 下 CPU 调度和 GPU 执行之间的同步瓶颈。</li><li>核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。</li><li>对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。</li><li>来源：<a href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">Hugging Face Blog</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI 扩展 Codex 移动端协作和 Windows sandbox**（2026-05-14，T0）
+    <div class="rendered-markdown"><ol><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy" decoding="async"> <strong><a href="https://openai.com/index/work-with-codex-from-anywhere/" rel="noopener noreferrer">OpenAI 扩展 Codex 移动端协作和 Windows sandbox</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>Codex mobile preview 覆盖 iOS 与 Android，可查看活跃线程、回答问题、改变方向、审批动作和跨主机切换，目标是支持长时间运行的 agentic coding session。</li><li>OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。</li><li>Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。</li></ul>
+<ol start="2"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC" alt="GitHub Changelog" loading="lazy" decoding="async"> <strong><a href="https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/" rel="noopener noreferrer">GitHub Changelog：GitHub 合并推进 Copilot app 与 cloud agent 自动选模</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，session 内可查看计划、diff、命令、预览、测试结果并推进到 pull request。</li><li>Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。</li><li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。</li></ul>
+<ol start="3"><li><strong><a href="https://www.anthropic.com/news/gates-foundation-partnership" rel="noopener noreferrer">Anthropic 与 Gates Foundation 建立 2 亿美元合作</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。</li><li>健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。</li><li>教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。</li></ul>
+<ol start="4"><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Google Developers Blog：Google 发布 Genkit Middleware 用于加固 agentic apps</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。</li><li>首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。</li><li>这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。</li></ul>
+<ol start="5"><li><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer">AWS What&#39;s New：AWS SageMaker AI 支持 Qwen3.6 serverless model customization</a></strong>（2026-05-14，T0）</li></ol>
+<ul><li>此前 SageMaker AI 已可部署 Qwen3.6 base model，本次新增用私有数据对模型做领域化定制，减少团队自建训练集群和调度基础设施的成本。</li><li>Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。</li><li>可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。</li></ul>
+<ol start="6"><li><strong><a href="https://huggingface.co/blog/continuous_async" rel="noopener noreferrer">Hugging Face Blog：Hugging Face 解释 continuous batching 的异步化路径</a></strong>（2026-05-14，T2）</li></ol>
+<ul><li>文章延续 KV cache、FlashAttention 和 attention masks 等基础概念，重点讨论 continuous batching 下 CPU 调度和 GPU 执行之间的同步瓶颈。</li><li>核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。</li><li>对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. ![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI 扩展 Codex 移动端协作和 Windows sandbox](https://openai.com/index/work-with-codex-from-anywhere/)**（2026-05-14，T0）
   - Codex mobile preview 覆盖 iOS 与 Android，可查看活跃线程、回答问题、改变方向、审批动作和跨主机切换，目标是支持长时间运行的 agentic coding session。
   - OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。
   - Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。
-  - 来源：[OpenAI](https://openai.com/index/work-with-codex-from-anywhere/)
 
-2. **GitHub 合并推进 Copilot app 与 cloud agent 自动选模**（2026-05-14，T0）
+2. ![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC) **[GitHub Changelog：GitHub 合并推进 Copilot app 与 cloud agent 自动选模](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)**（2026-05-14，T0）
   - Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，session 内可查看计划、diff、命令、预览、测试结果并推进到 pull request。
   - Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。
   - Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。
-  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/)
 
-3. **Anthropic 与 Gates Foundation 建立 2 亿美元合作**（2026-05-14，T0）
+3. **[Anthropic 与 Gates Foundation 建立 2 亿美元合作](https://www.anthropic.com/news/gates-foundation-partnership)**（2026-05-14，T0）
   - 合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。
   - 健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。
   - 教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。
-  - 来源：[Anthropic](https://www.anthropic.com/news/gates-foundation-partnership)
 
-4. **Google 发布 Genkit Middleware 用于加固 agentic apps**（2026-05-14，T0）
+4. **[Google Developers Blog：Google 发布 Genkit Middleware 用于加固 agentic apps](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)**（2026-05-14，T0）
   - 每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。
   - 首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。
   - 这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。
-  - 来源：[Google Developers Blog](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)
 
-5. **AWS SageMaker AI 支持 Qwen3.6 serverless model customization**（2026-05-14，T0）
+5. **[AWS What&#39;s New：AWS SageMaker AI 支持 Qwen3.6 serverless model customization](https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/)**（2026-05-14，T0）
   - 此前 SageMaker AI 已可部署 Qwen3.6 base model，本次新增用私有数据对模型做领域化定制，减少团队自建训练集群和调度基础设施的成本。
   - Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。
   - 可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。
-  - 来源：[AWS What&#39;s New](https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/)
 
-6. **Hugging Face 解释 continuous batching 的异步化路径**（2026-05-14，T2）
+6. **[Hugging Face Blog：Hugging Face 解释 continuous batching 的异步化路径](https://huggingface.co/blog/continuous_async)**（2026-05-14，T2）
   - 文章延续 KV cache、FlashAttention 和 attention masks 等基础概念，重点讨论 continuous batching 下 CPU 调度和 GPU 执行之间的同步瓶颈。
   - 核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。
-  - 对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。
-  - 来源：[Hugging Face Blog](https://huggingface.co/blog/continuous_async)</template>
+  - 对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1569,7 +1669,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1578,35 +1678,34 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。 <a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" rel="noopener noreferrer">来源</a></li><li>Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。 <a href="https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/" rel="noopener noreferrer">来源</a></li><li>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。 <a href="https://docs.x.ai/developers/models?cluster=us-east-1" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。 [来源](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)
+    <div class="rendered-markdown"><ul><li>OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。 <a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" rel="noopener noreferrer">来源</a></li><li>Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。 <a href="https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/" rel="noopener noreferrer">来源</a></li><li>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。 <a href="https://docs.x.ai/developers/models?cluster=us-east-1" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。 [来源](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)
 - Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。 [来源](https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/)
 - xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。 [来源](https://docs.x.ai/developers/models?cluster=us-east-1)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><p>未记录信源审计。</p></div>
-    <template data-rich-source data-source-fallback>未记录信源审计。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+    <template data-rich-source data-source-fallback>未记录信源审计。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮按用户确认的规则重写：优先拓展信源而非继续拉长时间窗口，source_window 保持 2026-05-14 至 2026-05-15；同一厂商相近动态已合并，GitHub 两条 Copilot 更新合并，OpenAI Codex 移动端与 Windows sandbox 合并；无 dated changelog 的 xAI docs 只作为社区线索。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li>本轮无新增建议。</li></ul>
@@ -1622,8 +1721,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 - 本轮无新增建议。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json)</template></div>
+  </details>
 
 
 

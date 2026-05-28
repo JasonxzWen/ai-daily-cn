@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,79 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-18 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-18</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <ul class="hero-summary-text hero-summary-list"><li>今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Ma…</li><li>上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conve…</li></ul>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-18 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-18 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-18</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="今日值得关注的项目" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-18</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>4</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>Codex</strong>：今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Malta 全国 ChatGPT Pl…</li><li><strong>SageMaker</strong>：上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 本轮…</li></ul></div>
-    <template data-rich-source data-source-fallback>- **Codex**：今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Malta 全国 ChatGPT Pl…
-- **SageMaker**：上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 本轮…</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1474,55 +1579,49 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划</strong>（2026-05-16，T0）</p>
-<ul><li>课程由 University of Malta 开发，目标是帮助公众理解 AI 能做什么、不能做什么，以及如何在家庭和工作中负责任地使用；完成课程后可获得一年 ChatGPT Plus 访问权限。</li><li>OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。</li><li>工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。</li><li>来源：<a href="https://openai.com/index/malta-chatgpt-plus-partnership/" rel="noopener noreferrer">OpenAI News</a></li></ul>
-<p>2. <strong>OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流</strong>（2026-05-15，T0）</p>
-<ul><li>OfficeQA Pro 聚焦 scanned PDFs、legacy files、long-context documents 中的 parsing、retrieval 和 grounded reasoning；这些场景会把早期抽取错误放大到后续 agent 决策。</li><li>OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。</li><li>Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。</li><li>来源：<a href="https://openai.com/index/databricks/" rel="noopener noreferrer">OpenAI Customer Story</a></li></ul>
-<p>3. <strong>GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点</strong>（2026-05-17，T0）</p>
-<ul><li>GPT-5.3-Codex 作为首个 Copilot LTS model，会在 Business 和 Enterprise 中替代 GPT-4.1 成为尚未通过内部模型审批时的 base model，同时带 1x premium request unit multiplier。</li><li>2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。</li><li>这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。</li><li>来源：<a href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/" rel="noopener noreferrer">GitHub Changelog</a></li></ul>
-<p>4. <strong>xAI 允许 Grok 订阅直接接入 Hermes Agent</strong>（2026-05-15，T0）</p>
-<ul><li>官方说明该连接在每个订阅 tier 上可用；用户在 `hermes model` 中选择 xAI Grok OAuth 后，通过浏览器登录，再启动 Hermes TUI。</li><li>Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。</li><li>这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。</li><li>来源：<a href="https://x.ai/news/grok-hermes" rel="noopener noreferrer">xAI News</a></li></ul>
-<p>5. <strong>Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物</strong>（2026-05-16，T0）</p>
-<ul><li>图像生成支持来自 `@earendil-works/pi-ai`，包括 image generation APIs、image model metadata 和 built-in OpenRouter image generation support。</li><li>Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。</li><li>修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。</li><li>来源：<a href="https://pi.dev/news/releases/0.74.1" rel="noopener noreferrer">Pi Release Notes</a></li></ul>
-<p>6. <strong>Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流</strong>（2026-05-18，T0）</p>
-<ul><li>GA 覆盖 transforms、TypeScript v1 functions repositories、Pipeline Builder、Ontology、Workshop、AIP Logic 和 Object Views；Workflow Lineage 也已支持 Global Branching。</li><li>分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。</li><li>对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。</li><li>来源：<a href="https://www.palantir.com/docs/foundry/announcements/2026-05" rel="noopener noreferrer">Palantir Foundry Announcements</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划**（2026-05-16，T0）
+    <div class="rendered-markdown"><ol><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI News" loading="lazy" decoding="async"> <strong><a href="https://openai.com/index/malta-chatgpt-plus-partnership/" rel="noopener noreferrer">OpenAI News：OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划</a></strong>（2026-05-16，T0）</li></ol>
+<ul><li>课程由 University of Malta 开发，目标是帮助公众理解 AI 能做什么、不能做什么，以及如何在家庭和工作中负责任地使用；完成课程后可获得一年 ChatGPT Plus 访问权限。</li><li>OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。</li><li>工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。</li></ul>
+<ol start="2"><li><strong><a href="https://openai.com/index/databricks/" rel="noopener noreferrer">OpenAI Customer Story：OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流</a></strong>（2026-05-15，T0）</li></ol>
+<ul><li>OfficeQA Pro 聚焦 scanned PDFs、legacy files、long-context documents 中的 parsing、retrieval 和 grounded reasoning；这些场景会把早期抽取错误放大到后续 agent 决策。</li><li>OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。</li><li>Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。</li></ul>
+<ol start="3"><li><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC" alt="GitHub Changelog" loading="lazy" decoding="async"> <strong><a href="https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/" rel="noopener noreferrer">GitHub Changelog：GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点</a></strong>（2026-05-17，T0）</li></ol>
+<ul><li>GPT-5.3-Codex 作为首个 Copilot LTS model，会在 Business 和 Enterprise 中替代 GPT-4.1 成为尚未通过内部模型审批时的 base model，同时带 1x premium request unit multiplier。</li><li>2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。</li><li>这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。</li></ul>
+<ol start="4"><li><strong><a href="https://x.ai/news/grok-hermes" rel="noopener noreferrer">xAI News：xAI 允许 Grok 订阅直接接入 Hermes Agent</a></strong>（2026-05-15，T0）</li></ol>
+<ul><li>官方说明该连接在每个订阅 tier 上可用；用户在 `hermes model` 中选择 xAI Grok OAuth 后，通过浏览器登录，再启动 Hermes TUI。</li><li>Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。</li><li>这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。</li></ul>
+<ol start="5"><li><strong><a href="https://pi.dev/news/releases/0.74.1" rel="noopener noreferrer">Pi Release Notes：Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物</a></strong>（2026-05-16，T0）</li></ol>
+<ul><li>图像生成支持来自 `@earendil-works/pi-ai`，包括 image generation APIs、image model metadata 和 built-in OpenRouter image generation support。</li><li>Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。</li><li>修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。</li></ul>
+<ol start="6"><li><strong><a href="https://www.palantir.com/docs/foundry/announcements/2026-05" rel="noopener noreferrer">Palantir Foundry Announcements：Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流</a></strong>（2026-05-18，T0）</li></ol>
+<ul><li>GA 覆盖 transforms、TypeScript v1 functions repositories、Pipeline Builder、Ontology、Workshop、AIP Logic 和 Object Views；Workflow Lineage 也已支持 Global Branching。</li><li>分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。</li><li>对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. ![OpenAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) **[OpenAI News：OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划](https://openai.com/index/malta-chatgpt-plus-partnership/)**（2026-05-16，T0）
   - 课程由 University of Malta 开发，目标是帮助公众理解 AI 能做什么、不能做什么，以及如何在家庭和工作中负责任地使用；完成课程后可获得一年 ChatGPT Plus 访问权限。
   - OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。
   - 工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。
-  - 来源：[OpenAI News](https://openai.com/index/malta-chatgpt-plus-partnership/)
 
-2. **OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流**（2026-05-15，T0）
+2. **[OpenAI Customer Story：OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流](https://openai.com/index/databricks/)**（2026-05-15，T0）
   - OfficeQA Pro 聚焦 scanned PDFs、legacy files、long-context documents 中的 parsing、retrieval 和 grounded reasoning；这些场景会把早期抽取错误放大到后续 agent 决策。
   - OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。
   - Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。
-  - 来源：[OpenAI Customer Story](https://openai.com/index/databricks/)
 
-3. **GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点**（2026-05-17，T0）
+3. ![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC) **[GitHub Changelog：GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点](https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/)**（2026-05-17，T0）
   - GPT-5.3-Codex 作为首个 Copilot LTS model，会在 Business 和 Enterprise 中替代 GPT-4.1 成为尚未通过内部模型审批时的 base model，同时带 1x premium request unit multiplier。
   - 2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。
   - 这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。
-  - 来源：[GitHub Changelog](https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/)
 
-4. **xAI 允许 Grok 订阅直接接入 Hermes Agent**（2026-05-15，T0）
+4. **[xAI News：xAI 允许 Grok 订阅直接接入 Hermes Agent](https://x.ai/news/grok-hermes)**（2026-05-15，T0）
   - 官方说明该连接在每个订阅 tier 上可用；用户在 `hermes model` 中选择 xAI Grok OAuth 后，通过浏览器登录，再启动 Hermes TUI。
   - Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。
   - 这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。
-  - 来源：[xAI News](https://x.ai/news/grok-hermes)
 
-5. **Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物**（2026-05-16，T0）
+5. **[Pi Release Notes：Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物](https://pi.dev/news/releases/0.74.1)**（2026-05-16，T0）
   - 图像生成支持来自 `@earendil-works/pi-ai`，包括 image generation APIs、image model metadata 和 built-in OpenRouter image generation support。
   - Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。
   - 修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。
-  - 来源：[Pi Release Notes](https://pi.dev/news/releases/0.74.1)
 
-6. **Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流**（2026-05-18，T0）
+6. **[Palantir Foundry Announcements：Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流](https://www.palantir.com/docs/foundry/announcements/2026-05)**（2026-05-18，T0）
   - GA 覆盖 transforms、TypeScript v1 functions repositories、Pipeline Builder、Ontology、Workshop、AIP Logic 和 Object Views；Workflow Lineage 也已支持 Global Branching。
   - 分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。
-  - 对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。
-  - 来源：[Palantir Foundry Announcements](https://www.palantir.com/docs/foundry/announcements/2026-05)</template>
+  - 对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1563,7 +1662,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1572,35 +1671,34 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。 <a href="https://github.com/supertone-inc/supertonic" rel="noopener noreferrer">来源</a></li><li>OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note；可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。 <a href="https://github.com/tinyhumansai/openhuman" rel="noopener noreferrer">来源</a></li><li>K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。 <a href="https://github.com/K-Dense-AI/scientific-agent-skills" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。 [来源](https://github.com/supertone-inc/supertonic)
+    <div class="rendered-markdown"><ul><li>Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。 <a href="https://github.com/supertone-inc/supertonic" rel="noopener noreferrer">来源</a></li><li>OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note；可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。 <a href="https://github.com/tinyhumansai/openhuman" rel="noopener noreferrer">来源</a></li><li>K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。 <a href="https://github.com/K-Dense-AI/scientific-agent-skills" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3；本轮不作为近 5 天主体，只作为本地 TTS 线索。 [来源](https://github.com/supertone-inc/supertonic)
 - OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note；可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。 [来源](https://github.com/tinyhumansai/openhuman)
 - K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。 [来源](https://github.com/K-Dense-AI/scientific-agent-skills)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><p>未记录信源审计。</p></div>
-    <template data-rich-source data-source-fallback>未记录信源审计。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+    <template data-rich-source data-source-fallback>未记录信源审计。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮 2026-05-18 当天 T0 发布不足 5 条，先拓展官方产品页、GitHub Changelog、开源 release、云平台公告和 AI agent 工具，再扩展到 2026-05-15。主体条目均使用官方或项目一手来源，并保留真实 event_date。已在 2026-05-17 草稿覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 不重复计入主体；Supertonic、OpenHuman、K-Dense Scientific Agent Skills 因官方日期不足或发布日期超出窗口，只放入 community_leads。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。</strong></li><li>为什么要改：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。</li><li><strong>社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。</strong></li><li>为什么要改：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。</li><li><strong>同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。</strong></li><li>为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。</li></ul>
@@ -1621,8 +1719,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。**
   - 为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-18.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-18.json)</template></div>
+  </details>
 
 
 

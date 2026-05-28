@@ -115,11 +115,43 @@ h3 {
 .rendered-markdown mark.text-highlight,
 .report-data-table mark.text-highlight,
 .report-hero mark.text-highlight {
-  padding: 0 0.18em;
-  border-radius: 4px;
-  background: #f7dfae;
-  color: #3d2a12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
   box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
 }
 
 .report-shell {
@@ -181,6 +213,10 @@ h3 {
   padding: 16px;
 }
 
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
 .eyebrow,
 .meta,
 .chip,
@@ -209,6 +245,12 @@ h3 {
   line-height: 1.08;
   max-width: 920px;
   overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
 }
 
 .hero-brief {
@@ -404,6 +446,102 @@ p.hero-summary-text {
   border-bottom: 1px solid var(--line);
 }
 
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 .claims-grid {
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 14px;
@@ -483,7 +621,39 @@ p.hero-summary-text {
 .card-detail-list dd {
   margin: 0;
   color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
 }
 
 .interactive-card {
@@ -1393,83 +1563,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">研究解释 | 研究综合、架构 walkthrough、有来源支撑的解释和图表</div>
-          <h1 class="report-title">AI 日报 2026-05-23</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
-      </div>
-      <div class="hero-brief hero-brief-single">
-        <ul class="hero-summary-text hero-summary-list"><li>今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施</li><li>24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</li></ul>
-
-      </div>
-      <div class="hero-decision-grid" data-report-intent data-primary-question="2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？" data-time-budget="8 分钟" data-artifact-kind="research">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
-      <strong>2026-05-23 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
-      <strong>只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
-      <ul class="hero-criteria-list"><li>主体信息不强行凑数</li><li>项目和 Builder 观察与主体信息分开</li><li>信源审计可见</li></ul>
-    </article>
-  </div>
+    <header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
+      <h1 class="report-title report-date-title">2026-05-23</h1>
     </header>
 
     <div class="report-layout">
-      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
-    <div class="report-nav-title">速览</div>
-    <div class="report-nav-group" data-nav-group="reading-order">
-      <div class="report-nav-group-title">阅读顺序</div>
-      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="日报概览" data-nav-link data-nav-index="1" data-nav-group-name="summary" data-nav-status="info"><span>日报概览</span></a>
-<a href="#section-html-work-report-2" title="主线摘要" data-nav-link data-nav-index="2" data-nav-group-name="summary" data-nav-status="info"><span>主线摘要</span></a>
-<a href="#section-html-work-report-3" title="主体信息" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
-<a href="#section-html-work-report-4" title="模型发布" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>模型发布</span></a>
-<a href="#section-html-work-report-5" title="热门技术博客" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
-<a href="#section-html-work-report-6" title="今日值得关注的项目" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>今日值得关注的项目</span></a>
-<a href="#section-html-work-report-7" title="社区线索" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-8" title="信源审计" data-nav-link data-nav-index="8" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-9" title="自检与产物" data-nav-link data-nav-index="9" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
-    </div>
-  </nav>
+
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel" id="section-html-work-report-1" data-section-type="summary-cards" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">摘要</p>
-      <h2>日报概览</h2>
-
-    </div>
-
-  </div>
-    <div class="metric-grid focus-field">
-      <article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">报告日期</div><strong>2026-05-23</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">主体信息</div><strong>6</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">模型发布</div><strong>1</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">热门技术博客</div><strong>4</strong></article>
-<article class="interactive-card evidence-card evidence-spotlight" data-evidence-spotlight><div class="meta">项目</div><strong>5</strong></article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="summary" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-
-      <h2>主线摘要</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>概览</strong>：今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施</li><li><strong>概览</strong>：24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</li></ul></div>
-    <template data-rich-source data-source-fallback>- **概览**：今日主线集中在 AI coding agent 的企业治理、浏览器/前端工作流、合规审计、计算机使用模型和 agent 执行基础设施
-- **概览**：24 小时内一手大发布偏少，因此在保持真实事件日期的前提下补入 2026-05-20 至 2026-05-21 的高信号官方研究、产品和工程博客</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1478,55 +1579,49 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>1. <strong>OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</strong>（2026-05-21，T0）</p>
-<ul><li>这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。</li><li>OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。</li><li>工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。</li><li>来源：<a href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer">OpenAI Help Center</a></li></ul>
-<p>2. <strong>Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路</strong>（2026-05-21，T0）</p>
-<ul><li>Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。</li><li>Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。</li><li>这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。</li><li>来源：<a href="https://support.claude.com/en/articles/12138966-release-notes" rel="noopener noreferrer">Claude Release Notes / Claude Blog</a></li></ul>
-<p>3. <strong>Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族</strong>（2026-05-21，T0）</p>
-<ul><li>Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。</li><li>官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。</li><li>对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。</li><li>来源：<a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research</a></li></ul>
-<p>4. <strong>Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台</strong>（2026-05-21，T0）</p>
-<ul><li>Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。</li><li>Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。</li><li>这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。</li><li>来源：<a href="https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx" rel="noopener noreferrer">Docusign Press Release</a></li></ul>
-<p>5. <strong>Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施</strong>（2026-05-21，T0）</p>
-<ul><li>Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。</li><li>文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。</li><li>这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。</li><li>来源：<a href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal Blog</a></li></ul>
-<p>6. <strong>OpenAI 模型给出离散几何单位距离问题的新反例</strong>（2026-05-20，T0）</p>
-<ul><li>该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。</li><li>OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</li><li>工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。</li><li>来源：<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/" rel="noopener noreferrer">OpenAI Research</a></li></ul></div>
-    <template data-rich-source data-source-fallback>1. **OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享**（2026-05-21，T0）
+    <div class="rendered-markdown"><ol><li><strong><a href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer">OpenAI Help Center：OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</a></strong>（2026-05-21，T0）</li></ol>
+<ul><li>这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。</li><li>OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。</li><li>工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。</li></ul>
+<ol start="2"><li><strong><a href="https://support.claude.com/en/articles/12138966-release-notes" rel="noopener noreferrer">Claude Release Notes / Claude Blog：Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路</a></strong>（2026-05-21，T0）</li></ol>
+<ul><li>Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。</li><li>Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。</li><li>这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。</li></ul>
+<ol start="3"><li><strong><a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族</a></strong>（2026-05-21，T0）</li></ol>
+<ul><li>Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。</li><li>官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。</li><li>对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。</li></ul>
+<ol start="4"><li><strong><a href="https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx" rel="noopener noreferrer">Docusign Press Release：Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台</a></strong>（2026-05-21，T0）</li></ol>
+<ul><li>Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。</li><li>Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。</li><li>这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。</li></ul>
+<ol start="5"><li><strong><a href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal Blog：Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施</a></strong>（2026-05-21，T0）</li></ol>
+<ul><li>Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。</li><li>文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。</li><li>这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。</li></ul>
+<ol start="6"><li><strong><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/" rel="noopener noreferrer">OpenAI Research：OpenAI 模型给出离散几何单位距离问题的新反例</a></strong>（2026-05-20，T0）</li></ol>
+<ul><li>该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。</li><li>OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</li><li>工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. **[OpenAI Help Center：OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享](https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf)**（2026-05-21，T0）
   - 这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。
   - OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。
   - 工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。
-  - 来源：[OpenAI Help Center](https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf)
 
-2. **Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路**（2026-05-21，T0）
+2. **[Claude Release Notes / Claude Blog：Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路](https://support.claude.com/en/articles/12138966-release-notes)**（2026-05-21，T0）
   - Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。
   - Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。
   - 这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。
-  - 来源：[Claude Release Notes / Claude Blog](https://support.claude.com/en/articles/12138966-release-notes)
 
-3. **Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族**（2026-05-21，T0）
+3. **[Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)**（2026-05-21，T0）
   - Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。
   - 官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。
   - 对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。
-  - 来源：[Microsoft Research](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)
 
-4. **Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台**（2026-05-21，T0）
+4. **[Docusign Press Release：Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台](https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx)**（2026-05-21，T0）
   - Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。
   - Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。
   - 这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。
-  - 来源：[Docusign Press Release](https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx)
 
-5. **Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施**（2026-05-21，T0）
+5. **[Modal Blog：Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施](https://modal.com/blog/modal-series-c)**（2026-05-21，T0）
   - Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。
   - 文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。
   - 这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。
-  - 来源：[Modal Blog](https://modal.com/blog/modal-series-c)
 
-6. **OpenAI 模型给出离散几何单位距离问题的新反例**（2026-05-20，T0）
+6. **[OpenAI Research：OpenAI 模型给出离散几何单位距离问题的新反例](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)**（2026-05-20，T0）
   - 该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。
   - OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。
-  - 工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。
-  - 来源：[OpenAI Research](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)</template>
+  - 工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1538,7 +1633,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="rendered-markdown"><ul><li><strong>Fara1.5</strong> <mark class="text-highlight">预览开放</mark> <mark class="text-highlight">官方可用性</mark>（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 <a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research</a></li></ul></div>
     <template data-rich-source data-source-fallback>- **Fara1.5** ==预览开放== ==官方可用性==（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 [Microsoft Research](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-3" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1547,13 +1642,39 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong><a href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></strong>（Claude Blog / Claude Code team，2026-05-20）：Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</li><li><strong><a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></strong>（Microsoft Research / Microsoft Research AI Frontiers team，2026-05-21）：文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。</li><li><strong><a href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></strong>（Claude Blog / Anthropic，2026-05-21）：Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。</li><li><strong><a href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></strong>（Modal Blog / Modal，2026-05-21）：Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</li></ul></div>
-    <template data-rich-source data-source-fallback>- **[Using Claude Code: The unreasonable effectiveness of HTML](https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html)**（Claude Blog / Claude Code team，2026-05-20）：Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。
-- **[Fara1.5 - A family of frontier computer use agent models](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)**（Microsoft Research / Microsoft Research AI Frontiers team，2026-05-21）：文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。
-- **[How our partners are putting Opus to work for cybersecurity](https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity)**（Claude Blog / Anthropic，2026-05-21）：Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。
-- **[Modal&#39;s Series C: Raising $355M at a $4.65B valuation](https://modal.com/blog/modal-series-c)**（Modal Blog / Modal，2026-05-21）：Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</template>
+
+    <div class="evidence-grid focus-field" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="agent output / HTML reports / coding workflow" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></h3>
+    <div class="card-tags"><span class="chip">agent output / HTML reports / coding workflow</span></div>
+    <p>Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Claude Code team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-20</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="computer use agents / browser agents / evaluation" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></h3>
+    <div class="card-tags"><span class="chip">computer use agents / browser agents / evaluation</span></div>
+    <p>文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Microsoft Research</span></dd></div><div><dt>作者</dt><dd><span>Microsoft Research AI Frontiers team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI security operations / Opus / vulnerability remediation" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></h3>
+    <div class="card-tags"><span class="chip">AI security operations / Opus / vulnerability remediation</span></div>
+    <p>Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Anthropic</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI infrastructure / agent runtime / sandboxes" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></h3>
+    <div class="card-tags"><span class="chip">AI infrastructure / agent runtime / sandboxes</span></div>
+    <p>Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</p>
+    <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Modal Blog</span></dd></div><div><dt>作者</dt><dd><span>Modal</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
+  </article>
+    </div>
   </section>
-<section class="panel" id="section-html-work-report-6" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1601,7 +1722,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1610,22 +1731,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>社区线索</h4>
-<ul><li>GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 <a href="https://github.com/trending" rel="noopener noreferrer">来源</a></li><li>Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 <a href="https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### 社区线索
-
-- GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 [来源](https://github.com/trending)
+    <div class="rendered-markdown"><ul><li>GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 <a href="https://github.com/trending" rel="noopener noreferrer">来源</a></li><li>Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 <a href="https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>- GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 [来源](https://github.com/trending)
 - Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 [来源](https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/)</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>信源审计</h2>
-
-    </div>
-
-  </div>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">信源审计</span>
+        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><h4>GitHub Trending</h4>
 <ul><li>检查状态：已检查</li><li>候选 / 入选：35 / 5</li><li>说明：官方 GitHub Trending 抽取受限，未把官方排名写成精确事实；项目区采用 GitTrend、Trendshift 与仓库 README 交叉可见的 AI coding-agent / MCP / skills 项目。</li></ul>
 <ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer">GitHub Trending daily</a>：blocked，npm run discover:github-trending -- 50 在 shell 网络下 fetch failed；Web 文本视图可打开页面但只稳定返回筛选器，未稳定返回官方仓库列表。</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer">GitHub Trending weekly</a>：blocked，同上，已检查但无法由当前自动解析器稳定抽取官方榜单。</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer">GitHub Trending language pages</a>：blocked，Python、TypeScript、Rust、Go daily/weekly 均由 discover 命令检查，当前 shell fetch failed。</li><li><a href="https://gittrend.io/" rel="noopener noreferrer">GitTrend daily repositories</a>：checked，页面显示 Ranked by engagement, May 22, 2026，并列出 codegraph、claude-plugins-official、Understand-Anything、hermes-agent 等 AI/coding-agent 项目。</li><li><a href="https://trendshift.io/" rel="noopener noreferrer">Trendshift live trending repositories</a>：checked，页面显示 Today(UTC) live ranking，包含 claude-plugins-official、codegraph、Understand-Anything、ChromeDevTools/chrome-devtools-mcp、dotnet/skills 等项目。</li><li><a href="https://ossinsight.io/trending/ai" rel="noopener noreferrer">OSSInsight AI trending</a>：checked，页面声明按 GitHub stars 与 recent growth 排名 AI agent frameworks、LLM tools、MCP servers、coding agents、RAG 与 inference 项目。</li></ul>
@@ -1655,17 +1774,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 - [follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：blocked，node C:\Users\Admin\.codex\skills\follow-builders\scripts\prepare-digest.js 返回 fetch failed。
 - [follow-builders local X cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。
-- [follow-builders local blog cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。</template>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-9" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <p class="meta">验证</p>
-      <h2>自检与产物</h2>
-
-    </div>
-
-  </div>
+- [follow-builders local blog cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。</template></div>
+  </details>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">附录</span>
+        <span class="collapsible-title">自检与产物</span>
+        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 6 条，未强行填满 10 条。因 24 小时 T0 一手来源不足，本轮扩展至 2026-05-20；2026-05-20 条目只作为高信号研究补充并保留真实 event_date。Builder 观察为空是因为 follow-builders 中央 feed 当前 fetch failed 且本地缓存过旧。项目表未把 GitHub 官方 Trending 解析失败伪装成成功，改用可访问趋势源和仓库 README 交叉验证。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。</strong></li><li>为什么要改：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。</li><li><strong>follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。</strong></li><li>为什么要改：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。</li><li><strong>周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。</strong></li><li>为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。</li></ul>
@@ -1686,8 +1806,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - **周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。**
   - 为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。
 
-- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json)</template>
-  </section>
+- [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json)</template></div>
+  </details>
 
 
 

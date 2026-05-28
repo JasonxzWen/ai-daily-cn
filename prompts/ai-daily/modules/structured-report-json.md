@@ -55,7 +55,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 `hot_blogs[*].summary` 必须是 300-500 字中文内容摘要，不要另写 `why_it_matters`；历史数据可保留该字段，但新草稿不需要填写。
 
-`github_trending` 用于独立展示 GitHub Trending 趋势，不再埋在 `projects` 或信源审计里。默认展示 5-8 个仓库；没有可核验趋势时使用空数组。每项包含：
+`github_trending` 用于独立展示 GitHub Trending 榜单，不再埋在 `projects` 或信源审计里。默认展示 Top 10 仓库；没有可核验趋势时使用空数组。每项包含：
 
 - `candidate_id`
 - `repo`
@@ -73,6 +73,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `evidence`
 
 `github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects`。
+`github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；页面展示会隐藏来源、语言等审计字段，只保留榜位、变化和中文简介。
 
 `hero_highlights` 用于公开页面 header，最多 1-3 条。每项包含：
 
@@ -85,7 +86,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
 
-`source_audit` 是每日结构化草稿的必填审计字段，用于证明已经检查 GitHub trending 与 Builder 原始源。它包含：
+`source_audit` 是每日结构化草稿的必填审计字段。它必须合并各发现命令的审计结果，而不是只把命令 stdout 留在本地临时文件里；需要在 `report:write` 后补充独立发现命令审计时，使用 `npm run sources:audit-merge -- --date YYYY-MM-DD --input <audit-output.json>[,<audit-output.json>]` 写回最终 `reports-data` JSON。连续运行验收读取最终 `reports-data` JSON，因此新日报至少包含这些审计组：
 
 - `github_trending.checked: true`
 - `github_trending.sources[]`：每个来源包含 `name`、`url`、`status`、可选 `notes`
@@ -99,7 +100,11 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `builder_sources.blocked_reason`：当 Builder 来源被阻塞或为空时填写机器可读原因，例如 `fetch_failed`、`auth_required`、`empty_feed`、`rate_limited`、`no_recent_signal`
 - `builder_sources.last_successful_feed_at`：记录上次成功获取中心 feed 的 ISO 时间；没有历史记录时用 `null`
 - `builder_sources.notes`
-- 可选 `content_sources`：记录热门博客、访谈、播客、Product Hunt 或聚合站检查结果，结构与其他审计组一致。
+- `content_sources.checked: true`：记录热门博客、访谈、播客、Product Hunt developer-tools/trending、广义科技媒体、大厂 newsroom、行业趋势源、X 热点 feed、微信公众号/自媒体中介线索或聚合站检查结果，结构与其他审计组一致。中介源必须在 notes 中保留 `primary_verification_required=true` 或等价说明；X 热点必须保留原始 X status URL。
+- `search_sources.checked: true`：记录 `discover:search-news` 的影子运行结果，必须包含 `shadow:true`，缺 key provider 记录为 `skipped_missing_token` 或在 notes 中说明。
+- `sources_health.checked: true`：记录 `sources:health` 的健康检查结果；未配置自托管 RSSHub/RSS-Bridge base URL 时记录 `skipped_missing_base_url`，不是日报失败。
+
+`source_audit.*.sources[].status` 允许 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`。如果某组没有候选，也必须说明检查过哪些源以及为什么未入选。
 
 `main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
