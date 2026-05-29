@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
-import { canonicalReportUrl } from "./paths.js";
+import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { planGeneratedFiles } from "./site.js";
 
 const execFileAsync = promisify(execFile);
@@ -23,6 +23,7 @@ export async function checkPublishPreflight(options = {}) {
     });
   }
 
+  await refreshRemoteTracking(repoRoot, git, allowedBranch);
   const remote = await git.remoteStatus();
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
@@ -37,6 +38,7 @@ export async function checkPublishPreflight(options = {}) {
   }
 
   const gitWritable = await assertGitDirectoryWritable(repoRoot, git, options.gitWritableCheck);
+  const pushTransport = await checkPushTransport(repoRoot, git, allowedBranch);
 
   return {
     mode: "preflight",
@@ -46,6 +48,7 @@ export async function checkPublishPreflight(options = {}) {
     remote,
     git_writable: gitWritable.ok,
     git_dir: gitWritable.git_dir,
+    push_transport: pushTransport,
     current_dirty_files: statusEntries.map((entry) => entry.path).sort()
   };
 }
@@ -148,6 +151,7 @@ export async function createPublishPlan(options = {}) {
     });
   }
 
+  await refreshRemoteTracking(repoRoot, git, allowedBranch);
   const remote = await git.remoteStatus();
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
@@ -174,8 +178,20 @@ export async function createPublishPlan(options = {}) {
     });
   }
 
-  const dates = generated.reports.map((report) => report.report_date).sort();
-  const repoFiles = toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files);
+  const reports = options.reportDate
+    ? generated.reports.filter((report) => report.report_date === options.reportDate)
+    : generated.reports;
+  if (reports.length === 0) {
+    throw new PublisherError("no_reports", `未发现可发布的日报：${options.reportDate || "(any)"}`);
+  }
+
+  const dates = reports.map((report) => report.report_date).sort();
+  const repoFiles = filterDocsForReportDate(
+    toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
+    options.outDir || "docs",
+    options.reportDate
+  );
+  const stageFiles = uniqueSorted([...repoFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
   const commitMessage =
     dates.length === 1
       ? `chore: publish AI daily report ${dates[0]}`
@@ -188,11 +204,11 @@ export async function createPublishPlan(options = {}) {
     allowed_branch: allowedBranch,
     remote,
     will_write_files: repoFiles,
-    will_stage_files: repoFiles,
+    will_stage_files: stageFiles,
     current_dirty_files: statusEntries.map((entry) => entry.path).sort(),
     commit_message: commitMessage,
-    expected_pages_url: generated.reports.length === 1 ? generated.reports[0].canonical_url : DEFAULT_SITE.siteUrl,
-    reports: generated.reports.map((report) => ({
+    expected_pages_url: reports.length === 1 ? reports[0].canonical_url : DEFAULT_SITE.siteUrl,
+    reports: reports.map((report) => ({
       report_date: report.report_date,
       title: report.title,
       canonical_url: report.canonical_url
@@ -219,6 +235,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     });
   }
 
+  await refreshRemoteTracking(repoRoot, git, branch);
   const remote = await git.remoteStatus();
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
@@ -250,13 +267,29 @@ export async function publishGeneratedArtifacts(options = {}) {
   if (typeof git.gitDir === "function") {
     await assertGitDirectoryWritable(repoRoot, git, options.gitWritableCheck);
   }
+  await checkPushTransport(repoRoot, git, branch);
 
   const commitMessage =
     options.commitMessage || `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`;
   await git.add(publishFiles);
   const commitOutput = await git.commit(commitMessage);
-  const pushOutput = await git.push(branch);
   const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  let pushOutput = "";
+  try {
+    pushOutput = await git.push(branch);
+  } catch (error) {
+    throw new PublisherError("git_push_failed", `发布提交已在本地创建，但推送到 origin/${branch} 失败：${error.message}`, {
+      branch,
+      repo_updated: true,
+      repo_pushed: false,
+      staged_files: publishFiles.sort(),
+      commit_message: commitMessage,
+      commit_output: commitOutput,
+      pages_url: pagesUrl,
+      cause: error.message,
+      remediation: "修复 Git 远端 push 通道后运行 publish:resume-push，或使用 publish:github-api 兜底。"
+    });
+  }
   const verification =
     pagesUrl && options.verifyPages
       ? await verifyPublishedUrl(pagesUrl, {
@@ -297,11 +330,9 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const sourceBranch = await git.branch();
 
   const statusEntries = parsePorcelain(await git.status());
-  const publishFiles = uniqueSorted(
-    statusEntries
-      .map((entry) => entry.path)
-      .filter((file) => isPublisherOwnedPath(file))
-  );
+  const dirtyPublishFiles = statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => isPublisherOwnedPath(file));
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
 
   if (unrelated.length > 0) {
@@ -309,6 +340,12 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
+
+  const publishFiles = uniqueSorted(
+    dirtyPublishFiles.length > 0
+      ? dirtyPublishFiles
+      : await plannedPublisherFiles(repoRoot, options)
+  );
 
   if (publishFiles.length === 0) {
     return {
@@ -424,6 +461,76 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   };
 }
 
+export async function resumePublishPush(options = {}) {
+  if (!options.confirmPush) {
+    throw new PublisherError(
+      "publish_confirmation_required",
+      "继续推送已存在的本地发布提交需要显式传入 --confirm-push。"
+    );
+  }
+
+  const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
+  const git = options.git || createGitAdapter(repoRoot);
+  const currentBranch = await git.branch();
+  if (currentBranch !== branch) {
+    throw new PublisherError("wrong_branch", `当前分支是 ${currentBranch || "(detached)"}，允许发布分支是 ${branch}。`, {
+      branch: currentBranch,
+      allowedBranch: branch
+    });
+  }
+
+  const statusEntries = parsePorcelain(await git.status());
+  if (statusEntries.length > 0) {
+    throw new PublisherError("dirty_worktree", "工作树仍有未提交改动，不能直接续推已有发布提交。", {
+      status: statusEntries.map((entry) => `${entry.code} ${entry.path}`)
+    });
+  }
+
+  await refreshRemoteTracking(repoRoot, git, branch);
+  const remote = await git.remoteStatus();
+  if (remote.remoteAhead > 0) {
+    throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续推送。`, remote);
+  }
+  if (remote.localAhead <= 0) {
+    return {
+      mode: "publish-resume-push",
+      branch,
+      remote,
+      committed: false,
+      pushed: false,
+      pushed_existing_commits: false,
+      message: "本地没有领先远端的提交需要继续推送。"
+    };
+  }
+
+  await checkPushTransport(repoRoot, git, branch);
+  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pushOutput = await git.push(branch);
+  const verification =
+    pagesUrl && options.verifyPages
+      ? await verifyPublishedUrl(pagesUrl, {
+          attempts: options.verificationAttempts,
+          intervalMs: options.verificationIntervalMs,
+          expectedText: options.reportDate,
+          fetchImpl: options.fetchImpl
+        })
+      : { ok: false, error: "" };
+
+  return {
+    mode: "publish-resume-push",
+    branch,
+    remote,
+    committed: false,
+    pushed: true,
+    pushed_existing_commits: true,
+    push_output: pushOutput,
+    pages_url: pagesUrl,
+    pages_verified: Boolean(verification.ok),
+    verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
+  };
+}
+
 export async function verifyPublishedUrl(url, options = {}) {
   const attempts = options.attempts ?? 12;
   const intervalMs = options.intervalMs ?? 5000;
@@ -477,6 +584,134 @@ function toRepoRelativeFiles(repoRoot, outDir, files) {
     .sort();
 }
 
+async function checkPushTransport(repoRoot, git, branch) {
+  const remoteUrl = typeof git.remoteUrl === "function" ? await git.remoteUrl() : "";
+  if (typeof git.pushDryRun !== "function") {
+    return {
+      ok: true,
+      checked: false,
+      remote_url: remoteUrl,
+      detail: "git adapter does not expose pushDryRun"
+    };
+  }
+
+  try {
+    const output = await git.pushDryRun(branch);
+    return {
+      ok: true,
+      checked: true,
+      remote_url: remoteUrl,
+      output
+    };
+  } catch (error) {
+    throw new PublisherError("git_push_unavailable", `Git 远端 push 通道不可用：${error.message}`, {
+      branch,
+      remoteUrl,
+      cause: error.message,
+      remediation: "修复 SSH/HTTPS 凭据或改用 GitHub API 兜底；不要等到日报提交后才发现 push 不可用。"
+    });
+  }
+}
+
+async function refreshRemoteTracking(repoRoot, git, branch) {
+  if (typeof git.fetch !== "function") {
+    return {
+      ok: true,
+      checked: false,
+      detail: "git adapter does not expose fetch"
+    };
+  }
+
+  try {
+    const output = await git.fetch(branch);
+    return {
+      ok: true,
+      checked: true,
+      output
+    };
+  } catch (error) {
+    throw new PublisherError("git_fetch_unavailable", `无法刷新远端 ${branch}：${error.message}`, {
+      branch,
+      cause: error.message,
+      remediation: "修复网络或 Git 远端读取权限；不能用过期的 origin/main 判断发布安全性。"
+    });
+  }
+}
+
+function filterDocsForReportDate(files, outDir, reportDate) {
+  if (!reportDate) {
+    return files;
+  }
+
+  const outPrefix = outDir.replaceAll("\\", "/").replace(/\/$/, "");
+  const paths = reportRelativePaths(reportDate);
+  const keep = new Set([
+    `${outPrefix}/.nojekyll`,
+    `${outPrefix}/assets/style.css`,
+    `${outPrefix}/feed.json`,
+    `${outPrefix}/index.html`,
+    `${outPrefix}/${paths.dataPath}`,
+    `${outPrefix}/${paths.candidateDataPath}`,
+    `${outPrefix}/${paths.htmlPath}`
+  ]);
+  if (paths.markdownPath) {
+    keep.add(`${outPrefix}/${paths.markdownPath}`);
+  }
+
+  return files.filter((file) => keep.has(file));
+}
+
+async function plannedPublisherFiles(repoRoot, options = {}) {
+  const generated = await planGeneratedFiles({
+    rootDir: repoRoot,
+    inputDir: options.inputDir || "reports-source",
+    dataInputDir: options.dataInputDir || "reports-data",
+    outDir: options.outDir || "docs",
+    siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
+    generatedAt: options.generatedAt
+  });
+  const reports = options.reportDate
+    ? generated.reports.filter((report) => report.report_date === options.reportDate)
+    : generated.reports;
+  const dates = reports.map((report) => report.report_date).sort();
+  const docsFiles = filterDocsForReportDate(
+    toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
+    options.outDir || "docs",
+    options.reportDate
+  );
+  const candidates = uniqueSorted([...docsFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
+  const existing = [];
+  for (const file of candidates) {
+    if (await exists(path.join(repoRoot, ...file.split("/")))) {
+      existing.push(file);
+    }
+  }
+  return existing;
+}
+
+async function plannedReportsDataFiles(repoRoot, dates) {
+  const files = [];
+  for (const date of dates) {
+    const [year, month] = date.split("-");
+    const base = `reports-data/${year}/${month}/${date}`;
+    for (const file of [`${base}.json`, `${base}.candidates.json`]) {
+      if (await exists(path.join(repoRoot, ...file.split("/")))) {
+        files.push(file);
+      }
+    }
+  }
+  return uniqueSorted(files);
+}
+
+async function exists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function createGitAdapter(repoRoot) {
   return {
     async status() {
@@ -524,6 +759,9 @@ export function createGitAdapter(repoRoot) {
     async remoteUrl() {
       return runGit(repoRoot, ["remote", "get-url", "origin"]);
     },
+    async fetch(branch) {
+      return runGit(repoRoot, ["fetch", "origin", branch, "--prune"], { trim: false });
+    },
     async add(files) {
       return runGit(repoRoot, ["add", "--", ...files]);
     },
@@ -535,6 +773,9 @@ export function createGitAdapter(repoRoot) {
     },
     async checkout(branch) {
       return runGit(repoRoot, ["checkout", branch]);
+    },
+    async pushDryRun(branch) {
+      return runGit(repoRoot, ["push", "--dry-run", "origin", branch], { trim: false });
     },
     async push(branch) {
       return runGit(repoRoot, ["push", "origin", branch]);
@@ -764,7 +1005,10 @@ async function assertGitDirectoryWritable(repoRoot, git, gitWritableCheck) {
 }
 
 function isDeferredPrepareBlocker(error) {
-  return error instanceof PublisherError && ["git_not_writable", "remote_ahead"].includes(error.code);
+  return (
+    error instanceof PublisherError &&
+    ["git_not_writable", "git_fetch_unavailable", "git_push_unavailable", "remote_ahead"].includes(error.code)
+  );
 }
 
 function isGitMetadataWriteFailure(error) {

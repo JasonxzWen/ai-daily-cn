@@ -13,8 +13,10 @@ import {
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
+  resumePublishPush,
   verifyPublishedUrl
 } from "../src/publish.js";
+import { buildSite } from "../src/site.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -97,13 +99,38 @@ test("publish dry-run 遇到 remote ahead 停止", async () => {
 
 test("publish preflight 检查分支、远端、工作树和 git 写权限", async () => {
   const result = await checkPublishPreflight({
-    git: fakeGit({ status: " M docs/index.html" }),
+    git: fakeGit({ status: " M docs/index.html", pushDryRunOutput: "dry-run ok" }),
     gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
   });
 
   assert.equal(result.mode, "preflight");
   assert.equal(result.git_writable, true);
+  assert.equal(result.push_transport.ok, true);
   assert.deepEqual(result.current_dirty_files, ["docs/index.html"]);
+});
+
+test("publish preflight fails early when push transport is unavailable", async () => {
+  await assert.rejects(
+    checkPublishPreflight({
+      git: fakeGit({
+        pushDryRunError: new Error("ssh: connect to host github.com port 22: Permission denied")
+      }),
+      gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "git_push_unavailable"
+  );
+});
+
+test("publish preflight fails early when remote tracking cannot be refreshed", async () => {
+  await assert.rejects(
+    checkPublishPreflight({
+      git: fakeGit({
+        fetchError: new Error("fatal: unable to access remote")
+      }),
+      gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "git_fetch_unavailable"
+  );
 });
 
 test("publish preflight 在 git 元数据不可写时停止", async () => {
@@ -133,6 +160,19 @@ test("publish prepare-worktree defers git_not_writable so report generation can 
   assert.equal(result.publish_blocker.details.gitDir, "D:\\ai-daily-cn\\.git");
   assert.equal(result.preflight, null);
   assert.equal(result.current_branch, "main");
+});
+
+test("publish prepare-worktree defers git push transport failures so report generation can continue", async () => {
+  const result = await preparePublishWorktree({
+    git: fakeGit({
+      pushDryRunError: new Error("ssh: connect to host github.com port 22: Permission denied")
+    }),
+    gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
+  });
+
+  assert.equal(result.publish_ready, false);
+  assert.equal(result.publish_blocker.code, "git_push_unavailable");
+  assert.match(result.publish_blocker.details.cause, /Permission denied/);
 });
 
 test("publish prepare-worktree defers checkout index.lock failure so generation can continue", async () => {
@@ -315,6 +355,39 @@ test("github api publish 跳过远端已一致的发布产物", async () => {
   assert.equal(calls.some((call) => call.method === "POST"), false);
 });
 
+test("github api publish can use planned generated files when the worktree is clean", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await buildSite({
+    rootDir: repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt
+  });
+  await fs.mkdir(path.join(repoRoot, "reports-data/2026/05"), { recursive: true });
+  await fs.copyFile(
+    path.join(repoRoot, "docs/data/2026/05/2026-05-13.json"),
+    path.join(repoRoot, "reports-data/2026/05/2026-05-13.json")
+  );
+
+  const calls = [];
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({ status: "" }),
+    fetchImpl: fakeGitHubFetch({ calls })
+  });
+
+  assert.equal(result.committed, true);
+  assert(result.published_files.includes("docs/reports/2026/05/2026-05-13.html"));
+  assert(result.published_files.includes("docs/data/2026/05/2026-05-13.json"));
+  assert(result.published_files.includes("reports-data/2026/05/2026-05-13.json"));
+});
+
 test("github api publish 遇到非发布器管理改动时停止", async () => {
   const repoRoot = await tempRepoWithFixture();
   await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
@@ -349,7 +422,46 @@ test("publish 只提交发布器管理的文件", async () => {
   assert.equal(result.committed, true);
   assert.equal(result.pushed, true);
   assert.deepEqual(result.staged_files, ["docs/index.html", "reports-data/2026/05/2026-05-13.json"]);
-  assert.deepEqual(calls.map((call) => call.name), ["add", "commit", "push"]);
+  assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "add", "commit", "push"]);
+});
+
+test("publish checks push transport before creating a new publish commit", async () => {
+  const calls = [];
+  await assert.rejects(
+    publishGeneratedArtifacts({
+      confirmPush: true,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: " M docs/index.html",
+        calls,
+        pushDryRunError: new Error("ssh: connect to host github.com port 22: Permission denied")
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "git_push_unavailable"
+  );
+
+  assert.deepEqual(calls.map((call) => call.name), ["fetch"]);
+});
+
+test("publish reports committed local state when the final push fails", async () => {
+  const calls = [];
+  await assert.rejects(
+    publishGeneratedArtifacts({
+      confirmPush: true,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: " M docs/index.html",
+        calls,
+        pushError: new Error("fatal: Could not read from remote repository.")
+      })
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "git_push_failed" &&
+      error.details.repo_updated === true
+  );
+
+  assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "add", "commit", "push"]);
 });
 
 test("publish 可在 push 后验证 Pages URL", async () => {
@@ -374,6 +486,32 @@ test("publish 可在 push 后验证 Pages URL", async () => {
   assert.equal(result.pages_verified, true);
   assert.equal(result.verification_error, "");
   assert.equal(result.pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+});
+
+test("publish resume pushes existing local commits and verifies Pages", async () => {
+  const calls = [];
+  const result = await resumePublishPush({
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    verifyPages: true,
+    verificationAttempts: 1,
+    verificationIntervalMs: 0,
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      text: async () => "<title>AI 鏃ユ姤 2026-05-13</title>"
+    }),
+    git: fakeGit({
+      status: "",
+      localAhead: 3,
+      calls
+    })
+  });
+
+  assert.equal(result.pushed, true);
+  assert.equal(result.pushed_existing_commits, true);
+  assert.equal(result.pages_verified, true);
+  assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "push"]);
 });
 
 test("publish 遇到非发布器管理改动时停止", async () => {
@@ -446,6 +584,13 @@ function fakeGit(overrides = {}) {
         remoteAhead: overrides.remoteAhead || 0
       };
     },
+    async fetch(branch) {
+      if (overrides.fetchError) {
+        throw overrides.fetchError;
+      }
+      calls.push({ name: "fetch", branch });
+      return overrides.fetchOutput || "";
+    },
     async add(files) {
       calls.push({ name: "add", files });
       return "";
@@ -454,8 +599,18 @@ function fakeGit(overrides = {}) {
       calls.push({ name: "commit", message });
       return "[main abc123] test";
     },
+    async pushDryRun(branch) {
+      if (overrides.pushDryRunError) {
+        throw overrides.pushDryRunError;
+      }
+      calls.push({ name: "pushDryRun", branch });
+      return overrides.pushDryRunOutput || "dry-run ok";
+    },
     async push(branch) {
       calls.push({ name: "push", branch });
+      if (overrides.pushError) {
+        throw overrides.pushError;
+      }
       return "pushed";
     },
     async remoteUrl() {

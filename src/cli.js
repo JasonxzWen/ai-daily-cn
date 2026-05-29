@@ -7,7 +7,8 @@ import {
   createPublishPlan,
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
-  publishGeneratedArtifacts
+  publishGeneratedArtifacts,
+  resumePublishPush
 } from "./publish.js";
 import { assemblePrompt } from "./prompt.js";
 import {
@@ -52,7 +53,8 @@ try {
       outDir: args.out || "docs",
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
-      generatedAt: args["generated-at"]
+      generatedAt: args["generated-at"],
+      reportDate: args.date || firstPositionalDate(argv)
     });
     printJson({
       ok: true,
@@ -305,6 +307,36 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       commitMessage: args.message,
       repository: args.repo,
+      inputDir: args.input || "reports-source",
+      dataInputDir: args["data-input"] || "reports-data",
+      outDir: args.out || "docs",
+      siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
+      generatedAt: args["generated-at"],
+      verifyPages: true
+    });
+    const publishOk = !result.verification_error;
+    printJson({
+      ok: publishOk,
+      publish_status: {
+        html_generated: true,
+        repo_updated: result.committed,
+        repo_pushed: result.pushed,
+        pages_url: result.pages_url || "",
+        publish_error: result.verification_error || ""
+      },
+      result
+    });
+    if (!publishOk) {
+      process.exitCode = 1;
+    }
+  } else if (command === "publish:resume-push") {
+    const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
+    const result = await resumePublishPush({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
+      reportDate: args.date || firstPositionalDate(argv),
       verifyPages: true
     });
     const publishOk = !result.verification_error;
@@ -334,9 +366,9 @@ try {
     details: error.details || undefined,
     publish_status: {
       html_generated: false,
-      repo_updated: false,
-      repo_pushed: false,
-      pages_url: "",
+      repo_updated: Boolean(error.details?.repo_updated),
+      repo_pushed: Boolean(error.details?.repo_pushed),
+      pages_url: error.details?.pages_url || "",
       publish_error: publishError
     }
   });
