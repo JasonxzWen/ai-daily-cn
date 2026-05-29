@@ -31,6 +31,8 @@ export function renderReportHtml(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
+  const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const sourceAudit = report.source_audit && typeof report.source_audit === "object" ? report.source_audit : null;
   const sourceAuditSection = sourceAudit ? `\n    ${renderSourceAudit(sourceAudit)}\n` : "";
   const metaItems = [
@@ -45,6 +47,8 @@ export function renderReportHtml(report) {
     .filter(Boolean)
     .join("\n        ");
   const optionalSections = [
+    renderQualityStatusSection(qualityStatus),
+    renderEvidenceAssetsSection(report, evidenceAssets),
     renderModelReleasesSection(modelReleases),
     renderHotBlogsSection(hotBlogs),
     renderGithubTrendingSection(githubTrending),
@@ -266,6 +270,14 @@ h3 {
   color: var(--muted);
 }
 
+.inline-site-icon {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.35em;
+  border-radius: 3px;
+  vertical-align: -0.15em;
+}
+
 .section {
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
@@ -305,6 +317,18 @@ h3 {
   border: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
+}
+
+.evidence-asset figure {
+  margin: 14px 0;
+}
+
+.evidence-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
 }
 
 .compact-list,
@@ -592,6 +616,71 @@ function renderCommunityLeads(items) {
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
 }
 
+function renderQualityStatusSection(status) {
+  if (!status || status.status === "ok") {
+    return "";
+  }
+
+  const reasons = Array.isArray(status.reasons) ? status.reasons : [];
+  const affected = Array.isArray(status.affected_sections) ? status.affected_sections : [];
+  return `<section class="section" id="quality-status">
+      <h2>质量状态</h2>
+      <article class="item">
+        <div class="item-meta">
+          <span>${escapeHtml(status.status)}</span>
+          ${renderTags(reasons)}
+          ${renderTags(affected.map((section) => `section:${section}`))}
+        </div>
+        <p>${escapeHtml(status.public_note || "")}</p>
+      </article>
+    </section>`;
+}
+
+function renderEvidenceAssetsSection(report, assets) {
+  if (!Array.isArray(assets) || assets.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="evidence-assets">
+      <h2>证据图表</h2>
+      ${assets.map((asset) => renderEvidenceAsset(report, asset)).join("\n")}
+    </section>`;
+}
+
+function renderEvidenceAsset(report, asset) {
+  const source = externalLink(asset.source_url, "source");
+  const media = asset.local_path
+    ? `<figure><img class="evidence-image" src="${escapeAttribute(relativeAssetHref(report.html_path, asset.local_path))}" alt="${escapeAttribute(asset.title)}" loading="lazy" decoding="async"><figcaption>${escapeHtml(asset.caption || "")}</figcaption></figure>`
+    : "";
+  const table = renderEvidenceTable(asset.data);
+  return `<article class="item evidence-asset">
+  <h3>${escapeHtml(asset.title)}</h3>
+  <div class="item-meta"><span>${escapeHtml(asset.type)}</span><span>${escapeHtml(asset.extraction_status)}</span></div>
+  ${asset.caption ? `<p>${escapeHtml(asset.caption)}</p>` : ""}
+  ${media}
+  ${table}
+  <p class="source-line">来源：${source}</p>
+</article>`;
+}
+
+function renderEvidenceTable(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return "";
+  }
+
+  const [header, ...body] = rows;
+  const headerHtml = Array.isArray(header)
+    ? `<thead><tr>${header.map((cell) => `<th>${escapeHtml(cell)}</th>`).join("")}</tr></thead>`
+    : "";
+  const bodyRows = body.length > 0 ? body : [];
+  return `<table class="project-table evidence-table">
+  ${headerHtml}
+  <tbody>
+    ${bodyRows.map((row) => `<tr>${(Array.isArray(row) ? row : []).map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("\n")}
+  </tbody>
+</table>`;
+}
+
 function renderSourceAudit(audit) {
   return `<section class="section" id="source-audit">
       <h2>信源审计</h2>
@@ -680,5 +769,27 @@ function renderFeedItem(item) {
 }
 
 function externalLink(url, label) {
-  return `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+  const icon = siteIconForUrl(url);
+  const iconHtml = icon ? `<img class="inline-site-icon" src="${escapeAttribute(icon)}" alt="" decoding="async">` : "";
+  return `${iconHtml}<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+}
+
+function siteIconForUrl(value) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase().replace(/^www\./, "");
+    const letter = hostname.replace(/[^a-z0-9]/g, "").slice(0, 1).toUpperCase() || "L";
+    const color = colorForHost(hostname);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="${color}"/><text x="16" y="21" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff">${letter}</text></svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+  } catch {
+    return "";
+  }
+}
+
+function colorForHost(hostname) {
+  let hash = 0;
+  for (const char of hostname) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 360;
+  }
+  return `hsl(${hash} 64% 38%)`;
 }

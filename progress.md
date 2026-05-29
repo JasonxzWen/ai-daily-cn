@@ -1,5 +1,24 @@
 # Progress
 
+## 2026-05-29 Quality-Status Repair
+
+- Implemented top-level `quality_status` and `evidence_assets` schema support.
+- Added quality derivation for blocked external sources, candidate-rich selection degradation, and low-signal checked sources.
+- Added publish dry-run blocking for reports whose `quality_status.status` is `blocked`.
+- Added inline site icons for rendered links/cards and safe external Markdown image rendering in the effective-interact renderer.
+- Added local evidence assets for the 2026-05-29 Anthropic examples:
+  - `docs/assets/evidence/anthropic-coding-agents-social-sciences-figure-1.jpg`
+  - `docs/assets/evidence/anthropic-claude-opus-4-8-benchmark-table.png`
+- Updated 2026-05-29 report data and generated docs to expose degraded source coverage plus the two evidence assets and transcribed tables.
+
+## 2026-05-29 Validation
+
+- `node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js` passed.
+- `npm run validate` passed after final evidence asset and renderer changes.
+- `node scripts\harness-validate.mjs` passed.
+- Browser render check passed for the 2026-05-29 report: quality/evidence sections present, 2 evidence images loaded, 4 inline site icons loaded.
+- `planGeneratedFiles` includes both `assets/evidence/*` files for publish planning.
+
 ## Current State
 
 - Repo-local harness files have been initialized from the latest `JasonxzWen/skill-hub` `origin/main` template.

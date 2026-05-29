@@ -110,6 +110,14 @@ h3 {
   color: var(--muted);
 }
 
+.inline-site-icon {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.35em;
+  border-radius: 3px;
+  vertical-align: -0.15em;
+}
+
 .section {
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
@@ -149,6 +157,18 @@ h3 {
   border: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
+}
+
+.evidence-asset figure {
+  margin: 14px 0;
+}
+
+.evidence-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
 }
 
 .compact-list,

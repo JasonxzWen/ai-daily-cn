@@ -19,6 +19,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `html_path`
 - `source_window`
 - `source_audit`
+- `quality_status`
 - `github_trending`
 - `main_items`
 - `model_releases`
@@ -26,9 +27,14 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `projects`
 - `builder_observations`
 - `community_leads`
+- `evidence_assets`
 - `self_check`
 - `publish_status`
 - `generated_at`
+
+`quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖或 schema 校验导致日报不能生成时使用 `blocked` 并停止发布；外部发现源失败但日报可生成时使用 `degraded`，并填写 `reasons`、`affected_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。
+
+`evidence_assets` 用于把来源链接里的关键图、表或已转写数据显式展示到日报。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
 
 `model_releases` 用于独立追踪开源/闭源模型发布。没有模型发布时使用空数组；有数据时每项包含：
 

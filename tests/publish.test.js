@@ -55,6 +55,33 @@ test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () =
   assert(plan.will_stage_files.includes("docs/index.html"));
 });
 
+test("publish dry-run stops when a selected report quality status is blocked", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-publish-blocked-quality-"));
+  const dataDir = path.join(repoRoot, "reports-data", "2026", "05");
+  await fs.mkdir(dataDir, { recursive: true });
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
+  report.quality_status = {
+    status: "blocked",
+    reasons: ["startup_failed"],
+    affected_sections: ["all"],
+    public_note: "Report generation startup failed."
+  };
+  await fs.writeFile(path.join(dataDir, "2026-05-15.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    createPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-05-15",
+      git: fakeGit()
+    }),
+    (error) => error instanceof PublisherError && error.code === "report_quality_blocked"
+  );
+});
+
 test("publish dry-run 遇到非发布器管理改动时停止", async () => {
   const repoRoot = await tempRepoWithFixture();
   await assert.rejects(

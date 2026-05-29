@@ -7,6 +7,7 @@ import { defaultGeneratedAt, isValidDateString } from "./time.js";
 import { defaultPublishStatus } from "./parser.js";
 import { requirePlainLanguage } from "./plain-language.js";
 import { requireFreshReport } from "./quality-gates.js";
+import { deriveQualityStatus } from "./quality-status.js";
 import {
   readCandidatePool,
   requireCandidateCoverage,
@@ -82,6 +83,7 @@ export function normalizeReportDraft(draft, options = {}) {
     projects: Array.isArray(draft.projects) ? draft.projects : [],
     builder_observations: Array.isArray(draft.builder_observations) ? draft.builder_observations : [],
     community_leads: Array.isArray(draft.community_leads) ? draft.community_leads : [],
+    evidence_assets: Array.isArray(draft.evidence_assets) ? draft.evidence_assets : [],
     publish_status: draft.publish_status || defaultPublishStatus(canonicalUrl),
     generated_at: draft.generated_at || options.generatedAt || defaultGeneratedAt()
   };
@@ -97,6 +99,8 @@ export function normalizeReportDraft(draft, options = {}) {
         : []
     };
   }
+
+  report.quality_status = deriveQualityStatus(report, options.candidatePool);
 
   const validation = validateReport(report);
   if (!validation.valid) {

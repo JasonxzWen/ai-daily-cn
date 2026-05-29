@@ -2,34 +2,48 @@
 
 ## Current Status
 
-- Harness bootstrap is complete.
-- Existing project instructions are preserved.
-- `.codex/skills/effective-interact` has been refreshed from Skill Hub `origin/main` where compatible with this repo's rendering contract.
-- The harness is now oriented around daily report generation, dry-run publishing, real publish confirmation, API fallback, and Pages verification.
-- `tasks/current-task.md` is a neutral entry point; future daily publish runs should copy scope from `tasks/templates/daily-publish-task.md`.
+- The AI daily quality-status repair is implemented and validated.
+- `quality_status` is now schema-backed, derived during report normalization/build, and blocks publish dry-run when `status` is `blocked`.
+- External source failures can publish as `degraded`; low-signal checked days remain `ok`; candidate-rich low-inclusion cases are flagged as selection degraded.
+- `evidence_assets` supports source-backed figures/tables, rendered in HTML/effective-interact output.
+- The 2026-05-29 report now includes two local Anthropic evidence assets and transcribed data tables for the social-science coding-agent figure and Opus 4.8 benchmark comparison.
+- Link/card titles now receive immediately loaded site icons through the renderer path.
+- No commit, push, publish, or automation change has been made.
 
 ## Changed Files
 
-- `AGENTS.md`
-- `clean-state-checklist.md`
-- `definition-of-done.md`
-- `feature_list.json`
+- `src/quality-status.js`
+- `src/report.js`
+- `src/site.js`
+- `src/publish.js`
+- `src/render.js`
+- `src/interaction-report.js`
+- `schemas/report.schema.json`
+- `prompts/ai-daily/modules/structured-report-json.md`
+- `.codex/skills/effective-interact/scripts/create-interaction.mjs`
+- `reports-data/2026/05/2026-05-29.json`
+- `docs/**` generated report/data/assets output
+- `tests/unit.test.js`
+- `tests/publish.test.js`
+- `tests/skills.test.js`
+- `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
-- `tasks/current-task.md`
-- `tasks/daily-publish-runbook.md`
-- `tasks/templates/daily-publish-task.md`
-- `scripts/harness-validate.mjs`
-- `.codex/skills/effective-interact/**`
 
 ## Validation Evidence
 
+- `node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js` passed.
+- `npm run validate` passed after the final implementation.
+- `planGeneratedFiles` returns:
+  - `assets/evidence/anthropic-claude-opus-4-8-benchmark-table.png`
+  - `assets/evidence/anthropic-coding-agents-social-sciences-figure-1.jpg`
 - `node scripts/harness-validate.mjs` passed.
-- `feature_list.json` JSON parse passed.
-- `git diff --check` passed.
-- `harness-hub validate-harness ... --json` passed with all required files present and no missing files.
-- `node --test tests/skills.test.js` passed.
-- `npm run validate` passed.
+- Browser render check for `docs/reports/2026/05/2026-05-29.html` passed:
+  - `质量状态` and `证据图表` are present.
+  - Evidence images load at `3840x2160` and `2600x1392`.
+  - 4 inline site icons load with no unloaded icon count.
+  - Transcribed `SWE-Bench Pro` / `69.2%` and `Economics` / `38%` / `91%` data are visible.
+- `git diff --check` passed through `npm run validate`.
 
 ## Blockers
 
@@ -37,4 +51,4 @@
 
 ## Next Action
 
-- Review the diff and decide whether to commit the harness bootstrap, daily publish harness expansion, and compatible skill update.
+- Review the diff and decide whether to commit the quality-status, evidence-asset, and renderer changes.
