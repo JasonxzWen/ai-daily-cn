@@ -34,7 +34,13 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 `quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖或 schema 校验导致日报不能生成时使用 `blocked` 并停止发布；外部发现源失败但日报可生成时使用 `degraded`，并填写 `reasons`、`affected_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。
 
-`evidence_assets` 用于把来源链接里的关键图、表或已转写数据显式展示到日报。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
+`evidence_assets` 用于把来源链接里的关键图、表或已转写数据挂到对应日报条目旁边；它不是独立图片展板。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
+
+证据图表拉取与展示规范：
+- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`model_releases`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或截图证据时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图一律不拉。
+- 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
+- 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。若有 `local_path`，页面只展示居中的图片和图片下方中文图名；`data` 只作为结构化 JSON 的可审计数据，只有没有图片时才退化为表格展示。`title` 必须是短中文图名，`caption` 只作为 JSON 审计说明，不在图片旁重复展示。
+- 排版约束：图片必须是可读的原图或清晰裁切，避免整页截图；宽图优先裁到图表本体，移动端不能横向撑破页面。不要为了“有图”而展示图片，不能清晰增强读者理解的图宁可不放。
 
 `model_releases` 用于独立追踪开源/闭源模型发布。没有模型发布时使用空数组；有数据时每项包含：
 

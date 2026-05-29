@@ -37,9 +37,11 @@
 8. 写入 `.tmp/daily-report.json` 前执行去套话检查：删掉“高信号”“核心信号”“可观察信号”“更多信号”“其他信号”“预期收益”等泛化或工作汇报式措辞；摘要只写用户需要快速判断的事实、日期、来源和变化。
 9. 同一厂商同日或同一 48h 窗口内的多条小更新默认合并成一条厂商动态；官方 docs 没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息，只作为社区线索并标记待验证。
 10. 生成结构化日报草稿 `.tmp/daily-report.json`。必须包含 `title`、`summary`、`main_items`、来源链接、`github_trending`、`model_releases`、`hot_blogs`、`self_check`；没有 GitHub Trending、模型发布、热门技术博客、项目、Builder 观察或社区线索时使用空数组。`main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写候选池中的 `candidate_id`。
+10a. 如原文包含能支撑已入选条目判断的官方图表或表格，才填写 `evidence_assets`；不要拉装饰图、logo、人物照、封面图或低信息量 hero 图。每个 `evidence_assets[*].source_url` 必须等于对应 `main_items`、`model_releases`、`hot_blogs` 或 `projects` 条目的 `url`，`title` 必须是短中文图名，`local_path` 必须指向可发布的 repo 内相对路径。公开页只会把图片放在匹配条目下方，居中显示图片和中文图名，不生成独立“证据图表”板块；`caption` 和 `data` 只作 JSON 审计，只有没有图片时才允许用 `data` 退化为表格。
 11. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`；该命令会同时写入 `reports-data/YYYY/MM/YYYY-MM-DD.candidates.json`。如果返回 `candidate_pool_missing`、`candidate_pool_reference_invalid` 或 `freshness_gate_failed`，修正候选池、条目回指或重复/旧内容，不要绕过门禁。
 11a. 如果 `discover:search-news`、`sources:health` 等发现命令的审计结果是独立 JSON，运行 `npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json`，把 `search_sources`、`sources_health` 等固定审计组合并进最终 `reports-data` 日报；只保留命令 stdout 不算连续运行证据。
 12. 运行 `npm run build`，生成 `docs/reports/YYYY/MM/YYYY-MM-DD.html`、`docs/data/YYYY/MM/YYYY-MM-DD.json`、`docs/data/YYYY/MM/YYYY-MM-DD.candidates.json`、`docs/feed.json` 和 `docs/index.html`。日报 HTML 必须由 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 以 `pre-rendered` 模式生成，并展示 `self_check.optimization_suggestions` 中的提示词/规则迭代建议；没有建议时明确显示本轮无新增建议。
+12a. build 后检查当日 HTML：不得出现独立 `证据图表` section 或可视 `证据图表：` 前缀；每张证据图必须位于匹配条目所在 section 下方，图片居中且下方中文图名可见。
 13. 运行 `npm run validate`。
 13a. 运行 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`，把结果作为连续运行验收证据；`phase5_complete:false` 不阻塞当天日报发布，但必须在自检/汇报中说明缺失的是天数、审计组还是 T3 事实栏目泄漏。
 14. 运行 `npm run publish:dry-run`，输出将写入文件、将暂存文件、commit message 和预期 GitHub Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。

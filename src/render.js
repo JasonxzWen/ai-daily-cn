@@ -33,6 +33,7 @@ export function renderReportHtml(report) {
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
+  const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const sourceAudit = report.source_audit && typeof report.source_audit === "object" ? report.source_audit : null;
   const sourceAuditSection = sourceAudit ? `\n    ${renderSourceAudit(sourceAudit)}\n` : "";
   const metaItems = [
@@ -48,8 +49,7 @@ export function renderReportHtml(report) {
     .join("\n        ");
   const optionalSections = [
     renderQualityStatusSection(qualityStatus),
-    renderEvidenceAssetsSection(report, evidenceAssets),
-    renderModelReleasesSection(modelReleases),
+    renderModelReleasesSection(report, modelReleases, evidenceByUrl),
     renderHotBlogsSection(hotBlogs),
     renderGithubTrendingSection(githubTrending),
     renderProjectsSection(projects),
@@ -84,7 +84,7 @@ ${defaultStyleCss}
 
     <section class="section" id="main-items">
       <h2>主体信息</h2>
-      ${mainItems.map(renderMainItem).join("\n")}
+      ${mainItems.map((item) => renderMainItem(report, item, evidenceByUrl)).join("\n")}
     </section>
 ${optionalSections ? `\n    ${optionalSections}\n` : ""}
 ${sourceAuditSection}
@@ -319,16 +319,39 @@ h3 {
   vertical-align: top;
 }
 
-.evidence-asset figure {
-  margin: 14px 0;
+.inline-evidence {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.inline-evidence figure {
+  margin: 10px 0 0;
+  text-align: center;
 }
 
 .evidence-image {
-  max-width: 100%;
+  display: block;
+  width: auto;
+  max-width: min(100%, 760px);
+  max-height: 420px;
   height: auto;
+  margin: 0 auto 6px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  object-fit: contain;
+}
+
+.inline-evidence figcaption,
+.inline-evidence-caption {
+  max-width: min(100%, 760px);
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .compact-list,
@@ -421,7 +444,7 @@ h3 {
 }
 `;
 
-function renderMainItem(item) {
+function renderMainItem(report, item, evidenceByUrl) {
   return `<article class="item">
   <h3>${escapeHtml(item.title)}</h3>
   <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
@@ -429,21 +452,22 @@ function renderMainItem(item) {
     ${item.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("\n")}
   </ul>
   <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
+  ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
 </article>`;
 }
 
-function renderModelReleasesSection(items) {
+function renderModelReleasesSection(report, items, evidenceByUrl) {
   if (items.length === 0) {
     return "";
   }
 
   return `<section class="section" id="model-releases">
       <h2>模型发布</h2>
-      ${items.map(renderModelRelease).join("\n")}
+      ${items.map((item) => renderModelRelease(report, item, evidenceByUrl)).join("\n")}
     </section>`;
 }
 
-function renderModelRelease(item) {
+function renderModelRelease(report, item, evidenceByUrl) {
   return `<article class="item">
   <h3>${escapeHtml(item.name)}</h3>
   <div class="item-meta">
@@ -454,6 +478,7 @@ function renderModelRelease(item) {
   </div>
   <p>${escapeHtml(item.summary)}</p>
   <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
+  ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
 </article>`;
 }
 
@@ -636,31 +661,63 @@ function renderQualityStatusSection(status) {
     </section>`;
 }
 
-function renderEvidenceAssetsSection(report, assets) {
-  if (!Array.isArray(assets) || assets.length === 0) {
-    return "";
+function evidenceAssetsBySourceUrl(assets) {
+  const grouped = new Map();
+  for (const asset of assets) {
+    const key = normalizeEvidenceUrl(asset?.source_url);
+    if (!key || !hasRenderableEvidence(asset)) {
+      continue;
+    }
+    grouped.set(key, [...(grouped.get(key) || []), asset]);
   }
-
-  return `<section class="section" id="evidence-assets">
-      <h2>证据图表</h2>
-      ${assets.map((asset) => renderEvidenceAsset(report, asset)).join("\n")}
-    </section>`;
+  return grouped;
 }
 
-function renderEvidenceAsset(report, asset) {
-  const source = externalLink(asset.source_url, "source");
+function evidenceForUrl(evidenceByUrl, url) {
+  if (!evidenceByUrl || typeof evidenceByUrl.get !== "function") {
+    return [];
+  }
+  return evidenceByUrl.get(normalizeEvidenceUrl(url)) || [];
+}
+
+function normalizeEvidenceUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    parsed.hash = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return String(value || "").trim().replace(/\/$/, "");
+  }
+}
+
+function hasRenderableEvidence(asset) {
+  return Boolean(asset && (asset.local_path || (Array.isArray(asset.data) && asset.data.length > 0)));
+}
+
+function renderInlineEvidenceAssets(report, assets) {
+  if (!report || !Array.isArray(assets) || assets.length === 0) {
+    return "";
+  }
+  return assets
+    .slice(0, 2)
+    .map((asset) => renderInlineEvidenceAsset(report, asset))
+    .filter(Boolean)
+    .join("\n");
+}
+
+function renderInlineEvidenceAsset(report, asset) {
   const media = asset.local_path
-    ? `<figure><img class="evidence-image" src="${escapeAttribute(relativeAssetHref(report.html_path, asset.local_path))}" alt="${escapeAttribute(asset.title)}" loading="lazy" decoding="async"><figcaption>${escapeHtml(asset.caption || "")}</figcaption></figure>`
+    ? `<figure><img class="evidence-image" src="${escapeAttribute(relativeAssetHref(report.html_path, asset.local_path))}" alt="${escapeAttribute(asset.title)}" loading="lazy" decoding="async"><figcaption>${escapeHtml(asset.title)}</figcaption></figure>`
     : "";
-  const table = renderEvidenceTable(asset.data);
-  return `<article class="item evidence-asset">
-  <h3>${escapeHtml(asset.title)}</h3>
-  <div class="item-meta"><span>${escapeHtml(asset.type)}</span><span>${escapeHtml(asset.extraction_status)}</span></div>
-  ${asset.caption ? `<p>${escapeHtml(asset.caption)}</p>` : ""}
-  ${media}
-  ${table}
-  <p class="source-line">来源：${source}</p>
-</article>`;
+  const table = asset.local_path ? "" : renderEvidenceTable(asset.data);
+  if (!media && !table) {
+    return "";
+  }
+  return `<aside class="inline-evidence">
+    ${media}
+    ${!media ? `<p class="inline-evidence-caption">${escapeHtml(asset.title)}</p>` : ""}
+    ${table}
+  </aside>`;
 }
 
 function renderEvidenceTable(rows) {

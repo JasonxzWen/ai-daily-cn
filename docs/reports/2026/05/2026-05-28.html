@@ -154,6 +154,39 @@ h3 {
   vertical-align: -0.2em;
 }
 
+.rendered-markdown .markdown-image {
+  display: block;
+  width: auto;
+  max-width: min(100%, 760px);
+  max-height: 420px;
+  margin: 10px auto 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) {
+  max-width: min(100%, 760px);
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) em {
+  color: inherit;
+  font-style: normal;
+  font-weight: inherit;
+}
+
 .report-shell {
   width: min(1280px, calc(100vw - 28px));
   margin: 0 auto;
@@ -1567,7 +1600,7 @@ summary:focus-visible {
 }
 
 
-table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-image{display:block;max-width:100%;height:auto;margin:14px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
 </head>
 <body>
   <main class="report-shell">

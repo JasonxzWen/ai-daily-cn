@@ -145,6 +145,39 @@ h3 {
   vertical-align: -0.2em;
 }
 
+.rendered-markdown .markdown-image {
+  display: block;
+  width: auto;
+  max-width: min(100%, 760px);
+  max-height: 420px;
+  margin: 10px auto 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) {
+  max-width: min(100%, 760px);
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) em {
+  color: inherit;
+  font-style: normal;
+  font-weight: inherit;
+}
+
 .report-shell {
   width: min(1280px, calc(100vw - 28px));
   margin: 0 auto;

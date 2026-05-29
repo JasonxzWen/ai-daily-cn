@@ -75,6 +75,7 @@ export function reportToInteractionInput(report) {
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
+  const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
   const sections = [
@@ -82,7 +83,7 @@ export function reportToInteractionInput(report) {
       type: "markdown",
       title: "主体信息",
       group: "main",
-      content: formatMainItems(mainItems)
+      content: formatMainItems(mainItems, { report, evidenceByUrl })
     }
   ];
 
@@ -91,7 +92,7 @@ export function reportToInteractionInput(report) {
       type: "markdown",
       title: "模型发布",
       group: "main",
-      content: formatModelReleases(modelReleases)
+      content: formatModelReleases(modelReleases, { report, evidenceByUrl })
     });
   }
   if (qualityStatus && qualityStatus.status !== "ok") {
@@ -101,14 +102,6 @@ export function reportToInteractionInput(report) {
       group: "verification",
       status: qualityStatus.status,
       content: formatQualityStatus(qualityStatus)
-    });
-  }
-  if (evidenceAssets.length > 0) {
-    sections.push({
-      type: "markdown",
-      title: "证据图表",
-      group: "main",
-      content: formatEvidenceAssets(report, evidenceAssets)
     });
   }
   if (hotBlogs.length > 0) {
@@ -330,7 +323,7 @@ function normalizePublicHtml(html) {
   return html.replaceAll('rel="noreferrer"', 'rel="noopener noreferrer"');
 }
 
-function formatMainItems(items) {
+function formatMainItems(items, context = {}) {
   if (items.length === 0) {
     return "暂无主体信息。";
   }
@@ -339,18 +332,23 @@ function formatMainItems(items) {
     .map((item, index) => {
       const bullets = item.bullets.map((bullet) => `  - ${bullet}`).join("\n");
       const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
-      return `${index + 1}. **${title}**（${item.event_date}，${item.tier}）\n${bullets}`;
+      const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+      return `${index + 1}. **${title}**（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
     })
     .join("\n\n");
 }
 
-function formatModelReleases(items) {
+function formatModelReleases(items, context = {}) {
   if (items.length === 0) {
     return "暂无模型发布。";
   }
 
   return items
-    .map((item) => `- **${item.name}**${formatHighlightTags(modelReleaseTags(item))}（${item.provider}，${item.availability}，${item.event_date}）：${item.summary} ${markdownLink(item.url, item.source)}`)
+    .map((item) => {
+      const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+      const line = `- **${item.name}**${formatHighlightTags(modelReleaseTags(item))}（${item.provider}，${item.availability}，${item.event_date}）：${item.summary} ${markdownLink(item.url, item.source)}`;
+      return `${line}${evidence ? `\n\n${evidence}` : ""}`;
+    })
     .join("\n");
 }
 
@@ -515,25 +513,63 @@ function formatQualityStatus(status) {
   ].filter(Boolean).join("\n");
 }
 
-function formatEvidenceAssets(report, assets) {
-  return assets.map((asset) => {
-    const lines = [
-      `### ${asset.title}`,
-      "",
-      `- 类型：${asset.type}`,
-      `- 提取状态：${asset.extraction_status}`,
-      `- 来源：${markdownLink(asset.source_url, "source")}`,
-      asset.caption ? `- 说明：${asset.caption}` : ""
-    ].filter(Boolean);
-    if (asset.local_path) {
-      lines.push("", markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title));
+function evidenceAssetsBySourceUrl(assets) {
+  const grouped = new Map();
+  for (const asset of assets) {
+    const key = normalizeEvidenceUrl(asset?.source_url);
+    if (!key || !hasRenderableEvidence(asset)) {
+      continue;
     }
-    const table = formatEvidenceTable(asset.data);
-    if (table) {
-      lines.push("", table);
-    }
-    return lines.join("\n");
-  }).join("\n\n");
+    grouped.set(key, [...(grouped.get(key) || []), asset]);
+  }
+  return grouped;
+}
+
+function evidenceForUrl(evidenceByUrl, url) {
+  if (!evidenceByUrl || typeof evidenceByUrl.get !== "function") {
+    return [];
+  }
+  return evidenceByUrl.get(normalizeEvidenceUrl(url)) || [];
+}
+
+function normalizeEvidenceUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    parsed.hash = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return String(value || "").trim().replace(/\/$/, "");
+  }
+}
+
+function hasRenderableEvidence(asset) {
+  return Boolean(asset && (asset.local_path || (Array.isArray(asset.data) && asset.data.length > 0)));
+}
+
+function formatInlineEvidenceAssets(report, assets) {
+  if (!report || !Array.isArray(assets) || assets.length === 0) {
+    return "";
+  }
+
+  return assets
+    .slice(0, 2)
+    .map((asset) => formatInlineEvidenceAsset(report, asset))
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function formatInlineEvidenceAsset(report, asset) {
+  if (asset.local_path) {
+    return [
+      markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title),
+      `*${asset.title}*`
+    ].join("\n\n");
+  }
+  const table = formatEvidenceTable(asset.data);
+  if (table) {
+    return [`*${asset.title}*`, table].join("\n\n");
+  }
+  return "";
 }
 
 function formatEvidenceTable(rows) {

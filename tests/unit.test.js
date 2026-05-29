@@ -707,7 +707,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
 });
 
-test("HTML and interaction input expose quality status and evidence assets", async () => {
+test("HTML and interaction input attach evidence assets to matching report items", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
   report.quality_status = {
@@ -720,7 +720,7 @@ test("HTML and interaction input expose quality status and evidence assets", asy
     {
       type: "figure",
       title: "Coding agent adoption by discipline",
-      source_url: "https://www.anthropic.com/research/coding-agents-social-sciences",
+      source_url: report.main_items[0].url,
       local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
       caption: "Official figure from Anthropic.",
       extraction_status: "source_image"
@@ -728,7 +728,7 @@ test("HTML and interaction input expose quality status and evidence assets", asy
     {
       type: "table",
       title: "Claude Opus 4.8 performance comparison",
-      source_url: "https://www.anthropic.com/news/claude-opus-4-8",
+      source_url: report.model_releases[0].url,
       caption: "Transcribed from the official launch image.",
       extraction_status: "extracted_from_image",
       data: [
@@ -746,20 +746,28 @@ test("HTML and interaction input expose quality status and evidence assets", asy
   assert(html.includes("degraded"));
   assert(html.includes("content_sources_blocked"));
   assert(html.includes("Some automated discovery sources failed"));
-  assert(html.includes('id="evidence-assets"'));
-  assert(html.includes("Coding agent adoption by discipline"));
-  assert(html.includes("Claude Opus 4.8 performance comparison"));
-  assert(html.includes("Agentic coding"));
+  assert(!html.includes('id="evidence-assets"'));
+  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="quality-status"'));
+  const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
+  assert(mainHtml.includes("Coding agent adoption by discipline"));
+  assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert(!mainHtml.includes("Claude Opus 4.8 performance comparison"));
+  assert(modelHtml.includes("Claude Opus 4.8 performance comparison"));
+  assert(modelHtml.includes("Agentic coding"));
 
   const input = reportToInteractionInput(validation.value);
   const qualitySection = input.sections.find((section) => section.title === "质量状态");
   assert(qualitySection);
   assert(qualitySection.content.includes("degraded"));
   assert(qualitySection.content.includes("content_sources_blocked"));
-  const evidenceSection = input.sections.find((section) => section.title === "证据图表");
-  assert(evidenceSection);
-  assert(evidenceSection.content.includes("Coding agent adoption by discipline"));
-  assert(evidenceSection.content.includes("Agentic coding"));
+  assert(!input.sections.some((section) => section.title === "证据图表"));
+  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  const modelSection = input.sections.find((section) => section.title === "模型发布");
+  assert(mainSection.content.includes("Coding agent adoption by discipline"));
+  assert(mainSection.content.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert(!mainSection.content.includes("Claude Opus 4.8 performance comparison"));
+  assert(modelSection.content.includes("Claude Opus 4.8 performance comparison"));
+  assert(modelSection.content.includes("Agentic coding"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {

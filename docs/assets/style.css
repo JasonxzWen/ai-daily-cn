@@ -159,16 +159,39 @@ h3 {
   vertical-align: top;
 }
 
-.evidence-asset figure {
-  margin: 14px 0;
+.inline-evidence {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.inline-evidence figure {
+  margin: 10px 0 0;
+  text-align: center;
 }
 
 .evidence-image {
-  max-width: 100%;
+  display: block;
+  width: auto;
+  max-width: min(100%, 760px);
+  max-height: 420px;
   height: auto;
+  margin: 0 auto 6px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  object-fit: contain;
+}
+
+.inline-evidence figcaption,
+.inline-evidence-caption {
+  max-width: min(100%, 760px);
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .compact-list,
