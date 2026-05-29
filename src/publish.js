@@ -190,6 +190,17 @@ export async function createPublishPlan(options = {}) {
     requirePublishableQuality(report);
   }
 
+  const blockedReports = reports.filter((report) => report.quality_status?.status === "blocked");
+  if (blockedReports.length > 0) {
+    throw new PublisherError("report_quality_blocked", "日报质量状态为 blocked，dry-run 已停止。", {
+      reports: blockedReports.map((report) => ({
+        report_date: report.report_date,
+        reasons: report.quality_status?.reasons || [],
+        public_note: report.quality_status?.public_note || ""
+      }))
+    });
+  }
+
   const dates = reports.map((report) => report.report_date).sort();
   const repoFiles = filterDocsForReportDate(
     toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
@@ -216,7 +227,8 @@ export async function createPublishPlan(options = {}) {
     reports: reports.map((report) => ({
       report_date: report.report_date,
       title: report.title,
-      canonical_url: report.canonical_url
+      canonical_url: report.canonical_url,
+      quality_status: report.quality_status?.status || "ok"
     }))
   };
 }

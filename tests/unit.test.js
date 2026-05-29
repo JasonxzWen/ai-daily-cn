@@ -152,9 +152,48 @@ test("schema 支持模型发布、hero 精选、博客新契约和项目用途�
       evidence: "GitHub Trending daily rank #3, yesterday #7."
     }
   ];
+  enriched.quality_status = {
+    status: "degraded",
+    reasons: ["content_sources_blocked"],
+    affected_sections: ["hot_blogs"],
+    public_note: "Content source coverage is degraded."
+  };
+  enriched.evidence_assets = [
+    {
+      type: "figure",
+      title: "Coding agent adoption by discipline",
+      source_url: "https://www.anthropic.com/research/coding-agents-social-sciences",
+      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
+      caption: "Figure 1 from the Anthropic research post.",
+      extraction_status: "source_image"
+    },
+    {
+      type: "table",
+      title: "Claude Opus 4.8 benchmark comparison",
+      source_url: "https://www.anthropic.com/news/claude-opus-4-8",
+      caption: "Table transcribed from the official launch image.",
+      extraction_status: "extracted_from_image",
+      data: [
+        ["Benchmark", "Opus 4.8", "Opus 4.7"],
+        ["SWE-Bench Pro", "69.2%", "64.3%"]
+      ]
+    }
+  ];
 
   const validation = validateReport(enriched);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const invalidEvidence = structuredClone(enriched);
+  invalidEvidence.evidence_assets[0].type = "chart";
+  const invalidEvidenceValidation = validateReport(invalidEvidence);
+  assert.equal(invalidEvidenceValidation.valid, false);
+  assert(invalidEvidenceValidation.errors.some((error) => error.path.includes("/evidence_assets/0/type")));
+
+  const invalidEvidencePath = structuredClone(enriched);
+  invalidEvidencePath.evidence_assets[0].local_path = "/absolute/not-allowed.png";
+  const invalidEvidencePathValidation = validateReport(invalidEvidencePath);
+  assert.equal(invalidEvidencePathValidation.valid, false);
+  assert(invalidEvidencePathValidation.errors.some((error) => error.path.includes("/evidence_assets/0/local_path")));
 
   const invalid = structuredClone(enriched);
   invalid.model_releases[0].availability = "unknown";
@@ -666,6 +705,61 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   assert(trendingSection.content.includes("==new=="));
   assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
   assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
+});
+
+test("HTML and interaction input expose quality status and evidence assets", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.quality_status = {
+    status: "degraded",
+    reasons: ["content_sources_blocked", "builder_sources_low_coverage"],
+    affected_sections: ["hot_blogs", "builder_observations"],
+    public_note: "Some automated discovery sources failed; blog and Builder coverage is incomplete."
+  };
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Coding agent adoption by discipline",
+      source_url: "https://www.anthropic.com/research/coding-agents-social-sciences",
+      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
+      caption: "Official figure from Anthropic.",
+      extraction_status: "source_image"
+    },
+    {
+      type: "table",
+      title: "Claude Opus 4.8 performance comparison",
+      source_url: "https://www.anthropic.com/news/claude-opus-4-8",
+      caption: "Transcribed from the official launch image.",
+      extraction_status: "extracted_from_image",
+      data: [
+        ["Task", "Opus 4.8", "Opus 4.7"],
+        ["Agentic coding", "69.2%", "64.3%"]
+      ]
+    }
+  ];
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const html = renderReportHtml(validation.value);
+  assert(html.includes('id="quality-status"'));
+  assert(html.includes("degraded"));
+  assert(html.includes("content_sources_blocked"));
+  assert(html.includes("Some automated discovery sources failed"));
+  assert(html.includes('id="evidence-assets"'));
+  assert(html.includes("Coding agent adoption by discipline"));
+  assert(html.includes("Claude Opus 4.8 performance comparison"));
+  assert(html.includes("Agentic coding"));
+
+  const input = reportToInteractionInput(validation.value);
+  const qualitySection = input.sections.find((section) => section.title === "质量状态");
+  assert(qualitySection);
+  assert(qualitySection.content.includes("degraded"));
+  assert(qualitySection.content.includes("content_sources_blocked"));
+  const evidenceSection = input.sections.find((section) => section.title === "证据图表");
+  assert(evidenceSection);
+  assert(evidenceSection.content.includes("Coding agent adoption by discipline"));
+  assert(evidenceSection.content.includes("Agentic coding"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -1827,12 +1921,96 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.main_items[0].candidate_id, "main-report-write");
   assert.deepEqual(result.report.model_releases, []);
   assert.deepEqual(result.report.hot_blogs, []);
+  assert.equal(result.report.quality_status.status, "ok");
   assert.equal(result.report.source_audit.github_trending.checked, true);
   assert.equal(result.report.source_audit.builder_sources.checked, true);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
   assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write derives degraded quality status for blocked content discovery", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.source_audit.content_sources.sources = [
+    {
+      name: "Content Sources",
+      url: "https://example.com/content-feed.xml",
+      status: "blocked",
+      notes: "fetch failed"
+    }
+  ];
+  draft.source_audit.content_sources.blocked_reason = "node_fetch_failed_for_registered_feeds";
+  draft.source_audit.content_sources.candidates_found = 0;
+  draft.source_audit.content_sources.included = 0;
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.reasons.includes("content_sources_blocked"));
+  assert(report.quality_status.affected_sections.includes("hot_blogs"));
+  assert.match(report.quality_status.public_note, /Content source/);
+});
+
+test("report:write keeps low-signal checked sources out of degraded status", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.source_audit.content_sources.candidates_found = 0;
+  draft.source_audit.content_sources.included = 0;
+  draft.source_audit.content_sources.sources[0].status = "no_signal";
+  draft.source_audit.content_sources.sources[0].notes = "0 recent entries parsed";
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "ok");
+  assert(report.quality_status.reasons.includes("low_signal"));
+  assert(!report.quality_status.reasons.includes("content_sources_blocked"));
+});
+
+test("report:write flags selection degradation when candidate pool has enough unused candidates", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.source_audit.content_sources.candidates_found = 3;
+  draft.source_audit.content_sources.included = 0;
+  candidatePool.sources.push({
+    id: "content-hot-blog-source",
+    name: "Content Blog Source",
+    url: "https://example.com/blog-feed.xml",
+    category: "blog",
+    status: "checked"
+  });
+  for (const index of [1, 2, 3]) {
+    candidatePool.candidates.push({
+      id: `hot-blog-unused-${index}`,
+      source_id: "content-hot-blog-source",
+      category: "hot_blog",
+      title: `Unused hot blog ${index}`,
+      url: `https://example.com/blog-${index}`,
+      source: "Content Blog Source",
+      event_date: "2026-05-16",
+      status: "excluded",
+      evidence: "fixture"
+    });
+  }
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.reasons.includes("hot_blogs_selection_degraded"));
+  assert(report.quality_status.affected_sections.includes("hot_blogs"));
 });
 
 test("report:write 缺少候选池时停止", async () => {

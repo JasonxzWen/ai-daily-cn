@@ -439,6 +439,7 @@ test("effective-interact filterable cards render linked project subcards", async
               group: "PROJECTS",
               title: "Project Alpha",
               href: "https://example.com/project-alpha",
+              titleIcon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=",
               body: "A **reusable** plugin set for ==agent workflows==. <script>alert(1)</script>",
               tags: ["daily signal"],
               points: [
@@ -468,6 +469,7 @@ test("effective-interact filterable cards render linked project subcards", async
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /project-card/);
+  assert.match(html, /<h3><img class="[^"]*\binline-site-icon\b[^"]*"/);
   assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
   assert.match(html, /card-detail-list/);
   assert.match(html, /card-detail-icon/);

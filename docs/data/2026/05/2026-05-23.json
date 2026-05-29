@@ -390,10 +390,16 @@
   "generated_at": "2026-05-22T18:39:07.361Z",
   "hero_highlights": [],
   "quality_status": {
-    "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "status": "degraded",
+    "reasons": [
+      "github_trending_blocked",
+      "builder_sources_blocked"
+    ],
+    "affected_sections": [
+      "github_trending",
+      "builder_observations"
+    ],
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete."
   },
   "github_trending": [],
   "evidence_assets": []

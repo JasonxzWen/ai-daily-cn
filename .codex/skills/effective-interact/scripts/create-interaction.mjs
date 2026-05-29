@@ -245,6 +245,9 @@ function safeLink(rawHref) {
   const href = String(rawHref ?? "").trim();
   if (!href) return "";
   if (href.startsWith("#")) return href;
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href) && !href.startsWith("//") && !/[\u0000-\u001f<>"']/u.test(href)) {
+    return href;
+  }
 
   try {
     const parsed = new URL(href);
@@ -388,9 +391,12 @@ function inlineMarkdown(text) {
   const links = [];
   const images = [];
   const withImageTokens = escaped.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (_match, label, src) => {
-    const safe = safeDataImage(src);
+    const dataImage = safeDataImage(src);
+    const safe = dataImage || safeLink(src);
+    const className = dataImage ? "inline-site-icon" : "markdown-image";
+    const loadingAttr = dataImage ? "" : ' loading="lazy"';
     const html = safe
-      ? `<img class="inline-site-icon" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}" loading="lazy" decoding="async">`
+      ? `<img class="${className}" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}"${loadingAttr} decoding="async">`
       : "";
     const token = `\u0000HTML_WORK_REPORT_IMAGE_${images.length}\u0000`;
     images.push(html);
@@ -1558,7 +1564,7 @@ async function createInteraction(input, options = {}) {
   const css = [
     fs.readFileSync(reportUiCssPath, "utf8"),
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
-    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
+    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-image{display:block;max-width:100%;height:auto;margin:14px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
   ].join("\n");
 
   const js = [

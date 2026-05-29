@@ -74,6 +74,7 @@ export function reportToInteractionInput(report) {
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
+  const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
   const sections = [
@@ -91,6 +92,23 @@ export function reportToInteractionInput(report) {
       title: "模型发布",
       group: "main",
       content: formatModelReleases(modelReleases)
+    });
+  }
+  if (qualityStatus && qualityStatus.status !== "ok") {
+    sections.push({
+      type: "markdown",
+      title: "质量状态",
+      group: "verification",
+      status: qualityStatus.status,
+      content: formatQualityStatus(qualityStatus)
+    });
+  }
+  if (evidenceAssets.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "证据图表",
+      group: "main",
+      content: formatEvidenceAssets(report, evidenceAssets)
     });
   }
   if (hotBlogs.length > 0) {
@@ -137,15 +155,6 @@ export function reportToInteractionInput(report) {
       title: signalSectionTitle(builderSection, communitySection),
       group: "signals",
       content: signalSections.join("\n\n")
-    });
-  }
-  if (qualityStatus && qualityStatus.status !== "ok") {
-    sections.push({
-      type: "markdown",
-      title: "质量状态",
-      group: "verification",
-      status: qualityStatus.status,
-      content: formatQualityStatus(qualityStatus)
     });
   }
   sections.push(
@@ -506,6 +515,41 @@ function formatQualityStatus(status) {
   ].filter(Boolean).join("\n");
 }
 
+function formatEvidenceAssets(report, assets) {
+  return assets.map((asset) => {
+    const lines = [
+      `### ${asset.title}`,
+      "",
+      `- 类型：${asset.type}`,
+      `- 提取状态：${asset.extraction_status}`,
+      `- 来源：${markdownLink(asset.source_url, "source")}`,
+      asset.caption ? `- 说明：${asset.caption}` : ""
+    ].filter(Boolean);
+    if (asset.local_path) {
+      lines.push("", markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title));
+    }
+    const table = formatEvidenceTable(asset.data);
+    if (table) {
+      lines.push("", table);
+    }
+    return lines.join("\n");
+  }).join("\n\n");
+}
+
+function formatEvidenceTable(rows) {
+  if (!Array.isArray(rows) || rows.length === 0 || !Array.isArray(rows[0])) {
+    return "";
+  }
+
+  const header = rows[0].map((cell) => escapeMarkdownTableCell(cell));
+  const body = rows.slice(1).filter(Array.isArray);
+  return [
+    `| ${header.join(" | ")} |`,
+    `| ${header.map(() => "---").join(" | ")} |`,
+    ...body.map((row) => `| ${row.map((cell) => escapeMarkdownTableCell(cell)).join(" | ")} |`)
+  ].join("\n");
+}
+
 function formatSourceAudit(audit) {
   if (!audit) {
     return "未记录信源审计。";
@@ -623,4 +667,8 @@ function escapeSvgText(value) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+function escapeMarkdownTableCell(value) {
+  return escapeMarkdownText(value).replaceAll("|", "\\|").replace(/\r?\n/g, " ");
 }
