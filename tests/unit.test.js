@@ -23,13 +23,16 @@ import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
+import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
+import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
+const trendConfigPath = path.join(rootDir, "config/trends.json");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 const siteUrl = "https://jasonxzwen.github.io/ai-daily-cn/";
 
@@ -765,6 +768,144 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(!mainSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Agentic coding"));
+});
+
+test("trend index uses controlled topics, conservative thresholds, and scoped annotations", async () => {
+  const config = await loadTrendConfig({ rootDir });
+  const reports = [
+    trendReport("2026-05-25", {
+      main: "OpenAI Codex pushed coding agent workflows toward eval harnesses.",
+      github: "example/coding-agent-memory brings memory to coding agents.",
+      project: "MCP tools for coding agent workflows.",
+      builder: "Builder note about coding agent harness practice."
+    }),
+    trendReport("2026-05-26", {
+      main: "GitHub Copilot added coding agent workflow controls.",
+      github: "example/eval-harness improves coding agent evaluation."
+    }),
+    trendReport("2026-05-27", {
+      main: "Anthropic described Claude Code as a coding agent surface.",
+      builder: "Builder thread on coding agent memory and eval loops."
+    }),
+    trendReport("2026-05-29", {
+      main: "OpenAI Codex and Claude Code made coding agent deployment more explicit.",
+      github: "example/codex-agent is a coding agent harness project.",
+      project: "A project-only coding agent mention should count but not be annotated.",
+      hotBlog: "A blog about coding agent eval harnesses."
+    })
+  ];
+
+  const trends = buildTrendIndex(reports, {
+    config,
+    reportDate: "2026-05-29",
+    generatedAt: fixedGeneratedAt
+  });
+  const validation = validateTrends(trends);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const topic = trends.topics.find((item) => item.id === "coding-agent");
+  assert.equal(topic.status, "hot");
+  assert(topic.sections.includes("projects"));
+  assert(topic.sections.includes("builder_observations"));
+  assert(topic.sections.includes("hot_blogs"));
+  assert(topic.entities.includes("OpenAI"));
+  assert(topic.entities.includes("Claude Code"));
+
+  const annotations = trends.annotations_by_date["2026-05-29"];
+  assert.equal(annotations.main_items.length, 1);
+  assert.equal(annotations.main_items[0].index, 0);
+  assert.equal(annotations.main_items[0].tags[0].topic_id, "coding-agent");
+  assert.equal(annotations.github_trending.length, 1);
+  assert.equal(annotations.github_trending[0].index, 0);
+  assert.equal(annotations.projects, undefined);
+  assert.equal(annotations.builder_observations, undefined);
+  assert(trends.candidate_topics.every((item) => item.display === false));
+});
+
+test("loadTrendConfig fails fast when the controlled vocabulary is missing or invalid", async () => {
+  const missingRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-missing-trends-"));
+  await assert.rejects(
+    () => loadTrendConfig({ rootDir: missingRoot }),
+    (error) => error instanceof PublisherError && error.code === "trend_config_missing"
+  );
+
+  const invalidRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-invalid-trends-"));
+  await fs.mkdir(path.join(invalidRoot, "config"), { recursive: true });
+  await fs.writeFile(path.join(invalidRoot, "config/trends.json"), "{}\n", "utf8");
+  await assert.rejects(
+    () => loadTrendConfig({ rootDir: invalidRoot }),
+    (error) => error instanceof PublisherError && error.code === "trend_config_invalid"
+  );
+});
+
+test("trend annotations are rendered only where they are injected", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      candidate_id: "trend-example-coding-agent",
+      name: "example/coding-agent",
+      repo: "example/coding-agent",
+      description: "Coding agent harness.",
+      url: "https://github.com/example/coding-agent",
+      event_date: report.report_date,
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 1,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #1."
+    }
+  ];
+  report.projects = [
+    {
+      name: "Project that should not get a trend tag",
+      description: "coding agent project mention",
+      url: "https://github.com/example/project",
+      event_date: report.report_date,
+      source: "GitHub",
+      signal: "trending",
+      evidence: "fixture"
+    }
+  ];
+  const trendAnnotations = {
+    main_items: [
+      {
+        index: 0,
+        tags: [
+          {
+            topic_id: "coding-agent",
+            label: "coding agent",
+            status: "hot",
+            text: "coding agent: 7d 8x/4d"
+          }
+        ]
+      }
+    ],
+    github_trending: [
+      {
+        index: 0,
+        tags: [
+          {
+            topic_id: "coding-agent",
+            label: "coding agent",
+            status: "hot",
+            text: "coding agent: 7d 8x/4d"
+          }
+        ]
+      }
+    ]
+  };
+
+  const input = reportToInteractionInput(report, { trendAnnotations });
+  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  const trendingSection = input.sections.find((section) => section.title.includes("GitHub Trending"));
+  const projectsSection = input.sections.find((section) => section.cardClass === "project-card");
+
+  assert(mainSection.content.includes("==coding agent: 7d 8x/4d=="));
+  assert(trendingSection.content.includes("==coding agent: 7d 8x/4d=="));
+  assert(!projectsSection.content.includes("==coding agent: 7d 8x/4d=="));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -1761,6 +1902,30 @@ test("statuspage discovery parses Atom incidents into candidates", async () => {
   assert.equal(collected.candidates[0].url, "https://status.claude.com/incidents/abc123");
 });
 
+test("buildSite fails fast when trend config is absent from the build root", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-missing-trends-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+
+  await assert.rejects(
+    () =>
+      buildSite({
+        rootDir: tmp,
+        inputDir,
+        outDir,
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    (error) => error instanceof PublisherError && error.code === "trend_config_missing"
+  );
+  assert.equal(await exists(path.join(outDir, "trends.json")), false);
+});
+
 test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-"));
   const inputDir = path.join(tmp, "reports-source");
@@ -1776,15 +1941,21 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
     inputDir,
     outDir,
     siteUrl,
-    generatedAt: fixedGeneratedAt
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
   });
 
   assert(result.writtenFiles.includes("reports/2026/05/2026-05-13.html"));
   assert(result.writtenFiles.includes("reports/2026/05/2026-05-13.md"));
   assert(result.writtenFiles.includes("data/2026/05/2026-05-13.json"));
+  assert(result.writtenFiles.includes("trends.json"));
   assert.equal(await exists(path.join(outDir, "index.html")), true);
   assert.equal(await exists(path.join(outDir, "feed.json")), true);
+  assert.equal(await exists(path.join(outDir, "trends.json")), true);
   assert.equal(await exists(path.join(outDir, "assets/style.css")), true);
+
+  const trends = JSON.parse(await fs.readFile(path.join(outDir, "trends.json"), "utf8"));
+  assert.equal(validateTrends(trends).valid, true);
 });
 
 test("buildSite skips unchanged files and avoids legacy shared scratch path", async () => {
@@ -1802,7 +1973,8 @@ test("buildSite skips unchanged files and avoids legacy shared scratch path", as
     inputDir,
     outDir,
     siteUrl,
-    generatedAt: fixedGeneratedAt
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
   };
   const first = await buildSite(options);
   const second = await buildSite(options);
@@ -1810,6 +1982,7 @@ test("buildSite skips unchanged files and avoids legacy shared scratch path", as
   assert(first.writtenFiles.includes("data/2026/05/2026-05-13.json"));
   assert(!second.writtenFiles.includes("data/2026/05/2026-05-13.json"));
   assert(!second.writtenFiles.includes("reports/2026/05/2026-05-13.html"));
+  assert(!second.writtenFiles.includes("trends.json"));
   assert.equal(await exists(path.join(tmp, ".tmp", "effective-interact-daily")), false);
 });
 
@@ -1839,7 +2012,8 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
     dataInputDir,
     outDir,
     siteUrl,
-    generatedAt: fixedGeneratedAt
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
   });
 
   assert(result.writtenFiles.includes("reports/2026/05/2026-05-15.html"));
@@ -1875,6 +2049,67 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert.equal(feed.reports[0].markdown_url, undefined);
 });
 
+test("buildSite writes trend index and injects scoped trend tags without mutating report data", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-trend-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const reports = [
+    structuredTrendReport(base, "2026-05-25", {
+      main: "OpenAI Codex pushed coding agent workflows toward eval harnesses.",
+      github: "example/coding-agent-memory brings memory to coding agents.",
+      project: "MCP tools for coding agent workflows.",
+      builder: "Builder note about coding agent harness practice."
+    }),
+    structuredTrendReport(base, "2026-05-26", {
+      main: "GitHub Copilot added coding agent workflow controls.",
+      github: "example/eval-harness improves coding agent evaluation."
+    }),
+    structuredTrendReport(base, "2026-05-27", {
+      main: "Anthropic described Claude Code as a coding agent surface.",
+      builder: "Builder thread on coding agent memory and eval loops."
+    }),
+    structuredTrendReport(base, "2026-05-29", {
+      main: "OpenAI Codex and Claude Code made coding agent deployment more explicit.",
+      github: "example/codex-agent is a coding agent harness project.",
+      project: "A project-only coding agent mention should count but not be annotated.",
+      hotBlog: "A blog about coding agent eval harnesses."
+    })
+  ];
+  for (const report of reports) {
+    await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  }
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert(result.writtenFiles.includes("trends.json"));
+  const trends = JSON.parse(await fs.readFile(path.join(outDir, "trends.json"), "utf8"));
+  assert.equal(validateTrends(trends).valid, true);
+  assert.equal(trends.topics.find((topic) => topic.id === "coding-agent").status, "hot");
+
+  const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-29.html"), "utf8");
+  assert(html.includes("coding agent: 7d"));
+  assert(html.includes("日报导航"));
+
+  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  assert(indexHtml.includes("近 7 日趋势"));
+  assert(indexHtml.includes("按年月周导航"));
+  assert(indexHtml.includes("coding agent"));
+
+  const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-29.json"), "utf8"));
+  assert.equal(data.annotations_by_date, undefined);
+  assert.equal(data.trends, undefined);
+});
+
 test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-legacy-json-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
@@ -1891,7 +2126,8 @@ test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build",
     dataInputDir,
     outDir,
     siteUrl,
-    generatedAt: fixedGeneratedAt
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
   });
 
   assert.deepEqual(result.reports[0].model_releases, []);
@@ -2796,6 +3032,164 @@ function auditGroupFixture(name, candidatesFound, included) {
     included,
     notes: "fixture"
   };
+}
+
+function trendReport(reportDate, options = {}) {
+  return {
+    report_date: reportDate,
+    main_items: [
+      {
+        title: options.main || "Main item",
+        summary: options.main || "",
+        bullets: [options.main || ""],
+        entities: options.mainEntities || [],
+        event_date: reportDate,
+        url: `https://example.com/main/${reportDate}`,
+        source: "Example",
+        tier: "T0"
+      }
+    ],
+    github_trending: options.github
+      ? [
+          {
+            name: options.github,
+            repo: "example/coding-agent",
+            description: options.github,
+            event_date: reportDate,
+            url: `https://github.com/example/coding-agent-${reportDate}`,
+            source: "GitHub Trending daily",
+            rank: 1,
+            trend: "new"
+          }
+        ]
+      : [],
+    projects: options.project
+      ? [
+          {
+            name: "Project",
+            description: options.project,
+            url: `https://github.com/example/project-${reportDate}`
+          }
+        ]
+      : [],
+    builder_observations: options.builder
+      ? [
+          {
+            author: "Builder",
+            content: options.builder,
+            url: `https://example.com/builder/${reportDate}`
+          }
+        ]
+      : [],
+    hot_blogs: options.hotBlog
+      ? [
+          {
+            title: "Blog",
+            publisher: "Example",
+            author: "Author",
+            event_date: reportDate,
+            topic: "agents",
+            summary: options.hotBlog,
+            url: `https://example.com/blog/${reportDate}`
+          }
+        ]
+      : [],
+    model_releases: []
+  };
+}
+
+function structuredTrendReport(base, reportDate, options = {}) {
+  const report = structuredClone(base);
+  const [year, month] = reportDate.split("-");
+  report.report_date = reportDate;
+  report.title = `AI 日报 ${reportDate}`;
+  report.summary = options.main || `Trend fixture ${reportDate}`;
+  report.canonical_url = `${siteUrl}reports/${year}/${month}/${reportDate}.html`;
+  report.html_path = `reports/${year}/${month}/${reportDate}.html`;
+  report.generated_at = fixedGeneratedAt;
+  report.source_window = {
+    date_from: reportDate,
+    date_to: reportDate,
+    fallback_window_used: false,
+    notes: "fixture"
+  };
+  report.self_check.report_date = reportDate;
+  report.main_items = [
+    {
+      title: options.main || "Main item",
+      event_date: reportDate,
+      url: `https://example.com/main/${reportDate}`,
+      source: "Example",
+      tier: "T0",
+      entities: options.mainEntities || ["OpenAI", "Codex"],
+      summary: options.main || "fixture",
+      bullets: [options.main || "fixture"]
+    }
+  ];
+  report.github_trending = options.github
+    ? [
+        {
+          candidate_id: `trend-${reportDate}`,
+          name: "example/coding-agent",
+          repo: "example/coding-agent",
+          description: options.github,
+          url: `https://github.com/example/coding-agent-${reportDate}`,
+          event_date: reportDate,
+          source: "GitHub Trending daily",
+          language: "TypeScript",
+          window: "daily",
+          rank: 1,
+          previous_rank: null,
+          rank_delta: null,
+          trend: "new",
+          evidence: "GitHub Trending daily rank #1."
+        }
+      ]
+    : [];
+  report.projects = options.project
+    ? [
+        {
+          name: "Trend Project",
+          description: options.project,
+          url: `https://github.com/example/project-${reportDate}`,
+          event_date: reportDate,
+          source: "GitHub",
+          signal: "trending",
+          evidence: "fixture"
+        }
+      ]
+    : [];
+  report.builder_observations = options.builder
+    ? [
+        {
+          author: "Builder",
+          content: options.builder,
+          url: `https://x.com/example/status/${reportDate.replaceAll("-", "")}`,
+          event_date: reportDate,
+          source: "follow-builders X feed",
+          evidence: "fixture"
+        }
+      ]
+    : [];
+  report.hot_blogs = options.hotBlog
+    ? [
+        {
+          title: "Trend Blog",
+          url: `https://example.com/blog/${reportDate}`,
+          publisher: "Example",
+          author: "Author",
+          event_date: reportDate,
+          topic: "coding agent",
+          summary: options.hotBlog
+        }
+      ]
+    : [];
+  report.model_releases = [];
+  report.community_leads = [];
+  report.self_check.main_items = report.main_items.length;
+  report.self_check.builder_observations = report.builder_observations.length;
+  delete report.candidate_pool_path;
+  return report;
 }
 
 function textResponse(text, status = 200, finalUrl = "") {

@@ -1,0 +1,1100 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-29T07:51:47.431Z",
+  "window_days": 7,
+  "source": {
+    "report_count": 16,
+    "date_from": "2026-05-23",
+    "date_to": "2026-05-29"
+  },
+  "thresholds": {
+    "watching": {
+      "min_occurrences": 2,
+      "min_active_days": 2
+    },
+    "active": {
+      "min_occurrences": 3,
+      "min_active_days": 3,
+      "min_sections_or_entities": 2
+    },
+    "hot": {
+      "min_occurrences": 5,
+      "min_active_days": 4,
+      "min_entities": 3,
+      "evidence_sections": [
+        "builder_observations",
+        "github_trending"
+      ]
+    }
+  },
+  "topics": [
+    {
+      "id": "coding-agent",
+      "label": "coding agent",
+      "status": "hot",
+      "occurrences": 29,
+      "active_days": 5,
+      "sections": [
+        "builder_observations",
+        "github_trending",
+        "hot_blogs",
+        "main_items",
+        "projects"
+      ],
+      "entities": [
+        "Anthropic",
+        "AWS",
+        "Claude Code",
+        "Codex",
+        "GitHub",
+        "GitHub Copilot",
+        "Google",
+        "Mistral",
+        "OpenAI"
+      ],
+      "dates": [
+        "2026-05-23",
+        "2026-05-25",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-29"
+      ],
+      "related_reports": [
+        "2026-05-23",
+        "2026-05-25",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-29"
+      ]
+    },
+    {
+      "id": "mcp",
+      "label": "MCP",
+      "status": "active",
+      "occurrences": 7,
+      "active_days": 3,
+      "sections": [
+        "builder_observations",
+        "main_items",
+        "projects"
+      ],
+      "entities": [
+        "Claude Code",
+        "Codex",
+        "GitHub Copilot",
+        "Google"
+      ],
+      "dates": [
+        "2026-05-23",
+        "2026-05-27",
+        "2026-05-28"
+      ],
+      "related_reports": [
+        "2026-05-23",
+        "2026-05-27",
+        "2026-05-28"
+      ]
+    },
+    {
+      "id": "enterprise-agent-governance",
+      "label": "enterprise agent governance",
+      "status": "watching",
+      "occurrences": 2,
+      "active_days": 2,
+      "sections": [
+        "hot_blogs",
+        "main_items"
+      ],
+      "entities": [
+        "GitHub Copilot"
+      ],
+      "dates": [
+        "2026-05-27",
+        "2026-05-28"
+      ],
+      "related_reports": [
+        "2026-05-27",
+        "2026-05-28"
+      ]
+    }
+  ],
+  "candidate_topics": [
+    {
+      "term": "agent",
+      "occurrences": 42,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "github",
+      "occurrences": 26,
+      "active_days": 4,
+      "display": false
+    },
+    {
+      "term": "claude",
+      "occurrences": 25,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "trending",
+      "occurrences": 23,
+      "active_days": 4,
+      "display": false
+    },
+    {
+      "term": "github trending",
+      "occurrences": 22,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "daily",
+      "occurrences": 20,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "stars",
+      "occurrences": 20,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "stars today",
+      "occurrences": 20,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "today",
+      "occurrences": 20,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "trending daily",
+      "occurrences": 20,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "code",
+      "occurrences": 18,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "coding",
+      "occurrences": 17,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "anthropic",
+      "occurrences": 15,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "agents",
+      "occurrences": 12,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "builder",
+      "occurrences": 12,
+      "active_days": 4,
+      "display": false
+    },
+    {
+      "term": "openai",
+      "occurrences": 11,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "release",
+      "occurrences": 11,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "api",
+      "occurrences": 10,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "work",
+      "occurrences": 10,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "all",
+      "occurrences": 10,
+      "active_days": 1,
+      "display": false
+    }
+  ],
+  "annotations_by_date": {
+    "2026-05-13": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-05-14": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-05-15": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "active",
+              "text": "coding agent: 7d 8x/3d",
+              "window_days": 7,
+              "occurrences": 8,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-16": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-05-17": {
+      "main_items": [
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 10x/4d",
+              "window_days": 7,
+              "occurrences": 10,
+              "active_days": 4,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-18": {
+      "main_items": [
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 14x/5d",
+              "window_days": 7,
+              "occurrences": 14,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 14x/5d",
+              "window_days": 7,
+              "occurrences": 14,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 14x/5d",
+              "window_days": 7,
+              "occurrences": 14,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-19": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 17x/6d",
+              "window_days": 7,
+              "occurrences": 17,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "active",
+              "text": "MCP: 7d 9x/3d",
+              "window_days": 7,
+              "occurrences": 9,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 17x/6d",
+              "window_days": 7,
+              "occurrences": 17,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "active",
+              "text": "MCP: 7d 9x/3d",
+              "window_days": 7,
+              "occurrences": 9,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 17x/6d",
+              "window_days": 7,
+              "occurrences": 17,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "tags": [
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "active",
+              "text": "enterprise agent governance: 7d 3x/3d",
+              "window_days": 7,
+              "occurrences": 3,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "OpenAI"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-20": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "active",
+              "text": "enterprise agent governance: 7d 5x/3d",
+              "window_days": 7,
+              "occurrences": 5,
+              "active_days": 3,
+              "entities": [
+                "Codex",
+                "Google",
+                "OpenAI"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "tags": [
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "active",
+              "text": "enterprise agent governance: 7d 5x/3d",
+              "window_days": 7,
+              "occurrences": 5,
+              "active_days": 3,
+              "entities": [
+                "Codex",
+                "Google",
+                "OpenAI"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 16x/6d",
+              "window_days": 7,
+              "occurrences": 16,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "active",
+              "text": "MCP: 7d 12x/3d",
+              "window_days": 7,
+              "occurrences": 12,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "GitHub",
+                "GitHub Copilot"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 16x/6d",
+              "window_days": 7,
+              "occurrences": 16,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "active",
+              "text": "MCP: 7d 12x/3d",
+              "window_days": 7,
+              "occurrences": 12,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "GitHub",
+                "GitHub Copilot"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-21": {
+      "main_items": [
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 15x/4d",
+              "window_days": 7,
+              "occurrences": 15,
+              "active_days": 4,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "GitHub",
+                "GitHub Copilot"
+              ]
+            },
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "hot",
+              "text": "enterprise agent governance: 7d 8x/4d",
+              "window_days": 7,
+              "occurrences": 8,
+              "active_days": 4,
+              "entities": [
+                "Anthropic",
+                "Codex",
+                "Google",
+                "OpenAI"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-22": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 27x/6d",
+              "window_days": 7,
+              "occurrences": 27,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 20x/5d",
+              "window_days": 7,
+              "occurrences": 20,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 27x/6d",
+              "window_days": 7,
+              "occurrences": 27,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 20x/5d",
+              "window_days": 7,
+              "occurrences": 20,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "hot",
+              "text": "enterprise agent governance: 7d 12x/5d",
+              "window_days": 7,
+              "occurrences": 12,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Codex",
+                "Google",
+                "OpenAI"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 27x/6d",
+              "window_days": 7,
+              "occurrences": 27,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 20x/5d",
+              "window_days": 7,
+              "occurrences": 20,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-23": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 34x/7d",
+              "window_days": 7,
+              "occurrences": 34,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 24x/6d",
+              "window_days": 7,
+              "occurrences": 24,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-25": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/6d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/6d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-26": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-05-27": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 13x/4d",
+              "window_days": 7,
+              "occurrences": 13,
+              "active_days": 4,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            },
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "active",
+              "text": "enterprise agent governance: 7d 8x/3d",
+              "window_days": 7,
+              "occurrences": 8,
+              "active_days": 3,
+              "entities": [
+                "Anthropic",
+                "GitHub Copilot",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 30x/5d",
+              "window_days": 7,
+              "occurrences": 30,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": []
+    },
+    "2026-05-28": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/5d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/5d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": [
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/5d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 32x/5d",
+              "window_days": 7,
+              "occurrences": 32,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-05-29": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 29x/5d",
+              "window_days": 7,
+              "occurrences": 29,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 29x/5d",
+              "window_days": 7,
+              "occurrences": 29,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": [
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 29x/5d",
+              "window_days": 7,
+              "occurrences": 29,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 29x/5d",
+              "window_days": 7,
+              "occurrences": 29,
+              "active_days": 5,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

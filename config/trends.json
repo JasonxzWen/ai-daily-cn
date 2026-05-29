@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "window_days": 7,
+  "candidate_window_days": 7,
+  "thresholds": {
+    "watching": {
+      "min_occurrences": 2,
+      "min_active_days": 2
+    },
+    "active": {
+      "min_occurrences": 3,
+      "min_active_days": 3,
+      "min_sections_or_entities": 2
+    },
+    "hot": {
+      "min_occurrences": 5,
+      "min_active_days": 4,
+      "min_entities": 3,
+      "evidence_sections": ["github_trending", "builder_observations"]
+    }
+  },
+  "topics": [
+    {
+      "id": "coding-agent",
+      "label": "coding agent",
+      "aliases": [
+        "coding agent",
+        "coding agents",
+        "code agent",
+        "code agents",
+        "agentic coding",
+        "ai coding agent",
+        "ai coding agents",
+        "claude code",
+        "codex",
+        "github copilot agent"
+      ]
+    },
+    {
+      "id": "mcp",
+      "label": "MCP",
+      "aliases": ["MCP", "Model Context Protocol"]
+    },
+    {
+      "id": "eval-harness",
+      "label": "eval harness",
+      "aliases": [
+        "eval harness",
+        "evaluation harness",
+        "eval loop",
+        "evaluation loop",
+        "benchmark harness"
+      ]
+    },
+    {
+      "id": "agent-memory",
+      "label": "agent memory",
+      "aliases": ["agent memory", "persistent memory", "memory for agents"]
+    },
+    {
+      "id": "enterprise-agent-governance",
+      "label": "enterprise agent governance",
+      "aliases": [
+        "enterprise agent",
+        "agent governance",
+        "agent workflow",
+        "managed agents",
+        "computer-using agents"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "id": "openai",
+      "label": "OpenAI",
+      "aliases": ["OpenAI"]
+    },
+    {
+      "id": "codex",
+      "label": "Codex",
+      "aliases": ["Codex", "OpenAI Codex"]
+    },
+    {
+      "id": "anthropic",
+      "label": "Anthropic",
+      "aliases": ["Anthropic"]
+    },
+    {
+      "id": "claude-code",
+      "label": "Claude Code",
+      "aliases": ["Claude Code"]
+    },
+    {
+      "id": "github",
+      "label": "GitHub",
+      "aliases": ["GitHub"]
+    },
+    {
+      "id": "github-copilot",
+      "label": "GitHub Copilot",
+      "aliases": ["GitHub Copilot", "Copilot"]
+    },
+    {
+      "id": "aws",
+      "label": "AWS",
+      "aliases": ["AWS", "Amazon Bedrock", "Bedrock"]
+    },
+    {
+      "id": "mistral",
+      "label": "Mistral",
+      "aliases": ["Mistral", "Mistral AI"]
+    },
+    {
+      "id": "google",
+      "label": "Google",
+      "aliases": ["Google", "Gemini"]
+    }
+  ],
+  "stopwords": [
+    "ai",
+    "agent",
+    "agents",
+    "model",
+    "models",
+    "release",
+    "update",
+    "tool",
+    "tools",
+    "workflow",
+    "workflows",
+    "github",
+    "today",
+    "daily",
+    "weekly"
+  ]
+}

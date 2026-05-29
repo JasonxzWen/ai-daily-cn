@@ -9,6 +9,7 @@ import { buildSite } from "../../src/site.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
+const trendConfigPath = path.join(rootDir, "config/trends.json");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 
 const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-e2e-"));
@@ -31,7 +32,8 @@ await buildSite({
   inputDir,
   dataInputDir,
   outDir,
-  generatedAt: fixedGeneratedAt
+  generatedAt: fixedGeneratedAt,
+  trendConfigPath
 });
 
 const server = await startStaticServer(outDir);
@@ -42,7 +44,8 @@ try {
   await page.goto(`${server.url}/index.html`);
   assert.match(await page.locator("h1").textContent(), /AI 日报/);
   assert.equal(await hasRemoteScripts(page), false);
-  assert.equal(await page.locator("a[href='reports/2026/05/2026-05-13.html']").count(), 1);
+  assert((await page.locator("a[href='reports/2026/05/2026-05-13.html']").count()) >= 1);
+  assert.match(await page.locator("body").textContent(), /按年月周导航/);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
@@ -53,6 +56,7 @@ try {
   assert.equal(await page.locator("#report-top .hero-decision-grid").count(), 0);
   assert.equal(await page.locator("nav.report-nav").count(), 0);
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
+  assert.match(await page.locator("#report-top").textContent(), /日报导航/);
   assert.match(await page.locator("body").textContent(), /主体信息/);
   assert.match(await page.locator("body").textContent(), /信源审计/);
   assert.equal(await page.locator("#report-top a[href='https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json']").count(), 1);

@@ -1,5 +1,45 @@
 # Progress
 
+## 2026-05-29 Navigation and Trend Index
+
+- Added controlled trend vocabulary in `config/trends.json`, split into `topics` and `entities`.
+- Added `schemas/trends.schema.json` and `validateTrends(...)`.
+- Added `src/trends.js` for deterministic site-index trend generation:
+  - rolling 7-day window
+  - conservative `watching` / `active` / `hot` thresholds
+  - automatic candidates retained as non-displayed `candidate_topics`
+  - annotations limited to `main_items` and `github_trending`
+- Updated `src/site.js` to generate `docs/trends.json` and inject per-date annotations into report rendering.
+- Updated homepage rendering with a Top trend overview and year/month/week navigation.
+- Added `日报导航` hero link on generated daily report pages.
+- Confirmed trend data is not written back into `reports-data/**/*.json` or `docs/data/**/*.json`.
+
+## 2026-05-29 Trend Validation
+
+- `node --test tests/unit.test.js` passed.
+- `npm run test:e2e` passed.
+- `npm run build` passed and generated `docs/trends.json`.
+- `npm run validate` passed; its build step reported `written_files: []`.
+- `node scripts\harness-validate.mjs` passed.
+- Manual artifact checks:
+  - `docs/trends.json` contains `coding-agent` as `hot`.
+  - `docs/index.html` contains `近 7 日趋势`, `按年月周导航`, and `trends.json`.
+  - `docs/reports/2026/05/2026-05-29.html` contains `日报导航` and scoped `coding agent: 7d ...` tags.
+  - `git diff -- reports-data docs/data --stat` is empty.
+
+## 2026-05-29 Trend Config Fail-Fast
+
+- Removed silent fallback from trend vocabulary loading.
+- `loadTrendConfig(...)` now throws `PublisherError` for missing, unreadable, invalid, or empty trend vocabulary.
+- Added regression coverage for missing/invalid vocabulary and for `buildSite(...)` failing when the build root has no trend config.
+- Updated temporary publish test fixtures to include `config/trends.json`, matching the real repository contract.
+- Validation:
+  - `node --test tests/unit.test.js` passed.
+  - `npm test` passed.
+  - `npm run build` passed with `written_files: []`.
+  - `npm run validate` passed.
+  - `node scripts\harness-validate.mjs` passed.
+
 ## 2026-05-29 Quality-Status Repair
 
 - Implemented top-level `quality_status` and `evidence_assets` schema support.

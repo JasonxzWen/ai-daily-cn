@@ -7,9 +7,10 @@ import { defaultStyleCss, renderIndexHtml } from "./render.js";
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
-import { validateFeed, validateReport } from "./schema.js";
+import { validateFeed, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus } from "./quality-status.js";
+import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -22,6 +23,7 @@ export async function buildSite(options = {}) {
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
   const reports = [];
+  const reportRecords = [];
   const writtenFiles = [];
 
   await fs.mkdir(outDir, { recursive: true });
@@ -31,14 +33,14 @@ export async function buildSite(options = {}) {
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
-    await writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown);
     reports.push(report);
+    reportRecords.push({ report, markdown, reportJsonPath: null });
   }
 
   for (const file of reportJsonFiles) {
     const report = await readReportJson(file);
-    await writeReportArtifacts(rootDir, outDir, report, writtenFiles, null, file);
     reports.push(report);
+    reportRecords.push({ report, markdown: null, reportJsonPath: file });
   }
 
   const existingFeed = await readExistingFeed(outDir, siteTitle, siteUrl, generatedAt);
@@ -49,14 +51,34 @@ export async function buildSite(options = {}) {
       errors: feedValidation.errors
     });
   }
+  const trendConfig = await loadTrendConfig({ rootDir, configPath: options.trendConfigPath });
+  const trendIndex = buildTrendIndex(reports, {
+    config: trendConfig,
+    reportDate: feedValidation.value.reports[0]?.report_date,
+    generatedAt: feedValidation.value.updated_at
+  });
+  const trendValidation = validateTrends(trendIndex);
+  if (!trendValidation.valid) {
+    throw new PublisherError("trends_schema_validation_failed", "生成的 trends.json 未通过 schema 校验。", {
+      errors: trendValidation.errors
+    });
+  }
+
+  for (const record of reportRecords) {
+    await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
+      trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date]
+    });
+  }
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
-  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value), writtenFiles);
+  await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
+  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value), writtenFiles);
 
   return {
     outDir,
     reports,
     feed: feedValidation.value,
+    trends: trendValidation.value,
     writtenFiles: uniqueSorted(writtenFiles)
   };
 }
@@ -103,7 +125,7 @@ export async function planGeneratedFiles(options = {}) {
   const generatedAt = options.generatedAt || defaultGeneratedAt();
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
-  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html"];
+  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json"];
   const reports = [];
 
   for (const file of markdownFiles) {
@@ -234,10 +256,11 @@ async function readExistingText(target) {
   }
 }
 
-async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null) {
+async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null, options = {}) {
   const paths = reportRelativePaths(report.report_date);
   const reportHtml = await renderReportWithEffectiveInteract(report, {
-    rootDir
+    rootDir,
+    trendAnnotations: options.trendAnnotations
   });
   await writeJsonTracked(outDir, paths.dataPath, report, writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
