@@ -509,6 +509,7 @@ test("publish resume pushes existing local commits and verifies Pages", async ()
   });
 
   assert.equal(result.pushed, true);
+  assert.equal(result.repo_updated, true);
   assert.equal(result.pushed_existing_commits, true);
   assert.equal(result.pages_verified, true);
   assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "push"]);

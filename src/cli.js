@@ -287,7 +287,7 @@ try {
       ok: publishOk,
       publish_status: {
         html_generated: true,
-        repo_updated: result.committed,
+        repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
         publish_error: result.verification_error || ""
@@ -319,7 +319,7 @@ try {
       ok: publishOk,
       publish_status: {
         html_generated: true,
-        repo_updated: result.committed,
+        repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
         publish_error: result.verification_error || ""
@@ -344,7 +344,7 @@ try {
       ok: publishOk,
       publish_status: {
         html_generated: true,
-        repo_updated: result.committed,
+        repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
         publish_error: result.verification_error || ""

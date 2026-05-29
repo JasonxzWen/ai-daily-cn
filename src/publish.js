@@ -258,6 +258,7 @@ export async function publishGeneratedArtifacts(options = {}) {
       mode: "publish",
       branch,
       remote,
+      repo_updated: false,
       committed: false,
       pushed: false,
       message: "没有发布产物变更需要提交。"
@@ -521,6 +522,7 @@ export async function resumePublishPush(options = {}) {
     mode: "publish-resume-push",
     branch,
     remote,
+    repo_updated: true,
     committed: false,
     pushed: true,
     pushed_existing_commits: true,
