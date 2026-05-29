@@ -31,7 +31,6 @@ export function renderReportHtml(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
-  const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const sourceAudit = report.source_audit && typeof report.source_audit === "object" ? report.source_audit : null;
@@ -48,7 +47,6 @@ export function renderReportHtml(report) {
     .filter(Boolean)
     .join("\n        ");
   const optionalSections = [
-    renderQualityStatusSection(qualityStatus),
     renderModelReleasesSection(report, modelReleases, evidenceByUrl),
     renderHotBlogsSection(hotBlogs),
     renderGithubTrendingSection(githubTrending),
@@ -722,26 +720,6 @@ function renderCommunityLeads(items) {
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
-}
-
-function renderQualityStatusSection(status) {
-  if (!status || status.status === "ok") {
-    return "";
-  }
-
-  const reasons = Array.isArray(status.reasons) ? status.reasons : [];
-  const affected = Array.isArray(status.affected_sections) ? status.affected_sections : [];
-  return `<section class="section" id="quality-status">
-      <h2>质量状态</h2>
-      <article class="item">
-        <div class="item-meta">
-          <span>${escapeHtml(status.status)}</span>
-          ${renderTags(reasons)}
-          ${renderTags(affected.map((section) => `section:${section}`))}
-        </div>
-        <p>${escapeHtml(status.public_note || "")}</p>
-      </article>
-    </section>`;
 }
 
 function evidenceAssetsBySourceUrl(assets) {
