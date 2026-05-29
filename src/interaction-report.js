@@ -73,7 +73,6 @@ export function reportToInteractionInput(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
-  const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const paths = reportRelativePaths(report.report_date);
@@ -93,15 +92,6 @@ export function reportToInteractionInput(report) {
       title: "模型发布",
       group: "main",
       content: formatModelReleases(modelReleases, { report, evidenceByUrl })
-    });
-  }
-  if (qualityStatus && qualityStatus.status !== "ok") {
-    sections.push({
-      type: "markdown",
-      title: "质量状态",
-      group: "verification",
-      status: qualityStatus.status,
-      content: formatQualityStatus(qualityStatus)
     });
   }
   if (hotBlogs.length > 0) {
@@ -190,7 +180,7 @@ export function reportToInteractionInput(report) {
     }),
     heroLinks: [{ label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }],
     hideNavigation: true,
-    status: qualityStatus?.status && qualityStatus.status !== "ok" ? qualityStatus.status : "complete",
+    status: "complete",
     template: "research-explainer",
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
@@ -500,17 +490,6 @@ function isStatuspageUrl(value) {
   } catch {
     return false;
   }
-}
-
-function formatQualityStatus(status) {
-  const reasons = Array.isArray(status.reasons) ? status.reasons : [];
-  const affected = Array.isArray(status.affected_sections) ? status.affected_sections : [];
-  return [
-    `- 状态：${status.status}`,
-    reasons.length > 0 ? `- 原因：${reasons.join("、")}` : "",
-    affected.length > 0 ? `- 影响板块：${affected.join("、")}` : "",
-    status.public_note ? `- 公开说明：${status.public_note}` : ""
-  ].filter(Boolean).join("\n");
 }
 
 function evidenceAssetsBySourceUrl(assets) {

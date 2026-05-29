@@ -742,12 +742,11 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
   const html = renderReportHtml(validation.value);
-  assert(html.includes('id="quality-status"'));
-  assert(html.includes("degraded"));
-  assert(html.includes("content_sources_blocked"));
-  assert(html.includes("Some automated discovery sources failed"));
+  assert(!html.includes('id="quality-status"'));
+  assert(!html.includes("质量状态"));
+  assert(!html.includes("Some automated discovery sources failed"));
   assert(!html.includes('id="evidence-assets"'));
-  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="quality-status"'));
+  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="model-releases"'));
   const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
   assert(mainHtml.includes("Coding agent adoption by discipline"));
   assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
@@ -757,9 +756,7 @@ test("HTML and interaction input attach evidence assets to matching report items
 
   const input = reportToInteractionInput(validation.value);
   const qualitySection = input.sections.find((section) => section.title === "质量状态");
-  assert(qualitySection);
-  assert(qualitySection.content.includes("degraded"));
-  assert(qualitySection.content.includes("content_sources_blocked"));
+  assert.equal(qualitySection, undefined);
   assert(!input.sections.some((section) => section.title === "证据图表"));
   const mainSection = input.sections.find((section) => section.title === "主体信息");
   const modelSection = input.sections.find((section) => section.title === "模型发布");
