@@ -46,7 +46,8 @@ export const schemas = {
   report: loadSchema("report.schema.json"),
   feed: loadSchema("feed.schema.json"),
   candidatePool: loadSchema("candidates.schema.json"),
-  sourceRegistry: loadSchema("sources.schema.json")
+  sourceRegistry: loadSchema("sources.schema.json"),
+  trends: loadSchema("trends.schema.json")
 };
 
 const ajv = createAjv();
@@ -54,6 +55,7 @@ const validateReportSchema = ajv.compile(schemas.report);
 const validateFeedSchema = ajv.compile(schemas.feed);
 const validateCandidatePoolSchema = ajv.compile(schemas.candidatePool);
 const validateSourceRegistrySchema = ajv.compile(schemas.sourceRegistry);
+const validateTrendsSchema = ajv.compile(schemas.trends);
 
 export function validateReport(report) {
   const candidate = structuredClone(report);
@@ -92,6 +94,16 @@ export function validateSourceRegistry(sourceRegistry) {
     valid,
     value: candidate,
     errors: valid ? [] : normalizeAjvErrors(validateSourceRegistrySchema.errors)
+  };
+}
+
+export function validateTrends(trends) {
+  const candidate = structuredClone(trends);
+  const valid = validateTrendsSchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateTrendsSchema.errors)
   };
 }
 

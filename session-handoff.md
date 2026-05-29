@@ -2,53 +2,56 @@
 
 ## Current Status
 
-- The AI daily quality-status repair is implemented and validated.
-- `quality_status` is now schema-backed, derived during report normalization/build, and blocks publish dry-run when `status` is `blocked`.
-- External source failures can publish as `degraded`; low-signal checked days remain `ok`; candidate-rich low-inclusion cases are flagged as selection degraded.
-- `evidence_assets` supports source-backed figures/tables, rendered in HTML/effective-interact output.
-- The 2026-05-29 report now includes two local Anthropic evidence assets and transcribed data tables for the social-science coding-agent figure and Opus 4.8 benchmark comparison.
-- Link/card titles now receive immediately loaded site icons through the renderer path.
+- AI daily navigation and trend tracking v1 is implemented.
+- Trends are generated as a derived site index at `docs/trends.json`.
+- Daily `reports-data/**/*.json` remains the authoritative report fact layer and is not mutated with trend fields.
+- Homepage now includes:
+  - a `近 7 日趋势` overview when active/hot topics exist
+  - a `按年月周导航` section
+  - the existing full historical report list
+- Daily report pages now include a `日报导航` hero link back to `index.html`.
+- Trend tags are injected only into `main_items` and `github_trending` via rendering context.
+- Trend vocabulary loading is fail-fast: missing, unreadable, invalid, or empty `config/trends.json` stops the build with `PublisherError` instead of publishing an empty trend index.
 - No commit, push, publish, or automation change has been made.
 
 ## Changed Files
 
-- `src/quality-status.js`
-- `src/report.js`
+- `config/trends.json`
+- `schemas/trends.schema.json`
+- `src/trends.js`
+- `src/schema.js`
 - `src/site.js`
-- `src/publish.js`
 - `src/render.js`
 - `src/interaction-report.js`
-- `schemas/report.schema.json`
-- `prompts/ai-daily/modules/structured-report-json.md`
-- `.codex/skills/effective-interact/scripts/create-interaction.mjs`
-- `reports-data/2026/05/2026-05-29.json`
-- `docs/**` generated report/data/assets output
 - `tests/unit.test.js`
+- `tests/e2e/site.e2e.js`
 - `tests/publish.test.js`
-- `tests/skills.test.js`
+- `docs/index.html`
+- `docs/trends.json`
+- `docs/reports/2026/05/*.html`
 - `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
 
 ## Validation Evidence
 
-- `node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js` passed.
-- `npm run validate` passed after the final implementation.
-- `planGeneratedFiles` returns:
-  - `assets/evidence/anthropic-claude-opus-4-8-benchmark-table.png`
-  - `assets/evidence/anthropic-coding-agents-social-sciences-figure-1.jpg`
-- `node scripts/harness-validate.mjs` passed.
-- Browser render check for `docs/reports/2026/05/2026-05-29.html` passed:
-  - `质量状态` and `证据图表` are present.
-  - Evidence images load at `3840x2160` and `2600x1392`.
-  - 4 inline site icons load with no unloaded icon count.
-  - Transcribed `SWE-Bench Pro` / `69.2%` and `Economics` / `38%` / `91%` data are visible.
-- `git diff --check` passed through `npm run validate`.
+- `node --test tests/unit.test.js` passed.
+- `npm test` passed.
+- `npm run test:e2e` passed.
+- `npm run build` passed and wrote `docs/trends.json`.
+- `npm run validate` passed; its build step reported `written_files: []`.
+- `node scripts\harness-validate.mjs` passed.
+- Fail-fast regression checks passed:
+  - `loadTrendConfig(...)` rejects missing or invalid controlled vocabulary.
+  - `buildSite(...)` rejects a build root without `config/trends.json`.
+- Manual artifact checks passed:
+  - `docs/trends.json` validates and contains `coding-agent` as `hot`.
+  - `docs/index.html` contains `近 7 日趋势`, `按年月周导航`, and `trends.json`.
+  - `docs/reports/2026/05/2026-05-29.html` contains `日报导航` and `coding agent: 7d ...` tags.
+  - `git diff -- reports-data docs/data --stat` produced no output.
 
-## Blockers
+## Known Limits
 
-- None recorded.
-
-## Next Action
-
-- Review the diff and decide whether to commit the quality-status, evidence-asset, and renderer changes.
+- No topic detail pages in v1.
+- Automatic candidate topics are collected in `candidate_topics` with `display: false`; they are not rendered.
+- Trend matching is deterministic and vocabulary-driven; expanding coverage requires editing `config/trends.json`.

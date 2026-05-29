@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/trends.schema.json",
+  "title": "AI Daily Trends Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "window_days",
+    "source",
+    "thresholds",
+    "topics",
+    "candidate_topics",
+    "annotations_by_date"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "window_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["report_count", "date_from", "date_to"],
+      "properties": {
+        "report_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "date_from": {
+          "type": "string",
+          "format": "date"
+        },
+        "date_to": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/topic_summary"
+      }
+    },
+    "candidate_topics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/candidate_topic"
+      }
+    },
+    "annotations_by_date": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/date_annotations"
+      }
+    }
+  },
+  "$defs": {
+    "topic_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "status",
+        "occurrences",
+        "active_days",
+        "sections",
+        "entities",
+        "dates",
+        "related_reports"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["watching", "active", "hot"]
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "active_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "related_reports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "candidate_topic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "occurrences", "active_days", "display"],
+      "properties": {
+        "term": {
+          "type": "string",
+          "minLength": 1
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "active_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "display": {
+          "const": false
+        }
+      }
+    },
+    "date_annotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_items", "github_trending"],
+      "properties": {
+        "main_items": {
+          "$ref": "#/$defs/annotation_list"
+        },
+        "github_trending": {
+          "$ref": "#/$defs/annotation_list"
+        }
+      }
+    },
+    "annotation_list": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item_annotation"
+      }
+    },
+    "item_annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "tags"],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trend_tag"
+          }
+        }
+      }
+    },
+    "trend_tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "topic_id",
+        "label",
+        "status",
+        "text",
+        "window_days",
+        "occurrences",
+        "active_days",
+        "entities"
+      ],
+      "properties": {
+        "topic_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["active", "hot"]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "window_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "active_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

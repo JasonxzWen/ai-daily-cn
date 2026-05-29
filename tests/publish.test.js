@@ -751,8 +751,11 @@ function gitBlobSha(content) {
 async function tempRepoWithFixture() {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-publish-"));
   const inputDir = path.join(tmp, "reports-source");
+  const configDir = path.join(tmp, "config");
   await fs.mkdir(path.join(tmp, "reports-data"), { recursive: true });
+  await fs.mkdir(configDir, { recursive: true });
   await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(path.join(rootDir, "config/trends.json"), path.join(configDir, "trends.json"));
   await fs.copyFile(
     path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
     path.join(inputDir, "official-release.md")
