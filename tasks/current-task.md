@@ -2,56 +2,79 @@
 
 ## Goal
 
-No active task is in progress.
+Implement the AI daily quality-status repair plan and run all required tests.
 
-For daily publishing work, start from `tasks/templates/daily-publish-task.md` and follow `tasks/daily-publish-runbook.md`.
+## Status
+
+Completed. Implementation and generated docs are updated; final `npm run validate`, harness validation, and browser render checks passed.
 
 ## Assumptions
 
-- The existing project `AGENTS.md` is authoritative.
-- Real publish requires explicit user confirmation.
-- Date-sensitive daily publishing work uses `Asia/Shanghai` unless the user says otherwise.
+- The public daily report should distinguish startup failures, external source degradation, selection degradation, and true low-signal days.
+- Startup/runtime dependency failures should block publishing before report generation.
+- External feed/network failures may still publish a report only when the report exposes a machine-readable degraded state.
+- Existing historical reports must continue to build without requiring new fields.
+
+## Scope
+
+- Add a top-level `quality_status` contract.
+- Add quality-status derivation and regression tests for source degradation, selection degradation, and low-signal days.
+- Improve report rendering for link icons/tags where needed by the repair plan.
+- Add an `evidence_assets` schema/rendering contract for source-backed figures/tables.
+- Run the repository validation suite before handoff.
 
 ## Non-goals
 
-- Do not change GitHub Pages settings or automation config unless explicitly requested.
-- Do not replace the daily report rendering path.
-- Do not force-overwrite existing project instructions.
-- Do not use `git reset --hard`, force push, or automatic stash to handle dirty state.
-
-## Worktree / Branch
-
-- Record `git status --short --branch` when a new task starts.
-- Use a dedicated branch or worktree for write tasks.
+- Do not publish, commit, push, or change GitHub Pages settings.
+- Do not rewrite historical daily report prose except where generated build output requires it.
+- Do not implement broad fully automatic chart extraction in this task.
 
 ## Allowed paths
 
-- No write paths are active until a concrete task starts.
-- For daily publish runs, copy the allowed paths from `tasks/templates/daily-publish-task.md`.
+- `schemas/**`
+- `src/**`
+- `tests/**`
+- `prompts/**`
+- `docs/**`
+- `reports-data/**`
+- `tasks/current-task.md`
+- `progress.md`
+- `session-handoff.md`
+- `package-lock.json`
+- `package.json`
 
 ## Forbidden paths
 
 - Remote repository settings and automation configuration.
 - Unrelated user changes.
-- Any path outside the active task's allowed paths.
+- Any path outside the active task's allowed paths unless required by the validation suite.
 
-## Acceptance criteria
+## Acceptance Criteria
 
-- A new task replaces this neutral state with a concrete goal, scope, validation commands, and handoff requirements.
-- `node scripts/harness-validate.mjs` passes after any harness change.
-- Daily publish tasks include dry-run evidence before real publish.
+- Missing dependencies or CLI startup failures are treated as blocked in the publish/preflight path.
+- Reports like 2026-05-29 with blocked Builder and content sources are marked `quality_status.status = "degraded"`.
+- Normal low-signal source checks are not misclassified as degraded.
+- Candidate-rich but low-inclusion scenarios are marked as selection degraded.
+- Link icons and cross-section tags are covered by unit/render tests.
+- Evidence assets can be represented in schema and rendered safely.
+- `npm run validate` passes.
 
 ## Validation commands
 
-- `node scripts/harness-validate.mjs`
-- Add task-specific commands before implementation or publish work starts.
+- `npm ci`
+- `npm test`
+- `npm run build`
+- `npm run test:e2e`
+- `npm run validate`
+- `node scripts\harness-validate.mjs`
+- Browser render check for `docs/reports/2026/05/2026-05-29.html`
 
 ## Parallel writes
 
-- Default: blocked for this task.
-- Allowed only with independent worktrees or branches, non-overlapping paths, independent validation, and one integration review point.
+- Default: blocked for this implementation task.
+- Read-only inspection and independent validation commands may run in parallel.
 
 ## Handoff requirements
 
-- Update `progress.md` and `session-handoff.md` when the next task changes repo state.
-- Record validation evidence before handoff.
+- Update `progress.md` and `session-handoff.md`.
+- Record all validation evidence and any remaining limitations.

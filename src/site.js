@@ -9,6 +9,7 @@ import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateFeed, validateReport } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
+import { deriveQualityStatus } from "./quality-status.js";
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -110,6 +111,7 @@ export async function planGeneratedFiles(options = {}) {
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.markdownPath, paths.dataPath, paths.htmlPath);
+    files.push(...evidenceAssetPaths(report));
     reports.push(report);
   }
 
@@ -117,6 +119,7 @@ export async function planGeneratedFiles(options = {}) {
     const report = await readReportJson(file);
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
+    files.push(...evidenceAssetPaths(report));
     if (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date)))) {
       files.push(paths.candidateDataPath);
     }
@@ -256,7 +259,19 @@ async function readReportJson(filePath) {
     });
   }
 
-  return validation.value;
+  const report = {
+    ...validation.value,
+    evidence_assets: Array.isArray(validation.value.evidence_assets) ? validation.value.evidence_assets : [],
+    quality_status: deriveQualityStatus(validation.value, null)
+  };
+  const finalValidation = validateReport(report);
+  if (!finalValidation.valid) {
+    throw new PublisherError("schema_validation_failed", `结构化日报 JSON 未通过 schema 校验：${filePath}`, {
+      errors: finalValidation.errors
+    });
+  }
+
+  return finalValidation.value;
 }
 
 async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {
@@ -265,6 +280,12 @@ async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {
 
 function uniqueSorted(items) {
   return [...new Set(items)].sort((a, b) => String(a).localeCompare(String(b)));
+}
+
+function evidenceAssetPaths(report) {
+  return (Array.isArray(report.evidence_assets) ? report.evidence_assets : [])
+    .map((asset) => asset?.local_path)
+    .filter(Boolean);
 }
 
 async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles) {

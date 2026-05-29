@@ -44,6 +44,8 @@ export function reportToInteractionInput(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
+  const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
   const sections = [
@@ -61,6 +63,22 @@ export function reportToInteractionInput(report) {
       title: "模型发布",
       group: "main",
       content: formatModelReleases(modelReleases)
+    });
+  }
+  if (qualityStatus && qualityStatus.status !== "ok") {
+    sections.push({
+      type: "markdown",
+      title: "质量状态",
+      group: "verification",
+      content: formatQualityStatus(qualityStatus)
+    });
+  }
+  if (evidenceAssets.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "证据图表",
+      group: "main",
+      content: formatEvidenceAssets(report, evidenceAssets)
     });
   }
   if (hotBlogs.length > 0) {
@@ -309,6 +327,7 @@ function formatProjectCards(items) {
       group: domains[0] || "PROJECTS",
       title: item.name,
       href: item.url,
+      titleIcon: siteIconForUrl(item.url),
       body: cleanProjectDescription(item.description),
       tags: projectHeatTags(item),
       points
@@ -333,6 +352,7 @@ function formatHotBlogCards(items) {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
       href: item.url,
+      titleIcon: siteIconForUrl(item.url),
       body: item.summary || "",
       showGroup: false,
       tags: item.topic ? [item.topic] : [],
@@ -413,6 +433,52 @@ function isStatuspageUrl(value) {
   }
 }
 
+function formatQualityStatus(status) {
+  const reasons = Array.isArray(status.reasons) ? status.reasons : [];
+  const affected = Array.isArray(status.affected_sections) ? status.affected_sections : [];
+  return [
+    `- 状态：${status.status}`,
+    reasons.length > 0 ? `- 原因：${reasons.join("、")}` : "",
+    affected.length > 0 ? `- 影响板块：${affected.join("、")}` : "",
+    status.public_note ? `- 公开说明：${status.public_note}` : ""
+  ].filter(Boolean).join("\n");
+}
+
+function formatEvidenceAssets(report, assets) {
+  return assets.map((asset) => {
+    const lines = [
+      `### ${asset.title}`,
+      "",
+      `- 类型：${asset.type}`,
+      `- 提取状态：${asset.extraction_status}`,
+      `- 来源：${markdownLink(asset.source_url, "source")}`,
+      asset.caption ? `- 说明：${asset.caption}` : ""
+    ].filter(Boolean);
+    if (asset.local_path) {
+      lines.push("", markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title));
+    }
+    const table = formatEvidenceTable(asset.data);
+    if (table) {
+      lines.push("", table);
+    }
+    return lines.join("\n");
+  }).join("\n\n");
+}
+
+function formatEvidenceTable(rows) {
+  if (!Array.isArray(rows) || rows.length === 0 || !Array.isArray(rows[0])) {
+    return "";
+  }
+
+  const header = rows[0].map((cell) => escapeMarkdownTableCell(cell));
+  const body = rows.slice(1).filter(Array.isArray);
+  return [
+    `| ${header.join(" | ")} |`,
+    `| ${header.map(() => "---").join(" | ")} |`,
+    ...body.map((row) => `| ${row.map((cell) => escapeMarkdownTableCell(cell)).join(" | ")} |`)
+  ].join("\n");
+}
+
 function formatSourceAudit(audit) {
   if (!audit) {
     return "未记录信源审计。";
@@ -476,6 +542,30 @@ function markdownImage(url, label) {
   return `![${escapeMarkdownText(label || "")}](${String(url)})`;
 }
 
+function siteIconForUrl(value) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase().replace(/^www\./, "");
+    const letter = hostname.replace(/[^a-z0-9]/g, "").slice(0, 1).toUpperCase() || "L";
+    const color = colorForHost(hostname);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="${color}"/><text x="16" y="21" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff">${letter}</text></svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+  } catch {
+    return "";
+  }
+}
+
+function colorForHost(hostname) {
+  let hash = 0;
+  for (const char of hostname) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 360;
+  }
+  return `hsl(${hash} 64% 38%)`;
+}
+
 function escapeMarkdownText(value) {
   return String(value).replaceAll("[", "\\[").replaceAll("]", "\\]");
+}
+
+function escapeMarkdownTableCell(value) {
+  return escapeMarkdownText(value).replaceAll("|", "\\|").replace(/\r?\n/g, " ");
 }

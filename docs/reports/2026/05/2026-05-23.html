@@ -1559,7 +1559,7 @@ summary:focus-visible {
 }
 
 
-table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-image{display:block;max-width:100%;height:auto;margin:14px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
 </head>
 <body>
   <main class="report-shell">
@@ -1633,7 +1633,22 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="rendered-markdown"><ul><li><strong>Fara1.5</strong> <mark class="text-highlight">预览开放</mark> <mark class="text-highlight">官方可用性</mark>（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 <a href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Microsoft Research</a></li></ul></div>
     <template data-rich-source data-source-fallback>- **Fara1.5** ==预览开放== ==官方可用性==（Microsoft Research，research_preview，2026-05-21）：面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。 [Microsoft Research](https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/)</template>
   </section>
-<section class="panel" id="section-html-work-report-3" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <p class="meta">验证</p>
+      <h2>质量状态</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ul><li>状态：degraded</li><li>原因：github_trending_blocked、builder_sources_blocked</li><li>影响板块：github_trending、builder_observations</li><li>公开说明：Builder source coverage is degraded; Builder observations may be incomplete.</li></ul></div>
+    <template data-rich-source data-source-fallback>- 状态：degraded
+- 原因：github_trending_blocked、builder_sources_blocked
+- 影响板块：github_trending、builder_observations
+- 公开说明：Builder source coverage is degraded; Builder observations may be incomplete.</template>
+  </section>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">正文</p>
@@ -1646,35 +1661,35 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="agent output / HTML reports / coding workflow" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woNTcgNjQlIDM4JSkiLz48dGV4dCB4PSIxNiIgeT0iMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZiI+QzwvdGV4dD48L3N2Zz4=" alt="" decoding="async"><a class="card-title-link" href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></h3>
     <div class="card-tags"><span class="chip">agent output / HTML reports / coding workflow</span></div>
     <p>Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Claude Code team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-20</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="computer use agents / browser agents / evaluation" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMTc3IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPk08L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></h3>
     <div class="card-tags"><span class="chip">computer use agents / browser agents / evaluation</span></div>
     <p>文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Microsoft Research</span></dd></div><div><dt>作者</dt><dd><span>Microsoft Research AI Frontiers team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI security operations / Opus / vulnerability remediation" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woNTcgNjQlIDM4JSkiLz48dGV4dCB4PSIxNiIgeT0iMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZiI+QzwvdGV4dD48L3N2Zz4=" alt="" decoding="async"><a class="card-title-link" href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></h3>
     <div class="card-tags"><span class="chip">AI security operations / Opus / vulnerability remediation</span></div>
     <p>Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Anthropic</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI infrastructure / agent runtime / sandboxes" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMjAwIDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPk08L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></h3>
     <div class="card-tags"><span class="chip">AI infrastructure / agent runtime / sandboxes</span></div>
     <p>Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Modal Blog</span></dd></div><div><dt>作者</dt><dd><span>Modal</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
     </div>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-5" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <p class="meta">projects</p>
@@ -1687,42 +1702,42 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
     <div class="meta">PROJECTS</div>
-    <h3><a class="card-title-link" href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMzE4IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkc8L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">anthropics/claude-plugins-official</a></h3>
 
     <p>Anthropic 管理的 Claude Code plugin 目录，包含内部插件和第三方插件入口，README 强调安装前需要信任插件来源。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
     <div class="meta">PROJECTS</div>
-    <h3><a class="card-title-link" href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMzE4IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkc8L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://github.com/colbymchenry/codegraph" rel="noopener noreferrer">colbymchenry/codegraph</a></h3>
 
     <p>面向 Claude Code、Codex、Cursor、OpenCode 等 coding agent 的本地代码知识图谱和 MCP 工具，目标是减少扫描文件、token 和工具调用。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
     <div class="meta">PROJECTS</div>
-    <h3><a class="card-title-link" href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMzE4IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkc8L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></h3>
 
     <p>把代码库、知识库或文档转成可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
     <div class="meta">PROJECTS</div>
-    <h3><a class="card-title-link" href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMzE4IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkc8L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://github.com/ChromeDevTools/chrome-devtools-mcp" rel="noopener noreferrer">ChromeDevTools/chrome-devtools-mcp</a></h3>
 
     <p>Chrome DevTools MCP server，让 coding agent 控制和检查真实 Chrome，支持性能 trace、网络请求、截图、console 调试和自动化。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
     <div class="meta">PROJECTS</div>
-    <h3><a class="card-title-link" href="https://github.com/dotnet/skills" rel="noopener noreferrer">dotnet/skills</a></h3>
+    <h3><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJoc2woMzE4IDY0JSAzOCUpIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkc8L3RleHQ+PC9zdmc+" alt="" decoding="async"><a class="card-title-link" href="https://github.com/dotnet/skills" rel="noopener noreferrer">dotnet/skills</a></h3>
 
     <p>.NET 团队维护的 Agent Skills 与 custom agents 集合，覆盖 MSBuild、NuGet、升级、诊断、测试、ASP.NET、.NET AI/RAG/MCP 等任务。</p>
 
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <p class="meta">signals</p>
@@ -1735,7 +1750,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <template data-rich-source data-source-fallback>- GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。 [来源](https://github.com/trending)
 - Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。 [来源](https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/)</template>
   </section>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
@@ -1776,7 +1791,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - [follow-builders local X cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。
 - [follow-builders local blog cache](https://github.com/zarazhangrui/follow-builders)：no_signal，本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。</template></div>
   </details>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-8" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
