@@ -188,6 +188,20 @@
       "checked_at": "2026-05-28T18:42:10.176Z",
       "notes": "discover:search-news returned fetch_failed.",
       "verification_sources": []
+    },
+    {
+      "id": "follow-builders-podcast",
+      "name": "follow-builders podcast feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-29T07:30:00.000Z",
+      "notes": "Feed accessible; found AI & I episode published 2026-05-27 and verified against Every transcript.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
+        "https://www.youtube.com/watch?v=dCmOTURRf1Y"
+      ]
     }
   ],
   "candidates": [
@@ -522,6 +536,24 @@
       "verification_status": "primary_confirmed",
       "verification_sources": [
         "https://simonwillison.net/2026/May/27/product-market-fit/"
+      ]
+    },
+    {
+      "id": "builder-dan-shipper-after-automation-podcast",
+      "source_id": "follow-builders-podcast",
+      "category": "builder_observation",
+      "title": "AI & I: We Automated Everything With AI and Tripled Our Headcount",
+      "url": "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
+      "source": "AI & I / Every",
+      "event_date": "2026-05-27",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Dan Shipper discusses Every as an agent-native organization where Claude Code, Codex and internal agents increase cross-functional output while human review and expert systems remain critical.",
+      "original_url": "https://www.youtube.com/watch?v=dCmOTURRf1Y",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
+        "https://www.youtube.com/watch?v=dCmOTURRf1Y"
       ]
     }
   ]

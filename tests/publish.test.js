@@ -41,6 +41,57 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert(plan.will_stage_files.includes("docs/feed.json"));
 });
 
+test("publish dry-run blocks reports with blocked Builder sources below minimum", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
+  report.source_audit = {
+    builder_sources: {
+      checked: true,
+      sources: [
+        {
+          name: "follow-builders X feed",
+          url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+          status: "blocked",
+          notes: "retry_failed_after_1"
+        }
+      ],
+      candidates_found: 2,
+      included: 2,
+      blocked_reason: "x_feed_failed",
+      notes: "fixture"
+    }
+  };
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      content: "Example Builder shared one X status.",
+      url: "https://x.com/example/status/2059000000000000000"
+    },
+    {
+      author: "Example Writer",
+      content: "Example Writer shared one blog post.",
+      url: "https://example.com/builder-post"
+    }
+  ];
+  const dataDir = path.join(repoRoot, "reports-data", "2026", "05");
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(path.join(dataDir, "2026-05-15.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    createPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-05-15",
+      git: fakeGit()
+    }),
+    (error) => error instanceof PublisherError && error.code === "builder_coverage_gate_failed"
+  );
+});
+
 test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () => {
   const repoRoot = await tempRepoWithFixture();
   const plan = await createPublishPlan({

@@ -6,6 +6,7 @@ import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
+import { requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles } from "./site.js";
 
 const execFileAsync = promisify(execFile);
@@ -28,6 +29,7 @@ export async function checkPublishPreflight(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
   }
+  await requirePublishableReportDate(repoRoot, options.reportDate);
 
   const statusEntries = parsePorcelain(await git.status());
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
@@ -183,6 +185,9 @@ export async function createPublishPlan(options = {}) {
     : generated.reports;
   if (reports.length === 0) {
     throw new PublisherError("no_reports", `未发现可发布的日报：${options.reportDate || "(any)"}`);
+  }
+  for (const report of reports) {
+    requirePublishableQuality(report);
   }
 
   const dates = reports.map((report) => report.report_date).sort();
@@ -341,6 +346,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
+  await requirePublishableReportDate(repoRoot, options.reportDate);
 
   const publishFiles = uniqueSorted(
     dirtyPublishFiles.length > 0
@@ -493,6 +499,7 @@ export async function resumePublishPush(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续推送。`, remote);
   }
+  await requirePublishableReportDate(repoRoot, options.reportDate);
   if (remote.localAhead <= 0) {
     return {
       mode: "publish-resume-push",
@@ -689,6 +696,24 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
     }
   }
   return existing;
+}
+
+async function requirePublishableReportDate(repoRoot, reportDate) {
+  if (!reportDate) {
+    return;
+  }
+
+  const [year, month] = reportDate.split("-");
+  const reportPath = path.join(repoRoot, "reports-data", year, month, `${reportDate}.json`);
+  try {
+    const report = JSON.parse(await fs.readFile(reportPath, "utf8"));
+    requirePublishableQuality(report);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return;
+    }
+    throw error;
+  }
 }
 
 async function plannedReportsDataFiles(repoRoot, dates) {

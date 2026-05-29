@@ -33,7 +33,36 @@ const SOURCE_ICONS = new Map([
   ["OpenAI News", OPENAI_STATUS_ICON],
   ["OpenAI News RSS", OPENAI_STATUS_ICON],
   ["OpenAI Status", OPENAI_STATUS_ICON],
-  ["GitHub Changelog", GITHUB_BLOG_ICON]
+  ["GitHub", GITHUB_BLOG_ICON],
+  ["GitHub Changelog", GITHUB_BLOG_ICON],
+  ["GitHub Trending", GITHUB_BLOG_ICON],
+  ["GitHub Trending daily", GITHUB_BLOG_ICON],
+  ["GitHub Trending weekly", GITHUB_BLOG_ICON],
+  ["AWS What's New", generatedSiteIcon("AWS", "#232f3e", "#ff9900")],
+  ["Anthropic", generatedSiteIcon("A", "#111111", "#d8c4a5")],
+  ["Anthropic Research", generatedSiteIcon("A", "#111111", "#d8c4a5")],
+  ["Mistral AI", generatedSiteIcon("M", "#ff7000", "#ffffff")],
+  ["Mistral Docs", generatedSiteIcon("M", "#ff7000", "#ffffff")],
+  ["Claude official X", generatedSiteIcon("X", "#111111", "#ffffff")],
+  ["Simon Willison Weblog", generatedSiteIcon("SW", "#2f6f9f", "#ffffff")],
+  ["AI & I / Every", generatedSiteIcon("E", "#111827", "#f7f1e8")]
+]);
+
+const DOMAIN_ICONS = new Map([
+  ["openai.com", OPENAI_STATUS_ICON],
+  ["status.openai.com", OPENAI_STATUS_ICON],
+  ["github.com", GITHUB_BLOG_ICON],
+  ["github.blog", GITHUB_BLOG_ICON],
+  ["raw.githubusercontent.com", GITHUB_BLOG_ICON],
+  ["huggingface.co", HUGGING_FACE_ICON],
+  ["aws.amazon.com", SOURCE_ICONS.get("AWS What's New")],
+  ["amazon.com", SOURCE_ICONS.get("AWS What's New")],
+  ["anthropic.com", SOURCE_ICONS.get("Anthropic")],
+  ["mistral.ai", SOURCE_ICONS.get("Mistral AI")],
+  ["x.com", SOURCE_ICONS.get("Claude official X")],
+  ["twitter.com", SOURCE_ICONS.get("Claude official X")],
+  ["simonwillison.net", SOURCE_ICONS.get("Simon Willison Weblog")],
+  ["every.to", SOURCE_ICONS.get("AI & I / Every")]
 ]);
 
 export function reportToInteractionInput(report) {
@@ -44,6 +73,7 @@ export function reportToInteractionInput(report) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const qualityStatus = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : null;
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
   const sections = [
@@ -109,6 +139,15 @@ export function reportToInteractionInput(report) {
       content: signalSections.join("\n\n")
     });
   }
+  if (qualityStatus && qualityStatus.status !== "ok") {
+    sections.push({
+      type: "markdown",
+      title: "质量状态",
+      group: "verification",
+      status: qualityStatus.status,
+      content: formatQualityStatus(qualityStatus)
+    });
+  }
   sections.push(
     {
       type: "markdown",
@@ -135,11 +174,21 @@ export function reportToInteractionInput(report) {
   return {
     title: report.title,
     summary: String(report.summary || "").trim(),
-    heroMode: "date-only",
+    heroMode: "daily-report",
     heroTitle: report.report_date,
-    hideHeroSummary: true,
+    heroEyebrow: "AI 日报",
+    heroStats: dailyHeroStats(report, {
+      mainItems,
+      modelReleases,
+      hotBlogs,
+      githubTrending,
+      projects,
+      builderObservations,
+      communityLeads
+    }),
+    heroLinks: [{ label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }],
     hideNavigation: true,
-    status: "complete",
+    status: qualityStatus?.status && qualityStatus.status !== "ok" ? qualityStatus.status : "complete",
     template: "research-explainer",
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
@@ -159,6 +208,38 @@ export function reportToInteractionInput(report) {
     sections,
     nextActions: []
   };
+}
+
+function dailyHeroStats(report, collections) {
+  const sourceWindow = report.source_window || {};
+  const openSourceCount = collections.githubTrending.length + collections.projects.length;
+  const builderCount = collections.builderObservations.length + collections.communityLeads.length;
+  return [
+    { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
+    { label: "模型", value: String(collections.modelReleases.length), detail: "发布" },
+    { label: "技术博客", value: String(collections.hotBlogs.length), detail: "深读" },
+    { label: "开源", value: String(openSourceCount), detail: "Top10 + 项目" },
+    { label: "Builder", value: String(builderCount), detail: "观察" },
+    {
+      label: "信源窗",
+      value: formatHeroDateRange(sourceWindow.date_from, sourceWindow.date_to) || formatHeroDate(report.report_date),
+      detail: sourceWindow.fallback_window_used ? "扩展" : "标准"
+    }
+  ];
+}
+
+function formatHeroDateRange(dateFrom, dateTo) {
+  const start = formatHeroDate(dateFrom);
+  const end = formatHeroDate(dateTo);
+  if (!start && !end) return "";
+  if (!start) return end;
+  if (!end || start === end) return start;
+  return `${start}..${end}`;
+}
+
+function formatHeroDate(value) {
+  const match = String(value || "").match(/^\d{4}-(\d{2})-(\d{2})$/);
+  return match ? `${match[1]}-${match[2]}` : "";
 }
 
 export async function renderReportWithEffectiveInteract(report, options = {}) {
@@ -248,9 +329,8 @@ function formatMainItems(items) {
   return items
     .map((item, index) => {
       const bullets = item.bullets.map((bullet) => `  - ${bullet}`).join("\n");
-      const icon = markdownImage(mainItemIconFor(item), item.source);
-      const title = markdownLink(item.url, mainItemTitle(item));
-      return `${index + 1}. ${icon ? `${icon} ` : ""}**${title}**（${item.event_date}，${item.tier}）\n${bullets}`;
+      const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
+      return `${index + 1}. **${title}**（${item.event_date}，${item.tier}）\n${bullets}`;
     })
     .join("\n\n");
 }
@@ -309,6 +389,7 @@ function formatProjectCards(items) {
       group: domains[0] || "PROJECTS",
       title: item.name,
       href: item.url,
+      titleIcon: siteIconForUrl(item.url, item.name),
       body: cleanProjectDescription(item.description),
       tags: projectHeatTags(item),
       points
@@ -333,6 +414,7 @@ function formatHotBlogCards(items) {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
       href: item.url,
+      titleIcon: siteIconForUrl(item.url, item.publisher || item.title),
       body: item.summary || "",
       showGroup: false,
       tags: item.topic ? [item.topic] : [],
@@ -350,7 +432,7 @@ function publisherIconFor(item) {
 }
 
 function mainItemIconFor(item) {
-  return item.source_icon || item.source_icon_data_uri || SOURCE_ICONS.get(item.source) || "";
+  return item.source_icon || item.source_icon_data_uri || sourceIconForName(item.source) || siteIconForUrl(item.url, item.source);
 }
 
 function mainItemTitle(item) {
@@ -413,6 +495,17 @@ function isStatuspageUrl(value) {
   }
 }
 
+function formatQualityStatus(status) {
+  const reasons = Array.isArray(status.reasons) ? status.reasons : [];
+  const affected = Array.isArray(status.affected_sections) ? status.affected_sections : [];
+  return [
+    `- 状态：${status.status}`,
+    reasons.length > 0 ? `- 原因：${reasons.join("、")}` : "",
+    affected.length > 0 ? `- 影响板块：${affected.join("、")}` : "",
+    status.public_note ? `- 公开说明：${status.public_note}` : ""
+  ].filter(Boolean).join("\n");
+}
+
 function formatSourceAudit(audit) {
   if (!audit) {
     return "未记录信源审计。";
@@ -465,8 +558,10 @@ function formatOptimizationSuggestion(item) {
   return `${firstLine}${item.expected_benefit ? `\n  - 为什么要改：${item.expected_benefit}` : ""}`;
 }
 
-function markdownLink(url, label) {
-  return `[${escapeMarkdownText(label || url)}](${String(url)})`;
+function markdownLink(url, label, options = {}) {
+  const icon = options.icon === false ? "" : options.icon || siteIconForUrl(url, label);
+  const iconMarkdown = icon ? `${markdownImage(icon, options.iconLabel || label)} ` : "";
+  return `${iconMarkdown}[${escapeMarkdownText(label || url)}](${String(url)})`;
 }
 
 function markdownImage(url, label) {
@@ -478,4 +573,54 @@ function markdownImage(url, label) {
 
 function escapeMarkdownText(value) {
   return String(value).replaceAll("[", "\\[").replaceAll("]", "\\]");
+}
+
+function sourceIconForName(name) {
+  return SOURCE_ICONS.get(String(name || "").trim()) || "";
+}
+
+function siteIconForUrl(url, label = "") {
+  try {
+    const parsed = new URL(String(url || ""));
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    return DOMAIN_ICONS.get(host) || generatedSiteIcon(siteInitials(label || host), siteColor(host), "#ffffff");
+  } catch {
+    return "";
+  }
+}
+
+function siteInitials(value) {
+  const text = String(value || "").trim();
+  const domain = text.includes(".") ? text.split(".").filter(Boolean).slice(0, 2).join(" ") : text;
+  const letters = domain
+    .replace(/https?:\/\//i, "")
+    .split(/[^a-z0-9]+/i)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+  return (letters || "?").slice(0, 3);
+}
+
+function siteColor(host) {
+  const colors = ["#2563eb", "#0f766e", "#7c3aed", "#be123c", "#b45309", "#374151", "#047857"];
+  const text = String(host || "");
+  let hash = 0;
+  for (const char of text) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return colors[hash % colors.length];
+}
+
+function generatedSiteIcon(label, background, foreground) {
+  const text = escapeSvgText(String(label || "?").slice(0, 3).toUpperCase());
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="${background}"/><text x="16" y="21" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${text.length > 2 ? 10 : 13}" font-weight="700" fill="${foreground}">${text}</text></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
+}
+
+function escapeSvgText(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }

@@ -46,6 +46,8 @@ test("effective-interact skill is installed with generator, validator, schema, a
 
   const schema = JSON.parse(await fsp.readFile(path.join(skillDir, "references", "interaction-input-schema.json"), "utf8"));
   assert.deepEqual(schema.required, ["title", "summary", "status", "sections"]);
+  assert(schema.properties.heroMode.enum.includes("daily-report"));
+  assert(schema.properties.heroStats);
   assert(schema.properties.sections.items.properties.type.enum.includes("diff"));
 });
 
@@ -171,6 +173,45 @@ test("effective-interact can hide hero summary and navigation while keeping repo
   assert.doesNotMatch(body, /速览/);
 });
 
+test("effective-interact section headers omit visual group label tags", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-no-section-group-label-"));
+  const inputPath = path.join(tmp, "no-section-group-label.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-05-29",
+      summary: "Section group labels should stay machine metadata only.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "Hot Blogs",
+          group: "main",
+          content: "- Verified item."
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "no-section-group-label", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const section = html.match(/<section class="panel rich-section"[^>]*id="section-hot-blogs-1"[\s\S]*?<\/section>/)?.[0] || "";
+  assert(section);
+  assert.match(section, /<h2>Hot Blogs<\/h2>/);
+  assert.doesNotMatch(section, /<p class="meta">/);
+  assert.match(section, /data-section-group="main"/);
+});
+
 test("effective-interact date-only hero renders only the visible date", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-date-only-hero-"));
   const inputPath = path.join(tmp, "date-only-hero.json");
@@ -222,6 +263,67 @@ test("effective-interact date-only hero renders only the visible date", async ()
   assert.doesNotMatch(header, /hero-decision-grid/);
   assert.doesNotMatch(header, /What changed\?/);
   assert.doesNotMatch(header, /Follow up/);
+});
+
+test("effective-interact daily report hero renders summary metrics and links", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-compact-hero-"));
+  const inputPath = path.join(tmp, "compact-hero.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-05-29",
+      summary: "今日主线：模型能力、企业可运维性和 agent 采用证据同时推进。",
+      heroMode: "daily-report",
+      heroTitle: "2026-05-29",
+      heroEyebrow: "AI 日报",
+      heroStats: [
+        { label: "主体", value: "4", detail: "重点条目" },
+        { label: "信源窗", value: "05-27..05-29", detail: "扩展" }
+      ],
+      heroLinks: [
+        {
+          label: "结构化 JSON",
+          href: "https://example.com/data.json",
+          icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmciLz4="
+        }
+      ],
+      hideNavigation: true,
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "主体信息",
+          content: "- Verified item."
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "compact-hero", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const start = html.indexOf('<header id="report-top"');
+  const end = html.indexOf("</header>", start) + "</header>".length;
+  const header = html.slice(start, end);
+  assert.match(header, /data-hero-mode="daily-report"/);
+  assert.match(header, /<div class="eyebrow">AI 日报<\/div>/);
+  assert.match(header, /<h1 class="report-title report-date-title">2026-05-29<\/h1>/);
+  assert.match(header, /今日主线：模型能力/);
+  assert.match(header, /<span>主体<\/span>/);
+  assert.match(header, /<strong>4<\/strong>/);
+  assert.match(header, /class="inline-site-icon hero-link-icon"/);
+  assert.match(header, /href="https:\/\/example\.com\/data\.json"/);
+  assert.doesNotMatch(header, /hero-decision-grid/);
+  assert.doesNotMatch(html, /<nav class="report-nav"/);
 });
 
 test("effective-interact can collapse appendix sections and next actions by default", async () => {

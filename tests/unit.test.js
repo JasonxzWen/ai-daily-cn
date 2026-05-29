@@ -426,10 +426,24 @@ test("日报可以转换为 effective-interact 输入", async () => {
 
   assert.equal(input.template, "research-explainer");
   assert.equal(input.renderMode, "pre-rendered");
-  assert.equal(input.heroMode, "date-only");
+  assert.equal(input.heroMode, "daily-report");
   assert.equal(input.heroTitle, "2026-05-15");
-  assert.equal(input.hideHeroSummary, true);
   assert.equal(input.hideNavigation, true);
+  assert.equal(input.heroEyebrow, "AI 日报");
+  assert(input.summary.includes("Google 把模型和 agent 工具放进同一条链路"));
+  assert.deepEqual(
+    input.heroStats.map((item) => [item.label, item.value, item.detail]),
+    [
+      ["主体", "2", "重点条目"],
+      ["模型", "1", "发布"],
+      ["技术博客", "1", "深读"],
+      ["开源", "2", "Top10 + 项目"],
+      ["Builder", "0", "观察"],
+      ["信源窗", "05-15", "标准"]
+    ]
+  );
+  assert(input.heroLinks.some((item) => item.label === "结构化 JSON" && item.href.endsWith("/data/2026/05/2026-05-15.json")));
+  assert(input.heroLinks.every((item) => item.icon));
   assert(!input.summary.includes("Agent harness 成为今日主线"));
   assert(!input.summary.includes("其余条目见后文"));
   assert(!input.sections.some((section) => section.title === "日报概览"));
@@ -437,7 +451,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const mainSection = input.sections.find((section) => section.title === "主体信息");
   assert(mainSection.content.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainSection.content.includes("![OpenAI News RSS](data:image/png;base64,"));
-  assert(mainSection.content.includes("**[OpenAI Status：Example Agent Platform GA]"));
+  assert(mainSection.content.includes("![OpenAI Status](data:image/png;base64,") && mainSection.content.includes("**![OpenAI Status]"));
   assert(!mainSection.content.includes("来源："));
   const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
   assert.equal(hotBlogsSection.type, "filterable-cards");
@@ -445,6 +459,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(hotBlogsSection.items.length, 1);
   assert.equal(hotBlogsSection.items[0].title, "Harness Engineering for Long Running Agents");
   assert.equal(hotBlogsSection.items[0].href, "https://example.com/blog/harness-engineering");
+  assert.match(hotBlogsSection.items[0].titleIcon, /^data:image\/svg\+xml;base64,/);
   assert(hotBlogsSection.items[0].body.includes("这篇文章把长运行 agent 的 harness"));
   assert.equal(hotBlogsSection.items[0].showGroup, false);
   assert.deepEqual(hotBlogsSection.items[0].tags, ["agent harness"]);
@@ -454,10 +469,13 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(hotBlogsSection.items[0].points.some((point) => point.label === "日期" && point.value === "2026-05-15"));
   assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
   const modelSection = input.sections.find((section) => section.title === "模型发布");
+  assert(modelSection.content.includes("![Example AI Model Card](data:image/svg+xml;base64,"));
   assert(modelSection.content.includes("==多平台可见=="));
   assert(modelSection.content.includes("==官方可用性=="));
   assert(!modelSection.content.includes("备注："));
   const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
+  assert(projectsSection.content.includes("![Example Agent Memory](data:image/png;base64,"));
+  assert.match(projectsSection.items[0].titleIcon, /^data:image\/png;base64,/);
   assert(projectsSection.content.includes("==本周 +456 stars=="));
   assert(projectsSection.content.includes("领域：coding_agent、agent_memory"));
   assert(projectsSection.content.includes("作用：给 coding agent 提供跨会话持久记忆"));
@@ -467,13 +485,15 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const trendingSection = input.sections.find((section) => section.title === "GitHub Trending · Top 10 daily");
   assert.equal(trendingSection.summary, undefined);
   assert(trendingSection.content.includes("example/agent-memory"));
-  assert(trendingSection.content.includes("1. **[example/agent-memory]"));
+  assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
+  assert(trendingSection.content.includes("1. **![example/agent-memory]"));
   assert(trendingSection.content.includes("==new=="));
   assert(!trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
+  assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
   assert.equal(sourceAuditSection.appendix, true);
   assert.equal(sourceAuditSection.collapsed, true);
   const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
@@ -642,7 +662,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   const input = reportToInteractionInput(validation.value);
   const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10 daily");
   assert(trendingSection);
-  assert(trendingSection.content.includes("3. **[hardikpandya/stop-slop]"));
+  assert(trendingSection.content.includes("3. **![hardikpandya/stop-slop]"));
   assert(trendingSection.content.includes("==new=="));
   assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
   assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
@@ -1975,6 +1995,44 @@ test("report:write 拒绝缺少原始 X status 的 Builder 观察", async () => 
   );
 });
 
+test("report:write blocks publishable drafts when blocked Builder sources stay below minimum", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.source_audit.builder_sources.sources = [
+    {
+      name: "follow-builders X feed",
+      url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      status: "blocked",
+      notes: "retry_failed_after_1"
+    }
+  ];
+  draft.source_audit.builder_sources.blocked_reason = "x_feed_failed";
+  draft.source_audit.builder_sources.candidates_found = 2;
+  draft.source_audit.builder_sources.included = 2;
+  draft.builder_observations = [
+    builderObservationFixture("builder-x-1", "https://x.com/example/status/2059000000000000000", "Example X"),
+    builderObservationFixture("builder-blog-1", "https://example.com/builder-post", "Example Blog")
+  ];
+  candidatePool.sources.push(
+    builderSourceFixture("builder-x-source", "Example X", "https://x.com/example/status/2059000000000000000"),
+    builderSourceFixture("builder-blog-source", "Example Blog", "https://example.com/builder-post")
+  );
+  candidatePool.candidates.push(
+    builderCandidateFixture("builder-x-1", "builder-x-source", "https://x.com/example/status/2059000000000000000", "Example X"),
+    builderCandidateFixture("builder-blog-1", "builder-blog-source", "https://example.com/builder-post", "Example Blog")
+  );
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "builder_coverage_gate_failed"
+  );
+});
+
 test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -2282,6 +2340,43 @@ function sourceAuditFixture() {
       included: 0,
       notes: "fixture"
     }
+  };
+}
+
+function builderObservationFixture(candidateId, url, source) {
+  return {
+    candidate_id: candidateId,
+    author: "Example Builder",
+    role: "builder",
+    content: "Example Builder shared a concrete agent workflow observation.",
+    url,
+    event_date: "2026-05-16",
+    source
+  };
+}
+
+function builderSourceFixture(id, name, url) {
+  return {
+    id,
+    name,
+    url,
+    category: "builder",
+    status: "checked"
+  };
+}
+
+function builderCandidateFixture(id, sourceId, url, source) {
+  return {
+    id,
+    source_id: sourceId,
+    category: "builder_observation",
+    title: `${source} builder observation`,
+    url,
+    source,
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "builder_observations",
+    evidence: "fixture"
   };
 }
 

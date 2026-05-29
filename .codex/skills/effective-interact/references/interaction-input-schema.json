@@ -50,12 +50,46 @@
     },
     "heroMode": {
       "type": "string",
-      "enum": ["date-only"],
-      "description": "Optional specialized hero layout. date-only renders only the heroTitle or title."
+      "enum": ["date-only", "daily-report"],
+      "description": "Optional specialized hero layout. date-only renders only the heroTitle or title; daily-report renders a compact report header with summary metrics."
     },
     "heroTitle": {
       "type": "string",
       "description": "Visible title used by specialized hero modes."
+    },
+    "heroEyebrow": {
+      "type": "string",
+      "description": "Short label shown above heroTitle in specialized hero modes."
+    },
+    "heroStats": {
+      "type": "array",
+      "description": "Compact metrics shown in specialized hero modes.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "heroLinks": {
+      "type": "array",
+      "description": "Compact hero action links.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "href"],
+        "properties": {
+          "label": { "type": "string" },
+          "href": { "type": "string" },
+          "icon": { "type": "string" },
+          "iconDataUri": { "type": "string" },
+          "icon_data_uri": { "type": "string" }
+        }
+      }
     },
     "intent": {
       "type": "object",

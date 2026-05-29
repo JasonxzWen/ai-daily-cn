@@ -52,6 +52,12 @@
           "notes": "fetch failed; retry_failed_after_1"
         },
         {
+          "name": "follow-builders podcast feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+          "status": "checked",
+          "notes": "feed generated 2026-05-28; parsed Every AI & I episode published 2026-05-27"
+        },
+        {
           "name": "Claude official X fallback",
           "url": "https://x.com/claudeai/status/2060042702150930686",
           "status": "checked",
@@ -64,11 +70,11 @@
           "notes": "one recent builder blog parsed"
         }
       ],
-      "candidates_found": 2,
-      "included": 2,
-      "blocked_reason": "node_fetch_failed_for_follow_builders",
+      "candidates_found": 3,
+      "included": 3,
+      "blocked_reason": "follow_builders_x_feed_failed_podcast_fallback_checked",
       "last_successful_feed_at": null,
-      "notes": "follow-builders feed 在 shell 中不可访问；本轮只收录带原始 URL 的 Claude official X 与 Simon Willison 原文，不用二手摘要顶替。"
+      "notes": "follow-builders X feed 仍为空并返回上游错误；podcast feed 可访问，补入 Dan Shipper / Every 原始访谈文字稿。最终 Builder 观察使用 Claude official X、Simon Willison 原文和 Every 原始访谈，共 3 条。"
     },
     "content_sources": {
       "checked": true,
@@ -530,13 +536,23 @@
       "event_date": "2026-05-27",
       "source": "Simon Willison Weblog",
       "evidence": "Original builder blog post published on 2026-05-27."
+    },
+    {
+      "candidate_id": "builder-dan-shipper-after-automation-podcast",
+      "author": "Dan Shipper",
+      "role": "Founder / operator",
+      "content": "Dan Shipper 在 Every 的 AI & I 访谈里把“自动化越多，人类工作越多”落到 agent-native 组织实践：Claude Code、Codex 和内部代理让更多人跨职能产出 PR、文章和运营流程，但真正稀缺的是专家设规则、审稿、把接近可用的输出推进到可发布。这个信号适合补足 Builder 观察，因为它来自原始访谈文字稿而不是二手摘要。",
+      "url": "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
+      "event_date": "2026-05-27",
+      "source": "AI & I / Every",
+      "evidence": "follow-builders podcast feed listed the YouTube episode; Every published the transcript on 2026-05-27."
     }
   ],
   "community_leads": [],
   "self_check": {
     "report_date": "2026-05-29",
     "main_items": 4,
-    "builder_observations": 2,
+    "builder_observations": 3,
     "builder_skill_used": [
       "github-ai-trending",
       "follow-builders",
@@ -551,12 +567,13 @@
     "fallback_sources": [
       "GitHub Trending web fallback after Node fetch failed",
       "Official Anthropic, AWS, Mistral and Hugging Face pages opened through web search",
-      "Claude official X status and Simon Willison original blog for Builder observations"
+      "Claude official X status and Simon Willison original blog for Builder observations",
+      "follow-builders podcast feed and Every transcript fallback for Builder observations"
     ],
     "primary_links": true,
     "no_banned_words": true,
     "no_unsourced_numbers": true,
-    "notes": "本地发现命令全部保留执行痕迹，但 shell 网络环境对 GitHub、RSS、GDELT、OpenAlex、arXiv 和 configured source health 都返回 fetch failed；本轮正文只使用网页检索打开的一手或原始来源。Phase 5 连续运行证据需要后续真实日报日继续产出完整 source_audit。",
+    "notes": "本地发现命令保留执行痕迹；shell 网络环境对部分源返回 fetch failed。Builder 侧重新核验 follow-builders feeds：X feed 为空并带上游错误，podcast feed 可访问，因此补入 Every / AI & I 原始访谈文字稿，使 Builder 观察达到 3 条。正文继续只使用一手或原始来源。",
     "optimization_suggestions": [
       {
         "observed_issue": "本地发现命令网络失败后，网页 fallback 候选需要人工写回",
@@ -580,5 +597,16 @@
     "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-29.html",
     "publish_error": ""
   },
-  "generated_at": "2026-05-28T18:48:09.023Z"
+  "generated_at": "2026-05-28T18:48:09.023Z",
+  "quality_status": {
+    "status": "degraded",
+    "reasons": [
+      "content_sources_blocked"
+    ],
+    "affected_sections": [
+      "hot_blogs"
+    ],
+    "public_note": "Content source coverage is degraded; some sections may be incomplete."
+  },
+  "evidence_assets": []
 }

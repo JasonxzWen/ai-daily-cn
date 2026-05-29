@@ -46,11 +46,16 @@ try {
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
-  assert.equal((await page.locator("#report-top").textContent()).trim(), "2026-05-13");
+  assert.equal(await page.locator("#report-top[data-hero-mode='daily-report']").count(), 1);
+  assert.match(await page.locator("#report-top").textContent(), /AI 日报/);
+  assert.equal(await page.locator("#report-top .hero-summary-text").count(), 1);
+  assert.match(await page.locator("#report-top .hero-stat-grid").textContent(), /主体/);
+  assert.equal(await page.locator("#report-top .hero-decision-grid").count(), 0);
+  assert.equal(await page.locator("nav.report-nav").count(), 0);
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
   assert.match(await page.locator("body").textContent(), /主体信息/);
   assert.match(await page.locator("body").textContent(), /信源审计/);
-  assert.equal(await page.locator("a[href='https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json']").count(), 1);
+  assert.equal(await page.locator("#report-top a[href='https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json']").count(), 1);
   assert.equal(await page.locator("link[rel='stylesheet']").count(), 0);
   assert.equal(await page.locator("style").count(), 1);
   assert.equal(await allExternalLinksHaveRel(page), true);

@@ -77,6 +77,15 @@
     "source_audit": {
       "$ref": "#/$defs/source_audit"
     },
+    "quality_status": {
+      "$ref": "#/$defs/quality_status",
+      "default": {
+        "status": "ok",
+        "reasons": [],
+        "affected_sections": [],
+        "public_note": "Core discovery checks completed without blocking degradation."
+      }
+    },
     "candidate_pool_path": {
       "$ref": "#/$defs/relative_path"
     },
@@ -130,6 +139,13 @@
       },
       "default": []
     },
+    "evidence_assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_asset"
+      },
+      "default": []
+    },
     "self_check": {
       "$ref": "#/$defs/self_check"
     },
@@ -149,6 +165,83 @@
     "absolute_url": {
       "type": "string",
       "format": "uri"
+    },
+    "quality_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reasons", "affected_sections", "public_note"],
+      "properties": {
+        "status": {
+          "enum": ["ok", "degraded", "blocked"]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "affected_sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "public_note": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "title", "source_url", "caption", "extraction_status"],
+      "properties": {
+        "type": {
+          "enum": ["figure", "table"]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "local_path": {
+          "$ref": "#/$defs/relative_path"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "extraction_status": {
+          "enum": ["source_image", "extracted_from_image", "manual_table", "unavailable"]
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
     },
     "main_item": {
       "type": "object",

@@ -359,20 +359,12 @@ function renderSourceLink(section, fallbackId) {
   return `<span class="source-link" data-source-link data-file-path="${escapeAttr(section.filePath || "")}" data-source-ref="${escapeAttr(fallbackId || "")}">${escapeHtml(label)}</span>`;
 }
 
-function visibleGroupLabel(section) {
-  const label = groupLabels[section.group] || section.group || "";
-  const title = String(section.title || "");
-  if (!label || title.includes(label)) return "";
-  return `<p class="meta">${escapeHtml(label)}</p>`;
-}
-
 function renderSectionHeader(section, statusText = "") {
   const summary = section.summary ? `<p class="section-summary">${escapeHtml(section.summary)}</p>` : "";
   const status = statusText || section.status || "info";
   const pill = showSectionStatus(status) ? `<span class="status-pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>` : "";
   return `<div class="section-heading split-row">
     <div>
-      ${visibleGroupLabel(section)}
       <h2>${escapeHtml(section.title)}</h2>
       ${summary}
     </div>
@@ -1130,10 +1122,12 @@ function renderCardTags(tags) {
 function renderCardTitle(item) {
   const title = escapeHtml(item.title || "Untitled");
   const href = safeLink(item.href || item.url || "");
+  const icon = safeDataImage(item.titleIcon || item.title_icon || item.icon || item.iconDataUri || item.icon_data_uri || "");
+  const iconHtml = icon ? `<img class="inline-site-icon card-title-icon" src="${escapeAttr(icon)}" alt="" loading="lazy" decoding="async">` : "";
   if (!href) {
-    return `<h3>${title}</h3>`;
+    return `<h3>${iconHtml}${title}</h3>`;
   }
-  return `<h3><a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a></h3>`;
+  return `<h3>${iconHtml}<a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a></h3>`;
 }
 
 function renderCardDetails(points) {
@@ -1390,6 +1384,21 @@ function trimLeadingConclusion(value) {
 }
 
 function renderHeroStats(input, sectionCount) {
+  const customStats = Array.isArray(input.heroStats)
+    ? input.heroStats
+      .map((item) => ({
+        label: String(item?.label || "").trim(),
+        value: String(item?.value || "").trim(),
+        detail: String(item?.detail || "").trim()
+      }))
+      .filter((item) => item.label && item.value)
+    : [];
+  if (customStats.length > 0) {
+    return `<div class="hero-stat-grid" aria-label="报告摘要指标">
+    ${customStats.map((item) => `<div class="hero-stat"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong><small>${escapeHtml(item.detail)}</small></div>`).join("\n")}
+  </div>`;
+  }
+
   const verification = input.verification || [];
   const passed = verification.filter((item) => item.status === "pass").length;
   const stats = [
@@ -1402,6 +1411,46 @@ function renderHeroStats(input, sectionCount) {
   return `<div class="hero-stat-grid" aria-label="报告摘要指标">
     ${stats.map((item) => `<div class="hero-stat"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong><small>${escapeHtml(item.detail)}</small></div>`).join("\n")}
   </div>`;
+}
+
+function renderHeroLinks(input) {
+  const links = Array.isArray(input.heroLinks) ? input.heroLinks : [];
+  return links
+    .map((item) => {
+      const href = safeLink(item?.href || "");
+      const label = String(item?.label || "").trim();
+      if (!href || !label) return "";
+      const icon = safeDataImage(item.icon || item.iconDataUri || item.icon_data_uri || "");
+      const iconHtml = icon ? `<img class="inline-site-icon hero-link-icon" src="${escapeAttr(icon)}" alt="${escapeAttr(label)}" loading="lazy" decoding="async">` : "";
+      return `${iconHtml}<a class="button hero-link" href="${escapeAttr(href)}" rel="noreferrer">${escapeHtml(label)}</a>`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+function renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge }) {
+  const heroLinks = renderHeroLinks(input);
+  const heroBrief = heroSummary || heroStats
+    ? `<div class="hero-brief hero-brief-single">
+        ${heroSummary}
+        ${heroStats}
+      </div>`
+    : "";
+  return `<header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">${escapeHtml(input.heroEyebrow || "AI 日报")}</div>
+          <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">${escapeHtml(dailyHeroStatusLabel(input.status))}</span>${compatibilityBadge}${heroLinks}</div>
+      </div>
+      ${heroBrief}
+    </header>`;
+}
+
+function dailyHeroStatusLabel(status) {
+  if (["complete", "ready", "pass"].includes(status)) return "已验证";
+  return statusLabel(status);
 }
 
 function renderHeroDecisionGrid(intent) {
@@ -1522,6 +1571,7 @@ async function createInteraction(input, options = {}) {
   const nav = showNavigation ? renderGroupedNav([...normalizedSections, ...extras]) : "";
   const heroMode = input.heroMode || "";
   const showDateOnlyHero = heroMode === "date-only";
+  const showDailyReportHero = heroMode === "daily-report";
   const heroTitle = input.heroTitle || input.title;
   const showHeroSummary = !showDateOnlyHero && input.hideHeroSummary !== true;
   const heroSummary = showHeroSummary ? renderHeroSummary(input.summary) : "";
@@ -1533,12 +1583,14 @@ async function createInteraction(input, options = {}) {
         ${heroStats}
       </div>`
     : "";
-  const heroDecisionGrid = showDateOnlyHero ? "" : renderHeroDecisionGrid(intent);
+  const heroDecisionGrid = showDateOnlyHero || showDailyReportHero ? "" : renderHeroDecisionGrid(intent);
   const compatibilityBadge = compatibility ? `<span class="status-pill status-warn" data-render-compatibility="${escapeAttr(compatibility)}">${escapeHtml(compatibility)}</span>` : "";
   const heroMarkup = showDateOnlyHero
     ? `<header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
       <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
     </header>`
+    : showDailyReportHero
+      ? renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge })
     : `<header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
       <div class="title-row">
         <div>
