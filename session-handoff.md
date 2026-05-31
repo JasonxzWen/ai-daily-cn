@@ -2,6 +2,45 @@
 
 ## Current Status
 
+- 2026-05-31 daily report generation completed locally.
+- Structured JSON, candidate JSON, feed, index, and self-contained HTML were generated for 2026-05-31.
+- `npm run validate` passed, including source validation, 116 tests, build, e2e, OpenSpec validation, and `git diff --check`.
+- Phase 5 source audit passed for 2026-05-31 through 2026-05-29.
+- Publish is blocked at dry-run by `git_fetch_unavailable`: `git fetch origin main --prune` cannot connect to `github.com:22` from this environment.
+- No real publish, push, reset, stash, force-push, or GitHub API fallback was run.
+
+## 2026-05-31 Changed Files
+
+- `reports-data/2026/05/2026-05-31.json`
+- `reports-data/2026/05/2026-05-31.candidates.json`
+- `docs/data/2026/05/2026-05-31.json`
+- `docs/data/2026/05/2026-05-31.candidates.json`
+- `docs/reports/2026/05/2026-05-31.html`
+- `docs/feed.json`
+- `docs/index.html`
+- `progress.md`
+- `session-handoff.md`
+- `tasks/current-task.md`
+
+## 2026-05-31 Validation Evidence
+
+- `npm run report:write -- .tmp/daily-report.json reports-data 2026-05-31` passed.
+- `npm run build` passed and wrote the 2026-05-31 docs artifacts.
+- `npm run validate` passed.
+- `npm run sources:phase5-audit -- --date 2026-05-31 --history-dir reports-data --days 3` passed.
+- Local HTML contains `2026-05-31`.
+
+## 2026-05-31 Blockers
+
+- Remote publish preflight cannot refresh `origin/main` because SSH access to `github.com:22` is denied.
+- `GH_TOKEN` / `GITHUB_TOKEN` is not present in the environment, and the failure is not a `.git` not-writable fallback case.
+
+## 2026-05-31 Next Action
+
+- Restore GitHub SSH connectivity or switch the remote/token setup to an allowed HTTPS/API publish path, then rerun publish dry-run and publish.
+
+## Previous Status
+
 - The AI daily quality-status repair is implemented and validated.
 - `quality_status` is now schema-backed, derived during report normalization/build, and blocks publish dry-run when `status` is `blocked`.
 - External source failures can publish as `degraded`; low-signal checked days remain `ok`; candidate-rich low-inclusion cases are flagged as selection degraded.

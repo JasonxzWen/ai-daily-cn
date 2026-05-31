@@ -2,39 +2,34 @@
 
 ## Goal
 
-Implement the AI daily quality-status repair plan and run all required tests.
+Generate the 2026-05-31 Chinese AI daily report and publish it to GitHub Pages when release gates pass.
 
 ## Status
 
-Completed. Implementation and generated docs are updated; final `npm run validate`, harness validation, and browser render checks passed.
+Report generation and validation completed. Publishing is blocked at `publish:dry-run` by `git_fetch_unavailable` because the current environment cannot connect to `github.com:22`.
 
 ## Assumptions
 
-- The public daily report should distinguish startup failures, external source degradation, selection degradation, and true low-signal days.
-- Startup/runtime dependency failures should block publishing before report generation.
-- External feed/network failures may still publish a report only when the report exposes a machine-readable degraded state.
-- Existing historical reports must continue to build without requiring new fields.
+- The active report date is `2026-05-31` in `Asia/Shanghai`.
+- The report may use web fallback sources when fixed discovery commands fail, but blocked discovery must remain visible in `source_audit`.
+- API fallback is only appropriate for local `.git` metadata/write failures with a usable token, not for this SSH fetch failure.
 
 ## Scope
 
-- Add a top-level `quality_status` contract.
-- Add quality-status derivation and regression tests for source degradation, selection degradation, and low-signal days.
-- Improve report rendering for link icons/tags where needed by the repair plan.
-- Add an `evidence_assets` schema/rendering contract for source-backed figures/tables.
-- Run the repository validation suite before handoff.
+- Generate `.tmp/source-candidates-2026-05-31.json` and `.tmp/daily-report.json`.
+- Write `reports-data/2026/05/2026-05-31.json` and candidate JSON.
+- Build `docs/` publish artifacts.
+- Run `npm run validate`, Phase 5 audit, and publish dry-run.
+- Stop before real publish when dry-run reports `publish_error`.
 
 ## Non-goals
 
-- Do not publish, commit, push, or change GitHub Pages settings.
-- Do not rewrite historical daily report prose except where generated build output requires it.
-- Do not implement broad fully automatic chart extraction in this task.
+- Do not reset, force-push, stash, or overwrite user changes.
+- Do not change remote GitHub Pages settings.
+- Do not use API fallback unless the failure is a `.git` not-writable case and credentials are available.
 
 ## Allowed paths
 
-- `schemas/**`
-- `src/**`
-- `tests/**`
-- `prompts/**`
 - `docs/**`
 - `reports-data/**`
 - `tasks/current-task.md`
@@ -51,23 +46,19 @@ Completed. Implementation and generated docs are updated; final `npm run validat
 
 ## Acceptance Criteria
 
-- Missing dependencies or CLI startup failures are treated as blocked in the publish/preflight path.
-- Reports like 2026-05-29 with blocked Builder and content sources are marked `quality_status.status = "degraded"`.
-- Normal low-signal source checks are not misclassified as degraded.
-- Candidate-rich but low-inclusion scenarios are marked as selection degraded.
-- Link icons and cross-section tags are covered by unit/render tests.
-- Evidence assets can be represented in schema and rendered safely.
+- 2026-05-31 report JSON and self-contained HTML are generated.
 - `npm run validate` passes.
+- Phase 5 audit passes or any gap is reported.
+- `publish:dry-run` result is reported.
+- If publish is blocked, report `publish_error`, cause, and remediation without destructive recovery.
 
 ## Validation commands
 
-- `npm ci`
-- `npm test`
+- `npm run report:write -- .tmp/daily-report.json reports-data 2026-05-31`
 - `npm run build`
-- `npm run test:e2e`
 - `npm run validate`
-- `node scripts\harness-validate.mjs`
-- Browser render check for `docs/reports/2026/05/2026-05-29.html`
+- `npm run sources:phase5-audit -- --date 2026-05-31 --history-dir reports-data --days 3`
+- `npm run publish:dry-run -- --date 2026-05-31`
 
 ## Parallel writes
 

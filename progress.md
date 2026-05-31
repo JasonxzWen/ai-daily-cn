@@ -1,5 +1,18 @@
 # Progress
 
+## 2026-05-31 Daily Publish Automation
+
+- Generated 2026-05-31 structured report and candidate pool:
+  - `reports-data/2026/05/2026-05-31.json`
+  - `reports-data/2026/05/2026-05-31.candidates.json`
+  - `docs/reports/2026/05/2026-05-31.html`
+  - `docs/data/2026/05/2026-05-31.json`
+  - `docs/data/2026/05/2026-05-31.candidates.json`
+- `npm run validate` passed.
+- `npm run sources:phase5-audit -- --date 2026-05-31 --history-dir reports-data --days 3` passed.
+- `npm run publish:dry-run -- --date 2026-05-31` failed with `git_fetch_unavailable` because SSH to `github.com:22` is denied in the current environment.
+- No real publish, push, reset, stash, force-push, or API fallback was run.
+
 ## 2026-05-29 Quality-Status Repair
 
 - Implemented top-level `quality_status` and `evidence_assets` schema support.

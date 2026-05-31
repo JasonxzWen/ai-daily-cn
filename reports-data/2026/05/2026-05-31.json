@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-05-31",
+  "title": "AI 日报 2026-05-31",
+  "summary": "今天的主线是 AI 从能力发布继续转向可审计落地：OpenAI 把第三方评测报告拆成 claim、harness 和有效性证据，GitHub 则把 Copilot 采用度推进到代码优先、agent 优先和多 agent cohort。开源侧，语音生成、coding agent workflow 和 AI 生成前端代码质检继续占据 GitHub Trending 前排。",
+  "hero_highlights": [
+    {
+      "title": "OpenAI 第三方评测 playbook",
+      "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+      "reason": "OpenAI 要求第三方评测说明 harness、工具、预算和有效性证据，这会直接影响模型横评、供应商准入和安全评审的报告格式。"
+    },
+    {
+      "title": "GitHub Copilot adoption cohorts",
+      "url": "https://github.blog/changelog/2026-05-29-copilot-usage-metrics-api-adds-cohorts-for-ai-adoption/",
+      "reason": "GitHub 把 Copilot 指标从活跃用户推进到使用成熟度 cohort，帮助企业识别代码补全、agent-first 和 multi-agent 工作流迁移。"
+    }
+  ],
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-31.html",
+  "html_path": "reports/2026/05/2026-05-31.html",
+  "source_window": {
+    "date_from": "2026-05-27",
+    "date_to": "2026-05-31",
+    "fallback_window_used": true,
+    "notes": "固定 discovery、search shadow 和 sources:health 命令已运行，但当前 shell 网络均返回 fetch failed；本轮使用已打开核验的一手官方页面、GitHub Changelog、Hugging Face 博客和 GitHub Trending 页面作为降级输入。主新闻限于 2026-05-29，较早材料只进入模型可用性、博客、项目或 Builder 背景。"
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GitHub Trending discovery command",
+          "url": "https://github.com/trending?since=daily",
+          "status": "blocked",
+          "notes": "discover:github-trending 返回 fetch failed；当前 shell 网络不可用。"
+        },
+        {
+          "name": "GitHub Trending Python daily web fallback",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "浏览器 fallback 读取 Python daily 榜单。"
+        },
+        {
+          "name": "GitHub Trending TypeScript daily web fallback",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "浏览器 fallback 读取 TypeScript daily 榜单。"
+        }
+      ],
+      "candidates_found": 14,
+      "included": 10,
+      "notes": "固定 discovery 命令失败后，使用 GitHub 官方 Trending 页面 fallback；报告保留 shell blocked 审计状态。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders X feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+          "status": "blocked",
+          "notes": "discover:builders 返回 fetch failed。"
+        },
+        {
+          "name": "follow-builders podcast feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+          "status": "blocked",
+          "notes": "discover:builders 返回 fetch failed。"
+        },
+        {
+          "name": "ClaudeDevs original X status",
+          "url": "https://x.com/ClaudeDevs/status/2060044853279617150",
+          "status": "checked",
+          "notes": "DeveloperIO 页面给出原始 X status URL，作为 Builder 原始社交来源。"
+        },
+        {
+          "name": "OpenAI third-party evaluations",
+          "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+          "status": "checked",
+          "notes": "OpenAI 官方评测框架提供 builder/evals 观点。"
+        },
+        {
+          "name": "OpenAI tax agents with Codex",
+          "url": "https://openai.com/index/building-self-improving-tax-agents-with-codex/",
+          "status": "checked",
+          "notes": "OpenAI 工程文章提供 Codex 驱动的垂直 agent 构建实践。"
+        }
+      ],
+      "candidates_found": 3,
+      "included": 3,
+      "notes": "follow-builders feed 不可访问；本轮补足 1 条原始 X status 与 2 条官方 builder/engineering 来源，避免用二手摘要替代事实。",
+      "blocked_reason": "follow_builders_feeds_fetch_failed_web_original_fallback_checked",
+      "last_successful_feed_at": null
+    },
+    "content_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "Registered content sources",
+          "url": "https://github.com/jasonxzwen/ai-daily-cn/tree/main/config/sources",
+          "status": "blocked",
+          "notes": "discover:content-sources 返回 fetch failed。"
+        },
+        {
+          "name": "OpenAI News",
+          "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+          "status": "checked",
+          "notes": "OpenAI 官方第三方评测 playbook。"
+        },
+        {
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-29-copilot-usage-metrics-api-adds-cohorts-for-ai-adoption/",
+          "status": "checked",
+          "notes": "GitHub 官方 Copilot usage metrics API 更新。"
+        },
+        {
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/torch-profiler",
+          "status": "checked",
+          "notes": "Hugging Face 官方博客中的 PyTorch profiler 教程。"
+        }
+      ],
+      "candidates_found": 8,
+      "included": 7,
+      "notes": "固定 content discovery 命令失败；正文仅使用已打开核验的官方页面、官方 changelog 和 Hugging Face 博客。",
+      "blocked_reason": "node_fetch_failed_for_registered_feeds_web_primary_fallback_checked",
+      "last_successful_feed_at": null
+    },
+    "search_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GDELT",
+          "url": "https://api.gdeltproject.org/",
+          "status": "blocked",
+          "notes": "fetch_failed"
+        },
+        {
+          "name": "OpenAlex",
+          "url": "https://api.openalex.org/",
+          "status": "blocked",
+          "notes": "fetch_failed"
+        },
+        {
+          "name": "arXiv",
+          "url": "https://export.arxiv.org/",
+          "status": "blocked",
+          "notes": "fetch_failed"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "discover:search-news 作为 shadow 运行；shell 网络失败时不把搜索摘要写入正文。",
+      "shadow": true,
+      "provider_runtime_ms": {},
+      "provider_cost_units": {}
+    },
+    "sources_health": {
+      "checked": true,
+      "sources": [
+        {
+          "id": "content-openai-news",
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "blocked",
+          "http_status": null,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "fetch failed"
+        },
+        {
+          "id": "content-anthropic-news",
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "blocked",
+          "http_status": null,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "fetch failed"
+        },
+        {
+          "id": "content-github-blog-changelog",
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "blocked",
+          "http_status": null,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "fetch failed in shell discovery; web fallback checked individual pages"
+        },
+        {
+          "id": "content-hugging-face-blog",
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "blocked",
+          "http_status": null,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "fetch failed in shell discovery; web fallback checked individual pages"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "sources:health 对 registry 执行后返回 fetch failed；web fallback 只作为事实核验，不改写健康检查结果。"
+    }
+  },
+  "quality_status": {
+    "status": "degraded",
+    "reasons": [
+      "shell_fetch_failed_for_registered_sources"
+    ],
+    "affected_sections": [
+      "source_audit"
+    ],
+    "public_note": "固定发现命令在本地 shell 网络中失败；本报告使用已核验的 web fallback 来源并保留 blocked 审计记录。"
+  },
+  "candidate_pool_path": "data/2026/05/2026-05-31.candidates.json",
+  "github_trending": [
+    {
+      "candidate_id": "trend-microsoft-markitdown",
+      "repo": "microsoft/markitdown",
+      "name": "microsoft/markitdown",
+      "description": "Microsoft 文件转 Markdown 工具，继续占据 Python daily 前排，适合文档摄取、RAG 预处理和评测样本清洗。",
+      "url": "https://github.com/microsoft/markitdown",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 2,
+      "rank_delta": 1,
+      "trend": "up",
+      "evidence": "GitHub Trending Python daily rank 1，页面显示 2473 stars today。"
+    },
+    {
+      "candidate_id": "trend-harry0703-moneyprinterturbo",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "name": "harry0703/MoneyPrinterTurbo",
+      "description": "大模型短视频生成流水线，覆盖脚本、素材、配音、字幕和成片生产。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": 1,
+      "rank_delta": -1,
+      "trend": "down",
+      "evidence": "GitHub Trending Python daily rank 2，页面显示 2775 stars today。"
+    },
+    {
+      "candidate_id": "trend-anthropics-claude-code",
+      "repo": "anthropics/claude-code",
+      "name": "anthropics/claude-code",
+      "description": "Anthropic 官方 Claude Code 仓库，围绕命令行、编辑器和 agent 编程工作流持续升温。",
+      "url": "https://github.com/anthropics/claude-code",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": 5,
+      "rank_delta": 2,
+      "trend": "up",
+      "evidence": "GitHub Trending Python daily rank 3，页面显示 595 stars today。"
+    },
+    {
+      "candidate_id": "trend-openbmb-voxcpm",
+      "repo": "OpenBMB/VoxCPM",
+      "name": "OpenBMB/VoxCPM",
+      "description": "OpenBMB 的端到端 TTS 模型仓库，关注语音生成和可复现推理链路。",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending Python daily rank 4，页面显示 1815 stars today。"
+    },
+    {
+      "candidate_id": "trend-openmoss-moss-tts",
+      "repo": "OpenMOSS/MOSS-TTS",
+      "name": "OpenMOSS/MOSS-TTS",
+      "description": "OpenMOSS 的语音与声音生成模型族，进入 Python daily 前排。",
+      "url": "https://github.com/OpenMOSS/MOSS-TTS",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending Python daily rank 6，页面显示 355 stars today。"
+    },
+    {
+      "candidate_id": "trend-anthropics-skills",
+      "repo": "anthropics/skills",
+      "name": "anthropics/skills",
+      "description": "Anthropic Agent Skills 示例与规范仓库，反映 coding agent 生态对可复用能力包的关注。",
+      "url": "https://github.com/anthropics/skills",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending Python daily rank 8，页面显示 945 stars today。"
+    },
+    {
+      "candidate_id": "trend-nvlabs-eagle",
+      "repo": "NVlabs/Eagle",
+      "name": "NVlabs/Eagle",
+      "description": "NVIDIA Labs 的视觉语言模型研究仓库，强调数据中心化策略和前沿 VLM。",
+      "url": "https://github.com/NVlabs/Eagle",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "language": "Python",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending Python daily rank 9，页面显示 250 stars today。"
+    },
+    {
+      "candidate_id": "trend-everyinc-compound-engineering-plugin",
+      "repo": "EveryInc/compound-engineering-plugin",
+      "name": "EveryInc/compound-engineering-plugin",
+      "description": "Every 的 Compound Engineering 插件仓库，面向 AI 辅助工程评审和流程约束。",
+      "url": "https://github.com/EveryInc/compound-engineering-plugin",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending TypeScript daily",
+      "language": "TypeScript",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 3,
+      "rank_delta": 2,
+      "trend": "up",
+      "evidence": "GitHub Trending TypeScript daily rank 1。"
+    },
+    {
+      "candidate_id": "trend-iofficeai-aionui",
+      "repo": "iOfficeAI/AionUi",
+      "name": "iOfficeAI/AionUi",
+      "description": "本地 cowork 应用，面向 Claude Code、Codex、Gemini CLI 等多 agent 开发环境。",
+      "url": "https://github.com/iOfficeAI/AionUi",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending TypeScript daily",
+      "language": "TypeScript",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending TypeScript daily rank 9。"
+    },
+    {
+      "candidate_id": "trend-millionco-react-doctor",
+      "repo": "millionco/react-doctor",
+      "name": "millionco/react-doctor",
+      "description": "面向 AI 生成 React 代码的检测工具，目标是捕捉组件和前端代码中的质量问题。",
+      "url": "https://github.com/millionco/react-doctor",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending TypeScript daily",
+      "language": "TypeScript",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "GitHub Trending TypeScript daily rank 10。"
+    }
+  ],
+  "main_items": [
+    {
+      "candidate_id": "main-openai-third-party-eval-playbook",
+      "title": "OpenAI 发布第三方评测 playbook，要求把 harness 与有效性证据讲清楚",
+      "event_date": "2026-05-29",
+      "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+      "source": "OpenAI",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "third-party evaluations",
+        "Codex",
+        "frontier model safeguards"
+      ],
+      "summary": "OpenAI 发布面向前沿模型第三方评测的实践框架，核心不是给出单一榜单，而是要求评测报告明确 claim、harness、工具、预算、模型设置和有效性证据。文章特别强调 agentic 系统的表现会被调用框架显著影响，因此第三方评测不能只公布结果分数。",
+      "bullets": [
+        "文章把第三方评测定位为前沿模型安全与能力判断的一部分，尤其适用于 safeguards、capabilities 和 agentic system 的外部检验。",
+        "OpenAI 提出评测报告应记录模型、工具、harness、预算和 validity checks，避免把一次运行结果包装成过宽的能力结论。",
+        "对工程团队的直接影响是：以后做模型横评或供应商准入时，报告模板需要暴露执行环境和 elicitation 方式，不能只存最终分数。"
+      ]
+    },
+    {
+      "candidate_id": "main-github-copilot-usage-cohorts",
+      "title": "GitHub Copilot usage metrics API 增加 adoption cohorts",
+      "event_date": "2026-05-29",
+      "url": "https://github.blog/changelog/2026-05-29-copilot-usage-metrics-api-adds-cohorts-for-ai-adoption/",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub",
+        "Copilot",
+        "usage metrics API",
+        "AI adoption"
+      ],
+      "summary": "GitHub 在 Copilot usage metrics API 中加入 adoption cohorts，让企业管理员可以按代码优先、agent 优先、多 agent 等使用成熟度观察组织采用进展，而不是只看活跃用户数量。该能力通过 REST API 暴露，并可与 teams filter 组合。",
+      "bullets": [
+        "这次更新把 Copilot 采用度从 seat 和 active user 视角推进到工作流成熟度视角，更适合内部平台团队跟踪 enablement 结果。",
+        "cohorts 可以帮助企业识别哪些团队停留在代码补全，哪些团队已经进入 agent-first 或 multi-agent 使用模式。",
+        "对采购和治理团队来说，这类指标能把 AI 工具 ROI 讨论从总使用量转向具体工作流迁移，但仍需要结合代码质量、review 和安全事件数据。"
+      ]
+    }
+  ],
+  "model_releases": [
+    {
+      "candidate_id": "model-github-copilot-claude-opus-48",
+      "name": "Claude Opus 4.8 in GitHub Copilot",
+      "provider": "Anthropic / GitHub Copilot",
+      "availability": "closed_product",
+      "release_scope": "gateway_availability",
+      "event_date": "2026-05-28",
+      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/",
+      "source": "GitHub Changelog",
+      "summary": "GitHub 宣布 Claude Opus 4.8 在 GitHub Copilot 中 generally available，覆盖 Copilot Pro+、Business 和 Enterprise 等用户，管理员需要在策略中允许该模型。",
+      "notes": "这不是 Anthropic 的首次模型发布，而是 GitHub Copilot 产品入口的可用性更新；适合已有 Copilot 治理流程的团队检查 policy、IDE 覆盖范围和 rollout 状态。"
+    }
+  ],
+  "hot_blogs": [
+    {
+      "candidate_id": "hot-openai-frontier-governance-framework",
+      "title": "OpenAI’s Frontier Governance Framework",
+      "url": "https://openai.com/index/openai-frontier-governance-framework/",
+      "publisher": "OpenAI",
+      "author": "OpenAI",
+      "event_date": "2026-05-28",
+      "topic": "前沿模型治理、风险评估与合规映射",
+      "summary": "OpenAI 更新 Frontier Governance Framework，把 cyber offense、CBRN、harmful manipulation、loss of control、model reporting、security risk management、incident response 和外部专家输入放进同一治理框架。它还明确把 California Transparency in Frontier AI Act 与 EU AI Act GPAI Code of Practice 作为对齐背景。对企业来说，这类框架的价值在于提供了供应商尽调问题清单：不仅问模型能力，也要问风险分类、事件响应、外部评审和安全管理链路。",
+      "content_type": "blog",
+      "why_it_matters": "前沿模型治理正在从原则叙述转向可审计控制项，采购、法务和安全团队需要把这些维度写进供应商评估。"
+    },
+    {
+      "candidate_id": "hot-openai-tax-agents-codex",
+      "title": "Building self-improving tax agents with Codex",
+      "url": "https://openai.com/index/building-self-improving-tax-agents-with-codex/",
+      "publisher": "OpenAI",
+      "author": "OpenAI / Thrive / Crete",
+      "event_date": "2026-05-27",
+      "topic": "Codex 驱动的垂直 agent 迭代闭环",
+      "summary": "OpenAI 与 Thrive、Crete 合作描述了 Tax AI 的构建方式：把税务专家反馈、生产使用信号和 Codex 驱动的实现循环结合起来，让 agent 可以围绕垂直领域任务持续改进。文章值得看的是流程形态，而不是税务场景本身：专家知识、真实任务、结构化反馈、代码修改和回归验证被放进同一个产品迭代闭环。",
+      "content_type": "engineering_note",
+      "why_it_matters": "垂直 agent 的差异点越来越像数据与反馈工程，Codex 类工具的价值在于把生产问题转成可验证的实现变更。"
+    },
+    {
+      "candidate_id": "hot-hf-pytorch-profiler",
+      "title": "Profiling in PyTorch (Part 1): The Basics of PyTorch Profiler",
+      "url": "https://huggingface.co/blog/torch-profiler",
+      "publisher": "Hugging Face Blog",
+      "author": "Aritra Roy Gosthipaty, Sayak Paul, Sergio Momesso, Remi Louf, Pedro Cuenca",
+      "event_date": "2026-05-29",
+      "topic": "torch.profiler、LLM 推理与训练性能分析",
+      "summary": "Hugging Face 的 PyTorch profiler 教程从矩阵运算、trace 读取、token/s、inference loop 和 training loop 入手，强调先知道什么可以被 profile，再看 trace 中的 CPU/GPU 时间和调度开销。对于部署 LLM 的团队，这比抽象性能建议更直接：它把 profile 对象限定到具体循环和具体指标，便于定位是数据加载、kernel、compile 还是模型调用链路造成瓶颈。",
+      "content_type": "engineering_note",
+      "why_it_matters": "当推理成本和延迟成为上线门槛时，团队需要能复现的 profiler 方法，而不是只看端到端耗时。"
+    },
+    {
+      "candidate_id": "hot-hf-dell-enterprise-hub",
+      "title": "Dell Enterprise Hub at Dell Tech World 2026",
+      "url": "https://huggingface.co/blog/balaatdell/dell-enterprise-hub-at-dell-tech-world-2026",
+      "publisher": "Hugging Face Blog",
+      "author": "Bala at Dell",
+      "event_date": "2026-05-29",
+      "topic": "企业本地部署开放模型与 Dell Enterprise Hub",
+      "summary": "这篇 Hugging Face 社区文章记录 Dell Enterprise Hub 在 Dell Tech World 2026 的展示，重点是让开放模型在 Dell 基础设施上以企业可部署方式交付，并提到 goodput 场景与 dell-ai SDK。它不是模型能力发布，更像企业 AI 基础设施信号：开放模型正在被包装进更标准化的硬件、SDK 和本地运行路径中。",
+      "content_type": "blog",
+      "why_it_matters": "关注私有化和本地部署的团队，可以把它作为开放模型商业交付路径的观察样本。"
+    }
+  ],
+  "projects": [
+    {
+      "candidate_id": "project-openbmb-voxcpm",
+      "name": "OpenBMB/VoxCPM",
+      "description": "端到端 TTS 模型仓库，在 GitHub Trending Python daily 中位居前排，语音生成方向热度明显。",
+      "domains": [
+        "text-to-speech",
+        "speech generation",
+        "open model"
+      ],
+      "use_case": "用于评估中文或多语音色生成、语音合成 demo 和本地推理链路。",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending Python daily rank 4，页面显示 1815 stars today。"
+    },
+    {
+      "candidate_id": "project-openmoss-moss-tts",
+      "name": "OpenMOSS/MOSS-TTS",
+      "description": "OpenMOSS 的语音与声音生成模型族，作为新进入 Python daily 前排的语音项目值得跟踪。",
+      "domains": [
+        "text-to-speech",
+        "voice generation",
+        "model family"
+      ],
+      "use_case": "用于比较开放 TTS 模型族的推理形态、许可边界和中文语音能力。",
+      "url": "https://github.com/OpenMOSS/MOSS-TTS",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending Python daily rank 6，页面显示 355 stars today。"
+    },
+    {
+      "candidate_id": "project-nvlabs-eagle",
+      "name": "NVlabs/Eagle",
+      "description": "NVIDIA Labs 的视觉语言模型研究仓库，标题强调 data-centric strategies。",
+      "domains": [
+        "vision-language model",
+        "research",
+        "data-centric AI"
+      ],
+      "use_case": "用于跟踪 VLM 研究中数据策略、训练配方和评测复现材料。",
+      "url": "https://github.com/NVlabs/Eagle",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending Python daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending Python daily rank 9，页面显示 250 stars today。"
+    },
+    {
+      "candidate_id": "project-millionco-react-doctor",
+      "name": "millionco/react-doctor",
+      "description": "面向 AI 生成 React 代码的质量检查工具，进入 TypeScript daily 榜单。",
+      "domains": [
+        "React",
+        "code quality",
+        "AI-generated code"
+      ],
+      "use_case": "用于在 AI 前端代码生成后增加静态检查和质量反馈，尤其适合 agent 生成 UI 的验收链路。",
+      "url": "https://github.com/millionco/react-doctor",
+      "event_date": "2026-05-31",
+      "source": "GitHub Trending TypeScript daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending TypeScript daily rank 10。"
+    }
+  ],
+  "builder_observations": [
+    {
+      "candidate_id": "builder-claudedevs-code-21154",
+      "author": "ClaudeDevs",
+      "content": "Claude Code v2.1.154 的开发者更新把 Opus 4.8、dynamic workflows 和安全修复放在同一批变更中。对 coding agent 团队来说，重点是能力发布已经和路径拦截、数据外泄防护、工作流自动切换一起交付，不能只看模型名称。",
+      "url": "https://x.com/ClaudeDevs/status/2060044853279617150",
+      "role": "Anthropic Claude developer account",
+      "event_date": "2026-05-29",
+      "source": "ClaudeDevs X / DeveloperIO context",
+      "evidence": "DeveloperIO 文章记录了原始 X status，并整理 Claude Code v2.1.154 的 44 项更新、Opus 4.8、dynamic workflows 与 security fixes。"
+    },
+    {
+      "candidate_id": "builder-openai-eval-harness",
+      "author": "OpenAI evals team",
+      "content": "OpenAI 在第三方评测框架中强调：agentic system 的能力结论必须和 harness、工具、预算、elicitation 方式绑定。这个观点对 builder 的含义是，评测资产本身会成为产品能力的一部分。",
+      "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+      "role": "OpenAI safety and evaluations team",
+      "event_date": "2026-05-29",
+      "source": "OpenAI",
+      "evidence": "OpenAI 官方文章要求评测报告声明 claim、validity evidence、harness choice 与最大化 elicitation 的边界。"
+    },
+    {
+      "candidate_id": "builder-openai-codex-tax-loop",
+      "author": "OpenAI / Thrive / Crete",
+      "content": "Tax AI 案例显示垂直 agent 的构建重心正在转向生产反馈闭环：专家给出判断，真实任务产生信号，Codex 把改进转成代码与验证循环。这个模式比单次 prompt 调优更接近长期产品工程。",
+      "url": "https://openai.com/index/building-self-improving-tax-agents-with-codex/",
+      "role": "Applied AI product and engineering teams",
+      "event_date": "2026-05-27",
+      "source": "OpenAI Engineering",
+      "evidence": "OpenAI 工程文章描述了 Thrive、Crete 与 OpenAI 用 Codex 构建自改进税务 agent 的流程。"
+    }
+  ],
+  "community_leads": [],
+  "evidence_assets": [],
+  "self_check": {
+    "report_date": "2026-05-31",
+    "main_items": 2,
+    "builder_observations": 3,
+    "builder_skill_used": [
+      "official-ai-releases",
+      "github-ai-trending",
+      "follow-builders"
+    ],
+    "fallback_sources": [
+      "GitHub Trending web fallback",
+      "official provider pages opened through web",
+      "GitHub Changelog pages opened through web",
+      "Hugging Face Blog pages opened through web"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "固定发现命令、搜索 shadow 和源健康检查均已执行；当前 shell 网络 fetch failed，因此正文只采用 web 已打开核验的一手或官方来源。Builder 观察补足 3 条，并包含 1 条原始 X status。",
+    "optimization_suggestions": [
+      {
+        "title": "让 discover 命令直接写 UTF-8 JSON",
+        "why": "PowerShell 重定向容易产生 BOM 或 UTF-16 输出，后续 JSON 合并脚本需要额外处理。"
+      },
+      {
+        "title": "为 GitHub Trending 增加浏览器导出 fallback",
+        "why": "shell fetch 失败时，官方网页仍可打开；脚本化 fallback 可减少人工转写 rank 和 stars today。"
+      },
+      {
+        "title": "把 Builder fallback 标注为 original_social_only 或 primary_confirmed",
+        "why": "follow-builders feed 阻断时，区分原始 X、官方文章和二手整理，能避免把间接摘要当作原始事实。"
+      }
+    ],
+    "publish_status": {
+      "html_generated": false,
+      "repo_updated": false,
+      "repo_pushed": false,
+      "pages_url": "",
+      "publish_error": ""
+    }
+  },
+  "publish_status": {
+    "html_generated": false,
+    "repo_updated": false,
+    "repo_pushed": false,
+    "pages_url": "",
+    "publish_error": ""
+  },
+  "generated_at": "2026-05-30T18:48:38.339Z"
+}
