@@ -388,7 +388,7 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert(html.includes('id="github-trending"'));
   assert(html.includes("GitHub Trending"));
   assert(html.includes("#2"));
-  assert(html.includes("up +7"));
+  assert(html.includes("↑ UP +7"));
   assert(html.includes("example/trending-agent"));
   assert(html.includes('id="source-audit"'));
   assert(html.includes("信源审计"));
@@ -432,6 +432,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   report.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
   report.hot_blogs[0].summary = "这篇文章把长运行 agent 的 harness 拆成任务规划、上下文治理、工具执行、结果校验和恢复路径几层，重点不是再发明一个模型包装器，而是把每一步都变成可观测、可重放、可回滚的工程边界。作者用 coding agent 和研究代理的例子说明，真正影响稳定性的往往是文件系统隔离、权限提示、失败重试、上下文压缩和评估回放，而不是单次补全质量。对研发团队来说，它适合作为设计 agent 平台、评估 Claude Code/Codex 类工具、或制定内部自动化安全门时的术语和架构参考。";
   report.hot_blogs[0].publisher = "Hugging Face";
+  report.hot_blogs[0].topic = "agent harness、long-running agents";
   report.hot_blogs[0].why_it_matters = "旧字段保留兼容，但公开页面不再渲染。";
   report.projects = [
     {
@@ -504,7 +505,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.match(hotBlogsSection.items[0].titleIcon, /^data:image\/svg\+xml;base64,/);
   assert(hotBlogsSection.items[0].body.includes("这篇文章把长运行 agent 的 harness"));
   assert.equal(hotBlogsSection.items[0].showGroup, false);
-  assert.deepEqual(hotBlogsSection.items[0].tags, ["agent harness"]);
+  assert.deepEqual(hotBlogsSection.items[0].tags, ["agent harness", "long-running agents"]);
   const publisherPoint = hotBlogsSection.items[0].points.find((point) => point.label === "发布方");
   assert.equal(publisherPoint.value, "Hugging Face");
   assert.match(publisherPoint.icon, /^data:image\/svg\+xml;base64,/);
@@ -529,7 +530,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(trendingSection.content.includes("example/agent-memory"));
   assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
   assert(trendingSection.content.includes("1. **![example/agent-memory]"));
-  assert(trendingSection.content.includes("==new=="));
+  assert(trendingSection.content.includes("==trend-new|NEW=="));
   assert(!trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
@@ -705,7 +706,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10 daily");
   assert(trendingSection);
   assert(trendingSection.content.includes("3. **![hardikpandya/stop-slop]"));
-  assert(trendingSection.content.includes("==new=="));
+  assert(trendingSection.content.includes("==trend-new|NEW=="));
   assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
   assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
 });

@@ -61,19 +61,31 @@ export function githubTrendTags(item) {
   return unique([githubTrendStatusTag(item)]);
 }
 
-export function githubTrendStatusTag(item) {
+export function githubTrendStatusMeta(item) {
   const trend = item?.trend === "up" || item?.trend === "down" || item?.trend === "same"
     ? item.trend
     : "new";
   const delta = Number.isInteger(item?.rank_delta) ? Math.abs(item.rank_delta) : null;
 
   if (trend === "up" && delta !== null) {
-    return `up +${delta}`;
+    return { trend, label: `↑ UP +${delta}` };
   }
   if (trend === "down" && delta !== null) {
-    return `down -${delta}`;
+    return { trend, label: `↓ DOWN -${delta}` };
   }
-  return trend;
+  if (trend === "same") {
+    return { trend, label: "SAME" };
+  }
+  return { trend: "new", label: "NEW" };
+}
+
+export function githubTrendStatusTag(item) {
+  return githubTrendStatusMeta(item).label;
+}
+
+export function githubTrendStatusHighlightTag(item) {
+  const status = githubTrendStatusMeta(item);
+  return `trend-${status.trend}|${status.label}`;
 }
 
 export function githubTrendMovementLabel(item) {
