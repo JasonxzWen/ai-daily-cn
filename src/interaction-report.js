@@ -8,7 +8,7 @@ import { relativeAssetHref, reportRelativePaths } from "./paths.js";
 import {
   cleanGithubTrendDescription,
   cleanProjectDescription,
-  githubTrendStatusTag,
+  githubTrendStatusHighlightTag,
   modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
@@ -374,7 +374,7 @@ function formatGithubTrending(items, context = {}) {
   return items
     .slice(0, 10)
     .map((item, index) => {
-      const tag = githubTrendStatusTag(item);
+      const tag = githubTrendStatusHighlightTag(item);
       const tagText = formatHighlightTags([tag, ...trendTagsFor(context.trendAnnotations, "github_trending", index)].filter(Boolean));
       return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}：${cleanGithubTrendDescription(item)}`;
     })
@@ -438,10 +438,18 @@ function formatHotBlogCards(items) {
       titleIcon: siteIconForUrl(item.url, item.publisher || item.title),
       body: item.summary || "",
       showGroup: false,
-      tags: item.topic ? [item.topic] : [],
+      tags: hotBlogTags(item),
       points
     };
   });
+}
+
+function hotBlogTags(item) {
+  const topic = String(item.topic || "").trim();
+  if (!topic) {
+    return [];
+  }
+  return [...new Set(topic.split(/[、,，/|]+/).map((tag) => tag.trim()).filter(Boolean))];
 }
 
 function publisherIconFor(item) {

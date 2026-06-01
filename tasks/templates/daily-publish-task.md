@@ -42,6 +42,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 ## Acceptance criteria
 
 - Candidate pool and structured draft pass report-write gates.
+- All collected information is compared against recent `reports-data` reports/candidate pools and deduped before selection.
 - `npm run validate` passes.
 - `npm run publish:dry-run` reports the publish plan and expected Pages URL.
 - Real publish, when approved, verifies the final Pages URL.

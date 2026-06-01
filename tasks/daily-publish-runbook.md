@@ -33,6 +33,7 @@ npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 ```
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
+- Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.
 

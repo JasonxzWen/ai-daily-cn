@@ -32,6 +32,7 @@
 4. 运行 `npm run prompt:build -- YYYY-MM-DD`，把输出作为本次日报生成与发布的完整工作契约。
 4a. 运行 `npm run sources:validate`，确认 `config/sources/*.json` 的 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement` 和 `verification_policy` 都有效；失败时先修配置，不要继续用硬编码源绕过。
 5. 按 repo 内提示词模块采样最近 AI 产品、模型、论文、开源项目、工程工具动态和高质量工程博客；优先一手来源。模型发布优先写入 `model_releases`，GitHub Trending 单独写入 `github_trending`，热门技术博客写入 `hot_blogs`，只有重大工程影响才同时进入 `main_items`。主体信息不足时先拓展信源覆盖，再从 24h 扩展到 48h；48h 仍不足时，才允许补入最近 5 天内与工程工作流直接相关的开源 release 或官方研究/产品更新，并在 `source_window` 和 self_check notes 里记录，不要把日报长期滚成周报。
+5a. 所有资讯收集都必须和前几天信息比较并去重：读取 `reports-data` 中最近至少 7 个日报日的日报 JSON 和 `.candidates.json`，对每个候选按 URL、同一事件、标题、厂商、来源主题和发布时间做历史比较。重复项保留在候选池中并标记 `status:"excluded"`、`exclusion_reason` 与历史日期/URL；只有出现新的 dated release、版本、政策、价格、可用范围、基准或工程结论时，才允许同一来源/事件再次入选，并在 notes/evidence 中说明新增变化。
 6. 先写入 `.tmp/source-candidates-YYYY-MM-DD.json` 候选池；所有来源成功、失败、无近期内容都要留痕。允许板块为空，但正文不得绕过候选池。
 7. 写入 `.tmp/daily-report.json` 前执行去重和新鲜度检查：最近 7 天出现过的 URL 默认不能再进 `main_items`；同一 URL 不得同时进入 `main_items`、`model_releases` 或 `hot_blogs`；48 小时外内容不得进入摘要或主体信息，只能作为补充/背景且每天最多 1 条。严格筛完只有 2-3 条也正常发布。
 8. 写入 `.tmp/daily-report.json` 前执行去套话检查：删掉“高信号”“核心信号”“可观察信号”“更多信号”“其他信号”“预期收益”等泛化或工作汇报式措辞；摘要只写用户需要快速判断的事实、日期、来源和变化。

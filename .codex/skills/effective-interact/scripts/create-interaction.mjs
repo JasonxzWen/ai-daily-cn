@@ -381,9 +381,18 @@ function renderSupplementalHeading({ group, title, summary, status = "info" }) {
 
 function renderInlineEmphasis(escaped) {
   return String(escaped ?? "")
-    .replace(/==([^=\n]+)==/g, '<mark class="text-highlight">$1</mark>')
+    .replace(/==([^=\n]+)==/g, (_match, value) => renderHighlight(value))
     .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^\*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+}
+
+function renderHighlight(value) {
+  const text = String(value || "");
+  const trend = text.match(/^trend-(new|up|down|same)\|(.+)$/);
+  if (trend) {
+    return `<mark class="text-highlight trend-status trend-status-${trend[1]}">${trend[2]}</mark>`;
+  }
+  return `<mark class="text-highlight">${text}</mark>`;
 }
 
 function inlineMarkdown(text) {

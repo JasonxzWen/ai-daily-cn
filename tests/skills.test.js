@@ -395,7 +395,12 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
         {
           type: "markdown",
           title: "GitHub Trending",
-          content: "1. ![GitHub](data:image/png;base64,iVBORw0KGgo=) **[example/repo](https://github.com/example/repo)** ==new==：示例项目。"
+          content: [
+            "1. ![GitHub](data:image/png;base64,iVBORw0KGgo=) **[example/repo](https://github.com/example/repo)** ==trend-new|NEW==：示例项目。",
+            "2. **[example/up](https://github.com/example/up)** ==trend-up|↑ UP +2==：上升项目。",
+            "3. **[example/down](https://github.com/example/down)** ==trend-down|↓ DOWN -1==：下降项目。",
+            "4. **[example/same](https://github.com/example/same)** ==trend-same|SAME==：持平项目。"
+          ].join("\n")
         }
       ]
     }),
@@ -413,7 +418,10 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /<ol><li><img class="inline-site-icon"/);
   assert.match(html, /<strong><a href="https:\/\/github\.com\/example\/repo"/);
-  assert.match(html, /<mark class="text-highlight">new<\/mark>/);
+  assert.match(html, /<mark class="text-highlight trend-status trend-status-new">NEW<\/mark>/);
+  assert.match(html, /<mark class="text-highlight trend-status trend-status-up">↑ UP \+2<\/mark>/);
+  assert.match(html, /<mark class="text-highlight trend-status trend-status-down">↓ DOWN -1<\/mark>/);
+  assert.match(html, /<mark class="text-highlight trend-status trend-status-same">SAME<\/mark>/);
   assert.doesNotMatch(html, /<ul><li>1\./);
 });
 
