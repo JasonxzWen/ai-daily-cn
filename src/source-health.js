@@ -85,6 +85,9 @@ export async function checkSourcesHealth(options = {}) {
 }
 
 function skipReasonForSource(source) {
+  if (source.source_kind === "manual") {
+    return "skipped_manual_source";
+  }
   if ((source.source_kind === "rsshub" || source.source_kind === "rss_bridge") && source.base_url_env && !process.env[source.base_url_env]) {
     return "skipped_missing_base_url";
   }

@@ -2,45 +2,100 @@
   "schema_version": 1,
   "report_date": "2026-06-01",
   "title": "AI 日报 2026-06-01",
-  "summary": "今天的主线是 AI 开发工具进入成本与治理阶段：GitHub Copilot usage-based billing 和私有仓库 code review 的 Actions minutes 消耗在 2026-06-01 生效；Microsoft Foundry 的 5 月更新把真实 trace 评测、项目级成本归因、Managed VNET、Foundry Local 和多个模型入口集中到企业 agent 平台中。固定发现命令在本地 shell 网络中仍然受阻，本版用已核验的官方页面和 GitHub Trending 页面补足公开来源。",
+  "summary": "今天主体信息扩展到 10 条：计费与成本归因、企业 agent 平台、国产模型、physical AI、企业 BI、AIGC 内容工具和科研应用一起进入日报视野。模型可用性 incident 被放入轻量运营线索，模型发布只保留 MiniMax M3 和 Cosmos 3 这类首发。",
   "hero_highlights": [
     {
-      "title": "Copilot 计费今天切换",
+      "title": "Copilot usage-based billing 生效",
       "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
-      "reason": "Copilot code review 在私有仓库开始消耗 GitHub Actions minutes，Copilot 使用也进入 AI Credits 计量，团队需要把 agent review 纳入预算。"
+      "reason": "AI 开发工具成本归因从 seat 走向用量、review 和 Actions minutes 联动。"
     },
     {
-      "title": "Foundry 把 agent 评测拉到生产 trace",
-      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
-      "reason": "Microsoft Foundry 5 月更新把外部/托管 agent trace 评测、项目级成本、隔离网络和本地模型能力放在同一批发布里。"
+      "title": "MiniMax M3 与 NVIDIA Cosmos 3 同日进入模型发布",
+      "url": "https://www.minimax.io/blog/minimax-m3",
+      "reason": "国产 coding/多模态与 physical AI open model 同时值得跟踪。"
+    },
+    {
+      "title": "Vercel AI Gateway spend caps 进入常规运营观察",
+      "url": "https://x.com/rauchg/status/2060787704166776927",
+      "reason": "AI 网关的 API key 级预算控制会影响团队成本治理。"
     }
   ],
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-01.html",
+  "html_path": "reports/2026/06/2026-06-01.html",
   "source_window": {
-    "date_from": "2026-05-28",
+    "date_from": "2026-05-30",
     "date_to": "2026-06-01",
     "fallback_window_used": true,
-    "notes": "主体信息严格限定在 2026-05-30..2026-06-01；模型发布、热门技术博客和 Builder 观察补入 2026-05-28..2026-05-29 的一手来源。固定 discovery、search shadow、statuspage 和 sources:health 命令均已运行，但本地 shell fetch failed；web fallback 已打开 GitHub、OpenAI、Microsoft 和 AWS 官方页面。"
+    "notes": "主体信息使用 2026-05-30 至 2026-06-01 的官方博客、原始 X status、GitHub Trending 和状态页；older technical blogs remain only in hot_blogs/background sections."
   },
   "source_audit": {
     "github_trending": {
       "checked": true,
       "sources": [
         {
-          "name": "GitHub Trending discovery command",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "discover:github-trending 返回 fetch failed；daily、weekly、语言榜和 OSSInsight fallback 均未能通过 shell 抓取。"
-        },
-        {
-          "name": "GitHub Trending daily web fallback",
+          "name": "GitHub Trending daily",
           "url": "https://github.com/trending?since=daily",
           "status": "checked",
-          "notes": "浏览器侧打开 GitHub 官方 Trending daily 页面并抽取可见 Top 10。"
+          "notes": "15 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending weekly",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "checked",
+          "notes": "19 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python daily",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "13 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python weekly",
+          "url": "https://github.com/trending/python?since=weekly",
+          "status": "checked",
+          "notes": "21 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript daily",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "14 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript weekly",
+          "url": "https://github.com/trending/typescript?since=weekly",
+          "status": "checked",
+          "notes": "17 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust daily",
+          "url": "https://github.com/trending/rust?since=daily",
+          "status": "checked",
+          "notes": "17 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust weekly",
+          "url": "https://github.com/trending/rust?since=weekly",
+          "status": "checked",
+          "notes": "15 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go daily",
+          "url": "https://github.com/trending/go?since=daily",
+          "status": "checked",
+          "notes": "15 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go weekly",
+          "url": "https://github.com/trending/go?since=weekly",
+          "status": "checked",
+          "notes": "16 repositories parsed"
         }
       ],
-      "candidates_found": 10,
+      "candidates_found": 122,
       "included": 10,
-      "notes": "命令行发现受阻时，使用 GitHub 官方页面补足 Trending 板块；previous_rank 未做跨口径比较，本轮 rank_delta 置空。"
+      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 6 个日期、67 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
     },
     "builder_sources": {
       "checked": true,
@@ -48,108 +103,308 @@
         {
           "name": "follow-builders X feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-          "status": "blocked",
-          "notes": "discover:builders 返回 fetch failed; retry_failed_after_1。"
+          "status": "checked",
+          "notes": "22 recent original entries parsed"
         },
         {
           "name": "follow-builders podcast feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
           "status": "blocked",
-          "notes": "discover:builders 返回 fetch failed; retry_failed_after_1。"
+          "notes": "0 recent original entries parsed; upstream_error=Podcast: Transcript error for \"🔬ESM: The Bitter Lesson is Coming for Proteins - Alex Rives, BioHub\": HTTP 404: {\"status\":\"error\",\"message\":\"Episode not found\"}"
         },
         {
-          "name": "Claude official X status",
-          "url": "https://x.com/claudeai/status/2060045358445576332",
-          "status": "checked",
-          "notes": "作为原始 X status fallback，满足 Builder 原始社交来源要求。"
+          "name": "follow-builders blog feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
         },
         {
-          "name": "OpenAI Codex release notes",
-          "url": "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images",
+          "name": "Simon Willison Weblog",
+          "url": "https://simonwillison.net/atom/everything/",
           "status": "checked",
-          "notes": "OpenAI 官方 release notes 提供 Codex Windows Computer Use、remote control 和 profiles 更新。"
+          "notes": "8 recent original entries parsed"
         },
         {
-          "name": "Microsoft Foundry Blog",
-          "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
-          "status": "checked",
-          "notes": "Foundry 开发体验团队发布 agent eval、Foundry Local 和成本归因更新。"
+          "name": "Chip Huyen Blog",
+          "url": "https://huyenchip.com/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Andrej Karpathy Blog",
+          "url": "https://karpathy.github.io/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
         }
       ],
-      "candidates_found": 3,
+      "candidates_found": 30,
       "included": 3,
-      "blocked_reason": "follow_builders_fetch_failed_web_original_fallback_checked",
-      "last_successful_feed_at": null,
-      "notes": "follow-builders central feed 不可访问；本轮以 1 条原始 X status 和 2 条官方 builder/engineering 来源补足 Builder 观察。"
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-01T07:18:15.154Z",
+      "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "content_sources": {
       "checked": true,
       "sources": [
         {
-          "name": "Registered content sources",
-          "url": "https://github.com/JasonxzWen/ai-daily-cn/tree/main/config/sources",
-          "status": "blocked",
-          "notes": "discover:content-sources 返回 fetch failed。"
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
         },
         {
           "name": "GitHub Changelog",
-          "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
-          "status": "checked",
-          "notes": "GitHub 官方计费切换公告。"
+          "url": "https://github.blog/changelog/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
         },
         {
-          "name": "Microsoft Foundry Blog",
-          "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
-          "status": "checked",
-          "notes": "Microsoft 官方 Foundry 月度更新。"
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
         },
         {
-          "name": "AWS Machine Learning Blog",
-          "url": "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/",
-          "status": "checked",
-          "notes": "AWS 官方 LLM inference observability 技术文章。"
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
         },
         {
           "name": "Microsoft Research Blog",
-          "url": "https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
           "status": "checked",
-          "notes": "Microsoft Research 官方 Data Formulator 0.7 文章。"
+          "notes": "6 recent blog/interview entries parsed"
+        },
+        {
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "status": "checked",
+          "notes": "2 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "status": "checked",
+          "notes": "2 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "status": "checked",
+          "notes": "7 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "status": "checked",
+          "notes": "2 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "status": "checked",
+          "notes": "9 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "status": "checked",
+          "notes": "4 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed"
+        },
+        {
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
+        },
+        {
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "status": "checked",
+          "notes": "28 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "status": "checked",
+          "notes": "18 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 9,
-      "included": 8,
-      "blocked_reason": "node_fetch_failed_for_registered_feeds_web_primary_fallback_checked",
-      "last_successful_feed_at": null,
-      "notes": "固定 content discovery 失败；正文只使用已打开核验的官方页面、官方 changelog 和 GitHub 官方 Trending 页面。"
+      "candidates_found": 33,
+      "included": 14,
+      "sources_checked": 37,
+      "enablement_counts": {
+        "core": 26,
+        "optional": 11
+      },
+      "tier_counts": {
+        "T0": 25,
+        "T1": 1,
+        "T3": 6,
+        "T2": 5
+      },
+      "source_kind_counts": {
+        "rss": 23,
+        "html_index": 14
+      },
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-01T10:33:46.174Z",
+      "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
       "checked": true,
-      "shadow": true,
       "sources": [
         {
-          "name": "GDELT",
-          "url": "https://api.gdeltproject.org/",
+          "name": "Search news shadow providers",
+          "url": "https://github.com/JasonxzWen/ai-daily-cn/blob/main/config/search-queries.json",
           "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "OpenAlex",
-          "url": "https://api.openalex.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "arXiv",
-          "url": "https://export.arxiv.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
+          "notes": "discover:search-news timed out twice; GDELT/OpenAlex/arXiv did not produce usable JSON in this local run."
         }
       ],
       "candidates_found": 0,
       "included": 0,
-      "provider_runtime_ms": {},
-      "provider_cost_units": {},
-      "notes": "discover:search-news 作为 shadow 运行；shell 网络失败，未把搜索摘要写入正文。"
+      "shadow": true,
+      "blocked_reason": "search_news_timeout",
+      "notes": "Search discovery was attempted after adding AIGC, Product Hunt/funding, AI devtool cost, and model availability queries, but this local run timed out."
     },
     "sources_health": {
       "checked": true,
@@ -164,12 +419,45 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "978 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-anthropic-news",
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
           "status": "blocked",
           "http_status": null,
           "feed_like": false,
           "recent_48h_entries": 0,
+          "notes": "The operation was aborted due to timeout"
+        },
+        {
+          "id": "content-hugging-face-blog",
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
           "original_url_count": null,
-          "notes": "fetch failed"
+          "notes": "788 feed entries parsed; 1 within 48h"
         },
         {
           "id": "content-github-changelog",
@@ -181,29 +469,63 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
           "recent_48h_entries": 0,
           "original_url_count": null,
-          "notes": "fetch failed in shell discovery; web fallback checked individual pages"
+          "notes": "10 feed entries parsed; 0 within 48h"
         },
         {
-          "id": "content-aws-machine-learning",
-          "name": "AWS Machine Learning Blog",
-          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "id": "content-google-research",
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
           "source_kind": "rss",
           "tier": "T0",
           "authority": "primary",
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-google-deepmind-blog",
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
           "feed_like": false,
           "recent_48h_entries": 0,
           "original_url_count": null,
-          "notes": "fetch failed in shell discovery; web fallback checked individual pages"
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-meta-ai-blog",
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
         },
         {
           "id": "content-microsoft-research",
@@ -215,195 +537,781 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-apple-machine-learning",
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-nvidia-developer-blog",
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 6,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 6 within 48h"
+        },
+        {
+          "id": "content-aws-machine-learning",
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-azure-blog",
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-meta-engineering",
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "9 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-xai-news",
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
           "feed_like": false,
           "recent_48h_entries": 0,
           "original_url_count": null,
-          "notes": "fetch failed in shell discovery; web fallback checked individual pages"
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-bytedance-seed-blog",
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tiktok-developers-blog",
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tencent-corporate-ai",
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tencent-hunyuan-blog",
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-qwen-blog",
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-alibaba-cloud-blog",
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-kimi-platform-blog",
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-kimi-technical-blog",
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-minimax-blog",
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-zhipu-research",
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-cloudflare-blog",
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-nature-machine-learning",
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "secondary",
+          "enablement": "core",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-techcrunch-ai",
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-the-verge-ai",
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-techcrunch-enterprise",
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-the-verge-main",
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 8,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 8 within 48h"
+        },
+        {
+          "id": "content-ars-technica",
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-product-hunt-trending",
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-product-hunt-devtools",
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-latent-space",
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-interconnects",
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "no_signal",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-planet-ai",
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 15,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 15 within 48h"
+        },
+        {
+          "id": "content-hn-frontpage",
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "community",
+          "enablement": "optional",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-36kr",
+          "name": "36Kr",
+          "url": "https://www.36kr.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 24,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 24 within 48h"
+        },
+        {
+          "id": "intermediary-qbitai",
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 10,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "id": "intermediary-leiphone",
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-infoq-cn",
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 7,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 7 within 48h"
+        },
+        {
+          "id": "intermediary-sspai",
+          "name": "SSPAI",
+          "url": "https://sspai.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "intermediary-ifanr",
+          "name": "iFanr",
+          "url": "https://www.ifanr.com/feed",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "status": "checked",
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 4,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 4 within 48h"
         }
       ],
       "candidates_found": 0,
       "included": 0,
-      "notes": "sources:health 对 registry 执行后返回 fetch failed；web fallback 只作为事实核验，不改写健康检查结果。"
+      "notes": "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
     }
   },
-  "quality_status": {
-    "status": "degraded",
-    "reasons": [
-      "shell_fetch_failed_for_registered_sources"
-    ],
-    "affected_sections": [
-      "source_audit"
-    ],
-    "public_note": "固定发现命令在本地 shell 网络中失败；本报告使用已核验的 web fallback 来源并保留 blocked 审计记录。"
-  },
+  "candidate_pool_path": "data/2026/06/2026-06-01.candidates.json",
   "github_trending": [
+    {
+      "candidate_id": "trend-harry0703-moneyprinterturbo",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "name": "harry0703/MoneyPrinterTurbo",
+      "description": "一键生成短视频的 AIGC 工具，覆盖文案、素材、配音和视频组装流程。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 2,
+      "rank_delta": 1,
+      "trend": "up",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 1,937 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-microsoft-markitdown",
+      "repo": "microsoft/markitdown",
+      "name": "microsoft/markitdown",
+      "description": "Microsoft 开源的文档转 Markdown 工具，可把多种文件转成适合 LLM/RAG 管线使用的文本。",
+      "url": "https://github.com/microsoft/markitdown",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": 1,
+      "rank_delta": -1,
+      "trend": "down",
+      "evidence": "microsoft/markitdown appeared on GitHub Trending daily with 2,798 stars today. 近 7 天本地记录曾在 2026-05-29、2026-05-30、2026-05-31 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
     {
       "candidate_id": "trend-d4vinci-scrapling",
       "repo": "D4Vinci/Scrapling",
       "name": "D4Vinci/Scrapling",
-      "description": "自适应 Web 抓取框架，覆盖从单次请求到大规模 crawl 的网页采集流程。",
+      "description": "自适应网页抓取框架，覆盖动态页面、crawl 和结构化数据提取。",
       "url": "https://github.com/D4Vinci/Scrapling",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "Python",
-      "window": "daily",
-      "rank": 1,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GitHub Trending daily rank 1，页面显示 639 stars today。"
-    },
-    {
-      "candidate_id": "trend-nesquena-hermes-webui",
-      "repo": "nesquena/hermes-webui",
-      "name": "nesquena/hermes-webui",
-      "description": "Hermes Agent 的 Web 与移动端使用界面，关注 agent 任务从桌面扩展到手机访问。",
-      "url": "https://github.com/nesquena/hermes-webui",
-      "event_date": "2026-06-01",
-      "source": "GitHub Trending daily",
-      "language": "Python",
-      "window": "daily",
-      "rank": 2,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GitHub Trending daily rank 2，页面显示 320 stars today。"
-    },
-    {
-      "candidate_id": "trend-everyinc-compound-engineering-plugin",
-      "repo": "EveryInc/compound-engineering-plugin",
-      "name": "EveryInc/compound-engineering-plugin",
-      "description": "面向 Claude Code、Codex、Cursor 等工具的 Compound Engineering 插件，强调工程流程与 agent 约束。",
-      "url": "https://github.com/EveryInc/compound-engineering-plugin",
-      "event_date": "2026-06-01",
-      "source": "GitHub Trending daily",
-      "language": "TypeScript",
+      "language": "all",
       "window": "daily",
       "rank": 3,
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 3，页面显示 243 stars today。"
+      "evidence": "D4Vinci/Scrapling appeared on GitHub Trending daily with 606 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
     },
     {
-      "candidate_id": "trend-github-docs",
-      "repo": "github/docs",
-      "name": "github/docs",
-      "description": "docs.github.com 的开源仓库，适合跟踪 GitHub 文档与产品行为说明变更。",
-      "url": "https://github.com/github/docs",
+      "candidate_id": "trend-nesquena-hermes-webui",
+      "repo": "nesquena/hermes-webui",
+      "name": "nesquena/hermes-webui",
+      "description": "Hermes Agent 的 Web 和移动端界面，关注 agent 任务跨设备访问。",
+      "url": "https://github.com/nesquena/hermes-webui",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "TypeScript",
+      "language": "all",
       "window": "daily",
       "rank": 4,
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 4，页面显示 20 stars today。"
+      "evidence": "nesquena/hermes-webui appeared on GitHub Trending daily with 357 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
     },
     {
-      "candidate_id": "trend-openbmb-voxcpm",
-      "repo": "OpenBMB/VoxCPM",
-      "name": "OpenBMB/VoxCPM",
-      "description": "面向多语音生成、创意音色设计和声音克隆的 tokenizer-free TTS 项目。",
-      "url": "https://github.com/OpenBMB/VoxCPM",
+      "candidate_id": "trend-everyinc-compound-engineering-plugin",
+      "repo": "EveryInc/compound-engineering-plugin",
+      "name": "EveryInc/compound-engineering-plugin",
+      "description": "面向 Claude Code、Codex、Cursor 的工程插件，连接 coding agent 与团队流程。",
+      "url": "https://github.com/EveryInc/compound-engineering-plugin",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "Python",
+      "language": "all",
       "window": "daily",
       "rank": 5,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GitHub Trending daily rank 5，页面显示 639 stars today。"
+      "previous_rank": 1,
+      "rank_delta": -4,
+      "trend": "down",
+      "evidence": "EveryInc/compound-engineering-plugin appeared on GitHub Trending daily with 251 stars today. 近 7 天本地记录曾在 2026-05-30、2026-05-31 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
     },
     {
-      "candidate_id": "trend-revfactory-harness",
-      "repo": "revfactory/harness",
-      "name": "revfactory/harness",
-      "description": "生成领域专用 agent team、专门 agent 和对应技能的 meta-skill 项目。",
-      "url": "https://github.com/revfactory/harness",
+      "candidate_id": "trend-github-docs",
+      "repo": "github/docs",
+      "name": "github/docs",
+      "description": "docs.github.com 开源仓库，用于跟踪 GitHub 产品文档和行为说明。",
+      "url": "https://github.com/github/docs",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "HTML",
+      "language": "all",
       "window": "daily",
       "rank": 6,
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 6，页面显示 318 stars today。"
+      "evidence": "github/docs appeared on GitHub Trending daily with 27 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
     },
     {
-      "candidate_id": "trend-fareed-train-llm",
+      "candidate_id": "trend-openbmb-voxcpm",
+      "repo": "OpenBMB/VoxCPM",
+      "name": "OpenBMB/VoxCPM",
+      "description": "面向声音克隆、创意音色和多语音生成的 tokenizer-free TTS 项目。",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": 4,
+      "rank_delta": -3,
+      "trend": "down",
+      "evidence": "OpenBMB/VoxCPM appeared on GitHub Trending daily with 635 stars today. 近 7 天本地记录曾在 2026-05-31 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-revfactory-harness",
+      "repo": "revfactory/harness",
+      "name": "revfactory/harness",
+      "description": "生成领域专用 agent team、agent 和 skills 的 meta-skill 项目。",
+      "url": "https://github.com/revfactory/harness",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": 10,
+      "rank_delta": 2,
+      "trend": "up",
+      "evidence": "revfactory/harness appeared on GitHub Trending daily with 323 stars today. 近 7 天本地记录曾在 2026-05-29 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-fareedkhan-dev-train-llm-from-scratch",
       "repo": "FareedKhan-dev/train-llm-from-scratch",
       "name": "FareedKhan-dev/train-llm-from-scratch",
-      "description": "从数据下载到文本生成的 LLM 训练教程型仓库，适合学习完整训练流程。",
+      "description": "从数据下载到文本生成的 LLM 训练教程型仓库。",
       "url": "https://github.com/FareedKhan-dev/train-llm-from-scratch",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "Jupyter Notebook",
-      "window": "daily",
-      "rank": 7,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GitHub Trending daily rank 7，页面显示 627 stars today。"
-    },
-    {
-      "candidate_id": "trend-supermemoryai-supermemory",
-      "repo": "supermemoryai/supermemory",
-      "name": "supermemoryai/supermemory",
-      "description": "面向 AI 应用的高速、可扩展 memory engine 和应用层接口。",
-      "url": "https://github.com/supermemoryai/supermemory",
-      "event_date": "2026-06-01",
-      "source": "GitHub Trending daily",
-      "language": "TypeScript",
-      "window": "daily",
-      "rank": 8,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GitHub Trending daily rank 8，页面显示 236 stars today。"
-    },
-    {
-      "candidate_id": "trend-crosstalk-project-nomad",
-      "repo": "Crosstalk-Solutions/project-nomad",
-      "name": "Crosstalk-Solutions/project-nomad",
-      "description": "离线 survival computer 项目，打包工具、知识库和 AI 能力用于断网环境。",
-      "url": "https://github.com/Crosstalk-Solutions/project-nomad",
-      "event_date": "2026-06-01",
-      "source": "GitHub Trending daily",
-      "language": "TypeScript",
+      "language": "all",
       "window": "daily",
       "rank": 9,
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 9，页面显示 372 stars today。"
+      "evidence": "FareedKhan-dev/train-llm-from-scratch appeared on GitHub Trending daily with 626 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
     },
     {
-      "candidate_id": "trend-anthropics-claude-code",
-      "repo": "anthropics/claude-code",
-      "name": "anthropics/claude-code",
-      "description": "Anthropic 官方 agentic coding 工具仓库，围绕终端、代码库理解和 git workflow 继续升温。",
-      "url": "https://github.com/anthropics/claude-code",
+      "candidate_id": "trend-supermemoryai-supermemory",
+      "repo": "supermemoryai/supermemory",
+      "name": "supermemoryai/supermemory",
+      "description": "面向 AI 应用的 memory engine 和可扩展 memory API。",
+      "url": "https://github.com/supermemoryai/supermemory",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
-      "language": "Python",
+      "language": "all",
       "window": "daily",
       "rank": 10,
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 10，页面显示 490 stars today。"
+      "evidence": "supermemoryai/supermemory appeared on GitHub Trending daily with 264 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
     }
   ],
   "main_items": [
     {
       "candidate_id": "main-github-copilot-billing-june1",
-      "title": "GitHub Copilot usage-based billing 今天生效，code review 会消耗 Actions minutes",
+      "title": "GitHub Copilot 计费切换今天生效，代码审查进入成本归因",
       "event_date": "2026-06-01",
       "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
       "source": "GitHub Changelog",
@@ -411,51 +1319,220 @@
       "entities": [
         "GitHub Copilot",
         "AI Credits",
-        "GitHub Actions minutes",
-        "Copilot code review"
+        "Actions minutes",
+        "code review"
       ],
-      "summary": "GitHub 在 2026-06-01 切换 Copilot usage-based billing：Copilot 使用按 AI Credits 计量，私有仓库中的 Copilot code review 还会消耗 GitHub Actions minutes。GitHub Docs 说明 AI Credits 由输入、输出和缓存 token 成本换算，agentic features 和 Copilot cloud agent 这类长任务会消耗更多额度。",
+      "summary": "今天生效：GitHub Copilot code review 从 2026-06-01 起在私有仓库消耗 Actions minutes，公有仓库 Actions minutes 仍免费。 双计费：每次 review 同时进入 Copilot AI Credits 和 GitHub Actions minutes，覆盖 Pro、Pro+、Business、Enterprise。 管理员需要核对 Actions entitlement / budgets / runner 设置，否则自动 PR review 会变成新的 CI 成本项。",
       "bullets": [
-        "私有仓库 code review 不再只是 Copilot 功能用量，还会进入 Actions minutes 账单；公共仓库 Actions minutes 仍保持免费口径。",
-        "GitHub Docs 给出 AI Credits 计量方式：模型选择、上下文长度和 agentic session 复杂度都会影响消耗，1 AI credit 对应 0.01 美元预算口径。",
-        "工程团队需要把 Copilot code review、CLI、cloud agent 和第三方 coding agent 的使用量接入预算、告警和用量报表，而不是只按 seat 管理。"
+        "**今天生效**：GitHub Copilot code review 从 2026-06-01 起在私有仓库消耗 Actions minutes，公有仓库 Actions minutes 仍免费。",
+        "**双计费**：每次 review 同时进入 Copilot AI Credits 和 GitHub Actions minutes，覆盖 Pro、Pro+、Business、Enterprise。",
+        "==管理员需要核对 **Actions entitlement / budgets / runner 设置**，否则自动 PR review 会变成新的 CI 成本项。=="
       ]
     },
     {
       "candidate_id": "main-microsoft-foundry-may-update",
-      "title": "Microsoft Foundry 5 月更新把 agent 评测、模型目录和本地运行集中到企业平台",
+      "title": "Microsoft Foundry 更新 agent 评测、成本归因和本地运行能力",
       "event_date": "2026-05-30",
       "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
       "source": "Microsoft Foundry Blog",
       "tier": "T0",
       "entities": [
         "Microsoft Foundry",
-        "Trace-based evaluation",
+        "trace evaluation",
         "Foundry Local",
-        "Managed VNET",
-        "Grok 4.3",
-        "DeepSeek V4"
+        "cost attribution"
       ],
-      "summary": "Microsoft Foundry 5 月更新把外部/托管 agent 的 trace-based evaluation、Grok 4.3、DeepSeek V4、Fireworks 上的 Kimi 2.6、GPT-5 Reinforcement Fine-Tuning gated GA、Managed VNET GA、项目级成本归因和 Foundry Local 1.1/1.2 放在同一批发布中。它显示企业 agent 平台正在同时处理模型选择、运行隔离、真实交互评测和成本治理。",
+      "summary": "评测与追踪：Foundry 把托管/外部 agent traces、评测和项目视角成本归因放在同一组更新里。 本地能力：Foundry Local 1.1 带来实时 ASR、embedding、Qwen 3.5 Vision、WebGPU 插件；1.2 又补多语 ASR、ARM64、WinML 2.0。 成本归因只解释模型/项目使用，完整账单仍要结合 Azure Cost Management、Search、Storage、Key Vault 等资源看。",
       "bullets": [
-        "Trace-based evaluation 支持评估运行在 Foundry、GCP、AWS 或任意 framework 的 agent traces，减少只靠人工整理测试集的盲点。",
-        "Managed VNET GA 和私有 Azure AI Search 连接让 RAG agent 的检索链路能放进网络隔离设计，不再只是应用层配置。",
-        "Foundry Local 1.1 增加本地实时转写、text embeddings、Qwen 3.5 Vision 和 WebGPU execution provider，适合评估端侧多模态与隐私敏感场景。"
+        "**评测与追踪**：Foundry 把托管/外部 agent traces、评测和项目视角成本归因放在同一组更新里。",
+        "**本地能力**：Foundry Local 1.1 带来实时 ASR、embedding、Qwen 3.5 Vision、WebGPU 插件；1.2 又补多语 ASR、ARM64、WinML 2.0。",
+        "==成本归因只解释模型/项目使用，完整账单仍要结合 Azure Cost Management、Search、Storage、Key Vault 等资源看。=="
+      ]
+    },
+    {
+      "candidate_id": "main-minimax-m3-model-page",
+      "title": "MiniMax M3 发布，主打 coding、长上下文和原生多模态",
+      "event_date": "2026-06-01",
+      "url": "https://www.minimax.io/models/text/m3",
+      "source": "MiniMax model page",
+      "tier": "T0",
+      "entities": [
+        "MiniMax M3",
+        "coding model",
+        "1M context",
+        "multimodal"
+      ],
+      "summary": "三能力合一：M3 主打 open-weight、coding/agentic、1M context 和原生多模态，API 最低保证 512K context。 长任务数据：官方案例给出 ICLR 论文复现 12 小时、18 commits、23 figures，以及 FP8 GEMM 147 次提交、9.4x speedup。 开发者侧有 Token Plan、API、MiniMax Code 和待开源本地部署路径，价格/配额会直接影响 coding agent 使用成本。",
+      "bullets": [
+        "**三能力合一**：M3 主打 open-weight、coding/agentic、1M context 和原生多模态，API 最低保证 512K context。",
+        "**长任务数据**：官方案例给出 ICLR 论文复现 12 小时、18 commits、23 figures，以及 FP8 GEMM 147 次提交、9.4x speedup。",
+        "开发者侧有 Token Plan、API、MiniMax Code 和待开源本地部署路径，==价格/配额会直接影响 coding agent 使用成本==。"
+      ]
+    },
+    {
+      "candidate_id": "main-nvidia-cosmos-3-physical-ai",
+      "title": "NVIDIA Cosmos 3 面向 physical AI 推理、世界模型和动作模型",
+      "event_date": "2026-06-01",
+      "url": "https://developer.nvidia.com/blog/develop-physical-ai-reasoning-world-and-action-models-with-nvidia-cosmos-3/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Cosmos 3",
+        "physical AI",
+        "robotics",
+        "world model"
+      ],
+      "summary": "架构变化：Cosmos 3 用 MoT 把 reasoner tower 和 generator tower 合并，输入可含文本、图像、视频、音频、动作。 模型规格：Nano 为 8B，面向工作站实时推理；Super 为 32B，面向 Hopper/Blackwell 数据中心部署。 NVIDIA 同步开放 6 类 synthetic datasets，并提供 BF16、FP8、NVFP4 NIM 路径，物理 AI 不只是视频生成。",
+      "bullets": [
+        "**架构变化**：Cosmos 3 用 MoT 把 reasoner tower 和 generator tower 合并，输入可含文本、图像、视频、音频、动作。",
+        "**模型规格**：Nano 为 8B，面向工作站实时推理；Super 为 32B，面向 Hopper/Blackwell 数据中心部署。",
+        "NVIDIA 同步开放 6 类 synthetic datasets，并提供 BF16、FP8、NVFP4 NIM 路径，==物理 AI 不只是视频生成==。"
+      ]
+    },
+    {
+      "candidate_id": "main-nvidia-doca-ai-security",
+      "title": "NVIDIA 用 DOCA In-Silicon Security 强化 agentic AI 基础设施",
+      "event_date": "2026-06-01",
+      "url": "https://developer.nvidia.com/blog/advancing-ai-infrastructure-for-agentic-ai-with-nvidia-doca-in-silicon-security/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA DOCA",
+        "In-Silicon Security",
+        "AI factory",
+        "agentic AI"
+      ],
+      "summary": "安全边界下沉：BlueField DPU 把监控、策略执行、遥测放到独立信任域，主机被攻破时仍可执行控制。 性能指标：DOCA 文章给出 runtime threat detection 最高 1,000x、网络/文件访问策略执行最高 800 Gb/s。 DOCA Argus、Vault、Flow 分别对应运行时威胁检测、文件级 zero-trust 访问和硬件加速网络策略。",
+      "bullets": [
+        "**安全边界下沉**：BlueField DPU 把监控、策略执行、遥测放到独立信任域，主机被攻破时仍可执行控制。",
+        "**性能指标**：DOCA 文章给出 runtime threat detection 最高 1,000x、网络/文件访问策略执行最高 800 Gb/s。",
+        "==DOCA Argus、Vault、Flow 分别对应运行时威胁检测、文件级 zero-trust 访问和硬件加速网络策略。=="
+      ]
+    },
+    {
+      "candidate_id": "main-nvidia-alpamayo-posttrain",
+      "title": "NVIDIA Alpamayo 文章聚焦自动驾驶模型闭环后训练",
+      "event_date": "2026-06-01",
+      "url": "https://developer.nvidia.com/blog/how-to-post-train-autonomous-vehicle-models-in-closed-loop-with-nvidia-alpamayo/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Alpamayo",
+        "autonomous vehicle",
+        "closed-loop post-training"
+      ],
+      "summary": "训练范式：AlpaGym 把 AlpaSim closed-loop rollouts 接入策略训练，让模型从自己动作造成的后果中学习。 工程依赖：教程要求 CUDA/cuDNN、NCCL、Redis、Git LFS、Hugging Face auth，并用 Hydra 配置 policy、scene、reward。 输出关注 mean reward、failure rates、policy loss、rollout throughput 和 checkpoint，可用于 AV 模型闭环验收。",
+      "bullets": [
+        "**训练范式**：AlpaGym 把 AlpaSim closed-loop rollouts 接入策略训练，让模型从自己动作造成的后果中学习。",
+        "**工程依赖**：教程要求 CUDA/cuDNN、NCCL、Redis、Git LFS、Hugging Face auth，并用 Hydra 配置 policy、scene、reward。",
+        "==输出关注 mean reward、failure rates、policy loss、rollout throughput 和 checkpoint，可用于 AV 模型闭环验收。=="
+      ]
+    },
+    {
+      "candidate_id": "main-alibaba-ticket-embedding",
+      "title": "阿里云 Quick BI 推 ticket-based enhanced embedding 处理数据分享权限",
+      "event_date": "2026-06-01",
+      "url": "https://www.alibabacloud.com/blog/sharing-data-without-risking-leaks-let-ticket-based-enhanced-embedding-strike-the-perfect-balance_603197",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud",
+        "Quick BI",
+        "ticket-based embedding",
+        "data sharing"
+      ],
+      "summary": "权限模型：Quick BI ticket-based enhanced embedding 支持时间锁、访问次数锁和按角色个性化视图。 嵌入粒度：可嵌完整 dashboard、单个可视化组件、ad hoc query 和自助分析模块到 ERP、OA、CRM、App 或小程序。 治理看板跟踪授权用户、嵌入报表数、访问量和启用报表数，BI 分享从链接分发变成可运营服务。",
+      "bullets": [
+        "**权限模型**：Quick BI ticket-based enhanced embedding 支持时间锁、访问次数锁和按角色个性化视图。",
+        "**嵌入粒度**：可嵌完整 dashboard、单个可视化组件、ad hoc query 和自助分析模块到 ERP、OA、CRM、App 或小程序。",
+        "治理看板跟踪授权用户、嵌入报表数、访问量和启用报表数，==BI 分享从链接分发变成可运营服务==。"
+      ]
+    },
+    {
+      "candidate_id": "main-alibaba-lingyang-qwen-quickbi",
+      "title": "Lingyang 在 Qwen Conference 展示 Quick BI 企业级数据方案",
+      "event_date": "2026-06-01",
+      "url": "https://www.alibabacloud.com/blog/lingyang-debuts-at-the-qwen-conference-in-singapore-quick-bi-deconstructs-enterprise-grade-data-solutions-for-the-ai-era_603196",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Lingyang",
+        "Qwen Conference",
+        "Quick BI",
+        "enterprise data"
+      ],
+      "summary": "会议场景：Qwen Conference Singapore 上，Quick BI 把 enterprise Agentic Analytics 讲成“Goals -> Inferences -> Actions”。 业务覆盖：文章列出电商运营、销售运营、制造运营、供应链、金融运营等场景，强调统一指标和权限边界。 案例称手工日报工作量下降约 90%、问题发现解决提速 10x，报表迁移人工校验工作量下降 50% 以上。",
+      "bullets": [
+        "**会议场景**：Qwen Conference Singapore 上，Quick BI 把 enterprise Agentic Analytics 讲成“Goals -> Inferences -> Actions”。",
+        "**业务覆盖**：文章列出电商运营、销售运营、制造运营、供应链、金融运营等场景，强调统一指标和权限边界。",
+        "==案例称手工日报工作量下降约 90%、问题发现解决提速 10x，报表迁移人工校验工作量下降 50% 以上。=="
+      ]
+    },
+    {
+      "candidate_id": "main-vercel-ai-gateway-spend-caps",
+      "title": "Vercel AI Gateway 出现按 API Key 设置 spend cap 的成本控制线索",
+      "event_date": "2026-05-30",
+      "url": "https://x.com/rauchg/status/2060787704166776927",
+      "source": "Guillermo Rauch X status",
+      "tier": "T1",
+      "entities": [
+        "Vercel AI Gateway",
+        "API key",
+        "spend cap",
+        "cost control"
+      ],
+      "summary": "X 原始信号：Guillermo Rauch 提到 Vercel AI Gateway 可按 API Key 设置 spend cap。 成本归因：per-key cap 能把项目、环境、客户或团队拆开限额，避免共享 key 把预算和责任混在一起。 这类变化属于 AI 开发工具的计费/配额/预算控制项，应和模型发布、状态页 incident 分开记录。",
+      "bullets": [
+        "**X 原始信号**：Guillermo Rauch 提到 Vercel AI Gateway 可按 API Key 设置 spend cap。",
+        "**成本归因**：per-key cap 能把项目、环境、客户或团队拆开限额，避免共享 key 把预算和责任混在一起。",
+        "这类变化属于 AI 开发工具的计费/配额/预算控制项，==应和模型发布、状态页 incident 分开记录==。"
+      ]
+    },
+    {
+      "candidate_id": "main-nature-acoustic-biodiversity-ml",
+      "title": "Nature 论文用全国尺度声学监测分析鸟类多样性与迁徙",
+      "event_date": "2026-05-30",
+      "url": "https://www.nature.com/articles/s42003-026-10389-4",
+      "source": "Nature Communications",
+      "tier": "T1",
+      "entities": [
+        "acoustic monitoring",
+        "machine learning",
+        "biodiversity",
+        "migration"
+      ],
+      "summary": "数据规模：研究在挪威 28 个联网传感器采集 37,429 小时春季迁徙音频。 模型结果：开源检测算法经专家验证后，57 个物种达到至少 80% precision，其中 14 个为完整迁徙物种。 研究用自动检测构建 3 种常见候鸟 arrival curves，并训练声学物种分布模型，展示科研/公共领域 AI 应用面。",
+      "bullets": [
+        "==**数据规模**：研究在挪威 28 个联网传感器采集 37,429 小时春季迁徙音频。==",
+        "**模型结果**：开源检测算法经专家验证后，57 个物种达到至少 80% precision，其中 14 个为完整迁徙物种。",
+        "研究用自动检测构建 3 种常见候鸟 arrival curves，并训练声学物种分布模型，展示科研/公共领域 AI 应用面。"
       ]
     }
   ],
   "model_releases": [
     {
-      "candidate_id": "model-github-copilot-claude-opus-48",
-      "name": "Claude Opus 4.8 in GitHub Copilot",
-      "provider": "Anthropic / GitHub Copilot",
-      "availability": "closed_product",
-      "release_scope": "gateway_availability",
-      "event_date": "2026-05-28",
-      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/",
-      "source": "GitHub Changelog",
-      "summary": "GitHub 宣布 Claude Opus 4.8 在 GitHub Copilot 中 generally available，覆盖 Copilot Pro+、Business 和 Enterprise。可用入口包括 VS Code、Visual Studio、Copilot CLI、Copilot cloud agent、GitHub Copilot App、github.com、GitHub Mobile、JetBrains、Xcode 和 Eclipse。",
-      "notes": "这是 GitHub Copilot 产品入口的可用性更新，不是 Anthropic 模型首发；Business 和 Enterprise 管理员需要在 Copilot settings 中启用 Claude Opus 4.8 policy。"
+      "candidate_id": "model-minimax-m3",
+      "name": "MiniMax M3",
+      "provider": "MiniMax",
+      "availability": "open_weights",
+      "release_scope": "provider_official_launch",
+      "event_date": "2026-06-01",
+      "url": "https://www.minimax.io/blog/minimax-m3",
+      "source": "MiniMax Blog",
+      "summary": "MiniMax 发布 M3，定位为 coding、1M context 和原生多模态模型；本条按模型首发记录，不和网关可用性混写。",
+      "notes": "主体信息引用模型页，模型发布引用官方博客；后续需继续核对权重下载、API 价格和 IDE/agent 接入。"
+    },
+    {
+      "candidate_id": "model-nvidia-cosmos-3",
+      "name": "NVIDIA Cosmos 3",
+      "provider": "NVIDIA",
+      "availability": "open_weights",
+      "release_scope": "provider_official_launch",
+      "event_date": "2026-06-01",
+      "url": "https://huggingface.co/blog/nvidia/cosmos-3-for-physical-ai",
+      "source": "Hugging Face Blog / NVIDIA",
+      "summary": "Hugging Face 的 NVIDIA 文章介绍 Cosmos 3 open omni-model，用于 physical AI reasoning and action；本条只记录模型发布本身。",
+      "notes": "工程实现与应用分析放在主体信息的 NVIDIA Developer Blog 条目，避免一条内容重复包装。"
     }
   ],
   "hot_blogs": [
@@ -498,41 +1575,73 @@
   ],
   "projects": [
     {
+      "candidate_id": "project-harry0703-moneyprinterturbo",
+      "name": "harry0703/MoneyPrinterTurbo",
+      "description": "一键生成短视频的 AIGC 工具，今日 GitHub Trending daily rank 1，适合观察内容生产自动化从脚本走向产品化模板。",
+      "domains": [
+        "AIGC_video",
+        "content_automation",
+        "short_video"
+      ],
+      "use_case": "用于把主题、文案、配音和素材组装成短视频工作流，适合内容团队评估自动化生产链。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily rank 1，discovery 记录 1,937 stars today。"
+    },
+    {
       "candidate_id": "project-d4vinci-scrapling",
       "name": "D4Vinci/Scrapling",
-      "description": "自适应网页抓取框架，GitHub Trending daily rank 1。README 描述覆盖单次请求到大规模 crawl，适合为 agent 或 RAG 管线构建网页采集层。",
+      "description": "自适应网页抓取框架，今日 GitHub Trending daily rank 3，覆盖动态页面和大规模 crawl 场景。",
       "domains": [
         "web_scraping",
         "data_ingestion",
         "RAG"
       ],
-      "use_case": "用于把网站页面转成可清洗数据，给搜索增强、竞品监控或评测样本采集提供抓取入口。",
+      "use_case": "用于给 RAG、竞品监控或评测样本构建网页采集层。",
       "url": "https://github.com/D4Vinci/Scrapling",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 1，页面显示 639 stars today。"
+      "evidence": "GitHub Trending daily rank 3，discovery 记录 606 stars today。"
     },
     {
-      "candidate_id": "project-revfactory-harness",
-      "name": "revfactory/harness",
-      "description": "生成领域专用 agent team、专门 agent 和对应 skills 的 meta-skill 项目，GitHub Trending daily rank 6。",
+      "candidate_id": "project-everyinc-compound-engineering-plugin",
+      "name": "EveryInc/compound-engineering-plugin",
+      "description": "面向 Claude Code、Codex、Cursor 等工具的工程插件，关注多工具协作、流程约束和代码生成质量。",
       "domains": [
-        "agent_harness",
-        "skills",
-        "multi_agent"
+        "coding_agent",
+        "developer_workflow",
+        "automation"
       ],
-      "use_case": "用于探索把领域任务拆成 agent、skill 和运行约束的自动化脚手架，适合评估团队级 agent 编排方式。",
-      "url": "https://github.com/revfactory/harness",
+      "use_case": "用于评估团队如何把多个 coding agent 接入同一工程工作流。",
+      "url": "https://github.com/EveryInc/compound-engineering-plugin",
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 6，页面描述为 meta-skill for domain-specific agent teams。"
+      "evidence": "GitHub Trending daily rank 5，discovery 记录 251 stars today。"
+    },
+    {
+      "candidate_id": "project-openbmb-voxcpm",
+      "name": "OpenBMB/VoxCPM",
+      "description": "面向多语音生成、创意音色设计和声音克隆的 tokenizer-free TTS 项目，继续在 daily 榜前列。",
+      "domains": [
+        "AIGC_audio",
+        "TTS",
+        "voice_clone"
+      ],
+      "use_case": "用于播客、短视频和多语种内容生产中的声音生成与克隆评估。",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "event_date": "2026-06-01",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily rank 7，discovery 记录 635 stars today。"
     },
     {
       "candidate_id": "project-supermemoryai-supermemory",
       "name": "supermemoryai/supermemory",
-      "description": "面向 AI 应用的 memory engine 和 app，GitHub Trending daily rank 8，项目定位是高速、可扩展的 AI memory API。",
+      "description": "面向 AI 应用的 memory engine 和 app，今日 GitHub Trending daily rank 10，定位为高速可扩展的 AI memory API。",
       "domains": [
         "agent_memory",
         "knowledge_base",
@@ -543,105 +1652,176 @@
       "event_date": "2026-06-01",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 8，页面显示 236 stars today。"
+      "evidence": "GitHub Trending daily rank 10，discovery 记录 264 stars today。"
     }
   ],
   "builder_observations": [
     {
-      "candidate_id": "builder-claudeai-opus-48-x",
-      "author": "Claude official account",
-      "content": "Claude 官方 X status 作为本轮 Builder 原始社交来源，围绕 Opus 4.8 发布。由于 follow-builders central feed 抓取失败，这条原始 X URL 只用于保持 Builder 来源可审计，不把二手摘要当作事实来源。",
-      "url": "https://x.com/claudeai/status/2060045358445576332",
-      "role": "Anthropic official social account",
-      "event_date": "2026-05-28",
-      "source": "Claude official X status",
-      "evidence": "Original X URL for Claude Opus 4.8 launch; web open returned an X page URL even though detailed content was not available without client runtime."
-    },
-    {
-      "candidate_id": "builder-openai-codex-windows",
-      "author": "OpenAI Codex product team",
-      "content": "OpenAI release notes 把 Codex Computer Use on Windows、远程控制和 usage profiles 放在 2026-05-29 更新中。对 builder 来说，这说明桌面自动化能力正在从单机运行扩展到移动端查看、远程接管和使用统计。",
-      "url": "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images",
-      "role": "OpenAI product release notes",
-      "event_date": "2026-05-29",
-      "source": "OpenAI Help Center",
-      "evidence": "OpenAI release notes dated 2026-05-29 list Codex Computer Use on Windows, remote control, profiles, usage stats, and token activity."
-    },
-    {
-      "candidate_id": "builder-microsoft-foundry-agent-evals",
-      "author": "Microsoft Foundry developer experience team",
-      "content": "Foundry 5 月更新把 trace-based evaluation、skill evaluation、workflow evaluation UX 和 Foundry Local 放在同一批发布里。Builder 侧值得关注的是评测入口开始连接真实生产 traces，而不是只围绕 synthetic datasets 做上线前检查。",
-      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
-      "role": "Microsoft Foundry product team",
+      "candidate_id": "follow-builders-x-guillermo-rauch-per-api-key-spend-caps-on-ai-gateway-t-co-css7",
+      "author": "Guillermo Rauch",
+      "content": "Rauch 提到 Vercel AI Gateway 的 per-API key spend caps。对 builder 来说，模型路由之外的关键变化是按项目、环境或客户拆分预算，减少共享 key 带来的成本不可解释问题。",
+      "url": "https://x.com/rauchg/status/2060787704166776927",
+      "role": "Vercel CEO",
       "event_date": "2026-05-30",
-      "source": "Microsoft Foundry Blog",
-      "evidence": "Microsoft Foundry blog lists external/hosted agent trace-based evaluation, evaluation UX, Foundry Local, and project-level cost attribution."
+      "source": "follow-builders X feed",
+      "evidence": "Original X status from follow-builders feed: Per-API Key spend caps on AI Gateway."
+    },
+    {
+      "candidate_id": "follow-builders-x-ryo-lu-what-i-love-about-auto-review-cursor-explains-the-comma",
+      "author": "Ryo Lu",
+      "content": "Ryo Lu 说 Cursor auto-review 会解释命令和风险，让新开发者更容易判断下一步。这里的观察点是 agent 工具正在把风险提示、命令解释和执行确认做成默认交互。",
+      "url": "https://x.com/ryolu_/status/2060766674203353190",
+      "role": "Cursor product/design builder",
+      "event_date": "2026-05-30",
+      "source": "follow-builders X feed",
+      "evidence": "Original X status from follow-builders feed about Cursor auto-review explaining command and risk."
+    },
+    {
+      "candidate_id": "follow-builders-x-peter-steinberger-with-gpt-5-5-goal-autoreview-and-crabbox-my-",
+      "author": "Peter Steinberger",
+      "content": "Steinberger 说 GPT-5.5、/goal、autoreview 和 crabbox 让自己的 prompts 从约 30-60 分钟延长到 4-10 小时任务。长任务的验收、回滚和成本上限会成为 coding agent 日常管理项。",
+      "url": "https://x.com/steipete/status/2060678430031597696",
+      "role": "Builder / engineer",
+      "event_date": "2026-05-30",
+      "source": "follow-builders X feed",
+      "evidence": "Original X status from follow-builders feed about GPT-5.5, /goal, autoreview, crabbox and 4-10h tasks."
     }
   ],
-  "community_leads": [],
-  "evidence_assets": [],
+  "community_leads": [
+    {
+      "content": "轻量运营：Claude Status 记录 2026-06-01 Opus 4.7 elevated errors 并进入 monitoring/resolved 流程。此类信息只影响运行检查、重试和降级策略，不写入模型发布。",
+      "url": "https://status.claude.com/incidents/rk70zc69m54p"
+    },
+    {
+      "content": "轻量运营：Claude Status 还记录 2026-05-31 另一次 Opus 4.7 elevated errors incident。连续短时 incident 适合进入日报的模型可用性台账。",
+      "url": "https://status.claude.com/incidents/694jznhm6tsl"
+    },
+    {
+      "content": "模型可用性：Claude Opus 4.8 在 GitHub Copilot 中 GA 属于产品入口可用性更新，本轮从模型发布移出，作为 Copilot 管理员策略和用户入口变更记录。",
+      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "MiniMax M3 论文复现实验截图",
+      "source_url": "https://www.minimax.io/models/text/m3",
+      "local_path": "assets/evidence/minimax-m3-paper-reproduction.png",
+      "caption": "图 1：MiniMax M3 官方页面展示的 ICLR 论文复现实验结果截图，保留原文图片而不是转写成表格。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "Cosmos 3 架构图",
+      "source_url": "https://developer.nvidia.com/blog/develop-physical-ai-reasoning-world-and-action-models-with-nvidia-cosmos-3/",
+      "local_path": "assets/evidence/nvidia-cosmos-3-architecture.webp",
+      "caption": "图 2：NVIDIA Developer Blog 原文中的 Cosmos 3 reasoner/generator 架构图。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "DOCA Argus 威胁检测架构图",
+      "source_url": "https://developer.nvidia.com/blog/advancing-ai-infrastructure-for-agentic-ai-with-nvidia-doca-in-silicon-security/",
+      "local_path": "assets/evidence/nvidia-doca-argus-architecture.webp",
+      "caption": "图 3：NVIDIA Developer Blog 原文中的 DOCA Argus AI threat detection 架构图。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "Alpamayo 闭环后训练工作流图",
+      "source_url": "https://developer.nvidia.com/blog/how-to-post-train-autonomous-vehicle-models-in-closed-loop-with-nvidia-alpamayo/",
+      "local_path": "assets/evidence/nvidia-alpamayo-workflow.webp",
+      "caption": "图 4：NVIDIA Alpamayo 原文中的自动驾驶模型闭环后训练工作流图。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "MiniMax M3 论文复现实验截图",
+      "source_url": "https://www.minimax.io/blog/minimax-m3",
+      "local_path": "assets/evidence/minimax-m3-paper-reproduction.png",
+      "caption": "图 1：MiniMax M3 官方页面展示的 ICLR 论文复现实验结果截图，复用于模型发布条目。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "Cosmos 3 架构图",
+      "source_url": "https://huggingface.co/blog/nvidia/cosmos-3-for-physical-ai",
+      "local_path": "assets/evidence/nvidia-cosmos-3-architecture.webp",
+      "caption": "图 2：NVIDIA Developer Blog 原文中的 Cosmos 3 reasoner/generator 架构图，复用于模型发布条目。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "SageMaker LLM 推理可观测性架构图",
+      "source_url": "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/",
+      "local_path": "assets/evidence/aws-sagemaker-llm-observability-architecture.png",
+      "caption": "AWS Machine Learning Blog 原文首图：SageMaker endpoint、Inference Components、CloudWatch 与 Grafana 的监控链路。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "AWS for SAP MCP Server 架构图",
+      "source_url": "https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/",
+      "local_path": "assets/evidence/aws-sap-mcp-agentcore-architecture.png",
+      "caption": "AWS for SAP Blog 原文架构图：MCP Server 运行在 Bedrock AgentCore Runtime 并连接 SAP OData API。",
+      "extraction_status": "source_image"
+    }
+  ],
   "self_check": {
     "report_date": "2026-06-01",
-    "main_items": 2,
+    "main_items": 10,
     "builder_observations": 3,
     "builder_skill_used": [
-      "official-ai-releases",
-      "github-ai-trending",
       "follow-builders"
     ],
     "fallback_sources": [
-      "GitHub Trending web fallback",
-      "official provider pages opened through web",
-      "GitHub Changelog and Docs pages opened through web",
-      "Microsoft and AWS official blogs opened through web"
+      "official content RSS/HTML feeds",
+      "follow-builders X feed",
+      "Claude Status Atom",
+      "GitHub Trending",
+      "web search for official source confirmation"
     ],
     "primary_links": true,
     "no_banned_words": true,
     "no_unsourced_numbers": true,
-    "notes": "固定 discovery、search shadow、statuspage 和 sources:health 命令已运行；本地 shell 网络返回 fetch failed，因此本轮使用 web fallback 核验官方来源。主体信息只保留 2026-05-30..2026-06-01；2026-05-28..2026-05-29 内容仅进入模型、博客、项目或 Builder 区。GitHub Trending previous_rank 未做跨口径比较。",
+    "notes": "本轮主体信息保留 10 条；已移除按条目凑数的手工表格，仅对原文确有图表的 4 条挂载 source_image。模型可用性 incident 仍在 community_leads 轻量运营项中。",
     "optimization_suggestions": [
       {
-        "title": "为 shell fetch 失败记录 web fallback 证据",
-        "observation": "固定 discovery 命令全部 fetch failed，但 web 侧能打开官方页面。",
-        "evidence": ".tmp 中 discovery 输出为 blocked，GitHub/OpenAI/Microsoft/AWS 页面通过 web 打开。",
-        "module": "prompts/ai-daily/modules/publish-workflow.md",
-        "expected_benefit": "让后续日报能稳定说明哪些来源来自命令、哪些来自浏览器 fallback。",
-        "requires_confirmation": true
+        "issue": "微信公众号行业动态已有手工白名单入口但尚未产生本轮条目",
+        "evidence": "已新增 manual source registry；本轮没有用户确认的公众号账号、转载页或人工录入条目。",
+        "module": "source-registry",
+        "suggestion": "补齐公众号白名单与录入规范；对低风险行业动态允许公众号线索入选，高风险事实仍回查主源或多源。",
+        "expected_benefit": "提高主体信息中的产业与内容行业覆盖。",
+        "requires_user_confirmation": true
       },
       {
-        "title": "按口径保存 GitHub Trending 历史",
-        "observation": "本轮从 global daily 页面抽取 Top 10，无法和前一日 Python/TypeScript 榜单直接比较 rank_delta。",
-        "evidence": "2026-05-31 使用语言榜，2026-06-01 使用 global daily fallback。",
-        "module": "discover:github-trending",
-        "expected_benefit": "避免跨口径排名变化误导读者，同时保留 daily、weekly、language 的连续比较。",
-        "requires_confirmation": true
-      },
-      {
-        "title": "区分 Builder 原始社交与官方工程来源",
-        "observation": "follow-builders feed 阻塞时，需要同时满足原始 X status 和 3 条 Builder 观察门禁。",
-        "evidence": "本轮使用 1 条 Claude 官方 X URL 与 2 条官方工程来源补足 Builder 区。",
-        "module": "prompts/ai-daily/modules/structured-report-json.md",
-        "expected_benefit": "减少把官方 release note、工程博客和社交帖混成同一种 Builder 证据的风险。",
-        "requires_confirmation": true
+        "issue": "小宇宙/喜马拉雅未进入自动抽取",
+        "evidence": "当前仓库没有 XIMALAYA_TOKEN，follow-builders podcast transcript also returned an upstream 404 for one episode。",
+        "module": "podcast-sources",
+        "suggestion": "小宇宙优先走公开 RSS；喜马拉雅需要开放 RSS 或授权 token，否则只记录节目页与人工摘要。",
+        "expected_benefit": "补齐中文播客、访谈和从业者观点。",
+        "requires_user_confirmation": false
       }
     ],
-    "publish_status": {
-      "html_generated": false,
-      "repo_updated": false,
-      "repo_pushed": false,
-      "pages_url": "",
-      "publish_error": ""
+    "pricing_quota_cost_items": 3,
+    "model_availability_ops": 3,
+    "wechat_whitelist_items": 0,
+    "provider_cost_units": {
+      "search_news": 0
     }
   },
   "publish_status": {
     "html_generated": false,
     "repo_updated": false,
     "repo_pushed": false,
-    "pages_url": "",
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-01.html",
     "publish_error": ""
   },
-  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-01.html",
-  "html_path": "reports/2026/06/2026-06-01.html",
-  "candidate_pool_path": "data/2026/06/2026-06-01.candidates.json",
-  "generated_at": "2026-05-31T18:45:44.506Z"
+  "generated_at": "2026-06-01T16:00:00+08:00",
+  "quality_status": {
+    "status": "ok",
+    "reasons": [],
+    "affected_sections": [],
+    "public_note": "Core discovery checks completed without blocking degradation."
+  }
 }

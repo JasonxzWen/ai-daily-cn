@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "wechat-industry-whitelist-manual",
+      "name": "WeChat Industry Whitelist Manual Intake",
+      "url": "https://mp.weixin.qq.com/",
+      "source_kind": "manual",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "intermediary",
+      "enablement": "manual",
+      "verification_policy": "community_only",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 1000,
+      "source_level": "wechat_industry_whitelist",
+      "allowed_low_risk_sections": ["community_leads", "main_items"],
+      "notes": "Manual entrypoint for user-approved WeChat public-account industry dynamics. High-stakes facts still require primary or multi-source verification."
+    }
+  ]
+}

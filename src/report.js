@@ -113,9 +113,45 @@ export function normalizeReportDraft(draft, options = {}) {
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
   requireBuilderXObservation(validation.value, options.candidatePool);
+  requireEvidenceAssetSelectivity(validation.value);
+  requireExpandedMainItemFormat(validation.value);
   requirePublishableQuality(validation.value);
 
   return validation.value;
+}
+
+function requireEvidenceAssetSelectivity(report) {
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  if (mainItems.length < 6) {
+    return;
+  }
+
+  const mainUrls = new Set(mainItems.map((item) => normalizeUrlForEvidenceGate(item.url)).filter(Boolean));
+  const assets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
+  const mainEvidenceAssets = assets.filter((asset) => mainUrls.has(normalizeUrlForEvidenceGate(asset?.source_url)));
+  const manualMainTables = mainEvidenceAssets.filter((asset) => asset?.type === "table" && asset?.extraction_status === "manual_table");
+
+  if (manualMainTables.length >= Math.ceil(mainItems.length * 0.8)) {
+    throw new PublisherError(
+      "evidence_assets_overpadded",
+      "evidence_assets 不能用人工转写表格覆盖大多数主体信息；只有原文图表或天然适合表格呈现的结构化数据才应挂载表格。",
+      {
+        main_items: mainItems.length,
+        main_evidence_assets: mainEvidenceAssets.length,
+        manual_main_tables: manualMainTables.length
+      }
+    );
+  }
+}
+
+function normalizeUrlForEvidenceGate(value) {
+  try {
+    const url = new URL(String(value || ""));
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return String(value || "").trim().replace(/\/$/, "");
+  }
 }
 
 function requireSourceAudit(report) {
@@ -138,6 +174,55 @@ function requireAuditGroup(group, pathName) {
   }
   if (!Array.isArray(group.sources) || group.sources.length === 0) {
     throw new PublisherError("source_audit_incomplete", `${pathName}.sources 必须至少记录一个已检查来源。`);
+  }
+  const candidatesFound = Number.isInteger(group.candidates_found) ? group.candidates_found : 0;
+  const included = Number.isInteger(group.included) ? group.included : 0;
+  if (included > candidatesFound) {
+    throw new PublisherError("source_audit_count_inconsistent", `${pathName}.included cannot exceed candidates_found.`, {
+      path: pathName,
+      candidates_found: candidatesFound,
+      included
+    });
+  }
+}
+
+function requireExpandedMainItemFormat(report) {
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  if (mainItems.length < 8) {
+    return;
+  }
+
+  const bannedMetaPhrases = ["日报跟踪口径", "报道边界", "后续跟进", "反思建议", "对日报的反思"];
+  const errors = [];
+
+  mainItems.forEach((item, index) => {
+    const bullets = Array.isArray(item.bullets) ? item.bullets.map((bullet) => String(bullet || "").trim()) : [];
+    const text = bullets.join("\n");
+    if (bullets.length < 2 || bullets.length > 4) {
+      errors.push(`main_items[${index}].bullets must contain 2-4 factual bullets`);
+    }
+    if (!/\*\*[^*]+\*\*/.test(text)) {
+      errors.push(`main_items[${index}] missing bold emphasis`);
+    }
+    if (!/==[^=]+==/.test(text)) {
+      errors.push(`main_items[${index}] missing highlight marker`);
+    }
+    const totalChars = bullets.reduce((sum, bullet) => sum + bullet.length, 0);
+    if (totalChars < 120) {
+      errors.push(`main_items[${index}] summary is too thin`);
+    }
+    const metaPhrase = bannedMetaPhrases.find((phrase) => text.includes(phrase));
+    if (metaPhrase) {
+      errors.push(`main_items[${index}] contains report-meta phrase: ${metaPhrase}`);
+    }
+  });
+
+  if (errors.length > 0) {
+    throw new PublisherError(
+      "main_items_format_weak",
+      "Expanded main_items require 2-4 factual bullets with bold and highlight markers.",
+      { errors }
+    );
   }
 }
 

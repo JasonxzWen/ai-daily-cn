@@ -246,7 +246,7 @@
 
 1. 提示词规格：更新 `source-policy`、`discovery-audit`、`structured-report-json`、`output-html`、`plain-language`，把本规格转成每日生成规则。
 2. 发现器：扩展 `discover:builders`，优先消费 `follow-builders` central JSON，再退到 raw feed、本地缓存和固定 RSS。
-3. 博客/访谈发现：`discover:content-sources` 从 `config/sources/*.json` 读取默认源，默认只跑 `core`，用 `--enablement core,optional` 显式打开 Product Hunt、广义科技媒体、Latent.Space、Interconnects、Planet AI 等候选源。
+3. 博客/访谈发现：`discover:content-sources` 从 `config/sources/*.json` 读取默认源，默认跑 `core,optional`，覆盖 Product Hunt、广义科技媒体、Latent.Space、Interconnects、Planet AI 等候选源；公众号/中文自媒体保留为 `manual`，需要显式打开或人工录入。
 4. 项目发现：扩展项目候选结构，补 `domains`、`use_case`、`signal`、`evidence`。
 5. Schema：新增向后兼容字段和新日报质量门。
 6. 渲染：动态生成 sections；空数组不渲染；header 使用 `hero_highlights`；博客不渲染“为什么重要”；项目展示领域/作用。

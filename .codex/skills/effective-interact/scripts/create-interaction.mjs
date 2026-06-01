@@ -586,7 +586,7 @@ function renderTable(headers, rows) {
   const body = rows
     .map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join("")}</tr>`)
     .join("");
-  return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  return `<div class="markdown-table-scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 function safeCssWidth(value) {
@@ -1157,6 +1157,24 @@ function renderCardDetails(points) {
   }).join("")}</dl>`;
 }
 
+function renderCardMedia(media) {
+  const items = Array.isArray(media)
+    ? media.filter((item) => item && item.src).slice(0, 2)
+    : [];
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<div class="card-media-grid" data-count="${items.length}">${items.map((item) => {
+    const src = safeDataImage(item.src) || safeLink(item.src);
+    if (!src) {
+      return "";
+    }
+    const caption = item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : "";
+    return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(item.alt || item.caption || "")}" loading="lazy" decoding="async">${caption}</figure>`;
+  }).filter(Boolean).join("")}</div>`;
+}
+
 function safeDataImage(value) {
   const src = String(value || "").trim();
   if (/^data:image\/(?:svg\+xml|png|jpe?g|webp|gif);base64,[a-z0-9+/=]+$/i.test(src)) {
@@ -1173,6 +1191,7 @@ function renderFilterableCard(item, target, cardClass) {
     ${groupMeta}
     ${renderCardTitle(item)}
     ${renderCardTags(item.tags)}
+    ${renderCardMedia(item.media)}
     <p>${inlineMarkdown(item.body || "")}</p>
     ${renderCardDetails(item.points)}
   </article>`;
@@ -1183,13 +1202,14 @@ function renderFilterableCards(section) {
   const items = Array.isArray(section.items) ? section.items : [];
   const groups = ["all", ...new Set(items.map((item) => item.group || "item"))];
   const cardClass = safeClassList(section.cardClass);
+  const gridClass = ["evidence-grid", "focus-field", cardClass ? `${cardClass}-grid` : ""].filter(Boolean).join(" ");
   const showFilters = section.showFilters !== false && groups.length > 2;
   return `<section class="panel" ${sectionAttrs(section)}>
     ${renderSectionHeader(section)}
     ${showFilters ? `<div class="toolbar" role="toolbar" aria-label="${escapeAttr(section.filterLabel || section.title)} filters">
       ${groups.map((group, index) => `<button data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" aria-pressed="${index === 0 ? "true" : "false"}">${escapeHtml(group === "all" ? "全部" : group)}</button>`).join("")}
     </div>` : ""}
-    <div class="evidence-grid focus-field" data-focus-field="${target}">
+    <div class="${escapeAttr(gridClass)}" data-focus-field="${target}">
       ${items.map((item) => renderFilterableCard(item, target, cardClass)).join("\n")}
     </div>
   </section>`;
@@ -1573,7 +1593,7 @@ async function createInteraction(input, options = {}) {
   const css = [
     fs.readFileSync(reportUiCssPath, "utf8"),
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
-    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
+    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 4px}.markdown-table-scroll table{margin:0}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}.markdown-table-scroll table{min-width:100%;font-size:12.5px}.markdown-table-scroll th,.markdown-table-scroll td{padding:7px 8px;word-break:break-word}}"
   ].join("\n");
 
   const js = [

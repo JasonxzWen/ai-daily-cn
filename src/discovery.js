@@ -998,6 +998,11 @@ export async function collectContentSources(options = {}) {
     const currentSource = normalizeGenericSource(rawSource, "content");
     const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
     candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
+    if (currentSource.source_kind === "manual") {
+      markSource(candidateSources.at(-1), "skipped_manual_review_required", "manual whitelist source");
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata"));
+      continue;
+    }
     if (Date.now() - startedAt > budgetMs) {
       markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
@@ -1117,7 +1122,7 @@ async function loadContentSources(options = {}) {
     const registry = await loadSourceRegistry({
       rootDir: options.rootDir || process.cwd(),
       sourcesPath: options.registryPath || path.join("config", "sources"),
-      includeEnablement: options.enablement || "core"
+      includeEnablement: options.enablement || "core,optional"
     });
     return registry.sources;
   } catch (error) {
@@ -1502,7 +1507,7 @@ export async function collectStatuspageIncidents(options = {}) {
         candidates.push({
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
-          category: "main_item",
+          category: "community_lead",
           title: `${currentSource.name}: ${entry.title}`,
           url: entry.url,
           source: currentSource.name,

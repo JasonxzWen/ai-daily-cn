@@ -3,7 +3,7 @@
 - T0：官方博客、论文、模型卡、GitHub Release、官方 benchmark。
 - T1：builder、研究者、founder、maintainer 的原始帖子或视频。
 - T2：GitHub、Hugging Face、arXiv、HN、Reddit、Product Hunt、播客原始单集页、可追溯社区讨论。
-- T3：媒体报道、微信公众号、自媒体、华尔街见闻、行业资讯站和聚合摘要，只作为发现线索或交叉验证，最终尽量回到 T0/T1/T2。
+- T3：媒体报道、普通微信公众号、自媒体、华尔街见闻、行业资讯站和聚合摘要，默认只作为发现线索或交叉验证，最终尽量回到 T0/T1/T2。用户确认的公众号白名单可按 `wechat_primary_like` 或 `wechat_industry_whitelist` 单独标注。
 
 优先扩展信源：
 
@@ -13,21 +13,33 @@
 - 广义科技、大厂和行业趋势：TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Google Keyword Blog、Official Microsoft Blog、Apple Newsroom、Meta Newsroom、Amazon News 等可以作为候选源；只有当它们影响 AI 供给、开发者工作流、平台政策、算力/云、产品分发、监管或产业结构时才入选。
 - 高质量个人/社区技术博客与访谈：Latent.Space、Interconnects、Simon Willison、Chip Huyen、Karpathy、BAIR Blog，以及对 OpenAI、Anthropic、Google、Meta 等大型实验室工程师的原始访谈或 transcript。
 - 产品发现：Product Hunt、新产品榜单、项目官网和 GitHub README 可作为候选源；最终事实尽量回到产品官网、GitHub、官方文档或原始发布页。
-- 播客平台：小宇宙、喜马拉雅等只作为具体节目或单集发现入口；最终需要单集页、RSS episode、原始音频或可信 transcript。
-- 中介媒体：微信公众号、自媒体和行业媒体是重要线索源，但不是最终报道实体；必须先尝试拿到其引用的一手信源。无法回源时只进入 `community_leads` 并标记待验证。
+- AI 开发工具商业化：固定检查 coding agent、IDE、API gateway、云平台、评测/观测工具的价格页、changelog、Service Quotas、usage dashboard、rate limit 和 credit/seat/usage-based billing 变化。
+- AIGC 与内容产业：RCTV、The Magnifier AI、Fast Company Creator Economy、Crunchbase News AI，以及中文内容产业媒体、平台公告、活动页面和公司公告可作为候选源。覆盖 AI 视频、短剧/漫剧、音乐/配音、广告创意、创作者工具、内容平台政策和商业化，但事实性入选必须回到官方、产品页、监管文件、投资方公告或多源确认。
+- 播客平台：小宇宙、喜马拉雅等只作为具体节目或单集发现入口；最终需要单集页、RSS episode、原始音频或可信 transcript。小宇宙可通过 RSSHub `/xiaoyuzhou/podcast/:id`；喜马拉雅可通过 RSSHub `/ximalaya/:type/:id/:all/:shownote?`，但通常需要 `XIMALAYA_TOKEN` 且默认不输出 ShowNote，缺少授权或单集证据时必须说明不可用。
+- 公众号与中介媒体：普通微信公众号、自媒体和行业媒体是重要线索源，但不是最终报道实体；必须先尝试拿到其引用的一手信源。`wechat_primary_like` 可作为半一手，`wechat_industry_whitelist` 可用于低风险行业动态和观点分析进入主体信息；无法回源且不在白名单时只进入 `community_leads` 并标记待验证。
 - 聚合站：Planet AI、RSS 索引仓库等只作发现和交叉验证，最终链接尽量回到原文。
+
+扩容目标：
+
+- 新日报目标是 22-30 个内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。
+- `main_items` 目标是 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报并使用 `**加粗**` / `==高亮==` 标重点。主体信息只写新闻事实、数据、图表、限制和影响，不写对日报自身的“后续跟进/报道口径/扩容建议”。
+- 扩容通过增加候选池实现，不通过降低高风险事实门槛实现。正文少于 18 个内容单元时，不凑数；在 `quality_status` 或 `self_check.notes` 写明缺口来源。
 
 禁止：
 
 - 使用没有来源的数字。
 - 只引用二手媒体而不回源。
-- 把微信公众号、自媒体或聚合摘要当作事实最终来源。
+- 把普通微信公众号、自媒体或聚合摘要当作事实最终来源。
+- 把白名单公众号里的融资金额、估值、价格、benchmark、安全事故、监管或模型能力断言当作无须核验的事实。
 - 使用没有原始 X status URL 的 X 热点摘要。
 - 把搜索结果摘要、公众号正文、媒体转载或聚合页直接写成事实来源；搜索命中必须先回到一手 URL 或保留为 `community_lead`。
 - 把预测、传闻或情绪化观点写成事实。
 - 把没有原文链接或可确认发布日期的博客写入 `hot_blogs`。
 - 把 builder 观察计入主体信息数量。
 - 官方 docs 页面没有 dated changelog、release note、RSS、commit 或官方 dated post 交叉确认时，不写入主体信息；可降级为社区线索，并固定说明“官方文档状态存在但发布日期待交叉确认”。
+- 把 Statuspage、第三方网关上架、preview access、区域/账号开放或模型短时可用性变化写入 `model_releases`；这些默认是 `community_leads` 轻量运营项。
+- 漏采 AI 开发工具的计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 或 credit 变化。
+- 为了视觉覆盖率给普通新闻批量构造 `manual_table`；表格只能来自原文表格、明确结构化数据，或确实适合对比呈现的价格/配额/benchmark/规格/步骤信息。原文有图表时优先引用并缓存原文图片。
 
 博客收录要求：
 

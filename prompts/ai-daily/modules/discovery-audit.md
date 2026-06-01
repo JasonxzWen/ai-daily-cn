@@ -26,17 +26,18 @@
    - 至少检查 OpenAI、Anthropic Engineering/News、GitHub Changelog、Google DeepMind/Research、Meta AI、Microsoft Research、Hugging Face Blog 中可访问的官方或工程博客源。
    - AI 日报不局限在狭义 AI：也要检查科技行业、大厂动态、平台政策、开发者生态、算力/芯片、云服务、产品分发和产业趋势。广义来源已注册为 `optional`，包括 TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Product Hunt、Latent.Space、Interconnects、Planet AI 等。
    - 至少检查一个高质量博客/访谈聚合源，例如 Latent.Space、Interconnects、Planet AI、Product Hunt、TechCrunch AI、The Verge AI 或 Follow AI Builders。
-   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认只检查 `core` 官方/工程/研究源。需要补漏时显式加 `--enablement core,optional`，把广义科技/大厂来源和聚合源写入候选池。`--per-source-limit` 用于避免单一大源挤掉其他来源。
+   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。`--per-source-limit` 用于避免单一大源挤掉其他来源。
    - Product Hunt 和新产品榜单只产生候选；入选项目区前必须用官网、GitHub、文档或 README 交叉确认，并补充“领域”和“作用”。
    - Product Hunt 必须同时覆盖 developer-tools feed 和 Product Hunt Trending feed；Product Hunt 本身只证明“上榜/热度”，不证明产品事实。
-   - 微信公众号、华尔街见闻、自媒体和中文科技媒体只能作为 `category:"intermediary"` 的中介发现源；入选事实性栏目之前，必须先追溯它们引用的一手来源。无法回源时只能进入 `community_leads` 并标记待验证。
-   - 小宇宙、喜马拉雅等播客平台只能作为具体节目/单集入口；平台首页或无日期页面不能作为最终来源。
+   - 普通微信公众号、华尔街见闻、自媒体和中文科技媒体默认作为 `category:"intermediary"` 的中介发现源；入选事实性栏目之前，必须先追溯它们引用的一手来源。用户确认的公众号白名单可使用 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，低风险行业动态可进入 `main_items`，但必须保留公众号名、发布时间、待核验点和风险等级。
+   - 小宇宙、喜马拉雅等播客平台只能作为具体节目/单集入口；平台首页或无日期页面不能作为最终来源。小宇宙可通过 RSSHub `/xiaoyuzhou/podcast/:id`；喜马拉雅可通过 RSSHub `/ximalaya/:type/:id/:all/:shownote?`，但通常需要 `XIMALAYA_TOKEN` 且默认不输出 ShowNote，缺少单集、音频、transcript 或授权时说明不可用原因。
 
 4. 热点讨论、播客和融资发现面：
    - 参考飞书周报做法，允许保留“热点讨论”和“融资/商业化”候选，但必须有原始帖子、节目主页、原始音频、公司公告、投资方公告或可信 dated source。
    - 通用 Twitter/X 热议没有稳定 API 时，不要臆造热度；优先使用 follow-builders central feed 中带原始 X URL 的帖子。需要扩展覆盖面时，只使用自托管 RSSHub、twscrape、列表导出或等价工具中能保留原始 `x.com/.../status/...` / `twitter.com/.../status/...` 的 feed，并在 `community_leads` 或 `builder_observations` 标明来源。
    - 播客或访谈必须保留节目主页/原始音频/转录链接之一；没有原始链接不进入 `hot_blogs` 或 `builder_observations`。
    - 融资信息优先放 `community_leads`，只有官方公告或多源交叉确认且影响模型/算力/产品供给时才进入 `main_items`。
+   - AI 开发工具计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 和 credit 变化是常规候选；影响开发工作流、团队预算、上线容量或采购口径时进 `main_items`，否则进 `community_leads`。
 
 5. 搜索 / 新闻影子发现面：
    - 用 `npm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 补漏和回源。
@@ -45,7 +46,7 @@
    - 搜索命中官方域名、论文、GitHub release 或产品文档时才可标记 `primary_confirmed`；媒体/自媒体/聚合站命中只能作为 `community_lead`。
 
 6. RSSHub / RSS-Bridge / 聚合健康检查：
-   - 用 `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional` 检查 feed 形态、HTTP 状态、近 48 小时条目数和原始 URL 要求。
+   - 用 `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查 feed 形态、HTTP 状态、近 48 小时条目数和原始 URL 要求；`manual` 来源应记录跳过原因，不做自动抓取失败处理。
    - 自托管 RSSHub/RSS-Bridge 未配置 base URL 时记录 `skipped_missing_base_url`，不是日报失败。
 
 7. 连续运行验收：
@@ -112,15 +113,23 @@
 }
 ```
 
-`sources[].status` 只能使用 `checked`、`blocked`、`no_signal`、`skipped_missing_token`、`skipped_missing_base_url`。没有合格候选时不要凑数，但必须在 `source_audit` 里说明已经检查过什么以及为什么未收录。
+`sources[].status` 只能使用 `checked`、`blocked`、`no_signal`、`skipped_missing_token`、`skipped_missing_base_url`、`skipped_manual_source`、`skipped_manual_review_required`。没有合格候选时不要凑数，但必须在 `source_audit` 里说明已经检查过什么以及为什么未收录。
+
+### 内容扩容验收
+
+- 目标公开内容单元为 22-30 个，计算口径为 `main_items + model_releases + hot_blogs + projects + builder_observations + community_leads + github_trending`。
+- `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写候选事实、数据、图表、限制和影响，不写“日报跟踪/报道边界/后续建议”类元评论。
+- 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，或在 `self_check.notes` 明确说明低信号、网络阻塞、回源失败或人工未选入。
+- 每日候选池应至少尝试覆盖：AIGC/内容产业 4 条、产品/融资 5 条、博客/播客 3 条、X/社区讨论 2 个事件。候选不足时记录 `no_signal`，不要伪造。
+- `content_sources` 至少记录 core 官方/工程源、Product Hunt、一个博客/访谈聚合源、一个广义科技/产业源的检查结果或阻塞原因。
 
 ### 固定兜底命令
 
 - `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data` 现在会先抓 GitHub Trending daily/weekly 与 Python/TypeScript/Rust/Go 页面；对 `fetch failed`、超时、429 或 5xx 默认延迟重试一次，并把重试结果写入 `source_audit.github_trending.sources[].notes`。如果这些页面全部失败或没有解析出仓库，会自动调用 OSSInsight `List trending repos` API 作为机器可复现的项目候选兜底，并尽量和前一日日报的 `github_trending` 做排名变化比较。浏览器导出仍使用 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>`。
 - `npm run discover:builders -- --date YYYY-MM-DD --limit 20` 优先消费 `follow-builders central feed`，再用少量固定原始 RSS/Atom 源补充 Builder 候选。它只产生带原始 URL 的候选；没有近期条目时记录 `no_signal`，不要手工改写成入选。
-- `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3` 解析 `config/sources` 中 `enablement:"core"` 的官方/工程/研究 RSS/Atom 和 HTML index；需要广义科技、Product Hunt、Latent.Space、Interconnects、Planet AI 等候选时加 `--enablement core,optional`。Product Hunt 候选会自动尝试打开产品页并用 GitHub、docs、README 或官网确认用途；确认成功的候选优先使用确认页 URL，确认失败的候选不得直接入选项目区。通过 `--sources` 追加微信公众号/自媒体时使用 `category:"intermediary"`；追加 X 热点 feed 时使用 `category:"x_hotspot"` 并保留原始 X status URL。
+- `npm run discover:content-sources -- --date YYYY-MM-DD --limit 100 --per-source-limit 3` 默认解析 `config/sources` 中 `enablement:"core"` 和 `enablement:"optional"` 的官方/工程/研究 RSS/Atom、HTML index、广义科技、AIGC 内容产业、Product Hunt、Latent.Space、Interconnects、Planet AI 等候选。Product Hunt 候选会自动尝试打开产品页并用 GitHub、docs、README 或官网确认用途；确认成功的候选优先使用确认页 URL，确认失败的候选不得直接入选项目区。通过 `--sources` 追加普通微信公众号/自媒体时使用 `category:"intermediary"`；追加白名单公众号时必须带 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，或使用 `manual` registry 人工录入；追加 X 热点 feed 时使用 `category:"x_hotspot"` 并保留原始 X status URL。
 - `npm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 影子运行搜索/新闻补漏；结果默认是 `community_lead` 候选和 `source_audit.search_sources`，不得自动进入正文。
-- `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional` 检查配置源健康状态；用于解释空板块、发现抓取失败和确认 RSSHub/RSS-Bridge 自托管依赖是否可用。
+- `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查配置源健康状态；用于解释空板块、发现抓取失败和确认 RSSHub/RSS-Bridge 自托管依赖是否可用，`manual` 来源只记录 `skipped_manual_source`。
 - `npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json` 把独立发现命令输出中的审计组合并进最终日报 JSON，并在写回前运行 report schema 校验。
 - `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 读取最近 3 个日报日的 source audit 和候选池，输出连续运行验收状态；只有返回 `phase5_complete:true` 才能宣称 Phase 5 完成。
-- `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `main_item` 候选。状态页候选仍必须和其他候选一起走去重、新鲜度和 `candidate_id` 回指门禁。
+- `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `community_lead` 轻量运营候选。状态页、模型网关上架、preview access、区域/账号可用性和短时限流默认不写入 `model_releases`；只有影响生产迁移、成本边界或上线排期时才可人工升格为 `main_items`。
