@@ -1,0 +1,548 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-06-01",
+  "generated_at": "2026-05-31T18:46:00.000Z",
+  "sources": [
+    {
+      "id": "github-trending-shell",
+      "name": "GitHub Trending discovery command",
+      "url": "https://github.com/trending?since=daily",
+      "category": "github_trending",
+      "status": "blocked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "discover:github-trending returned fetch failed for daily, weekly, language pages, and OSSInsight fallback.",
+      "verification_sources": []
+    },
+    {
+      "id": "github-trending-web",
+      "name": "GitHub Trending daily web fallback",
+      "url": "https://github.com/trending?since=daily",
+      "category": "github_trending",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "Web fallback opened GitHub Trending daily and extracted the visible top repositories.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "github-copilot-billing",
+      "name": "GitHub Changelog",
+      "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "GitHub official changelog states that Copilot code review billing changes take effect on 2026-06-01.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
+        "https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals"
+      ]
+    },
+    {
+      "id": "microsoft-foundry-may",
+      "name": "Microsoft Foundry Blog",
+      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "Microsoft Foundry May 2026 update, published 2026-05-30.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/"
+      ]
+    },
+    {
+      "id": "openai-release-notes",
+      "name": "OpenAI Help Center release notes",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images",
+      "category": "official_release",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "OpenAI release notes list Codex Computer Use on Windows and remote control updates under 2026-05-29.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images"
+      ]
+    },
+    {
+      "id": "aws-sagemaker-observability",
+      "name": "AWS Machine Learning Blog",
+      "url": "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "AWS technical blog on LLM observability for SageMaker AI, published 2026-05-29.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/"
+      ]
+    },
+    {
+      "id": "aws-sap-mcp",
+      "name": "AWS for SAP Blog",
+      "url": "https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "AWS blog on AWS for SAP MCP Server and Amazon Bedrock AgentCore, published 2026-05-29.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/"
+      ]
+    },
+    {
+      "id": "ms-research-data-formulator",
+      "name": "Microsoft Research Blog",
+      "url": "https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/",
+      "category": "blog",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "Microsoft Research Data Formulator 0.7 blog, published 2026-05-28.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/"
+      ]
+    },
+    {
+      "id": "github-copilot-opus-48",
+      "name": "GitHub Changelog",
+      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/",
+      "category": "model_registry",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "GitHub official changelog says Claude Opus 4.8 is available in Copilot, published 2026-05-28.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/"
+      ]
+    },
+    {
+      "id": "claudeai-x-opus-48",
+      "name": "Claude official X status",
+      "url": "https://x.com/claudeai/status/2060045358445576332",
+      "category": "builder",
+      "status": "checked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "Original Claude X status referenced by external crawl results for the Opus 4.8 launch.",
+      "verification_status": "original_social_only",
+      "verification_sources": [
+        "https://x.com/claudeai/status/2060045358445576332"
+      ]
+    },
+    {
+      "id": "follow-builders-x",
+      "name": "follow-builders X feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+      "category": "builder",
+      "status": "blocked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "discover:builders returned fetch failed; retry_failed_after_1.",
+      "verification_sources": []
+    },
+    {
+      "id": "follow-builders-podcasts",
+      "name": "follow-builders podcast feed",
+      "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+      "category": "builder",
+      "status": "blocked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "discover:builders returned fetch failed; retry_failed_after_1.",
+      "verification_sources": []
+    },
+    {
+      "id": "content-sources-registry",
+      "name": "Registered content sources",
+      "url": "https://github.com/JasonxzWen/ai-daily-cn/tree/main/config/sources",
+      "category": "other",
+      "status": "blocked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "discover:content-sources and sources:health returned fetch failed for registered feeds.",
+      "verification_sources": []
+    },
+    {
+      "id": "search-news-shadow",
+      "name": "Search news shadow providers",
+      "url": "https://github.com/JasonxzWen/ai-daily-cn/blob/main/config/search-queries.json",
+      "category": "community",
+      "status": "blocked",
+      "checked_at": "2026-05-31T18:46:00.000Z",
+      "notes": "GDELT, OpenAlex, and arXiv shadow discovery returned fetch_failed.",
+      "verification_sources": []
+    }
+  ],
+  "candidates": [
+    {
+      "id": "trend-d4vinci-scrapling",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "D4Vinci/Scrapling",
+      "url": "https://github.com/D4Vinci/Scrapling",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 1; page showed 639 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-nesquena-hermes-webui",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "nesquena/hermes-webui",
+      "url": "https://github.com/nesquena/hermes-webui",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 2; page showed 320 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-everyinc-compound-engineering-plugin",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "EveryInc/compound-engineering-plugin",
+      "url": "https://github.com/EveryInc/compound-engineering-plugin",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 3; page showed 243 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-github-docs",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "github/docs",
+      "url": "https://github.com/github/docs",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 4; page showed 20 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-openbmb-voxcpm",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "OpenBMB/VoxCPM",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 5; page showed 639 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-revfactory-harness",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "revfactory/harness",
+      "url": "https://github.com/revfactory/harness",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 6; page showed 318 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-fareed-train-llm",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "FareedKhan-dev/train-llm-from-scratch",
+      "url": "https://github.com/FareedKhan-dev/train-llm-from-scratch",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 7; page showed 627 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-supermemoryai-supermemory",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "supermemoryai/supermemory",
+      "url": "https://github.com/supermemoryai/supermemory",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 8; page showed 236 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-crosstalk-project-nomad",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "Crosstalk-Solutions/project-nomad",
+      "url": "https://github.com/Crosstalk-Solutions/project-nomad",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 9; page showed 372 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "trend-anthropics-claude-code",
+      "source_id": "github-trending-web",
+      "category": "github_trending",
+      "title": "anthropics/claude-code",
+      "url": "https://github.com/anthropics/claude-code",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "github_trending",
+      "evidence": "GitHub Trending daily rank 10; page showed 490 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "main-github-copilot-billing-june1",
+      "source_id": "github-copilot-billing",
+      "category": "main_item",
+      "title": "GitHub Copilot 计费切换在 2026-06-01 生效",
+      "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
+      "source": "GitHub Changelog",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "Official GitHub changelog states the change takes effect on 2026-06-01; GitHub Docs describes AI Credits pricing.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
+        "https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals"
+      ]
+    },
+    {
+      "id": "main-microsoft-foundry-may-update",
+      "source_id": "microsoft-foundry-may",
+      "category": "main_item",
+      "title": "Microsoft Foundry 5 月更新把 agent 评测、模型目录和本地运行放进同一批发布",
+      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
+      "source": "Microsoft Foundry Blog",
+      "event_date": "2026-05-30",
+      "status": "included",
+      "included_in": "main_items",
+      "evidence": "Official Microsoft Foundry blog published on 2026-05-30 lists trace-based evaluation, model catalog additions, Foundry Local updates, Managed VNET GA, and project-level cost attribution.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/"
+      ]
+    },
+    {
+      "id": "model-github-copilot-claude-opus-48",
+      "source_id": "github-copilot-opus-48",
+      "category": "model_release",
+      "title": "Claude Opus 4.8 in GitHub Copilot",
+      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/",
+      "source": "GitHub Changelog",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "model_releases",
+      "evidence": "GitHub Changelog says Claude Opus 4.8 is generally available in Copilot for Pro+, Business, and Enterprise users.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/"
+      ]
+    },
+    {
+      "id": "hot-aws-sagemaker-llm-observability",
+      "source_id": "aws-sagemaker-observability",
+      "category": "hot_blog",
+      "title": "Comprehensive observability for Amazon SageMaker AI LLM inference",
+      "url": "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/",
+      "source": "AWS Machine Learning Blog",
+      "event_date": "2026-05-29",
+      "status": "included",
+      "included_in": "hot_blogs",
+      "evidence": "AWS official technical post dated 2026-05-29 covers quantity and quality observability for LLM inference.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/"
+      ]
+    },
+    {
+      "id": "hot-aws-sap-mcp-agentcore",
+      "source_id": "aws-sap-mcp",
+      "category": "hot_blog",
+      "title": "Building Agentic Enterprises on AWS with the AWS for SAP MCP Server",
+      "url": "https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/",
+      "source": "AWS for SAP Blog",
+      "event_date": "2026-05-29",
+      "status": "included",
+      "included_in": "hot_blogs",
+      "evidence": "AWS official blog dated 2026-05-29 explains AWS for SAP MCP Server on Amazon Bedrock AgentCore.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/"
+      ]
+    },
+    {
+      "id": "hot-ms-research-data-formulator-07",
+      "source_id": "ms-research-data-formulator",
+      "category": "hot_blog",
+      "title": "Data Formulator 0.7: AI-powered data analytics for enterprise data",
+      "url": "https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/",
+      "source": "Microsoft Research Blog",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "hot_blogs",
+      "evidence": "Microsoft Research official post dated 2026-05-28 describes Data Formulator 0.7.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/"
+      ]
+    },
+    {
+      "id": "project-d4vinci-scrapling",
+      "source_id": "github-trending-web",
+      "category": "project",
+      "title": "D4Vinci/Scrapling",
+      "url": "https://github.com/D4Vinci/Scrapling",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "GitHub Trending daily rank 1; page showed 639 stars today.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/D4Vinci/Scrapling",
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "project-revfactory-harness",
+      "source_id": "github-trending-web",
+      "category": "project",
+      "title": "revfactory/harness",
+      "url": "https://github.com/revfactory/harness",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "GitHub Trending daily rank 6; page described a meta-skill for domain-specific agent teams.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/revfactory/harness",
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "project-supermemoryai-supermemory",
+      "source_id": "github-trending-web",
+      "category": "project",
+      "title": "supermemoryai/supermemory",
+      "url": "https://github.com/supermemoryai/supermemory",
+      "source": "GitHub Trending daily",
+      "event_date": "2026-06-01",
+      "status": "included",
+      "included_in": "projects",
+      "evidence": "GitHub Trending daily rank 8; page described a memory engine and app for the AI era.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://github.com/supermemoryai/supermemory",
+        "https://github.com/trending?since=daily"
+      ]
+    },
+    {
+      "id": "builder-claudeai-opus-48-x",
+      "source_id": "claudeai-x-opus-48",
+      "category": "builder_observation",
+      "title": "Claude official account",
+      "url": "https://x.com/claudeai/status/2060045358445576332",
+      "source": "Claude official X status",
+      "event_date": "2026-05-28",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Original X URL for Claude Opus 4.8 launch; used as Builder original-social fallback because follow-builders feed was blocked.",
+      "verification_status": "original_social_only",
+      "verification_sources": [
+        "https://x.com/claudeai/status/2060045358445576332"
+      ]
+    },
+    {
+      "id": "builder-openai-codex-windows",
+      "source_id": "openai-release-notes",
+      "category": "builder_observation",
+      "title": "OpenAI Codex product team",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images",
+      "source": "OpenAI Help Center release notes",
+      "event_date": "2026-05-29",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "OpenAI release notes describe Codex Computer Use on Windows, remote control, and usage profiles.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images"
+      ]
+    },
+    {
+      "id": "builder-microsoft-foundry-agent-evals",
+      "source_id": "microsoft-foundry-may",
+      "category": "builder_observation",
+      "title": "Microsoft Foundry developer experience team",
+      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
+      "source": "Microsoft Foundry Blog",
+      "event_date": "2026-05-30",
+      "status": "included",
+      "included_in": "builder_observations",
+      "evidence": "Microsoft Foundry blog lists trace-based evaluation, skill evaluation, workflow evaluation UX, and Foundry Local updates.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/"
+      ]
+    },
+    {
+      "id": "excluded-openai-codex-windows-main",
+      "source_id": "openai-release-notes",
+      "category": "main_item",
+      "title": "Codex supports Computer Use on Windows",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images",
+      "source": "OpenAI Help Center release notes",
+      "event_date": "2026-05-29",
+      "status": "excluded",
+      "exclusion_reason": "The release note is dated 2026-05-29, outside the 48-hour main-item window for 2026-06-01; kept as Builder/product observation instead.",
+      "verification_status": "primary_confirmed",
+      "verification_sources": [
+        "https://help.openai.com/en/articles/6825453-chatgpt-can-now-generate-images"
+      ]
+    }
+  ]
+}
