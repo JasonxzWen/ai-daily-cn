@@ -1339,6 +1339,57 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("Product Hunt Trending Feed"));
 });
 
+test("registered content sources cover frontier AI company official sources", async () => {
+  const registry = JSON.parse(await fs.readFile(path.join(rootDir, "config/sources/default-content-sources.json"), "utf8"));
+  const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const expected = [
+    ["content-openai-news", "openai.com"],
+    ["content-anthropic-news", "www.anthropic.com"],
+    ["content-google-deepmind-blog", "deepmind.google"],
+    ["content-meta-ai-blog", "ai.meta.com"],
+    ["content-xai-news", "x.ai"],
+    ["content-bytedance-seed-blog", "seed.bytedance.com"],
+    ["content-tiktok-developers-blog", "developers.tiktok.com"],
+    ["content-tencent-corporate-ai", "www.tencent.com"],
+    ["content-tencent-hunyuan-blog", "llm.hunyuan.tencent.com"],
+    ["content-qwen-blog", "qwen.ai"],
+    ["content-alibaba-cloud-blog", "www.alibabacloud.com"],
+    ["content-kimi-platform-blog", "platform.kimi.com"],
+    ["content-kimi-technical-blog", "www.kimi.com"],
+    ["content-minimax-blog", "www.minimax.io"],
+    ["content-zhipu-research", "www.zhipuai.cn"]
+  ];
+
+  for (const [id, hostname] of expected) {
+    const source = sourcesById.get(id);
+    assert(source, `missing source ${id}`);
+    assert.equal(new URL(source.url).hostname, hostname);
+    assert.equal(source.authority, "primary");
+    assert.equal(source.verification_policy, "primary_allowed");
+  }
+});
+
+test("search shadow queries allow primary domains for China frontier AI labs", async () => {
+  const queries = JSON.parse(await fs.readFile(path.join(rootDir, "config/search-queries.json"), "utf8"));
+  const query = queries.find((item) => item.id === "china-frontier-labs-release");
+
+  assert(query);
+  assert.deepEqual(query.allowed_primary_domains, [
+    "seed.bytedance.com",
+    "developers.tiktok.com",
+    "www.tencent.com",
+    "llm.hunyuan.tencent.com",
+    "qwen.ai",
+    "qwenlm.github.io",
+    "www.alibabacloud.com",
+    "platform.kimi.com",
+    "www.kimi.com",
+    "www.minimax.io",
+    "www.zhipuai.cn",
+    "z.ai"
+  ]);
+});
+
 test("source registry validates required source metadata", () => {
   const valid = normalizeSourceRegistry({
     schema_version: 1,
