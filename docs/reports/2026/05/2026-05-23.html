@@ -145,6 +145,52 @@ h3 {
   transform: translateY(-1px);
 }
 
+.rendered-markdown mark.text-highlight.trend-status,
+.report-data-table mark.text-highlight.trend-status,
+.report-hero mark.text-highlight.trend-status {
+  font-family: var(--ui-font);
+  font-size: 0.7em;
+  letter-spacing: 0.02em;
+}
+
+.rendered-markdown mark.trend-status-new,
+.report-data-table mark.trend-status-new,
+.report-hero mark.trend-status-new {
+  background: #ecfeff;
+  border-color: #67e8f9;
+  color: #155e75;
+}
+
+.rendered-markdown mark.trend-status-up,
+.report-data-table mark.trend-status-up,
+.report-hero mark.trend-status-up {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.rendered-markdown mark.trend-status-down,
+.report-data-table mark.trend-status-down,
+.report-hero mark.trend-status-down {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.trend-status-same,
+.report-data-table mark.trend-status-same,
+.report-hero mark.trend-status-same {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.text-highlight.trend-status:hover,
+.report-data-table mark.text-highlight.trend-status:hover,
+.report-hero mark.text-highlight.trend-status:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+}
+
 .inline-site-icon {
   width: 18px;
   height: 18px;
@@ -684,6 +730,48 @@ p.hero-summary-text {
   border-top: 1px solid var(--line);
 }
 
+.blog-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  grid-template-areas:
+    "blog-title blog-body"
+    "blog-tags blog-body"
+    "blog-details blog-details";
+  column-gap: 20px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.blog-card h3 {
+  grid-area: blog-title;
+  margin: 0;
+}
+
+.blog-card .card-tags {
+  grid-area: blog-tags;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
+  align-items: start;
+}
+
+.blog-card .card-tags .chip {
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.blog-card > p {
+  grid-area: blog-body;
+}
+
+.blog-card .card-detail-list {
+  grid-area: blog-details;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px 14px;
+}
+
 .blog-card .card-detail-list div {
   display: inline-flex;
   gap: 4px;
@@ -695,6 +783,21 @@ p.hero-summary-text {
 
 .blog-card .card-detail-list dt::after {
   content: "：";
+}
+
+@media (max-width: 760px) {
+  .blog-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card .card-tags {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
 }
 
 .interactive-card {
@@ -1703,28 +1806,28 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="agent output / HTML reports / coding workflow" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Q0I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer">Using Claude Code: The unreasonable effectiveness of HTML</a></h3>
-    <div class="card-tags"><span class="chip">agent output / HTML reports / coding workflow</span></div>
+    <div class="card-tags"><span class="chip">agent output</span><span class="chip">HTML reports</span><span class="chip">coding workflow</span></div>
     <p>Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Claude Code team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-20</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="computer use agents / browser agents / evaluation" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TVI8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer">Fara1.5 - A family of frontier computer use agent models</a></h3>
-    <div class="card-tags"><span class="chip">computer use agents / browser agents / evaluation</span></div>
+    <div class="card-tags"><span class="chip">computer use agents</span><span class="chip">browser agents</span><span class="chip">evaluation</span></div>
     <p>文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Microsoft Research</span></dd></div><div><dt>作者</dt><dd><span>Microsoft Research AI Frontiers team</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI security operations / Opus / vulnerability remediation" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Q0I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer">How our partners are putting Opus to work for cybersecurity</a></h3>
-    <div class="card-tags"><span class="chip">AI security operations / Opus / vulnerability remediation</span></div>
+    <div class="card-tags"><span class="chip">AI security operations</span><span class="chip">Opus</span><span class="chip">vulnerability remediation</span></div>
     <p>Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Claude Blog</span></dd></div><div><dt>作者</dt><dd><span>Anthropic</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI infrastructure / agent runtime / sandboxes" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TUI8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer">Modal&#39;s Series C: Raising $355M at a $4.65B valuation</a></h3>
-    <div class="card-tags"><span class="chip">AI infrastructure / agent runtime / sandboxes</span></div>
+    <div class="card-tags"><span class="chip">AI infrastructure</span><span class="chip">agent runtime</span><span class="chip">sandboxes</span></div>
     <p>Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。</p>
     <dl class="card-detail-list"><div><dt>发布方</dt><dd><span>Modal Blog</span></dd></div><div><dt>作者</dt><dd><span>Modal</span></dd></div><div><dt>日期</dt><dd><span>2026-05-21</span></dd></div></dl>
   </article>
