@@ -65,7 +65,7 @@ const DOMAIN_ICONS = new Map([
   ["every.to", SOURCE_ICONS.get("AI & I / Every")]
 ]);
 
-export function reportToInteractionInput(report) {
+export function reportToInteractionInput(report, options = {}) {
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
@@ -77,12 +77,14 @@ export function reportToInteractionInput(report) {
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const paths = reportRelativePaths(report.report_date);
   const dataHref = publicAssetUrl(report, paths.dataPath);
+  const indexHref = publicAssetUrl(report, "index.html");
+  const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
   const sections = [
     {
       type: "markdown",
       title: "主体信息",
       group: "main",
-      content: formatMainItems(mainItems, { report, evidenceByUrl })
+      content: formatMainItems(mainItems, { report, evidenceByUrl, trendAnnotations })
     }
   ];
 
@@ -110,7 +112,7 @@ export function reportToInteractionInput(report) {
       type: "markdown",
       title: "GitHub Trending · Top 10 daily",
       group: "projects",
-      content: formatGithubTrending(githubTrending)
+      content: formatGithubTrending(githubTrending, { trendAnnotations })
     });
   }
   if (projects.length > 0) {
@@ -178,7 +180,10 @@ export function reportToInteractionInput(report) {
       builderObservations,
       communityLeads
     }),
-    heroLinks: [{ label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }],
+    heroLinks: [
+      { label: "日报导航", href: indexHref, icon: siteIconForUrl(indexHref, "AI") },
+      { label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }
+    ],
     hideNavigation: true,
     status: "complete",
     template: "research-explainer",
@@ -246,7 +251,9 @@ export async function renderReportWithEffectiveInteract(report, options = {}) {
 
   await fs.mkdir(inputDir, { recursive: true });
   await fs.mkdir(outputDir, { recursive: true });
-  await fs.writeFile(inputPath, `${JSON.stringify(reportToInteractionInput(report), null, 2)}\n`, "utf8");
+  await fs.writeFile(inputPath, `${JSON.stringify(reportToInteractionInput(report, {
+    trendAnnotations: options.trendAnnotations
+  }), null, 2)}\n`, "utf8");
 
   const { stdout } = await execFileAsync(process.execPath, [
     createScript,
@@ -313,6 +320,22 @@ function normalizePublicHtml(html) {
   return html.replaceAll('rel="noreferrer"', 'rel="noopener noreferrer"');
 }
 
+function normalizeTrendAnnotations(value) {
+  const annotations = value && typeof value === "object" ? value : {};
+  return {
+    main_items: Array.isArray(annotations.main_items) ? annotations.main_items : [],
+    github_trending: Array.isArray(annotations.github_trending) ? annotations.github_trending : []
+  };
+}
+
+function trendTagsFor(annotations, section, index) {
+  const match = (annotations?.[section] || []).find((item) => item.index === index);
+  if (!match || !Array.isArray(match.tags)) {
+    return [];
+  }
+  return match.tags.map((tag) => tag.text || tag.label).filter(Boolean);
+}
+
 function formatMainItems(items, context = {}) {
   if (items.length === 0) {
     return "暂无主体信息。";
@@ -322,8 +345,9 @@ function formatMainItems(items, context = {}) {
     .map((item, index) => {
       const bullets = item.bullets.map((bullet) => `  - ${bullet}`).join("\n");
       const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
+      const trendTags = formatHighlightTags(trendTagsFor(context.trendAnnotations, "main_items", index));
       const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
-      return `${index + 1}. **${title}**（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+      return `${index + 1}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
     })
     .join("\n\n");
 }
@@ -342,16 +366,16 @@ function formatModelReleases(items, context = {}) {
     .join("\n");
 }
 
-function formatGithubTrending(items) {
+function formatGithubTrending(items, context = {}) {
   if (items.length === 0) {
     return "";
   }
 
   return items
     .slice(0, 10)
-    .map((item) => {
+    .map((item, index) => {
       const tag = githubTrendStatusTag(item);
-      const tagText = tag ? ` ==${tag}==` : "";
+      const tagText = formatHighlightTags([tag, ...trendTagsFor(context.trendAnnotations, "github_trending", index)].filter(Boolean));
       return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}：${cleanGithubTrendDescription(item)}`;
     })
     .join("\n");

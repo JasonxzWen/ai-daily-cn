@@ -1,5 +1,15 @@
 # Progress
 
+## 2026-06-01 Publish Retry
+
+- Retried publishing accumulated daily artifacts after SSH fetch became available.
+- `npm run publish:dry-run -- --date 2026-06-01` advanced past the previous `git_fetch_unavailable` blocker, then stopped with `remote_ahead` because `origin/main` contains `b226e31 add navigation and trend index (#8)`.
+- Committed the local 2026-06-01 publisher-managed artifacts as `1908fce chore: publish AI daily report 2026-06-01` before merging remote changes, avoiding stash/reset.
+- Started merging `origin/main`; only handoff Markdown files conflicted and were resolved by preserving both the trend-index work and the daily-publish retry state.
+- Post-merge `npm run build` regenerated `docs/trends.json`, `docs/index.html`, and the 2026-05-30/2026-05-31/2026-06-01 report HTML.
+- `npm run validate` passed after the merge resolution.
+- `npm run sources:phase5-audit -- --date 2026-06-01 --history-dir reports-data --days 3` passed.
+
 ## 2026-05-31 Daily Publish Automation
 
 - Generated 2026-05-31 structured report and candidate pool:
@@ -10,8 +20,48 @@
   - `docs/data/2026/05/2026-05-31.candidates.json`
 - `npm run validate` passed.
 - `npm run sources:phase5-audit -- --date 2026-05-31 --history-dir reports-data --days 3` passed.
-- `npm run publish:dry-run -- --date 2026-05-31` failed with `git_fetch_unavailable` because SSH to `github.com:22` is denied in the current environment.
-- No real publish, push, reset, stash, force-push, or API fallback was run.
+- `npm run publish:dry-run -- --date 2026-05-31` failed with `git_fetch_unavailable` because SSH to `github.com:22` was denied in that environment.
+- No real publish, push, reset, stash, force-push, or API fallback was run in that automation run.
+
+## 2026-05-29 Navigation and Trend Index
+
+- Added controlled trend vocabulary in `config/trends.json`, split into `topics` and `entities`.
+- Added `schemas/trends.schema.json` and `validateTrends(...)`.
+- Added `src/trends.js` for deterministic site-index trend generation:
+  - rolling 7-day window
+  - conservative `watching` / `active` / `hot` thresholds
+  - automatic candidates retained as non-displayed `candidate_topics`
+  - annotations limited to `main_items` and `github_trending`
+- Updated `src/site.js` to generate `docs/trends.json` and inject per-date annotations into report rendering.
+- Updated homepage rendering with a Top trend overview and year/month/week navigation.
+- Added `日报导航` hero link on generated daily report pages.
+- Confirmed trend data is not written back into `reports-data/**/*.json` or `docs/data/**/*.json`.
+
+## 2026-05-29 Trend Validation
+
+- `node --test tests/unit.test.js` passed.
+- `npm run test:e2e` passed.
+- `npm run build` passed and generated `docs/trends.json`.
+- `npm run validate` passed; its build step reported `written_files: []`.
+- `node scripts\harness-validate.mjs` passed.
+- Manual artifact checks:
+  - `docs/trends.json` contains `coding-agent` as `hot`.
+  - `docs/index.html` contains trend overview/navigation and `trends.json`.
+  - `docs/reports/2026/05/2026-05-29.html` contains `日报导航` and scoped trend tags.
+  - `git diff -- reports-data docs/data --stat` is empty.
+
+## 2026-05-29 Trend Config Fail-Fast
+
+- Removed silent fallback from trend vocabulary loading.
+- `loadTrendConfig(...)` now throws `PublisherError` for missing, unreadable, invalid, or empty trend vocabulary.
+- Added regression coverage for missing/invalid vocabulary and for `buildSite(...)` failing when the build root has no trend config.
+- Updated temporary publish test fixtures to include `config/trends.json`, matching the real repository contract.
+- Validation:
+  - `node --test tests/unit.test.js` passed.
+  - `npm test` passed.
+  - `npm run build` passed with `written_files: []`.
+  - `npm run validate` passed.
+  - `node scripts\harness-validate.mjs` passed.
 
 ## 2026-05-29 Quality-Status Repair
 
@@ -24,33 +74,13 @@
   - `docs/assets/evidence/anthropic-claude-opus-4-8-benchmark-table.png`
 - Updated 2026-05-29 report data and generated docs to expose degraded source coverage plus the two evidence assets and transcribed tables.
 
-## 2026-05-29 Validation
-
-- `node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js` passed.
-- `npm run validate` passed after final evidence asset and renderer changes.
-- `node scripts\harness-validate.mjs` passed.
-- Browser render check passed for the 2026-05-29 report: quality/evidence sections present, 2 evidence images loaded, 4 inline site icons loaded.
-- `planGeneratedFiles` includes both `assets/evidence/*` files for publish planning.
-
 ## Current State
 
-- Repo-local harness files have been initialized from the latest `JasonxzWen/skill-hub` `origin/main` template.
-- Existing project `AGENTS.md` was preserved and extended with the minimal Codex harness markers.
-- The installed `.codex/skills/effective-interact` skill was refreshed with compatible upstream Skill Hub updates.
-- Daily publish operation is now the primary harness use case: feature inventory, runbook, task template, clean-state checklist, definition of done, and harness validation all reference the publish path.
-- `tasks/current-task.md` has been reset to a neutral "no active task" entry point for future daily publish runs.
+- Daily publish operation is the primary harness use case.
+- The current work is merging remote trend-index support with accumulated unpublished daily report artifacts.
+- `tasks/current-task.md`, `progress.md`, and `session-handoff.md` should reflect the publish retry until the retry completes.
 
 ## Recent Validation
 
-- `node scripts/harness-validate.mjs` passed.
-- `feature_list.json` JSON parse passed.
-- `git diff --check` passed.
-- `harness-hub validate-harness <repo> --json` from a temporary Skill Hub `origin/main` export passed.
-- `node --test tests/skills.test.js` passed.
-- `npm run validate` passed.
-
-## Notes
-
-- `skill-hub init-harness --dry-run` identified existing `AGENTS.md` as a blocker, so the harness is integrated without overwriting project-specific instructions.
-- The upstream `create-interaction.mjs` and `interaction-ui.css` changes were not retained because they regressed this project's existing hero and project-card smoke tests.
-- `scripts/harness-validate.mjs` now checks daily publish package scripts, runbook sections, task template markers, and required daily publish feature IDs.
+- Before this merge retry, 2026-06-01 automation had `npm run validate` passing and Phase 5 audit passing for 2026-06-01 through 2026-05-30.
+- After resolving this merge, rerun `npm run build`, `npm run validate`, `npm run sources:phase5-audit -- --date 2026-06-01 --history-dir reports-data --days 3`, and publish dry-run.

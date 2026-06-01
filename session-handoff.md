@@ -2,92 +2,64 @@
 
 ## Current Status
 
-- 2026-05-31 daily report generation completed locally.
-- Structured JSON, candidate JSON, feed, index, and self-contained HTML were generated for 2026-05-31.
-- `npm run validate` passed, including source validation, 116 tests, build, e2e, OpenSpec validation, and `git diff --check`.
-- Phase 5 source audit passed for 2026-05-31 through 2026-05-29.
-- Publish is blocked at dry-run by `git_fetch_unavailable`: `git fetch origin main --prune` cannot connect to `github.com:22` from this environment.
-- No real publish, push, reset, stash, force-push, or GitHub API fallback was run.
-
-## 2026-05-31 Changed Files
-
-- `reports-data/2026/05/2026-05-31.json`
-- `reports-data/2026/05/2026-05-31.candidates.json`
-- `docs/data/2026/05/2026-05-31.json`
-- `docs/data/2026/05/2026-05-31.candidates.json`
-- `docs/reports/2026/05/2026-05-31.html`
-- `docs/feed.json`
-- `docs/index.html`
-- `progress.md`
-- `session-handoff.md`
-- `tasks/current-task.md`
-
-## 2026-05-31 Validation Evidence
-
-- `npm run report:write -- .tmp/daily-report.json reports-data 2026-05-31` passed.
-- `npm run build` passed and wrote the 2026-05-31 docs artifacts.
-- `npm run validate` passed.
-- `npm run sources:phase5-audit -- --date 2026-05-31 --history-dir reports-data --days 3` passed.
-- Local HTML contains `2026-05-31`.
-
-## 2026-05-31 Blockers
-
-- Remote publish preflight cannot refresh `origin/main` because SSH access to `github.com:22` is denied.
-- `GH_TOKEN` / `GITHUB_TOKEN` is not present in the environment, and the failure is not a `.git` not-writable fallback case.
-
-## 2026-05-31 Next Action
-
-- Restore GitHub SSH connectivity or switch the remote/token setup to an allowed HTTPS/API publish path, then rerun publish dry-run and publish.
-
-## Previous Status
-
-- The AI daily quality-status repair is implemented and validated.
-- `quality_status` is now schema-backed, derived during report normalization/build, and blocks publish dry-run when `status` is `blocked`.
-- External source failures can publish as `degraded`; low-signal checked days remain `ok`; candidate-rich low-inclusion cases are flagged as selection degraded.
-- `evidence_assets` supports source-backed figures/tables, rendered in HTML/effective-interact output.
-- The 2026-05-29 report now includes two local Anthropic evidence assets and transcribed data tables for the social-science coding-agent figure and Opus 4.8 benchmark comparison.
-- Link/card titles now receive immediately loaded site icons through the renderer path.
-- No commit, push, publish, or automation change has been made.
+- Publish retry is in progress for accumulated 2026-05-30, 2026-05-31, and 2026-06-01 daily artifacts.
+- SSH fetch now works, but the first retry surfaced `remote_ahead`: `origin/main` contains `b226e31 add navigation and trend index (#8)`.
+- The local 2026-06-01 publisher-managed artifacts were committed as `1908fce chore: publish AI daily report 2026-06-01` before merging remote changes.
+- The remote navigation/trend-index feature is being merged into local `main`; only handoff Markdown files conflicted.
+- 2026-05-31 daily report generation completed locally and passed validation plus Phase 5 audit.
+- 2026-06-01 daily report generation completed locally in the later automation run and passed validation plus Phase 5 audit before publish was blocked.
+- AI daily navigation and trend tracking v1 is implemented by remote commit `b226e31`.
+- Trends are generated as a derived site index at `docs/trends.json`; daily `reports-data/**/*.json` remains the authoritative report fact layer and is not mutated with trend fields.
+- Daily report pages include a `日报导航` hero link back to `index.html`.
+- Trend tags are injected only into `main_items` and `github_trending` via rendering context.
+- Trend vocabulary loading is fail-fast: missing, unreadable, invalid, or empty `config/trends.json` stops the build with `PublisherError`.
+- No reset, stash, force-push, API fallback, or remote Pages setting change has been made.
 
 ## Changed Files
 
-- `src/quality-status.js`
-- `src/report.js`
+- `config/trends.json`
+- `schemas/trends.schema.json`
+- `src/trends.js`
+- `src/schema.js`
 - `src/site.js`
-- `src/publish.js`
 - `src/render.js`
 - `src/interaction-report.js`
-- `schemas/report.schema.json`
-- `prompts/ai-daily/modules/structured-report-json.md`
-- `.codex/skills/effective-interact/scripts/create-interaction.mjs`
-- `reports-data/2026/05/2026-05-29.json`
-- `docs/**` generated report/data/assets output
 - `tests/unit.test.js`
+- `tests/e2e/site.e2e.js`
 - `tests/publish.test.js`
-- `tests/skills.test.js`
+- `docs/index.html`
+- `docs/trends.json`
+- `docs/reports/2026/05/*.html`
+- `docs/data/2026/05/2026-05-30*.json`
+- `docs/data/2026/05/2026-05-31*.json`
+- `docs/data/2026/06/2026-06-01*.json`
+- `docs/reports/2026/05/2026-05-30.html`
+- `docs/reports/2026/05/2026-05-31.html`
+- `docs/reports/2026/06/2026-06-01.html`
+- `reports-data/2026/05/2026-05-30*.json`
+- `reports-data/2026/05/2026-05-31*.json`
+- `reports-data/2026/06/2026-06-01*.json`
 - `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
 
 ## Validation Evidence
 
-- `node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js` passed.
-- `npm run validate` passed after the final implementation.
-- `planGeneratedFiles` returns:
-  - `assets/evidence/anthropic-claude-opus-4-8-benchmark-table.png`
-  - `assets/evidence/anthropic-coding-agents-social-sciences-figure-1.jpg`
-- `node scripts/harness-validate.mjs` passed.
-- Browser render check for `docs/reports/2026/05/2026-05-29.html` passed:
-  - `质量状态` and `证据图表` are present.
-  - Evidence images load at `3840x2160` and `2600x1392`.
-  - 4 inline site icons load with no unloaded icon count.
-  - Transcribed `SWE-Bench Pro` / `69.2%` and `Economics` / `38%` / `91%` data are visible.
-- `git diff --check` passed through `npm run validate`.
+- `npm run publish:dry-run -- --date 2026-06-01` reached remote comparison and failed with `remote_ahead`, proving the previous SSH fetch blocker is resolved for this run.
+- Post-merge `npm run build` passed and regenerated `docs/trends.json`, `docs/index.html`, and the latest daily report HTML.
+- Post-merge `npm run validate` passed with 121 tests, build, e2e, OpenSpec, and `git diff --check`.
+- Post-merge Phase 5 audit passed for 2026-06-01 through 2026-05-30.
+- Prior 2026-06-01 automation: `npm run validate` passed.
+- Prior 2026-06-01 automation: `npm run sources:phase5-audit -- --date 2026-06-01 --history-dir reports-data --days 3` passed.
+- Remote trend-index commit validation included `npm run validate`, `npm run build`, `npm run test:e2e`, and `node scripts\harness-validate.mjs`.
 
-## Blockers
+## Known Limits
 
-- None recorded.
+- The current merge still needs a post-merge rebuild and validation before publishing.
+- No topic detail pages in trend v1.
+- Automatic candidate topics are collected in `candidate_topics` with `display: false`; they are not rendered.
+- Trend matching is deterministic and vocabulary-driven; expanding coverage requires editing `config/trends.json`.
 
 ## Next Action
 
-- Review the diff and decide whether to commit the quality-status, evidence-asset, and renderer changes.
+- Finish the merge commit, rebuild with merged code, run validation, rerun `publish:dry-run`, then run `npm run publish -- confirm-push 2026-06-01` if dry-run passes.

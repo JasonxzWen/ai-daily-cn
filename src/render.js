@@ -120,8 +120,10 @@ function renderHeroSummary(report) {
     .join("\n")}</ul>`;
 }
 
-export function renderIndexHtml(feed) {
+export function renderIndexHtml(feed, trends = null) {
   const latest = feed.reports[0];
+  const trendOverview = renderTrendOverview(trends);
+  const dateNavigation = renderDateNavigation(feed.reports);
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -146,6 +148,10 @@ export function renderIndexHtml(feed) {
       </div>
     </section>
 
+    ${trendOverview}
+
+    ${dateNavigation}
+
     <section class="section" id="reports">
       <h2>历史日报</h2>
       ${feed.reports.length > 0 ? `<ol class="report-list">${feed.reports.map(renderFeedItem).join("\n")}</ol>` : "<p>暂无可展示日报。</p>"}
@@ -154,6 +160,83 @@ export function renderIndexHtml(feed) {
 </body>
 </html>
 `;
+}
+
+function renderTrendOverview(trends) {
+  const topics = Array.isArray(trends?.topics)
+    ? trends.topics.filter((topic) => topic.status === "active" || topic.status === "hot").slice(0, 3)
+    : [];
+  if (topics.length === 0) {
+    return "";
+  }
+
+  return `<section class="section" id="trends">
+      <h2>近 7 日趋势</h2>
+      <ol class="report-list">${topics.map(renderTrendItem).join("\n")}</ol>
+      <nav class="artifact-links" aria-label="趋势索引">
+        <a href="trends.json">趋势索引 JSON</a>
+      </nav>
+    </section>`;
+}
+
+function renderTrendItem(topic) {
+  const entities = Array.isArray(topic.entities) && topic.entities.length > 0
+    ? `<div class="item-meta">${topic.entities.slice(0, 4).map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>`
+    : "";
+  return `<li class="report-card">
+  <h3>${escapeHtml(topic.label)} ${renderTags([topic.status])}</h3>
+  <p>近 7 日出现 ${escapeHtml(topic.occurrences)} 次，覆盖 ${escapeHtml(topic.active_days)} 天。</p>
+  ${entities}
+</li>`;
+}
+
+function renderDateNavigation(reports) {
+  if (!Array.isArray(reports) || reports.length === 0) {
+    return "";
+  }
+  const groups = new Map();
+  for (const item of reports) {
+    const [year, month] = item.report_date.split("-");
+    const monthKey = `${year}-${month}`;
+    const weekKey = `${year}-W${String(isoWeek(item.report_date)).padStart(2, "0")}`;
+    const monthGroup = groups.get(monthKey) || new Map();
+    const weekItems = monthGroup.get(weekKey) || [];
+    weekItems.push(item);
+    monthGroup.set(weekKey, weekItems);
+    groups.set(monthKey, monthGroup);
+  }
+
+  const monthSections = [...groups.entries()]
+    .sort(([left], [right]) => right.localeCompare(left))
+    .map(([monthKey, weeks]) => {
+      const weekHtml = [...weeks.entries()]
+        .sort(([left], [right]) => right.localeCompare(left))
+        .map(([weekKey, weekReports]) => `<div class="report-card">
+          <h3>${escapeHtml(weekKey)}</h3>
+          <div class="item-meta">${weekReports
+            .sort((a, b) => b.report_date.localeCompare(a.report_date))
+            .map((report) => `<a class="tag" href="${escapeAttribute(report.url)}">${escapeHtml(report.report_date)}</a>`)
+            .join("")}</div>
+        </div>`)
+        .join("\n");
+      return `<article class="item">
+        <h3>${escapeHtml(monthKey)}</h3>
+        ${weekHtml}
+      </article>`;
+    })
+    .join("\n");
+
+  return `<section class="section" id="calendar">
+      <h2>按年月周导航</h2>
+      ${monthSections}
+    </section>`;
+}
+
+function isoWeek(dateString) {
+  const date = new Date(`${dateString}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
 }
 
 export const defaultStyleCss = `:root {
