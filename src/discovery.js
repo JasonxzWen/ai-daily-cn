@@ -136,6 +136,83 @@ export const DEFAULT_CONTENT_SOURCES = [
     linkPattern: "https://ai.meta.com/blog/"
   },
   {
+    id: "content-xai-news",
+    name: "xAI News",
+    url: "https://x.ai/news",
+    format: "html_index",
+    linkPattern: "/news/"
+  },
+  {
+    id: "content-bytedance-seed-blog",
+    name: "ByteDance Seed Tech Blog",
+    url: "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+    format: "html_index",
+    linkPattern: "/en/blog/"
+  },
+  {
+    id: "content-tiktok-developers-blog",
+    name: "TikTok for Developers Blog",
+    url: "https://developers.tiktok.com/blogs/",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-tencent-corporate-ai",
+    name: "Tencent AI Business",
+    url: "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+    format: "html_index",
+    linkPattern: "/en-us/articles/"
+  },
+  {
+    id: "content-tencent-hunyuan-blog",
+    name: "Tencent Hunyuan Blog",
+    url: "https://llm.hunyuan.tencent.com/#/Blog",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-qwen-blog",
+    name: "Qwen Blog",
+    url: "https://qwen.ai/blog",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-alibaba-cloud-blog",
+    name: "Alibaba Cloud Blog",
+    url: "https://www.alibabacloud.com/blog",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-kimi-platform-blog",
+    name: "Moonshot AI Kimi Platform Blog",
+    url: "https://platform.kimi.com/blog",
+    format: "html_index",
+    linkPattern: "/blog/posts/"
+  },
+  {
+    id: "content-kimi-technical-blog",
+    name: "Kimi Technical Blog",
+    url: "https://www.kimi.com/blog/",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-minimax-blog",
+    name: "MiniMax Blog",
+    url: "https://www.minimax.io/blog",
+    format: "html_index",
+    linkPattern: "/blog/"
+  },
+  {
+    id: "content-zhipu-research",
+    name: "Z.ai Research",
+    url: "https://www.zhipuai.cn/en/research",
+    format: "html_index",
+    linkPattern: "/en/research/"
+  },
+  {
     id: "content-microsoft-research",
     name: "Microsoft Research Blog",
     url: "https://www.microsoft.com/en-us/research/feed/"
