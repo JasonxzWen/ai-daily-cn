@@ -6,7 +6,7 @@ Retry publishing accumulated AI daily report artifacts after syncing the remote 
 
 ## Status
 
-In progress. SSH fetch now works; `publish:dry-run` stopped because `origin/main` is ahead by the navigation/trend-index commit. Local 2026-06-01 artifacts were committed before merging remote changes.
+Completed. SSH fetch recovered, the remote trend-index commit was merged, accumulated daily artifacts were pushed, and the 2026-06-01 Pages URL verified HTTP 200 with the report date.
 
 ## Decisions
 
@@ -70,6 +70,7 @@ In progress. SSH fetch now works; `publish:dry-run` stopped because `origin/main
 - Phase 5 audit passes or any gap is reported.
 - `publish:dry-run` passes before real publish.
 - Real publish pushes to `main` and Pages URL verifies HTTP 200 with the report date, or reports `publish_error` without destructive recovery.
+- Completed retry leaves local `main` aligned with `origin/main`.
 
 ## Validation commands
 

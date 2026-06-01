@@ -9,6 +9,10 @@
 - Post-merge `npm run build` regenerated `docs/trends.json`, `docs/index.html`, and the 2026-05-30/2026-05-31/2026-06-01 report HTML.
 - `npm run validate` passed after the merge resolution.
 - `npm run sources:phase5-audit -- --date 2026-06-01 --history-dir reports-data --days 3` passed.
+- `npm run publish:dry-run -- --date 2026-06-01` passed after the merge.
+- `npm run publish -- confirm-push 2026-06-01` found no new artifact commit was needed, then `npm run publish:resume-push -- confirm-push 2026-06-01` pushed existing local commits.
+- Pages verification passed for `https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-01.html`; direct `Invoke-WebRequest` returned HTTP 200 with `2026-06-01` and `AI 日报 2026-06-01` present.
+- Final publish state after the retry: local `main` and `origin/main` aligned at `ca8f081`; worktree clean before this handoff update.
 
 ## 2026-05-31 Daily Publish Automation
 

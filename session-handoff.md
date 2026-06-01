@@ -2,10 +2,10 @@
 
 ## Current Status
 
-- Publish retry is in progress for accumulated 2026-05-30, 2026-05-31, and 2026-06-01 daily artifacts.
+- Publish retry completed for accumulated 2026-05-30, 2026-05-31, and 2026-06-01 daily artifacts.
 - SSH fetch now works, but the first retry surfaced `remote_ahead`: `origin/main` contains `b226e31 add navigation and trend index (#8)`.
 - The local 2026-06-01 publisher-managed artifacts were committed as `1908fce chore: publish AI daily report 2026-06-01` before merging remote changes.
-- The remote navigation/trend-index feature is being merged into local `main`; only handoff Markdown files conflicted.
+- The remote navigation/trend-index feature was merged into local `main`; only handoff Markdown files conflicted and were resolved.
 - 2026-05-31 daily report generation completed locally and passed validation plus Phase 5 audit.
 - 2026-06-01 daily report generation completed locally in the later automation run and passed validation plus Phase 5 audit before publish was blocked.
 - AI daily navigation and trend tracking v1 is implemented by remote commit `b226e31`.
@@ -14,6 +14,8 @@
 - Trend tags are injected only into `main_items` and `github_trending` via rendering context.
 - Trend vocabulary loading is fail-fast: missing, unreadable, invalid, or empty `config/trends.json` stops the build with `PublisherError`.
 - No reset, stash, force-push, API fallback, or remote Pages setting change has been made.
+- `npm run publish:resume-push -- confirm-push 2026-06-01` pushed existing local commits and verified Pages.
+- Independent Pages check returned HTTP 200 and confirmed the page contains `2026-06-01` and `AI 日报 2026-06-01`.
 
 ## Changed Files
 
@@ -49,17 +51,20 @@
 - Post-merge `npm run build` passed and regenerated `docs/trends.json`, `docs/index.html`, and the latest daily report HTML.
 - Post-merge `npm run validate` passed with 121 tests, build, e2e, OpenSpec, and `git diff --check`.
 - Post-merge Phase 5 audit passed for 2026-06-01 through 2026-05-30.
+- Post-merge `npm run publish:dry-run -- --date 2026-06-01` passed.
+- `npm run publish:resume-push -- confirm-push 2026-06-01` passed with `repo_pushed:true` and `pages_verified:true`.
+- Direct `Invoke-WebRequest` to the 2026-06-01 Pages URL returned HTTP 200 with date/title present.
 - Prior 2026-06-01 automation: `npm run validate` passed.
 - Prior 2026-06-01 automation: `npm run sources:phase5-audit -- --date 2026-06-01 --history-dir reports-data --days 3` passed.
 - Remote trend-index commit validation included `npm run validate`, `npm run build`, `npm run test:e2e`, and `node scripts\harness-validate.mjs`.
 
 ## Known Limits
 
-- The current merge still needs a post-merge rebuild and validation before publishing.
+- None for the completed retry.
 - No topic detail pages in trend v1.
 - Automatic candidate topics are collected in `candidate_topics` with `display: false`; they are not rendered.
 - Trend matching is deterministic and vocabulary-driven; expanding coverage requires editing `config/trends.json`.
 
 ## Next Action
 
-- Finish the merge commit, rebuild with merged code, run validation, rerun `publish:dry-run`, then run `npm run publish -- confirm-push 2026-06-01` if dry-run passes.
+- Continue with the next scheduled daily report run from a clean `main`.
