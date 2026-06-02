@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-01T07:48:31.697Z",
+  "generated_at": "2026-06-02T06:15:00.199Z",
   "window_days": 7,
   "source": {
-    "report_count": 19,
-    "date_from": "2026-05-26",
-    "date_to": "2026-06-01"
+    "report_count": 20,
+    "date_from": "2026-05-27",
+    "date_to": "2026-06-02"
   },
   "thresholds": {
     "watching": {
@@ -32,13 +32,14 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 31,
-      "active_days": 6,
+      "occurrences": 39,
+      "active_days": 7,
       "sections": [
         "builder_observations",
         "github_trending",
         "hot_blogs",
         "main_items",
+        "model_releases",
         "projects"
       ],
       "entities": [
@@ -58,7 +59,8 @@
         "2026-05-29",
         "2026-05-30",
         "2026-05-31",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-02"
       ],
       "related_reports": [
         "2026-05-27",
@@ -66,15 +68,16 @@
         "2026-05-29",
         "2026-05-30",
         "2026-05-31",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-02"
       ]
     },
     {
       "id": "mcp",
       "label": "MCP",
-      "status": "active",
-      "occurrences": 4,
-      "active_days": 3,
+      "status": "hot",
+      "occurrences": 5,
+      "active_days": 4,
       "sections": [
         "builder_observations",
         "hot_blogs",
@@ -88,105 +91,155 @@
       "dates": [
         "2026-05-27",
         "2026-05-28",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-02"
       ],
       "related_reports": [
         "2026-05-27",
         "2026-05-28",
-        "2026-06-01"
+        "2026-06-01",
+        "2026-06-02"
       ]
     },
     {
       "id": "enterprise-agent-governance",
       "label": "enterprise agent governance",
       "status": "active",
-      "occurrences": 3,
-      "active_days": 3,
+      "occurrences": 4,
+      "active_days": 4,
       "sections": [
+        "github_trending",
         "hot_blogs",
         "main_items"
       ],
       "entities": [
+        "Claude Code",
+        "Codex",
+        "GitHub",
         "GitHub Copilot",
         "Google"
       ],
       "dates": [
         "2026-05-27",
         "2026-05-28",
-        "2026-05-30"
+        "2026-05-30",
+        "2026-06-02"
       ],
       "related_reports": [
         "2026-05-27",
         "2026-05-28",
-        "2026-05-30"
+        "2026-05-30",
+        "2026-06-02"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "github",
-      "occurrences": 68,
-      "active_days": 6,
+      "occurrences": 82,
+      "active_days": 7,
       "display": false
     },
     {
       "term": "daily",
-      "occurrences": 62,
-      "active_days": 5,
+      "occurrences": 75,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "github trending",
-      "occurrences": 62,
-      "active_days": 5,
+      "occurrences": 75,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "trending",
-      "occurrences": 62,
-      "active_days": 5,
+      "occurrences": 75,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "agent",
-      "occurrences": 49,
+      "occurrences": 63,
       "active_days": 7,
       "display": false
     },
     {
       "term": "trending daily",
-      "occurrences": 48,
-      "active_days": 4,
+      "occurrences": 61,
+      "active_days": 5,
       "display": false
     },
     {
       "term": "stars",
-      "occurrences": 46,
-      "active_days": 5,
+      "occurrences": 58,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "stars today",
-      "occurrences": 46,
-      "active_days": 5,
+      "occurrences": 58,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "today",
-      "occurrences": 46,
-      "active_days": 5,
+      "occurrences": 58,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "daily rank",
-      "occurrences": 42,
-      "active_days": 4,
+      "occurrences": 45,
+      "active_days": 5,
       "display": false
     },
     {
       "term": "rank",
-      "occurrences": 42,
+      "occurrences": 45,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "with",
+      "occurrences": 33,
       "active_days": 4,
+      "display": false
+    },
+    {
+      "term": "all",
+      "occurrences": 30,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "appeared",
+      "occurrences": 30,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "appeared github",
+      "occurrences": 30,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "daily with",
+      "occurrences": 30,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "with stars",
+      "occurrences": 30,
+      "active_days": 3,
+      "display": false
+    },
+    {
+      "term": "code",
+      "occurrences": 27,
+      "active_days": 7,
       "display": false
     },
     {
@@ -196,51 +249,9 @@
       "display": false
     },
     {
-      "term": "code",
-      "occurrences": 24,
+      "term": "coding",
+      "occurrences": 23,
       "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "with",
-      "occurrences": 22,
-      "active_days": 3,
-      "display": false
-    },
-    {
-      "term": "anthropic",
-      "occurrences": 20,
-      "active_days": 6,
-      "display": false
-    },
-    {
-      "term": "all",
-      "occurrences": 20,
-      "active_days": 2,
-      "display": false
-    },
-    {
-      "term": "appeared",
-      "occurrences": 20,
-      "active_days": 2,
-      "display": false
-    },
-    {
-      "term": "appeared github",
-      "occurrences": 20,
-      "active_days": 2,
-      "display": false
-    },
-    {
-      "term": "daily with",
-      "occurrences": 20,
-      "active_days": 2,
-      "display": false
-    },
-    {
-      "term": "with stars",
-      "occurrences": 20,
-      "active_days": 2,
       "display": false
     }
   ],
@@ -1270,6 +1281,106 @@
                 "AWS",
                 "Claude Code",
                 "Codex"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-06-02": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 39x/7d",
+              "window_days": 7,
+              "occurrences": 39,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 39x/7d",
+              "window_days": 7,
+              "occurrences": 39,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 5x/4d",
+              "window_days": 7,
+              "occurrences": 5,
+              "active_days": 4,
+              "entities": [
+                "AWS",
+                "Claude Code",
+                "GitHub Copilot"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": [
+        {
+          "index": 7,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 39x/7d",
+              "window_days": 7,
+              "occurrences": 39,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            },
+            {
+              "topic_id": "enterprise-agent-governance",
+              "label": "enterprise agent governance",
+              "status": "active",
+              "text": "enterprise agent governance: 7d 4x/4d",
+              "window_days": 7,
+              "occurrences": 4,
+              "active_days": 4,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "GitHub Copilot"
               ]
             }
           ]

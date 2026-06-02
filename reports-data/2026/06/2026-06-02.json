@@ -1,0 +1,2290 @@
+{
+  "report_date": "2026-06-02",
+  "title": "AI 日报 2026-06-02",
+  "summary": "今天用最新 main 重新生成：主体信息扩展为 10 条，OpenAI/AWS、Anthropic IPO、GitHub Copilot 成本、Mellum2、AWS/NVIDIA agent 基础设施和 AIGC 工具进入主线；GitHub Trending Top 10、3 条项目、3 条 Builder 观察和 4 张原文技术图单独展示。",
+  "hero_highlights": [
+    {
+      "title": "OpenAI 模型与 Codex 正式进入 AWS",
+      "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
+      "reason": "企业采购、治理和部署路径从单独接入转向 Bedrock/Codex on AWS。"
+    },
+    {
+      "title": "GitHub Copilot 用量计费生效",
+      "url": "https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans",
+      "reason": "AI 编程工具从 seat 价格转向 AI Credits、Actions minutes 和用户级预算。"
+    },
+    {
+      "title": "Mellum2 开源 12B MoE",
+      "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
+      "reason": "JetBrains 把低延迟代码/路由/RAG 模型推到 Apache 2.0 开源权重。"
+    }
+  ],
+  "source_window": {
+    "date_from": "2026-06-01",
+    "date_to": "2026-06-02",
+    "fallback_window_used": true,
+    "notes": "先扩展固定信源覆盖后使用 48 小时窗口；所有 main_items 均为 2026-06-01 或 2026-06-02 的官方/原始来源，近期重复 URL 已留在候选池并排除。search-news shadow command timed out, but content/GitHub/Builder/source-health audits completed."
+  },
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily",
+          "status": "checked",
+          "notes": "17 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending weekly",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "checked",
+          "notes": "20 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python daily",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "13 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python weekly",
+          "url": "https://github.com/trending/python?since=weekly",
+          "status": "checked",
+          "notes": "20 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript daily",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "16 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript weekly",
+          "url": "https://github.com/trending/typescript?since=weekly",
+          "status": "checked",
+          "notes": "16 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust daily",
+          "url": "https://github.com/trending/rust?since=daily",
+          "status": "checked",
+          "notes": "14 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust weekly",
+          "url": "https://github.com/trending/rust?since=weekly",
+          "status": "checked",
+          "notes": "15 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go daily",
+          "url": "https://github.com/trending/go?since=daily",
+          "status": "checked",
+          "notes": "16 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go weekly",
+          "url": "https://github.com/trending/go?since=weekly",
+          "status": "checked",
+          "notes": "15 repositories parsed"
+        }
+      ],
+      "candidates_found": 115,
+      "included": 10,
+      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 6 个日期、85 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders X feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+          "status": "checked",
+          "notes": "23 recent original entries parsed"
+        },
+        {
+          "name": "follow-builders podcast feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+          "status": "blocked",
+          "notes": "0 recent original entries parsed; upstream_error=Podcast: Transcript error for \"Giving Agents Computers — Ivan Burazin, Daytona\": HTTP 404: {\"status\":\"error\",\"message\":\"Episode not found\"}"
+        },
+        {
+          "name": "follow-builders blog feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Simon Willison Weblog",
+          "url": "https://simonwillison.net/atom/everything/",
+          "status": "checked",
+          "notes": "5 recent original entries parsed"
+        },
+        {
+          "name": "Chip Huyen Blog",
+          "url": "https://huyenchip.com/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Andrej Karpathy Blog",
+          "url": "https://karpathy.github.io/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        }
+      ],
+      "candidates_found": 25,
+      "included": 3,
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-02T03:59:21.460Z",
+      "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
+    },
+    "content_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "OpenAI Blog RSS",
+          "url": "https://openai.com/blog/rss.xml",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/feed/",
+          "status": "checked",
+          "notes": "2 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google DeepMind RSS",
+          "url": "https://deepmind.google/blog/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Microsoft Research Blog",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "status": "checked",
+          "notes": "9 recent blog/interview entries parsed"
+        },
+        {
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "checked",
+          "notes": "10 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "status": "checked",
+          "notes": "9 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "status": "checked",
+          "notes": "9 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "status": "checked",
+          "notes": "10 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "status": "checked",
+          "notes": "17 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/feed/",
+          "status": "checked",
+          "notes": "2 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "VentureBeat AI",
+          "url": "https://venturebeat.com/category/ai/feed",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "ML Papers of the Week",
+          "url": "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "HelloGitHub",
+          "url": "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "RuanYF Weekly",
+          "url": "https://github.com/ruanyf/weekly/commits/master.atom",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
+        },
+        {
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed"
+        },
+        {
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "status": "checked",
+          "notes": "2 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "arXiv cs.AI",
+          "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Hacker News Topstories API",
+          "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+          "status": "checked",
+          "notes": "13 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Hugging Face Daily Papers",
+          "url": "https://huggingface.co/papers",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Papers with Code API",
+          "url": "https://paperswithcode.com/api/v1/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Reddit r/MachineLearning",
+          "url": "https://www.reddit.com/r/MachineLearning/.json",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Smol AI News",
+          "url": "https://news.smol.ai/rss.xml",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "AI News Archive",
+          "url": "https://buttondown.com/ainews/rss",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Ben's Bites",
+          "url": "https://bensbites.com/feed",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Magnifier AI",
+          "url": "https://themagnifier.ai/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Fast Company Creator Economy",
+          "url": "https://www.fastcompany.com/section/creator-economy",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Crunchbase News AI",
+          "url": "https://news.crunchbase.com/sections/ai/",
+          "status": "checked",
+          "notes": "4 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "status": "checked",
+          "notes": "50 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "36Kr",
+          "url": "https://36kr.com/feed",
+          "status": "checked",
+          "notes": "30 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "status": "checked",
+          "notes": "10 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Jiqizhixin",
+          "url": "https://www.jiqizhixin.com/rss",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "status": "checked",
+          "notes": "16 recent intermediary lead entries parsed"
+        }
+      ],
+      "candidates_found": 60,
+      "included": 15,
+      "sources_checked": 60,
+      "enablement_counts": {
+        "core": 28,
+        "optional": 32
+      },
+      "tier_counts": {
+        "T0": 28,
+        "T1": 1,
+        "T3": 16,
+        "T2": 15
+      },
+      "source_kind_counts": {
+        "rss": 38,
+        "html_index": 18,
+        "search_api": 4
+      },
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-02T03:59:21.467Z",
+      "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
+    },
+    "search_sources": {
+      "checked": true,
+      "shadow": true,
+      "sources": [
+        {
+          "name": "OpenAlex shadow search",
+          "url": "https://api.openalex.org/works",
+          "status": "blocked",
+          "notes": "discover:search-news timed out in the current shell; arXiv items were still covered through content-sources."
+        },
+        {
+          "name": "arXiv shadow search",
+          "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+          "status": "blocked",
+          "notes": "discover:search-news timed out before producing JSON; content source arXiv cs.AI feed remained checked."
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "blocked_reason": "discover:search-news timed out twice after 180s; fixed content, GitHub, Builder and source-health audits completed.",
+      "notes": "Search-news is a shadow补漏 source; no search result was promoted to factual sections."
+    },
+    "sources_health": {
+      "checked": true,
+      "sources": [
+        {
+          "id": "content-openai-news",
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "981 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "content-openai-blog-rss",
+          "name": "OpenAI Blog RSS",
+          "url": "https://openai.com/blog/rss.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "981 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "content-anthropic-news",
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-hugging-face-blog",
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 3,
+          "original_url_count": null,
+          "notes": "789 feed entries parsed; 3 within 48h"
+        },
+        {
+          "id": "content-github-changelog",
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/feed/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-google-research",
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-google-deepmind-blog",
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-google-deepmind-rss",
+          "name": "Google DeepMind RSS",
+          "url": "https://deepmind.google/blog/rss.xml",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-meta-ai-blog",
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-microsoft-research",
+          "name": "Microsoft Research Blog",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-apple-machine-learning",
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-nvidia-developer-blog",
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 9,
+          "original_url_count": null,
+          "notes": "100 feed entries parsed; 9 within 48h"
+        },
+        {
+          "id": "content-aws-machine-learning",
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 10,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 10 within 48h"
+        },
+        {
+          "id": "content-azure-blog",
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-meta-engineering",
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "9 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-xai-news",
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-bytedance-seed-blog",
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tiktok-developers-blog",
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tencent-corporate-ai",
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-tencent-hunyuan-blog",
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-qwen-blog",
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-alibaba-cloud-blog",
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-kimi-platform-blog",
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-kimi-technical-blog",
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-minimax-blog",
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-zhipu-research",
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-cloudflare-blog",
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-nature-machine-learning",
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T0",
+          "authority": "secondary",
+          "enablement": "core",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-techcrunch-ai",
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 7,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 7 within 48h"
+        },
+        {
+          "id": "content-the-verge-ai",
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 8,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 8 within 48h"
+        },
+        {
+          "id": "content-techcrunch-enterprise",
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-the-verge-main",
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 10,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "id": "content-ars-technica",
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 15,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 15 within 48h"
+        },
+        {
+          "id": "content-mit-technology-review",
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/feed/",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-venturebeat-ai",
+          "name": "VentureBeat AI",
+          "url": "https://venturebeat.com/category/ai/feed",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "7 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-ml-papers-week",
+          "name": "ML Papers of the Week",
+          "url": "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-hellogithub",
+          "name": "HelloGitHub",
+          "url": "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-ruanyf-weekly",
+          "name": "RuanYF Weekly",
+          "url": "https://github.com/ruanyf/weekly/commits/master.atom",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-product-hunt-trending",
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 47,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 47 within 48h"
+        },
+        {
+          "id": "content-product-hunt-devtools",
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 46,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 46 within 48h"
+        },
+        {
+          "id": "content-latent-space",
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 2 within 48h"
+        },
+        {
+          "id": "content-arxiv-cs-ai",
+          "name": "arXiv cs.AI",
+          "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+          "status": "checked",
+          "source_kind": "search_api",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "optional",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "content-hacker-news-api",
+          "name": "Hacker News Topstories API",
+          "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+          "status": "blocked",
+          "source_kind": "search_api",
+          "tier": "T2",
+          "authority": "community",
+          "enablement": "optional",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "response is not feed-like"
+        },
+        {
+          "id": "content-huggingface-daily-papers",
+          "name": "Hugging Face Daily Papers",
+          "url": "https://huggingface.co/papers",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-papers-with-code-api",
+          "name": "Papers with Code API",
+          "url": "https://paperswithcode.com/api/v1/",
+          "status": "blocked",
+          "source_kind": "search_api",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "response is not feed-like"
+        },
+        {
+          "id": "content-reddit-machinelearning",
+          "name": "Reddit r/MachineLearning",
+          "url": "https://www.reddit.com/r/MachineLearning/.json",
+          "status": "blocked",
+          "source_kind": "search_api",
+          "tier": "T2",
+          "authority": "community",
+          "enablement": "optional",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "http_status": 403,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "notes": "HTTP 403"
+        },
+        {
+          "id": "content-smol-ai-news",
+          "name": "Smol AI News",
+          "url": "https://news.smol.ai/rss.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "645 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-ai-news-buttondown",
+          "name": "AI News Archive",
+          "url": "https://buttondown.com/ainews/rss",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-bens-bites",
+          "name": "Ben's Bites",
+          "url": "https://bensbites.com/feed",
+          "status": "no_signal",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "id": "content-interconnects",
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 1,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 1 within 48h"
+        },
+        {
+          "id": "content-the-magnifier-ai",
+          "name": "The Magnifier AI",
+          "url": "https://themagnifier.ai/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T2",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-fastcompany-creator-economy",
+          "name": "Fast Company Creator Economy",
+          "url": "https://www.fastcompany.com/section/creator-economy",
+          "status": "blocked",
+          "source_kind": "html_index",
+          "tier": "T3",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 403,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "notes": "HTTP 403"
+        },
+        {
+          "id": "content-crunchbase-ai-news",
+          "name": "Crunchbase News AI",
+          "url": "https://news.crunchbase.com/sections/ai/",
+          "status": "checked",
+          "source_kind": "html_index",
+          "tier": "T3",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "id": "content-planet-ai",
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "aggregator",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 50,
+          "original_url_count": null,
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "id": "content-hn-frontpage",
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T2",
+          "authority": "community",
+          "enablement": "optional",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-36kr",
+          "name": "36Kr",
+          "url": "https://36kr.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 30,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 30 within 48h"
+        },
+        {
+          "id": "intermediary-qbitai",
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 9,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 9 within 48h"
+        },
+        {
+          "id": "intermediary-jiqizhixin",
+          "name": "Jiqizhixin",
+          "url": "https://www.jiqizhixin.com/rss",
+          "status": "blocked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "response is not feed-like"
+        },
+        {
+          "id": "intermediary-leiphone",
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "id": "intermediary-infoq-cn",
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "optional",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 15,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 15 within 48h"
+        },
+        {
+          "id": "intermediary-sspai",
+          "name": "SSPAI",
+          "url": "https://sspai.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 5,
+          "original_url_count": null,
+          "notes": "10 feed entries parsed; 5 within 48h"
+        },
+        {
+          "id": "intermediary-ifanr",
+          "name": "iFanr",
+          "url": "https://www.ifanr.com/feed",
+          "status": "checked",
+          "source_kind": "rss",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "primary_required",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 8,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 8 within 48h"
+        },
+        {
+          "id": "wechat-industry-whitelist-manual",
+          "name": "WeChat Industry Whitelist Manual Intake",
+          "url": "https://mp.weixin.qq.com/",
+          "status": "skipped_manual_source",
+          "source_kind": "manual",
+          "tier": "T3",
+          "authority": "intermediary",
+          "enablement": "manual",
+          "verification_policy": "community_only",
+          "requires_original_url": false,
+          "http_status": null,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "notes": "skipped_manual_source"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
+    }
+  },
+  "github_trending": [
+    {
+      "candidate_id": "trend-microsoft-markitdown",
+      "importance": "general",
+      "name": "microsoft/markitdown",
+      "repo": "microsoft/markitdown",
+      "description": "Microsoft 的文档转 Markdown 工具继续排在 daily #1，适合把 Office、PDF 和图片输入接入 RAG 或 agent 预处理链路。",
+      "url": "https://github.com/microsoft/markitdown",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 2,
+      "rank_delta": 1,
+      "trend": "up",
+      "evidence": "microsoft/markitdown appeared on GitHub Trending daily with 3,034 stars today. 近 7 天本地记录曾在 2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-nesquena-hermes-webui",
+      "importance": "general",
+      "name": "nesquena/hermes-webui",
+      "repo": "nesquena/hermes-webui",
+      "description": "Hermes Agent 的 Web/移动端界面，说明浏览器化 agent 控制台仍在吸引用户试用。",
+      "url": "https://github.com/nesquena/hermes-webui",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": 4,
+      "rank_delta": 2,
+      "trend": "up",
+      "evidence": "nesquena/hermes-webui appeared on GitHub Trending daily with 945 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-supermemoryai-supermemory",
+      "importance": "general",
+      "name": "supermemoryai/supermemory",
+      "repo": "supermemoryai/supermemory",
+      "description": "面向 AI 应用的 memory API 与应用，排名上升到 #3，继续验证长期记忆基础设施热度。",
+      "url": "https://github.com/supermemoryai/supermemory",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": 10,
+      "rank_delta": 7,
+      "trend": "up",
+      "evidence": "supermemoryai/supermemory appeared on GitHub Trending daily with 647 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-harry0703-moneyprinterturbo",
+      "importance": "general",
+      "name": "harry0703/MoneyPrinterTurbo",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "description": "用大模型一键生成短视频的 AIGC 项目，连续多日上榜但今日排名回落。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": 1,
+      "rank_delta": -3,
+      "trend": "down",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 3,375 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-d4vinci-scrapling",
+      "importance": "general",
+      "name": "D4Vinci/Scrapling",
+      "repo": "D4Vinci/Scrapling",
+      "description": "自适应网页抓取框架，从单请求到大规模 crawl，适合数据采集型 agent 工具链。",
+      "url": "https://github.com/D4Vinci/Scrapling",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": 3,
+      "rank_delta": -2,
+      "trend": "down",
+      "evidence": "D4Vinci/Scrapling appeared on GitHub Trending daily with 1,486 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-pbakaus-impeccable",
+      "importance": "notable",
+      "name": "pbakaus/impeccable",
+      "repo": "pbakaus/impeccable",
+      "description": "面向 AI harness 的设计语言项目，新进入 Top 10，直接回应 agent 输出审美与 UI 质量问题。",
+      "url": "https://github.com/pbakaus/impeccable",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "pbakaus/impeccable appeared on GitHub Trending daily with 485 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-p-e-w-heretic",
+      "importance": "general",
+      "name": "p-e-w/heretic",
+      "repo": "p-e-w/heretic",
+      "description": "面向语言模型 censorship removal 的自动化项目，风险与合规边界需要谨慎评估。",
+      "url": "https://github.com/p-e-w/heretic",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": 7,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 249 stars today. 近 7 天本地记录曾在 2026-05-28、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-everyinc-compound-engineering-plugin",
+      "importance": "general",
+      "name": "EveryInc/compound-engineering-plugin",
+      "repo": "EveryInc/compound-engineering-plugin",
+      "description": "面向 Claude Code、Codex、Cursor 等工具的 Compound Engineering 插件，持续处于 agent workflow 讨论核心。",
+      "url": "https://github.com/EveryInc/compound-engineering-plugin",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": 5,
+      "rank_delta": -3,
+      "trend": "down",
+      "evidence": "EveryInc/compound-engineering-plugin appeared on GitHub Trending daily with 417 stars today. 近 7 天本地记录曾在 2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    },
+    {
+      "candidate_id": "trend-tauricresearch-tradingagents",
+      "importance": "notable",
+      "name": "TauricResearch/TradingAgents",
+      "repo": "TauricResearch/TradingAgents",
+      "description": "多 agent 金融交易框架，新上榜，展示垂直多 agent 编排仍在扩散。",
+      "url": "https://github.com/TauricResearch/TradingAgents",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "TauricResearch/TradingAgents appeared on GitHub Trending daily with 299 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+    },
+    {
+      "candidate_id": "trend-revfactory-harness",
+      "importance": "general",
+      "name": "revfactory/harness",
+      "repo": "revfactory/harness",
+      "description": "自动设计领域 agent team 和技能的 meta-skill 项目，适合观察 agent 组织编排形态。",
+      "url": "https://github.com/revfactory/harness",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": 8,
+      "rank_delta": -2,
+      "trend": "down",
+      "evidence": "revfactory/harness appeared on GitHub Trending daily with 524 stars today. 近 7 天本地记录曾在 2026-05-29、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+    }
+  ],
+  "main_items": [
+    {
+      "candidate_id": "main-openai-aws-frontier-codex",
+      "importance": "major",
+      "title": "OpenAI frontier models 与 Codex 正式进入 AWS",
+      "event_date": "2026-06-01",
+      "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "AWS",
+        "Amazon Bedrock",
+        "Codex"
+      ],
+      "summary": "OpenAI 把 frontier models 和 Codex 放进 AWS 商业与 GovCloud 区域，让企业用现有采购、安全和治理链路部署。",
+      "bullets": [
+        "**OpenAI on AWS** 已通过 Amazon Bedrock 和 Codex on Amazon Bedrock 提供，OpenAI 称这是面向企业生产部署的 ==general availability==，覆盖 Commercial 与 GovCloud 区域。",
+        "**Codex** 被纳入 AWS 运行与治理模型后，团队可以把代码生成、review、debug 和现代化任务放进既有合规、采购、账单和权限流程，而不是另建供应商通道。"
+      ]
+    },
+    {
+      "candidate_id": "main-openai-stargate-michigan",
+      "importance": "major",
+      "title": "OpenAI 在 Michigan 启动 Stargate 数据中心项目",
+      "event_date": "2026-06-01",
+      "url": "https://openai.com/index/stargate-michigan-data-center",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Oracle",
+        "Related Digital",
+        "Walbridge",
+        "Stargate"
+      ],
+      "summary": "OpenAI 与州政府和合作方在 Saline 推进 1GW campus，并承诺本地电力、水资源、就业和 Codex credits。",
+      "bullets": [
+        "**The Barn** 是 Saline, Michigan 的 1GW 数据中心 campus，OpenAI 写明项目承担基础设施和能源成本，采用 ==closed-loop cooling==，并预计创造建设、常驻和间接岗位。",
+        "**Codex credits** 也被放进基础设施叙事：OpenAI 将向 Michigan 40 万名合格学生提供最高 4500 万美元 credits，把算力建设、教育触达和 workforce training 绑定。"
+      ]
+    },
+    {
+      "candidate_id": "main-openai-policy-advocacy",
+      "importance": "notable",
+      "title": "OpenAI 公布 AI policy 与政治倡议边界",
+      "event_date": "2026-06-01",
+      "url": "https://openai.com/index/our-views-on-ai-policy-and-political-advocacy",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI",
+        "Leading the Future",
+        "AI policy"
+      ],
+      "summary": "OpenAI 声明没有 super PAC 捐款或员工 PAC，并把 AI 政策倡议的透明度边界公开写清。",
+      "bullets": [
+        "**OpenAI** 表示没有向 super PAC、候选人或竞选活动捐款，也没有 employee-funded PAC；员工个人政治参与与公司观点分离，属于 ==governance disclosure==。",
+        "**AI policy** 部分强调支持监管、强模型测试、安全标准、公共问责和广泛可及；这对后续政策新闻判断很重要，因为要区分公司正式立场和外围组织叙事。"
+      ]
+    },
+    {
+      "candidate_id": "main-anthropic-confidential-s1",
+      "importance": "major",
+      "title": "Anthropic 向 SEC 机密提交 draft S-1",
+      "event_date": "2026-06-01",
+      "url": "https://www.anthropic.com/news/confidential-draft-s1-sec",
+      "source": "Anthropic News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic",
+        "SEC",
+        "IPO",
+        "Claude"
+      ],
+      "summary": "Anthropic 官方确认已提交 draft S-1，为潜在 IPO 取得监管反馈路径，但发行规模和价格未定。",
+      "bullets": [
+        "**Anthropic, PBC** 已向 U.S. SEC 机密提交 Form S-1 draft registration statement，官方措辞是获得在 SEC review 后上市的 ==option==，不是已经公开招股。",
+        "**Claude** 供应商若进入公开市场，会让训练成本、企业收入、资本开支和风险披露变得可审计；当前仍需等公开 S-1，股数和价格尚未设定。"
+      ]
+    },
+    {
+      "candidate_id": "main-github-copilot-june1-billing-auto",
+      "importance": "major",
+      "title": "GitHub Copilot 用量计费和 auto evaluation models 同日生效",
+      "event_date": "2026-06-01",
+      "url": "https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans",
+      "source": "GitHub Changelog",
+      "tier": "T0",
+      "entities": [
+        "GitHub Copilot",
+        "AI Credits",
+        "Actions minutes",
+        "Copilot Max"
+      ],
+      "summary": "GitHub 把 Copilot usage-based billing 推到所有 plans，并让 code review 同时消耗 Actions minutes。",
+      "bullets": [
+        "**Copilot plans** 从 6 月 1 日起按 GitHub AI Credits 计费，超出 included usage 后需要设置额外预算；组织和企业可以用 ==user-level budgets== 控制用户总用量。",
+        "**Copilot code review** 现在除 AI Credits 外还消耗 GitHub Actions minutes；同日 changelog 还说明 individual non-enterprise 用户的 auto model selection 可能被分配到 evaluation models。"
+      ]
+    },
+    {
+      "candidate_id": "main-jetbrains-mellum2",
+      "importance": "major",
+      "title": "JetBrains 发布 Mellum2 12B MoE 开源模型",
+      "event_date": "2026-06-01",
+      "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
+      "source": "Hugging Face Blog",
+      "tier": "T1",
+      "entities": [
+        "JetBrains",
+        "Mellum2",
+        "Hugging Face",
+        "MoE"
+      ],
+      "summary": "Mellum2 是 12B MoE、每 token 激活 2.5B 参数，主打低延迟代码、路由、RAG 和私有部署。",
+      "bullets": [
+        "**Mellum2** 从头训练在自然语言和代码上，总参数 12B、每 token 激活 2.5B，并以 Apache 2.0 发布；JetBrains 将它定位为 ==low-latency inference== 的工作流模型。",
+        "**使用场景** 写得很具体：routing、RAG、summarization、sub-agents、高吞吐 coding features 和 private deployments，适合团队评估小 MoE 是否能替代部分重模型调用。"
+      ]
+    },
+    {
+      "candidate_id": "main-aws-agentcore-auth-code-flow",
+      "importance": "major",
+      "title": "AWS AgentCore Gateway 给 MCP clients 补授权码流程",
+      "event_date": "2026-06-01",
+      "url": "https://aws.amazon.com/blogs/machine-learning/building-a-secure-auth-code-flow-setup-using-agentcore-gateway-with-mcp-clients/",
+      "source": "AWS Machine Learning Blog",
+      "tier": "T0",
+      "entities": [
+        "AWS",
+        "Amazon Bedrock AgentCore",
+        "MCP",
+        "Kiro",
+        "Cognito"
+      ],
+      "summary": "AWS 展示 MCP clients 经 AgentCore Gateway 接入企业 IdP 的 inbound authentication 流程。",
+      "bullets": [
+        "**AgentCore Gateway** 作为 agent-to-tool 通信入口，文章把 Kiro IDE、MCP client、Gateway、IdP 和 MCP server 串成 ==authorization code flow==，解决远程工具访问的身份核验。",
+        "**企业 IdP** 支持 Okta、Microsoft Entra ID 和 Amazon Cognito 等路径；重点不是再写一个 MCP server，而是让 agent 访问工具前经过集中认证、路由和审计。"
+      ]
+    },
+    {
+      "candidate_id": "main-nvidia-jetpack-72-agentic-edge",
+      "importance": "notable",
+      "title": "NVIDIA JetPack 7.2 面向边缘 agent 加入 NemoClaw 和 Jetson skills",
+      "event_date": "2026-06-01",
+      "url": "https://developer.nvidia.com/blog/deploy-agentic-ready-ai-at-the-edge-with-memory-efficiency-in-nvidia-jetpack-7-2/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA",
+        "JetPack 7.2",
+        "Jetson",
+        "NemoClaw"
+      ],
+      "summary": "JetPack 7.2 增加 NemoClaw 一键部署、Jetson agent skills、Super Mode 和 Jetson Thor MIG 支持。",
+      "bullets": [
+        "**JetPack 7.2** 把 NemoClaw、Jetson agent skills 和 memory/performance 优化放进边缘部署路径，目标是让 robotics、industrial automation 和 edge AI 使用 ==agentic-ready== stack。",
+        "**Jetson Thor MIG** 和 Super Mode 等能力使多 workload 隔离与性能调度更明确；这会影响把本地模型、工具调用和机器人控制放到同一边缘设备的设计。"
+      ]
+    },
+    {
+      "candidate_id": "main-nvidia-dgx-spark-local-agents",
+      "importance": "notable",
+      "title": "NVIDIA DGX Spark 更新本地长运行 agent 路径",
+      "event_date": "2026-06-01",
+      "url": "https://developer.nvidia.com/blog/run-local-ai-agents-with-faster-models-and-multi-node-clustering-on-nvidia-dgx-spark/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA",
+        "DGX Spark",
+        "NemoClaw",
+        "OpenClaw",
+        "Qwen3.6"
+      ],
+      "summary": "DGX Spark 文章把 NemoClaw 安装、OpenClaw 示例、Qwen3.6 优化和多节点集群连成 developer path。",
+      "bullets": [
+        "**DGX Spark** 面向本地 autonomous agents：文章强调长上下文、并发 subagents、隐私和 per-token cost 驱动本地运行，NemoClaw 负责安装与执行编排。",
+        "**Qwen3.6** 在 DGX Spark 上经 Computex 优化后展示吞吐改进，并提供 guided multi-node cluster setup；适合评估私有 agent lab 是否能从单机扩展到 ==multi-node==。"
+      ]
+    },
+    {
+      "candidate_id": "main-alibaba-qwen-code-model-studio",
+      "importance": "notable",
+      "title": "Alibaba Cloud 用 Qwen Code 与 Model Studio CLI 做公众号封面生成",
+      "event_date": "2026-06-02",
+      "url": "https://www.alibabacloud.com/blog/qwen-code-%C3%97-model-studio-cli-wechat-cover-generation-guide_603198",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T1",
+      "entities": [
+        "Alibaba Cloud",
+        "Qwen Code",
+        "Model Studio CLI",
+        "AIGC"
+      ],
+      "summary": "Alibaba Cloud Community 展示一个 Skill：分析文章语气、生成 prompt，并调用 Model Studio CLI 做封面图。",
+      "bullets": [
+        "**Qwen Code + Model Studio CLI** 被写成内容生产 Skill：输入标题或主题后自动分析 tone、选择 style、压缩标题并生成 prompt，目标是减少公众号封面制作的 ==manual design loop==。",
+        "**AIGC workflow** 的价值在于把风格选择、prompt 生成和图像调用固化为可复用 Skill，而不是单次聊天生成图片；这正好覆盖用户要求追踪的内容产业工具面。"
+      ]
+    }
+  ],
+  "model_releases": [
+    {
+      "candidate_id": "model-openai-aws-frontier-codex",
+      "importance": "major",
+      "name": "OpenAI frontier models on AWS / Codex on Amazon Bedrock",
+      "provider": "OpenAI / AWS",
+      "availability": "closed_api",
+      "release_scope": "gateway_availability",
+      "event_date": "2026-06-01",
+      "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
+      "source": "OpenAI News RSS",
+      "summary": "OpenAI frontier models and Codex are generally available through AWS paths for enterprise deployment.",
+      "notes": "Gateway availability is mirrored in main_items because it changes enterprise procurement and governance paths."
+    },
+    {
+      "candidate_id": "model-jetbrains-mellum2",
+      "importance": "major",
+      "name": "Mellum2",
+      "provider": "JetBrains",
+      "availability": "open_weights",
+      "release_scope": "provider_official_launch",
+      "event_date": "2026-06-01",
+      "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
+      "source": "Hugging Face Blog",
+      "summary": "12B MoE model with 2.5B active parameters per token, Apache 2.0, optimized for coding-adjacent workflows.",
+      "notes": "Official Hugging Face team article links to model collection and technical report."
+    }
+  ],
+  "hot_blogs": [
+    {
+      "candidate_id": "hot-cloudflare-core-boot-time",
+      "importance": "notable",
+      "title": "How we reduced core unit boot time from hours to minutes",
+      "url": "https://blog.cloudflare.com/optimizing-core-unit-boot-time/",
+      "publisher": "Cloudflare Blog",
+      "author": "Giovanni Pereira Zantedeschi, Nnamdi Ajah, Omar Sheik-Omar",
+      "event_date": "2026-06-01",
+      "topic": "bare-metal reliability",
+      "summary": "Cloudflare 复盘 Gen12 core servers 固件更新后 UEFI boot timeout，把数小时启动降回分钟级；适合基础设施团队学习 rollout、firmware 和容量恢复的 failure mode。",
+      "content_type": "engineering_note"
+    },
+    {
+      "candidate_id": "hot-latent-video-agents",
+      "importance": "notable",
+      "title": "Why Video Agent models are next",
+      "url": "https://www.latent.space/p/video-agents",
+      "publisher": "Latent.Space",
+      "author": "Latent Space / Ethan He",
+      "event_date": "2026-06-01",
+      "topic": "video agents",
+      "summary": "Ethan He 从 xAI Grok Imagine 和 NVIDIA Cosmos 经验谈 video generation、world models、API 成本与速度；适合关注视频 agent 和多模态产品的人读。",
+      "content_type": "podcast"
+    },
+    {
+      "candidate_id": "hot-interconnects-open-closed-exponentials",
+      "importance": "notable",
+      "title": "Open and closed models are on different exponentials",
+      "url": "https://www.interconnects.ai/p/open-and-closed-models-are-on-different",
+      "publisher": "Interconnects",
+      "author": "Nathan Lambert",
+      "event_date": "2026-06-01",
+      "topic": "open vs closed model economics",
+      "summary": "文章把 coding agents 视为用户愿意为边际智能付费的早期市场，同时指出开放模型会压缩 API 业务利润；适合评估模型商业化路径。",
+      "content_type": "blog"
+    }
+  ],
+  "projects": [
+    {
+      "candidate_id": "project-pbakaus-impeccable",
+      "importance": "notable",
+      "name": "pbakaus/impeccable",
+      "description": "面向 AI harness 的 design language，目标是让 agent 生成的设计更一致、更少审美跑偏。",
+      "domains": [
+        "AI harness",
+        "design systems",
+        "frontend quality"
+      ],
+      "use_case": "用于给设计/前端 agent 固化视觉语言和判断标准。",
+      "url": "https://github.com/pbakaus/impeccable",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "signal": "star_velocity",
+      "evidence": "GitHub Trending daily rank #6, new in 7-day local history, 485 stars today."
+    },
+    {
+      "candidate_id": "project-tauricresearch-tradingagents",
+      "importance": "general",
+      "name": "TauricResearch/TradingAgents",
+      "description": "多 agent 金融交易框架，把 LLM agents 用于市场研究、策略讨论和交易决策模拟。",
+      "domains": [
+        "multi-agent",
+        "financial analysis",
+        "LLM workflow"
+      ],
+      "use_case": "用于研究垂直领域 multi-agent 编排，不应直接当作投资建议或自动交易系统。",
+      "url": "https://github.com/TauricResearch/TradingAgents",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily rank #9, new in 7-day local history, 299 stars today."
+    },
+    {
+      "candidate_id": "project-dmtrkovalenko-fff",
+      "importance": "general",
+      "name": "dmtrKovalenko/fff",
+      "description": "面向 AI agents、Neovim、Rust、C 和 NodeJS 的快速文件搜索工具。",
+      "domains": [
+        "developer tools",
+        "agent tools",
+        "file search"
+      ],
+      "use_case": "用于提升 coding agent 在大仓库里定位文件和上下文的速度。",
+      "url": "https://github.com/dmtrKovalenko/fff",
+      "event_date": "2026-06-02",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "GitHub Trending daily rank #16; description highlights AI-agent file search."
+    }
+  ],
+  "builder_observations": [
+    {
+      "candidate_id": "builder-aaron-levie-enterprise-agents",
+      "importance": "notable",
+      "author": "Aaron Levie",
+      "role": "Box CEO",
+      "event_date": "2026-06-01",
+      "source": "follow-builders X feed",
+      "content": "企业 AI agents 的关键问题继续落在权限、身份、数据边界和可审计动作上；这和 AWS AgentCore Gateway、Copilot budgets 属于同一条企业治理线。",
+      "url": "https://x.com/levie/status/2061247380897579500",
+      "evidence": "Original X status URL preserved by follow-builders feed."
+    },
+    {
+      "candidate_id": "builder-guillermo-rauch-ceos-coding",
+      "importance": "notable",
+      "author": "Guillermo Rauch",
+      "role": "Vercel CEO",
+      "event_date": "2026-05-31",
+      "source": "follow-builders X feed",
+      "content": "CEO/CTO 重新亲自写代码的趋势如果持续，说明 coding agent 正从个体效率工具进入管理者直接改产品、改系统的工作方式。",
+      "url": "https://x.com/rauchg/status/2061135404942974982",
+      "evidence": "Original X status URL preserved by follow-builders feed."
+    },
+    {
+      "candidate_id": "builder-steipete-codex-qa-assistant",
+      "importance": "notable",
+      "author": "Peter Steinberger",
+      "role": "OpenClaw / PSPDFKit founder",
+      "event_date": "2026-05-31",
+      "source": "follow-builders X feed",
+      "content": "把 Codex 训练成每个 commit 的 QA assistant，重点不是再生成代码，而是把用户测试、回归检查和 review evidence 放进提交工作流。",
+      "url": "https://x.com/steipete/status/2061208638027395490",
+      "evidence": "Original X status URL preserved by follow-builders feed."
+    }
+  ],
+  "community_leads": [
+    {
+      "importance": "general",
+      "content": "OpenAI Status 记录 Free users ChatGPT availability 下降；这类状态页事件只作轻量运营线索，不进入主体信息。",
+      "url": "https://status.openai.com//incidents/01KT204M76EYZYJX7WYG1B2QPH"
+    },
+    {
+      "importance": "general",
+      "content": "Claude Status 记录 Sonnet 4.6 degraded performance；模型可用性 incident 保留在社区线索，避免伪装成模型发布。",
+      "url": "https://status.claude.com/incidents/vxp8fdrckj7q"
+    },
+    {
+      "importance": "general",
+      "content": "TechCrunch 报道 NVIDIA、Microsoft、Dell、HP 的 AI agent PC 方向，当前只作为中介线索，待回源到厂商页面后再升格。",
+      "url": "https://techcrunch.com/2026/06/01/nvidia-chases-200b-cpu-market-with-ai-agent-pcs-from-microsoft-dell-and-hp/"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "AgentCore 授权码流程",
+      "source_url": "https://aws.amazon.com/blogs/machine-learning/building-a-secure-auth-code-flow-setup-using-agentcore-gateway-with-mcp-clients/",
+      "local_path": "assets/evidence/aws-agentcore-auth-code-flow.jpg",
+      "caption": "AWS 原文中的 AgentCore Gateway authorization code flow 架构图。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "JetPack 7.2 更新概览",
+      "source_url": "https://developer.nvidia.com/blog/deploy-agentic-ready-ai-at-the-edge-with-memory-efficiency-in-nvidia-jetpack-7-2/",
+      "local_path": "assets/evidence/nvidia-jetpack-7-2-updates.webp",
+      "caption": "NVIDIA 原文中的 JetPack 7.2 agentic-ready edge AI 更新概览。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "DGX Spark Qwen3.6 吞吐对比",
+      "source_url": "https://developer.nvidia.com/blog/run-local-ai-agents-with-faster-models-and-multi-node-clustering-on-nvidia-dgx-spark/",
+      "local_path": "assets/evidence/nvidia-dgx-spark-qwen-throughput.webp",
+      "caption": "NVIDIA 原文中的 Qwen3.6-35B throughput improvement 对比图。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "Mellum2 eval grid",
+      "source_url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
+      "local_path": "assets/evidence/jetbrains-mellum2-evals.jpg",
+      "caption": "Hugging Face/JetBrains 页面中的 Mellum2 benchmark grid。",
+      "extraction_status": "source_image"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-06-02",
+    "main_items": 10,
+    "builder_observations": 3,
+    "builder_skill_used": [
+      "follow-builders X feed",
+      "discover:builders"
+    ],
+    "fallback_sources": [
+      "discover:search-news timed out; no search-news candidates promoted"
+    ],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "Generated after syncing current main with strict coverage gates. Fixed source surface checked: GitHub Trending, content sources, builders, sources health and statuspage incidents. Recent duplicate URLs from 2026-06-01 were excluded from main_items.",
+    "optimization_suggestions": [
+      {
+        "area": "search_news",
+        "observed_issue": "discover:search-news timed out twice in the current shell.",
+        "suggestion": "Add a shorter default timeout per provider and stream partial provider results so OpenAlex/GDELT slowness cannot blank the shadow audit."
+      },
+      {
+        "area": "candidate_pool",
+        "observed_issue": "Discovery candidates default to excluded even when they will later feed public sections.",
+        "suggestion": "Add a merge utility that promotes selected discovery candidates to included categories without manual ID/category rewriting."
+      }
+    ],
+    "automation_revision": {
+      "schema_version": 1,
+      "git_commit": "af29e7e0f30d4f464b2ce46bd7d9a45645d1cbb9",
+      "git_commit_short": "af29e7e0f30d",
+      "git_branch": "main",
+      "prompt_manifest": "prompts/ai-daily/manifest.json",
+      "prompt_modules": [
+        "base.md",
+        "date-scope.md",
+        "discovery-audit.md",
+        "candidate-pool.md",
+        "source-policy.md",
+        "fixed-source-checklist.md",
+        "selection-rules.md",
+        "plain-language.md",
+        "output-html.md",
+        "effective-interact-output.md",
+        "structured-report-json.md",
+        "publish-workflow.md",
+        "reflection-loop.md"
+      ],
+      "source_registry_count": 63,
+      "source_registry_enablement_counts": {
+        "core": 28,
+        "optional": 32,
+        "manual": 3
+      },
+      "rules": [
+        "main_items_min_8_when_candidates_available",
+        "content_units_min_18_when_candidates_available",
+        "model_releases_must_mirror_main_items",
+        "github_api_fallback_for_git_transport",
+        "fixed_source_checklist"
+      ]
+    }
+  },
+  "schema_version": 1,
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html",
+  "html_path": "reports/2026/06/2026-06-02.html",
+  "candidate_pool_path": "data/2026/06/2026-06-02.candidates.json",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html",
+    "publish_error": ""
+  },
+  "generated_at": "2026-06-02T06:14:41.487Z",
+  "quality_status": {
+    "status": "ok",
+    "reasons": [],
+    "affected_sections": [],
+    "public_note": "Core discovery checks completed without blocking degradation."
+  }
+}
