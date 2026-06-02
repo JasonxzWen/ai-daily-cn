@@ -574,7 +574,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
   assert(trendingSection.content.includes("1. **![example/agent-memory]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
-  assert(trendingSection.content.includes("\n  - "));
+  assert(!trendingSection.content.includes("\n  - "));
+  assert(trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
@@ -1840,6 +1841,96 @@ test("content source discovery parses official HTML pages and Product Hunt proje
   assert.equal(collected.candidates[1].url, "https://www.producthunt.com/products/agent-debugger");
 });
 
+test("content source discovery parses JSON API sources", async () => {
+  const requestedUrls = [];
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-hacker-news-api",
+        name: "Hacker News Topstories API",
+        url: "https://hacker-news.firebaseio.com/v0/topstories.json",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "community_api"
+      },
+      {
+        id: "content-papers-with-code-api",
+        name: "Papers with Code API",
+        url: "https://paperswithcode.com/api/v1/",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "paper_api"
+      },
+      {
+        id: "content-reddit-machinelearning",
+        name: "Reddit r/MachineLearning",
+        url: "https://www.reddit.com/r/MachineLearning/.json",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "community_api"
+      }
+    ],
+    fetchImpl: async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).endsWith("/topstories.json")) {
+        return textResponse(JSON.stringify([12345]));
+      }
+      if (String(url).endsWith("/item/12345.json")) {
+        return textResponse(JSON.stringify({
+          id: 12345,
+          title: "HN discussion about agent evals",
+          url: "https://example.com/hn-agent-evals",
+          time: 1779742800,
+          text: "Discussion about production agent eval loops."
+        }));
+      }
+      if (String(url).endsWith("/api/v1/papers/")) {
+        return textResponse(JSON.stringify({
+          results: [
+            {
+              title: "Agentic Evaluation for Long-Horizon Tasks",
+              url: "https://paperswithcode.com/paper/agentic-evaluation",
+              published: "2026-05-26",
+              abstract: "A paper about long-horizon agent evaluation."
+            }
+          ]
+        }));
+      }
+      if (String(url).endsWith("/r/MachineLearning/.json")) {
+        return textResponse(JSON.stringify({
+          data: {
+            children: [
+              {
+                data: {
+                  title: "[D] Practical lessons for AI agents",
+                  url: "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/",
+                  created_utc: 1779746400,
+                  selftext: "Practitioners compare agent memory and eval results."
+                }
+              }
+            ]
+          }
+        }));
+      }
+      return textResponse("{}", 404);
+    }
+  });
+
+  assert(requestedUrls.includes("https://hacker-news.firebaseio.com/v0/item/12345.json"));
+  assert(requestedUrls.includes("https://paperswithcode.com/api/v1/papers/"));
+  assert.equal(collected.source_audit.content_sources.candidates_found, 3);
+  assert.deepEqual(
+    collected.candidates.map((candidate) => [candidate.source_id, candidate.url]),
+    [
+      ["content-hacker-news-api", "https://example.com/hn-agent-evals"],
+      ["content-papers-with-code-api", "https://paperswithcode.com/paper/agentic-evaluation"],
+      ["content-reddit-machinelearning", "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/"]
+    ]
+  );
+});
+
 test("content source discovery cross-checks Product Hunt candidates with GitHub or docs", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
@@ -3036,6 +3127,20 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
   });
   const issues = findFreshnessIssues(report);
   assert.equal(issues.length, 0);
+
+  const repeatedMain = structuredClone(report);
+  repeatedMain.main_items.push({
+    ...repeatedMain.main_items[0],
+    candidate_id: "main-report-write-repeat"
+  });
+  assert.equal(findFreshnessIssues(repeatedMain)[0].code, "same_report_duplicate_url");
+
+  const repeatedModel = structuredClone(report);
+  repeatedModel.model_releases.push({
+    ...repeatedModel.model_releases[0],
+    candidate_id: "model-report-write-repeat"
+  });
+  assert.equal(findFreshnessIssues(repeatedModel)[0].code, "same_report_duplicate_url");
 
   report.hot_blogs = [
     {

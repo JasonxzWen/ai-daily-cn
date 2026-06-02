@@ -422,8 +422,8 @@ function formatGithubTrending(items, context = {}) {
     .map((item, index) => {
       const tag = githubTrendStatusHighlightTag(item);
       const tagText = formatHighlightTags([importanceTag(item), tag, ...trendTagsFor(context.trendAnnotations, "github_trending", index)].filter(Boolean));
-      const bullets = githubTrendBullets(item).map((bullet) => `  - ${bullet}`).join("\n");
-      return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}\n${bullets}`;
+      const details = githubTrendBullets(item).join(" | ");
+      return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}${details ? `: ${details}` : ""}`;
     })
     .join("\n");
 }
