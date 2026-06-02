@@ -27,7 +27,8 @@
         "Codex mobile preview 覆盖 iOS 与 Android，可查看活跃线程、回答问题、改变方向、审批动作和跨主机切换，目标是支持长时间运行的 agentic coding session。",
         "OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。",
         "Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "GitHub 合并推进 Copilot app 与 cloud agent 自动选模",
@@ -47,7 +48,8 @@
         "Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，session 内可查看计划、diff、命令、预览、测试结果并推进到 pull request。",
         "Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。",
         "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Anthropic 与 Gates Foundation 建立 2 亿美元合作",
@@ -66,7 +68,8 @@
         "合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。",
         "健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。",
         "教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Google 发布 Genkit Middleware 用于加固 agentic apps",
@@ -86,7 +89,8 @@
         "每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。",
         "首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。",
         "这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "AWS SageMaker AI 支持 Qwen3.6 serverless model customization",
@@ -106,7 +110,8 @@
         "此前 SageMaker AI 已可部署 Qwen3.6 base model，本次新增用私有数据对模型做领域化定制，减少团队自建训练集群和调度基础设施的成本。",
         "Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。",
         "可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Hugging Face 解释 continuous batching 的异步化路径",
@@ -126,7 +131,8 @@
         "文章延续 KV cache、FlashAttention 和 attention masks 等基础概念，重点讨论 continuous batching 下 CPU 调度和 GPU 执行之间的同步瓶颈。",
         "核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。",
         "对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。"
-      ]
+      ],
+      "importance": "notable"
     }
   ],
   "projects": [
@@ -134,46 +140,54 @@
       "name": "Codex mobile preview",
       "description": "ChatGPT mobile app 内的 Codex preview，可远程查看和推进仍在主机或 devbox 上运行的 coding agent session。",
       "url": "https://openai.com/index/work-with-codex-from-anywhere/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "GitHub Copilot app",
       "description": "GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面中。",
       "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Genkit Middleware",
       "description": "用于 Genkit generation/tool loop 的 composable middleware，覆盖 retries、fallbacks、approval 和 observability。",
       "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "SageMaker Qwen3.6 customization",
       "description": "Amazon SageMaker AI 对 Qwen3.6 27B 支持 serverless SFT/RFT，适合观察云厂商如何产品化开放模型定制。",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Continuous async batching",
       "description": "Hugging Face 的推理服务工程文章，聚焦 CPU/GPU 工作负载解耦与 continuous batching 利用率问题。",
       "url": "https://huggingface.co/blog/continuous_async",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。",
-      "url": "https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/"
+      "url": "https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/",
+      "importance": "general"
     },
     {
       "content": "Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。",
-      "url": "https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/"
+      "url": "https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/",
+      "importance": "general"
     },
     {
       "content": "xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。",
-      "url": "https://docs.x.ai/developers/models?cluster=us-east-1"
+      "url": "https://docs.x.ai/developers/models?cluster=us-east-1",
+      "importance": "general"
     }
   ],
   "self_check": {

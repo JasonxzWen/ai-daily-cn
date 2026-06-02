@@ -12,6 +12,7 @@ import {
   modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
+import { importanceTag } from "./importance.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "./source-icon-cache.js";
 
 const execFileAsync = promisify(execFile);
@@ -378,7 +379,7 @@ function formatMainItems(items, context = {}) {
     .map((item, index) => {
       const bullets = item.bullets.map((bullet) => `  - ${bullet}`).join("\n");
       const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
-      const trendTags = formatHighlightTags(trendTagsFor(context.trendAnnotations, "main_items", index));
+      const trendTags = formatHighlightTags([importanceTag(item), ...trendTagsFor(context.trendAnnotations, "main_items", index)].filter(Boolean));
       const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
       return `${index + 1}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
     })
@@ -403,7 +404,7 @@ function formatModelReleases(items, context = {}) {
         context.report,
         evidenceAssets.filter((asset) => !asset?.local_path)
       );
-      const line = `- **${item.name}**${formatHighlightTags(modelReleaseTags(item))}（${item.provider}，${item.availability}，${item.event_date}）：${item.summary} ${markdownLink(item.url, item.source)}`;
+      const line = `- **${item.name}**${formatHighlightTags([importanceTag(item), ...modelReleaseTags(item)].filter(Boolean))}（${item.provider}，${item.availability}，${item.event_date}）：${item.summary} ${markdownLink(item.url, item.source)}`;
       return `${line}${evidence ? `\n\n${evidence}` : ""}`;
     })
     .join("\n");
@@ -420,9 +421,9 @@ function formatGithubTrending(items, context = {}) {
     .slice(0, 10)
     .map((item, index) => {
       const tag = githubTrendStatusHighlightTag(item);
-      const tagText = formatHighlightTags([tag, ...trendTagsFor(context.trendAnnotations, "github_trending", index)].filter(Boolean));
-      const bullets = githubTrendBullets(item).map((bullet) => `  - ${bullet}`).join("\n");
-      return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}\n${bullets}`;
+      const tagText = formatHighlightTags([importanceTag(item), tag, ...trendTagsFor(context.trendAnnotations, "github_trending", index)].filter(Boolean));
+      const details = githubTrendBullets(item).join(" | ");
+      return `${item.rank}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}${details ? `: ${details}` : ""}`;
     })
     .join("\n");
 }
@@ -482,7 +483,7 @@ function formatProjects(items) {
     .map((item) => {
       const domains = Array.isArray(item.domains) && item.domains.length > 0 ? `\n  - 领域：${item.domains.join("、")}` : "";
       const useCase = item.use_case ? `\n  - 作用：${item.use_case}` : "";
-      return `- **${markdownLink(item.url, item.name)}**${formatHighlightTags(projectHeatTags(item))}：${cleanProjectDescription(item.description)}${domains}${useCase}`;
+      return `- **${markdownLink(item.url, item.name)}**${formatHighlightTags([importanceTag(item), ...projectHeatTags(item)].filter(Boolean))}：${cleanProjectDescription(item.description)}${domains}${useCase}`;
     })
     .join("\n");
 }
@@ -504,7 +505,7 @@ function formatProjectCards(items) {
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.name),
       body: cleanProjectDescription(item.description),
-      tags: projectHeatTags(item),
+      tags: [importanceTag(item), ...projectHeatTags(item)].filter(Boolean),
       points
     };
   });
@@ -520,7 +521,7 @@ function formatHotBlogCards(items, context = {}) {
       titleIcon: siteIconForUrl(item.url, item.publisher || item.title),
       body: item.summary || "",
       showGroup: false,
-      tags: hotBlogTags(item),
+      tags: [importanceTag(item), ...hotBlogTags(item)].filter(Boolean),
       points: [],
       ...(media.length > 0 ? { media } : {})
     };
@@ -570,7 +571,7 @@ function formatHighlightTags(tags) {
 function formatTwitterDiscussion(items, auditGroup, options = {}) {
   if (items.length > 0) {
     const content = items
-      .map((item) => `- **${item.author}**${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "X/Twitter")}`)
+      .map((item) => `- **${item.author}**${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "X/Twitter")}`)
       .join("\n");
     return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
   }
@@ -595,7 +596,7 @@ function formatCommunityLeads(items, options = {}) {
     return "";
   }
 
-  const content = leads.map((item) => `- ${item.content} ${markdownLink(item.url, "来源")}`).join("\n");
+  const content = leads.map((item) => `- ${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.content} ${markdownLink(item.url, "来源")}`).join("\n");
   return options.includeHeading ? `### 社区线索\n\n${content}` : content;
 }
 
@@ -632,9 +633,17 @@ function evidenceAssetsBySourceUrl(assets) {
     if (!key || !hasRenderableEvidence(asset)) {
       continue;
     }
-    grouped.set(key, [...(grouped.get(key) || []), asset]);
+    const current = grouped.get(key) || [];
+    if (!current.some((existing) => evidenceAssetIdentity(existing) === evidenceAssetIdentity(asset))) {
+      current.push(asset);
+    }
+    grouped.set(key, current);
   }
   return grouped;
+}
+
+function evidenceAssetIdentity(asset) {
+  return asset?.local_path || `${asset?.title || ""}:${JSON.stringify(asset?.data || [])}`;
 }
 
 function evidenceForUrl(evidenceByUrl, url) {

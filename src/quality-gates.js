@@ -68,7 +68,12 @@ function findSameReportUrlDuplicates(report) {
       const previous = seen.get(url);
       if (previous) {
         const previousSection = previous.split("[")[0];
-        if (MODEL_MAIN_DUPLICATE_SECTIONS.has(previousSection) && MODEL_MAIN_DUPLICATE_SECTIONS.has(section)) {
+        if (
+          previousSection !== section &&
+          MODEL_MAIN_DUPLICATE_SECTIONS.has(previousSection) &&
+          MODEL_MAIN_DUPLICATE_SECTIONS.has(section)
+        ) {
+          seen.set(url, current);
           continue;
         }
         errors.push({

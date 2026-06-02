@@ -574,7 +574,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
   assert(trendingSection.content.includes("1. **![example/agent-memory]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
-  assert(trendingSection.content.includes("\n  - "));
+  assert(!trendingSection.content.includes("\n  - "));
+  assert(trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
   assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
   assert(input.sections.some((section) => section.title === "主体信息"));
@@ -814,6 +815,14 @@ test("HTML and interaction input attach evidence assets to matching report items
         ["Task", "Opus 4.8", "Opus 4.7"],
         ["Agentic coding", "69.2%", "64.3%"]
       ]
+    },
+    {
+      type: "figure",
+      title: "Duplicate coding agent adoption figure",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
+      caption: "Duplicate figure should not render twice.",
+      extraction_status: "source_image"
     }
   ];
 
@@ -829,6 +838,7 @@ test("HTML and interaction input attach evidence assets to matching report items
   const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
   assert(mainHtml.includes("Coding agent adoption by discipline"));
   assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert.equal((mainHtml.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
   assert(!mainHtml.includes("Claude Opus 4.8 performance comparison"));
   assert(modelHtml.includes("Claude Opus 4.8 performance comparison"));
   assert(modelHtml.includes("Agentic coding"));
@@ -841,6 +851,7 @@ test("HTML and interaction input attach evidence assets to matching report items
   const modelSection = input.sections.find((section) => section.title === "模型发布");
   assert(mainSection.content.includes("Coding agent adoption by discipline"));
   assert(mainSection.content.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert.equal((mainSection.content.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
   assert(!mainSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Agentic coding"));
@@ -1840,6 +1851,96 @@ test("content source discovery parses official HTML pages and Product Hunt proje
   assert.equal(collected.candidates[1].url, "https://www.producthunt.com/products/agent-debugger");
 });
 
+test("content source discovery parses JSON API sources", async () => {
+  const requestedUrls = [];
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-hacker-news-api",
+        name: "Hacker News Topstories API",
+        url: "https://hacker-news.firebaseio.com/v0/topstories.json",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "community_api"
+      },
+      {
+        id: "content-papers-with-code-api",
+        name: "Papers with Code API",
+        url: "https://paperswithcode.com/api/v1/",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "paper_api"
+      },
+      {
+        id: "content-reddit-machinelearning",
+        name: "Reddit r/MachineLearning",
+        url: "https://www.reddit.com/r/MachineLearning/.json",
+        source_kind: "search_api",
+        category: "intermediary",
+        source_level: "community_api"
+      }
+    ],
+    fetchImpl: async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).endsWith("/topstories.json")) {
+        return textResponse(JSON.stringify([12345]));
+      }
+      if (String(url).endsWith("/item/12345.json")) {
+        return textResponse(JSON.stringify({
+          id: 12345,
+          title: "HN discussion about agent evals",
+          url: "https://example.com/hn-agent-evals",
+          time: 1779742800,
+          text: "Discussion about production agent eval loops."
+        }));
+      }
+      if (String(url).endsWith("/api/v1/papers/")) {
+        return textResponse(JSON.stringify({
+          results: [
+            {
+              title: "Agentic Evaluation for Long-Horizon Tasks",
+              url: "https://paperswithcode.com/paper/agentic-evaluation",
+              published: "2026-05-26",
+              abstract: "A paper about long-horizon agent evaluation."
+            }
+          ]
+        }));
+      }
+      if (String(url).endsWith("/r/MachineLearning/.json")) {
+        return textResponse(JSON.stringify({
+          data: {
+            children: [
+              {
+                data: {
+                  title: "[D] Practical lessons for AI agents",
+                  url: "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/",
+                  created_utc: 1779746400,
+                  selftext: "Practitioners compare agent memory and eval results."
+                }
+              }
+            ]
+          }
+        }));
+      }
+      return textResponse("{}", 404);
+    }
+  });
+
+  assert(requestedUrls.includes("https://hacker-news.firebaseio.com/v0/item/12345.json"));
+  assert(requestedUrls.includes("https://paperswithcode.com/api/v1/papers/"));
+  assert.equal(collected.source_audit.content_sources.candidates_found, 3);
+  assert.deepEqual(
+    collected.candidates.map((candidate) => [candidate.source_id, candidate.url]),
+    [
+      ["content-hacker-news-api", "https://example.com/hn-agent-evals"],
+      ["content-papers-with-code-api", "https://paperswithcode.com/paper/agentic-evaluation"],
+      ["content-reddit-machinelearning", "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/"]
+    ]
+  );
+});
+
 test("content source discovery cross-checks Product Hunt candidates with GitHub or docs", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
@@ -2313,6 +2414,11 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   const outDir = path.join(tmp, "docs");
   await fs.mkdir(dataInputDir, { recursive: true });
   const structuredReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  for (const sectionName of ["main_items", "model_releases", "hot_blogs", "projects", "github_trending", "builder_observations", "community_leads"]) {
+    for (const item of structuredReport[sectionName] || []) {
+      delete item.importance;
+    }
+  }
   structuredReport.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
   structuredReport.projects = [
     {
@@ -2351,6 +2457,8 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes("官方可用性"));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
+  assert(html.includes(">重大<"));
+  assert(html.includes(">值得关注<"));
   assert(html.includes("今日 +321 stars"));
   assert(!html.includes("备注："));
   assert(!html.includes("信号：trending"));
@@ -2363,6 +2471,9 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("Markdown 原文"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
+  assert.equal(data.main_items[0].importance, "major");
+  assert.equal(data.model_releases[0].importance, "major");
+  assert.equal(data.hot_blogs[0].importance, "notable");
   assert.equal(data.model_releases.length, 1);
   assert.equal(data.hot_blogs.length, 1);
 
@@ -2481,6 +2592,7 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.publish_status.repo_pushed, false);
   assert.equal(result.report.candidate_pool_path, "data/2026/05/2026-05-16.candidates.json");
   assert.equal(result.report.main_items[0].candidate_id, "main-report-write");
+  assert.equal(result.report.main_items[0].importance, "major");
   assert.deepEqual(result.report.model_releases, []);
   assert.deepEqual(result.report.hot_blogs, []);
   assert.equal(result.report.quality_status.status, "ok");
@@ -2491,6 +2603,33 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write importance labels are schema-validated and rendered", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.main_items[0].importance, "major");
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const invalid = structuredClone(report);
+  invalid.main_items[0].importance = "urgent";
+  const invalidValidation = validateReport(invalid);
+  assert.equal(invalidValidation.valid, false);
+  assert(invalidValidation.errors.some((error) => error.path.includes("/main_items/0/importance")));
+
+  const html = renderReportHtml(report);
+  assert(html.includes(">重大<"));
+
+  const interaction = reportToInteractionInput(report);
+  assert(interaction.sections.some((section) => String(section.content || "").includes("==重大==")));
 });
 
 test("report:write records automation revision fingerprint in self_check", async () => {
@@ -3009,6 +3148,20 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
   const issues = findFreshnessIssues(report);
   assert.equal(issues.length, 0);
 
+  const repeatedMain = structuredClone(report);
+  repeatedMain.main_items.push({
+    ...repeatedMain.main_items[0],
+    candidate_id: "main-report-write-repeat"
+  });
+  assert.equal(findFreshnessIssues(repeatedMain)[0].code, "same_report_duplicate_url");
+
+  const repeatedModel = structuredClone(report);
+  repeatedModel.model_releases.push({
+    ...repeatedModel.model_releases[0],
+    candidate_id: "model-report-write-repeat"
+  });
+  assert.equal(findFreshnessIssues(repeatedModel)[0].code, "same_report_duplicate_url");
+
   report.hot_blogs = [
     {
       candidate_id: "blog-report-write",
@@ -3206,6 +3359,13 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("Industry and funding"));
   assert(prompt.includes("Open-source projects"));
   assert(prompt.includes("Opinions and long-form reads"));
+  assert(prompt.includes("importance"));
+  assert(prompt.includes("major"));
+  assert(prompt.includes("notable"));
+  assert(prompt.includes("general"));
+  assert(prompt.includes("重大"));
+  assert(prompt.includes("值得关注"));
+  assert(prompt.includes("一般"));
   assert(prompt.includes("大厂动态"));
   assert(prompt.includes("行业趋势"));
   assert(prompt.includes("公众号"));

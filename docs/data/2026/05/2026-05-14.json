@@ -27,7 +27,8 @@
         "Claude for Small Business 以 Cowork 内的开关形式启用，用户连接已有业务工具后选择任务；发送、发布或付款等动作仍要求人工批准。",
         "首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。",
         "权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "GitHub 开放 Copilot cloud agent 任务 REST API 预览",
@@ -47,7 +48,8 @@
         "新的 API 处于 public preview，支持用 prompt 启动仓库任务，可指定 base ref、模型和是否创建 pull request。",
         "GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。",
         "对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "SAP 发布 Business AI Platform 与 Autonomous Suite",
@@ -67,7 +69,8 @@
         "SAP Business AI Platform 以 SAP Knowledge Graph 提供业务实体、流程和关系图谱，Joule Studio 则面向企业 Agent、应用和 agentic workflows 构建。",
         "Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。",
         "SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛",
@@ -87,7 +90,8 @@
         "比赛收到 1,000 多名参与者的 2,000 多份提交，OpenAI 独立复现 record track，重点展示优化器调参、GPTQ、per-document LoRA test-time training、CaseOps tokenizer、XSA 和 recurrent layers 等方向。",
         "OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。",
         "对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Thinking Machines 发布 Interaction Models 研究预览",
@@ -107,7 +111,8 @@
         "研究预览模型 TML-Interaction-Small 使用 time-aligned micro-turn 设计，把输入和输出流按 200ms 片段交错处理，从而支持边听边说、视觉触发、计时意识和并行工具调用。",
         "系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。",
         "官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "projects": [
@@ -115,36 +120,42 @@
       "name": "Copilot Agent tasks REST API",
       "description": "GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。",
       "url": "https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "SAP Business AI Platform",
       "description": "SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。",
       "url": "https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "TML-Interaction-Small",
       "description": "Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。",
       "url": "https://thinkingmachines.ai/blog/interaction-models/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Parameter Golf",
       "description": "OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。",
       "url": "https://openai.com/index/what-parameter-golf-taught-us/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。",
-      "url": "https://openai.com/daybreak"
+      "url": "https://openai.com/daybreak",
+      "importance": "general"
     },
     {
       "content": "Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。",
-      "url": "https://code.claude.com/docs/en/fast-mode"
+      "url": "https://code.claude.com/docs/en/fast-mode",
+      "importance": "general"
     }
   ],
   "self_check": {

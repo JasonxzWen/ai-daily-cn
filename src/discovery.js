@@ -1158,9 +1158,9 @@ export async function collectContentSources(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(currentSource.url, {
+      const response = await fetchImpl(contentSourceRequestUrl(currentSource), {
         headers: {
-          accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
+          accept: "application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
         },
         ...timeoutInit(currentSource.timeoutMs || currentSource.timeout_ms || 15000)
@@ -1172,7 +1172,12 @@ export async function collectContentSources(options = {}) {
         continue;
       }
 
-      const entries = parseContentSourceEntries(await response.text(), currentSource)
+      const parsedEntries = await hydrateSearchApiEntries(
+        parseContentSourceEntries(await response.text(), currentSource),
+        currentSource,
+        fetchImpl
+      );
+      const entries = parsedEntries
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
       let notes = withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, response);
@@ -2245,7 +2250,122 @@ function parseContentSourceEntries(content, sourceInfo) {
   if (sourceInfo.format === "html_index") {
     return parseHtmlIndexEntries(content, sourceInfo);
   }
+  if (sourceInfo.source_kind === "search_api" && looksLikeJson(content)) {
+    return parseJsonSearchApiEntries(content, sourceInfo);
+  }
   return parseFeedEntries(content);
+}
+
+function contentSourceRequestUrl(sourceInfo) {
+  if (sourceInfo.id === "content-papers-with-code-api" && /\/api\/v1\/?$/i.test(sourceInfo.url || "")) {
+    return `${String(sourceInfo.url).replace(/\/?$/, "/")}papers/`;
+  }
+  return sourceInfo.url;
+}
+
+function looksLikeJson(content) {
+  return /^[\s\r\n]*[\[{]/.test(String(content || ""));
+}
+
+async function hydrateSearchApiEntries(entries, sourceInfo, fetchImpl) {
+  if (!isHackerNewsTopstoriesSource(sourceInfo)) {
+    return entries;
+  }
+
+  const hydrated = [];
+  for (const entry of entries.slice(0, Math.max(15, Number(sourceInfo.maxItemsPerRun) || 0))) {
+    if (!entry.item_api_url) {
+      hydrated.push(entry);
+      continue;
+    }
+    try {
+      const response = await fetchImpl(entry.item_api_url, {
+        headers: {
+          accept: "application/json, */*",
+          "user-agent": "ai-daily-cn-static-publisher"
+        },
+        ...timeoutInit(sourceInfo.timeoutMs || sourceInfo.timeout_ms || 15000)
+      });
+      if (!response.ok) {
+        continue;
+      }
+      const item = JSON.parse(await response.text());
+      const normalized = normalizeJsonApiEntry(item, sourceInfo);
+      if (normalized.title && normalized.url && normalized.event_date) {
+        hydrated.push(normalized);
+      }
+    } catch {
+      continue;
+    }
+  }
+  return hydrated;
+}
+
+function parseJsonSearchApiEntries(content, sourceInfo) {
+  let payload;
+  try {
+    payload = JSON.parse(content);
+  } catch {
+    return [];
+  }
+
+  if (isHackerNewsTopstoriesSource(sourceInfo) && Array.isArray(payload)) {
+    return payload
+      .filter((id) => Number.isInteger(Number(id)))
+      .slice(0, 30)
+      .map((id) => ({
+        item_api_url: `https://hacker-news.firebaseio.com/v0/item/${id}.json`
+      }));
+  }
+
+  const items = isRedditSource(sourceInfo)
+    ? ((payload?.data?.children || []).map((child) => child?.data || child))
+    : arrayFromPossibleKeys(payload, ["results", "data", "items", "papers", "posts", "children"]);
+
+  return items.map((item) => normalizeJsonApiEntry(item, sourceInfo)).filter((entry) => entry.title && entry.url);
+}
+
+function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
+  const item = rawItem?.data && !rawItem.title ? rawItem.data : rawItem;
+  if (!item || typeof item !== "object") {
+    return {};
+  }
+
+  const idUrl = sourceInfo.id === "content-hacker-news-api" && item.id
+    ? `https://news.ycombinator.com/item?id=${item.id}`
+    : "";
+  const permalink = absoluteUrl(firstString(item.permalink, item.comments_url), sourceInfo.url);
+  const url = absoluteUrl(
+    firstString(item.url_abs, item.html_url, item.url, item.paper_url, item.repository_url, item.arxiv_url, item.link, permalink, idUrl),
+    sourceInfo.url
+  );
+  const summary = cleanText(firstString(item.abstract, item.summary, item.excerpt, item.selftext, item.text, item.description));
+
+  return {
+    title: cleanText(firstString(item.title, item.name, item.paper_title)),
+    url,
+    event_date: jsonDateOnly(firstString(item.published, item.published_at, item.date, item.created_at, item.createdAt, item.updated_at, item.time, item.created_utc)),
+    summary,
+    links: extractHtmlLinks(summary, url)
+  };
+}
+
+function jsonDateOnly(value) {
+  if (Number.isFinite(Number(value)) && String(value).trim() !== "") {
+    const numeric = Number(value);
+    const timestampMs = numeric < 100000000000 ? numeric * 1000 : numeric;
+    const date = new Date(timestampMs);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+  }
+  return dateOnly(value);
+}
+
+function isHackerNewsTopstoriesSource(sourceInfo = {}) {
+  return sourceInfo.id === "content-hacker-news-api" || /hacker-news\.firebaseio\.com\/v0\/topstories\.json/i.test(sourceInfo.url || "");
+}
+
+function isRedditSource(sourceInfo = {}) {
+  return /reddit\.com\/r\/[^/]+\/\.json/i.test(sourceInfo.url || "");
 }
 
 function parseHtmlIndexEntries(html, sourceInfo = {}) {

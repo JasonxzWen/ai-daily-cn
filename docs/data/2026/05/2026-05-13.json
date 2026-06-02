@@ -27,7 +27,8 @@
         "GPT-Realtime-2 面向实时语音 Agent，支持更长上下文、并行工具调用提示、可调 reasoning effort 和更强恢复行为。",
         "GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。",
         "价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "OpenAI 将 ChatGPT 默认模型升级为 GPT-5.5 Instant",
@@ -46,7 +47,8 @@
         "原文称 GPT-5.5 Instant 正在替代 GPT-5.3 Instant 成为默认模型，并在 API 中通过 chat-latest 暴露。",
         "增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。",
         "对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Anthropic 提高 Claude Code 与 Claude API 使用限额",
@@ -65,7 +67,8 @@
         "Claude Code 的五小时限额面向 Pro、Max、Team 和 seat-based Enterprise 计划翻倍，并移除 Pro/Max 峰值时段限额下调。",
         "Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。",
         "算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Anthropic 发布金融服务 Agent 模板与 Microsoft 365 集成",
@@ -85,7 +88,8 @@
         "模板覆盖 pitchbook、KYC、月结、估值复核、财报审阅、市场研究等工作，可作为 Claude Cowork/Claude Code 插件或 Managed Agents cookbook 使用。",
         "模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。",
         "这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "xAI 在 Grok Web、iOS 和 Android 上推出 Connectors",
@@ -104,7 +108,8 @@
         "连接器支持读取、搜索、综合和部分写入动作，让 Grok 直接处理邮件、文档、表格、日历、代码仓库和项目任务。",
         "GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。",
         "Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "xAI 公布 2026-05-15 API 模型退休迁移清单",
@@ -122,7 +127,8 @@
         "受影响模型包括 grok-4-1、grok-4、grok-code-fast-1、grok-3 和 grok-imagine-image-pro 等旧 API 名称。",
         "文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。",
         "使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Ollama v0.23.3 发布，继续修复 MLX 与更新流程",
@@ -140,7 +146,8 @@
         "发布说明列出 MLX 相关推送行为、线程亲和性和推理状态超时修复，影响 Apple Silicon 本地推理稳定性。",
         "同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。",
         "该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。"
-      ]
+      ],
+      "importance": "notable"
     },
     {
       "title": "vLLM v0.20.2 修复 DeepSeek V4、gpt-oss 与 Qwen3-VL 路径",
@@ -159,7 +166,8 @@
         "DeepSeek V4 相关修复覆盖 Hopper persistent topk、CUDA graph capture 和 V1 engine KV cache manager。",
         "gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。",
         "线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。"
-      ]
+      ],
+      "importance": "notable"
     },
     {
       "title": "OpenAI Codex 0.130.0 发布远程控制、插件元数据与 Windows sandbox 修复",
@@ -178,7 +186,8 @@
         "remote-control 提供更直接的 headless app-server 启动入口，适合自动化或远程控制场景试验。",
         "插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。",
         "Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。"
-      ]
+      ],
+      "importance": "notable"
     },
     {
       "title": "LangChain 0.3.30 与 langchain-core 0.3.86 回补反序列化安全修复",
@@ -196,7 +205,8 @@
         "langchain-core 0.3.86 明确回补 path-traversal 修复，LangChain 0.3.30 同步 harden loads/dumps 并弃用 hub 路径。",
         "同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。",
         "仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。"
-      ]
+      ],
+      "importance": "notable"
     }
   ],
   "projects": [
@@ -204,32 +214,37 @@
       "name": "Ollama",
       "description": "v0.23.3 在 2026-05-12 发布，主要修复 MLX、本地 imagegen runner 和更新流程；本地推理用户应关注 macOS/Apple Silicon 运行稳定性。",
       "url": "https://github.com/ollama/ollama/releases/tag/v0.23.3",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "vLLM",
       "description": "v0.20.2 在 2026-05-10 发布，小补丁覆盖 DeepSeek V4、gpt-oss 和 Qwen3-VL 的推理稳定性问题。",
       "url": "https://github.com/vllm-project/vllm/releases/tag/v0.20.2",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "OpenAI Codex",
       "description": "0.130.0 在 2026-05-08 发布，remote-control、插件元数据和 Windows sandbox 修复对自动化编码工作流有参考价值。",
       "url": "https://github.com/openai/codex/releases/tag/rust-v0.130.0",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "LangChain",
       "description": "2026-05-07 相关发布回补反序列化和路径遍历安全修复；依赖旧版本线的 Agent/RAG 服务应安排升级。",
       "url": "https://github.com/langchain-ai/langchain/releases",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。",
-      "url": "https://mistral.ai/news/mistral-3"
+      "url": "https://mistral.ai/news/mistral-3",
+      "importance": "general"
     }
   ],
   "self_check": {

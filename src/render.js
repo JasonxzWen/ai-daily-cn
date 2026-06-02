@@ -6,6 +6,7 @@ import {
   modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
+import { importanceLabel } from "./importance.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -535,7 +536,7 @@ h3 {
 function renderMainItem(report, item, evidenceByUrl) {
   return `<article class="item">
   <h3>${escapeHtml(item.title)}</h3>
-  <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
+  <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${renderImportanceSpan(item)}${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
   <ul>
     ${item.bullets.map((bullet) => `<li>${renderInlineEmphasis(bullet)}</li>`).join("\n")}
   </ul>
@@ -568,6 +569,7 @@ function renderModelRelease(report, item, evidenceByUrl) {
     <span>${escapeHtml(item.event_date)}</span>
     <span>${escapeHtml(item.provider)}</span>
     <span>${escapeHtml(renderAvailability(item.availability))}</span>
+    ${renderImportanceSpan(item)}
     ${renderTags(modelReleaseTags(item))}
   </div>
   <p>${escapeHtml(item.summary)}</p>
@@ -595,6 +597,7 @@ function renderHotBlog(item) {
     <span>${escapeHtml(item.publisher)}</span>
     <span>${escapeHtml(item.author)}</span>
     <span>${escapeHtml(item.topic)}</span>
+    ${renderImportanceSpan(item)}
   </div>
   <p>${escapeHtml(item.summary)}</p>
 </article>`;
@@ -630,7 +633,7 @@ function renderGithubTrending(items) {
       .slice(0, 10)
       .map(
         (item) =>
-          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([githubTrendStatusTag(item)])}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
+          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item)].filter(Boolean))}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
       )
       .join("\n")}
   </tbody>
@@ -671,7 +674,7 @@ function renderProjects(projects) {
 }
 
 function renderProjectDetails(project) {
-  const tags = projectHeatTags(project);
+  const tags = [importanceLabel(project.importance), ...projectHeatTags(project)].filter(Boolean);
   const tagsHtml = tags.length > 0 ? `<div class="item-meta">${renderTags(tags)}</div>` : "";
   const domains = Array.isArray(project.domains) && project.domains.length > 0
     ? `<p><strong>领域：</strong>${escapeHtml(project.domains.join("、"))}</p>`
@@ -709,7 +712,8 @@ function renderBuilderObservation(item) {
   const meta = [
     item.role ? item.role : "",
     item.event_date ? item.event_date : "",
-    item.source ? item.source : ""
+    item.source ? item.source : "",
+    importanceLabel(item.importance)
   ].filter(Boolean);
   const metaHtml = meta.length > 0 ? `<div class="item-meta">${meta.map((value) => `<span>${escapeHtml(value)}</span>`).join("")}</div>` : "";
   const evidence = item.evidence ? `<p class="muted">${escapeHtml(item.evidence)}</p>` : "";
@@ -732,7 +736,12 @@ function renderCommunityLeads(items) {
     return "";
   }
 
-  return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
+  return `<ul class="compact-list">${items.map((item) => `<li>${renderImportanceSpan(item)}${escapeHtml(item.content)} ${externalLink(item.url, "来源")}</li>`).join("\n")}</ul>`;
+}
+
+function renderImportanceSpan(item) {
+  const label = importanceLabel(item?.importance);
+  return label ? `<span>${escapeHtml(label)}</span>` : "";
 }
 
 function evidenceAssetsBySourceUrl(assets) {
@@ -742,9 +751,17 @@ function evidenceAssetsBySourceUrl(assets) {
     if (!key || !hasRenderableEvidence(asset)) {
       continue;
     }
-    grouped.set(key, [...(grouped.get(key) || []), asset]);
+    const current = grouped.get(key) || [];
+    if (!current.some((existing) => evidenceAssetIdentity(existing) === evidenceAssetIdentity(asset))) {
+      current.push(asset);
+    }
+    grouped.set(key, current);
   }
   return grouped;
+}
+
+function evidenceAssetIdentity(asset) {
+  return asset?.local_path || `${asset?.title || ""}:${JSON.stringify(asset?.data || [])}`;
 }
 
 function evidenceForUrl(evidenceByUrl, url) {

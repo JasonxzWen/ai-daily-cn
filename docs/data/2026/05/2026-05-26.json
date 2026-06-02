@@ -86,7 +86,8 @@
         "这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。",
         "团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。",
         "同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-google-workspace-gemini-rollout",
@@ -106,7 +107,8 @@
         "Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。",
         "Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。",
         "Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-claude-opus-status",
@@ -126,7 +128,8 @@
         "这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。",
         "状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。",
         "如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "model_releases": [],
@@ -140,7 +143,8 @@
       "event_date": "2026-05-25",
       "topic": "Platform governance for AI-generated code",
       "summary": "文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。",
-      "why_it_matters": "很多团队已经在生产路径里使用 AI 代码和代理，平台侧需要更早定义可观测、审批、依赖和维护边界。"
+      "why_it_matters": "很多团队已经在生产路径里使用 AI 代码和代理，平台侧需要更早定义可观测、审批、依赖和维护边界。",
+      "importance": "notable"
     }
   ],
   "projects": [],
@@ -148,7 +152,8 @@
   "community_leads": [
     {
       "content": "BenchFlow News 列出 Agent Skills '26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。",
-      "url": "https://www.benchflow.ai/blog"
+      "url": "https://www.benchflow.ai/blog",
+      "importance": "general"
     }
   ],
   "self_check": {

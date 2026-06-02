@@ -85,7 +85,8 @@
         "这条不是产品发布，但会影响正在跑长任务、自动化任务或多人共享配额的 Codex 工作流。",
         "如果团队最近看到 Codex 任务排队、失败或提前撞限，需要把平台 incident 与本地脚本问题分开排查。",
         "状态页只给聚合可用性指标，不代表每个订阅层级或每种模型路径的体验完全一致。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-hf-paperswithcode",
@@ -105,7 +106,8 @@
         "这类索引不是模型本身，但会影响研究对比、benchmark 追踪和 agent 选型时的证据质量。",
         "外部论文和 GitHub repo 也能提交后，非 arXiv 工程成果更容易进入同一检索与评测视图。",
         "对日报来说，这类来源适合进入研究/工具观察，不应和模型发布混写。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-github-agent-tooling",
@@ -125,7 +127,8 @@
         "earendil-works/pi 在 2026-05-23 发布 v0.75.5，改动包括 coding-agent 工具输出、Windows 文件工具和 provider 配置修复。",
         "anthropics/knowledge-work-plugins 和 NVlabs/LongLive 都有 2026-05-24 之后的仓库活动，分别对应 Claude Cowork 插件目录和 long-video generation infra。",
         "这一组更像工程工作流温度计，不等同于官方产品发布。"
-      ]
+      ],
+      "importance": "notable"
     }
   ],
   "model_releases": [],
@@ -140,7 +143,8 @@
       "source": "GitHub Release",
       "signal": "release",
       "evidence": "Release page lists v0.75.5 and 2026-05-23 release time。",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "candidate_id": "project-anthropic-knowledge-work-plugins",
@@ -151,7 +155,8 @@
       "source": "GitHub commits",
       "signal": "official_update",
       "evidence": "Commit history shows a 2026-05-24 commit on main。",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "candidate_id": "project-longlive",
@@ -162,7 +167,8 @@
       "source": "GitHub commits",
       "signal": "notable_pr",
       "evidence": "Commit history shows 2026-05-25 commits: Optimize NVFP4 inference path, Bold README throughput improvement。",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "candidate_id": "project-mirofish",
@@ -173,7 +179,8 @@
       "source": "GitHub repo metadata",
       "signal": "trending",
       "evidence": "discover:github-trending 收录该仓库；gh api reports pushed_at=2026-05-24T16:48:58Z。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     }
   ],
   "builder_observations": [
@@ -185,7 +192,8 @@
       "role": "Claude Code engineer",
       "event_date": "2026-05-24",
       "source": "X",
-      "evidence": "follow-builders feed includes original X post and follow-up about cleaning leftover services."
+      "evidence": "follow-builders feed includes original X post and follow-up about cleaning leftover services.",
+      "importance": "notable"
     },
     {
       "candidate_id": "builder-steipete-scratch-log",
@@ -195,7 +203,8 @@
       "role": "OpenClaw / OpenAI builder",
       "event_date": "2026-05-23",
       "source": "X",
-      "evidence": "Original X post is included in follow-builders feed."
+      "evidence": "Original X post is included in follow-builders feed.",
+      "importance": "notable"
     }
   ],
   "community_leads": [],
