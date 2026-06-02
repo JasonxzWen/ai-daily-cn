@@ -1,5 +1,21 @@
 # Progress
 
+## 2026-06-02 Harness Hub Skill Aggregation
+
+- Source updated: `D:/harness-hub` `main` fast-forwarded to `origin/main` commit `586950abb086828bca7361ec3f17c5397bdd05c3`.
+- Target: repository-local `.codex/skills` in `C:\Users\Admin\.codex\worktrees\94c6\ai-daily-cn`.
+- Baseline before aggregation: 12 tracked local skills.
+- Harness Hub source contained 44 skills.
+- Imported 33 Hub-only skills, including `workflow-router`, `karpathy-guidelines`, `delivery-workflow`, `webapp-testing`, and OpenSpec workflow helpers.
+- Preserved local-only `html-work-reports`.
+- Aggregated 11 same-name skills by keeping local active files, copying Hub-only files into place, and preserving 22 same-path Hub conflicts under each skill's `_harness-hub/` directory.
+- Wrote `.codex/harness-hub-aggregation.json` with source commit, policy, counts, copied files, preserved conflicts, identical files, and local-only files kept.
+- Merged low-risk active `effective-interact` updates: schema `$id` now uses `harness-hub.local`, default render mode is `pre-rendered`, browser Mermaid can be disabled with `EFFECTIVE_INTERACT_DISABLE_BROWSER_MERMAID=1`, and fallback Mermaid sections report degraded state.
+- Added `tests/skills.test.js` coverage for the aggregation manifest, imported skills, local-only skill preservation, local `agents/openai.yaml`, and preserved Hub conflict copies.
+- Focused validation passed: `node --test tests\skills.test.js`.
+- Full validation passed after installing lockfile dependencies with `npm ci`: `npm run validate`, `node scripts\harness-validate.mjs`, and `git diff --check`.
+- Browser visual acceptance passed on generated `effective-interact` HTML using Chromium desktop 1280x900 and mobile 390x844. Screenshots were written to `.tmp/harness-hub-visual/desktop.png` and `.tmp/harness-hub-visual/mobile.png`; checks confirmed pre-rendered mode, degraded fallback Mermaid state, and no page-level horizontal overflow.
+
 ## 2026-06-02 Automation Worktree And Two-Level Quality Gate
 
 - Current branch: `codex/automation-worktree-publish-hardening` in `C:\Users\Admin\.codex\worktrees\0744\ai-daily-cn`.

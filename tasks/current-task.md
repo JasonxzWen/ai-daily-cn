@@ -2,76 +2,64 @@
 
 ## Goal
 
-Implement the automation publishing hardening plan requested in this session:
-
-- scheduled AI daily runs use a worktree execution environment;
-- scheduled runs treat the latest `origin/main` as the only authoritative baseline;
-- publish quality is split into blocking `blocking_issues` and publishable `degraded_sections`;
-- degraded quality is disclosed in structured JSON and public HTML;
-- GitHub API fallback reports `publish_mode` and `base_commit_sha`;
-- the actual `ai-daily` automation prompt is synchronized after user approval.
+Update this repository's local `.codex/skills` from the latest `D:/harness-hub` while preserving both sides when a local skill and a Harness Hub skill share the same skill name.
 
 ## Status
 
-In progress on branch `codex/automation-worktree-publish-hardening` in `C:\Users\Admin\.codex\worktrees\0744\ai-daily-cn`.
+Completed in `C:\Users\Admin\.codex\worktrees\94c6\ai-daily-cn`.
 
-Implemented code/test changes:
+Completed so far:
 
-- `src/quality-status.js` now classifies publish quality into `blocking_issues` and `degraded_sections`.
-- Fixed source, GitHub Trending, Builder X, evidence asset, empty-section, and model-release mirroring gaps are degraded instead of blocking.
-- Automation revision/version proof issues remain blocking.
-- Public HTML and effective-interact reports include a `发布质量说明` section when quality is degraded or blocked.
-- Publish outputs include `degraded_sections`; publish/GitHub API paths expose `publish_mode`.
-- `report:write` no longer blocks otherwise publishable reports solely because model-release mirroring or Builder X coverage is degraded.
-- Unit and publish tests were updated for the two-level gate.
-
-Documentation updates are in progress for automation setup, runbook, prompt modules, publisher decisions, and task templates.
+- Fast-forwarded local `D:/harness-hub` `main` to `origin/main` at `586950abb086828bca7361ec3f17c5397bdd05c3`.
+- Imported Harness Hub-only skills into `.codex/skills`.
+- Preserved local-only `html-work-reports`.
+- For same-name skills, kept existing local active files, copied Hub-only files into the skill directory, and preserved same-path Hub conflicts under `_harness-hub/`.
+- Wrote `.codex/harness-hub-aggregation.json` as the source/merge manifest.
+- Added `tests/skills.test.js` coverage for the aggregation contract.
+- Merged low-risk active `effective-interact` updates from Harness Hub without dropping the AI Daily renderer extensions.
+- Passed `npm run validate`, `node scripts\harness-validate.mjs`, `git diff --check`, and Chromium desktop/mobile visual acceptance.
 
 ## Allowed paths
 
-- `docs/**`
-- `prompts/ai-daily/modules/**`
-- `schemas/**`
-- `src/**`
-- `tests/**`
-- `tasks/daily-publish-runbook.md`
-- `tasks/templates/**`
+- `.codex/harness-hub-aggregation.json`
+- `.codex/skills/**`
+- `tests/skills.test.js`
 - `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
 
 ## Forbidden paths
 
-- Generated daily publish artifacts unless needed for local visual verification.
+- Generated daily publish artifacts.
 - `.github/**`
 - Remote GitHub Pages settings.
-- Destructive git operations: `git reset --hard`, `git push --force`, automatic stash, or overwriting user changes.
+- Destructive git operations: `git reset --hard`, `git checkout --`, force push, or automatic stash.
+- Automatic commit or push unless the user explicitly asks.
 
 ## Acceptance criteria
 
-- `publish:dry-run`, local `publish`, and `publish:github-api` block only true `blocking_issues`.
-- Coverage gaps are retained as `degraded_sections`, included in JSON, shown in public HTML, and summarized in publish plans.
-- Automation/runbook prompts state that scheduled runs only use latest `origin/main`.
-- Automation/runbook prompts state that scheduled runs do not modify `progress.md`, `session-handoff.md`, or `tasks/current-task.md`.
-- GitHub API fallback uses remote `main` commit/tree, `force:false`, publisher-managed paths only, and reports `publish_mode: github-api-fallback` plus `base_commit_sha`.
-- Actual `ai-daily` automation config is updated after approval.
-- Validation and visual checks pass or blockers are explicitly reported.
+- Harness Hub latest source commit is recorded.
+- Hub-only skills are present in `.codex/skills`.
+- Local-only skills are preserved.
+- Same-name skill conflicts preserve both the local active file and the Harness Hub copy.
+- `effective-interact` still passes the existing generator/schema/layout smoke tests.
+- Repository validation and harness validation pass or blockers are explicitly reported.
 
 ## Validation commands
 
-- `node --test tests\unit.test.js tests\publish.test.js`
+- `node --test tests\skills.test.js`
 - `npm run validate`
 - `node scripts\harness-validate.mjs`
-- Browser/Playwright desktop and mobile visual check for the public `发布质量说明` section.
 - `git diff --check`
 
 ## Parallel writes
 
-- No parallel writes while this branch has uncommitted changes.
-- Read-only file inspection and independent validation commands may run in parallel.
-- Automation updates, git operations, and patch edits must run serially.
+- No parallel file writes.
+- Read-only inspection and independent validation commands may run in parallel.
 
 ## Handoff requirements
 
-- Summarize code, prompt, automation, validation, and visual-check status.
-- Explicitly list any remaining blocker or degraded behavior.
+- Report the Harness Hub source commit.
+- Summarize imported, overlapping, local-only, and conflict-preserved counts.
+- List validation commands and outcomes.
+- Call out that no commit, push, Pages setting change, or daily publish was performed.

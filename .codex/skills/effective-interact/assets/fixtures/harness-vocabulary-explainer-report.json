@@ -1,0 +1,265 @@
+{
+  "title": "Harness vocabulary explainer",
+  "summary": "Decision: use local-original definitions to explain Harness Hub concepts without copying external glossary text.",
+  "status": "ready",
+  "template": "research-explainer",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-29T00:00:00.000Z",
+  "intent": {
+    "audience": "Harness Hub maintainer",
+    "primaryQuestion": "How should effective-interact explain local harness vocabulary?",
+    "decision": "Use definition, adjacent concept contrast, avoid/use-instead wording, usage scenario, evidence, and acceptance boundary.",
+    "timeBudget": "3m",
+    "artifactKind": "explainer",
+    "successCriteria": [
+      "Definitions are local-original and source-bounded.",
+      "Adjacent terms are explicitly separated.",
+      "The artifact stays useful without copying external glossary text."
+    ]
+  },
+  "sections": [
+    {
+      "type": "summary-cards",
+      "title": "Explainer contract",
+      "group": "overview",
+      "priority": 1,
+      "status": "ready",
+      "cards": [
+        {
+          "label": "Source boundary",
+          "value": "reference-only",
+          "detail": "Use the dictionary repo as a structure reference, not copied content."
+        },
+        {
+          "label": "Local source",
+          "value": "docs/harness-vocabulary.md",
+          "detail": "Harness Hub owns the actual definitions and examples."
+        },
+        {
+          "label": "Output shape",
+          "value": "definition + boundary",
+          "detail": "Every concept needs the nearest adjacent term and misuse warning."
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "title": "BLUF",
+      "group": "overview",
+      "priority": 2,
+      "status": "ready",
+      "content": "**Use vocabulary explainers to prevent wrong routing and false validation claims.**\n\n- Keep the first screen focused on the term boundary.\n- Use adjacent concepts to show what would change the next action.\n- Treat source links as evidence, not text to copy."
+    },
+    {
+      "type": "data-table",
+      "title": "Required term shape",
+      "group": "terms",
+      "priority": 1,
+      "status": "ready",
+      "summary": "The same rows can be used for model/agent, skill/tool, or check/review distinctions.",
+      "columns": [
+        { "key": "part", "label": "Part", "width": "22%" },
+        { "key": "purpose", "label": "Purpose", "width": "42%" },
+        { "key": "failure", "label": "Failure it prevents", "width": "36%" }
+      ],
+      "rows": [
+        {
+          "part": "Definition",
+          "purpose": "State the Harness Hub meaning in one local-original paragraph.",
+          "failure": "The reader imports a vendor definition that does not match this repo."
+        },
+        {
+          "part": "Adjacent concept",
+          "purpose": "Name the closest term that is easy to confuse.",
+          "failure": "The report treats a skill like a tool or a check like a review."
+        },
+        {
+          "part": "Avoid / use instead",
+          "purpose": "Show wording that would change routing, safety, or validation meaning.",
+          "failure": "The artifact sounds precise while preserving the wrong boundary."
+        },
+        {
+          "part": "Usage scenario",
+          "purpose": "Anchor the term in one repo-local maintenance or handoff situation.",
+          "failure": "The glossary becomes abstract documentation instead of decision support."
+        },
+        {
+          "part": "Acceptance boundary",
+          "purpose": "Name the evidence or decision that proves the explanation worked.",
+          "failure": "The report ends with explanation but no actionable next step."
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "title": "Adjacent concept examples",
+      "group": "terms",
+      "priority": 2,
+      "status": "ready",
+      "summary": "Each tab models the contrast pattern without copying external entries.",
+      "tabs": [
+        {
+          "label": "skill vs tool",
+          "content": "Definition: a skill is conditional context the agent reads; a tool is a callable action surface. Avoid saying a skill runs commands. Use instead: the skill instructs the agent when to call a tool."
+        },
+        {
+          "label": "check vs review",
+          "content": "Definition: an automated check is deterministic pass/fail; automated review is judgement. Avoid calling an LLM reviewer a check unless the assertion is deterministic."
+        },
+        {
+          "label": "handoff vs compaction",
+          "content": "Definition: a handoff artifact is explicit and inspectable; compaction is lossy session carryover. Avoid treating a compacted summary as the only proof of completed work."
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "Harness Hub vocabulary anchors",
+      "group": "anchors",
+      "priority": 1,
+      "status": "ready",
+      "summary": "These anchors keep local explainers aligned with repo policy.",
+      "columns": [
+        { "key": "anchor", "label": "Anchor" },
+        { "key": "role", "label": "Role" },
+        { "key": "acceptance", "label": "Acceptance" }
+      ],
+      "rows": [
+        {
+          "anchor": "docs/source-projects.md",
+          "role": "Records dictionary-of-ai-coding as reference-only.",
+          "acceptance": "No copied entry text or installable component."
+        },
+        {
+          "anchor": "docs/harness-vocabulary.md",
+          "role": "Defines local-original Harness Hub terms.",
+          "acceptance": "Terms separate model/agent/harness, skill/tool, and check/review."
+        },
+        {
+          "anchor": "docs/skill-quality-guide.md",
+          "role": "Constrains vocabulary normalization to local or deeply adapted skills.",
+          "acceptance": "Imported skill bodies remain preserved by default."
+        },
+        {
+          "anchor": "effective-interact references",
+          "role": "Turns concept boundaries into a reusable explainer pattern.",
+          "acceptance": "Research explainers include definition and adjacent-concept contrast."
+        }
+      ]
+    },
+    {
+      "type": "evidence",
+      "title": "Evidence rail",
+      "group": "evidence",
+      "priority": 1,
+      "status": "ready",
+      "items": [
+        {
+          "label": "Local vocabulary",
+          "value": "docs/harness-vocabulary.md",
+          "filePath": "docs/harness-vocabulary.md",
+          "line": 1,
+          "status": "info"
+        },
+        {
+          "label": "Source registry",
+          "value": "docs/source-projects.md",
+          "filePath": "docs/source-projects.md",
+          "line": 31,
+          "status": "info"
+        },
+        {
+          "label": "Reference-only upstream",
+          "value": "mattpocock/dictionary-of-ai-coding",
+          "sourceHref": "https://github.com/mattpocock/dictionary-of-ai-coding",
+          "status": "info"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "title": "Next action",
+      "group": "next",
+      "priority": 1,
+      "status": "ready",
+      "items": [
+        "Use this explainer shape when a Harness Hub report depends on terms such as skill, tool, harness, check, review, handoff, or compaction.",
+        "Stay in Markdown when one compact table explains the distinction.",
+        "Escalate to HTML only when source anchors, tabs, or side-by-side concept comparisons lower decision cost."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-local-original",
+      "statement": "Harness Hub vocabulary explainers must use local-original definitions rather than copied external glossary text.",
+      "kind": "conclusion",
+      "evidenceIds": ["evidence-source-registry", "evidence-vocabulary"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim-boundary-first",
+      "statement": "The reusable explainer value is the adjacent-concept boundary, not a larger glossary.",
+      "kind": "recommendation",
+      "evidenceIds": ["evidence-patterns"],
+      "confidence": "medium"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-source-registry",
+      "kind": "file",
+      "label": "Reference-only source record",
+      "value": "docs/source-projects.md",
+      "status": "info",
+      "filePath": "docs/source-projects.md",
+      "line": 31
+    },
+    {
+      "id": "evidence-vocabulary",
+      "kind": "file",
+      "label": "Local vocabulary",
+      "value": "docs/harness-vocabulary.md",
+      "status": "info",
+      "filePath": "docs/harness-vocabulary.md",
+      "line": 1
+    },
+    {
+      "id": "evidence-patterns",
+      "kind": "file",
+      "label": "Effective Interact pattern docs",
+      "value": "skills/effective-interact/references/interaction-patterns.md",
+      "status": "info",
+      "filePath": "skills/effective-interact/references/interaction-patterns.md",
+      "line": 106
+    },
+    {
+      "id": "evidence-upstream",
+      "kind": "source",
+      "label": "dictionary-of-ai-coding upstream",
+      "sourceUrl": "https://github.com/mattpocock/dictionary-of-ai-coding",
+      "sourceTitle": "mattpocock/dictionary-of-ai-coding",
+      "status": "info",
+      "knownLimits": [
+        "No license file or package license field was present in the reviewed snapshot."
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "label": "source boundary",
+      "status": "pass",
+      "detail": "The fixture references upstream as source inspiration only and uses local-original definitions."
+    },
+    {
+      "label": "explainer structure",
+      "status": "pass",
+      "detail": "The artifact includes definition, adjacent concept, avoid/use-instead, usage scenario, and acceptance boundary."
+    }
+  ],
+  "nextActions": [
+    "Generate this fixture with create-interaction.mjs.",
+    "Validate the generated HTML with validate-interaction.mjs.",
+    "Use docs/harness-vocabulary.md as the local term source for future Harness Hub explainers."
+  ]
+}
