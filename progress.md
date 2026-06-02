@@ -27,4 +27,9 @@
 ## Validation Status
 
 - Pre-merge validation passed before the merge: `node --test tests/unit.test.js`, `npm run validate`, `node scripts/harness-validate.mjs`, and Playwright desktop/mobile checks.
-- After conflict resolution, rerun required: `npm run validate`, `node scripts/harness-validate.mjs`, and desktop/mobile visual checks for `docs/reports/2026/06/2026-06-02.html`.
+- After conflict resolution, validation passed: `node --test tests/unit.test.js`, `npm run validate`, `node scripts/harness-validate.mjs`, conflict-marker scan, `git diff --check`, and desktop/mobile Playwright visual checks for `docs/reports/2026/06/2026-06-02.html`.
+
+## PR Status
+
+- PR opened: https://github.com/JasonxzWen/ai-daily-cn/pull/19
+- Initial PR state from GitHub: `OPEN`, non-draft, `mergeable=MERGEABLE`, `mergeStateStatus=CLEAN`, no status checks reported yet.

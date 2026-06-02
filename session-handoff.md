@@ -6,7 +6,9 @@
 - Branch: `codex/durable-ai-daily-workflow`
 - User request: update to latest main, resolve conflicts, open a PR, and ensure the PR can merge.
 - Latest fetched `origin/main`: `3859b07 fix: harden AI daily longform workflow (#17)`.
-- Current branch has local commit `222b66d fix: codify durable AI daily workflow` and is in the middle of resolving the merge from `origin/main`.
+- Current branch contains `222b66d fix: codify durable AI daily workflow` plus merge commit `fbde205 Merge origin/main into durable AI daily workflow`.
+- PR opened: https://github.com/JasonxzWen/ai-daily-cn/pull/19
+- GitHub reported the PR as non-draft, `mergeable=MERGEABLE`, `mergeStateStatus=CLEAN`, with no status checks reported yet.
 
 ## Conflict Resolution Policy
 
@@ -22,11 +24,12 @@
 
 ## Validation Needed After Merge Resolution
 
-- `npm run validate`
-- `node scripts/harness-validate.mjs`
-- Playwright desktop/mobile check for `docs/reports/2026/06/2026-06-02.html`
-- Push branch to origin.
-- Open PR against `main`, add labels when available, and verify mergeability is clean.
+- Completed: `node --test tests/unit.test.js`
+- Completed: `npm run validate`
+- Completed: `node scripts/harness-validate.mjs`
+- Completed: conflict-marker scan and `git diff --check`
+- Completed: Playwright desktop/mobile visual check for `docs/reports/2026/06/2026-06-02.html`
+- Completed: branch push and PR creation.
 
 ## Boundaries
 
