@@ -329,6 +329,12 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(html.includes("48 小时窗口仍不足时缺少扩窗规则"));
   assert(html.includes("模块：date-scope"));
   assert(html.includes("需要确认"));
+
+  const input = reportToInteractionInput(report);
+  const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
+  assert(selfCheckSection.content.includes("为什么要改：避免低质量硬凑。"));
+  assert(!selfCheckSection.content.includes("。；为什么要改"));
+  assert(!/\n\s+- 为什么要改/.test(selfCheckSection.content));
 });
 
 test("HTML 渲染会展示模型发布和热门技术博客", async () => {

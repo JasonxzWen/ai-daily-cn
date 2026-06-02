@@ -2090,7 +2090,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：4</li><li>Builder 观察：3</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本地发现命令保留执行痕迹；shell 网络环境对部分源返回 fetch failed。Builder 侧重新核验 follow-builders feeds：X feed 为空并带上游错误，podcast feed 可访问，因此补入 Every / AI &amp; I 原始访谈文字稿，使 Builder 观察达到 3 条。正文继续只使用一手或原始来源。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>本地发现命令网络失败后，网页 fallback 候选需要人工写回</strong>：在 discovery-audit 或 publish-workflow 中增加 web fallback 输出合同，要求把网页核验得到的 sources/candidates 写成统一 JSON，再由 report:write 读取。</li><li>为什么要改：减少手工整理候选池时的 schema 风险，并让 source_audit 能区分 shell fetch failed 与 web fallback checked。</li><li><strong>Builder X 硬门禁把官方产品 X 与个人 builder X 放在同一验收路径</strong>：在 source-policy 中把 official_product_social、builder_original_social、x_search_fallback 三类分开，并给每类定义是否可进入 Builder 观察。</li><li>为什么要改：保留原始 X status 的硬要求，同时避免把官方模型发布帖误写成普通 builder 观点。</li></ul>
+<ul><li><strong>本地发现命令网络失败后，网页 fallback 候选需要人工写回</strong>：在 discovery-audit 或 publish-workflow 中增加 web fallback 输出合同，要求把网页核验得到的 sources/candidates 写成统一 JSON，再由 report:write 读取；为什么要改：减少手工整理候选池时的 schema 风险，并让 source_audit 能区分 shell fetch failed 与 web fallback checked。</li><li><strong>Builder X 硬门禁把官方产品 X 与个人 builder X 放在同一验收路径</strong>：在 source-policy 中把 official_product_social、builder_original_social、x_search_fallback 三类分开，并给每类定义是否可进入 Builder 观察；为什么要改：保留原始 X status 的硬要求，同时避免把官方模型发布帖误写成普通 builder 观点。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-29.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：4
 - Builder 观察：3
@@ -2101,10 +2101,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **本地发现命令网络失败后，网页 fallback 候选需要人工写回**：在 discovery-audit 或 publish-workflow 中增加 web fallback 输出合同，要求把网页核验得到的 sources/candidates 写成统一 JSON，再由 report:write 读取。
-  - 为什么要改：减少手工整理候选池时的 schema 风险，并让 source_audit 能区分 shell fetch failed 与 web fallback checked。
-- **Builder X 硬门禁把官方产品 X 与个人 builder X 放在同一验收路径**：在 source-policy 中把 official_product_social、builder_original_social、x_search_fallback 三类分开，并给每类定义是否可进入 Builder 观察。
-  - 为什么要改：保留原始 X status 的硬要求，同时避免把官方模型发布帖误写成普通 builder 观点。
+- **本地发现命令网络失败后，网页 fallback 候选需要人工写回**：在 discovery-audit 或 publish-workflow 中增加 web fallback 输出合同，要求把网页核验得到的 sources/candidates 写成统一 JSON，再由 report:write 读取；为什么要改：减少手工整理候选池时的 schema 风险，并让 source_audit 能区分 shell fetch failed 与 web fallback checked。
+- **Builder X 硬门禁把官方产品 X 与个人 builder X 放在同一验收路径**：在 source-policy 中把 official_product_social、builder_original_social、x_search_fallback 三类分开，并给每类定义是否可进入 Builder 观察；为什么要改：保留原始 X status 的硬要求，同时避免把官方模型发布帖误写成普通 builder 观点。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-29.json)</template></div>
   </details>

@@ -1976,7 +1976,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：5</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体条目均使用官方或原始来源。24 小时内高质量一手主体条目偏少，48 小时窗口内保留 Anthropic、GitHub、SAP、OpenAI 四条；为避免低质量硬凑，将窗口扩到 2026-05-11 并加入 Thinking Machines 官方研究预览。OpenAI Daybreak 与 Claude Opus fast mode 因发布日期或文档一致性不足，仅放入社区线索。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。</strong>：增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则。</li><li>为什么要改：避免为了满足条目数引入弱来源，同时让扩窗边界可审计。</li><li><strong>官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。</strong>：要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体。</li><li>为什么要改：减少把无法定日的产品页误判成今日发布。</li><li><strong>T1 builder 观察缺少可用原帖时容易空缺。</strong>：保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因。</li><li>为什么要改：防止用二手转述填充 Builder 区域，提升日报可追溯性。</li></ul>
+<ul><li><strong>当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。</strong>：增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则；为什么要改：避免为了满足条目数引入弱来源，同时让扩窗边界可审计。</li><li><strong>官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。</strong>：要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体；为什么要改：减少把无法定日的产品页误判成今日发布。</li><li><strong>T1 builder 观察缺少可用原帖时容易空缺。</strong>：保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因；为什么要改：防止用二手转述填充 Builder 区域，提升日报可追溯性。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-14.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：5
 - Builder 观察：0
@@ -1987,12 +1987,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。**：增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则。
-  - 为什么要改：避免为了满足条目数引入弱来源，同时让扩窗边界可审计。
-- **官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。**：要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体。
-  - 为什么要改：减少把无法定日的产品页误判成今日发布。
-- **T1 builder 观察缺少可用原帖时容易空缺。**：保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因。
-  - 为什么要改：防止用二手转述填充 Builder 区域，提升日报可追溯性。
+- **当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。**：增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则；为什么要改：避免为了满足条目数引入弱来源，同时让扩窗边界可审计。
+- **官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。**：要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体；为什么要改：减少把无法定日的产品页误判成今日发布。
+- **T1 builder 观察缺少可用原帖时容易空缺。**：保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因；为什么要改：防止用二手转述填充 Builder 区域，提升日报可追溯性。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-14.json)</template></div>
   </details>

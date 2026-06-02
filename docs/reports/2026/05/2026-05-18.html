@@ -1984,7 +1984,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮 2026-05-18 当天 T0 发布不足 5 条，先拓展官方产品页、GitHub Changelog、开源 release、云平台公告和 AI agent 工具，再扩展到 2026-05-15。主体条目均使用官方或项目一手来源，并保留真实 event_date。已在 2026-05-17 草稿覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 不重复计入主体；Supertonic、OpenHuman、K-Dense Scientific Agent Skills 因官方日期不足或发布日期超出窗口，只放入 community_leads。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。</strong></li><li>为什么要改：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。</li><li><strong>社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。</strong></li><li>为什么要改：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。</li><li><strong>同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。</strong></li><li>为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。</li></ul>
+<ul><li><strong>连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。</strong>：为什么要改：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。</li><li><strong>社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。</strong>：为什么要改：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。</li><li><strong>同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。</strong>：为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-18.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：6
 - Builder 观察：0
@@ -1995,12 +1995,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。**
-  - 为什么要改：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。
-- **社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。**
-  - 为什么要改：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。
-- **同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。**
-  - 为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。
+- **连续多天日报会遇到未发布草稿中的主体条目，当前提示词没有明确要求把本地未提交日报也当作去重依据。**：为什么要改：把本地 reports-data 中最近 2-3 天未提交草稿纳入去重清单，避免发布堆积时重复生成主体。
+- **社区热门开源项目经常只有 README 更新或二手站点发布日期，容易被误判为当天 release。**：为什么要改：要求 GitHub 热门项目入主体时必须有 release、tag、dated changelog 或可核验 commit，否则固定进入 community_leads。
+- **同一厂商多条官方内容有时跨越不同部署面，简单合并会丢失工程含义。**：为什么要改：允许同厂商条目在产品面、模型面、部署治理面明显不同时拆分，并要求 notes 解释拆分原因。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-18.json)</template></div>
   </details>

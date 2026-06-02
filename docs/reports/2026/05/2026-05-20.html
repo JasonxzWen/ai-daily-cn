@@ -2050,7 +2050,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：本轮没有为了凑数扩大到 48 小时主体窗口。Google I/O 的模型、agent、Search、Workspace、Flow 等多条同厂商发布合并为一个开发者栈主体条目，Gemini 3.5 Flash 和 Omni 进入 model_releases。GitHub 5 月 19 日 Copilot 两条更新合并为一个主体条目。Chrome DevTools for agents 1.0 虽同属 Google，但属于独立 Chrome 开发者工具稳定版，单独保留。Mistral 3 因页面缺少稳定发布日期降级为 community_leads；Anthropic Stainless 因 24 小时内主体已足够且事件日期为 2026-05-18，作为社区线索提示后续复核。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。</strong></li><li>为什么要改：为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。</li><li><strong>model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。</strong></li><li>为什么要改：增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。</li><li><strong>社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。</strong></li><li>为什么要改：给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。</li></ul>
+<ul><li><strong>聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。</strong>：为什么要改：为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。</li><li><strong>model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。</strong>：为什么要改：增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。</li><li><strong>社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。</strong>：为什么要改：给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-20.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：6
 - Builder 观察：0
@@ -2061,12 +2061,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。**
-  - 为什么要改：为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。
-- **model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。**
-  - 为什么要改：增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。
-- **社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。**
-  - 为什么要改：给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。
+- **聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。**：为什么要改：为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。
+- **model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。**：为什么要改：增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。
+- **社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。**：为什么要改：给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-20.json)</template></div>
   </details>

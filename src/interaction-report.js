@@ -776,8 +776,15 @@ function formatSelfCheck(selfCheck) {
 function formatOptimizationSuggestion(item) {
   const title = item.issue || item.observed_issue || item.suggestion || "建议";
   const change = item.suggestion || item.proposed_change || "";
-  const firstLine = change ? `- **${title}**：${change}` : `- **${title}**`;
-  return `${firstLine}${item.expected_benefit ? `\n  - 为什么要改：${item.expected_benefit}` : ""}`;
+  const details = [
+    stripTrailingSentencePunctuation(change),
+    item.expected_benefit ? `为什么要改：${item.expected_benefit}` : ""
+  ].filter(Boolean);
+  return details.length > 0 ? `- **${title}**：${details.join("；")}` : `- **${title}**`;
+}
+
+function stripTrailingSentencePunctuation(value) {
+  return String(value || "").trim().replace(/[。；;.\s]+$/u, "");
 }
 
 function markdownLink(url, label, options = {}) {
