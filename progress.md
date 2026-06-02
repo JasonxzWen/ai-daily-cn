@@ -1,5 +1,14 @@
 # Progress
 
+## 2026-06-02 Strict Publish Coverage Gate
+
+- Current branch: `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`.
+- PR #11 and PR #13 are already merged into `main`; PR #14 remains open for the suggestion-rendering follow-up. This branch adds the next global guardrail: 2026-06-02+ reports cannot publish unless the final JSON proves the fixed source surface and version state.
+- Added strict publish issues in `src/quality-status.js` for missing/stale `self_check.automation_revision`, missing A-F source audit proof, GitHub Trending Top 10/source audit gaps, missing follow-builders X coverage, missing linked local evidence assets, and model releases not mirrored in `main_items`.
+- Updated prompt/runbook/docs so automations treat these as publish blockers, not reflection suggestions or environment failures. Also corrected the runbook content-source command to use `--limit 60 --per-source-limit 3`.
+- Validation passed: `node --test tests\unit.test.js`, `npm run validate`, and `node scripts\harness-validate.mjs`.
+- Boundary: no 2026-06-02 report publish/regeneration was performed, and the untracked evidence images remain intentionally untouched.
+
 ## 2026-06-02 AI Daily Automation Recovery
 
 - Root cause: `main`/`origin/main` were aligned at `ccdd5cd`, but the broad source/quality fixes were still draft/unmerged in PR #11, so scheduled runs on `main` could not see them. This is why the 2026-06-02 scheduled report looked like an old version.

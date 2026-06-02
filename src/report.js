@@ -38,7 +38,8 @@ export async function writeReportDraft(options = {}) {
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
     candidatePool,
-    automationRevision
+    automationRevision,
+    rootDir
   });
   await requireFreshReport(report, {
     historyDir: outputDir,
@@ -134,7 +135,10 @@ export function normalizeReportDraft(draft, options = {}) {
   requireBuilderXObservation(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
   requireExpandedMainItemFormat(validation.value);
-  requirePublishableQuality(validation.value);
+  requirePublishableQuality(validation.value, {
+    rootDir: options.rootDir,
+    currentAutomationRevision: options.automationRevision
+  });
 
   return validation.value;
 }

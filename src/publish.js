@@ -8,6 +8,7 @@ import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles } from "./site.js";
+import { buildAutomationRevision } from "./automation-revision.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -186,8 +187,9 @@ export async function createPublishPlan(options = {}) {
   if (reports.length === 0) {
     throw new PublisherError("no_reports", `未发现可发布的日报：${options.reportDate || "(any)"}`);
   }
+  const currentAutomationRevision = await buildAutomationRevision({ rootDir: repoRoot });
   for (const report of reports) {
-    requirePublishableQuality(report);
+    requirePublishableQuality(report, { rootDir: repoRoot, currentAutomationRevision });
   }
 
   const blockedReports = reports.filter((report) => report.quality_status?.status === "blocked");
@@ -282,6 +284,10 @@ export async function publishGeneratedArtifacts(options = {}) {
     };
   }
 
+  await requirePublishableReportDate(repoRoot, options.reportDate, {
+    currentAutomationRevision: await buildAutomationRevision({ rootDir: repoRoot })
+  });
+
   if (typeof git.gitDir === "function") {
     await assertGitDirectoryWritable(repoRoot, git, options.gitWritableCheck);
   }
@@ -358,7 +364,9 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
-  await requirePublishableReportDate(repoRoot, options.reportDate);
+  await requirePublishableReportDate(repoRoot, options.reportDate, {
+    currentAutomationRevision: await buildAutomationRevision({ rootDir: repoRoot })
+  });
 
   const publishFiles = uniqueSorted(
     dirtyPublishFiles.length > 0
@@ -710,7 +718,7 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
   return existing;
 }
 
-async function requirePublishableReportDate(repoRoot, reportDate) {
+async function requirePublishableReportDate(repoRoot, reportDate, qualityOptions = {}) {
   if (!reportDate) {
     return;
   }
@@ -719,7 +727,7 @@ async function requirePublishableReportDate(repoRoot, reportDate) {
   const reportPath = path.join(repoRoot, "reports-data", year, month, `${reportDate}.json`);
   try {
     const report = JSON.parse(await fs.readFile(reportPath, "utf8"));
-    requirePublishableQuality(report);
+    requirePublishableQuality(report, { rootDir: repoRoot, ...qualityOptions });
   } catch (error) {
     if (error.code === "ENOENT") {
       return;
