@@ -101,12 +101,65 @@ test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () =
     inputDir: "reports-source",
     dataInputDir: "reports-data",
     generatedAt: fixedGeneratedAt,
-    git: fakeGit({ status: " M docs/index.html\n M docs/trends.json\n?? reports-data/2026/05/2026-05-13.json" })
+    git: fakeGit({ status: " M docs/index.html\n M docs/trends.json" })
   });
 
-  assert.deepEqual(plan.current_dirty_files, ["docs/index.html", "docs/trends.json", "reports-data/2026/05/2026-05-13.json"]);
+  assert.deepEqual(plan.current_dirty_files, ["docs/index.html", "docs/trends.json"]);
   assert(plan.will_stage_files.includes("docs/index.html"));
   assert(plan.will_stage_files.includes("docs/trends.json"));
+});
+
+test("publish dry-run stages evidence assets for the selected report", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Fixture evidence",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/fixture-evidence.png",
+      caption: "Fixture evidence image.",
+      extraction_status: "source_image"
+    }
+  ];
+  const dataDir = path.join(repoRoot, "reports-data", "2026", "05");
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(path.join(dataDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  const plan = await createPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: report.report_date,
+    git: fakeGit()
+  });
+
+  assert(plan.will_stage_files.includes("docs/assets/evidence/fixture-evidence.png"));
+});
+
+test("publish dry-run blocks publisher files outside the selected publish plan", async () => {
+  const repoRoot = await tempRepoWithFixture();
+
+  await assert.rejects(
+    createPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: " M docs/index.html\n?? docs/assets/evidence/unplanned-evidence.png"
+      })
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "publisher_dirty_outside_publish_plan" &&
+      error.details.files.includes("docs/assets/evidence/unplanned-evidence.png")
+  );
 });
 
 test("publish dry-run stops when a selected report quality status is blocked", async () => {

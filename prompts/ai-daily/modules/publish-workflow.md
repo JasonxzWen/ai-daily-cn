@@ -6,6 +6,10 @@
 
 > 严格覆盖发布门：从 `2026-06-02` 起，`publish:dry-run`、真实 `publish` 和 GitHub API 兜底都会阻断缺少固定覆盖证明的日报。最终 `reports-data` JSON 必须包含有效 `self_check.automation_revision`、固定 A-F 信源面的 `source_audit`、GitHub Trending Top 10、至少 3 条 Builder 观察且包含 follow-builders X 原始 status、至少 1 个匹配正文条目的本地 `evidence_assets` 图片，并保持模型发布已合并进 `main_items`。这些不是反思建议，缺失时只能修复日报或保留未发布状态。
 
+> 固定信源审计口径：固定 A-F 信源面的要求是“已检查并写入最终 `source_audit`”。如果公开源在当前环境返回 403/5xx，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可证明 source surface 已尝试检查，但不得把 blocked 来源的未核验事实写入正文。
+
+> 发布计划精确性：`publish:dry-run` 必须证明所有 `current_dirty_files` 中的发布器管理文件都出现在 `will_stage_files`。如果返回 `publisher_dirty_outside_publish_plan`，不要真实发布；先修复发布计划或归档与本次日期无关的悬空 `docs/` / `reports-data/` 产物。特别确认当日 `evidence_assets[*].local_path` 对应的 `docs/assets/evidence/**` 图片进入 `will_stage_files`。
+
 执行顺序：
 
 1. 运行 `npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"`；如果当前分支有本地改动，先提交到当前分支；如果当前分支不是 `main`，再切回 `main` 并执行发布预检。`wrong_branch` 和非发布产物脏改动必须先用本步骤消解，不能直接拦截日报生成。
@@ -13,6 +17,7 @@
 3. 生成 `.tmp/daily-report.json` 草稿。
 4. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 写入 `reports-data/`。
 5. 运行 `npm run build` 生成 `docs/` 静态站点。
+5a. 如果本轮在 `report:write` 之后提交并 push 了发布器、质量门、渲染器、提示词或信源配置改动，必须重新运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 和 `npm run build`，让 `self_check.automation_revision.git_commit` 等于当前 `HEAD`。
 6. 运行 `npm run validate`。
 7. 运行 `npm run publish:dry-run` 查看将写入、将暂存、commit message 和预期 Pages URL；如果 dry-run 失败，保留已生成日报并报告 `publish_error`，不要丢弃产物。若失败码为 `automation_revision_gate_failed`、`fixed_source_surface_gate_failed`、`github_trending_top10_gate_failed`、`builder_x_coverage_gate_failed` 或 `evidence_assets_gate_failed`，说明不是发布环境问题，而是日报缺少固定覆盖证明，必须回到发现/草稿阶段修复。
 8. 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`，使用本机 Git 进行普通 commit/push。

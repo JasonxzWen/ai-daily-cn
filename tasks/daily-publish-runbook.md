@@ -34,6 +34,7 @@ npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
 - For reports dated `2026-06-02` or later, treat strict publish coverage as a hard gate: final `source_audit` must prove the fixed A-F source surface, GitHub Trending Top 10, follow-builders X, automation revision, and evidence assets before any dry-run or real publish can pass.
+- A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.
@@ -48,6 +49,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 ```
 
 - Stop and repair the draft when `candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` appears.
+- If you commit/push any workflow, prompt, source, renderer, or quality-gate code after `report:write`, rerun `report:write` and `npm run build` so `self_check.automation_revision.git_commit` matches current `HEAD`.
 
 ## Build And Validate
 
@@ -73,6 +75,8 @@ npm run publish:dry-run
 ```
 
 - Capture changed files, commit message, and expected Pages URL.
+- Confirm every `current_dirty_files` publisher artifact is also present in `will_stage_files`. A `publisher_dirty_outside_publish_plan` error is a real safety gate: repair the publish plan or move unrelated stale artifacts out of the worktree before publishing.
+- Check that every report-linked `evidence_assets[*].local_path` appears in `will_stage_files` as `docs/assets/evidence/...`; local file existence alone is not enough for GitHub Pages.
 - If dry-run fails, keep the generated local HTML/JSON artifacts and report the blocker.
 
 ## Real Publish

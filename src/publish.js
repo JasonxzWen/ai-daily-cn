@@ -207,9 +207,11 @@ export async function createPublishPlan(options = {}) {
   const repoFiles = filterDocsForReportDate(
     toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
     options.outDir || "docs",
-    options.reportDate
+    options.reportDate,
+    generated.reports
   );
   const stageFiles = uniqueSorted([...repoFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
+  assertDirtyPublisherFilesCovered(statusEntries, stageFiles);
   const commitMessage =
     dates.length === 1
       ? `chore: publish AI daily report ${dates[0]}`
@@ -667,7 +669,7 @@ async function refreshRemoteTracking(repoRoot, git, branch) {
   }
 }
 
-function filterDocsForReportDate(files, outDir, reportDate) {
+function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
   if (!reportDate) {
     return files;
   }
@@ -686,6 +688,10 @@ function filterDocsForReportDate(files, outDir, reportDate) {
   ]);
   if (paths.markdownPath) {
     keep.add(`${outPrefix}/${paths.markdownPath}`);
+  }
+  const report = reports.find((item) => item.report_date === reportDate);
+  for (const evidencePath of reportEvidenceAssetPaths(report)) {
+    keep.add(`${outPrefix}/${evidencePath}`);
   }
 
   return files.filter((file) => keep.has(file));
@@ -707,7 +713,8 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
   const docsFiles = filterDocsForReportDate(
     toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
     options.outDir || "docs",
-    options.reportDate
+    options.reportDate,
+    generated.reports
   );
   const candidates = uniqueSorted([...docsFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
   const existing = [];
@@ -880,6 +887,30 @@ function isPublisherOwnedPath(filePath) {
     filePath.startsWith("docs/reports/") ||
     filePath.startsWith("reports-data/")
   );
+}
+
+function reportEvidenceAssetPaths(report) {
+  return (Array.isArray(report?.evidence_assets) ? report.evidence_assets : [])
+    .map((asset) => asset?.local_path)
+    .filter(Boolean);
+}
+
+function assertDirtyPublisherFilesCovered(statusEntries, stageFiles) {
+  const planned = new Set(stageFiles);
+  const uncovered = statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => isPublisherOwnedPath(file))
+    .filter((file) => !planned.has(file));
+  if (uncovered.length > 0) {
+    throw new PublisherError(
+      "publisher_dirty_outside_publish_plan",
+      "发布器管理的脏文件未出现在本次 dry-run stage 计划中，已停止发布预演。",
+      {
+        files: uniqueSorted(uncovered),
+        remediation: "重新构建本日报，确认 evidence/trends/feed/data/report 输出都进入 will_stage_files；清理或归档与本次日期无关的悬空发布产物。"
+      }
+    );
+  }
 }
 
 function uniqueSorted(values) {
