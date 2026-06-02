@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "feedback/p1-optimization-suggestions-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Normalize optimization suggestions",
+      "problem": "Daily reports recorded follow-up suggestions with multiple incompatible field shapes, so future sessions could not reliably consume them.",
+      "expected_behavior": "New report writes normalize `self_check.optimization_suggestions` to one canonical field contract, and arbitrary objects fail schema validation.",
+      "scope": [
+        "schemas/report.schema.json",
+        "src/feedback-contract.js",
+        "src/report.js",
+        "src/parser.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "schema rejects arbitrary optimization_suggestions objects",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-ledger-validation-binding",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Require ledger-backed feedback gates",
+      "problem": "User-confirmed feedback could be written as advice without becoming a durable test or gate.",
+      "expected_behavior": "Every open P1 feedback ledger item includes existing scope files, a validation command covered by `npm run validate`, and a test name that exists in `tests/**`.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "scripts/validate-feedback-contract.mjs",
+        "package.json"
+      ],
+      "validation": {
+        "command": "node scripts/validate-feedback-contract.mjs",
+        "test_name": "feedback contract requires P1 ledger items to bind to tests or gates",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-origin-main-baseline",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Prove latest origin/main baseline",
+      "problem": "A merged PR could fail to affect new sessions if generation starts from stale local `main` instead of the latest `origin/main`.",
+      "expected_behavior": "`report:write` records `origin_main_sha`, and strict publish quality blocks reports whose generation commit does not match current `origin/main`.",
+      "scope": [
+        "src/automation-revision.js",
+        "src/quality-status.js",
+        "src/publish.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js tests/publish.test.js",
+        "test_name": "publish quality blocks strict daily reports not generated from current origin/main",
+        "gate": "publish:dry-run"
+      }
+    }
+  ]
+}

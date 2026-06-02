@@ -18,6 +18,8 @@ export function defaultAutomationRevision(overrides = {}) {
     git_commit: "unknown",
     git_commit_short: "unknown",
     git_branch: "unknown",
+    origin_main_sha: "unknown",
+    origin_main_short: "unknown",
     prompt_manifest: PROMPT_MANIFEST,
     prompt_modules: [],
     source_registry_count: null,
@@ -50,6 +52,7 @@ async function readGitRevision(rootDir) {
   }
 
   try {
+    const originMain = await readGitRef(gitDir, "refs/remotes/origin/main");
     const head = (await fs.readFile(path.join(gitDir, "HEAD"), "utf8")).trim();
     if (head.startsWith("ref:")) {
       const ref = head.slice("ref:".length).trim();
@@ -57,14 +60,18 @@ async function readGitRevision(rootDir) {
       return {
         git_commit: commit || "unknown",
         git_commit_short: commit ? commit.slice(0, 12) : "unknown",
-        git_branch: ref.startsWith("refs/heads/") ? ref.slice("refs/heads/".length) : ref
+        git_branch: ref.startsWith("refs/heads/") ? ref.slice("refs/heads/".length) : ref,
+        origin_main_sha: originMain || "unknown",
+        origin_main_short: originMain ? originMain.slice(0, 12) : "unknown"
       };
     }
     if (/^[0-9a-f]{40}$/i.test(head)) {
       return {
         git_commit: head,
         git_commit_short: head.slice(0, 12),
-        git_branch: "detached"
+        git_branch: "detached",
+        origin_main_sha: originMain || "unknown",
+        origin_main_short: originMain ? originMain.slice(0, 12) : "unknown"
       };
     }
   } catch {

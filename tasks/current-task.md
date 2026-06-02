@@ -2,70 +2,86 @@
 
 ## Goal
 
-Update the durable AI daily workflow branch to the latest `origin/main`, resolve merge conflicts, validate the result, push the branch, and open a PR that is mergeable.
+Create and merge a PR against `main` for the first P1 feedback durability gate for AI daily generation, so user-confirmed recurring feedback survives new sessions, PR merges, and scheduled publish runs.
 
 ## Branch
 
-- Worktree: `D:\ai-daily-cn`
-- Branch: `codex/durable-ai-daily-workflow`
-- Base after update: latest `origin/main` at `3859b07`
-- Local pre-merge commit: `222b66d fix: codify durable AI daily workflow`
+- Worktree: `C:\Users\Admin\.codex\worktrees\406c\ai-daily-cn`
+- Branch: `codex/feedback-durability-gates`
+- PR: https://github.com/JasonxzWen/ai-daily-cn/pull/20
+- Base after update: latest `origin/main` at `1e0681e [codex] Codify durable AI daily workflow (#19)`
+- Local commit being rebased: `265986f fix: add durable feedback validation gates`
 
-## Scope
+## User Decisions
 
-This PR should preserve both upstream work and this branch's durable fixes:
+- User-confirmed feedback that must persist is P1 by default.
+- P1 feedback gates must run in `npm run validate`.
+- `report:write` and `publish:dry-run` must reuse the same checks where they affect report generation or publishing.
+- First scope is limited to:
+  - normalize `self_check.optimization_suggestions`;
+  - require confirmed feedback to live in a ledger and bind to tests or gates;
+  - require daily generation/publish metadata to prove the latest `origin/main` baseline, not only local `main`.
 
-- upstream Harness Hub skill aggregation from PR #18;
-- upstream long-form engineer daily source/editorial contract from PR #17;
-- coverage-window hero text;
-- inline keyword highlights as bold colored text, not tag UI;
-- typed color tags/chips for importance, stars, project highlights, topics, and trend state;
-- no public `模型发布` section;
-- GitHub Trending Top 10 with star tags and project highlight tags only inside matching items;
-- hot blog point summaries with evidence images and lightbox behavior;
-- Builder original text, complete Chinese translation, handle/avatar data, Twitter-like card rendering, and strict publish-quality blocking when the contract is violated.
+## Acceptance Criteria
+
+- `optimization_suggestions` has a concrete schema and normalizer; historical compatible shapes may render, but new report writes produce canonical fields.
+- A committed feedback ledger records the three P1 feedback items and each item has deterministic validation evidence.
+- `npm run validate` fails if a P1 ledger item lacks existing scope files, a validation command covered by the validate chain, a real test/gate binding, or if prompt module metadata drifts from the real prompt manifest.
+- `report:write` records current revision metadata including `origin_main_sha` when available.
+- `publish:dry-run` blocks selected strict reports whose revision metadata does not match current repo metadata, including the `origin_main_sha` check.
+- PR #20 is rebased onto latest `origin/main`, pushed, and mergeable before attempting to merge.
 
 ## Allowed paths
 
-- `.codex/**` Harness Hub and effective-interact skill files already changed by upstream or this branch.
-- `prompts/ai-daily/**` durable daily-generation rules and output contracts.
-- `src/**` renderer, quality gate, discovery, and publish workflow fixes needed by the durable contract.
-- `schemas/**` contract fields needed by the durable report JSON.
-- `tests/**` unit, e2e, publish, skills, and harness coverage for the durable contract.
-- `reports-data/2026/06/2026-06-02.json` and generated `docs/**` outputs for the regenerated daily report.
-- `tasks/current-task.md`, `progress.md`, and `session-handoff.md` for this human-assisted PR handoff.
+- `tasks/current-task.md`
+- `progress.md`
+- `session-handoff.md`
+- `definition-of-done.md`
+- `feature_list.json`
+- `package.json`
+- `schemas/report.schema.json`
+- `src/**`
+- `scripts/**`
+- `tests/**`
+- `prompts/ai-daily/**`
+- `tasks/daily-publish-runbook.md`
+- `docs/codex-automation-setup.md`
+- `config/**`
 
 ## Forbidden paths
 
-- Do not reset hard, force push, auto stash, or overwrite unrelated user changes.
-- Do not change GitHub Pages settings or scheduled automation configuration.
-- Do not publish the daily report in this task; the user asked for a PR.
+- Do not change remote Pages settings.
+- Do not modify scheduled automation configuration directly.
+- Do not hand-edit generated public report HTML.
+- Do not reset hard or overwrite unrelated user changes.
 
 ## Validation commands
 
-Run before final PR handoff:
+Run after rebase and before updating/merging PR #20:
 
+- `npm run feedback:validate`
+- `node --test tests\unit.test.js tests\publish.test.js`
 - `npm run validate`
-- `node scripts/harness-validate.mjs`
-- Playwright desktop/mobile visual check on `docs/reports/2026/06/2026-06-02.html`
+- `node scripts\harness-validate.mjs`
 - Confirm `git status` has no unresolved conflicts.
-- Push branch and confirm the PR merge state is clean/mergeable.
+- Confirm PR #20 merge state is clean/mergeable after force-with-lease push.
 
 ## Parallel writes
 
-- Parallel read-only inspection and independent validation is allowed.
-- Concurrent writes are blocked; source, generated docs, and task-state files should be edited or regenerated in a single controlled sequence.
+- No parallel writes. Manual edits use `apply_patch`; generated output comes from validation/build commands.
 
 ## Handoff requirements
 
-- Commit the resolved merge and durable workflow changes on `codex/durable-ai-daily-workflow`.
-- Push the branch to `origin`.
-- Open a PR against `main`; add `codex` and `codex-automation` labels when those labels exist.
-- Report validation, visual-check result, PR URL, and mergeability state.
+- Resolve rebase conflicts on `codex/feedback-durability-gates`.
+- Rerun validation after the rebase.
+- Push the rebased branch with `--force-with-lease`.
+- Attempt merge into `main` only after GitHub reports the PR is mergeable or allows auto-merge.
+- Report validation, PR URL, and mergeability/merge result.
 
-## Current status
+## Current Status
 
-- PR opened: https://github.com/JasonxzWen/ai-daily-cn/pull/19
-- Validation completed: `node --test tests/unit.test.js`, `npm run validate`, `node scripts/harness-validate.mjs`, conflict-marker scan, `git diff --check`, and Playwright desktop/mobile visual check.
-- GitHub initially reported the PR as non-draft, `mergeable=MERGEABLE`, `mergeStateStatus=CLEAN`.
-- Repository labels `codex` and `codex-automation` do not currently exist, so no PR labels were applied.
+- PR opened: https://github.com/JasonxzWen/ai-daily-cn/pull/20
+- Initial PR state before rebase: non-draft, `mergeable=CONFLICTING`, `mergeStateStatus=DIRTY`, no status checks reported.
+- Rebase conflict scope: `progress.md`, `session-handoff.md`, and `tasks/current-task.md`.
+- Functional/source conflicts did not require manual resolution.
+- Post-rebase validation passed: `npm run feedback:validate`, `node --test tests\unit.test.js tests\publish.test.js`, `npm run validate` (172 tests; build wrote no files), and `node scripts\harness-validate.mjs`.

@@ -3,6 +3,7 @@ import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { defaultGeneratedAt, isValidDateString } from "./time.js";
 import { validateReport } from "./schema.js";
+import { normalizeOptimizationSuggestions } from "./feedback-contract.js";
 
 const MAIN_ITEM_HEADING =
   /^(\d+)\.\s+(.+?)\s+\[event_date:\s*(\d{4}-\d{2}-\d{2})\]\s+\[tier:\s*(T[0-3])\]\s*$/;
@@ -357,9 +358,7 @@ function normalizeSelfCheck(selfCheck) {
     ...selfCheck,
     builder_skill_used: Array.isArray(selfCheck.builder_skill_used) ? selfCheck.builder_skill_used : [],
     fallback_sources: Array.isArray(selfCheck.fallback_sources) ? selfCheck.fallback_sources : [],
-    optimization_suggestions: Array.isArray(selfCheck.optimization_suggestions)
-      ? selfCheck.optimization_suggestions
-      : []
+    optimization_suggestions: normalizeOptimizationSuggestions(selfCheck.optimization_suggestions)
   };
 }
 

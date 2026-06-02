@@ -1006,7 +1006,7 @@
         "optimization_suggestions": {
           "type": "array",
           "items": {
-            "type": "object"
+            "$ref": "#/$defs/optimization_suggestion"
           },
           "default": []
         },
@@ -1014,6 +1014,126 @@
           "$ref": "#/$defs/publish_status"
         }
       }
+    },
+    "optimization_suggestion": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issue",
+            "evidence",
+            "module",
+            "suggestion",
+            "expected_benefit",
+            "requires_user_confirmation"
+          ],
+          "properties": {
+            "issue": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence": {
+              "type": "string",
+              "minLength": 1
+            },
+            "module": {
+              "type": "string",
+              "minLength": 1
+            },
+            "suggestion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_benefit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requires_user_confirmation": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issue",
+            "evidence",
+            "suggested_module",
+            "expected_benefit",
+            "needs_user_confirmation"
+          ],
+          "properties": {
+            "issue": {
+              "type": "string"
+            },
+            "evidence": {
+              "type": "string"
+            },
+            "suggested_module": {
+              "type": "string"
+            },
+            "expected_benefit": {
+              "type": "string"
+            },
+            "needs_user_confirmation": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["area", "evidence", "observed_issue", "expected_benefit", "needs_user_confirmation", "suggested_module"],
+          "properties": {
+            "area": { "type": "string" },
+            "evidence": { "type": "string" },
+            "observed_issue": { "type": "string" },
+            "expected_benefit": { "type": "string" },
+            "needs_user_confirmation": { "type": "boolean" },
+            "suggested_module": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["area", "observed_issue", "suggestion"],
+          "properties": {
+            "area": { "type": "string" },
+            "observed_issue": { "type": "string" },
+            "suggestion": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["area", "suggestion"],
+          "properties": {
+            "area": { "type": "string" },
+            "suggestion": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["observed_issue", "suggestion", "expected_benefit"],
+          "properties": {
+            "observed_issue": { "type": "string" },
+            "suggestion": { "type": "string" },
+            "expected_benefit": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "why"],
+          "properties": {
+            "title": { "type": "string" },
+            "why": { "type": "string" }
+          }
+        }
+      ]
     },
     "source_audit": {
       "type": "object",

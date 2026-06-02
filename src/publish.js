@@ -30,7 +30,9 @@ export async function checkPublishPreflight(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
   }
-  await requirePublishableReportDate(repoRoot, options.reportDate);
+  await requirePublishableReportDate(repoRoot, options.reportDate, {
+    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
+  });
 
   const statusEntries = parsePorcelain(await git.status());
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
@@ -187,7 +189,7 @@ export async function createPublishPlan(options = {}) {
   if (reports.length === 0) {
     throw new PublisherError("no_reports", `未发现可发布的日报：${options.reportDate || "(any)"}`);
   }
-  const currentAutomationRevision = await buildAutomationRevision({ rootDir: repoRoot });
+  const currentAutomationRevision = await resolveCurrentAutomationRevision(options, repoRoot);
   for (const report of reports) {
     requirePublishableQuality(report, { rootDir: repoRoot, currentAutomationRevision });
   }
@@ -289,7 +291,7 @@ export async function publishGeneratedArtifacts(options = {}) {
   }
 
   await requirePublishableReportDate(repoRoot, options.reportDate, {
-    currentAutomationRevision: await buildAutomationRevision({ rootDir: repoRoot })
+    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
   });
 
   if (typeof git.gitDir === "function") {
@@ -370,7 +372,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     });
   }
   await requirePublishableReportDate(repoRoot, options.reportDate, {
-    currentAutomationRevision: await buildAutomationRevision({ rootDir: repoRoot })
+    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
   });
 
   const publishFiles = uniqueSorted(
@@ -527,7 +529,9 @@ export async function resumePublishPush(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续推送。`, remote);
   }
-  await requirePublishableReportDate(repoRoot, options.reportDate);
+  await requirePublishableReportDate(repoRoot, options.reportDate, {
+    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
+  });
   if (remote.localAhead <= 0) {
     return {
       mode: "publish-resume-push",
@@ -748,6 +752,10 @@ async function requirePublishableReportDate(repoRoot, reportDate, qualityOptions
     }
     throw error;
   }
+}
+
+async function resolveCurrentAutomationRevision(options, repoRoot) {
+  return options.currentAutomationRevision || buildAutomationRevision({ rootDir: repoRoot });
 }
 
 async function plannedReportsDataFiles(repoRoot, dates) {

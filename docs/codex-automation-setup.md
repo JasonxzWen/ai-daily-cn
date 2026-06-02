@@ -20,7 +20,7 @@
 ```text
 始终用中文回复。
 
-你在 ai-daily-cn 项目根目录内运行。定时任务必须以最新 `origin/main` 为权威基线生成和发布日报；未合并 PR、本地分支、detached HEAD 和临时改动都不能影响定时日报。不要执行 `git reset --hard`、`git push --force`、自动 `stash` 或覆盖用户改动。定时日报任务不要修改或提交 `progress.md`、`session-handoff.md`、`tasks/current-task.md`；这些只留给人工会话或明确项目迭代任务。
+你在 ai-daily-cn 项目根目录内运行。定时任务必须以最新 `origin/main` 为权威基线生成和发布日报；未合并 PR、本地分支、detached HEAD 和临时改动都不能影响定时日报。用户确认需要长期生效的反馈默认为 P1，必须写入 `config/feedback-ledger.json`，并绑定真实存在的 scope 文件、`npm run validate` 覆盖的验证命令和真实测试断言或运行时质量门，否则只算本会话建议。不要执行 `git reset --hard`、`git push --force`、自动 `stash` 或覆盖用户改动。定时日报任务不要修改或提交 `progress.md`、`session-handoff.md`、`tasks/current-task.md`；这些只留给人工会话或明确项目迭代任务。
 
 目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报。主产物是由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成的自包含静态 HTML 和结构化 JSON；验证通过后只发布 `docs/` 与 `reports-data/`，由 GitHub Actions Pages workflow 部署到 GitHub Pages。
 
@@ -32,7 +32,7 @@
 
 固定信源面的目标是证明“已检查并写入最终 `source_audit`”。公开源在当前环境返回 403/5xx 或抓取失败时，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可作为 source-surface proof，但不得把 blocked 来源的未核验事实写入正文。
 
-发布质量分两级处理：`blocking_issues` 必须阻断发布，包括 validate 失败、schema 或候选池回指失败、最近 7 天重复旧闻、正文事实缺少一手/可信来源、无法确认远端 `main` 基线、`remote_ahead`、非发布产物会被提交、GitHub API 兜底无法读取 `base_commit_sha` 或 token 权限不足、Pages HTTP 200 验证失败。`degraded_sections` 允许发布但必须公开标注，包括固定信源面部分不可用、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空、模型发布未同步进入主体条目、截图验收受阻但静态校验通过。降级信息必须写入 `quality_status.degraded_sections`，并在公开 HTML 的“发布质量说明”和最终回复中列出。
+发布质量分两级处理：`blocking_issues` 必须阻断发布，包括 validate 失败、`self_check.automation_revision.git_commit` 未证明来自当前 `origin/main` / `origin_main_sha`、schema 或候选池回指失败、最近 7 天重复旧闻、正文事实缺少一手/可信来源、无法确认远端 `main` 基线、`remote_ahead`、非发布产物会被提交、GitHub API 兜底无法读取 `base_commit_sha` 或 token 权限不足、Pages HTTP 200 验证失败。`degraded_sections` 允许发布但必须公开标注，包括固定信源面部分不可用、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空、模型发布未同步进入主体条目、截图验收受阻但静态校验通过。降级信息必须写入 `quality_status.degraded_sections`，并在公开 HTML 的“发布质量说明”和最终回复中列出。
 
 真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。`publish:dry-run` 必须证明 `current_dirty_files` 中所有发布器管理文件都出现在 `will_stage_files`；如果出现 `publisher_dirty_outside_publish_plan`，先修复发布计划或归档与本次日期无关的悬空产物。特别确认 `docs/trends.json`、`docs/feed.json`、`docs/index.html`、当日 `docs/data/**`、`docs/reports/**`、`reports-data/**`、日报引用的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 都进入本次 stage 计划。如果本机 Git 元数据、分支切换或 Git 传输失败阻塞发布，在验证和 dry-run 通过且不存在 `remote_ahead` 后运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 兜底；允许使用 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token`。API 兜底必须通过 GitHub API 读取远端 `main` 的当前 commit/tree，使用 `force:false`，只写 `docs/` 与 `reports-data/`，并在输出中记录 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
 

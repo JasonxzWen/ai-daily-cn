@@ -9,7 +9,7 @@
         "npm run prompt:build -- YYYY-MM-DD",
         "npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
         "npm run discover:builders -- --date YYYY-MM-DD --limit 20",
-        "npm run discover:content-sources -- --date YYYY-MM-DD --limit 20",
+        "npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
         "npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
       ],
       "artifacts": [
@@ -40,10 +40,34 @@
       "acceptance": [
         "`report:write` succeeds without candidate-pool, freshness, or duplicate wrapping errors.",
         "The structured JSON keeps required empty arrays instead of omitting optional sections.",
-        "`self_check.optimization_suggestions` captures prompt or rule follow-up proposals."
+        "`self_check.optimization_suggestions` captures prompt or rule follow-up proposals with canonical fields."
       ],
       "stop_conditions": [
         "`candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` is returned."
+      ]
+    },
+    {
+      "id": "feedback-durability-gate",
+      "status": "active",
+      "summary": "Turn user-confirmed recurring feedback into durable validation-backed project behavior.",
+      "commands": [
+        "npm run feedback:validate",
+        "npm run validate"
+      ],
+      "artifacts": [
+        "config/feedback-ledger.json",
+        "scripts/validate-feedback-contract.mjs",
+        "prompts/ai-daily/modules.json",
+        "schemas/report.schema.json"
+      ],
+      "acceptance": [
+        "Open P1 feedback ledger items include existing scope paths, a validation command covered by `npm run validate`, and a test name that exists in `tests/**`.",
+        "`npm run validate` runs the feedback contract gate.",
+        "Prompt module metadata remains aligned with `prompts/ai-daily/manifest.json`."
+      ],
+      "stop_conditions": [
+        "A user-confirmed persistent feedback item has no real scope file, executable validate-chain command, or existing test assertion.",
+        "Prompt module metadata drifts from the manifest."
       ]
     },
     {
