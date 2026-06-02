@@ -2719,6 +2719,28 @@ test("publish quality blocks strict daily reports missing requested Chinese sour
   assert(issues.some((issue) => issue.code === "fixed_source_d_chinese_media" && issue.missing_sources.includes("QbitAI")));
 });
 
+test("publish quality blocks strict daily reports missing OpenAI News RSS source proof", () => {
+  const report = strictPublishReportFixture();
+  report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
+    .filter((source) => source.name !== "OpenAI News RSS")
+    .concat({
+      name: "Strict OpenAI Filler Source",
+      url: "https://example.com/strict-openai-filler.xml",
+      status: "checked",
+      notes: "fixture"
+    });
+
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+
+  assert(
+    issues.some(
+      (issue) =>
+        issue.code === "fixed_source_b_official_labs" &&
+        issue.missing_sources.includes("OpenAI News RSS")
+    )
+  );
+});
+
 test("publish quality blocks strict daily reports missing GitHub Trending Top 10 proof", () => {
   const report = strictPublishReportFixture();
   report.github_trending = report.github_trending.slice(0, 9);

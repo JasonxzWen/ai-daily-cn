@@ -46,6 +46,7 @@ const FIXED_SOURCE_REQUIREMENTS = [
     label: "B. official AI lab/blog sources",
     sources: [
       { groups: ["content_sources"], label: "OpenAI Blog RSS", name: /OpenAI Blog RSS/i },
+      { groups: ["content_sources"], label: "OpenAI News RSS", name: /OpenAI News RSS/i },
       { groups: ["content_sources"], label: "Google DeepMind RSS", name: /Google DeepMind RSS/i },
       { groups: ["content_sources"], label: "Google Research Blog", name: /Google Research Blog/i },
       { groups: ["content_sources"], label: "Meta AI Blog", name: /Meta AI Blog/i },
