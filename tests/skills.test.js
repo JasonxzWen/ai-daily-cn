@@ -51,6 +51,28 @@ test("effective-interact skill is installed with generator, validator, schema, a
   assert(schema.properties.sections.items.properties.type.enum.includes("diff"));
 });
 
+test("Harness Hub skill aggregation imports new skills without dropping local skill assets", async () => {
+  const manifestPath = path.join(rootDir, ".codex", "harness-hub-aggregation.json");
+  const manifest = JSON.parse(await fsp.readFile(manifestPath, "utf8"));
+
+  assert.match(manifest.source.commit, /^[a-f0-9]{40}$/);
+  assert.equal(manifest.source.path, "D:/harness-hub");
+  assert(manifest.importedSkills.includes("workflow-router"));
+  assert(manifest.importedSkills.includes("karpathy-guidelines"));
+  assert(manifest.localOnlySkills.includes("html-work-reports"));
+  assert(manifest.overlappingSkills.includes("tdd-workflow"));
+
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "karpathy-guidelines", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "html-work-reports", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "agents", "openai.yaml")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "_harness-hub", "SKILL.md")), true);
+  assert.equal(
+    fs.existsSync(path.join(rootDir, ".codex", "skills", "effective-interact", "_harness-hub", "scripts", "create-interaction.mjs")),
+    true
+  );
+});
+
 test("effective-interact generator creates a validated self-contained interaction report", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-"));
   const fixture = path.join(skillDir, "assets", "fixtures", "pre-rendered-report.json");
@@ -324,6 +346,59 @@ test("effective-interact daily report hero renders summary metrics and links", a
   assert.match(header, /href="https:\/\/example\.com\/data\.json"/);
   assert.doesNotMatch(header, /hero-decision-grid/);
   assert.doesNotMatch(html, /<nav class="report-nav"/);
+});
+
+test("effective-interact keeps local daily-report extensions while applying Harness Hub defaults", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-merged-"));
+  const inputPath = path.join(tmp, "merged-effective-interact.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily merged behavior",
+      summary: "- **[Primary item](https://example.com/primary)**: local hero highlight layout should still render.",
+      heroMode: "daily-report",
+      heroTitle: "2026-06-02",
+      heroStats: [{ label: "Items", value: "1", detail: "local extension" }],
+      heroLinks: [{ label: "Data", href: "https://example.com/data.json" }],
+      hideNavigation: true,
+      status: "complete",
+      sections: [
+        {
+          type: "mermaid",
+          title: "Fallback flow",
+          content: "graph LR\n  A --> B"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "merged-effective-interact", "--json"],
+    {
+      cwd: rootDir,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        EFFECTIVE_INTERACT_DISABLE_BROWSER_MERMAID: "1"
+      }
+    }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  assert.equal(payload.renderMode, "pre-rendered");
+
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-render-mode="pre-rendered"/);
+  assert.match(html, /data-hero-mode="daily-report"/);
+  assert.match(html, /<h1 class="report-title report-date-title">2026-06-02<\/h1>/);
+  assert.match(html, /hero-highlight-list/);
+  assert.match(html, /hero-link/);
+  assert.doesNotMatch(html, /<nav class="report-nav"/);
+  assert.match(html, /data-rich-kind="mermaid" data-render-state="degraded"/);
+  assert.match(html, /data-mermaid-renderer="fallback"/);
 });
 
 test("effective-interact can collapse appendix sections and next actions by default", async () => {

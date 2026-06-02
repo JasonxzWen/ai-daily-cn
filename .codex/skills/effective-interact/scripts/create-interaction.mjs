@@ -178,7 +178,7 @@ function usage() {
   return [
     "Usage: node skills/effective-interact/scripts/create-interaction.mjs --input report.json [--out-dir <dir>] [--slug name] [--json] [--browser-mermaid]",
     "",
-    "Inputs follow references/interaction-input-schema.json. Default renderMode is runtime-cdn. Default outDir is ignored skills/effective-interact/artifacts/. Use --out-dir only for another gitignored directory."
+    "Inputs follow references/interaction-input-schema.json. Default renderMode is pre-rendered. Default outDir is ignored skills/effective-interact/artifacts/. Use --out-dir only for another gitignored directory."
   ].join("\n");
 }
 
@@ -258,7 +258,7 @@ function safeLink(rawHref) {
 }
 
 function normalizeRenderMode(mode) {
-  if (!mode) return { mode: "runtime-cdn", compatibility: "" };
+  if (!mode) return { mode: "pre-rendered", compatibility: "" };
   if (mode === "runtime") return { mode: "runtime-cdn", compatibility: "legacy-runtime-alias" };
   return { mode, compatibility: "" };
 }
@@ -936,6 +936,13 @@ async function renderMermaidSvg(source, title, options) {
 }
 
 async function renderMermaidWithBrowser(source) {
+  if (process.env.EFFECTIVE_INTERACT_DISABLE_BROWSER_MERMAID === "1") {
+    return {
+      ok: false,
+      error: "Playwright unavailable: disabled by EFFECTIVE_INTERACT_DISABLE_BROWSER_MERMAID"
+    };
+  }
+
   let chromium;
   try {
     ({ chromium } = await import("playwright"));
@@ -966,11 +973,14 @@ async function renderMermaidWithBrowser(source) {
 }
 
 function fallbackMermaidSvg(source, title, message) {
-  const lines = String(source ?? "").split("\n").filter(Boolean).slice(0, 6);
+  const lines = String(source ?? "").split("\n").filter(Boolean).slice(0, 8);
   const width = 900;
-  const height = Math.max(190, 82 + lines.length * 24);
+  const contentStart = 88;
+  const lineStep = 24;
+  const footerY = contentStart + lines.length * lineStep + 22;
+  const height = Math.max(220, footerY + 38);
   const renderedLines = lines
-    .map((line, index) => `<text x="34" y="${88 + index * 24}" font-size="14" fill="#172033">${escapeHtml(line.slice(0, 110))}</text>`)
+    .map((line, index) => `<text x="34" y="${contentStart + index * lineStep}" font-size="14" fill="#172033">${escapeHtml(line.slice(0, 110))}</text>`)
     .join("");
 
   return [
@@ -979,7 +989,7 @@ function fallbackMermaidSvg(source, title, message) {
     `<rect x="24" y="24" width="${width - 48}" height="34" rx="6" fill="#eef4ff" stroke="#2563eb"/>`,
     `<text x="38" y="46" font-size="15" font-weight="700" fill="#172033">${escapeHtml(title.slice(0, 96))}</text>`,
     renderedLines,
-    `<text x="34" y="${height - 30}" font-size="12" fill="#475467">${escapeHtml(message)}</text>`,
+    `<text x="34" y="${footerY}" font-size="12" fill="#475467">${escapeHtml(message)}</text>`,
     `</svg>`
   ].join("");
 }
@@ -1079,8 +1089,10 @@ async function renderMermaidSection(section, mode, index, options) {
 
   const rendered = mode === "pre-rendered";
   const svg = rendered ? await renderMermaidSvg(section.content || "", section.title, options) : fallbackMermaidSvg(section.content || "", section.title, "Fallback-only mode keeps Mermaid source auditable.");
-  return `<section class="panel diagram-panel mermaid-evidence rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="mermaid" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback>
-    ${renderSectionHeader(section, rendered ? "ready" : "degraded")}
+  const isFallback = svg.includes('data-mermaid-renderer="fallback"');
+  const renderState = rendered && !isFallback ? "ready" : "degraded";
+  return `<section class="panel diagram-panel mermaid-evidence rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="mermaid" data-render-state="${renderState}" data-source-fallback>
+    ${renderSectionHeader(section, renderState)}
     <div class="mermaid-rendered">${svg}</div>
     <template id="${sourceId}" data-rich-source data-source-fallback data-mermaid-source>${escapeHtml(section.content || "")}</template>
   </section>`;

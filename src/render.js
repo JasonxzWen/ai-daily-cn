@@ -3,7 +3,6 @@ import {
   cleanGithubTrendDescription,
   cleanProjectDescription,
   githubTrendStatusTag,
-  modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
 import { importanceLabel } from "./importance.js";
@@ -648,33 +647,6 @@ function stripSourcePrefixForRender(title, source) {
     .trim() || text;
 }
 
-function renderModelReleasesSection(report, items, evidenceByUrl) {
-  if (items.length === 0) {
-    return "";
-  }
-
-  return `<section class="section" id="model-releases">
-      <h2>模型发布</h2>
-      ${items.map((item) => renderModelRelease(report, item, evidenceByUrl)).join("\n")}
-    </section>`;
-}
-
-function renderModelRelease(report, item, evidenceByUrl) {
-  return `<article class="item">
-  <h3>${escapeHtml(item.name)}</h3>
-  <div class="item-meta">
-    <span>${escapeHtml(item.event_date)}</span>
-    <span>${escapeHtml(item.provider)}</span>
-    <span>${escapeHtml(renderAvailability(item.availability))}</span>
-    ${renderImportanceSpan(item)}
-    ${renderTags(modelReleaseTags(item))}
-  </div>
-  <p>${escapeHtml(item.summary)}</p>
-  <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
-  ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
-</article>`;
-}
-
 function renderHotBlogsSection(items) {
   if (items.length === 0) {
     return "";
@@ -698,17 +670,6 @@ function renderHotBlog(item) {
   </div>
   <p>${escapeHtml(item.summary)}</p>
 </article>`;
-}
-
-function renderAvailability(value) {
-  const labels = {
-    open_weights: "开源权重",
-    closed_api: "闭源 API",
-    closed_product: "产品内可用",
-    research_preview: "研究预览"
-  };
-  const label = labels[value];
-  return label ? `${label} (${value})` : value;
 }
 
 function renderGithubTrendingSection(items, projects = []) {

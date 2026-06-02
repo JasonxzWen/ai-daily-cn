@@ -2,41 +2,34 @@
 
 ## Latest Status
 
-- Current worktree: `D:\ai-daily-cn`.
-- Latest `origin/main` was pulled successfully before implementation.
-- The 2026-06-02 daily report has been regenerated locally using the updated renderer and prompt rules.
-- Follow-up hardening moved the display rules into specs, workflow docs, runbook checks, renderer code, and tests so future runs inherit them.
-- Public static HTML: `D:\ai-daily-cn\docs\reports\2026\06\2026-06-02.html`.
-- Structured JSON: `D:\ai-daily-cn\reports-data\2026\06\2026-06-02.json`.
+- Worktree: `D:\ai-daily-cn`
+- Branch: `codex/durable-ai-daily-workflow`
+- User request: update to latest main, resolve conflicts, open a PR, and ensure the PR can merge.
+- Latest fetched `origin/main`: `3859b07 fix: harden AI daily longform workflow (#17)`.
+- Current branch has local commit `222b66d fix: codify durable AI daily workflow` and is in the middle of resolving the merge from `origin/main`.
 
-## Implemented
+## Conflict Resolution Policy
 
-- Hero date area now states the report coverage window.
-- Main-item highlight markers now render as bold colored inline text, not tag UI.
-- Tags and chips now differentiate importance, stars, project highlights, topics, and trend state by color.
-- Main items keep source icons/links but omit visible source-name labels.
-- Main-item titles are larger and not underlined.
-- The public `模型发布` section is removed; model news remains available through main items and JSON.
-- Hot tech blog summaries are expanded into point-style descriptions around the requested density.
-- GitHub star changes render as tags.
-- Duplicate tag rendering is de-duped, including the case where a Trending item is also a project highlight.
-- The standalone project section is removed; project recommendations are merged into GitHub Trending highlights.
-- `docs/codex-automation-setup.md` and `tasks/daily-publish-runbook.md` state the public report contract explicitly.
-- Prompt-build regression tests assert the core contract remains present in the assembled daily prompt.
+- Preserve upstream Harness Hub aggregation and long-form engineer daily workflow changes.
+- Preserve this branch's durable presentation/workflow fixes:
+  - no public `模型发布` section;
+  - project highlights only as tags inside GitHub Trending Top 10;
+  - star deltas as tags;
+  - coverage-window hero text;
+  - click-to-enlarge evidence/card images;
+  - Builder original text, full Chinese translation, handle/avatar data, Twitter-like cards, and strict Builder publish quality gate.
+- Generated `docs/**` files should be rebuilt from source data after source conflicts are resolved rather than manually edited.
 
-## Validation
+## Validation Needed After Merge Resolution
 
-- `npm run validate` passed.
-- Playwright desktop/mobile visual checks passed for the affected page.
-- Final image/tag visual check found no visible broken images, no horizontal overflow, and no duplicate star tags.
-- Harness validation and full validation were rerun after workflow/spec/test hardening.
-
-## Remaining
-
-- Current follow-up: GitHub Trending project highlights have been changed to tag-only display on matching Top 10 items; standalone `项目 highlights` subsections/lists and the hero `项目高亮` stat are removed.
-- User decision: commit/PR, publish, or leave as local regenerated output.
-- If publish is requested, run dry-run first and then use the repository publish flow.
+- `npm run validate`
+- `node scripts/harness-validate.mjs`
+- Playwright desktop/mobile check for `docs/reports/2026/06/2026-06-02.html`
+- Push branch to origin.
+- Open PR against `main`, add labels when available, and verify mergeability is clean.
 
 ## Boundaries
 
-- No commit, push, publish, reset, stash, force push, or remote Pages setting change was performed.
+- No publish flow for this task.
+- No reset hard, force push, auto stash, or Pages setting changes.
+- If validation fails, fix locally and rerun before pushing the PR.

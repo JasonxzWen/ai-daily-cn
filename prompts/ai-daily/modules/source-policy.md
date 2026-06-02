@@ -21,7 +21,7 @@
 
 扩容目标：
 
-- 新日报目标是 20-28 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 作为 GitHub Trending highlights 展示。
+- 新日报目标是 22-30 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 只作为 GitHub Trending highlights 展示。
 - `main_items` 目标是 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报并使用 `**加粗**` / `==高亮词==` 标重点。高亮词会渲染成加粗变色文字，不是 tag/chip。主体信息只写新闻事实、数据、图表、限制和影响，不写对日报自身的“后续跟进/报道口径/扩容建议”。
 - 高信号真实模型发布必须纳入 `main_items`，`model_releases` 只作为结构化索引和可用性字段集合，不能让主体信息因此减少。
 - 扩容通过增加候选池实现，不通过降低高风险事实门槛实现。正文少于 18 个内容单元时，不凑数；在 `quality_status` 或 `self_check.notes` 写明缺口来源。

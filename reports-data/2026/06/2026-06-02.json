@@ -1,22 +1,22 @@
 {
   "report_date": "2026-06-02",
   "title": "AI 日报 2026-06-02",
-  "summary": "本期覆盖 2026-06-01 至 2026-06-02：主体信息保留 10 条，OpenAI/AWS、Anthropic IPO、GitHub Copilot 成本、Mellum2、AWS/NVIDIA agent 基础设施和 AIGC 工具进入主线；模型发布合入主体信息，项目以 highlight 形式并入 GitHub Trending。",
+  "summary": "今天这份更像一张 AI 行业地图：OpenAI 进入 AWS、Anthropic 推进上市、GitHub 改 Copilot 计费，属于平台和商业模式的大新闻；NVIDIA、AWS 把 agent 往边缘、本地和企业权限链路推；AIGC 侧则出现内容生产 workflow、视频 agent、短视频开源项目和 AI PC 线索，适合工程师判断工具、成本和产品方向。",
   "hero_highlights": [
     {
-      "title": "OpenAI 模型与 Codex 正式进入 AWS",
+      "title": "OpenAI/Codex 进入 AWS，企业采购路径变了",
       "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
-      "reason": "企业采购、治理和部署路径从单独接入转向 Bedrock/Codex on AWS。"
+      "reason": "这不是单纯多一个 API 入口，而是把 frontier AI 和 coding agent 放进 AWS 的采购、权限、账单和 GovCloud 体系。"
     },
     {
-      "title": "GitHub Copilot 用量计费生效",
+      "title": "AI 编程工具开始按云资源方式治理",
       "url": "https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans",
-      "reason": "AI 编程工具从 seat 价格转向 AI Credits、Actions minutes 和用户级预算。"
+      "reason": "Copilot 的 AI Credits、Actions minutes 和用户级预算，会让 IDE 里的 agent 调用进入团队成本管理。"
     },
     {
-      "title": "Mellum2 开源 12B MoE",
-      "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
-      "reason": "JetBrains 把低延迟代码/路由/RAG 模型推到 Apache 2.0 开源权重。"
+      "title": "AIGC 从单次生成转向生产 workflow",
+      "url": "https://www.alibabacloud.com/blog/qwen-code-%C3%97-model-studio-cli-wechat-cover-generation-guide_603198",
+      "reason": "Qwen Code + Model Studio CLI、视频 agent 讨论和 MoneyPrinterTurbo 上榜，说明内容工具正在从“生成一次”走向可复用流水线。"
     }
   ],
   "source_window": {
@@ -1641,7 +1641,10 @@
       "previous_rank": 2,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "microsoft/markitdown appeared on GitHub Trending daily with 3,034 stars today. 近 7 天本地记录曾在 2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "microsoft/markitdown appeared on GitHub Trending daily with 3,034 stars today. 近 7 天本地记录曾在 2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-nesquena-hermes-webui",
@@ -1658,7 +1661,10 @@
       "previous_rank": 4,
       "rank_delta": 2,
       "trend": "up",
-      "evidence": "nesquena/hermes-webui appeared on GitHub Trending daily with 945 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "nesquena/hermes-webui appeared on GitHub Trending daily with 945 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-supermemoryai-supermemory",
@@ -1675,14 +1681,17 @@
       "previous_rank": 10,
       "rank_delta": 7,
       "trend": "up",
-      "evidence": "supermemoryai/supermemory appeared on GitHub Trending daily with 647 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "supermemoryai/supermemory appeared on GitHub Trending daily with 647 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-harry0703-moneyprinterturbo",
       "importance": "general",
       "name": "harry0703/MoneyPrinterTurbo",
       "repo": "harry0703/MoneyPrinterTurbo",
-      "description": "用大模型一键生成短视频的 AIGC 项目，连续多日上榜但今日排名回落。",
+      "description": "用大模型一键生成短视频的 AIGC 项目，连续多日上榜但排名回落；它提醒内容自动化仍有强需求，但工程上要重点看版权、素材来源、队列成本和人工审核。",
       "url": "https://github.com/harry0703/MoneyPrinterTurbo",
       "event_date": "2026-06-02",
       "source": "GitHub Trending daily",
@@ -1692,7 +1701,10 @@
       "previous_rank": 1,
       "rank_delta": -3,
       "trend": "down",
-      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 3,375 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending daily with 3,375 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-d4vinci-scrapling",
@@ -1709,7 +1721,10 @@
       "previous_rank": 3,
       "rank_delta": -2,
       "trend": "down",
-      "evidence": "D4Vinci/Scrapling appeared on GitHub Trending daily with 1,486 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "D4Vinci/Scrapling appeared on GitHub Trending daily with 1,486 stars today. 近 7 天本地记录曾在 2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-pbakaus-impeccable",
@@ -1726,7 +1741,10 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "pbakaus/impeccable appeared on GitHub Trending daily with 485 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+      "evidence": "pbakaus/impeccable appeared on GitHub Trending daily with 485 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-p-e-w-heretic",
@@ -1743,7 +1761,10 @@
       "previous_rank": 7,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 249 stars today. 近 7 天本地记录曾在 2026-05-28、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "p-e-w/heretic appeared on GitHub Trending daily with 249 stars today. 近 7 天本地记录曾在 2026-05-28、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-everyinc-compound-engineering-plugin",
@@ -1760,7 +1781,10 @@
       "previous_rank": 5,
       "rank_delta": -3,
       "trend": "down",
-      "evidence": "EveryInc/compound-engineering-plugin appeared on GitHub Trending daily with 417 stars today. 近 7 天本地记录曾在 2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "EveryInc/compound-engineering-plugin appeared on GitHub Trending daily with 417 stars today. 近 7 天本地记录曾在 2026-05-30、2026-05-31、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-tauricresearch-tradingagents",
@@ -1777,7 +1801,10 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "TauricResearch/TradingAgents appeared on GitHub Trending daily with 299 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。"
+      "evidence": "TauricResearch/TradingAgents appeared on GitHub Trending daily with 299 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     },
     {
       "candidate_id": "trend-revfactory-harness",
@@ -1794,14 +1821,17 @@
       "previous_rank": 8,
       "rank_delta": -2,
       "trend": "down",
-      "evidence": "revfactory/harness appeared on GitHub Trending daily with 524 stars today. 近 7 天本地记录曾在 2026-05-29、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。"
+      "evidence": "revfactory/harness appeared on GitHub Trending daily with 524 stars today. 近 7 天本地记录曾在 2026-05-29、2026-06-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed"
     }
   ],
   "main_items": [
     {
       "candidate_id": "main-openai-aws-frontier-codex",
       "importance": "major",
-      "title": "OpenAI frontier models 与 Codex 正式进入 AWS",
+      "title": "OpenAI/Codex 正式进入 AWS，企业 AI 采购链路被重写",
       "event_date": "2026-06-01",
       "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
       "source": "OpenAI News RSS",
@@ -1812,16 +1842,22 @@
         "Amazon Bedrock",
         "Codex"
       ],
-      "summary": "OpenAI 把 frontier models 和 Codex 放进 AWS 商业与 GovCloud 区域，让企业用现有采购、安全和治理链路部署。",
+      "summary": "OpenAI 和 AWS 把 frontier AI、Codex on Amazon Bedrock、Commercial/GovCloud 可用性放到同一条企业部署线上。",
       "bullets": [
-        "**OpenAI on AWS** 已通过 Amazon Bedrock 和 Codex on Amazon Bedrock 提供，OpenAI 称这是面向企业生产部署的 ==general availability==，覆盖 Commercial 与 GovCloud 区域。",
-        "**Codex** 被纳入 AWS 运行与治理模型后，团队可以把代码生成、review、debug 和现代化任务放进既有合规、采购、账单和权限流程，而不是另建供应商通道。"
-      ]
+        "**OpenAI on AWS** 已通过 Amazon Bedrock 和 Codex on Amazon Bedrock 提供，官方称面向企业生产部署 ==general availability==，覆盖 Commercial 与 GovCloud 区域。",
+        "**Codex** 被纳入 AWS 运行与治理模型后，代码生成、review、debug 和现代化任务可以沿用企业既有合规、采购、账单和权限流程。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "ai_industry",
+      "why_it_matters": "真正的变化不是“又能调用一个模型”，而是 OpenAI 开始嵌进云厂商的采购和治理系统，企业团队评估 AI 平台时会少一条单独供应商通道。",
+      "reader_relevance": "已经在 AWS 上跑 Bedrock、IAM、CloudTrail 或 GovCloud 的团队，可以把这条当作代码 agent 落地路径的采购/权限参考。",
+      "watch_next": "后面要看 Bedrock 上的能力边界、Codex 权限模型、区域可用性和企业价格是否跟官方叙事一致。"
     },
     {
       "candidate_id": "main-openai-stargate-michigan",
       "importance": "major",
-      "title": "OpenAI 在 Michigan 启动 Stargate 数据中心项目",
+      "title": "OpenAI 把 Stargate 落到 Michigan，算力扩张进入地方经济叙事",
       "event_date": "2026-06-01",
       "url": "https://openai.com/index/stargate-michigan-data-center",
       "source": "OpenAI News RSS",
@@ -1833,16 +1869,22 @@
         "Walbridge",
         "Stargate"
       ],
-      "summary": "OpenAI 与州政府和合作方在 Saline 推进 1GW campus，并承诺本地电力、水资源、就业和 Codex credits。",
+      "summary": "OpenAI 在 Michigan 启动 1GW 数据中心 campus，并把能源、就业、税收和学生 Codex credits 放进同一份基础设施公告。",
       "bullets": [
         "**The Barn** 是 Saline, Michigan 的 1GW 数据中心 campus，OpenAI 写明项目承担基础设施和能源成本，采用 ==closed-loop cooling==，并预计创造建设、常驻和间接岗位。",
-        "**Codex credits** 也被放进基础设施叙事：OpenAI 将向 Michigan 40 万名合格学生提供最高 4500 万美元 credits，把算力建设、教育触达和 workforce training 绑定。"
-      ]
+        "**Codex credits** 被放进 workforce training 叙事：OpenAI 将向 Michigan 40 万名合格学生提供最高 4500 万美元 credits。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "policy_infra",
+      "why_it_matters": "这类新闻表面是建数据中心，本质是 AI 供给被电力、水、地方审批和人才计划共同约束，模型能力之外的硬资源开始变成产品节奏的一部分。",
+      "reader_relevance": "评估大模型服务稳定性、区域部署或长期成本时，工程团队不能只看 API benchmark，也要看供应商背后的算力扩张是否跟得上。",
+      "watch_next": "值得继续盯电网接入、投产时间、GovCloud/企业负载是否受益，以及本地社区对能源和水资源的反馈。"
     },
     {
       "candidate_id": "main-openai-policy-advocacy",
       "importance": "notable",
-      "title": "OpenAI 公布 AI policy 与政治倡议边界",
+      "title": "OpenAI 公开划清 AI policy 与政治捐赠边界",
       "event_date": "2026-06-01",
       "url": "https://openai.com/index/our-views-on-ai-policy-and-political-advocacy",
       "source": "OpenAI News RSS",
@@ -1852,16 +1894,22 @@
         "Leading the Future",
         "AI policy"
       ],
-      "summary": "OpenAI 声明没有 super PAC 捐款或员工 PAC，并把 AI 政策倡议的透明度边界公开写清。",
+      "summary": "OpenAI 表示没有 super PAC、候选人或竞选活动捐款，也没有 employee-funded PAC，并把员工个人政治参与和公司政策立场分开。",
       "bullets": [
-        "**OpenAI** 表示没有向 super PAC、候选人或竞选活动捐款，也没有 employee-funded PAC；员工个人政治参与与公司观点分离，属于 ==governance disclosure==。",
-        "**AI policy** 部分强调支持监管、强模型测试、安全标准、公共问责和广泛可及；这对后续政策新闻判断很重要，因为要区分公司正式立场和外围组织叙事。"
-      ]
+        "**OpenAI** 表示没有向 super PAC、候选人或竞选活动捐款，也没有 employee-funded PAC；员工个人政治参与与公司观点分离。",
+        "**AI policy** 部分强调支持监管、强模型测试、安全标准、公共问责和广泛可及，属于判断后续政策新闻时可引用的官方口径。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "policy_infra",
+      "why_it_matters": "AI 公司现在不只卖产品，也在进入政策、监管和公共叙事场；官方边界说清楚后，后续新闻更容易区分公司承诺和外围组织叙事。",
+      "reader_relevance": "做企业 AI 合规、采购或安全评估时，这类政策口径会影响供应商风险判断，尤其是面向政府和受监管行业的项目。",
+      "watch_next": "继续看这些原则会不会落成更具体的安全测试、透明度报告或监管合作机制。"
     },
     {
       "candidate_id": "main-anthropic-confidential-s1",
       "importance": "major",
-      "title": "Anthropic 向 SEC 机密提交 draft S-1",
+      "title": "Anthropic 秘密提交 draft S-1，Claude 供应商走向公开市场",
       "event_date": "2026-06-01",
       "url": "https://www.anthropic.com/news/confidential-draft-s1-sec",
       "source": "Anthropic News",
@@ -1872,16 +1920,22 @@
         "IPO",
         "Claude"
       ],
-      "summary": "Anthropic 官方确认已提交 draft S-1，为潜在 IPO 取得监管反馈路径，但发行规模和价格未定。",
+      "summary": "Anthropic 宣布已向 U.S. SEC 机密提交 Form S-1 draft registration statement，当前只是获得未来上市选项，股数和价格尚未设定。",
       "bullets": [
         "**Anthropic, PBC** 已向 U.S. SEC 机密提交 Form S-1 draft registration statement，官方措辞是获得在 SEC review 后上市的 ==option==，不是已经公开招股。",
-        "**Claude** 供应商若进入公开市场，会让训练成本、企业收入、资本开支和风险披露变得可审计；当前仍需等公开 S-1，股数和价格尚未设定。"
-      ]
+        "**Claude** 背后的收入、训练成本、资本开支和云依赖一旦进入公开披露，会给企业客户和开发者提供更多可审计信号。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "company_business",
+      "why_it_matters": "这是一条资本市场大新闻：Claude 供应商若进入公开市场，模型训练、企业收入和安全责任都会受到更强披露压力。",
+      "reader_relevance": "Claude/Codex 类工具已经嵌入工程工作流，供应商融资和上市节奏会影响价格、稳定性、企业采购和长期平台风险。",
+      "watch_next": "公开 S-1 出来后，重点看收入结构、云供应商依赖、研发成本、安全责任和企业客户集中度。"
     },
     {
       "candidate_id": "main-github-copilot-june1-billing-auto",
       "importance": "major",
-      "title": "GitHub Copilot 用量计费和 auto evaluation models 同日生效",
+      "title": "GitHub Copilot 计费改成 AI Credits，AI 编程开始进入 FinOps",
       "event_date": "2026-06-01",
       "url": "https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans",
       "source": "GitHub Changelog",
@@ -1892,16 +1946,22 @@
         "Actions minutes",
         "Copilot Max"
       ],
-      "summary": "GitHub 把 Copilot usage-based billing 推到所有 plans，并让 code review 同时消耗 Actions minutes。",
+      "summary": "GitHub 从 6 月 1 日起让 Copilot 各计划进入 usage-based billing，同时 code review 会额外消耗 Actions minutes。",
       "bullets": [
-        "**Copilot plans** 从 6 月 1 日起按 GitHub AI Credits 计费，超出 included usage 后需要设置额外预算；组织和企业可以用 ==user-level budgets== 控制用户总用量。",
-        "**Copilot code review** 现在除 AI Credits 外还消耗 GitHub Actions minutes；同日 changelog 还说明 individual non-enterprise 用户的 auto model selection 可能被分配到 evaluation models。"
-      ]
+        "**Copilot plans** 从 6 月 1 日起按 GitHub AI Credits 计费，超出 included usage 后需要设置额外预算；组织和企业可以用 ==user-level budgets== 控制总用量。",
+        "**Copilot code review** 除 AI Credits 外还消耗 GitHub Actions minutes；同日 changelog 还说明 individual non-enterprise 用户的 auto model selection 可能被分配到 evaluation models。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "engineering_toolchain",
+      "why_it_matters": "AI 编程工具正在从 seat 订阅变成可计量资源，代码 review、agent 调用和模型选择都会进入预算和治理讨论。",
+      "reader_relevance": "普通工程师会直接感受到 review、自动模型选择和 agent 调用的额度限制；团队也需要把 IDE 体验和成本策略放在一起看。",
+      "watch_next": "留意组织级 budget 默认值、超额通知、auto model selection 的实际模型分配，以及 code review 对 Actions minutes 的消耗。"
     },
     {
       "candidate_id": "main-jetbrains-mellum2",
       "importance": "major",
-      "title": "JetBrains 发布 Mellum2 12B MoE 开源模型",
+      "title": "JetBrains Mellum2 走小 MoE 路线，瞄准 IDE 和内部工具常驻推理",
       "event_date": "2026-06-01",
       "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
       "source": "Hugging Face Blog",
@@ -1912,16 +1972,22 @@
         "Hugging Face",
         "MoE"
       ],
-      "summary": "Mellum2 是 12B MoE、每 token 激活 2.5B 参数，主打低延迟代码、路由、RAG 和私有部署。",
+      "summary": "Mellum2 是 12B MoE、每 token 激活 2.5B、Apache 2.0 发布的工作流模型，目标是低延迟 coding、routing、RAG 和 private deployment。",
       "bullets": [
         "**Mellum2** 从头训练在自然语言和代码上，总参数 12B、每 token 激活 2.5B，并以 Apache 2.0 发布；JetBrains 将它定位为 ==low-latency inference== 的工作流模型。",
-        "**使用场景** 写得很具体：routing、RAG、summarization、sub-agents、高吞吐 coding features 和 private deployments，适合团队评估小 MoE 是否能替代部分重模型调用。"
-      ]
+        "**使用场景** 写得很具体：routing、RAG、summarization、sub-agents、高吞吐 coding features 和 private deployments。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "model_release",
+      "why_it_matters": "这条不需要被单独放成模型栏目；它更像一个工具链信号：IDE 厂商在探索小模型常驻、低延迟、低成本地服务开发工作流。",
+      "reader_relevance": "做 IDE 插件、内部代码助手、RAG 路由或私有化 coding agent 的团队，可以用它判断哪些任务不必一直调用大模型 API。",
+      "watch_next": "后续看真实代码补全延迟、tool routing 准确率、私有仓库微调体验，以及与 Qwen/DeepSeek-Coder 的成本对比。"
     },
     {
       "candidate_id": "main-aws-agentcore-auth-code-flow",
       "importance": "major",
-      "title": "AWS AgentCore Gateway 给 MCP clients 补授权码流程",
+      "title": "AWS AgentCore Gateway 把 MCP 拉进企业身份和审计链路",
       "event_date": "2026-06-01",
       "url": "https://aws.amazon.com/blogs/machine-learning/building-a-secure-auth-code-flow-setup-using-agentcore-gateway-with-mcp-clients/",
       "source": "AWS Machine Learning Blog",
@@ -1933,16 +1999,22 @@
         "Kiro",
         "Cognito"
       ],
-      "summary": "AWS 展示 MCP clients 经 AgentCore Gateway 接入企业 IdP 的 inbound authentication 流程。",
+      "summary": "AWS 文章把 Kiro IDE、MCP client、AgentCore Gateway、企业 IdP 和 MCP server 串成授权码流程，重点是 agent-to-tool 的身份核验。",
       "bullets": [
-        "**AgentCore Gateway** 作为 agent-to-tool 通信入口，文章把 Kiro IDE、MCP client、Gateway、IdP 和 MCP server 串成 ==authorization code flow==，解决远程工具访问的身份核验。",
+        "**AgentCore Gateway** 作为 agent-to-tool 通信入口，把 Kiro IDE、MCP client、Gateway、IdP 和 MCP server 串成 ==authorization code flow==。",
         "**企业 IdP** 支持 Okta、Microsoft Entra ID 和 Amazon Cognito 等路径；重点不是再写一个 MCP server，而是让 agent 访问工具前经过集中认证、路由和审计。"
-      ]
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "engineering_toolchain",
+      "why_it_matters": "agent 基础设施正在从 demo 进入权限、身份和审计设计；MCP 真要进企业，OAuth、token 交换和最小权限比 prompt 更关键。",
+      "reader_relevance": "如果团队要让 agent 访问 Jira、GitHub、数据库或内部工具，这篇可以作为设计授权链路和审计日志的参考。",
+      "watch_next": "继续看 Gateway 对多租户、token 生命周期、工具权限分级和审计日志的支持。"
     },
     {
       "candidate_id": "main-nvidia-jetpack-72-agentic-edge",
       "importance": "notable",
-      "title": "NVIDIA JetPack 7.2 面向边缘 agent 加入 NemoClaw 和 Jetson skills",
+      "title": "NVIDIA JetPack 7.2 把边缘 AI 推向 agent-ready 工具栈",
       "event_date": "2026-06-01",
       "url": "https://developer.nvidia.com/blog/deploy-agentic-ready-ai-at-the-edge-with-memory-efficiency-in-nvidia-jetpack-7-2/",
       "source": "NVIDIA Developer Blog",
@@ -1953,16 +2025,22 @@
         "Jetson",
         "NemoClaw"
       ],
-      "summary": "JetPack 7.2 增加 NemoClaw 一键部署、Jetson agent skills、Super Mode 和 Jetson Thor MIG 支持。",
+      "summary": "JetPack 7.2 把 NemoClaw、Jetson agent skills、memory/performance 优化、Super Mode 和 Jetson Thor MIG 串成边缘 agent 部署路径。",
       "bullets": [
         "**JetPack 7.2** 把 NemoClaw、Jetson agent skills 和 memory/performance 优化放进边缘部署路径，目标是让 robotics、industrial automation 和 edge AI 使用 ==agentic-ready== stack。",
-        "**Jetson Thor MIG** 和 Super Mode 等能力使多 workload 隔离与性能调度更明确；这会影响把本地模型、工具调用和机器人控制放到同一边缘设备的设计。"
-      ]
+        "**Jetson Thor MIG** 和 Super Mode 让多 workload 隔离与性能调度更明确，会影响本地模型、工具调用和机器人控制放在同一边缘设备上的设计。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "engineering_toolchain",
+      "why_it_matters": "这属于硬件和部署层面的行业动态：agent 不只在云端和 IDE 里跑，机器人、工业视觉和端侧推理也开始有更完整的工具链。",
+      "reader_relevance": "做机器人、工业视觉、端侧推理或本地工具调用的工程师，可以从这里判断 Jetson 侧是否能同时撑住模型、技能、调度和内存优化。",
+      "watch_next": "继续看 Jetson skills 的可复用度、NemoClaw 安装体验、Super Mode 对功耗和稳定性的影响。"
     },
     {
       "candidate_id": "main-nvidia-dgx-spark-local-agents",
       "importance": "notable",
-      "title": "NVIDIA DGX Spark 更新本地长运行 agent 路径",
+      "title": "NVIDIA DGX Spark 强调本地长运行 agent，私有 agent lab 更具体了",
       "event_date": "2026-06-01",
       "url": "https://developer.nvidia.com/blog/run-local-ai-agents-with-faster-models-and-multi-node-clustering-on-nvidia-dgx-spark/",
       "source": "NVIDIA Developer Blog",
@@ -1978,12 +2056,18 @@
       "bullets": [
         "**DGX Spark** 面向本地 autonomous agents：文章强调长上下文、并发 subagents、隐私和 per-token cost 驱动本地运行，NemoClaw 负责安装与执行编排。",
         "**Qwen3.6** 在 DGX Spark 上经 Computex 优化后展示吞吐改进，并提供 guided multi-node cluster setup；适合评估私有 agent lab 是否能从单机扩展到 ==multi-node==。"
-      ]
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "engineering_toolchain",
+      "why_it_matters": "本地 agent lab 的叙事正在变具体：长上下文、多 agent、隐私和 per-token 成本不再只是云端 API 问题。",
+      "reader_relevance": "需要处理私有数据、长任务或高频工具调用的团队，可以用这条判断什么时候从纯 API 调用转向本地/混合部署。",
+      "watch_next": "继续看多节点设置复杂度、Qwen3.6 实测吞吐，以及它和云端 API 的总成本边界。"
     },
     {
       "candidate_id": "main-alibaba-qwen-code-model-studio",
       "importance": "notable",
-      "title": "Alibaba Cloud 用 Qwen Code 与 Model Studio CLI 做公众号封面生成",
+      "title": "Qwen Code + Model Studio CLI 把公众号封面做成 AIGC workflow",
       "event_date": "2026-06-02",
       "url": "https://www.alibabacloud.com/blog/qwen-code-%C3%97-model-studio-cli-wechat-cover-generation-guide_603198",
       "source": "Alibaba Cloud Blog",
@@ -1994,41 +2078,20 @@
         "Model Studio CLI",
         "AIGC"
       ],
-      "summary": "Alibaba Cloud Community 展示一个 Skill：分析文章语气、生成 prompt，并调用 Model Studio CLI 做封面图。",
+      "summary": "Alibaba Cloud 示例把标题/主题分析、tone 判断、style 选择、prompt 压缩和图像调用固化为可复用 Skill。",
       "bullets": [
-        "**Qwen Code + Model Studio CLI** 被写成内容生产 Skill：输入标题或主题后自动分析 tone、选择 style、压缩标题并生成 prompt，目标是减少公众号封面制作的 ==manual design loop==。",
-        "**AIGC workflow** 的价值在于把风格选择、prompt 生成和图像调用固化为可复用 Skill，而不是单次聊天生成图片；这正好覆盖用户要求追踪的内容产业工具面。"
-      ]
+        "**Qwen Code + Model Studio CLI** 被写成内容生产 Skill：输入标题或主题后自动分析 tone、选择 style、压缩标题并生成 prompt，减少公众号封面制作的 ==manual design loop==。",
+        "**AIGC workflow** 的看点不是“又能生成图”，而是把风格选择、prompt 生成、模型调用和产物审核变成团队可复用的流程。"
+      ],
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "editorial_category": "content_aigc",
+      "why_it_matters": "AIGC 内容工具正在从单次聊天生成，走向可配置、可审查、可接入 CMS 或运营后台的生产流水线。",
+      "reader_relevance": "做运营工具、内容平台、设计自动化或增长系统的工程师，可以从这个例子拆出 prompt 模板、权限、成本和审核的工程问题。",
+      "watch_next": "继续看 Model Studio CLI 是否支持批量生成、权限隔离、成本控制，以及与现有 CMS/设计系统的集成。"
     }
   ],
-  "model_releases": [
-    {
-      "candidate_id": "model-openai-aws-frontier-codex",
-      "importance": "major",
-      "name": "OpenAI frontier models on AWS / Codex on Amazon Bedrock",
-      "provider": "OpenAI / AWS",
-      "availability": "closed_api",
-      "release_scope": "gateway_availability",
-      "event_date": "2026-06-01",
-      "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
-      "source": "OpenAI News RSS",
-      "summary": "OpenAI frontier models and Codex are generally available through AWS paths for enterprise deployment.",
-      "notes": "Gateway availability is mirrored in main_items because it changes enterprise procurement and governance paths."
-    },
-    {
-      "candidate_id": "model-jetbrains-mellum2",
-      "importance": "major",
-      "name": "Mellum2",
-      "provider": "JetBrains",
-      "availability": "open_weights",
-      "release_scope": "provider_official_launch",
-      "event_date": "2026-06-01",
-      "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
-      "source": "Hugging Face Blog",
-      "summary": "12B MoE model with 2.5B active parameters per token, Apache 2.0, optimized for coding-adjacent workflows.",
-      "notes": "Official Hugging Face team article links to model collection and technical report."
-    }
-  ],
+  "model_releases": [],
   "hot_blogs": [
     {
       "candidate_id": "hot-cloudflare-core-boot-time",
@@ -2039,8 +2102,13 @@
       "author": "Giovanni Pereira Zantedeschi, Nnamdi Ajah, Omar Sheik-Omar",
       "event_date": "2026-06-01",
       "topic": "bare-metal reliability",
-      "summary": "Cloudflare 复盘 Gen12 core servers 固件更新后触发 UEFI boot timeout，单台 core server 重启被拖到数小时；文章拆解 UEFI data structures、iPXE automation 和 firmware rollout 的排障路径。结论是把无效等待和流程阻塞清掉后，容量恢复重新回到分钟级，适合基础设施团队学习大规模硬件更新的 failure mode。",
-      "content_type": "engineering_note"
+      "summary": "Cloudflare 复盘 Gen12 core servers 固件更新后 UEFI boot timeout，把数小时启动降回分钟级。它不是泛泛的事故复盘，而是把 firmware rollout、裸金属启动链路、容量恢复和自动化回滚拆开讲，适合基础设施团队学习如何把硬件/固件问题纳入发布门禁和可观测性。",
+      "content_type": "engineering_note",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "对维护裸金属、固件 rollout 或大规模服务器 fleet 的工程师，文章提供了从 timeout、日志到容量恢复的完整排障路径。",
+      "watch_next": "可对照自己团队的 firmware 升级、reboot SLO、自动回滚和现场恢复流程。"
     },
     {
       "candidate_id": "hot-latent-video-agents",
@@ -2050,9 +2118,14 @@
       "publisher": "Latent.Space",
       "author": "Latent Space / Ethan He",
       "event_date": "2026-06-01",
-      "topic": "video agents",
-      "summary": "Ethan He 以 xAI Grok Imagine 和 NVIDIA Cosmos 经验解释 video generation 与 world models 的差异；讨论点集中在视频 agent 为什么需要更快生成、更低 API 成本和可交互控制。对做多模态产品的人，重点不是单次出片质量，而是视频模型能否支撑持续规划、反馈和工具调用。",
-      "content_type": "podcast"
+      "topic": "AIGC、video agents、多模态产品",
+      "summary": "Ethan He 从 xAI Grok Imagine 和 NVIDIA Cosmos 经验谈 video generation、world models、API 成本与速度。它适合放在 AIGC/多模态产品雷达里看：视频工具的竞争点正在从“生成一段素材”转向连续编辑、场景理解、状态记忆和工具调用。",
+      "content_type": "podcast",
+      "editorial_category": "podcast",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "做内容工具、广告素材、互动视频、多模态 agent 的工程师，可以把这篇当成视频 agent 产品化路线图来读。",
+      "watch_next": "继续看视频 agent 是否能稳定处理可控编辑、连续镜头、成本预算和 API 延迟。"
     },
     {
       "candidate_id": "hot-interconnects-open-closed-exponentials",
@@ -2063,8 +2136,13 @@
       "author": "Nathan Lambert",
       "event_date": "2026-06-01",
       "topic": "open vs closed model economics",
-      "summary": "Interconnects 把开放模型和闭源模型放到不同增长曲线里看：coding agents 是用户愿意为边际智能付费的早期市场，但开源权重会持续压缩通用 API 的溢价。文章适合用来评估模型商业化路径，尤其是哪些场景能保留闭源性能、工具链和分发优势。",
-      "content_type": "blog"
+      "summary": "Nathan Lambert 把开放模型和闭源模型放在不同增长曲线上比较，并把 coding agents 视为用户愿意为边际智能付费的早期市场。文章对工程团队的价值在于，它提醒平台选择不能只看当下 leaderboard，还要看开放权重的迭代速度、API 利润空间和长期锁定风险。",
+      "content_type": "blog",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "适合评估开源模型、闭源 API、coding agent 付费意愿和模型商业化路径的工程/平台负责人。",
+      "watch_next": "关注开放模型在 coding、tool use 和推理成本上的追赶速度。"
     }
   ],
   "projects": [
@@ -2083,7 +2161,12 @@
       "event_date": "2026-06-02",
       "source": "GitHub Trending daily",
       "signal": "star_velocity",
-      "evidence": "GitHub Trending daily rank #6, new in 7-day local history, 485 stars today."
+      "evidence": "GitHub Trending daily rank #6, new in 7-day local history, 485 stars today.",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "适合给设计/前端 agent 设定视觉语言、审美约束和输出验收标准。",
+      "watch_next": "看它是否能沉淀成可复用 design system prompt、组件规则和截图验收流程。"
     },
     {
       "candidate_id": "project-tauricresearch-tradingagents",
@@ -2100,7 +2183,13 @@
       "event_date": "2026-06-02",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank #9, new in 7-day local history, 299 stars today."
+      "evidence": "GitHub Trending daily rank #9, new in 7-day local history, 299 stars today.",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "verification_note": "GitHub 仓库和 Trending 信号已确认；金融结论不作为事实建议。",
+      "risk_note": "这是 multi-agent 交易研究框架，不应直接作为投资建议或自动交易系统使用。",
+      "reader_relevance": "适合研究多 agent 角色分工、辩论式决策和垂直领域 workflow 编排。"
     },
     {
       "candidate_id": "project-dmtrkovalenko-fff",
@@ -2117,7 +2206,12 @@
       "event_date": "2026-06-02",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank #16; description highlights AI-agent file search."
+      "evidence": "GitHub Trending daily rank #16; description highlights AI-agent file search.",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "适合关注 coding agent 上下文检索、文件定位和大仓库导航效率的工程师。",
+      "watch_next": "看它和 ripgrep/fzf/Neovim 插件生态的集成，以及 agent 工具调用时的延迟表现。"
     }
   ],
   "builder_observations": [
@@ -2125,63 +2219,96 @@
       "candidate_id": "builder-aaron-levie-enterprise-agents",
       "importance": "notable",
       "author": "Aaron Levie",
-      "handle": "levie",
       "role": "Box CEO",
       "event_date": "2026-06-01",
       "source": "follow-builders X feed",
+      "content": "企业里的整个 AI agent 问题是一个非常复杂、充满未知的领域。它实际上是在尝试把身份、权限、控制和工作流管理带到任意组合的已连接 AI agents 中。而这还没有算上数据访问和信息架构这类问题。",
+      "url": "https://x.com/levie/status/2061247380897579500",
+      "evidence": "Original X status URL preserved by follow-builders feed.",
+      "editorial_category": "x_discussion",
+      "source_level": "original_social",
+      "verification_status": "original_social_only",
+      "verification_note": "保留原始 X status URL，作为 builder 观点收录，不写成事实新闻。",
+      "risk_note": "这是个人观点，需要结合 Box/AWS/GitHub 等官方产品变化判断。",
+      "reader_relevance": "适合关注企业 agent 权限、数据边界和审计链路的工程师。",
+      "handle": "levie",
       "original_text": "The entire AI agent problem for the enterprise is such a wild area. It's effectively trying to bring identity, permissions, controls, and workflow management to any combination of connected AI agents. And that's even before you bring in things like data access and information architecture.",
       "translation": "企业里的整个 AI agent 问题是一个非常复杂、充满未知的领域。它实际上是在尝试把身份、权限、控制和工作流管理带到任意组合的已连接 AI agents 中。而这还没有算上数据访问和信息架构这类问题。",
-      "content": "企业里的整个 AI agent 问题是一个非常复杂、充满未知的领域。它实际上是在尝试把身份、权限、控制和工作流管理带到任意组合的已连接 AI agents 中。而这还没有算上数据访问和信息架构这类问题。",
-      "avatar_url": "https://unavatar.io/x/levie",
-      "url": "https://x.com/levie/status/2061247380897579500",
-      "evidence": "Original X status URL preserved by follow-builders feed."
+      "avatar_url": "https://unavatar.io/x/levie"
     },
     {
       "candidate_id": "builder-guillermo-rauch-ceos-coding",
       "importance": "notable",
       "author": "Guillermo Rauch",
-      "handle": "rauchg",
       "role": "Vercel CEO",
       "event_date": "2026-05-31",
       "source": "follow-builders X feed",
+      "content": "CEO 和 CTO 重新回到写代码（并分享他们对此的兴奋感）这一现象不应被低估。",
+      "url": "https://x.com/rauchg/status/2061135404942974982",
+      "evidence": "Original X status URL preserved by follow-builders feed.",
+      "editorial_category": "x_discussion",
+      "source_level": "original_social",
+      "verification_status": "original_social_only",
+      "verification_note": "保留原始 X status URL，作为 founder 观察收录。",
+      "risk_note": "趋势判断来自单一原始观点，不代表行业统计。",
+      "reader_relevance": "适合观察 coding agent 是否从个人效率工具进入管理层直接参与产品开发。",
+      "handle": "rauchg",
       "original_text": "The phenomenon of CEOs and CTOs going back to coding (and sharing their excitement for it) should not be underestimated",
       "translation": "CEO 和 CTO 重新回到写代码（并分享他们对此的兴奋感）这一现象不应被低估。",
-      "content": "CEO 和 CTO 重新回到写代码（并分享他们对此的兴奋感）这一现象不应被低估。",
-      "avatar_url": "https://unavatar.io/x/rauchg",
-      "url": "https://x.com/rauchg/status/2061135404942974982",
-      "evidence": "Original X status URL preserved by follow-builders feed."
+      "avatar_url": "https://unavatar.io/x/rauchg"
     },
     {
       "candidate_id": "builder-steipete-codex-qa-assistant",
       "importance": "notable",
       "author": "Peter Steinberger",
-      "handle": "steipete",
       "role": "OpenClaw / PSPDFKit founder",
       "event_date": "2026-05-31",
       "source": "follow-builders X feed",
+      "content": "想象一下，如果你能教 Codex 充当 QA assistant，并在每次 commit 之后生成类似用户测试的报告。看到 @nikitonsky 的帖子并（尝试）重复测试，正是这么一回事。（有意思的是，他的 AI 出故障了，所以这就是他的报告结尾。）",
+      "url": "https://x.com/steipete/status/2061208638027395490",
+      "evidence": "Original X status URL preserved by follow-builders feed.",
+      "editorial_category": "x_discussion",
+      "source_level": "original_social",
+      "verification_status": "original_social_only",
+      "verification_note": "保留原始 X status URL，作为实践线索收录。",
+      "risk_note": "具体效果依赖团队测试流程、仓库规模和回归集质量。",
+      "reader_relevance": "适合把 Codex/Claude Code 接入 commit、QA、回归证据和 review 流程的团队参考。",
+      "handle": "steipete",
       "original_text": "Imagine if you could teach Codex to act as a QA assistant and produce user-test-like reports after every commit. Seeing @nikitonsky’s post and (trying to) repeat the test is exactly that. (Funny enough, his AI broke, so this was the end of his report)",
       "translation": "想象一下，如果你能教 Codex 充当 QA assistant，并在每次 commit 之后生成类似用户测试的报告。看到 @nikitonsky 的帖子并（尝试）重复测试，正是这么一回事。（有意思的是，他的 AI 出故障了，所以这就是他的报告结尾。）",
-      "content": "想象一下，如果你能教 Codex 充当 QA assistant，并在每次 commit 之后生成类似用户测试的报告。看到 @nikitonsky 的帖子并（尝试）重复测试，正是这么一回事。（有意思的是，他的 AI 出故障了，所以这就是他的报告结尾。）",
-      "avatar_url": "https://unavatar.io/x/steipete",
-      "url": "https://x.com/steipete/status/2061208638027395490",
-      "evidence": "Original X status URL preserved by follow-builders feed."
+      "avatar_url": "https://unavatar.io/x/steipete"
     }
   ],
   "community_leads": [
     {
       "importance": "general",
       "content": "OpenAI Status 记录 Free users ChatGPT availability 下降；这类状态页事件只作轻量运营线索，不进入主体信息。",
-      "url": "https://status.openai.com//incidents/01KT204M76EYZYJX7WYG1B2QPH"
+      "url": "https://status.openai.com//incidents/01KT204M76EYZYJX7WYG1B2QPH",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "适合工程团队跟踪 ChatGPT 免费用户可用性波动，但这类运营事件只影响服务状态判断，不应被包装成模型或产品发布。",
+      "verification_note": "来源是 OpenAI 官方状态页 incident，可确认事件存在和服务影响范围。",
+      "risk_note": "状态页事件通常是短周期运营信号，不能推导长期产品质量或模型能力变化。"
     },
     {
       "importance": "general",
-      "content": "Claude Status 记录 Sonnet 4.6 degraded performance；模型可用性 incident 保留在社区线索，避免伪装成模型发布。",
-      "url": "https://status.claude.com/incidents/vxp8fdrckj7q"
+      "content": "Claude Status 记录 Sonnet 4.6 degraded performance；这类可用性 incident 保留在社区线索，用于提醒依赖 Claude 的团队检查降级预案。",
+      "url": "https://status.claude.com/incidents/vxp8fdrckj7q",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "reader_relevance": "适合依赖 Claude Sonnet 的工程团队做可用性复盘、供应商 SLA 观察和降级预案检查。",
+      "verification_note": "来源是 Anthropic/Claude 官方状态页 incident，可确认 degraded performance 事件本身。",
+      "risk_note": "状态页只说明服务可用性事件，不代表模型能力、价格或长期稳定性结论。"
     },
     {
       "importance": "general",
-      "content": "TechCrunch 报道 NVIDIA、Microsoft、Dell、HP 的 AI agent PC 方向，当前只作为中介线索，待回源到厂商页面后再升格。",
-      "url": "https://techcrunch.com/2026/06/01/nvidia-chases-200b-cpu-market-with-ai-agent-pcs-from-microsoft-dell-and-hp/"
+      "content": "TechCrunch 报道 NVIDIA、Microsoft、Dell、HP 的 AI agent PC 方向；这条先作为产业雷达保留，说明端侧 agent 和 AI PC 正在从芯片叙事走向 OEM 产品线。",
+      "url": "https://techcrunch.com/2026/06/01/nvidia-chases-200b-cpu-market-with-ai-agent-pcs-from-microsoft-dell-and-hp/",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "reader_relevance": "关注端侧 agent、Windows PC OEM、企业桌面环境和本地推理的工程师，可以先用它建立观察项。",
+      "verification_note": "当前保留 TechCrunch 原文作为中介线索，尚未逐项回源到 NVIDIA、Microsoft、Dell 或 HP 官方页面。",
+      "risk_note": "不能作为主体事实使用；需要厂商发布页或多源确认后才能升格。"
     }
   ],
   "evidence_assets": [
@@ -2247,8 +2374,8 @@
     ],
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "a98575708c012976783ce96841f664ebb5cd6945",
-      "git_commit_short": "a98575708c01",
+      "git_commit": "af29e7e0f30d4f464b2ce46bd7d9a45645d1cbb9",
+      "git_commit_short": "af29e7e0f30d",
       "git_branch": "main",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
@@ -2292,13 +2419,13 @@
     "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html",
     "publish_error": ""
   },
-  "generated_at": "2026-06-02T07:26:44.229Z",
+  "generated_at": "2026-06-02T06:14:41.487Z",
   "quality_status": {
     "status": "ok",
     "reasons": [],
     "affected_sections": [],
     "degraded_sections": [],
     "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "当前日报已按长日报口径重写：独立模型栏目移除，主体覆盖平台、资本、计费、agent 基础设施、AIGC 内容工具和产业线索。"
   }
 }

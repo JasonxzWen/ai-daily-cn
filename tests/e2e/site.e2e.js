@@ -171,8 +171,10 @@ try {
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  assert.doesNotMatch(await page.locator("body").textContent(), /模型发布/);
-  assert.doesNotMatch(await page.locator("body").textContent(), /ExampleModel 2/);
+  const reportBody = await page.locator("body").textContent();
+  assert.doesNotMatch(reportBody, /模型发布/);
+  assert.doesNotMatch(reportBody, /ExampleModel 2/);
+  assert.equal(await page.locator("#model-releases").count(), 0);
   assert.match(await page.locator("body").textContent(), /热门技术博客/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.match(await page.locator("body").textContent(), /GitHub Trending/);

@@ -11,5 +11,6 @@
 - 正文证据图和热门技术博客/卡片图片必须通过 effective-interact 的 lightbox 交互支持点开放大；内嵌来源 icon 不参与放大。
 - `model_releases` 只保留为结构化 JSON 索引，不渲染公开“模型发布”正文板块；相关模型新闻必须先进入 `main_items`。
 - `projects` 只作为 GitHub Trending 条目内的项目 highlight tag 和行内说明数据来源；不渲染公开“今日值得关注的项目”独立板块，也不渲染“项目 highlights”子标题或额外项目列表。未匹配到 GitHub Trending Top 10 的 `projects` 不公开展示。
+- 非一手来源进入观点、产品、Builder 或社区板块时，interaction input 必须保留来源层级、核验说明或风险说明。
 - 不要把工作汇报式的文件行号、实现细节或本地绝对路径写入公开日报；公开日报只展示面向读者的新闻、工程判断和可公开来源。
 - 如果 effective-interact 生成失败，报告 `publish_error`，保留结构化 JSON，不要回退到旧手写 HTML 模板悄悄发布。
