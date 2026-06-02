@@ -234,7 +234,101 @@
     lastActiveNavId = active ? active.id : "";
   }
 
+  var imageLightbox = null;
+  var imageLightboxReturnFocus = null;
+
+  function ensureImageLightbox() {
+    if (imageLightbox) return imageLightbox;
+
+    var root = document.createElement("div");
+    root.className = "image-lightbox";
+    root.hidden = true;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "图片放大预览");
+    root.innerHTML = [
+      '<button class="image-lightbox__backdrop" type="button" data-lightbox-close aria-label="关闭放大图片"></button>',
+      '<figure class="image-lightbox__figure">',
+      '<button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭放大图片">关闭</button>',
+      '<img class="image-lightbox__image" alt="">',
+      '<figcaption class="image-lightbox__caption"></figcaption>',
+      '</figure>'
+    ].join("");
+    document.body.appendChild(root);
+
+    imageLightbox = {
+      root: root,
+      image: root.querySelector(".image-lightbox__image"),
+      caption: root.querySelector(".image-lightbox__caption"),
+      close: root.querySelector(".image-lightbox__close")
+    };
+    return imageLightbox;
+  }
+
+  function imageLightboxCaption(image) {
+    var explicit = image.getAttribute("data-lightbox-caption") || image.getAttribute("alt") || "";
+    if (explicit.trim()) return explicit.trim();
+
+    var figure = image.closest("figure");
+    var caption = figure ? figure.querySelector("figcaption") : null;
+    if (caption && caption.textContent.trim()) return caption.textContent.trim();
+
+    var paragraph = image.closest("p");
+    var next = paragraph ? paragraph.nextElementSibling : null;
+    if (next && next.matches("p") && next.textContent.trim()) {
+      return next.textContent.trim();
+    }
+    return "";
+  }
+
+  function openImageLightbox(image) {
+    var source = image.currentSrc || image.getAttribute("src") || "";
+    if (!source) return;
+
+    var dialog = ensureImageLightbox();
+    var caption = imageLightboxCaption(image);
+    imageLightboxReturnFocus = image;
+    dialog.image.src = source;
+    dialog.image.alt = image.getAttribute("alt") || caption || "放大图片";
+    dialog.caption.textContent = caption;
+    dialog.caption.hidden = !caption;
+    dialog.root.hidden = false;
+    dialog.root.setAttribute("data-open", "true");
+    document.body.classList.add("lightbox-open");
+    window.setTimeout(function () {
+      if (dialog.close && dialog.close.focus) {
+        dialog.close.focus({ preventScroll: true });
+      }
+    }, 0);
+  }
+
+  function closeImageLightbox() {
+    if (!imageLightbox || imageLightbox.root.hidden) return;
+    imageLightbox.root.removeAttribute("data-open");
+    imageLightbox.root.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    imageLightbox.image.removeAttribute("src");
+    if (imageLightboxReturnFocus && imageLightboxReturnFocus.focus) {
+      imageLightboxReturnFocus.focus({ preventScroll: true });
+    }
+    imageLightboxReturnFocus = null;
+  }
+
   document.addEventListener("click", function (event) {
+    var lightboxClose = event.target.closest("[data-lightbox-close]");
+    if (lightboxClose) {
+      event.preventDefault();
+      closeImageLightbox();
+      return;
+    }
+
+    var lightboxImage = event.target.closest("[data-lightbox-image]");
+    if (lightboxImage) {
+      event.preventDefault();
+      openImageLightbox(lightboxImage);
+      return;
+    }
+
     var navLink = event.target.closest("[data-nav-link]");
     if (navLink) {
       var href = navLink.getAttribute("href") || "";
@@ -264,6 +358,18 @@
 
     if (button.matches("[data-tab-group][data-tab]")) {
       activateTab(button);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeImageLightbox();
+      return;
+    }
+
+    if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-lightbox-image]")) {
+      event.preventDefault();
+      openImageLightbox(event.target);
     }
   });
 

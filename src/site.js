@@ -13,6 +13,10 @@ import { deriveQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 
+const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
+const AVATAR_MAX_BYTES = 1_000_000;
+const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
+
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const inputDir = path.resolve(rootDir, options.inputDir || "reports-source");
@@ -67,7 +71,8 @@ export async function buildSite(options = {}) {
 
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
-      trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date]
+      trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date],
+      fetchImpl: options.fetchImpl
     });
   }
 
@@ -134,7 +139,7 @@ export async function planGeneratedFiles(options = {}) {
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.markdownPath, paths.dataPath, paths.htmlPath);
-    files.push(...evidenceAssetPaths(report));
+    files.push(...reportManagedAssetPaths(report));
     reports.push(report);
   }
 
@@ -142,7 +147,7 @@ export async function planGeneratedFiles(options = {}) {
     const report = await readReportJson(file);
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
-    files.push(...evidenceAssetPaths(report));
+    files.push(...reportManagedAssetPaths(report));
     if (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date)))) {
       files.push(paths.candidateDataPath);
     }
@@ -259,6 +264,9 @@ async function readExistingText(target) {
 
 async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null, options = {}) {
   const paths = reportRelativePaths(report.report_date);
+  await localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, {
+    fetchImpl: options.fetchImpl
+  });
   const reportHtml = await renderReportWithEffectiveInteract(report, {
     rootDir,
     trendAnnotations: options.trendAnnotations
@@ -322,10 +330,154 @@ function uniqueSorted(items) {
   return [...new Set(items)].sort((a, b) => String(a).localeCompare(String(b)));
 }
 
+export function reportManagedAssetPaths(report) {
+  return uniqueSorted([...evidenceAssetPaths(report), ...builderAvatarAssetPaths(report)]);
+}
+
 function evidenceAssetPaths(report) {
-  return (Array.isArray(report.evidence_assets) ? report.evidence_assets : [])
+  return (Array.isArray(report?.evidence_assets) ? report.evidence_assets : [])
     .map((asset) => asset?.local_path)
     .filter(Boolean);
+}
+
+function builderAvatarAssetPaths(report) {
+  return (Array.isArray(report?.builder_observations) ? report.builder_observations : [])
+    .map((item) => builderAvatarAssetPath(report, item))
+    .filter(Boolean);
+}
+
+export function builderAvatarAssetPath(report, item) {
+  if (item?.avatar_local_path) {
+    return item.avatar_local_path;
+  }
+  const avatarUrl = normalizeHttpUrl(item?.avatar_url);
+  if (!avatarUrl || !report?.report_date) {
+    return "";
+  }
+  const [year, month] = report.report_date.split("-");
+  const slug = slugForAsset(item.handle || xHandleFromStatusUrl(item.url) || item.author || "builder");
+  return `assets/avatars/${year}/${month}/${report.report_date}-${slug}${imageExtensionFromUrl(avatarUrl) || ".png"}`;
+}
+
+async function localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, options = {}) {
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const items = Array.isArray(report?.builder_observations) ? report.builder_observations : [];
+  if (typeof fetchImpl !== "function" || items.length === 0) {
+    return;
+  }
+
+  await Promise.all(items.map((item) => localizeSingleBuilderAvatar(outDir, report, item, writtenFiles, fetchImpl)));
+}
+
+async function localizeSingleBuilderAvatar(outDir, report, item, writtenFiles, fetchImpl) {
+  if (!item || item.avatar_data_uri) {
+    return;
+  }
+  const avatarUrl = builderAvatarDownloadUrl(item);
+  const relativePath = item.avatar_local_path || builderAvatarAssetPath(report, item);
+  if (!avatarUrl || !relativePath) {
+    return;
+  }
+
+  const target = safeOutPath(outDir, relativePath);
+  if (!target) {
+    return;
+  }
+  if (await exists(target)) {
+    item.avatar_local_path = relativePath;
+    return;
+  }
+
+  const downloaded = await downloadImage(fetchImpl, avatarUrl, target);
+  if (downloaded) {
+    item.avatar_local_path = relativePath;
+    writtenFiles.push(relativePath);
+  }
+}
+
+async function downloadImage(fetchImpl, url, target) {
+  try {
+    const response = await fetchImpl(url, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(AVATAR_DOWNLOAD_TIMEOUT_MS),
+      headers: {
+        accept: "image/avif,image/webp,image/png,image/jpeg,image/gif,image/*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      }
+    });
+    if (!response.ok) {
+      return false;
+    }
+    const contentType = String(response.headers?.get?.("content-type") || "").toLowerCase();
+    if (contentType && !contentType.startsWith("image/")) {
+      return false;
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length === 0 || buffer.length > AVATAR_MAX_BYTES) {
+      return false;
+    }
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, buffer);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function builderAvatarDownloadUrl(item) {
+  return normalizeHttpUrl(item?.avatar_url);
+}
+
+function normalizeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+function normalizeXHandle(value) {
+  const handle = String(value || "").trim().replace(/^@/, "");
+  return /^[A-Za-z0-9_]{1,32}$/.test(handle) ? handle : "";
+}
+
+function xHandleFromStatusUrl(value) {
+  try {
+    const [, handle] = new URL(String(value || "")).pathname.match(/^\/([^/]+)\/status\/\d+/i) || [];
+    return normalizeXHandle(handle);
+  } catch {
+    return "";
+  }
+}
+
+function imageExtensionFromUrl(value) {
+  try {
+    const ext = path.extname(new URL(String(value || "")).pathname).toLowerCase();
+    return IMAGE_EXTENSIONS.has(ext) ? ext : "";
+  } catch {
+    return "";
+  }
+}
+
+function safeOutPath(outDir, relativePath) {
+  const normalized = String(relativePath || "").replaceAll("\\", "/");
+  if (!normalized || normalized.startsWith("/") || normalized.includes("\0") || normalized.split("/").includes("..")) {
+    return "";
+  }
+  const target = path.resolve(outDir, ...normalized.split("/"));
+  const root = path.resolve(outDir);
+  return target === root || target.startsWith(`${root}${path.sep}`) ? target : "";
+}
+
+function slugForAsset(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60) || "builder";
 }
 
 async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles) {

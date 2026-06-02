@@ -56,6 +56,23 @@ a {
   color: var(--accent);
 }
 
+.rendered-markdown ol > li > strong:first-child,
+.rendered-markdown ol > li > strong:first-child a {
+  font-size: 1.04rem;
+  line-height: 1.36;
+}
+
+.rendered-markdown ol > li > strong:first-child a,
+.card-title-link {
+  text-decoration: none;
+}
+
+.rendered-markdown ol > li > strong:first-child a:hover,
+.card-title-link:hover {
+  color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+  text-decoration: none;
+}
+
 p,
 ul,
 ol {
@@ -105,6 +122,36 @@ h3 {
   font-weight: 760;
 }
 
+.rendered-markdown strong.text-keyword,
+.report-data-table strong.text-keyword,
+.report-hero strong.text-keyword {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-weight: 820;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.rendered-markdown strong.keyword-major,
+.report-data-table strong.keyword-major,
+.report-hero strong.keyword-major {
+  color: #b42318;
+}
+
+.rendered-markdown strong.keyword-notable,
+.report-data-table strong.keyword-notable,
+.report-hero strong.keyword-notable {
+  color: #9a4a14;
+}
+
+.rendered-markdown strong.keyword-general,
+.report-data-table strong.keyword-general,
+.report-hero strong.keyword-general {
+  color: #0f766e;
+}
+
 .rendered-markdown em,
 .report-data-table em {
   color: #5f5d57;
@@ -151,6 +198,61 @@ h3 {
   font-family: var(--ui-font);
   font-size: 0.7em;
   letter-spacing: 0.02em;
+}
+
+.rendered-markdown mark.text-highlight.daily-tag,
+.report-data-table mark.text-highlight.daily-tag,
+.report-hero mark.text-highlight.daily-tag {
+  font-family: var(--ui-font);
+  letter-spacing: 0;
+}
+
+.rendered-markdown mark.daily-tag-major,
+.report-data-table mark.daily-tag-major,
+.report-hero mark.daily-tag-major {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.daily-tag-notable,
+.report-data-table mark.daily-tag-notable,
+.report-hero mark.daily-tag-notable {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
+.rendered-markdown mark.daily-tag-general,
+.report-data-table mark.daily-tag-general,
+.report-hero mark.daily-tag-general {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.daily-tag-stars,
+.report-data-table mark.daily-tag-stars,
+.report-hero mark.daily-tag-stars {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.rendered-markdown mark.daily-tag-highlight,
+.report-data-table mark.daily-tag-highlight,
+.report-hero mark.daily-tag-highlight {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.rendered-markdown mark.daily-tag-topic,
+.report-data-table mark.daily-tag-topic,
+.report-hero mark.daily-tag-topic {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
 }
 
 .rendered-markdown mark.trend-status-new,
@@ -210,6 +312,24 @@ h3 {
   border-radius: 8px;
   background: #ffffff;
   object-fit: contain;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image],
+.card-media-grid img[data-lightbox-image] {
+  cursor: zoom-in;
+  transition: box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:hover,
+.card-media-grid img[data-lightbox-image]:hover {
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:focus-visible,
+.card-media-grid img[data-lightbox-image]:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.44);
+  outline-offset: 3px;
 }
 
 .rendered-markdown p:has(> .markdown-image:only-child) {
@@ -747,6 +867,90 @@ p.hero-summary-text {
   text-align: center;
 }
 
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(17, 24, 39, 0.76);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.image-lightbox[hidden] {
+  display: none !important;
+}
+
+.image-lightbox[data-open="true"] {
+  opacity: 1;
+}
+
+.image-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.image-lightbox__figure {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  width: min(96vw, 1400px);
+  max-height: calc(100vh - 56px);
+  margin: 0;
+  place-items: center;
+}
+
+.image-lightbox__image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(82vh, 980px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  object-fit: contain;
+}
+
+.image-lightbox__caption {
+  max-width: min(900px, 92vw);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.image-lightbox__close {
+  justify-self: end;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #111827;
+  background: #ffffff;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.image-lightbox__close:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
 .card-detail-list {
   display: grid;
   gap: 8px;
@@ -886,6 +1090,76 @@ p.hero-summary-text {
   content: "：";
 }
 
+.builder-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.builder-card {
+  gap: 10px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.builder-card h3 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+}
+
+.builder-card .card-title-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  object-fit: cover;
+}
+
+.builder-card .card-title-link {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.builder-card .card-title-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.builder-card .card-tags {
+  gap: 6px;
+}
+
+.builder-card > p {
+  margin: 0;
+  color: #25231f;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.builder-card .card-detail-list {
+  gap: 10px;
+}
+
+.builder-card .card-detail-list div {
+  padding-top: 10px;
+}
+
+.builder-card .card-detail-list dd {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.builder-card .card-detail-list dd span {
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 760px) {
   .blog-card {
     grid-template-columns: 1fr;
@@ -905,6 +1179,10 @@ p.hero-summary-text {
     grid-template-columns: 1fr;
   }
 
+  .builder-card-grid {
+    grid-template-columns: 1fr;
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -916,6 +1194,112 @@ p.hero-summary-text {
 
   .project-card .card-detail-list,
   .card-media-grid[data-count="2"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-card {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "blog-title"
+    "blog-tags"
+    "blog-body"
+    "blog-details";
+  gap: 12px;
+}
+
+.blog-card:has(.card-media-grid) {
+  grid-template-columns: minmax(360px, 1fr) minmax(300px, 0.42fr);
+  grid-template-areas:
+    "blog-title blog-media"
+    "blog-tags blog-media"
+    "blog-body blog-media"
+    "blog-details blog-details";
+  column-gap: 22px;
+}
+
+.blog-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.blog-card .card-tags .chip {
+  justify-content: flex-start;
+}
+
+.blog-card > p {
+  max-width: 1080px;
+}
+
+.blog-card .card-detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list div::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: 0.72em;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.blog-card .card-detail-list dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: none;
+}
+
+.blog-card .card-detail-list dd {
+  display: block;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+@media (max-width: 760px) {
+  .blog-card,
+  .blog-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-media"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card .card-detail-list {
     grid-template-columns: 1fr;
   }
 }
@@ -981,6 +1365,45 @@ p.hero-summary-text {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.chip-major,
+.chip-importance-major {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.chip-notable,
+.chip-importance-notable {
+  border-color: #fdba74;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.chip-general,
+.chip-importance-general {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.chip-stars {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.chip-topic {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.chip-highlight {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .swatch-chip {
@@ -1830,7 +2253,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
       <div class="title-row">
         <div>
-          <div class="eyebrow">AI 日报</div>
+          <div class="eyebrow">AI 日报 · 覆盖 2026-05-11 至 2026-05-14</div>
           <h1 class="report-title report-date-title">2026-05-14</h1>
         </div>
         <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QTwvdGV4dD48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
@@ -1842,9 +2265,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="hero-stat"><span>主体</span><strong>5</strong><small>重点条目</small></div>
 <div class="hero-stat"><span>AIGC</span><strong>0</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>技术博客</span><strong>0</strong><small>深读</small></div>
-<div class="hero-stat"><span>开源</span><strong>4</strong><small>Top10 + 项目</small></div>
+<div class="hero-stat"><span>GitHub</span><strong>0</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>2</strong><small>观察</small></div>
-<div class="hero-stat"><span>信源窗</span><strong>05-11..05-14</strong><small>扩展</small></div>
+<div class="hero-stat"><span>覆盖</span><strong>05-11..05-14</strong><small>扩展时间范围</small></div>
   </div>
       </div>
     </header>
@@ -1860,86 +2283,42 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QTwvdGV4dD48L3N2Zz4=" alt="Anthropic" decoding="async"> <a href="https://www.anthropic.com/news/claude-for-small-business" rel="noopener noreferrer">Anthropic 发布 Claude for Small Business</a></strong> <mark class="text-highlight">重大</mark>（2026-05-13，T0）</li></ol>
+    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QTwvdGV4dD48L3N2Zz4=" alt="Anthropic" decoding="async"> <a href="https://www.anthropic.com/news/claude-for-small-business" rel="noopener noreferrer">发布 Claude for Small Business</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-13，T0）</li></ol>
 <ul><li>Claude for Small Business 以 Cowork 内的开关形式启用，用户连接已有业务工具后选择任务；发送、发布或付款等动作仍要求人工批准。</li><li>首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。</li><li>权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。</li></ul>
-<ol start="2"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> <a href="https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/" rel="noopener noreferrer">GitHub Changelog：GitHub 开放 Copilot cloud agent 任务 REST API 预览</a></strong> <mark class="text-highlight">重大</mark>（2026-05-13，T0）</li></ol>
+<ol start="2"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> <a href="https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/" rel="noopener noreferrer">GitHub 开放 Copilot cloud agent 任务 REST API 预览</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-13，T0）</li></ol>
 <ul><li>新的 API 处于 public preview，支持用 prompt 启动仓库任务，可指定 base ref、模型和是否创建 pull request。</li><li>GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。</li><li>对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。</li></ul>
-<ol start="3"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U05DPC90ZXh0Pjwvc3ZnPg==" alt="SAP News Center" decoding="async"> <a href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" rel="noopener noreferrer">SAP News Center：SAP 发布 Business AI Platform 与 Autonomous Suite</a></strong> <mark class="text-highlight">重大</mark>（2026-05-12，T0）</li></ol>
+<ol start="3"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U05DPC90ZXh0Pjwvc3ZnPg==" alt="SAP News Center" decoding="async"> <a href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" rel="noopener noreferrer">SAP 发布 Business AI Platform 与 Autonomous Suite</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-12，T0）</li></ol>
 <ul><li>SAP Business AI Platform 以 SAP Knowledge Graph 提供业务实体、流程和关系图谱，Joule Studio 则面向企业 Agent、应用和 agentic workflows 构建。</li><li>Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。</li><li>SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。</li></ul>
-<ol start="4"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI" decoding="async"> <a href="https://openai.com/index/what-parameter-golf-taught-us/" rel="noopener noreferrer">OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛</a></strong> <mark class="text-highlight">重大</mark>（2026-05-12，T0）</li></ol>
+<ol start="4"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI" decoding="async"> <a href="https://openai.com/index/what-parameter-golf-taught-us/" rel="noopener noreferrer">复盘 Parameter Golf：AI coding agent 改变开放研究竞赛</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-12，T0）</li></ol>
 <ul><li>比赛收到 1,000 多名参与者的 2,000 多份提交，OpenAI 独立复现 record track，重点展示优化器调参、GPTQ、per-document LoRA test-time training、CaseOps tokenizer、XSA 和 recurrent layers 等方向。</li><li>OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。</li><li>对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。</li></ul>
-<ol start="5"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+VE1MPC90ZXh0Pjwvc3ZnPg==" alt="Thinking Machines Lab" decoding="async"> <a href="https://thinkingmachines.ai/blog/interaction-models/" rel="noopener noreferrer">Thinking Machines Lab：Thinking Machines 发布 Interaction Models 研究预览</a></strong> <mark class="text-highlight">重大</mark>（2026-05-11，T0）</li></ol>
+<ol start="5"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+VE1MPC90ZXh0Pjwvc3ZnPg==" alt="Thinking Machines Lab" decoding="async"> <a href="https://thinkingmachines.ai/blog/interaction-models/" rel="noopener noreferrer">Thinking Machines 发布 Interaction Models 研究预览</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-11，T0）</li></ol>
 <ul><li>研究预览模型 TML-Interaction-Small 使用 time-aligned micro-turn 设计，把输入和输出流按 200ms 片段交错处理，从而支持边听边说、视觉触发、计时意识和并行工具调用。</li><li>系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。</li><li>官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。</li></ul></div>
-    <template data-rich-source data-source-fallback>1. **![Anthropic](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QTwvdGV4dD48L3N2Zz4=) [Anthropic 发布 Claude for Small Business](https://www.anthropic.com/news/claude-for-small-business)** ==重大==（2026-05-13，T0）
+    <template data-rich-source data-source-fallback>1. **![Anthropic](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QTwvdGV4dD48L3N2Zz4=) [发布 Claude for Small Business](https://www.anthropic.com/news/claude-for-small-business)** ==tag-major|重大==（2026-05-13，T0）
   - Claude for Small Business 以 Cowork 内的开关形式启用，用户连接已有业务工具后选择任务；发送、发布或付款等动作仍要求人工批准。
   - 首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。
   - 权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。
 
-2. **![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) [GitHub Changelog：GitHub 开放 Copilot cloud agent 任务 REST API 预览](https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/)** ==重大==（2026-05-13，T0）
+2. **![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) [GitHub 开放 Copilot cloud agent 任务 REST API 预览](https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/)** ==tag-major|重大==（2026-05-13，T0）
   - 新的 API 处于 public preview，支持用 prompt 启动仓库任务，可指定 base ref、模型和是否创建 pull request。
   - GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。
   - 对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。
 
-3. **![SAP News Center](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U05DPC90ZXh0Pjwvc3ZnPg==) [SAP News Center：SAP 发布 Business AI Platform 与 Autonomous Suite](https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/)** ==重大==（2026-05-12，T0）
+3. **![SAP News Center](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U05DPC90ZXh0Pjwvc3ZnPg==) [SAP 发布 Business AI Platform 与 Autonomous Suite](https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/)** ==tag-major|重大==（2026-05-12，T0）
   - SAP Business AI Platform 以 SAP Knowledge Graph 提供业务实体、流程和关系图谱，Joule Studio 则面向企业 Agent、应用和 agentic workflows 构建。
   - Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。
   - SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。
 
-4. **![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) [OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛](https://openai.com/index/what-parameter-golf-taught-us/)** ==重大==（2026-05-12，T0）
+4. **![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) [复盘 Parameter Golf：AI coding agent 改变开放研究竞赛](https://openai.com/index/what-parameter-golf-taught-us/)** ==tag-major|重大==（2026-05-12，T0）
   - 比赛收到 1,000 多名参与者的 2,000 多份提交，OpenAI 独立复现 record track，重点展示优化器调参、GPTQ、per-document LoRA test-time training、CaseOps tokenizer、XSA 和 recurrent layers 等方向。
   - OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。
   - 对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。
 
-5. **![Thinking Machines Lab](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+VE1MPC90ZXh0Pjwvc3ZnPg==) [Thinking Machines Lab：Thinking Machines 发布 Interaction Models 研究预览](https://thinkingmachines.ai/blog/interaction-models/)** ==重大==（2026-05-11，T0）
+5. **![Thinking Machines Lab](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+VE1MPC90ZXh0Pjwvc3ZnPg==) [Thinking Machines 发布 Interaction Models 研究预览](https://thinkingmachines.ai/blog/interaction-models/)** ==tag-major|重大==（2026-05-11，T0）
   - 研究预览模型 TML-Interaction-Small 使用 time-aligned micro-turn 设计，把输入和输出流按 200ms 片段交错处理，从而支持边听边说、视觉触发、计时意识和并行工具调用。
   - 系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。
   - 官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。</template>
   </section>
-<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>今日值得关注的项目</h2>
-
-    </div>
-
-  </div>
-
-    <div class="evidence-grid focus-field project-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
-    <div class="meta">PROJECTS</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Q0FUPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api" rel="noopener noreferrer">Copilot Agent tasks REST API</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
-    <div class="meta">PROJECTS</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U0JBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/" rel="noopener noreferrer">SAP Business AI Platform</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
-    <div class="meta">PROJECTS</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+VElTPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://thinkingmachines.ai/blog/interaction-models/" rel="noopener noreferrer">TML-Interaction-Small</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="PROJECTS" data-search-target="html-work-report">
-    <div class="meta">PROJECTS</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://openai.com/index/what-parameter-golf-taught-us/" rel="noopener noreferrer">Parameter Golf</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-2" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>社区线索</h2>
@@ -1947,11 +2326,11 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><mark class="text-highlight">一般</mark>OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="来源" decoding="async"> <a href="https://openai.com/daybreak" rel="noopener noreferrer">来源</a></li><li><mark class="text-highlight">一般</mark>Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 <img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=" alt="来源" decoding="async"> <a href="https://code.claude.com/docs/en/fast-mode" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>-  ==一般==OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) [来源](https://openai.com/daybreak)
--  ==一般==Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 ![来源](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=) [来源](https://code.claude.com/docs/en/fast-mode)</template>
+    <div class="rendered-markdown"><ul><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="来源" decoding="async"> <a href="https://openai.com/daybreak" rel="noopener noreferrer">来源</a></li><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 <img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=" alt="来源" decoding="async"> <a href="https://code.claude.com/docs/en/fast-mode" rel="noopener noreferrer">来源</a></li></ul></div>
+    <template data-rich-source data-source-fallback>-  ==tag-general|一般==OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) [来源](https://openai.com/daybreak)
+-  ==tag-general|一般==Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。 ![来源](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=) [来源](https://code.claude.com/docs/en/fast-mode)</template>
   </section>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-3" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
@@ -1964,7 +2343,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="rendered-markdown"><p>未记录信源审计。</p></div>
     <template data-rich-source data-source-fallback>未记录信源审计。</template></div>
   </details>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-4" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
@@ -2238,7 +2617,101 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     lastActiveNavId = active ? active.id : "";
   }
 
+  var imageLightbox = null;
+  var imageLightboxReturnFocus = null;
+
+  function ensureImageLightbox() {
+    if (imageLightbox) return imageLightbox;
+
+    var root = document.createElement("div");
+    root.className = "image-lightbox";
+    root.hidden = true;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "图片放大预览");
+    root.innerHTML = [
+      '<button class="image-lightbox__backdrop" type="button" data-lightbox-close aria-label="关闭放大图片"></button>',
+      '<figure class="image-lightbox__figure">',
+      '<button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭放大图片">关闭</button>',
+      '<img class="image-lightbox__image" alt="">',
+      '<figcaption class="image-lightbox__caption"></figcaption>',
+      '</figure>'
+    ].join("");
+    document.body.appendChild(root);
+
+    imageLightbox = {
+      root: root,
+      image: root.querySelector(".image-lightbox__image"),
+      caption: root.querySelector(".image-lightbox__caption"),
+      close: root.querySelector(".image-lightbox__close")
+    };
+    return imageLightbox;
+  }
+
+  function imageLightboxCaption(image) {
+    var explicit = image.getAttribute("data-lightbox-caption") || image.getAttribute("alt") || "";
+    if (explicit.trim()) return explicit.trim();
+
+    var figure = image.closest("figure");
+    var caption = figure ? figure.querySelector("figcaption") : null;
+    if (caption && caption.textContent.trim()) return caption.textContent.trim();
+
+    var paragraph = image.closest("p");
+    var next = paragraph ? paragraph.nextElementSibling : null;
+    if (next && next.matches("p") && next.textContent.trim()) {
+      return next.textContent.trim();
+    }
+    return "";
+  }
+
+  function openImageLightbox(image) {
+    var source = image.currentSrc || image.getAttribute("src") || "";
+    if (!source) return;
+
+    var dialog = ensureImageLightbox();
+    var caption = imageLightboxCaption(image);
+    imageLightboxReturnFocus = image;
+    dialog.image.src = source;
+    dialog.image.alt = image.getAttribute("alt") || caption || "放大图片";
+    dialog.caption.textContent = caption;
+    dialog.caption.hidden = !caption;
+    dialog.root.hidden = false;
+    dialog.root.setAttribute("data-open", "true");
+    document.body.classList.add("lightbox-open");
+    window.setTimeout(function () {
+      if (dialog.close && dialog.close.focus) {
+        dialog.close.focus({ preventScroll: true });
+      }
+    }, 0);
+  }
+
+  function closeImageLightbox() {
+    if (!imageLightbox || imageLightbox.root.hidden) return;
+    imageLightbox.root.removeAttribute("data-open");
+    imageLightbox.root.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    imageLightbox.image.removeAttribute("src");
+    if (imageLightboxReturnFocus && imageLightboxReturnFocus.focus) {
+      imageLightboxReturnFocus.focus({ preventScroll: true });
+    }
+    imageLightboxReturnFocus = null;
+  }
+
   document.addEventListener("click", function (event) {
+    var lightboxClose = event.target.closest("[data-lightbox-close]");
+    if (lightboxClose) {
+      event.preventDefault();
+      closeImageLightbox();
+      return;
+    }
+
+    var lightboxImage = event.target.closest("[data-lightbox-image]");
+    if (lightboxImage) {
+      event.preventDefault();
+      openImageLightbox(lightboxImage);
+      return;
+    }
+
     var navLink = event.target.closest("[data-nav-link]");
     if (navLink) {
       var href = navLink.getAttribute("href") || "";
@@ -2268,6 +2741,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     if (button.matches("[data-tab-group][data-tab]")) {
       activateTab(button);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeImageLightbox();
+      return;
+    }
+
+    if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-lightbox-image]")) {
+      event.preventDefault();
+      openImageLightbox(event.target);
     }
   });
 

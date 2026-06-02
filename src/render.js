@@ -39,7 +39,6 @@ export function renderReportHtml(report) {
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     githubTrending.length > 0 ? `<span><strong>${githubTrending.length}</strong> GitHub Trending</span>` : "",
     hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技术博客</span>` : "",
-    projects.length > 0 ? `<span><strong>${projects.length}</strong> 项目</span>` : "",
     builderObservations.length > 0 ? `<span><strong>${builderObservations.length}</strong> Builder 观察</span>` : "",
     communityLeads.length > 0 ? `<span><strong>${communityLeads.length}</strong> 社区线索</span>` : ""
   ]
@@ -47,8 +46,7 @@ export function renderReportHtml(report) {
     .join("\n        ");
   const optionalSections = [
     renderHotBlogsSection(hotBlogs),
-    renderGithubTrendingSection(githubTrending),
-    renderProjectsSection(projects),
+    renderGithubTrendingSection(githubTrending, projects),
     renderBuilderObservationsSection(builderObservations),
     renderCommunityLeadsSection(communityLeads)
   ].filter(Boolean).join("\n\n");
@@ -408,6 +406,59 @@ h3 {
   background: var(--panel);
 }
 
+.builder-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.builder-card {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.builder-card-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.builder-avatar {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  object-fit: cover;
+}
+
+.builder-card-title {
+  display: grid;
+  gap: 2px;
+}
+
+.builder-card-title strong {
+  line-height: 1.25;
+}
+
+.builder-card-title span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.builder-original {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
 .item-meta,
 .source-line {
   display: flex;
@@ -569,12 +620,11 @@ h3 {
 
 function renderMainItem(report, item, evidenceByUrl) {
   return `<article class="item">
-  <h3>${escapeHtml(item.title)}</h3>
+  <h3>${externalLink(item.url, stripSourcePrefixForRender(item.title, item.source))}</h3>
   <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${renderImportanceSpan(item)}${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
   <ul>
     ${item.bullets.map((bullet) => `<li>${renderInlineEmphasis(bullet)}</li>`).join("\n")}
   </ul>
-  <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
   ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
 </article>`;
 }
@@ -582,7 +632,19 @@ function renderMainItem(report, item, evidenceByUrl) {
 function renderInlineEmphasis(value) {
   return escapeHtml(value)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/==([^=]+)==/g, "<mark>$1</mark>");
+    .replace(/==([^=]+)==/g, '<strong class="text-keyword">$1</strong>');
+}
+
+function stripSourcePrefixForRender(title, source) {
+  const text = String(title || "").trim();
+  const sourceText = String(source || "").trim();
+  if (!sourceText) {
+    return text;
+  }
+  const escapedSource = sourceText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return text
+    .replace(new RegExp(`^${escapedSource}\\s*[：:｜|\\-—–]?\\s*`, "i"), "")
+    .trim() || text;
 }
 
 function renderHotBlogsSection(items) {
@@ -610,34 +672,96 @@ function renderHotBlog(item) {
 </article>`;
 }
 
-function renderGithubTrendingSection(items) {
+function renderGithubTrendingSection(items, projects = []) {
   if (items.length === 0) {
     return "";
   }
 
   return `<section class="section" id="github-trending">
       <h2>GitHub Trending</h2>
-      ${renderGithubTrending(items)}
+      ${renderGithubTrending(items, projects)}
     </section>`;
 }
 
-function renderGithubTrending(items) {
+function renderGithubTrending(items, projects = []) {
+  const projectIndex = indexProjectsForRender(projects);
+  const rows = items
+    .slice(0, 10)
+    .map((item) => {
+      const project = projectForTrendRender(item, projectIndex);
+      return `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item), githubStarsTag(item), ...(project ? projectHeatTags(project) : []), project ? "项目 highlight" : ""].filter(Boolean))}</td><td>${renderGithubTrendDetails(item, project)}</td></tr>`;
+    })
+    .join("\n");
   return `<table class="project-table">
   <thead><tr><th>榜位</th><th>项目</th><th>变化</th><th>简介</th></tr></thead>
   <tbody>
-    ${items
-      .slice(0, 10)
-      .map(
-        (item) =>
-          `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item)].filter(Boolean))}</td><td>${renderGithubTrendDetails(item)}</td></tr>`
-      )
-      .join("\n")}
+    ${rows}
   </tbody>
 </table>`;
 }
 
-function renderGithubTrendDetails(item) {
-  return `<p>${escapeHtml(cleanGithubTrendDescription(item))}</p>`;
+function renderGithubTrendDetails(item, project = null) {
+  const projectDetail = project ? ` ${renderProjectHighlightText(project)}` : "";
+  return `<p>${escapeHtml(cleanGithubTrendDescription(item))}${escapeHtml(projectDetail)}</p>`;
+}
+
+function githubStarsTag(item) {
+  const evidence = String(item.evidence || "");
+  const match = evidence.match(/with\s+([0-9,]+)\s+stars today/i) || evidence.match(/显示\s*([0-9,]+)\s+stars today/i);
+  return match ? `今日 +${match[1]} stars` : "";
+}
+
+function renderProjectHighlightText(project) {
+  const domains = Array.isArray(project.domains) && project.domains.length > 0 ? `领域：${project.domains.join("、")}。` : "";
+  const useCase = project.use_case ? `适合：${project.use_case}` : "";
+  return [cleanProjectDescription(project.description), domains, useCase].filter(Boolean).join(" ");
+}
+
+function indexProjectsForRender(projects) {
+  const byUrl = new Map();
+  const byRepo = new Map();
+  for (const project of projects) {
+    const urlKey = normalizeUrlForRender(project?.url);
+    if (urlKey) byUrl.set(urlKey, project);
+    const repoKey = repoKeyForRender(project);
+    if (repoKey) byRepo.set(repoKey, project);
+  }
+  return { byUrl, byRepo };
+}
+
+function projectForTrendRender(item, projectIndex) {
+  const urlKey = normalizeUrlForRender(item?.url);
+  if (urlKey && projectIndex.byUrl.has(urlKey)) {
+    return projectIndex.byUrl.get(urlKey);
+  }
+  const repoKey = repoKeyForRender(item);
+  return repoKey ? projectIndex.byRepo.get(repoKey) : null;
+}
+
+function repoKeyForRender(item) {
+  const value = item?.repo || item?.name || repoFromGithubUrlForRender(item?.url);
+  return String(value || "").trim().replace(/^https?:\/\/github\.com\//i, "").replace(/\/$/, "").toLowerCase();
+}
+
+function repoFromGithubUrlForRender(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    if (!parsed.hostname.toLowerCase().includes("github.com")) return "";
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function normalizeUrlForRender(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    parsed.hash = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return String(value || "").trim().replace(/\/$/, "");
+  }
 }
 
 function renderProjectsSection(projects) {
@@ -680,7 +804,9 @@ function renderProjectDetails(project) {
 }
 
 function renderTags(tags) {
-  return tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
+  return [...new Set(tags.map((tag) => String(tag || "").trim()).filter(Boolean))]
+    .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
+    .join("");
 }
 
 function renderBuilderObservationsSection(items) {
@@ -699,21 +825,65 @@ function renderBuilderObservations(items) {
     return "";
   }
 
-  return `<ul class="compact-list">${items
-    .map((item) => `<li>${renderBuilderObservation(item)}</li>`)
-    .join("\n")}</ul>`;
+  return `<div class="builder-card-list">${items
+    .map((item) => renderBuilderObservation(item))
+    .join("\n")}</div>`;
 }
 
 function renderBuilderObservation(item) {
   const meta = [
     item.role ? item.role : "",
     item.event_date ? item.event_date : "",
-    item.source ? item.source : "",
     importanceLabel(item.importance)
   ].filter(Boolean);
   const metaHtml = meta.length > 0 ? `<div class="item-meta">${meta.map((value) => `<span>${escapeHtml(value)}</span>`).join("")}</div>` : "";
-  const evidence = item.evidence ? `<p class="muted">${escapeHtml(item.evidence)}</p>` : "";
-  return `<strong>${escapeHtml(item.author)}</strong>：${escapeHtml(item.content)} ${externalLink(item.url, "来源")}${metaHtml}${evidence}`;
+  const handle = builderHandle(item);
+  const handleHtml = handle ? `<span>@${escapeHtml(handle)}</span>` : "";
+  const original = builderOriginalText(item);
+  const originalHtml = original ? `<p class="builder-original"><strong>原文：</strong>${escapeHtml(original)}</p>` : "";
+  return `<article class="builder-card">
+      <div class="builder-card-header">
+        <img class="builder-avatar" src="${escapeAttribute(builderAvatarSrc(item))}" alt="" loading="lazy" decoding="async">
+        <div class="builder-card-title"><strong>${externalLink(item.url, item.author || "Builder")}</strong>${handleHtml}</div>
+      </div>
+      ${metaHtml}
+      <p>${escapeHtml(builderTranslationText(item))}</p>
+      ${originalHtml}
+    </article>`;
+}
+
+function builderOriginalText(item) {
+  return String(item?.original_text || item?.originalText || item?.raw_text || "").trim();
+}
+
+function builderTranslationText(item) {
+  return String(item?.translation || item?.translated_text || item?.content || "").trim();
+}
+
+function builderHandle(item) {
+  const handle = String(item?.handle || "").trim().replace(/^@/, "");
+  if (handle) {
+    return handle;
+  }
+  try {
+    const [, parsedHandle] = new URL(String(item?.url || "")).pathname.match(/^\/([^/]+)\/status\/\d+/i) || [];
+    return String(parsedHandle || "").trim().replace(/^@/, "");
+  } catch {
+    return "";
+  }
+}
+
+function builderAvatarSrc(item) {
+  if (item?.avatar_data_uri) {
+    return item.avatar_data_uri;
+  }
+  return generatedLegacyIcon(item?.author || builderHandle(item) || "B");
+}
+
+function generatedLegacyIcon(label) {
+  const text = escapeHtml(String(label || "B").split(/\s+/).filter(Boolean).map((part) => part[0]).join("").toUpperCase().slice(0, 3) || "B");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="22" fill="#111827"/><text x="22" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff">${text}</text></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
 }
 
 function renderCommunityLeadsSection(items) {

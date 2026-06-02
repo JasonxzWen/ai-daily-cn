@@ -47,7 +47,7 @@ test("HTML renders main item bold and highlight markers", async () => {
   const html = renderReportHtml(report);
 
   assert(html.includes("<strong>Cost attribution</strong>"));
-  assert(html.includes("<mark>regular tracking</mark>"));
+  assert(html.includes('<strong class="text-keyword">regular tracking</strong>'));
 });
 
 test("解析 good fixture 并生成完整 report.json", async () => {
@@ -391,8 +391,11 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   report.builder_observations = [
     {
       author: "Example Builder",
+      handle: "examplebuilder",
       role: "maintainer",
-      content: "发布了 agent harness 的实现经验。",
+      original_text: "I shipped a concrete agent harness workflow.",
+      translation: "我发布了一个具体的 agent harness 工作流。",
+      content: "我发布了一个具体的 agent harness 工作流。",
       url: "https://example.com/builder-post",
       event_date: "2026-05-15",
       source: "follow-builders",
@@ -422,7 +425,9 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert(!html.includes("信号：trending"));
   assert(!html.includes("GitHub Trending daily 显示 123 stars today"));
   assert(!html.includes("在 GitHub Trending daily 中出现"));
-  assert(html.includes("原始帖子链接可访问"));
+  assert(html.includes("我发布了一个具体的 agent harness 工作流"));
+  assert(html.includes("I shipped a concrete agent harness workflow"));
+  assert(!html.includes("原始帖子链接可访问"));
 });
 
 test("日报可以转换为 effective-interact 输入", async () => {
@@ -519,7 +524,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.heroMode, "daily-report");
   assert.equal(input.heroTitle, "2026-05-15");
   assert.equal(input.hideNavigation, true);
-  assert.equal(input.heroEyebrow, "AI 日报");
+  assert.equal(input.heroEyebrow, "AI 日报 · 覆盖 2026-05-15");
   assert(input.summary.includes("Google 把模型和 agent 工具放进同一条链路"));
   assert.deepEqual(
     input.heroStats.map((item) => [item.label, item.value, item.detail]),
@@ -527,9 +532,9 @@ test("日报可以转换为 effective-interact 输入", async () => {
       ["主体", "2", "重点条目"],
       ["AIGC", "1", "产品/内容"],
       ["技术博客", "1", "深读"],
-      ["开源", "2", "Top10 + 项目"],
+      ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
-      ["信源窗", "05-15", "标准"]
+      ["覆盖", "05-15", "标准时间范围"]
     ]
   );
   assert(input.heroLinks.some((item) => item.label === "结构化 JSON" && item.href.endsWith("/data/2026/05/2026-05-15.json")));
@@ -552,35 +557,30 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.match(hotBlogsSection.items[0].titleIcon, /^data:image\/svg\+xml;base64,/);
   assert(hotBlogsSection.items[0].body.includes("这篇文章把长运行 agent 的 harness"));
   assert.equal(hotBlogsSection.items[0].showGroup, false);
-  assert.deepEqual(hotBlogsSection.items[0].tags, ["agent harness", "long-running agents"]);
-  assert.deepEqual(hotBlogsSection.items[0].points, []);
+  assert.deepEqual(hotBlogsSection.items[0].tags, ["notable|值得关注", "topic|agent harness", "topic|long-running agents"]);
+  assert(hotBlogsSection.items[0].points.length > 0);
   assert.equal(hotBlogsSection.items[0].media.length, 1);
   assert(hotBlogsSection.items[0].media[0].src.endsWith("assets/evidence/harness-architecture.png"));
   assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("发布方"));
-  assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("作者"));
   assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("日期"));
+  assert(!hotBlogsSection.items[0].points.some((point) => ["发布方", "作者", "日期"].includes(point.label)));
   assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
-  const titles = input.sections.map((section) => section.title);
-  assert(!titles.includes("模型发布"));
+  assert(!input.sections.some((section) => section.title === "模型发布"));
+  assert(!input.sections.some((section) => section.title === "今日值得关注的项目"));
+  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending · Top 10");
   assert(!JSON.stringify(input.sections).includes("ExampleModel 2"));
   assert(!JSON.stringify(input.sections).includes("open_weights"));
-  const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
-  assert(projectsSection.content.includes("![Example Agent Memory](data:image/png;base64,"));
-  assert.match(projectsSection.items[0].titleIcon, /^data:image\/png;base64,/);
-  assert(projectsSection.content.includes("==本周 +456 stars=="));
-  assert(projectsSection.content.includes("领域：coding_agent、agent_memory"));
-  assert(projectsSection.content.includes("作用：给 coding agent 提供跨会话持久记忆"));
-  assert(!projectsSection.content.includes("信号："));
-  assert(!projectsSection.content.includes("证据："));
-  assert(!projectsSection.content.includes("GitHub Trending weekly 中出现"));
-  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending · Top 10 daily");
   assert.equal(trendingSection.summary, undefined);
   assert(trendingSection.content.includes("example/agent-memory"));
   assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
   assert(trendingSection.content.includes("1. **![example/agent-memory]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
+  assert(trendingSection.content.includes("==tag-stars|本周 +456 stars=="));
+  assert.equal((trendingSection.content.match(/==tag-stars\|/g) || []).length, 1);
+  assert(trendingSection.content.includes("==tag-highlight|项目 highlight=="));
+  assert(trendingSection.content.includes("领域：coding_agent、agent_memory") || trendingSection.content.includes("给 coding agent 提供跨会话持久记忆"));
   assert(!trendingSection.content.includes("\n  - "));
-  assert(trendingSection.content.includes(" | "));
+  assert(!trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("普通工程师"));
   assert(input.intent.primaryQuestion.includes("模型、产品、开源、观点和社区动态"));
@@ -600,8 +600,25 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.evidence, undefined);
 });
 
-test("project interaction section uses one card per project", async () => {
+test("project interaction content is only shown as GitHub Trending item tags", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      name: "example/project-alpha",
+      repo: "example/project-alpha",
+      description: "A reusable plugin set for agent workflows.",
+      url: "https://github.com/example/project-alpha",
+      event_date: "2026-05-15",
+      source: "GitHub Trending weekly",
+      language: "TypeScript",
+      window: "weekly",
+      rank: 1,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending weekly rank #1 with 456 stars today."
+    }
+  ];
   report.projects = [
     {
       name: "Project Alpha",
@@ -628,15 +645,17 @@ test("project interaction section uses one card per project", async () => {
   ];
 
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.group === "projects");
+  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
 
-  assert.equal(section.type, "filterable-cards");
-  assert.equal(section.items.length, 2);
-  assert.equal(section.items[0].title, "Project Alpha");
-  assert.equal(section.items[0].href, "https://github.com/example/project-alpha");
-  assert(section.items[0].body.includes("agent workflows"));
-  assert(section.items[0].points.some((point) => point.value.includes("agent")));
-  assert(section.items[1].points.some((point) => point.value.includes("eval dashboards")));
+  assert.equal(section.type, "markdown");
+  assert(!input.sections.some((item) => item.cardClass === "project-card"));
+  assert(!section.content.includes("项目 highlights"));
+  assert(section.content.includes("example/project-alpha"));
+  assert(section.content.includes("agent workflows"));
+  assert(section.content.includes("领域：agent、workflow"));
+  assert(section.content.includes("==tag-highlight|项目 highlight=="));
+  assert(!section.content.includes("Project Beta"));
+  assert(!section.content.includes("eval dashboards"));
 });
 
 test("interaction input rewrites generation-log summaries into editorial summaries", async () => {
@@ -680,13 +699,16 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   assert(!mainSection.content.includes("行业媒体/播客整理"));
 });
 
-test("builder interaction section omits explicit evidence bullets", async () => {
+test("builder interaction section renders translated Twitter-style cards and omits explicit evidence bullets", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
     {
       author: "Example Builder",
+      handle: "examplebuilder",
       role: "maintainer",
-      content: "Shared a concrete coding-agent workflow observation.",
+      original_text: "Coding agents need eval loops before unattended work.",
+      translation: "Coding agent 在无人值守工作之前需要 eval loops。",
+      content: "Coding agent 在无人值守工作之前需要 eval loops。",
       url: "https://example.com/builder-post",
       event_date: "2026-05-15",
       source: "follow-builders X feed",
@@ -699,11 +721,14 @@ test("builder interaction section omits explicit evidence bullets", async () => 
   const section = input.sections.find((item) => item.group === "signals");
 
   assert.equal(section.title, "X/Twitter 讨论");
-  assert(section.content.includes("Example Builder"));
-  assert(section.content.includes("follow-builders X feed"));
-  assert(!section.content.includes("### X/Twitter 讨论"));
-  assert(!section.content.includes("Original X URL was collected"));
-  assert(!section.content.includes("证据："));
+  assert.equal(section.type, "filterable-cards");
+  assert.equal(section.cardClass, "builder-card");
+  assert.equal(section.items[0].title, "Example Builder");
+  assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
+  assert(section.items[0].points.some((point) => point.label === "原文" && point.value.includes("unattended work")));
+  assert(section.items[0].points.some((point) => point.label === "账号" && point.value === "@examplebuilder"));
+  assert(!JSON.stringify(section).includes("Original X URL was collected"));
+  assert(!JSON.stringify(section).includes("证据："));
 });
 
 test("community leads omit low-signal statuspage troubleshooting items", async () => {
@@ -730,10 +755,10 @@ test("community leads omit low-signal statuspage troubleshooting items", async (
   const section = input.sections.find((item) => item.group === "signals");
 
   assert.equal(section.title, "X/Twitter 讨论");
-  assert(section.content.includes("Example Builder"));
-  assert(!section.content.includes("Claude Status"));
-  assert(!section.content.includes("elevated errors"));
-  assert(!section.content.includes("社区线索"));
+  assert(JSON.stringify(section).includes("Example Builder"));
+  assert(!JSON.stringify(input).includes("Claude Status"));
+  assert(!JSON.stringify(input).includes("elevated errors"));
+  assert(!input.sections.some((item) => item.title === "社区线索"));
 });
 
 test("X/Twitter discussion section reports checked-source degradation when no status is included", async () => {
@@ -826,7 +851,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   assert(!section.includes("\u8bed\u8a00\uff1a"));
 
   const input = reportToInteractionInput(validation.value);
-  const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10 daily");
+  const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
   assert(trendingSection);
   assert(trendingSection.content.includes("3. **![hardikpandya/stop-slop]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
@@ -1132,11 +1157,10 @@ test("trend annotations are rendered only where they are injected", async () => 
   const input = reportToInteractionInput(report, { trendAnnotations });
   const mainSection = input.sections.find((section) => section.title === "主体信息");
   const trendingSection = input.sections.find((section) => section.title.includes("GitHub Trending"));
-  const projectsSection = input.sections.find((section) => section.cardClass === "project-card");
 
-  assert(mainSection.content.includes("==coding agent: 7d 8x/4d=="));
-  assert(trendingSection.content.includes("==coding agent: 7d 8x/4d=="));
-  assert(!projectsSection.content.includes("==coding agent: 7d 8x/4d=="));
+  assert(mainSection.content.includes("==tag-topic|coding agent: 7d 8x/4d=="));
+  assert(trendingSection.content.includes("==tag-topic|coding agent: 7d 8x/4d=="));
+  assert(!input.sections.some((section) => section.cardClass === "project-card"));
 });
 
 test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
@@ -1429,6 +1453,10 @@ test("builder discovery 优先解析 follow-builders central X feed", async () =
   assert.equal(collected.candidates[0].source, "follow-builders X feed");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].url, "https://x.com/swyx/status/2059000000000000000");
+  assert.equal(collected.candidates[0].author, "Swyx");
+  assert.equal(collected.candidates[0].handle, "swyx");
+  assert.equal(collected.candidates[0].original_text, "The model alone is no longer the product; the harness, memory, eval loop, and workflow are the product surface now.");
+  assert.equal(collected.candidates[0].avatar_url, "https://unavatar.io/x/swyx");
   assert.match(collected.candidates[0].evidence, /model alone is no longer the product/i);
 });
 
@@ -1502,6 +1530,9 @@ test("builder discovery falls back to Tavily X status search when central X feed
   assert.equal(collected.candidates[0].url, "https://x.com/examplebuilder/status/2059094004961914880");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].verification_status, "original_social_only");
+  assert.equal(collected.candidates[0].handle, "examplebuilder");
+  assert.match(collected.candidates[0].original_text, /Coding agents need eval loops/);
+  assert.equal(collected.candidates[0].avatar_url, "https://unavatar.io/x/examplebuilder");
 });
 
 test("builder discovery retries transient fetch failures and records retry notes", async () => {
@@ -2467,6 +2498,23 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
     }
   }
   structuredReport.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
+  structuredReport.github_trending = [
+    {
+      name: "example/agent-tool",
+      repo: "example/agent-tool",
+      description: "面向 coding agents 的本地工具。",
+      url: "https://github.com/example/agent-tool",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 1,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #1 with 321 stars today."
+    }
+  ];
   structuredReport.projects = [
     {
       name: "Example Agent Tool",
@@ -2507,6 +2555,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
   assert(html.includes("今日 +321 stars"));
+  assert(html.includes("项目 highlight"));
   assert(!html.includes("备注："));
   assert(!html.includes("信号：trending"));
   assert(!html.includes("证据：GitHub Trending daily 显示 321 stars today"));
@@ -2676,7 +2725,7 @@ test("report:write importance labels are schema-validated and rendered", async (
   assert(html.includes(">重大<"));
 
   const interaction = reportToInteractionInput(report);
-  assert(interaction.sections.some((section) => String(section.content || "").includes("==重大==")));
+  assert(interaction.sections.some((section) => String(section.content || "").includes("==tag-major|重大==")));
 });
 
 test("report:write records automation revision fingerprint in self_check", async () => {
@@ -2887,6 +2936,24 @@ test("publish quality degrades strict daily reports missing follow-builders X st
   assert(
     classification.degraded_sections.some(
       (issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false
+    )
+  );
+});
+
+test("publish quality blocks strict daily reports with summarized Builder observations", () => {
+  const report = strictPublishReportFixture();
+  delete report.builder_observations[0].original_text;
+  report.builder_observations[1].translation = "完整翻译。";
+  report.builder_observations[1].content = "摘要而不是完整翻译。";
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert(
+    classification.blocking_issues.some(
+      (issue) =>
+        issue.error_code === "builder_translation_gate_failed" &&
+        issue.violations.some((violation) => violation.index === 0 && violation.missing.includes("original_text")) &&
+        issue.violations.some((violation) => violation.index === 1 && violation.missing.includes("content_matches_translation"))
     )
   );
 });
@@ -3725,8 +3792,21 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("builder_sources"));
   assert(prompt.includes("blocked_reason"));
   assert(prompt.includes("last_successful_feed_at"));
+  assert(prompt.includes("original_text"));
+  assert(prompt.includes("translation"));
+  assert(prompt.includes("content` 为兼容字段"));
+  assert(prompt.includes("不得写成概括"));
   assert(prompt.includes("hero_highlights"));
-  assert(prompt.includes("300-500"));
+  assert(prompt.includes("100-160"));
+  assert(prompt.includes("点开放大"));
+  assert(prompt.includes("项目 highlight"));
+  assert(prompt.includes("覆盖时间范围"));
+  assert(prompt.includes("不渲染公开“模型发布”"));
+  assert(prompt.includes("不渲染公开“今日值得关注的项目”"));
+  assert(prompt.includes("项目 highlights"));
+  assert(prompt.includes("额外项目列表"));
+  assert(prompt.includes("star 变化"));
+  assert(prompt.includes("加粗变色文字"));
   assert(prompt.includes("follow-builders central feed"));
   assert(prompt.includes("Product Hunt"));
   assert(prompt.includes("Product Hunt Trending"));
@@ -3860,7 +3940,9 @@ function strictPublishReportFixture() {
       candidate_id: "strict-builder-x",
       author: "Strict Builder",
       role: "builder",
-      content: "Original X status about agent workflow practice.",
+      original_text: "Original X status about agent workflow practice.",
+      translation: "关于 agent workflow 实践的原始 X 状态。",
+      content: "关于 agent workflow 实践的原始 X 状态。",
       url: "https://x.com/strictbuilder/status/2059000000000000000",
       event_date: reportDate,
       source: "follow-builders X feed",
@@ -3876,7 +3958,9 @@ function strictPublishReportFixture() {
       candidate_id: "strict-builder-blog",
       author: "Strict Maintainer",
       role: "maintainer",
-      content: "Original blog note about agent evaluation.",
+      original_text: "Original blog note about agent evaluation.",
+      translation: "关于 agent evaluation 的原始博客笔记。",
+      content: "关于 agent evaluation 的原始博客笔记。",
       url: "https://example.com/strict/builder-blog",
       event_date: reportDate,
       source: "follow-builders blog feed",
@@ -3890,7 +3974,9 @@ function strictPublishReportFixture() {
       candidate_id: "strict-builder-research",
       author: "Strict Researcher",
       role: "researcher",
-      content: "Researcher note about model deployment constraints.",
+      original_text: "Researcher note about model deployment constraints.",
+      translation: "关于模型部署约束的研究者笔记。",
+      content: "关于模型部署约束的研究者笔记。",
       url: "https://example.com/strict/research-note",
       event_date: reportDate,
       source: "Simon Willison Weblog",
@@ -4242,11 +4328,14 @@ function sourceAuditFixture() {
 }
 
 function builderObservationFixture(candidateId, url, source) {
+  const translation = "Example Builder 分享了一个具体的 agent workflow 观察。";
   return {
     candidate_id: candidateId,
     author: "Example Builder",
     role: "builder",
-    content: "Example Builder shared a concrete agent workflow observation.",
+    original_text: "Example Builder shared a concrete agent workflow observation.",
+    translation,
+    content: translation,
     url,
     event_date: "2026-05-16",
     source

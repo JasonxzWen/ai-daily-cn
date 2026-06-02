@@ -113,7 +113,7 @@ test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () =
   assert(plan.will_stage_files.includes("docs/trends.json"));
 });
 
-test("publish dry-run stages evidence assets for the selected report", async () => {
+test("publish dry-run stages evidence and builder avatar assets for the selected report", async () => {
   const repoRoot = await tempRepoWithFixture();
   await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
   const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
@@ -127,6 +127,21 @@ test("publish dry-run stages evidence assets for the selected report", async () 
       extraction_status: "source_image"
     }
   ];
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      handle: "example",
+      role: "builder",
+      event_date: report.report_date,
+      source: "follow-builders X feed",
+      original_text: "Coding agents need eval loops.",
+      translation: "Coding agent 需要 eval loops。",
+      content: "Coding agent 需要 eval loops。",
+      avatar_url: "https://unavatar.io/x/example",
+      url: "https://x.com/example/status/2059000000000000000"
+    }
+  ];
+  report.self_check.builder_observations = 1;
   const dataDir = path.join(repoRoot, "reports-data", "2026", "05");
   await fs.mkdir(dataDir, { recursive: true });
   await fs.writeFile(path.join(dataDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
@@ -142,6 +157,8 @@ test("publish dry-run stages evidence assets for the selected report", async () 
   });
 
   assert(plan.will_stage_files.includes("docs/assets/evidence/fixture-evidence.png"));
+  const [year, month] = report.report_date.split("-");
+  assert(plan.will_stage_files.includes(`docs/assets/avatars/${year}/${month}/${report.report_date}-example.png`));
 });
 
 test("publish dry-run blocks publisher files outside the selected publish plan", async () => {

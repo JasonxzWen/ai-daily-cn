@@ -496,13 +496,56 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /<ol><li><img class="inline-site-icon"/);
+  const sourceIcon = html.match(/<ol><li><img[^>]+>/)?.[0] || "";
+  assert.doesNotMatch(sourceIcon, /data-lightbox-image/);
   assert.match(html, /<strong><a href="https:\/\/github\.com\/example\/repo"/);
-  assert.match(html, /<mark class="text-highlight trend-status trend-status-new">NEW<\/mark>/);
-  assert.match(html, /<mark class="text-highlight trend-status trend-status-up">↑ UP \+2<\/mark>/);
-  assert.match(html, /<mark class="text-highlight trend-status trend-status-down">↓ DOWN -1<\/mark>/);
-  assert.match(html, /<mark class="text-highlight trend-status trend-status-same">SAME<\/mark>/);
+  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-new">NEW<\/mark>/);
+  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP \+2<\/mark>/);
+  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -1<\/mark>/);
+  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-same">SAME<\/mark>/);
   assert.doesNotMatch(html, /<ul><li>1\./);
   assert.match(html, /<div class="markdown-table-scroll"><table>/);
+});
+
+test("effective-interact pre-rendered markdown images are lightbox-enabled", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-image-lightbox-"));
+  const inputPath = path.join(tmp, "image-lightbox.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 鏃ユ姤 2026-05-28",
+      summary: "Image lightbox check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "Evidence",
+          content: "![Evidence chart](https://example.com/chart.png)\n\n![GitHub](data:image/png;base64,iVBORw0KGgo=)"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "image-lightbox", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const evidenceImage = html.match(/<img class="markdown-image"[^>]+>/)?.[0] || "";
+  const sourceIcon = html.match(/<img class="inline-site-icon"[^>]+>/)?.[0] || "";
+  assert.match(evidenceImage, /data-lightbox-image="true"/);
+  assert.match(evidenceImage, /data-lightbox-caption="Evidence chart"/);
+  assert.match(evidenceImage, /role="button"/);
+  assert.match(evidenceImage, /tabindex="0"/);
+  assert.doesNotMatch(sourceIcon, /data-lightbox-image/);
+  assert.match(html, /image-lightbox/);
 });
 
 test("effective-interact filterable cards render linked project subcards", async () => {
@@ -632,6 +675,10 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(card, /<h3><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
   assert.match(card, /<span class="chip">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/span>/);
   assert.match(card, /card-media-grid/);
+  assert.match(card, /data-lightbox-image="true"/);
+  assert.match(card, /data-lightbox-caption="Original blog architecture diagram\."/);
+  assert.match(card, /role="button"/);
+  assert.match(card, /tabindex="0"/);
   assert.match(card, /<figcaption>Original blog architecture diagram\.<\/figcaption>/);
 });
 

@@ -53,12 +53,12 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - AIGC 与内容产业动态：事实已回源时写入 `main_items`；只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `main_items`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
-- X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。
+- X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括。
 
 内容密度目标：
 
-- 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`。
-- `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
+- 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
+- `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。`==...==` 只用于正文关键词，公开页会渲染为加粗变色文字，不是 tag/chip。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
 - 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 
@@ -69,8 +69,9 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 证据图表拉取与展示规范：
 - 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或截图证据时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图一律不拉。
 - 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
-- 主线条目、热门技术博客和项目都适用同一规则：只有原文图能帮助读者理解能力边界、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个条目最多优先展示 1-2 张最重要图片。每张图的 `source_url` 必须等于对应日报条目的 `url`。
+- 主线条目、热门技术博客和项目都适用同一规则：只有原文图能帮助读者理解能力边界、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个条目最多优先展示 1-2 张最重要图片。每张图的 `source_url` 必须等于对应日报条目的 `url`。模型相关图片必须挂在对应 `main_items` 或 `hot_blogs` 条目下展示；`model_releases` 不再单独渲染公开图片行。
 - 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。若有 `local_path`，页面展示居中的图片和图片下方中文说明；只有没有图片时才用 `data` 退化为表格展示，表格说明必须在表格下方。`title` 必须是短中文图名或表名，`caption` 写清数据/图表来自原文哪个部分。
+- 图片展示必须保持可点开放大；不要把来源 icon、站点 favicon 或低信息密度封面图当成证据图。
 - 排版约束：图片必须是可读的原图或清晰裁切，避免整页截图；宽图优先裁到图表本体，移动端不能横向撑破页面。不要为了“有图”而展示图片，不能清晰增强读者理解的图宁可不放。
 
 证据图表的选择必须克制：
@@ -79,7 +80,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - 不追求每条主体信息都有图表。多数主体信息没有图表是正常状态；宁可留空 `evidence_assets`，也不要为了视觉覆盖率构造表格。
 - 若同一批主体信息中 `manual_table` 覆盖大多数条目，应视为过度包装并重写，只保留真正提升理解的数据或原文图。
 
-`model_releases` 是历史兼容字段，不作为公开日报的独立新闻池，新草稿默认使用空数组。模型类重大动态应在 `main_items` 中讲清楚事实、能力、限制、可用性和影响；若兼容旧数据必须保留该字段，每项包含：
+`model_releases` 是历史兼容和结构化索引字段，不作为公开日报的独立新闻池，新草稿默认使用空数组。模型类重大动态必须在 `main_items` 中讲清楚事实、能力、限制、可用性和影响；若兼容旧数据必须保留该字段，每项包含：
 
 - `name`
 - `provider`
@@ -104,9 +105,9 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `summary`
 - 可选 `content_type`：`blog`、`interview`、`podcast`、`engineering_note`
 
-`hot_blogs[*].summary` 必须是 300-500 字中文内容摘要，不要另写 `why_it_matters`；历史数据可保留该字段，但新草稿不需要填写。
+`hot_blogs[*].summary` 必须是约 100-160 个中文字符的分点式中文内容摘要，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要另写 `why_it_matters`。历史数据可保留该字段，但新草稿不需要填写。
 
-`github_trending` 用于独立展示 GitHub Trending 榜单，不再埋在 `projects` 或信源审计里。默认展示 Top 10 仓库；没有可核验趋势时使用空数组。每项包含：
+`github_trending` 用于独立展示 GitHub Trending Top 10 榜单，并承载经过核验的项目 highlight tag。默认展示 Top 10 仓库；没有可核验趋势时使用空数组。每项包含：
 
 - `candidate_id`
 - `repo`
@@ -123,8 +124,8 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `trend`：`new`、`up`、`down`、`same`
 - `evidence`
 
-`github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects`。
-`github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在 100 个中文字符以内，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计或泛化热度判断。页面展示会隐藏来源、语言等审计字段，只保留榜位、变化和中文简介，并把排名/星标变化拆成短 bullet。
+`github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects` 作为 highlight 元数据，但公开页面仍合并在 GitHub Trending 中展示。
+`github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在 80-140 个中文字符以内，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计或泛化热度判断。页面展示会隐藏来源、语言等审计字段，只保留榜位、变化、star 变化 tag、项目 highlight tag 和中文简介。
 
 `hero_highlights` 用于公开页面 header，最多 1-3 条。每项包含：
 
@@ -134,7 +135,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 只放当天最重磅的消息、项目或观点。没有特大新闻时写 1 条今日主线，禁止写“其余条目见后文”或“本版只保留 N 条”。
 
-没有热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容；`model_releases` 新草稿也保持空数组。
+没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。空的 `model_releases` 或 `projects` 不应造成公开 HTML 出现空板块；`model_releases` 新草稿默认保持空数组。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
 
 `source_audit` 是每日结构化草稿的必填审计字段。它必须合并各发现命令的审计结果，而不是只把命令 stdout 留在本地临时文件里；需要在 `report:write` 后补充独立发现命令审计时，使用 `npm run sources:audit-merge -- --date YYYY-MM-DD --input <audit-output.json>[,<audit-output.json>]` 写回最终 `reports-data` JSON。连续运行验收读取最终 `reports-data` JSON，因此新日报至少包含这些审计组：
@@ -160,7 +161,9 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 `main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
-`projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case；公开 HTML 会把项目渲染成横向卡片，过长文本会造成布局不均。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。`builder_observations` 可额外填写 `role`、`event_date`、`source`、`evidence`；没有原始 URL 的 builder 内容不得写入。
+`projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case。公开 HTML 只会把匹配 GitHub Trending Top 10 的项目作为对应条目的 `项目 highlight` tag 和行内说明，不生成单独项目卡片区、“项目 highlights”子标题或额外项目列表；未匹配 Top 10 的 `projects` 只保留在结构化 JSON 中。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。
+
+`builder_observations` 必须填写 `author`、`content`、`url`，新草稿还必须填写 `original_text` 和 `translation`。`original_text` 放原帖或原始连续摘录的完整英文/原文；`translation` 是完整、精确、忠于原意的中文翻译，不能压缩为观点摘要，不能添加原文没有的判断；`content` 为兼容字段，必须与 `translation` 保持同义，推荐直接填同一段完整翻译。可额外填写 `handle`、`role`、`event_date`、`source`、`evidence`、`avatar_url`、`avatar_local_path` 或 `avatar_data_uri`。如果有 X handle，应填写 `handle`；如果能取得头像 URL，填写 `avatar_url`，构建器会 best-effort 缓存到 `docs/assets/avatars/**` 并写入公开数据。没有原始 URL、没有原文或无法完整翻译的 builder 内容不得写入。
 
 Product Hunt 项目只有在官网、GitHub、README、文档或原始发布页完成交叉确认后才能写入 `projects`；否则写入 `community_leads` 或丢弃。融资类产品即使来自 Crunchbase、TechCrunch、36Kr 等来源，也必须满足 `primary_confirmed` 或 `multi_source_confirmed` 后才进入事实栏目。
 

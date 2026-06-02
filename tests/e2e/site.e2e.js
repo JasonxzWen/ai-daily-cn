@@ -26,6 +26,10 @@ const structuredReport = JSON.parse(
   await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8")
 );
 const firstModel = structuredReport.model_releases[0];
+const builderAvatarDataUri = `data:image/svg+xml;base64,${Buffer.from(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="22" fill="#111827"/><text x="22" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff">EB</text></svg>',
+  "utf8"
+).toString("base64")}`;
 structuredReport.model_releases.push({
   ...firstModel,
   name: "ExampleModel Vision",
@@ -73,6 +77,31 @@ structuredReport.github_trending = [
     evidence: "example/agent-memory appeared on GitHub Trending daily with 123 stars today."
   }
 ];
+structuredReport.hot_blogs.push({
+  title: "No Media Blog Layout",
+  url: "https://example.com/blog/no-media-layout",
+  publisher: "Example Blog",
+  author: "Example Author",
+  event_date: "2026-05-15",
+  topic: "layout regression",
+  summary: "This post validates blog cards without evidence images\u3002It should use a full-width title and body instead of leaving an empty media column\u3002Its extra points should render as readable bullets rather than visible labels\u3002"
+});
+structuredReport.builder_observations = [
+  {
+    author: "Example Builder",
+    handle: "examplebuilder",
+    role: "maintainer",
+    event_date: "2026-05-15",
+    source: "follow-builders X feed",
+    original_text: "Coding agents need eval loops before unattended work.",
+    translation: "Coding agent 在无人值守工作之前需要 eval loops。",
+    content: "Coding agent 在无人值守工作之前需要 eval loops。",
+    avatar_data_uri: builderAvatarDataUri,
+    url: "https://x.com/examplebuilder/status/2059000000000000000",
+    evidence: "Original X status URL was collected from follow-builders central feed."
+  }
+];
+structuredReport.self_check.builder_observations = structuredReport.builder_observations.length;
 structuredReport.evidence_assets = [
   {
     type: "figure",
@@ -148,13 +177,26 @@ try {
   assert.equal(await page.locator("#model-releases").count(), 0);
   assert.match(await page.locator("body").textContent(), /热门技术博客/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
+  assert.match(await page.locator("body").textContent(), /GitHub Trending/);
+  assert.match(await page.locator("body").textContent(), /项目 highlight/);
+  assert.doesNotMatch(await page.locator("body").textContent(), /项目 highlights/);
+  assert.doesNotMatch(await page.locator("#report-top").textContent(), /项目高亮/);
   assert.equal(await allImagesLoaded(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
-  assert.equal(await page.locator(".project-card-grid").count(), 1);
-  assert.equal(await projectCardsAreHorizontalAndEven(page), true);
+  assert.equal(await page.locator(".blog-card").count(), 2);
+  assert.equal(await page.locator(".builder-card").count(), 1);
+  assert.equal(await page.locator(".builder-card .card-title-icon").count(), 1);
+  assert.match(await page.locator(".builder-card").textContent(), /Coding agent 在无人值守工作之前需要 eval loops/);
+  assert.match(await page.locator(".builder-card").textContent(), /Coding agents need eval loops before unattended work/);
+  assert.doesNotMatch(await page.locator(".builder-card").textContent(), /Original X status URL was collected/);
+  assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
+  await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
+  assert.equal(await page.locator(".project-card-grid").count(), 0);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.setViewportSize({ width: 375, height: 812 });
+  await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
+  assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 } finally {
   await browser.close();
@@ -242,6 +284,53 @@ async function allImagesLoaded(page) {
   return page.evaluate(() =>
     Array.from(document.images).every((image) => image.complete && image.naturalWidth > 0)
   );
+}
+
+async function imageLightboxOpensAndCloses(page, selector) {
+  const image = page.locator(selector).first();
+  await image.scrollIntoViewIfNeeded();
+  await image.click();
+  const lightbox = page.locator(".image-lightbox:not([hidden])");
+  await lightbox.waitFor({ state: "visible", timeout: 2000 });
+  await page.waitForFunction(() => document.querySelector(".image-lightbox[data-open='true']"), null, { timeout: 2000 });
+  assert.equal(await page.locator("body.lightbox-open").count(), 1);
+  assert.equal(
+    await page.locator(".image-lightbox__image").evaluate((node) => node.complete && node.naturalWidth > 0),
+    true
+  );
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector(".image-lightbox:not([hidden])"), null, { timeout: 2000 });
+  assert.equal(await page.locator("body.lightbox-open").count(), 0);
+}
+
+async function noMediaBlogCardsUseReadableSingleColumn(page) {
+  return page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll(".blog-card"))
+      .filter((card) => !card.querySelector(".card-media-grid"));
+
+    if (cards.length === 0) return false;
+
+    return cards.every((card) => {
+      const styles = getComputedStyle(card);
+      const cardRect = card.getBoundingClientRect();
+      const titleRect = card.querySelector("h3")?.getBoundingClientRect();
+      const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
+      const termRects = Array.from(card.querySelectorAll(".card-detail-list dt"))
+        .map((node) => node.getBoundingClientRect());
+      const detailRects = Array.from(card.querySelectorAll(".card-detail-list dd"))
+        .map((node) => node.getBoundingClientRect());
+      const detailMinWidth = Math.min(240, cardRect.width * 0.6);
+
+      return styles.gridTemplateColumns.trim().split(/\s+/).length === 1
+        && !styles.gridTemplateAreas.includes("blog-media")
+        && Boolean(titleRect && titleRect.width >= cardRect.width * 0.75)
+        && Boolean(bodyRect && bodyRect.width >= cardRect.width * 0.75)
+        && termRects.length > 0
+        && termRects.every((rect) => rect.width <= 2 && rect.height <= 2)
+        && detailRects.length > 0
+        && detailRects.every((rect) => rect.width >= detailMinWidth);
+    });
+  });
 }
 
 async function modelReleaseImagesShareRow(page) {

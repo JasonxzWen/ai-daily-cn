@@ -56,6 +56,23 @@ a {
   color: var(--accent);
 }
 
+.rendered-markdown ol > li > strong:first-child,
+.rendered-markdown ol > li > strong:first-child a {
+  font-size: 1.04rem;
+  line-height: 1.36;
+}
+
+.rendered-markdown ol > li > strong:first-child a,
+.card-title-link {
+  text-decoration: none;
+}
+
+.rendered-markdown ol > li > strong:first-child a:hover,
+.card-title-link:hover {
+  color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+  text-decoration: none;
+}
+
 p,
 ul,
 ol {
@@ -105,6 +122,36 @@ h3 {
   font-weight: 760;
 }
 
+.rendered-markdown strong.text-keyword,
+.report-data-table strong.text-keyword,
+.report-hero strong.text-keyword {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-weight: 820;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.rendered-markdown strong.keyword-major,
+.report-data-table strong.keyword-major,
+.report-hero strong.keyword-major {
+  color: #b42318;
+}
+
+.rendered-markdown strong.keyword-notable,
+.report-data-table strong.keyword-notable,
+.report-hero strong.keyword-notable {
+  color: #9a4a14;
+}
+
+.rendered-markdown strong.keyword-general,
+.report-data-table strong.keyword-general,
+.report-hero strong.keyword-general {
+  color: #0f766e;
+}
+
 .rendered-markdown em,
 .report-data-table em {
   color: #5f5d57;
@@ -151,6 +198,61 @@ h3 {
   font-family: var(--ui-font);
   font-size: 0.7em;
   letter-spacing: 0.02em;
+}
+
+.rendered-markdown mark.text-highlight.daily-tag,
+.report-data-table mark.text-highlight.daily-tag,
+.report-hero mark.text-highlight.daily-tag {
+  font-family: var(--ui-font);
+  letter-spacing: 0;
+}
+
+.rendered-markdown mark.daily-tag-major,
+.report-data-table mark.daily-tag-major,
+.report-hero mark.daily-tag-major {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.daily-tag-notable,
+.report-data-table mark.daily-tag-notable,
+.report-hero mark.daily-tag-notable {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
+.rendered-markdown mark.daily-tag-general,
+.report-data-table mark.daily-tag-general,
+.report-hero mark.daily-tag-general {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.daily-tag-stars,
+.report-data-table mark.daily-tag-stars,
+.report-hero mark.daily-tag-stars {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.rendered-markdown mark.daily-tag-highlight,
+.report-data-table mark.daily-tag-highlight,
+.report-hero mark.daily-tag-highlight {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.rendered-markdown mark.daily-tag-topic,
+.report-data-table mark.daily-tag-topic,
+.report-hero mark.daily-tag-topic {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
 }
 
 .rendered-markdown mark.trend-status-new,
@@ -210,6 +312,24 @@ h3 {
   border-radius: 8px;
   background: #ffffff;
   object-fit: contain;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image],
+.card-media-grid img[data-lightbox-image] {
+  cursor: zoom-in;
+  transition: box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:hover,
+.card-media-grid img[data-lightbox-image]:hover {
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:focus-visible,
+.card-media-grid img[data-lightbox-image]:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.44);
+  outline-offset: 3px;
 }
 
 .rendered-markdown p:has(> .markdown-image:only-child) {
@@ -747,6 +867,90 @@ p.hero-summary-text {
   text-align: center;
 }
 
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(17, 24, 39, 0.76);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.image-lightbox[hidden] {
+  display: none !important;
+}
+
+.image-lightbox[data-open="true"] {
+  opacity: 1;
+}
+
+.image-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.image-lightbox__figure {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  width: min(96vw, 1400px);
+  max-height: calc(100vh - 56px);
+  margin: 0;
+  place-items: center;
+}
+
+.image-lightbox__image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(82vh, 980px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  object-fit: contain;
+}
+
+.image-lightbox__caption {
+  max-width: min(900px, 92vw);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.image-lightbox__close {
+  justify-self: end;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #111827;
+  background: #ffffff;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.image-lightbox__close:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
 .card-detail-list {
   display: grid;
   gap: 8px;
@@ -886,6 +1090,76 @@ p.hero-summary-text {
   content: "：";
 }
 
+.builder-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.builder-card {
+  gap: 10px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.builder-card h3 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+}
+
+.builder-card .card-title-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  object-fit: cover;
+}
+
+.builder-card .card-title-link {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.builder-card .card-title-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.builder-card .card-tags {
+  gap: 6px;
+}
+
+.builder-card > p {
+  margin: 0;
+  color: #25231f;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.builder-card .card-detail-list {
+  gap: 10px;
+}
+
+.builder-card .card-detail-list div {
+  padding-top: 10px;
+}
+
+.builder-card .card-detail-list dd {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.builder-card .card-detail-list dd span {
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 760px) {
   .blog-card {
     grid-template-columns: 1fr;
@@ -905,6 +1179,10 @@ p.hero-summary-text {
     grid-template-columns: 1fr;
   }
 
+  .builder-card-grid {
+    grid-template-columns: 1fr;
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -916,6 +1194,112 @@ p.hero-summary-text {
 
   .project-card .card-detail-list,
   .card-media-grid[data-count="2"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-card {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "blog-title"
+    "blog-tags"
+    "blog-body"
+    "blog-details";
+  gap: 12px;
+}
+
+.blog-card:has(.card-media-grid) {
+  grid-template-columns: minmax(360px, 1fr) minmax(300px, 0.42fr);
+  grid-template-areas:
+    "blog-title blog-media"
+    "blog-tags blog-media"
+    "blog-body blog-media"
+    "blog-details blog-details";
+  column-gap: 22px;
+}
+
+.blog-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.blog-card .card-tags .chip {
+  justify-content: flex-start;
+}
+
+.blog-card > p {
+  max-width: 1080px;
+}
+
+.blog-card .card-detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list div::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: 0.72em;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.blog-card .card-detail-list dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: none;
+}
+
+.blog-card .card-detail-list dd {
+  display: block;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+@media (max-width: 760px) {
+  .blog-card,
+  .blog-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-media"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card .card-detail-list {
     grid-template-columns: 1fr;
   }
 }
@@ -981,6 +1365,45 @@ p.hero-summary-text {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.chip-major,
+.chip-importance-major {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.chip-notable,
+.chip-importance-notable {
+  border-color: #fdba74;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.chip-general,
+.chip-importance-general {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.chip-stars {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.chip-topic {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.chip-highlight {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .swatch-chip {
@@ -1830,7 +2253,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
       <div class="title-row">
         <div>
-          <div class="eyebrow">AI 日报</div>
+          <div class="eyebrow">AI 日报 · 覆盖 2026-05-26 至 2026-05-28</div>
           <h1 class="report-title report-date-title">2026-05-28</h1>
         </div>
         <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QTwvdGV4dD48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
@@ -1842,9 +2265,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="hero-stat"><span>主体</span><strong>3</strong><small>重点条目</small></div>
 <div class="hero-stat"><span>AIGC</span><strong>2</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>技术博客</span><strong>2</strong><small>深读</small></div>
-<div class="hero-stat"><span>开源</span><strong>12</strong><small>Top10 + 项目</small></div>
+<div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>7</strong><small>观察</small></div>
-<div class="hero-stat"><span>信源窗</span><strong>05-26..05-28</strong><small>扩展</small></div>
+<div class="hero-stat"><span>覆盖</span><strong>05-26..05-28</strong><small>扩展时间范围</small></div>
   </div>
       </div>
     </header>
@@ -1860,23 +2283,23 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI Status" decoding="async"> <a href="https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7" rel="noopener noreferrer">OpenAI Status：Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁</a></strong> <mark class="text-highlight">重大</mark> <mark class="text-highlight">coding agent: 7d 32x/5d</mark>（2026-05-28，T0）</li></ol>
+    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="OpenAI Status" decoding="async"> <a href="https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7" rel="noopener noreferrer">Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 32x/5d</mark>（2026-05-28，T0）</li></ol>
 <ul><li><strong>状态已恢复</strong>：本次重新抓取的 Statuspage 输出显示 affected components 已回到 operational，不再沿用早些时候的 investigating 口径。</li><li><strong>运行分类</strong>：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。</li><li><strong>自动化处理</strong>：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。</li></ul>
-<ol start="2"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> <a href="https://openai.com/index/cisco" rel="noopener noreferrer">OpenAI News RSS：Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理</a></strong> <mark class="text-highlight">重大</mark> <mark class="text-highlight">coding agent: 7d 32x/5d</mark>（2026-05-27，T0）</li></ol>
+<ol start="2"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> <a href="https://openai.com/index/cisco" rel="noopener noreferrer">Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 32x/5d</mark>（2026-05-27，T0）</li></ol>
 <ul><li><strong>落点更具体</strong>：官方文章提到 scale AI-native development、accelerate AI Defense work 和 automate defect remediation，说明 Codex 的叙事正在进入缺陷、测试和安全流程。</li><li><strong>团队门槛</strong>：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。</li><li><strong>可跟进项</strong>：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。</li></ul>
-<ol start="3"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> <a href="https://github.blog/changelog/" rel="noopener noreferrer">GitHub Changelog：GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界</a></strong> <mark class="text-highlight">重大</mark>（2026-05-26，T0）</li></ol>
+<ol start="3"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> <a href="https://github.blog/changelog/" rel="noopener noreferrer">GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-26，T0）</li></ol>
 <ul><li><strong>记忆边界</strong>：仓库级关闭开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实，减少错误记忆被全仓库复用。</li><li><strong>模型准入</strong>：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。</li><li><strong>合并门禁</strong>：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。</li></ul></div>
-    <template data-rich-source data-source-fallback>1. **![OpenAI Status](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) [OpenAI Status：Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁](https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7)** ==重大== ==coding agent: 7d 32x/5d==（2026-05-28，T0）
+    <template data-rich-source data-source-fallback>1. **![OpenAI Status](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=) [Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁](https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7)** ==tag-major|重大== ==tag-topic|coding agent: 7d 32x/5d==（2026-05-28，T0）
   - **状态已恢复**：本次重新抓取的 Statuspage 输出显示 affected components 已回到 operational，不再沿用早些时候的 investigating 口径。
   - **运行分类**：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。
   - **自动化处理**：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。
 
-2. **![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) [OpenAI News RSS：Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理](https://openai.com/index/cisco)** ==重大== ==coding agent: 7d 32x/5d==（2026-05-27，T0）
+2. **![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) [Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理](https://openai.com/index/cisco)** ==tag-major|重大== ==tag-topic|coding agent: 7d 32x/5d==（2026-05-27，T0）
   - **落点更具体**：官方文章提到 scale AI-native development、accelerate AI Defense work 和 automate defect remediation，说明 Codex 的叙事正在进入缺陷、测试和安全流程。
   - **团队门槛**：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。
   - **可跟进项**：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。
 
-3. **![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) [GitHub Changelog：GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界](https://github.blog/changelog/)** ==重大==（2026-05-26，T0）
+3. **![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) [GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界](https://github.blog/changelog/)** ==tag-major|重大==（2026-05-26，T0）
   - **记忆边界**：仓库级关闭开关和捕获时 scope 提示，让团队能区分个人偏好和仓库事实，减少错误记忆被全仓库复用。
   - **模型准入**：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。
   - **合并门禁**：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。</template>
@@ -1894,70 +2317,42 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Agentic enterprise IT benchmark" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://huggingface.co/blog/ibm-research/itbench-aa" rel="noopener noreferrer">ITBench-AA: Frontier Models Score Below 50% on the First Benchmark for Agentic Enterprise IT Tasks</a></h3>
-    <div class="card-tags"><span class="chip">值得关注</span><span class="chip">Agentic enterprise IT benchmark</span></div>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Agentic enterprise IT benchmark</span></div>
 
-    <p>这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。</p>
-
+    <p>这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。</p>
+    <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Local speech-to-speech agent stack" data-search-target="html-work-report">
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://huggingface.co/blog/local-reachy-mini-conversation" rel="noopener noreferrer">Reachy Mini goes fully local</a></h3>
-    <div class="card-tags"><span class="chip">值得关注</span><span class="chip">Local speech-to-speech agent stack</span></div>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Local speech-to-speech agent stack</span></div>
 
-    <p>文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。</p>
-
+    <p>文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。</p>
+    <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。</span></dd></div></dl>
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-github-trending-top-10-daily-3" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-github-trending-top-10-3" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
-      <h2>GitHub Trending · Top 10 daily</h2>
+      <h2>GitHub Trending · Top 10</h2>
 
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="harry0703/MoneyPrinterTurbo" decoding="async"> <a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer">harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight">值得关注</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 利用 AI 大模型一键生成高清短视频。 | #1，较前一日持平；今日 +1,742 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Lum1104/Understand-Anything" decoding="async"> <a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight">值得关注</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark> <mark class="text-highlight">coding agent: 7d 32x/5d</mark>: 把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Code… | #2，较前一日持平；今日 +4,465 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="hardikpandya/stop-slop" decoding="async"> <a href="https://github.com/hardikpandya/stop-slop" rel="noopener noreferrer">hardikpandya/stop-slop</a></strong> <mark class="text-highlight">值得关注</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 用于去除文章中常见 AI 痕迹的 skill 文件。 | #3，较前一日持平；今日 +664 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="affaan-m/ECC" decoding="async"> <a href="https://github.com/affaan-m/ECC" rel="noopener noreferrer">affaan-m/ECC</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark> <mark class="text-highlight">coding agent: 7d 32x/5d</mark>: 面向 Claude Code、Codex、opencode、Cursor 等工具的 age… | #4，较前一日持平；今日 +2,062 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="anthropics/knowledge-work-plugins" decoding="async"> <a href="https://github.com/anthropics/knowledge-work-plugins" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。 | #5，较前一日持平；今日 +695 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Leonxlnx/taste-skill" decoding="async"> <a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer">Leonxlnx/taste-skill</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。 | #6，较前一日持平；今日 +2,715 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="p-e-w/heretic" decoding="async"> <a href="https://github.com/p-e-w/heretic" rel="noopener noreferrer">p-e-w/heretic</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 用于自动移除语言模型审查限制的工具。 | #7，较前一日持平；今日 +211 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="shiyu-coder/Kronos" decoding="async"> <a href="https://github.com/shiyu-coder/Kronos" rel="noopener noreferrer">shiyu-coder/Kronos</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 面向金融市场序列语言的基础模型。 | #8，较前一日持平；今日 +401 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="mukul975/Anthropic-Cybersecurity-Skills" decoding="async"> <a href="https://github.com/mukul975/Anthropic-Cybersecurity-Skills" rel="noopener noreferrer">mukul975/Anthropic-Cybersecurity-Skills</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK… | #9，较前一日持平；今日 +886 stars</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="twentyhq/twenty" decoding="async"> <a href="https://github.com/twentyhq/twenty" rel="noopener noreferrer">twentyhq/twenty</a></strong> <mark class="text-highlight">一般</mark> <mark class="text-highlight trend-status trend-status-new">NEW</mark>: 面向 AI 场景设计的开源 Salesforce 替代方案。 | #10，较前一日持平；今日 +519 stars</li></ol></div>
-    <template data-rich-source data-source-fallback>1. **![harry0703/MoneyPrinterTurbo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==值得关注== ==trend-new|NEW==: 利用 AI 大模型一键生成高清短视频。 | #1，较前一日持平；今日 +1,742 stars
-2. **![Lum1104/Understand-Anything](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==值得关注== ==trend-new|NEW== ==coding agent: 7d 32x/5d==: 把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Code… | #2，较前一日持平；今日 +4,465 stars
-3. **![hardikpandya/stop-slop](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop)** ==值得关注== ==trend-new|NEW==: 用于去除文章中常见 AI 痕迹的 skill 文件。 | #3，较前一日持平；今日 +664 stars
-4. **![affaan-m/ECC](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [affaan-m/ECC](https://github.com/affaan-m/ECC)** ==一般== ==trend-new|NEW== ==coding agent: 7d 32x/5d==: 面向 Claude Code、Codex、opencode、Cursor 等工具的 age… | #4，较前一日持平；今日 +2,062 stars
-5. **![anthropics/knowledge-work-plugins](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)** ==一般== ==trend-new|NEW==: Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。 | #5，较前一日持平；今日 +695 stars
-6. **![Leonxlnx/taste-skill](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)** ==一般== ==trend-new|NEW==: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。 | #6，较前一日持平；今日 +2,715 stars
-7. **![p-e-w/heretic](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [p-e-w/heretic](https://github.com/p-e-w/heretic)** ==一般== ==trend-new|NEW==: 用于自动移除语言模型审查限制的工具。 | #7，较前一日持平；今日 +211 stars
-8. **![shiyu-coder/Kronos](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [shiyu-coder/Kronos](https://github.com/shiyu-coder/Kronos)** ==一般== ==trend-new|NEW==: 面向金融市场序列语言的基础模型。 | #8，较前一日持平；今日 +401 stars
-9. **![mukul975/Anthropic-Cybersecurity-Skills](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills)** ==一般== ==trend-new|NEW==: 为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK… | #9，较前一日持平；今日 +886 stars
-10. **![twentyhq/twenty](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [twentyhq/twenty](https://github.com/twentyhq/twenty)** ==一般== ==trend-new|NEW==: 面向 AI 场景设计的开源 Salesforce 替代方案。 | #10，较前一日持平；今日 +519 stars</template>
+    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="harry0703/MoneyPrinterTurbo" decoding="async"> <a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer">harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,742 stars</mark>: 利用 AI 大模型一键生成高清短视频。；#1，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Lum1104/Understand-Anything" decoding="async"> <a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer">Lum1104/Understand-Anything</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +4,465 stars</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 32x/5d</mark>: 把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。；#2，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="hardikpandya/stop-slop" decoding="async"> <a href="https://github.com/hardikpandya/stop-slop" rel="noopener noreferrer">hardikpandya/stop-slop</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +664 stars</mark>: 用于去除文章中常见 AI 痕迹的 skill 文件。；#3，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="affaan-m/ECC" decoding="async"> <a href="https://github.com/affaan-m/ECC" rel="noopener noreferrer">affaan-m/ECC</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +2,062 stars</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 32x/5d</mark>: 面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。；#4，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="anthropics/knowledge-work-plugins" decoding="async"> <a href="https://github.com/anthropics/knowledge-work-plugins" rel="noopener noreferrer">anthropics/knowledge-work-plugins</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +695 stars</mark>: Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。；#5，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Leonxlnx/taste-skill" decoding="async"> <a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer">Leonxlnx/taste-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +2,715 stars</mark>: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。；#6，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="p-e-w/heretic" decoding="async"> <a href="https://github.com/p-e-w/heretic" rel="noopener noreferrer">p-e-w/heretic</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +211 stars</mark>: 用于自动移除语言模型审查限制的工具。；#7，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="shiyu-coder/Kronos" decoding="async"> <a href="https://github.com/shiyu-coder/Kronos" rel="noopener noreferrer">shiyu-coder/Kronos</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +401 stars</mark>: 面向金融市场序列语言的基础模型。；#8，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="mukul975/Anthropic-Cybersecurity-Skills" decoding="async"> <a href="https://github.com/mukul975/Anthropic-Cybersecurity-Skills" rel="noopener noreferrer">mukul975/Anthropic-Cybersecurity-Skills</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +886 stars</mark>: 为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK、NIST CSF、MITRE ATLAS、D3FEND 与 NIST AI RMF，并面向 Claude Code、GitHub Copilot、…；#9，较前一日持平</li><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="twentyhq/twenty" decoding="async"> <a href="https://github.com/twentyhq/twenty" rel="noopener noreferrer">twentyhq/twenty</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +519 stars</mark>: 面向 AI 场景设计的开源 Salesforce 替代方案。；#10，较前一日持平</li></ol></div>
+    <template data-rich-source data-source-fallback>1. **![harry0703/MoneyPrinterTurbo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +1,742 stars==: 利用 AI 大模型一键生成高清短视频。；#1，较前一日持平
+2. **![Lum1104/Understand-Anything](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +4,465 stars== ==tag-topic|coding agent: 7d 32x/5d==: 把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。；#2，较前一日持平
+3. **![hardikpandya/stop-slop](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +664 stars==: 用于去除文章中常见 AI 痕迹的 skill 文件。；#3，较前一日持平
+4. **![affaan-m/ECC](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [affaan-m/ECC](https://github.com/affaan-m/ECC)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +2,062 stars== ==tag-topic|coding agent: 7d 32x/5d==: 面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。；#4，较前一日持平
+5. **![anthropics/knowledge-work-plugins](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +695 stars==: Anthropic 面向 Claude Cowork 知识工作场景开放的插件仓库。；#5，较前一日持平
+6. **![Leonxlnx/taste-skill](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +2,715 stars==: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。；#6，较前一日持平
+7. **![p-e-w/heretic](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [p-e-w/heretic](https://github.com/p-e-w/heretic)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +211 stars==: 用于自动移除语言模型审查限制的工具。；#7，较前一日持平
+8. **![shiyu-coder/Kronos](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [shiyu-coder/Kronos](https://github.com/shiyu-coder/Kronos)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +401 stars==: 面向金融市场序列语言的基础模型。；#8，较前一日持平
+9. **![mukul975/Anthropic-Cybersecurity-Skills](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +886 stars==: 为 AI agents 准备的结构化网络安全 skills，映射 MITRE ATT&amp;CK、NIST CSF、MITRE ATLAS、D3FEND 与 NIST AI RMF，并面向 Claude Code、GitHub Copilot、…；#9，较前一日持平
+10. **![twentyhq/twenty](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [twentyhq/twenty](https://github.com/twentyhq/twenty)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|今日 +519 stars==: 面向 AI 场景设计的开源 Salesforce 替代方案。；#10，较前一日持平</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>今日值得关注的项目</h2>
-
-    </div>
-
-  </div>
-
-    <div class="evidence-grid focus-field project-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="inference_serving" data-search-target="html-work-report">
-    <div class="meta">inference_serving</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://github.com/vllm-project/vllm-metal" rel="noopener noreferrer">vllm-project/vllm-metal</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>社区维护的 vLLM Apple Silicon 硬件插件，GitHub release 显示 2026-05-27 的 v0.2.0-20260527-105045。它面向想在 macOS Apple Silicon 上使用 vLLM CLI 和 OpenAI-compatible serving 的开发者。</p>
-    <dl class="card-detail-list"><div><dt>领域</dt><dd><span>inference_serving、apple_silicon、vllm_plugin</span></dd></div><div><dt>作用</dt><dd><span>在 Apple Silicon 本地环境测试或演示 vLLM serving，降低小团队做本地 LLM 服务验证的门槛。</span></dd></div></dl>
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight project-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="RAG" data-search-target="html-work-report">
-    <div class="meta">RAG</div>
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://github.com/infiniflow/ragflow/releases" rel="noopener noreferrer">RAGFlow v0.25.6</a></h3>
-    <div class="card-tags"><span class="chip">一般</span></div>
-
-    <p>RAGFlow v0.25.6 在 2026-05-26 发布，release note 包含 agent Browser component、RAPTOR/AHC 相关 RAG 改进、轻量 @tool decorator、base64 image agent message 和 chat completion 参数控制。</p>
-    <dl class="card-detail-list"><div><dt>领域</dt><dd><span>RAG、agent_builder、knowledge_base</span></dd></div><div><dt>作用</dt><dd><span>给需要把检索、agent 工作流和文档知识库放在同一平台中的团队，提供近期可验证的功能更新入口。</span></dd></div></dl>
-  </article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-x-twitter-5" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-x-twitter-4" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>X/Twitter 讨论</h2>
@@ -1965,18 +2360,59 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><h4>X/Twitter 讨论</h4>
-<ul><li><strong>Weights &amp; Biases</strong> <mark class="text-highlight">值得关注</mark>（MLOps / eval platform builder）：W&amp;B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC" alt="Tavily X builder search fallback" decoding="async"> <a href="https://x.com/wandb/status/2059384552725025226" rel="noopener noreferrer">Tavily X builder search fallback</a></li><li><strong>Suryansh Tiwari</strong> <mark class="text-highlight">值得关注</mark>（AI tool builder / curator）：Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC" alt="Tavily X builder search fallback" decoding="async"> <a href="https://x.com/Suryanshti777/status/2059555214294970631" rel="noopener noreferrer">Tavily X builder search fallback</a></li><li><strong>AI &amp; I by Every</strong> <mark class="text-highlight">值得关注</mark>（Podcast）：Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。 <img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RkJQPC90ZXh0Pjwvc3ZnPg==" alt="follow-builders podcast feed" decoding="async"> <a href="https://www.youtube.com/watch?v=dCmOTURRf1Y" rel="noopener noreferrer">follow-builders podcast feed</a></li><li><strong>Simon Willison</strong> <mark class="text-highlight">值得关注</mark>（Builder / researcher）：SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=" alt="Simon Willison Weblog" decoding="async"> <a href="https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li><li><strong>Simon Willison</strong> <mark class="text-highlight">值得关注</mark>（Builder / researcher）：Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=" alt="Simon Willison Weblog" decoding="async"> <a href="https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li><li><strong>Simon Willison</strong> <mark class="text-highlight">值得关注</mark>（Builder / researcher）：curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=" alt="Simon Willison Weblog" decoding="async"> <a href="https://simonwillison.net/2026/May/26/the-pressure/#atom-everything" rel="noopener noreferrer">Simon Willison Weblog</a></li></ul></div>
-    <template data-rich-source data-source-fallback>### X/Twitter 讨论
 
-- **Weights &amp; Biases** ==值得关注==（MLOps / eval platform builder）：W&amp;B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。 ![Tavily X builder search fallback](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC) [Tavily X builder search fallback](https://x.com/wandb/status/2059384552725025226)
-- **Suryansh Tiwari** ==值得关注==（AI tool builder / curator）：Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。 ![Tavily X builder search fallback](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC) [Tavily X builder search fallback](https://x.com/Suryanshti777/status/2059555214294970631)
-- **AI &amp; I by Every** ==值得关注==（Podcast）：Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。 ![follow-builders podcast feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RkJQPC90ZXh0Pjwvc3ZnPg==) [follow-builders podcast feed](https://www.youtube.com/watch?v=dCmOTURRf1Y)
-- **Simon Willison** ==值得关注==（Builder / researcher）：SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。 ![Simon Willison Weblog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=) [Simon Willison Weblog](https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything)
-- **Simon Willison** ==值得关注==（Builder / researcher）：Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。 ![Simon Willison Weblog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=) [Simon Willison Weblog](https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything)
-- **Simon Willison** ==值得关注==（Builder / researcher）：curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。 ![Simon Willison Weblog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=) [Simon Willison Weblog](https://simonwillison.net/2026/May/26/the-pressure/#atom-everything)</template>
+    <div class="evidence-grid focus-field builder-card-grid" data-focus-field="x-twitter">
+      <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+V0I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/wandb/status/2059384552725025226" rel="noopener noreferrer">Weights &amp; Biases</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">MLOps / eval platform builder</span><span class="chip chip-date">2026-05-26</span></div>
+
+    <p>W&amp;B 在 X 上宣布 MCP server 已上线：coding agents 不只读代码，也可以读取实验、监控训练并驱动研究循环。这里的重点不是又多一个 MCP，而是实验跟踪系统开始变成 agent 的工具面；团队接入时要同时看权限、审计和哪些实验数据允许被 agent 读取。</p>
+    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@wandb</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U1Q8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/Suryanshti777/status/2059555214294970631" rel="noopener noreferrer">Suryansh Tiwari</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI tool builder / curator</span><span class="chip chip-date">2026-05-27</span></div>
+
+    <p>Suryansh 在 X 上把 Claude Code 的 claude-code-setup 插件描述为一层工程环境初始化器：扫描项目后建议 hooks、skills、MCP servers、subagents 和 automations。可采纳的信息是工作流方向，而不是把插件效果当作官方背书；真正落地前仍要回到插件仓库和安装说明核验。</p>
+    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@Suryanshti777</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUlCPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://www.youtube.com/watch?v=dCmOTURRf1Y" rel="noopener noreferrer">AI &amp; I by Every</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Podcast</span><span class="chip chip-date">2026-05-27</span></div>
+
+    <p>Every 的访谈把 AI 自动化和团队扩张放在同一张表里讨论：自动化不是简单减人，而是把流程、岗位和交付节奏重新拆分。这里只把它作为 builder 观察，不把标题里的业绩数字当成未经核验的事实结论。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U1c8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://simonwillison.net/2026/May/27/sqlite-agents/#atom-everything" rel="noopener noreferrer">Simon Willison</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Builder / researcher</span><span class="chip chip-date">2026-05-27</span></div>
+
+    <p>SQLite 新增 AGENTS.md 不是为了接受 agent PR，而是给外部 agents 明确项目边界。这提示成熟代码库会把“agent 可读规则”和“维护者接受贡献”分开写清楚。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U1c8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://simonwillison.net/2026/May/27/product-market-fit/#atom-everything" rel="noopener noreferrer">Simon Willison</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Builder / researcher</span><span class="chip chip-date">2026-05-27</span></div>
+
+    <p>Simon 把 Anthropic 和 OpenAI 的高频企业使用归因到 coding agents 找到 product-market fit：公司员工用得越多，账单越高。这条适合观察 agent 工具从个人提效进入企业预算项后的成本边界。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U1c8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://simonwillison.net/2026/May/26/the-pressure/#atom-everything" rel="noopener noreferrer">Simon Willison</a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Builder / researcher</span><span class="chip chip-date">2026-05-26</span></div>
+
+    <p>curl 维护者面对 AI 辅助安全报告数量上升，问题不只是“更多漏洞线索”，还包括 triage 负担、误报成本和维护者注意力。开源项目接入 AI 报告前，需要先设计报告质量门。</p>
+
+  </article>
+    </div>
   </section>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
@@ -2107,7 +2543,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - ![SSPAI](data:image/png;base64,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) [SSPAI](https://sspai.com/feed)：checked，10 feed entries parsed; 6 within 48h
 - ![iFanr](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFPUlEQVR4nO2b/2vTThjHn/uWZE1a026uXaDZsJaJUlAYiqD4J33+Q8Ef/GnFLz8IlW1qW9S2Ebs169ilubvPD7Mw62aHTXKD9Q0HbQjJc6/c89z7rikCgAO4wcK6A9CtJQDdAejWEoDuAHRrCUB3ALq1BKA7AN1aAtAdgG4tAegOQLduPAC66AUMw0AIoSufL4RQcRwvetvEtBAAQgg0Gg3m+z6ZHlNKwd+AfP36Vbx58ya6LhAWAiCEgE6nE/u+T/L5PFZK/XEOQgimxxFCsLW1hYIgEJ8/fxaL3DspEQD4b5ELcM6VYRjI8zzCGEOEkL82y7KQZVmo3+8LznlC3fh3LQxAKQXj8Vitr6+TUqmECSEwrxUKBRxFEfR6PXHRqMlSCwMAAIiiCJRS4Ps+tSzrtyeOMf7tO6UUUUqR67q43+/LMAy1EkgEAADAaDSSa2treGNjg85LA0IIyuVy2DAM1G63hRD6ykFiAKSUMBqN5J07d2g+n8dXgVAsFnEYhrLX68kkYvgXJQYAAODk5EQRQqBerzPG2NxaYJomunXrFm632/HJyYmWVEgUAABAGIayXC7jSqVCZ/P/opbP5zEAwJcvX2Ipsx8IiQPgnEMUReru3bvMcZxLUwFjDIQQxBhDxWIRDwYDGQRB5gQSBwBwVhBd18Wbm5t01hucHxWUUoQxRo7jYNM00f7+fsw5zzQVUgEghIDhcCi3t7eNUqmEfz1tIITAZZ9v376Nj46OVKfTibP0BqkAADgriFJKuH//vmGa5txaYBgGKpfL5OPHj5PRaJQZgdQAAAD8+PFDVqtV6vv+H97gogI5TYUPHz5MsvIGqQKI4xjCMFSNRsMoFAr4so5P6wFjDK2trZEgCES3282EQKoAAAAODw+lbdvowYMHxmXeYFoLMMZg2zZyHAe1Wq3J8fFx6qmQOgApJfz8+VPUajXmeR5FCCGM8aUjAWOM1tfXyXg8Vq1Wa5K2N0gdAADA8fGxUkqphw8fmrZtT70BzE6H0+OMMVypVOje3t5kMBikSiATAAAAvV5PVqtVUqvV2HRFOO307GjAGKNCoYBt20bNZjOaTCapxZUZgDiOod/viydPnpjFYvFK+waVSoUGQSD29vZS2z/LDADAmUMkhMDOzo5pGMZcb7CysoLK5TJ5+/ZtdHR0lEoqZApAKQX9fl/U63VWq9XY+YJ4vp1PhVKphAEA3r17l8pGaqYAAM4c4unpqdzZ2TFd1yXzVoymaaJKpUIPDg4m7XY7cW+QOQAAgF6vJzzPo41G40JvMLtecF0XO46Dms0mH4/HiXoDLQCEEPDt2zfx+PFjc2Nj46/7BtO0qFardDAYiPfv3yc6JWgBAHDmEAFAPXv2zLIsC2GM4aI2HQmGYSDf99nu7i5Pct9AGwAAgG63K+7du8e2t7dNSuncWaFUKuFcLodevXp1mlRB1AqAc66CIBAvXrywVldXf9s3uKgxxpDneaTb7catViuRVNAKAABgMBgI13XR06dPrXm/LP1yiGR1dRW/fv369PDwcOGCqB2AEAK+f/8uHj16ZPzyBrM1YLYggud5NAxDubu7u7A30A4AAGA4HEoppXr+/PlKoVAgszPArEEyTRNtbW3RZrPJO53OQt7gWgAAAPj06VNcr9fZ5uYmjaJIcc5VFEV/NM654pyrXC6HKKXo5cuXp4sslhBco/8LOI6DbNu+8lsrk8lEDYdDucgm6rUCoEM3/h2hJQDdAejWEoDuAHRrCUB3ALq1BKA7AN1aAtAdgG4tAegOQLduPID/ATYeFM+mDUq7AAAAAElFTkSuQmCC) [iFanr](https://www.ifanr.com/feed)：checked，20 feed entries parsed; 12 within 48h</template></div>
   </details>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
       <span class="collapsible-summary-main">
         <span class="meta">附录</span>
@@ -2379,7 +2815,101 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     lastActiveNavId = active ? active.id : "";
   }
 
+  var imageLightbox = null;
+  var imageLightboxReturnFocus = null;
+
+  function ensureImageLightbox() {
+    if (imageLightbox) return imageLightbox;
+
+    var root = document.createElement("div");
+    root.className = "image-lightbox";
+    root.hidden = true;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "图片放大预览");
+    root.innerHTML = [
+      '<button class="image-lightbox__backdrop" type="button" data-lightbox-close aria-label="关闭放大图片"></button>',
+      '<figure class="image-lightbox__figure">',
+      '<button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭放大图片">关闭</button>',
+      '<img class="image-lightbox__image" alt="">',
+      '<figcaption class="image-lightbox__caption"></figcaption>',
+      '</figure>'
+    ].join("");
+    document.body.appendChild(root);
+
+    imageLightbox = {
+      root: root,
+      image: root.querySelector(".image-lightbox__image"),
+      caption: root.querySelector(".image-lightbox__caption"),
+      close: root.querySelector(".image-lightbox__close")
+    };
+    return imageLightbox;
+  }
+
+  function imageLightboxCaption(image) {
+    var explicit = image.getAttribute("data-lightbox-caption") || image.getAttribute("alt") || "";
+    if (explicit.trim()) return explicit.trim();
+
+    var figure = image.closest("figure");
+    var caption = figure ? figure.querySelector("figcaption") : null;
+    if (caption && caption.textContent.trim()) return caption.textContent.trim();
+
+    var paragraph = image.closest("p");
+    var next = paragraph ? paragraph.nextElementSibling : null;
+    if (next && next.matches("p") && next.textContent.trim()) {
+      return next.textContent.trim();
+    }
+    return "";
+  }
+
+  function openImageLightbox(image) {
+    var source = image.currentSrc || image.getAttribute("src") || "";
+    if (!source) return;
+
+    var dialog = ensureImageLightbox();
+    var caption = imageLightboxCaption(image);
+    imageLightboxReturnFocus = image;
+    dialog.image.src = source;
+    dialog.image.alt = image.getAttribute("alt") || caption || "放大图片";
+    dialog.caption.textContent = caption;
+    dialog.caption.hidden = !caption;
+    dialog.root.hidden = false;
+    dialog.root.setAttribute("data-open", "true");
+    document.body.classList.add("lightbox-open");
+    window.setTimeout(function () {
+      if (dialog.close && dialog.close.focus) {
+        dialog.close.focus({ preventScroll: true });
+      }
+    }, 0);
+  }
+
+  function closeImageLightbox() {
+    if (!imageLightbox || imageLightbox.root.hidden) return;
+    imageLightbox.root.removeAttribute("data-open");
+    imageLightbox.root.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    imageLightbox.image.removeAttribute("src");
+    if (imageLightboxReturnFocus && imageLightboxReturnFocus.focus) {
+      imageLightboxReturnFocus.focus({ preventScroll: true });
+    }
+    imageLightboxReturnFocus = null;
+  }
+
   document.addEventListener("click", function (event) {
+    var lightboxClose = event.target.closest("[data-lightbox-close]");
+    if (lightboxClose) {
+      event.preventDefault();
+      closeImageLightbox();
+      return;
+    }
+
+    var lightboxImage = event.target.closest("[data-lightbox-image]");
+    if (lightboxImage) {
+      event.preventDefault();
+      openImageLightbox(lightboxImage);
+      return;
+    }
+
     var navLink = event.target.closest("[data-nav-link]");
     if (navLink) {
       var href = navLink.getAttribute("href") || "";
@@ -2409,6 +2939,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     if (button.matches("[data-tab-group][data-tab]")) {
       activateTab(button);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeImageLightbox();
+      return;
+    }
+
+    if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-lightbox-image]")) {
+      event.preventDefault();
+      openImageLightbox(event.target);
     }
   });
 

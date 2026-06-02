@@ -8,11 +8,11 @@
 
 > 固定信源审计口径：固定 A-F 信源面的要求是“已检查并写入最终 `source_audit`”。如果公开源在当前环境返回 403/5xx，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可证明 source surface 已尝试检查，但不得把 blocked 来源的未核验事实写入正文。
 
-> 发布计划精确性：`publish:dry-run` 必须证明所有 `current_dirty_files` 中的发布器管理文件都出现在 `will_stage_files`。如果返回 `publisher_dirty_outside_publish_plan`，不要真实发布；先修复发布计划或归档与本次日期无关的悬空 `docs/` / `reports-data/` 产物。特别确认当日 `evidence_assets[*].local_path` 对应的 `docs/assets/evidence/**` 图片进入 `will_stage_files`。
+> 发布计划精确性：`publish:dry-run` 必须证明所有 `current_dirty_files` 中的发布器管理文件都出现在 `will_stage_files`。如果返回 `publisher_dirty_outside_publish_plan`，不要真实发布；先修复发布计划或归档与本次日期无关的悬空 `docs/` / `reports-data/` 产物。特别确认当日 `evidence_assets[*].local_path` 对应的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 进入 `will_stage_files`。
 
 > 固定信源审计口径：固定 A-F 信源面的要求是“已检查并写入最终 `source_audit`”。如果公开源在当前环境返回 403/5xx，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可证明 source surface 已尝试检查，但不得把 blocked 来源的未核验事实写入正文。
 
-> 发布计划精确性：`publish:dry-run` 必须证明所有 `current_dirty_files` 中的发布器管理文件都出现在 `will_stage_files`。如果返回 `publisher_dirty_outside_publish_plan`，不要真实发布；先修复发布计划或归档与本次日期无关的悬空 `docs/` / `reports-data/` 产物。特别确认当日 `evidence_assets[*].local_path` 对应的 `docs/assets/evidence/**` 图片进入 `will_stage_files`。
+> 发布计划精确性：`publish:dry-run` 必须证明所有 `current_dirty_files` 中的发布器管理文件都出现在 `will_stage_files`。如果返回 `publisher_dirty_outside_publish_plan`，不要真实发布；先修复发布计划或归档与本次日期无关的悬空 `docs/` / `reports-data/` 产物。特别确认当日 `evidence_assets[*].local_path` 对应的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 进入 `will_stage_files`。
 
 执行顺序：
 

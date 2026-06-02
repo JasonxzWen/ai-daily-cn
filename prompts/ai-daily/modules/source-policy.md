@@ -8,7 +8,7 @@
 优先扩展信源：
 
 - 信源注册表：固定源统一维护在 `config/sources/*.json`，新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement` 和 `verification_policy`，并通过 `npm run sources:validate`。默认日报只运行 `core`，`optional/manual` 需要显式启用或用户提供。
-- Builder/X/播客：优先使用 `follow-builders central feed`，再回到原始 X URL、公开视频、播客页或个人博客；Follow AI Builders 可作为 builder 名录和标签线索。需要更大 X 覆盖面时，只使用能保留原始 X status URL 的自托管 RSSHub、twscrape、列表导出或等价工具。
+- Builder/X/播客：优先使用 `follow-builders central feed`，再回到原始 X URL、公开视频、播客页或个人博客；Follow AI Builders 可作为 builder 名录和标签线索。需要更大 X 覆盖面时，只使用能保留原始 X status URL 的自托管 RSSHub、twscrape、列表导出或等价工具。Builder 观点入选时必须保留完整 `original_text` 并提供忠实中文 `translation`，不能用二手摘要或自己概括替代；能拿到 handle/头像时同步写入 `handle` 和 `avatar_url`。
 - 官方与实验室工程博客：OpenAI News/RSS、Anthropic Engineering/News、Google DeepMind、Google Research、Meta AI、Microsoft Research、Hugging Face Blog。
 - 广义科技、大厂和行业趋势：TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Google Keyword Blog、Official Microsoft Blog、Apple Newsroom、Meta Newsroom、Amazon News 等可以作为候选源；只有当它们影响 AI 供给、开发者工作流、平台政策、算力/云、产品分发、监管或产业结构时才入选。
 - 高质量个人/社区技术博客与访谈：Latent.Space、Interconnects、Simon Willison、Chip Huyen、Karpathy、BAIR Blog，以及对 OpenAI、Anthropic、Google、Meta 等大型实验室工程师的原始访谈或 transcript。
@@ -21,9 +21,9 @@
 
 扩容目标：
 
-- 新日报目标是 22-30 个内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。
-- `main_items` 目标是 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报并使用 `**加粗**` / `==高亮==` 标重点。主体信息只写新闻事实、数据、图表、限制和影响，不写对日报自身的“后续跟进/报道口径/扩容建议”。
-- 高信号模型类重大变化必须纳入 `main_items`，`model_releases` 只作为历史兼容字段，新草稿默认空数组，不能让主体信息因此减少。
+- 新日报目标是 22-30 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 只作为 GitHub Trending highlights 展示。
+- `main_items` 目标是 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报并使用 `**加粗**` / `==高亮词==` 标重点。高亮词会渲染成加粗变色文字，不是 tag/chip。主体信息只写新闻事实、数据、图表、限制和影响，不写对日报自身的“后续跟进/报道口径/扩容建议”。
+- 高信号真实模型发布必须纳入 `main_items`，`model_releases` 只作为结构化索引和可用性字段集合，不能让主体信息因此减少。
 - 扩容通过增加候选池实现，不通过降低高风险事实门槛实现。正文少于 18 个内容单元时，不凑数；在 `quality_status` 或 `self_check.notes` 写明缺口来源。
 
 禁止：
@@ -47,5 +47,5 @@
 - `hot_blogs` 必须使用原文链接，且能确认 `event_date`。
 - 没有明确发布日期、发布时间或可交叉确认日期的博客，只能作为社区线索或待验证线索，不进入 `hot_blogs`。
 - 工程博客、研究博客和设计文章可以来自官方工程博客、研究团队、项目维护者或高质量个人站点；最终链接必须回到原文。
-- `hot_blogs[*].summary` 必须是 300-500 字中文内容摘要，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要写“为什么重要”。
+- `hot_blogs[*].summary` 必须是约 100-160 个中文字符的分点式内容摘要，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要写“为什么重要”。如果原文有直接支撑理解的架构图、流程图、benchmark 图或关键截图，应通过 `evidence_assets` 缓存并贴图；没有信息密度的封面图不贴。
 - 访谈和播客如果有原始链接、受访者身份和明确技术/工程内容，可作为 `hot_blogs`、`builder_observations` 或 `community_leads` 候选。

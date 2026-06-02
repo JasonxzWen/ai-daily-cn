@@ -229,6 +229,25 @@
         "evidence": {
           "type": "string"
         },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "avatar_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "avatar_local_path": {
+          "type": "string",
+          "minLength": 1
+        },
         "notes": {
           "type": "string"
         },
