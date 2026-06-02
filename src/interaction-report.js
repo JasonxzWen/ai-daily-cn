@@ -9,7 +9,6 @@ import {
   cleanGithubTrendDescription,
   cleanProjectDescription,
   githubTrendStatusHighlightTag,
-  modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
 import { importanceTag } from "./importance.js";
@@ -101,7 +100,6 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
 
 export function reportToInteractionInput(report, options = {}) {
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
-  const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
   const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
@@ -122,14 +120,6 @@ export function reportToInteractionInput(report, options = {}) {
     }
   ];
 
-  if (modelReleases.length > 0) {
-    sections.push({
-      type: "markdown",
-      title: "模型发布",
-      group: "main",
-      content: formatModelReleases(modelReleases, { report, evidenceByUrl })
-    });
-  }
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -210,13 +200,12 @@ export function reportToInteractionInput(report, options = {}) {
 
   return {
     title: report.title,
-    summary: String(report.summary || "").trim(),
+    summary: editorialSummary(report),
     heroMode: "daily-report",
     heroTitle: report.report_date,
     heroEyebrow: "AI 日报",
     heroStats: dailyHeroStats(report, {
       mainItems,
-      modelReleases,
       hotBlogs,
       githubTrending,
       projects,
@@ -243,10 +232,58 @@ export function reportToInteractionInput(report, options = {}) {
         "项目和 Builder 观察与主体信息分开",
         "信源审计可展开",
         "结构化 JSON 可追溯"
-      ]
+      ],
+      ...dailyIntent(report)
     },
     sections,
     nextActions: []
+  };
+}
+
+function editorialSummary(report) {
+  const summary = String(report?.summary || "").trim();
+  if (!isProcessStatusSummary(summary)) {
+    return summary;
+  }
+
+  const highlights = Array.isArray(report?.hero_highlights) ? report.hero_highlights : [];
+  const highlightSummary = highlights
+    .slice(0, 3)
+    .map((item) => {
+      const title = String(item?.title || "").trim();
+      const reason = String(item?.reason || "").trim();
+      if (!title) return "";
+      return reason ? `${title}：${reason}` : title;
+    })
+    .filter(Boolean)
+    .join("；");
+  if (highlightSummary) {
+    return `今日主线：${highlightSummary}`;
+  }
+
+  const mainTitles = (Array.isArray(report?.main_items) ? report.main_items : [])
+    .slice(0, 3)
+    .map((item) => String(item?.title || "").trim())
+    .filter(Boolean)
+    .join("、");
+  return mainTitles ? `今日主线围绕 ${mainTitles} 展开。` : summary;
+}
+
+function isProcessStatusSummary(summary) {
+  return /最新\s*main|重新生成|结构化\s*JSON|内容单元|扩展为\s*\d+\s*条|generated from|regenerated|build log/i.test(summary);
+}
+
+function dailyIntent(report) {
+  return {
+    audience: "普通工程师：有技术能力，关注 AI 行业内模型、公司、工具、产品、开源项目、观点和社区讨论。",
+    primaryQuestion: `${report.report_date} 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
+    decision: "事实主线只保留可回溯的一手、官方、论文、GitHub 或多源确认条目；观点和社区线索必须披露来源层级与风险。",
+    successCriteria: [
+      "主体信息解释为什么重要或与工程师的关系",
+      "观点、播客、社区讨论和产品雷达承载高密度但标明来源风险",
+      "HTML 保留结构化导航、卡片、证据图片和 source_audit 附录",
+      "结构化 JSON 可回溯到候选池与核验状态"
+    ]
   };
 }
 
@@ -254,9 +291,10 @@ function dailyHeroStats(report, collections) {
   const sourceWindow = report.source_window || {};
   const openSourceCount = collections.githubTrending.length + collections.projects.length;
   const builderCount = collections.builderObservations.length + collections.communityLeads.length;
+  const aigcCount = countAigcSignals(collections);
   return [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "模型", value: String(collections.modelReleases.length), detail: "发布" },
+    { label: "AIGC", value: String(aigcCount), detail: "产品/内容" },
     { label: "技术博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "开源", value: String(openSourceCount), detail: "Top10 + 项目" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
@@ -266,6 +304,31 @@ function dailyHeroStats(report, collections) {
       detail: sourceWindow.fallback_window_used ? "扩展" : "标准"
     }
   ];
+}
+
+function countAigcSignals(collections) {
+  const items = [
+    ...collections.mainItems,
+    ...collections.hotBlogs,
+    ...collections.githubTrending,
+    ...collections.projects,
+    ...collections.communityLeads
+  ];
+  return items.filter((item) => {
+    const text = [
+      item?.title,
+      item?.name,
+      item?.repo,
+      item?.topic,
+      item?.summary,
+      item?.description,
+      item?.content,
+      Array.isArray(item?.tags) ? item.tags.join(" ") : ""
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return /\bAIGC\b|video|image|creator|content|cover|AI PC|agent PC|Grok Imagine|Cosmos|MoneyPrinter|Qwen Code|Model Studio/i.test(text);
+  }).length;
 }
 
 function formatQualityStatus(status) {
@@ -427,39 +490,13 @@ function formatMainItems(items, context = {}) {
 
   return items
     .map((item, index) => {
-      const bullets = item.bullets.map((bullet) => `  - ${bullet}`).join("\n");
+      const bullets = [...item.bullets, ...editorialBullets(item)].map((bullet) => `  - ${bullet}`).join("\n");
       const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
       const trendTags = formatHighlightTags([importanceTag(item), ...trendTagsFor(context.trendAnnotations, "main_items", index)].filter(Boolean));
       const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
       return `${index + 1}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
     })
     .join("\n\n");
-}
-
-function formatModelReleases(items, context = {}) {
-  if (items.length === 0) {
-    return "暂无模型发布。";
-  }
-
-  const sectionImages = [];
-  const lines = items
-    .map((item) => {
-      const evidenceAssets = evidenceForUrl(context.evidenceByUrl, item.url);
-      for (const asset of evidenceAssets) {
-        if (asset?.local_path && sectionImages.length < 2) {
-          sectionImages.push(asset);
-        }
-      }
-      const evidence = formatInlineEvidenceAssets(
-        context.report,
-        evidenceAssets.filter((asset) => !asset?.local_path)
-      );
-      const line = `- **${item.name}**${formatHighlightTags([importanceTag(item), ...modelReleaseTags(item)].filter(Boolean))}（${item.provider}，${item.availability}，${item.event_date}）：${item.summary} ${markdownLink(item.url, item.source)}`;
-      return `${line}${evidence ? `\n\n${evidence}` : ""}`;
-    })
-    .join("\n");
-  const imageRow = formatInlineEvidenceAssets(context.report, sectionImages);
-  return imageRow ? `${lines}\n\n${imageRow}` : lines;
 }
 
 function formatGithubTrending(items, context = {}) {
@@ -541,7 +578,7 @@ function formatProjects(items) {
 function formatProjectCards(items) {
   return items.map((item) => {
     const domains = Array.isArray(item.domains) ? item.domains.filter(Boolean) : [];
-    const points = [];
+    const points = editorialCardPoints(item);
     if (domains.length > 0) {
       points.push({ label: "领域", value: domains.join("、") });
     }
@@ -572,10 +609,77 @@ function formatHotBlogCards(items, context = {}) {
       body: item.summary || "",
       showGroup: false,
       tags: [importanceTag(item), ...hotBlogTags(item)].filter(Boolean),
-      points: [],
+      points: editorialCardPoints(item),
       ...(media.length > 0 ? { media } : {})
     };
   });
+}
+
+function editorialBullets(item) {
+  return [
+    item?.why_it_matters ? item.why_it_matters : "",
+    item?.reader_relevance ? item.reader_relevance : "",
+    item?.watch_next ? item.watch_next : "",
+    hasNonPrimarySourceSignal(item) && item?.verification_note ? `核验：${item.verification_note}` : "",
+    hasNonPrimarySourceSignal(item) && item?.risk_note ? `风险：${item.risk_note}` : ""
+  ].filter(Boolean);
+}
+
+function editorialCardPoints(item) {
+  const points = [];
+  if (item?.reader_relevance) {
+    points.push({ label: "看点", value: item.reader_relevance });
+  }
+  if (item?.watch_next) {
+    points.push({ label: "继续看", value: item.watch_next });
+  }
+  if (hasNonPrimarySourceSignal(item)) {
+    if (item?.source_level) {
+      points.push({ label: "来源层级", value: sourceLevelLabel(item.source_level) });
+    }
+    if (item?.verification_note) {
+      points.push({ label: "核验", value: item.verification_note });
+    }
+    if (item?.risk_note) {
+      points.push({ label: "风险", value: item.risk_note });
+    }
+  }
+  return points;
+}
+
+function hasNonPrimarySourceSignal(item = {}) {
+  const sourceLevel = String(item?.source_level || "").trim();
+  const status = String(item?.verification_status || "").trim();
+  return Boolean(
+    ["intermediary_only", "original_social_only", "unverified"].includes(status) ||
+    (sourceLevel && !["primary", "official", "paper", "github", "multi_source"].includes(sourceLevel))
+  );
+}
+
+function sourceLevelLabel(value) {
+  const labels = {
+    primary: "一手来源",
+    official: "官方来源",
+    paper: "论文/研究来源",
+    github: "GitHub/仓库来源",
+    multi_source: "多源确认",
+    intermediary: "中介/媒体线索",
+    community: "社区线索",
+    original_social: "原始社交动态",
+    unverified: "未核验线索",
+    wechat_primary_like: "白名单公众号/近一手",
+    wechat_industry_whitelist: "白名单公众号/行业线索",
+    weekly_paper_aggregator: "论文周报聚合",
+    open_source_aggregator: "开源聚合",
+    tech_weekly_aggregator: "技术周报聚合",
+    paper_api: "论文 API",
+    community_api: "社区 API",
+    paper_aggregator: "论文聚合",
+    ai_news_aggregator: "AI 新闻聚合",
+    aigc_content_industry: "AIGC 内容产业线索",
+    ai_funding_product_radar: "融资/产品雷达线索"
+  };
+  return labels[value] || String(value || "").trim();
 }
 
 function formatCardMedia(report, assets) {
@@ -621,7 +725,11 @@ function formatHighlightTags(tags) {
 function formatTwitterDiscussion(items, auditGroup, options = {}) {
   if (items.length > 0) {
     const content = items
-      .map((item) => `- **${item.author}**${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "X/Twitter")}`)
+      .map((item) => {
+        const details = formatNestedEditorialDetails(item);
+        const line = `- **${item.author}**${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.role ? `（${item.role}）` : ""}：${item.content} ${markdownLink(item.url, item.source || "X/Twitter")}`;
+        return details ? `${line}\n${details}` : line;
+      })
       .join("\n");
     return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
   }
@@ -646,8 +754,18 @@ function formatCommunityLeads(items, options = {}) {
     return "";
   }
 
-  const content = leads.map((item) => `- ${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.content} ${markdownLink(item.url, "来源")}`).join("\n");
+  const content = leads.map((item) => {
+    const details = formatNestedEditorialDetails(item);
+    const line = `- ${formatHighlightTags([importanceTag(item)].filter(Boolean))}${item.content} ${markdownLink(item.url, "来源")}`;
+    return details ? `${line}\n${details}` : line;
+  }).join("\n");
   return options.includeHeading ? `### 社区线索\n\n${content}` : content;
+}
+
+function formatNestedEditorialDetails(item) {
+  return editorialBullets(item)
+    .map((bullet) => `  - ${bullet}`)
+    .join("\n");
 }
 
 function signalSectionTitle(builderSection, communitySection) {

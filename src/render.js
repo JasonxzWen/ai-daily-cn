@@ -3,7 +3,6 @@ import {
   cleanGithubTrendDescription,
   cleanProjectDescription,
   githubTrendStatusTag,
-  modelReleaseTags,
   projectHeatTags
 } from "./presentation.js";
 import { importanceLabel } from "./importance.js";
@@ -26,7 +25,6 @@ export function renderReportHtml(report) {
   const jsonHref = relativeAssetHref(report.html_path, paths.dataPath);
   const markdownHref = report.markdown_path ? relativeAssetHref(report.html_path, report.markdown_path) : "";
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
-  const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
   const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
@@ -40,7 +38,6 @@ export function renderReportHtml(report) {
   const metaItems = [
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     githubTrending.length > 0 ? `<span><strong>${githubTrending.length}</strong> GitHub Trending</span>` : "",
-    modelReleases.length > 0 ? `<span><strong>${modelReleases.length}</strong> 模型发布</span>` : "",
     hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技术博客</span>` : "",
     projects.length > 0 ? `<span><strong>${projects.length}</strong> 项目</span>` : "",
     builderObservations.length > 0 ? `<span><strong>${builderObservations.length}</strong> Builder 观察</span>` : "",
@@ -49,7 +46,6 @@ export function renderReportHtml(report) {
     .filter(Boolean)
     .join("\n        ");
   const optionalSections = [
-    renderModelReleasesSection(report, modelReleases, evidenceByUrl),
     renderHotBlogsSection(hotBlogs),
     renderGithubTrendingSection(githubTrending),
     renderProjectsSection(projects),
@@ -589,33 +585,6 @@ function renderInlineEmphasis(value) {
     .replace(/==([^=]+)==/g, "<mark>$1</mark>");
 }
 
-function renderModelReleasesSection(report, items, evidenceByUrl) {
-  if (items.length === 0) {
-    return "";
-  }
-
-  return `<section class="section" id="model-releases">
-      <h2>模型发布</h2>
-      ${items.map((item) => renderModelRelease(report, item, evidenceByUrl)).join("\n")}
-    </section>`;
-}
-
-function renderModelRelease(report, item, evidenceByUrl) {
-  return `<article class="item">
-  <h3>${escapeHtml(item.name)}</h3>
-  <div class="item-meta">
-    <span>${escapeHtml(item.event_date)}</span>
-    <span>${escapeHtml(item.provider)}</span>
-    <span>${escapeHtml(renderAvailability(item.availability))}</span>
-    ${renderImportanceSpan(item)}
-    ${renderTags(modelReleaseTags(item))}
-  </div>
-  <p>${escapeHtml(item.summary)}</p>
-  <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
-  ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
-</article>`;
-}
-
 function renderHotBlogsSection(items) {
   if (items.length === 0) {
     return "";
@@ -639,17 +608,6 @@ function renderHotBlog(item) {
   </div>
   <p>${escapeHtml(item.summary)}</p>
 </article>`;
-}
-
-function renderAvailability(value) {
-  const labels = {
-    open_weights: "开源权重",
-    closed_api: "闭源 API",
-    closed_product: "产品内可用",
-    research_preview: "研究预览"
-  };
-  const label = labels[value];
-  return label ? `${label} (${value})` : value;
 }
 
 function renderGithubTrendingSection(items) {

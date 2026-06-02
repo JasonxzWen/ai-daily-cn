@@ -142,12 +142,13 @@ try {
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  assert.match(await page.locator("body").textContent(), /模型发布/);
-  assert.match(await page.locator("body").textContent(), /ExampleModel 2/);
+  const reportBody = await page.locator("body").textContent();
+  assert.doesNotMatch(reportBody, /模型发布/);
+  assert.doesNotMatch(reportBody, /ExampleModel 2/);
+  assert.equal(await page.locator("#model-releases").count(), 0);
   assert.match(await page.locator("body").textContent(), /热门技术博客/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.equal(await allImagesLoaded(page), true);
-  assert.equal(await modelReleaseImagesShareRow(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
   assert.equal(await page.locator(".project-card-grid").count(), 1);
   assert.equal(await projectCardsAreHorizontalAndEven(page), true);
