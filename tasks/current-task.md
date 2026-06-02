@@ -35,6 +35,7 @@ In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix
 - `model_releases` entries must also be represented in `main_items`.
 - Git transport failures (`git_fetch_unavailable` / `git_push_unavailable`) are eligible for GitHub API fallback, but `remote_ahead` is not.
 - AIGC/content-industry and product/funding sources are registered and tested.
+- User-requested A-F source surface is registered or covered by dedicated discovery: follow-builders, ML Papers, HelloGitHub, RuanYF Weekly, official lab RSS/HTML, international/chinese media leads, arXiv/HN/HF/Papers with Code/Reddit/GitHub Trending, Smol AI News, AI News Archive, Latent.Space, and Ben's Bites.
 - Prompt build includes Lark-document-aligned coverage: AIGC/content industry, Product Hunt, X/Twitter, follow-builders, 8-12 main items, and GitHub API fallback.
 
 ## Validation commands

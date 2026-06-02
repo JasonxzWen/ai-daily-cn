@@ -70,6 +70,11 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://openai.com/news/rss.xml"
   },
   {
+    id: "content-openai-blog-rss",
+    name: "OpenAI Blog RSS",
+    url: "https://openai.com/blog/rss.xml"
+  },
+  {
     id: "content-anthropic-news",
     name: "Anthropic News",
     url: "https://www.anthropic.com/news",
@@ -112,6 +117,63 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://feeds.arstechnica.com/arstechnica/index"
   },
   {
+    id: "content-mit-technology-review",
+    name: "MIT Technology Review",
+    url: "https://www.technologyreview.com/feed/",
+    category: "intermediary"
+  },
+  {
+    id: "content-venturebeat-ai",
+    name: "VentureBeat AI",
+    url: "https://venturebeat.com/category/ai/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-jiqizhixin",
+    name: "Jiqizhixin",
+    url: "https://www.jiqizhixin.com/rss",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-qbitai",
+    name: "QbitAI",
+    url: "https://www.qbitai.com/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-36kr",
+    name: "36Kr",
+    url: "https://36kr.com/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-infoq-cn",
+    name: "InfoQ CN",
+    url: "https://www.infoq.cn/feed",
+    category: "intermediary"
+  },
+  {
+    id: "content-ml-papers-week",
+    name: "ML Papers of the Week",
+    url: "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+    category: "intermediary",
+    sourceLevel: "weekly_paper_aggregator"
+  },
+  {
+    id: "content-hellogithub",
+    name: "HelloGitHub",
+    url: "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+    category: "intermediary",
+    sourceLevel: "open_source_aggregator"
+  },
+  {
+    id: "content-ruanyf-weekly",
+    name: "RuanYF Weekly",
+    url: "https://github.com/ruanyf/weekly/commits/master.atom",
+    category: "intermediary",
+    sourceLevel: "tech_weekly_aggregator"
+  },
+  {
     id: "content-google-keyword",
     name: "Google Keyword Blog",
     url: "https://blog.google/rss/"
@@ -127,6 +189,11 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://deepmind.google/discover/blog/",
     format: "html_index",
     linkPattern: "/blog/"
+  },
+  {
+    id: "content-google-deepmind-rss",
+    name: "Google DeepMind RSS",
+    url: "https://deepmind.google/blog/rss.xml"
   },
   {
     id: "content-meta-ai-blog",
@@ -241,6 +308,63 @@ export const DEFAULT_CONTENT_SOURCES = [
     id: "content-latent-space",
     name: "Latent.Space",
     url: "https://www.latent.space/feed"
+  },
+  {
+    id: "content-arxiv-cs-ai",
+    name: "arXiv cs.AI",
+    url: "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-hacker-news-api",
+    name: "Hacker News Topstories API",
+    url: "https://hacker-news.firebaseio.com/v0/topstories.json",
+    category: "intermediary",
+    sourceLevel: "community_api"
+  },
+  {
+    id: "content-huggingface-daily-papers",
+    name: "Hugging Face Daily Papers",
+    url: "https://huggingface.co/papers",
+    format: "html_index",
+    linkPattern: "/papers/",
+    category: "intermediary",
+    sourceLevel: "paper_aggregator"
+  },
+  {
+    id: "content-papers-with-code-api",
+    name: "Papers with Code API",
+    url: "https://paperswithcode.com/api/v1/",
+    category: "intermediary",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-reddit-machinelearning",
+    name: "Reddit r/MachineLearning",
+    url: "https://www.reddit.com/r/MachineLearning/.json",
+    category: "intermediary",
+    sourceLevel: "community_api"
+  },
+  {
+    id: "content-smol-ai-news",
+    name: "Smol AI News",
+    url: "https://news.smol.ai/rss.xml",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
+  },
+  {
+    id: "content-ai-news-buttondown",
+    name: "AI News Archive",
+    url: "https://buttondown.com/ainews/rss",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
+  },
+  {
+    id: "content-bens-bites",
+    name: "Ben's Bites",
+    url: "https://bensbites.com/feed",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
   },
   {
     id: "content-interconnects",

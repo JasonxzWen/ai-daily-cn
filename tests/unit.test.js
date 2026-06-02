@@ -10,6 +10,7 @@ import {
   collectBuilderFallbacks,
   collectContentSources,
   DEFAULT_CONTENT_SOURCES,
+  DEFAULT_GITHUB_TRENDING_SOURCES,
   collectGitHubTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml
@@ -18,7 +19,7 @@ import { collectSearchNews } from "../src/search-news.js";
 import { checkSourcesHealth } from "../src/source-health.js";
 import { auditSourceRunHistory } from "../src/source-phase5.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
-import { normalizeSourceRegistry } from "../src/source-registry.js";
+import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
@@ -1511,6 +1512,80 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("The Magnifier AI"));
   assert(names.includes("Fast Company Creator Economy"));
   assert(names.includes("Crunchbase News AI"));
+  assert(names.includes("OpenAI Blog RSS"));
+  assert(names.includes("Google DeepMind RSS"));
+  assert(names.includes("MIT Technology Review"));
+  assert(names.includes("VentureBeat AI"));
+  assert(names.includes("ML Papers of the Week"));
+  assert(names.includes("HelloGitHub"));
+  assert(names.includes("RuanYF Weekly"));
+  assert(names.includes("Jiqizhixin"));
+  assert(names.includes("arXiv cs.AI"));
+  assert(names.includes("Hacker News Topstories API"));
+  assert(names.includes("Hugging Face Daily Papers"));
+  assert(names.includes("Papers with Code API"));
+  assert(names.includes("Reddit r/MachineLearning"));
+  assert(names.includes("Smol AI News"));
+  assert(names.includes("AI News Archive"));
+  assert(names.includes("Ben's Bites"));
+});
+
+test("registered discovery sources cover the user requested AI source list", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const fixedSources = [
+    ...registry.sources,
+    ...DEFAULT_CONTENT_SOURCES,
+    ...DEFAULT_GITHUB_TRENDING_SOURCES,
+    {
+      name: "follow-builders central feed",
+      url: "https://github.com/zarazhangrui/follow-builders"
+    }
+  ];
+
+  const expected = [
+    ["follow-builders", ["https://github.com/zarazhangrui/follow-builders"]],
+    ["ML-Papers-of-the-Week", ["https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom"]],
+    ["HelloGitHub", ["https://github.com/521xueweihan/HelloGitHub/commits/master.atom"]],
+    ["RuanYF Weekly", ["https://github.com/ruanyf/weekly/commits/master.atom"]],
+    ["OpenAI Blog RSS", ["https://openai.com/blog/rss.xml", "https://openai.com/news/rss.xml"]],
+    ["Google DeepMind", ["https://deepmind.google/blog/rss.xml", "https://deepmind.google/discover/blog/"]],
+    ["Google Research", ["https://research.google/blog/rss/"]],
+    ["Meta AI", ["https://ai.meta.com/blog/rss/", "https://ai.meta.com/blog/"]],
+    ["Microsoft Research", ["https://www.microsoft.com/en-us/research/feed/"]],
+    ["AWS ML Blog", ["https://aws.amazon.com/blogs/machine-learning/feed/"]],
+    ["Anthropic News", ["https://www.anthropic.com/news"]],
+    ["Hugging Face Blog", ["https://huggingface.co/blog/feed.xml"]],
+    ["TechCrunch AI", ["https://techcrunch.com/category/artificial-intelligence/feed/"]],
+    ["The Verge", ["https://www.theverge.com/rss/index.xml"]],
+    ["MIT Technology Review", ["https://www.technologyreview.com/feed/"]],
+    ["Ars Technica", ["https://feeds.arstechnica.com/arstechnica/index"]],
+    ["VentureBeat AI", ["https://venturebeat.com/category/ai/feed"]],
+    ["HNRSS Frontpage", ["https://hnrss.org/frontpage"]],
+    ["Jiqizhixin", ["https://www.jiqizhixin.com/rss"]],
+    ["QbitAI", ["https://www.qbitai.com/feed"]],
+    ["36Kr", ["https://36kr.com/feed", "https://www.36kr.com/feed"]],
+    ["InfoQ CN", ["https://www.infoq.cn/feed"]],
+    ["arXiv cs.AI", ["http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20"]],
+    ["Hacker News API", ["https://hacker-news.firebaseio.com/v0/topstories.json"]],
+    ["Hugging Face Daily Papers", ["https://huggingface.co/papers"]],
+    ["Papers with Code API", ["https://paperswithcode.com/api/v1/"]],
+    ["Reddit r/MachineLearning", ["https://www.reddit.com/r/MachineLearning/.json"]],
+    ["GitHub Trending", ["https://github.com/trending?since=daily"]],
+    ["Smol AI News", ["https://news.smol.ai/rss.xml", "https://news.smol.ai/"]],
+    ["AI News Archive", ["https://buttondown.com/ainews/rss", "https://buttondown.com/ainews/archive/"]],
+    ["Latent Space", ["https://www.latent.space/feed", "https://www.latent.space/"]],
+    ["Ben's Bites", ["https://bensbites.com/feed", "https://bensbites.com/"]]
+  ];
+
+  for (const [label, urls] of expected) {
+    assert(
+      fixedSources.some((source) => urls.some((url) => normalizedSourceUrl(source.url) === normalizedSourceUrl(url))),
+      `missing requested source: ${label}`
+    );
+  }
 });
 
 test("registered content sources cover frontier AI company official sources", async () => {
@@ -3068,6 +3143,31 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("Product Hunt Trending"));
   assert(prompt.includes("TechCrunch AI"));
   assert(prompt.includes("TechCrunch AI/Enterprise"));
+  assert(prompt.includes("ML Papers of the Week"));
+  assert(prompt.includes("HelloGitHub"));
+  assert(prompt.includes("RuanYF Weekly"));
+  assert(prompt.includes("OpenAI Blog RSS"));
+  assert(prompt.includes("Google DeepMind RSS"));
+  assert(prompt.includes("MIT Technology Review"));
+  assert(prompt.includes("VentureBeat AI"));
+  assert(prompt.includes("Jiqizhixin"));
+  assert(prompt.includes("QbitAI"));
+  assert(prompt.includes("36Kr"));
+  assert(prompt.includes("InfoQ CN"));
+  assert(prompt.includes("arXiv cs.AI"));
+  assert(prompt.includes("Hacker News Topstories API"));
+  assert(prompt.includes("Hugging Face Daily Papers"));
+  assert(prompt.includes("Papers with Code API"));
+  assert(prompt.includes("Reddit r/MachineLearning"));
+  assert(prompt.includes("Smol AI News"));
+  assert(prompt.includes("AI News Archive"));
+  assert(prompt.includes("Ben's Bites"));
+  assert(prompt.includes("Big-company moves"));
+  assert(prompt.includes("Models and papers"));
+  assert(prompt.includes("Products and tools"));
+  assert(prompt.includes("Industry and funding"));
+  assert(prompt.includes("Open-source projects"));
+  assert(prompt.includes("Opinions and long-form reads"));
   assert(prompt.includes("大厂动态"));
   assert(prompt.includes("行业趋势"));
   assert(prompt.includes("公众号"));
@@ -3655,6 +3755,19 @@ function structuredTrendReport(base, reportDate, options = {}) {
   report.self_check.builder_observations = report.builder_observations.length;
   delete report.candidate_pool_path;
   return report;
+}
+
+function normalizedSourceUrl(value) {
+  const text = String(value || "").trim();
+  try {
+    const url = new URL(text);
+    url.protocol = "https:";
+    url.hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    url.pathname = url.pathname.replace(/\/$/, "");
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return text.toLowerCase().replace(/^http:/, "https:").replace(/\/$/, "");
+  }
 }
 
 function textResponse(text, status = 200, finalUrl = "") {

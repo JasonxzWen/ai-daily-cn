@@ -12,6 +12,11 @@
   - `node scripts\harness-validate.mjs`
   - `git diff --check`
 - Do not mix the main worktree's local 2026-06-02 publish artifacts into PR #11 unless explicitly asked.
+- Follow-up source recovery added the user's explicit A-F source surface to repo state:
+  - Registry/default discovery now covers ML Papers of the Week, HelloGitHub, RuanYF Weekly, OpenAI Blog RSS, Google DeepMind RSS, MIT Technology Review, VentureBeat AI, arXiv cs.AI, HN API, Hugging Face Daily Papers, Papers with Code API, Reddit r/MachineLearning, Smol AI News, AI News Archive, and Ben's Bites.
+  - 36Kr, QbitAI, Jiqizhixin, and InfoQ CN are `optional` intermediary leads with `primary_required`; Meta AI uses the working HTML source because the listed RSS endpoint currently returns 404.
+  - Added `prompts/ai-daily/modules/fixed-source-checklist.md` and tests so `prompt:build` includes the full source surface plus the six output buckets.
+  - `npm run sources:validate` now reports 63 registered sources; a `discover:content-sources` sample showed these sources enter the default `core,optional` audit surface.
 
 ## Previous Local Report Status
 
