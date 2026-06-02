@@ -9,6 +9,7 @@ import { requirePlainLanguage } from "./plain-language.js";
 import { requireFreshReport } from "./quality-gates.js";
 import { deriveQualityStatus, requirePublishableQuality } from "./quality-status.js";
 import { buildAutomationRevision, defaultAutomationRevision } from "./automation-revision.js";
+import { withDefaultImportance } from "./importance.js";
 import {
   readCandidatePool,
   requireCandidateCoverage,
@@ -90,6 +91,18 @@ export function normalizeReportDraft(draft, options = {}) {
     publish_status: draft.publish_status || defaultPublishStatus(canonicalUrl),
     generated_at: draft.generated_at || options.generatedAt || defaultGeneratedAt()
   };
+
+  for (const sectionName of [
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "projects",
+    "github_trending",
+    "builder_observations",
+    "community_leads"
+  ]) {
+    report[sectionName] = withDefaultImportance(sectionName, report[sectionName]);
+  }
 
   if (report.self_check && typeof report.self_check === "object") {
     report.self_check = {

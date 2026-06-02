@@ -19,3 +19,9 @@ Map selected items into these six public-topic buckets before rendering:
 - Opinions and long-form reads: Latent.Space, AI News, Smol AI News, Ben's Bites, a16z-style long reads, podcasts, and high-signal builder commentary.
 
 Same-event multi-source reports must be merged. T3, intermediary, community, and aggregator items must not enter factual sections without primary-source or multi-source confirmation.
+
+Every selected public item should carry an importance label:
+
+- `importance: "major"` renders as `重大` and is reserved for platform/lab launches, high-impact model releases, major funding/M&A/regulatory moves, or events that can change production usage.
+- `importance: "notable"` renders as `值得关注` and is for useful new tools, strong papers/blogs, high-signal GitHub Trending entries, Product Hunt items after cross-check, and named-builder viewpoints.
+- `importance: "general"` renders as `一般` and is for lightweight community leads, background items, lower-rank trending entries, or operational follow-ups.

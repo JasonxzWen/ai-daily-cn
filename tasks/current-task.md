@@ -38,6 +38,7 @@ In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix
 - User-requested A-F source surface is registered or covered by dedicated discovery: follow-builders, ML Papers, HelloGitHub, RuanYF Weekly, official lab RSS/HTML, international/chinese media leads, arXiv/HN/HF/Papers with Code/Reddit/GitHub Trending, Smol AI News, AI News Archive, Latent.Space, and Ben's Bites.
 - Prompt build includes Lark-document-aligned coverage: AIGC/content industry, Product Hunt, X/Twitter, follow-builders, 8-12 main items, and GitHub API fallback.
 - `report:write` records an `self_check.automation_revision` fingerprint with git commit, branch, prompt modules, source registry count, and active hardening rules so scheduled runs can prove which repo version generated a report.
+- Public report items carry an `importance` label (`major`, `notable`, `general`) that renders as “重大 / 值得关注 / 一般”, matching the user-provided item format.
 
 ## Validation commands
 

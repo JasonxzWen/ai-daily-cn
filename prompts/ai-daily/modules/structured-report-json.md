@@ -32,6 +32,14 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `publish_status`
 - `generated_at`
 
+`main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
+
+- `major`：公开页面显示为“重大”。
+- `notable`：公开页面显示为“值得关注”。
+- `general`：公开页面显示为“一般”。
+
+如果草稿遗漏该字段，`report:write` 会按板块、tier、release_scope、rank/trend 和 signal 自动补默认值；但日报研究阶段仍应主动判断重要性，避免把普通运营项写成重大事件。
+
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
 - AI 核心动态：高信号真实模型发布必须先作为主体新闻写入 `main_items`，并可同步写入 `model_releases` 作为结构化索引；`model_releases` 不能替代主体信息。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
