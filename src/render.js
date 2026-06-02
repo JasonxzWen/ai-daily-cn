@@ -751,9 +751,17 @@ function evidenceAssetsBySourceUrl(assets) {
     if (!key || !hasRenderableEvidence(asset)) {
       continue;
     }
-    grouped.set(key, [...(grouped.get(key) || []), asset]);
+    const current = grouped.get(key) || [];
+    if (!current.some((existing) => evidenceAssetIdentity(existing) === evidenceAssetIdentity(asset))) {
+      current.push(asset);
+    }
+    grouped.set(key, current);
   }
   return grouped;
+}
+
+function evidenceAssetIdentity(asset) {
+  return asset?.local_path || `${asset?.title || ""}:${JSON.stringify(asset?.data || [])}`;
 }
 
 function evidenceForUrl(evidenceByUrl, url) {

@@ -815,6 +815,14 @@ test("HTML and interaction input attach evidence assets to matching report items
         ["Task", "Opus 4.8", "Opus 4.7"],
         ["Agentic coding", "69.2%", "64.3%"]
       ]
+    },
+    {
+      type: "figure",
+      title: "Duplicate coding agent adoption figure",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
+      caption: "Duplicate figure should not render twice.",
+      extraction_status: "source_image"
     }
   ];
 
@@ -830,6 +838,7 @@ test("HTML and interaction input attach evidence assets to matching report items
   const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
   assert(mainHtml.includes("Coding agent adoption by discipline"));
   assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert.equal((mainHtml.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
   assert(!mainHtml.includes("Claude Opus 4.8 performance comparison"));
   assert(modelHtml.includes("Claude Opus 4.8 performance comparison"));
   assert(modelHtml.includes("Agentic coding"));
@@ -842,6 +851,7 @@ test("HTML and interaction input attach evidence assets to matching report items
   const modelSection = input.sections.find((section) => section.title === "模型发布");
   assert(mainSection.content.includes("Coding agent adoption by discipline"));
   assert(mainSection.content.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert.equal((mainSection.content.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
   assert(!mainSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Claude Opus 4.8 performance comparison"));
   assert(modelSection.content.includes("Agentic coding"));
