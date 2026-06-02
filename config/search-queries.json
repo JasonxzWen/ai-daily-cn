@@ -46,6 +46,36 @@
     "verification_policy": "multi_source_required"
   },
   {
+    "id": "aigc-content-industry",
+    "query": "(AIGC OR \"AI video\" OR \"generative video\" OR \"creator economy\" OR \"AI short drama\" OR \"AI music\") (launch OR policy OR platform OR funding OR product)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
+    "id": "china-aigc-content-industry",
+    "query": "(AI短剧 OR AI漫剧 OR AIGC OR AI视频 OR AI配音) (平台 OR 政策 OR 融资 OR 发布 OR 分成)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
+    "id": "ai-product-launches",
+    "query": "(\"AI agent\" OR \"AI video\" OR \"developer tool\" OR \"creator tool\") (\"Product Hunt\" OR launch OR released)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
+    "id": "ai-devtools-pricing-quota-cost",
+    "query": "(\"AI coding\" OR \"coding agent\" OR \"AI gateway\" OR \"developer tool\" OR \"IDE AI\" OR Copilot OR Cursor OR Windsurf OR Claude Code OR Codex) (pricing OR quota OR \"rate limit\" OR billing OR credits OR \"cost attribution\" OR \"usage dashboard\" OR \"Service Quotas\")",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
+    "id": "model-availability-ops",
+    "query": "(OpenAI OR Anthropic OR Gemini OR Claude OR Copilot OR \"AI Gateway\") (statuspage OR incident OR availability OR preview OR \"rate limit\" OR quota OR region)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required"
+  },
+  {
     "id": "ai-papers-systems",
     "query": "(LLM OR agent OR inference OR evaluation OR retrieval)",
     "candidate_category": "community_lead",

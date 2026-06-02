@@ -9,6 +9,7 @@ import { PublisherError } from "../src/errors.js";
 import {
   checkPublishPreflight,
   createPublishPlan,
+  isGitHubApiFallbackEligibleError,
   parsePorcelain,
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
@@ -209,6 +210,14 @@ test("publish preflight fails early when remote tracking cannot be refreshed", a
     }),
     (error) => error instanceof PublisherError && error.code === "git_fetch_unavailable"
   );
+});
+
+test("git transport failures are eligible for GitHub API fallback", () => {
+  assert.equal(isGitHubApiFallbackEligibleError(new PublisherError("git_fetch_unavailable", "fetch failed")), true);
+  assert.equal(isGitHubApiFallbackEligibleError(new PublisherError("git_push_unavailable", "push dry-run failed")), true);
+  assert.equal(isGitHubApiFallbackEligibleError(new PublisherError("git_not_writable", "git metadata locked")), true);
+  assert.equal(isGitHubApiFallbackEligibleError(new PublisherError("remote_ahead", "remote has newer commits")), false);
+  assert.equal(isGitHubApiFallbackEligibleError(new Error("fetch failed")), false);
 });
 
 test("publish preflight 在 git 元数据不可写时停止", async () => {

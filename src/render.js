@@ -386,6 +386,13 @@ h3 {
   margin-top: 12px;
 }
 
+.item mark {
+  padding: 0 0.25em;
+  border-radius: 4px;
+  background: #fff3a3;
+  color: #2f2b12;
+}
+
 .project-table {
   width: 100%;
   border-collapse: collapse;
@@ -530,11 +537,17 @@ function renderMainItem(report, item, evidenceByUrl) {
   <h3>${escapeHtml(item.title)}</h3>
   <div class="item-meta"><span>${escapeHtml(item.event_date)}</span><span>${escapeHtml(item.tier)}</span>${item.entities.map((entity) => `<span>${escapeHtml(entity)}</span>`).join("")}</div>
   <ul>
-    ${item.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("\n")}
+    ${item.bullets.map((bullet) => `<li>${renderInlineEmphasis(bullet)}</li>`).join("\n")}
   </ul>
   <p class="source-line">来源：${externalLink(item.url, item.source)}</p>
   ${renderInlineEvidenceAssets(report, evidenceForUrl(evidenceByUrl, item.url))}
 </article>`;
+}
+
+function renderInlineEmphasis(value) {
+  return escapeHtml(value)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/==([^=]+)==/g, "<mark>$1</mark>");
 }
 
 function renderModelReleasesSection(report, items, evidenceByUrl) {

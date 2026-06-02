@@ -22,10 +22,84 @@ await fs.copyFile(
   path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
   path.join(inputDir, "official-release.md")
 );
-await fs.copyFile(
-  path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"),
-  path.join(dataInputDir, "structured-report.json")
+const structuredReport = JSON.parse(
+  await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8")
 );
+const firstModel = structuredReport.model_releases[0];
+structuredReport.model_releases.push({
+  ...firstModel,
+  name: "ExampleModel Vision",
+  url: "https://example.com/model/examplemodel-vision",
+  summary: "ExampleModel Vision release for validating the two-image model release row."
+});
+structuredReport.projects = [
+  {
+    name: "Example Agent Memory",
+    description: "Agent memory engine for validating horizontal project cards.",
+    url: "https://github.com/example/agent-memory",
+    domains: ["agent_memory", "developer_api"],
+    use_case: "Provide cross-session memory and retrieval for agent apps.",
+    event_date: "2026-05-15",
+    source: "GitHub Trending daily",
+    signal: "trending",
+    evidence: "GitHub Trending daily showed 123 stars today."
+  },
+  {
+    name: "Example Eval Harness",
+    description: "Coding-agent eval harness for validating even project card heights.",
+    url: "https://github.com/example/eval-harness",
+    domains: ["eval_harness", "coding_agent"],
+    use_case: "Replay agent tasks, record outputs, and compare regressions.",
+    event_date: "2026-05-15",
+    source: "GitHub Trending daily",
+    signal: "trending",
+    evidence: "GitHub Trending daily showed 98 stars today."
+  }
+];
+structuredReport.github_trending = [
+  {
+    name: "example/agent-memory",
+    repo: "example/agent-memory",
+    description: "Agent memory engine.",
+    url: "https://github.com/example/agent-memory",
+    event_date: "2026-05-15",
+    source: "GitHub Trending daily",
+    language: "TypeScript",
+    window: "daily",
+    rank: 1,
+    previous_rank: 3,
+    rank_delta: 2,
+    trend: "up",
+    evidence: "example/agent-memory appeared on GitHub Trending daily with 123 stars today."
+  }
+];
+structuredReport.evidence_assets = [
+  {
+    type: "figure",
+    title: "ExampleModel benchmark",
+    source_url: firstModel.url,
+    local_path: "assets/evidence/e2e-model-benchmark.png",
+    caption: "Official benchmark figure.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
+    title: "ExampleModel vision workflow",
+    source_url: "https://example.com/model/examplemodel-vision",
+    local_path: "assets/evidence/e2e-model-workflow.png",
+    caption: "Official workflow figure.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
+    title: "Harness architecture",
+    source_url: structuredReport.hot_blogs[0].url,
+    local_path: "assets/evidence/e2e-blog-architecture.png",
+    caption: "Original blog architecture figure.",
+    extraction_status: "source_image"
+  }
+];
+await fs.writeFile(path.join(dataInputDir, "structured-report.json"), JSON.stringify(structuredReport, null, 2), "utf8");
 
 await buildSite({
   rootDir: tmp,
@@ -35,6 +109,9 @@ await buildSite({
   generatedAt: fixedGeneratedAt,
   trendConfigPath
 });
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-benchmark.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();
@@ -69,6 +146,11 @@ try {
   assert.match(await page.locator("body").textContent(), /ExampleModel 2/);
   assert.match(await page.locator("body").textContent(), /热门技术博客/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
+  assert.equal(await allImagesLoaded(page), true);
+  assert.equal(await modelReleaseImagesShareRow(page), true);
+  assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
+  assert.equal(await page.locator(".project-card-grid").count(), 1);
+  assert.equal(await projectCardsAreHorizontalAndEven(page), true);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.setViewportSize({ width: 375, height: 812 });
@@ -136,4 +218,63 @@ async function allExternalLinksHaveRel(page) {
 
 async function hasHorizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+}
+
+async function allImagesLoaded(page) {
+  await page.evaluate(async () => {
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    for (const image of document.images) {
+      image.loading = "eager";
+    }
+    for (let y = 0; y <= document.documentElement.scrollHeight; y += window.innerHeight) {
+      window.scrollTo(0, y);
+      await nextFrame();
+    }
+    window.scrollTo(0, 0);
+    await nextFrame();
+  });
+  await page.waitForFunction(
+    () => Array.from(document.images).every((image) => image.complete),
+    null,
+    { timeout: 5000 }
+  );
+  return page.evaluate(() =>
+    Array.from(document.images).every((image) => image.complete && image.naturalWidth > 0)
+  );
+}
+
+async function modelReleaseImagesShareRow(page) {
+  return page.evaluate(() => {
+    const row = Array.from(document.querySelectorAll(".rendered-markdown p")).find((paragraph) => {
+      const sources = Array.from(paragraph.querySelectorAll("img.markdown-image"))
+        .map((image) => image.getAttribute("src") || "");
+      return sources.some((source) => source.includes("e2e-model-benchmark"))
+        && sources.some((source) => source.includes("e2e-model-workflow"));
+    });
+    if (!row) return false;
+    const rects = Array.from(row.querySelectorAll("img.markdown-image"))
+      .map((image) => image.getBoundingClientRect());
+    return rects.length === 2 && Math.abs(rects[0].y - rects[1].y) <= 4;
+  });
+}
+
+async function projectCardsAreHorizontalAndEven(page) {
+  return page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll(".project-card"));
+    if (cards.length < 2) return false;
+    const firstTitle = cards[0].querySelector("h3")?.getBoundingClientRect();
+    const firstBody = cards[0].querySelector(":scope > p")?.getBoundingClientRect();
+    const heights = cards.map((card) => Math.round(card.getBoundingClientRect().height));
+    return Boolean(firstTitle && firstBody && firstBody.x > firstTitle.x)
+      && Math.max(...heights) - Math.min(...heights) <= 8;
+  });
+}
+
+async function writeTinyPng(filePath) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAr9c6yQAAAAASUVORK5CYII=",
+    "base64"
+  );
+  await fs.writeFile(filePath, png);
 }

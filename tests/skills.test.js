@@ -399,7 +399,11 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
             "1. ![GitHub](data:image/png;base64,iVBORw0KGgo=) **[example/repo](https://github.com/example/repo)** ==trend-new|NEW==：示例项目。",
             "2. **[example/up](https://github.com/example/up)** ==trend-up|↑ UP +2==：上升项目。",
             "3. **[example/down](https://github.com/example/down)** ==trend-down|↓ DOWN -1==：下降项目。",
-            "4. **[example/same](https://github.com/example/same)** ==trend-same|SAME==：持平项目。"
+            "4. **[example/same](https://github.com/example/same)** ==trend-same|SAME==：持平项目。",
+            "",
+            "| 指标 | 数值 | 说明 |",
+            "|---|---|---|",
+            "| Stars | 456 | 本周新增 |"
           ].join("\n")
         }
       ]
@@ -423,6 +427,7 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
   assert.match(html, /<mark class="text-highlight trend-status trend-status-down">↓ DOWN -1<\/mark>/);
   assert.match(html, /<mark class="text-highlight trend-status trend-status-same">SAME<\/mark>/);
   assert.doesNotMatch(html, /<ul><li>1\./);
+  assert.match(html, /<div class="markdown-table-scroll"><table>/);
 });
 
 test("effective-interact filterable cards render linked project subcards", async () => {
@@ -477,6 +482,7 @@ test("effective-interact filterable cards render linked project subcards", async
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /project-card/);
+  assert.match(html, /project-card-grid/);
   assert.match(html, /<h3><img class="[^"]*\binline-site-icon\b[^"]*"/);
   assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
   assert.match(html, /card-detail-list/);
@@ -518,6 +524,13 @@ test("effective-interact filterable cards can hide visual group labels", async (
               title: "Reachy Mini goes fully local",
               href: "https://huggingface.co/blog/reachy-mini",
               tags: ["LOCAL SPEECH-TO-SPEECH AGENT STACK"],
+              media: [
+                {
+                  src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=",
+                  alt: "Architecture",
+                  caption: "Original blog architecture diagram."
+                }
+              ],
               body: "这篇文章说明本地语音 agent 栈。"
             }
           ]
@@ -538,10 +551,13 @@ test("effective-interact filterable cards can hide visual group labels", async (
   const html = await fsp.readFile(payload.outputPath, "utf8");
   const card = html.match(/<article class="interactive-card evidence-card evidence-spotlight blog-card"[\s\S]*?<\/article>/)?.[0] || "";
   assert(card);
+  assert.match(html, /blog-card-grid/);
   assert.match(card, /data-filter-value="LOCAL SPEECH-TO-SPEECH AGENT STACK"/);
   assert.doesNotMatch(card, /<div class="meta">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/div>/);
   assert.match(card, /<h3><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
   assert.match(card, /<span class="chip">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/span>/);
+  assert.match(card, /card-media-grid/);
+  assert.match(card, /<figcaption>Original blog architecture diagram\.<\/figcaption>/);
 });
 
 test("GitHub Pages deployment workflow publishes the generated docs artifact", async () => {

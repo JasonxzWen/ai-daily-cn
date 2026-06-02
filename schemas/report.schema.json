@@ -166,6 +166,13 @@
       "type": "string",
       "format": "uri"
     },
+    "non_negative_count_map": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
     "quality_status": {
       "type": "object",
       "additionalProperties": false,
@@ -702,6 +709,19 @@
           "type": "integer",
           "minimum": 0
         },
+        "sources_checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "enablement_counts": {
+          "$ref": "#/$defs/non_negative_count_map"
+        },
+        "tier_counts": {
+          "$ref": "#/$defs/non_negative_count_map"
+        },
+        "source_kind_counts": {
+          "$ref": "#/$defs/non_negative_count_map"
+        },
         "shadow": {
           "type": "boolean"
         },
@@ -751,7 +771,15 @@
           "$ref": "#/$defs/absolute_url"
         },
         "status": {
-          "enum": ["checked", "blocked", "no_signal", "skipped_missing_token", "skipped_missing_base_url"]
+          "enum": [
+            "checked",
+            "blocked",
+            "no_signal",
+            "skipped_missing_token",
+            "skipped_missing_base_url",
+            "skipped_manual_source",
+            "skipped_manual_review_required"
+          ]
         },
         "id": {
           "type": "string"

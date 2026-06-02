@@ -834,6 +834,13 @@ export function disabledPublishStatus() {
   };
 }
 
+export function isGitHubApiFallbackEligibleError(error) {
+  return (
+    error instanceof PublisherError &&
+    ["git_not_writable", "git_fetch_unavailable", "git_push_unavailable"].includes(error.code)
+  );
+}
+
 export function parsePorcelain(output) {
   return output
     .split(/\r?\n/)

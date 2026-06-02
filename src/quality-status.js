@@ -3,13 +3,17 @@ import { PublisherError } from "./errors.js";
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 
 export const SECTION_MINIMUMS = {
+  main_items: 8,
   github_trending: 10,
   hot_blogs: 3,
   projects: 3,
   builder_observations: 3
 };
 
+export const CONTENT_UNIT_MINIMUM = 18;
+
 const CANDIDATE_SECTION_MAP = {
+  main_item: "main_items",
   github_trending: "github_trending",
   hot_blog: "hot_blogs",
   project: "projects",
@@ -87,18 +91,46 @@ export function normalizeQualityStatus(value) {
 
 export function findPublishQualityIssues(report) {
   const issues = [];
+  const reasons = new Set(report?.quality_status?.reasons || []);
+  const mainItemCount = sectionCount(report, "main_items");
+  const contentUnitCount = countContentUnits(report);
+  const mainItemMinimum = SECTION_MINIMUMS.main_items;
   const builderCount = sectionCount(report, "builder_observations");
   const builderMinimum = SECTION_MINIMUMS.builder_observations;
   const builderSources = report?.source_audit?.builder_sources;
 
+  if (reasons.has("main_items_selection_degraded") && mainItemCount < mainItemMinimum) {
+    issues.push({
+      error_code: "main_items_coverage_gate_failed",
+      code: "main_items_below_minimum",
+      section: "main_items",
+      count: mainItemCount,
+      minimum: mainItemMinimum,
+      remediation: "Use the candidate pool to include 8-12 high-signal main_items, or mark weak candidates as excluded so the selection degradation reason disappears."
+    });
+  }
+
+  if (reasons.has("content_units_selection_degraded") && contentUnitCount < CONTENT_UNIT_MINIMUM) {
+    issues.push({
+      error_code: "content_units_coverage_gate_failed",
+      code: "content_units_below_minimum",
+      section: "content_units",
+      count: contentUnitCount,
+      minimum: CONTENT_UNIT_MINIMUM,
+      remediation: "Include enough qualified candidates across main_items, GitHub Trending, projects, blogs, Builder observations, and community leads, or record why candidates were excluded."
+    });
+  }
+
   if (groupHasBlockingSignal(builderSources) && builderCount < builderMinimum) {
     issues.push({
+      error_code: "builder_coverage_gate_failed",
       code: "builder_coverage_below_minimum",
       section: "builder_observations",
       count: builderCount,
       minimum: builderMinimum,
       blocked_reason: String(builderSources?.blocked_reason || "").trim(),
-      sources: Array.isArray(builderSources?.sources) ? builderSources.sources : []
+      sources: Array.isArray(builderSources?.sources) ? builderSources.sources : [],
+      remediation: "Add reliable original Builder fallback candidates until builder_observations reaches the minimum, or fix the blocked Builder source before publishing."
     });
   }
 
@@ -113,11 +145,11 @@ export function requirePublishableQuality(report) {
 
   const issue = issues[0];
   throw new PublisherError(
-    "builder_coverage_gate_failed",
-    `Builder observations below publish minimum: ${issue.count}/${issue.minimum}; blocked Builder sources cannot be published as complete coverage.`,
+    issue.error_code || "report_quality_gate_failed",
+    `${issue.section} below publish minimum: ${issue.count}/${issue.minimum}; available candidate coverage was not reflected in the report.`,
     {
       issues,
-      remediation: "Add reliable original Builder fallback candidates until builder_observations reaches the minimum, or fix the blocked Builder source before publishing."
+      remediation: issue.remediation || "Fix the report coverage issue before publishing."
     }
   );
 }
@@ -157,6 +189,15 @@ function addSelectionDegradation({ report, candidatePool, reasons, affectedSecti
       affectedSections.push(section);
     }
   }
+
+  const selectableContentUnits = [...counts.entries()].reduce((sum, [section, count]) => {
+    return sum + (section === "github_trending" ? Math.min(count, SECTION_MINIMUMS.github_trending) : count);
+  }, 0);
+
+  if (selectableContentUnits >= CONTENT_UNIT_MINIMUM && countContentUnits(report) < CONTENT_UNIT_MINIMUM) {
+    reasons.push("content_units_selection_degraded");
+    affectedSections.push("content_units");
+  }
 }
 
 function groupHasBlockingSignal(group) {
@@ -172,6 +213,18 @@ function groupHasBlockingSignal(group) {
 function sectionCount(report, section) {
   const value = report?.[section];
   return Array.isArray(value) ? value.length : 0;
+}
+
+function countContentUnits(report) {
+  return [
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "projects",
+    "builder_observations",
+    "community_leads",
+    "github_trending"
+  ].reduce((sum, section) => sum + sectionCount(report, section), 0);
 }
 
 function lowSignalReasons(report) {

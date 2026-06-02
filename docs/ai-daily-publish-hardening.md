@@ -16,6 +16,7 @@
 2. `npm run publish:resume-push -- confirm-push YYYY-MM-DD`
    当本地 `main` 已领先远端且工作树干净时，优先续推已有提交，并验证 Pages。
 3. `npm run publish:github-api -- confirm-push YYYY-MM-DD`
+   GitHub API 兜底适用于本机 Git 元数据不可写，或 Git fetch/push 传输返回 `git_fetch_unavailable` / `git_push_unavailable` 的情况；该路径只发布发布器管理的 `docs/` 与 `reports-data/` 文件，使用 `force:false`，不得绕过 `remote_ahead`。
    当本机 Git 元数据或 push 通道不可用，但 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token` 可用时，用 API 写入远端 `main`。该路径只发布发布器管理的 `docs/` 与 `reports-data/` 文件。
 4. 仍失败时只报告 `publish_error`、失败原因和修复建议，不执行 `reset --hard`、`push --force`、自动 `stash` 或覆盖用户改动。
 

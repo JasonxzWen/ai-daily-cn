@@ -70,6 +70,11 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://openai.com/news/rss.xml"
   },
   {
+    id: "content-openai-blog-rss",
+    name: "OpenAI Blog RSS",
+    url: "https://openai.com/blog/rss.xml"
+  },
+  {
     id: "content-anthropic-news",
     name: "Anthropic News",
     url: "https://www.anthropic.com/news",
@@ -112,6 +117,63 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://feeds.arstechnica.com/arstechnica/index"
   },
   {
+    id: "content-mit-technology-review",
+    name: "MIT Technology Review",
+    url: "https://www.technologyreview.com/feed/",
+    category: "intermediary"
+  },
+  {
+    id: "content-venturebeat-ai",
+    name: "VentureBeat AI",
+    url: "https://venturebeat.com/category/ai/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-jiqizhixin",
+    name: "Jiqizhixin",
+    url: "https://www.jiqizhixin.com/rss",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-qbitai",
+    name: "QbitAI",
+    url: "https://www.qbitai.com/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-36kr",
+    name: "36Kr",
+    url: "https://36kr.com/feed",
+    category: "intermediary"
+  },
+  {
+    id: "intermediary-infoq-cn",
+    name: "InfoQ CN",
+    url: "https://www.infoq.cn/feed",
+    category: "intermediary"
+  },
+  {
+    id: "content-ml-papers-week",
+    name: "ML Papers of the Week",
+    url: "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+    category: "intermediary",
+    sourceLevel: "weekly_paper_aggregator"
+  },
+  {
+    id: "content-hellogithub",
+    name: "HelloGitHub",
+    url: "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+    category: "intermediary",
+    sourceLevel: "open_source_aggregator"
+  },
+  {
+    id: "content-ruanyf-weekly",
+    name: "RuanYF Weekly",
+    url: "https://github.com/ruanyf/weekly/commits/master.atom",
+    category: "intermediary",
+    sourceLevel: "tech_weekly_aggregator"
+  },
+  {
     id: "content-google-keyword",
     name: "Google Keyword Blog",
     url: "https://blog.google/rss/"
@@ -127,6 +189,11 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://deepmind.google/discover/blog/",
     format: "html_index",
     linkPattern: "/blog/"
+  },
+  {
+    id: "content-google-deepmind-rss",
+    name: "Google DeepMind RSS",
+    url: "https://deepmind.google/blog/rss.xml"
   },
   {
     id: "content-meta-ai-blog",
@@ -243,9 +310,90 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://www.latent.space/feed"
   },
   {
+    id: "content-arxiv-cs-ai",
+    name: "arXiv cs.AI",
+    url: "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-hacker-news-api",
+    name: "Hacker News Topstories API",
+    url: "https://hacker-news.firebaseio.com/v0/topstories.json",
+    category: "intermediary",
+    sourceLevel: "community_api"
+  },
+  {
+    id: "content-huggingface-daily-papers",
+    name: "Hugging Face Daily Papers",
+    url: "https://huggingface.co/papers",
+    format: "html_index",
+    linkPattern: "/papers/",
+    category: "intermediary",
+    sourceLevel: "paper_aggregator"
+  },
+  {
+    id: "content-papers-with-code-api",
+    name: "Papers with Code API",
+    url: "https://paperswithcode.com/api/v1/",
+    category: "intermediary",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-reddit-machinelearning",
+    name: "Reddit r/MachineLearning",
+    url: "https://www.reddit.com/r/MachineLearning/.json",
+    category: "intermediary",
+    sourceLevel: "community_api"
+  },
+  {
+    id: "content-smol-ai-news",
+    name: "Smol AI News",
+    url: "https://news.smol.ai/rss.xml",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
+  },
+  {
+    id: "content-ai-news-buttondown",
+    name: "AI News Archive",
+    url: "https://buttondown.com/ainews/rss",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
+  },
+  {
+    id: "content-bens-bites",
+    name: "Ben's Bites",
+    url: "https://bensbites.com/feed",
+    category: "intermediary",
+    sourceLevel: "ai_news_aggregator"
+  },
+  {
     id: "content-interconnects",
     name: "Interconnects",
     url: "https://www.interconnects.ai/feed"
+  },
+  {
+    id: "content-the-magnifier-ai",
+    name: "The Magnifier AI",
+    url: "https://themagnifier.ai/",
+    format: "html_index",
+    linkPattern: "https://themagnifier.ai/",
+    sourceLevel: "aigc_content_industry"
+  },
+  {
+    id: "content-fastcompany-creator-economy",
+    name: "Fast Company Creator Economy",
+    url: "https://www.fastcompany.com/section/creator-economy",
+    format: "html_index",
+    linkPattern: "/section/creator-economy",
+    sourceLevel: "aigc_content_industry"
+  },
+  {
+    id: "content-crunchbase-ai-news",
+    name: "Crunchbase News AI",
+    url: "https://news.crunchbase.com/sections/ai/",
+    format: "html_index",
+    linkPattern: "/",
+    sourceLevel: "ai_funding_product_radar"
   },
   {
     id: "content-product-hunt-devtools",
@@ -998,6 +1146,11 @@ export async function collectContentSources(options = {}) {
     const currentSource = normalizeGenericSource(rawSource, "content");
     const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
     candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
+    if (currentSource.source_kind === "manual") {
+      markSource(candidateSources.at(-1), "skipped_manual_review_required", "manual whitelist source");
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata"));
+      continue;
+    }
     if (Date.now() - startedAt > budgetMs) {
       markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
@@ -1117,7 +1270,7 @@ async function loadContentSources(options = {}) {
     const registry = await loadSourceRegistry({
       rootDir: options.rootDir || process.cwd(),
       sourcesPath: options.registryPath || path.join("config", "sources"),
-      includeEnablement: options.enablement || "core"
+      includeEnablement: options.enablement || "core,optional"
     });
     return registry.sources;
   } catch (error) {
@@ -1502,7 +1655,7 @@ export async function collectStatuspageIncidents(options = {}) {
         candidates.push({
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
-          category: "main_item",
+          category: "community_lead",
           title: `${currentSource.name}: ${entry.title}`,
           url: entry.url,
           source: currentSource.name,

@@ -3,6 +3,7 @@ import path from "node:path";
 import { PublisherError } from "./errors.js";
 
 const CURRENT_SECTIONS = ["main_items", "model_releases", "hot_blogs"];
+const MODEL_MAIN_DUPLICATE_SECTIONS = new Set(["main_items", "model_releases"]);
 const HISTORY_SECTIONS = ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations"];
 
 export async function requireFreshReport(report, options = {}) {
@@ -66,6 +67,10 @@ function findSameReportUrlDuplicates(report) {
       const current = `${section}[${index}]`;
       const previous = seen.get(url);
       if (previous) {
+        const previousSection = previous.split("[")[0];
+        if (MODEL_MAIN_DUPLICATE_SECTIONS.has(previousSection) && MODEL_MAIN_DUPLICATE_SECTIONS.has(section)) {
+          continue;
+        }
         errors.push({
           code: "same_report_duplicate_url",
           path: current,

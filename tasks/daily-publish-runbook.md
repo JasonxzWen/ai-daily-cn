@@ -87,7 +87,7 @@ npm run publish -- confirm-push YYYY-MM-DD
 
 ## GitHub API Fallback
 
-- Use this only when local git metadata or branch switching blocks real publish:
+- Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`:
 
 ```powershell
 npm run publish:github-api -- confirm-push YYYY-MM-DD

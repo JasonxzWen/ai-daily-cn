@@ -16,7 +16,7 @@
 
 - `config/sources/*.json`：配置化信源注册表，区分 `core`、`optional`、`manual`。
 - `schemas/sources.schema.json` 与 `npm run sources:validate`：校验新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement`、`verification_policy`。
-- `npm run discover:content-sources`：默认只运行 `core`，可用 `--enablement core,optional` 显式打开广义科技、Product Hunt 和聚合源。
+- `npm run discover:content-sources`：默认运行 `core,optional`，覆盖广义科技、Product Hunt 和聚合源；公众号/中文自媒体等 `manual` 来源需要显式打开或人工录入。
 - `npm run discover:search-news -- --shadow`：GDELT、OpenAlex、arXiv 默认影子运行；Brave/Tavily/Exa/SerPAPI/Semantic Scholar 只在有环境变量时启用。
 - `npm run sources:health`：检查配置源 HTTP 状态、feed 形态、近 48 小时条目数和原始 URL 要求。
 - `npm run sources:audit-merge`：把独立发现命令输出的 `source_audit` 固定组合并进最终日报 JSON，避免 Phase 5 只能看到临时 stdout。
@@ -148,7 +148,7 @@
 - `github_trending`、`builder_sources`、`content_sources` 是内容候选证据。
 - `search_sources` 是补漏和回源证据；`shadow:true` 表示默认不自动升格入正文。
 - `sources_health` 是发现面可用性证据；不产生内容候选也必须记录。
-- `sources[].status` 允许 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`；跳过类状态必须写在 `notes` 或 status 中，不能静默缺失。
+- `sources[].status` 允许 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`、`skipped_manual_source`、`skipped_manual_review_required`；跳过类状态必须写在 `notes` 或 status 中，不能静默缺失。
 - 只有这些组出现在最终日报 JSON 中，`sources:phase5-audit` 才能把当天算作连续运行证据。
 
 独立发现命令输出可用以下命令合并；该命令只改 `source_audit`，写回前会校验 report schema，不改正文和候选池：
