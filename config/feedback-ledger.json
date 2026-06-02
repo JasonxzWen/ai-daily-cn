@@ -55,6 +55,68 @@
         "test_name": "publish quality blocks strict daily reports not generated from current origin/main",
         "gate": "publish:dry-run"
       }
+    },
+    {
+      "id": "feedback/p1-source-outage-disclosure",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Expose source discovery outages",
+      "problem": "A scheduled run could have most fixed sources blocked while old populated sections made the public report look healthy.",
+      "expected_behavior": "When multiple fixed source groups are mostly blocked with network-like errors, the report records `source_discovery_network_unavailable`, exposes blocked counts, and tells the user to check Codex network access for workspace-write sandbox mode.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/quality-status.js",
+        "src/interaction-report.js",
+        "src/render.js",
+        "prompts/ai-daily/modules/fixed-source-checklist.md",
+        "tasks/daily-publish-runbook.md",
+        "docs/codex-automation-setup.md"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "publish quality exposes network-wide source outage even when sections are populated",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-search-provider-partials",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Preserve partial search discovery",
+      "problem": "`discover:search-news` could obscure provider-level failures and did not record provider timing or error counts.",
+      "expected_behavior": "Shadow search keeps candidates from healthy providers when another provider fails, and records provider runtime, request cost, and error counts in `source_audit.search_sources`.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/search-news.js",
+        "src/discovery.js",
+        "tasks/daily-publish-runbook.md",
+        "prompts/ai-daily/modules/fixed-source-checklist.md"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "search news discovery preserves provider-level partial results and timing",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-discovery-output-json",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Write clean discovery JSON",
+      "problem": "Saving discovery stdout through PowerShell could be polluted by encoding, BOM, or npm banners.",
+      "expected_behavior": "JSON-producing CLI commands accept `--output` and write clean UTF-8 JSON files directly while avoiding accidental argument inference from output file paths.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/cli.js",
+        "tasks/daily-publish-runbook.md",
+        "docs/codex-automation-setup.md",
+        "prompts/ai-daily/modules/fixed-source-checklist.md"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "CLI JSON commands can write clean UTF-8 output files",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

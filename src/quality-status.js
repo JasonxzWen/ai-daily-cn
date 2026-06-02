@@ -23,6 +23,12 @@ export const STRICT_SOURCE_REGISTRY_MINIMUM = 60;
 export const STRICT_GITHUB_TRENDING_SOURCE_MINIMUM = 10;
 export const STRICT_BUILDER_SOURCE_MINIMUM = 3;
 
+const SOURCE_OUTAGE_BLOCKED_RATIO = 0.8;
+const SOURCE_OUTAGE_MIN_BLOCKED = 3;
+const SOURCE_OUTAGE_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
+const WORKSPACE_WRITE_NETWORK_REMINDER =
+  "Check config.toml or Codex settings and enable network access for workspace-write sandbox mode: set [sandbox_workspace_write] network_access = true / 设置“当沙盒设置为工作区写入时允许网络访问”.";
+
 const CANDIDATE_SECTION_MAP = {
   main_item: "main_items",
   github_trending: "github_trending",
@@ -152,6 +158,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
   const strictIssues = strictDailyCoverageIssues(report);
   const blockingIssues = strictIssues.filter(isBlockingPublishQualityIssue);
   const strictDegradedSections = strictIssues.filter((issue) => !isBlockingPublishQualityIssue(issue));
+  const strictDegradedReasons = strictDegradedSections.map((issue) => issue.code || issue.error_code).filter(Boolean);
   const degradedSections = uniqueQualityIssues([
     ...(explicit?.degraded_sections || []),
     ...degradedSectionsFromReasons(reasons, affectedSections),
@@ -165,7 +172,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
       ? "degraded"
       : "ok";
   const finalReasons = status === "degraded"
-    ? unique([...reasons, ...degradedReasons])
+    ? unique([...reasons, ...degradedReasons, ...strictDegradedReasons])
     : status === "blocked"
       ? unique([...reasons, ...blockingIssues.map((issue) => issue.code || issue.error_code)])
       : unique([...(explicit?.reasons || []), ...lowSignalReasons(report)]);
@@ -486,6 +493,8 @@ function strictSourceAuditIssues(report) {
     });
   }
 
+  issues.push(...strictSourceAvailabilityIssues(report));
+
   for (const requirement of FIXED_SOURCE_REQUIREMENTS) {
     const missing = requirement.sources
       .filter((sourceRequirement) => !hasAuditSource(report, sourceRequirement))
@@ -506,6 +515,91 @@ function strictSourceAuditIssues(report) {
   }
 
   return issues;
+}
+
+function strictSourceAvailabilityIssues(report) {
+  const summaries = SOURCE_OUTAGE_GROUPS
+    .map((groupName) => sourceAuditGroupSummary(groupName, report?.source_audit?.[groupName]))
+    .filter((summary) => summary.total_sources > 0);
+  const outageGroups = summaries.filter((summary) =>
+    summary.blocked_count >= SOURCE_OUTAGE_MIN_BLOCKED &&
+    summary.blocked_ratio >= SOURCE_OUTAGE_BLOCKED_RATIO
+  );
+  if (outageGroups.length === 0) {
+    return [];
+  }
+
+  const likelyNetworkOutage = outageGroups.length >= 2 &&
+    outageGroups.some((summary) => summary.network_error_count >= SOURCE_OUTAGE_MIN_BLOCKED);
+  const issueGroups = likelyNetworkOutage ? outageGroups : outageGroups.filter((summary) => summary.group !== "sources_health");
+  if (issueGroups.length === 0) {
+    return [];
+  }
+
+  const groupSummaryText = issueGroups
+    .map((summary) => `${summary.group} ${summary.blocked_count}/${summary.total_sources} blocked`)
+    .join("; ");
+
+  if (likelyNetworkOutage) {
+    return [
+      {
+        error_code: "source_discovery_network_gate_failed",
+        code: "source_discovery_network_unavailable",
+        section: "source_audit",
+        count: issueGroups.reduce((sum, summary) => sum + summary.blocked_count, 0),
+        minimum: SOURCE_OUTAGE_MIN_BLOCKED,
+        blocked_count: issueGroups.reduce((sum, summary) => sum + summary.blocked_count, 0),
+        total_sources: issueGroups.reduce((sum, summary) => sum + summary.total_sources, 0),
+        affected_groups: issueGroups.map((summary) => summary.group),
+        group_summaries: issueGroups,
+        message: `Source discovery appears network-unavailable for this run: ${groupSummaryText}.`,
+        remediation: WORKSPACE_WRITE_NETWORK_REMINDER
+      }
+    ];
+  }
+
+  return issueGroups.map((summary) => ({
+    error_code: "source_blocked_rate_gate_failed",
+    code: "source_group_blocked_rate_high",
+    section: `source_audit.${summary.group}`,
+    count: summary.blocked_count,
+    minimum: Math.ceil(summary.total_sources * SOURCE_OUTAGE_BLOCKED_RATIO),
+    blocked_count: summary.blocked_count,
+    total_sources: summary.total_sources,
+    blocked_ratio: summary.blocked_ratio,
+    checked_count: summary.checked_count,
+    no_signal_count: summary.no_signal_count,
+    skipped_count: summary.skipped_count,
+    group_summaries: [summary],
+    message: `${summary.group} has a high blocked-source ratio: ${summary.blocked_count}/${summary.total_sources} blocked.`,
+    remediation: "Keep blocked sources out of factual text, disclose the degraded source lane publicly, and repair the source path before relying on this lane for selection."
+  }));
+}
+
+function sourceAuditGroupSummary(groupName, group) {
+  const sources = Array.isArray(group?.sources) ? group.sources : [];
+  const activeSources = sources.filter((source) => !String(source?.status || "").startsWith("skipped_manual"));
+  const statuses = activeSources.map((source) => String(source?.status || "unknown"));
+  const blockedCount = statuses.filter((status) => BLOCKED_SOURCE_STATUSES.has(status) || status === "blocked").length;
+  const checkedCount = statuses.filter((status) => status === "checked").length;
+  const noSignalCount = statuses.filter((status) => status === "no_signal").length;
+  const skippedCount = statuses.filter((status) => status.startsWith("skipped")).length;
+  const networkErrorCount = activeSources.filter((source) => isNetworkUnavailableNote(source?.notes)).length;
+  return {
+    group: groupName,
+    total_sources: activeSources.length,
+    blocked_count: blockedCount,
+    checked_count: checkedCount,
+    no_signal_count: noSignalCount,
+    skipped_count: skippedCount,
+    network_error_count: networkErrorCount,
+    blocked_ratio: activeSources.length > 0 ? Number((blockedCount / activeSources.length).toFixed(3)) : 0,
+    blocked_reason: String(group?.blocked_reason || "").trim()
+  };
+}
+
+function isNetworkUnavailableNote(value) {
+  return /fetch failed|network|timeout|timed out|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|retry_failed/i.test(String(value || ""));
 }
 
 function strictBuilderIssues(report) {
@@ -746,6 +840,10 @@ function publicQualityNote(status, reasons, explicitNote) {
     return explicitNote || "Report generation is blocked by a startup or validation failure.";
   }
   if (status === "degraded") {
+    if (reasons.includes("source_discovery_network_unavailable")) {
+      return explicitNote ||
+        `本轮固定信源发现面疑似网络不可用，日报可能沿用了旧候选或只保留 blocked 审计。${WORKSPACE_WRITE_NETWORK_REMINDER}`;
+    }
     if (reasons.includes("content_sources_blocked") && reasons.includes("builder_sources_blocked")) {
       return explicitNote || "Content source and Builder source coverage is degraded; those sections may be incomplete.";
     }
@@ -936,6 +1034,14 @@ function normalizeQualityIssue(issue) {
     "has_rank_coverage",
     "has_follow_builders_x",
     "has_x_observation",
+    "blocked_count",
+    "total_sources",
+    "blocked_ratio",
+    "checked_count",
+    "no_signal_count",
+    "skipped_count",
+    "affected_groups",
+    "group_summaries",
     "missing_sources",
     "missing_model_releases",
     "revision_mismatches",

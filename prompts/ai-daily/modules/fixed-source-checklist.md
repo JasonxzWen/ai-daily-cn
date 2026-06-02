@@ -22,6 +22,13 @@ Same-event multi-source reports must be merged. T3, intermediary, community, and
 
 From `2026-06-02` onward, this checklist is enforced by the publish quality gate, not only by the prompt. The final `source_audit` should prove these sources were checked, even when individual feeds return `no_signal`. Missing automation revision, invalid schema, broken candidate references, stale duplicate stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, and Pages verification failures are blocking. Source-surface coverage gaps are degraded: `publish:dry-run`, local `publish`, and `publish:github-api` may proceed only when the gap is written into `quality_status.degraded_sections` and disclosed in the public report.
 
+Discovery command output and network outage rules:
+
+- Prefer `node src/cli.js ... --output .tmp/<name>-YYYY-MM-DD.json` for fixed discovery commands. Do not rely on PowerShell `Tee-Object` to preserve JSON, because shell encoding or npm banners can pollute stdout.
+- Run `discover:search-news` with provider-level isolation, for example `--provider-timeout-ms 45000 --output .tmp/search-news-YYYY-MM-DD.json`; one provider failure must not erase other provider candidates, timing, cost, or error evidence.
+- When multiple fixed source groups are mostly `status:"blocked"` with `fetch failed`, `retry_failed_after_1`, DNS, timeout, or network notes, set `quality_status.status:"degraded"` and include `source_discovery_network_unavailable` in `quality_status.degraded_sections`.
+- In that network-outage degradation, explicitly tell the user to check `config.toml` or Codex settings and enable network access when sandbox mode is `workspace-write`: `[sandbox_workspace_write] network_access = true` / 设置“当沙盒设置为工作区写入时允许网络访问”.
+
 Every selected public item should carry an importance label:
 
 - `importance: "major"` renders as `重大` and is reserved for platform/lab launches, high-impact model releases, major funding/M&A/regulatory moves, or events that can change production usage.

@@ -1174,10 +1174,12 @@ function formatAuditGroup(title, group) {
     return `### ${title}\n\n未记录。`;
   }
 
+  const counts = sourceStatusCounts(group.sources);
   const sources = Array.isArray(group.sources) && group.sources.length > 0
     ? group.sources.map((source) => `- ${markdownLink(source.url, source.name)}：${source.status}${source.notes ? `，${source.notes}` : ""}`).join("\n")
     : "- 未记录具体来源。";
   const details = [
+    `- Source status: checked=${counts.checked}; no_signal=${counts.no_signal}; blocked=${counts.blocked}; skipped=${counts.skipped}`,
     `- 检查状态：${group.checked ? "已检查" : "未检查"}`,
     `- 候选 / 入选：${group.candidates_found} / ${group.included}`,
     group.blocked_reason ? `- 阻塞原因：${group.blocked_reason}` : "",
@@ -1185,6 +1187,18 @@ function formatAuditGroup(title, group) {
     `- 说明：${group.notes || "无"}`
   ].filter(Boolean);
   return `### ${title}\n\n${details.join("\n")}\n\n${sources}`;
+}
+
+function sourceStatusCounts(sources) {
+  const counts = { checked: 0, no_signal: 0, blocked: 0, skipped: 0 };
+  for (const source of Array.isArray(sources) ? sources : []) {
+    const status = String(source?.status || "");
+    if (status === "checked") counts.checked += 1;
+    else if (status === "no_signal") counts.no_signal += 1;
+    else if (status === "blocked") counts.blocked += 1;
+    else if (status.startsWith("skipped")) counts.skipped += 1;
+  }
+  return counts;
 }
 
 function formatSelfCheck(selfCheck) {

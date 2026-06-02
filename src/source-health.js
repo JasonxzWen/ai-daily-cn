@@ -1,4 +1,4 @@
-import { createDiscoveryFetch } from "./discovery.js";
+import { createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
 import { loadSourceRegistry, normalizeEnablements } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 
@@ -65,7 +65,7 @@ export async function checkSourcesHealth(options = {}) {
       }));
     } catch (error) {
       results.push(healthResult(source, "blocked", {
-        notes: error.message
+        notes: formatDiscoveryErrorNote(error)
       }));
     }
   }

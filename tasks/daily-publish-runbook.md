@@ -29,16 +29,25 @@ npm run prompt:build -- YYYY-MM-DD
 - Check source lanes before writing the draft:
 
 ```powershell
-npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data
-npm run discover:builders -- --date YYYY-MM-DD --limit 20
-npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3
-npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
+node src/cli.js discover:github-trending --date YYYY-MM-DD --limit 50 --history-root reports-data --output .tmp/github-trending-YYYY-MM-DD.json
+node src/cli.js discover:builders --date YYYY-MM-DD --limit 20 --output .tmp/builders-YYYY-MM-DD.json
+node src/cli.js discover:content-sources --date YYYY-MM-DD --limit 60 --per-source-limit 3 --output .tmp/content-sources-YYYY-MM-DD.json
+node src/cli.js discover:statuspage-incidents --date YYYY-MM-DD --limit 20 --output .tmp/statuspage-incidents-YYYY-MM-DD.json
+```
+
+- Prefer discovery command `--output` over PowerShell `Tee-Object` or stdout redirection. The command writes UTF-8 JSON directly, so npm banners, shell encoding, or BOM handling cannot pollute the audit artifact.
+- Run shadow search with provider-level timing and partial-result retention:
+
+```powershell
+node src/cli.js discover:search-news --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --provider-timeout-ms 45000 --shadow --output .tmp/search-news-YYYY-MM-DD.json
+node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual --output .tmp/sources-health-YYYY-MM-DD.json
 ```
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
 - For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, report generation commit not proving latest `origin/main` through `origin_main_sha`, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or Pages verification failure. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but the JSON and public HTML must disclose them in `quality_status`.
 - Also for reports dated `2026-06-02` or later, enforce the long-form engineer daily gate: public `summary` must be an editorial lead, not a generation log; every `main_items` entry must include `why_it_matters` or `reader_relevance`; `main_items` must use primary, official, paper, GitHub, or multi-source confirmed evidence; non-primary leads may only appear in viewpoint/product/Builder/community sections with `source_level`, `verification_status`, and `verification_note` or `risk_note`; keep `model_releases` empty for new drafts unless preserving legacy data.
 - A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
+- If multiple fixed source groups are mostly `blocked` with `fetch failed`, treat it as a likely scheduled-task network outage. The public `quality_status.degraded_sections` must include `source_discovery_network_unavailable`, and the final response must tell the user to check `config.toml` or Codex settings and enable network access for workspace-write sandbox mode: `[sandbox_workspace_write] network_access = true`, also shown in the UI as `当沙盒设置为工作区写入时允许网络访问`.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.

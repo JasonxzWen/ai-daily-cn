@@ -1014,7 +1014,9 @@ function renderAuditGroup(title, group) {
   }
 
   const status = group.checked ? "已检查" : "未检查";
+  const counts = sourceStatusCounts(group.sources);
   const meta = [
+    `status checked=${counts.checked} no_signal=${counts.no_signal} blocked=${counts.blocked} skipped=${counts.skipped}`,
     status,
     `${group.candidates_found} 候选`,
     `${group.included} 入选`,
@@ -1029,6 +1031,18 @@ function renderAuditGroup(title, group) {
   ${group.notes ? `<p>${escapeHtml(group.notes)}</p>` : ""}
   ${renderAuditSources(group.sources)}
 </article>`;
+}
+
+function sourceStatusCounts(sources) {
+  const counts = { checked: 0, no_signal: 0, blocked: 0, skipped: 0 };
+  for (const source of Array.isArray(sources) ? sources : []) {
+    const status = String(source?.status || "");
+    if (status === "checked") counts.checked += 1;
+    else if (status === "no_signal") counts.no_signal += 1;
+    else if (status === "blocked") counts.blocked += 1;
+    else if (status.startsWith("skipped")) counts.skipped += 1;
+  }
+  return counts;
 }
 
 function renderAuditSources(sources = []) {

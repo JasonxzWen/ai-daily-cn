@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
@@ -43,6 +45,7 @@ const rootDir = path.resolve(__dirname, "..");
 const trendConfigPath = path.join(rootDir, "config/trends.json");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 const siteUrl = "https://jasonxzwen.github.io/ai-daily-cn/";
+const execFileAsync = promisify(execFile);
 
 test("HTML renders main item bold and highlight markers", async () => {
   const markdown = await readFixture("reports/good/official-release.md");
@@ -2221,6 +2224,52 @@ test("search news discovery skips keyed providers without exposing tokens", asyn
   assert.equal(collected.candidates.length, 0);
 });
 
+test("search news discovery preserves provider-level partial results and timing", async () => {
+  const collected = await collectSearchNews({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    providers: "gdelt,openalex",
+    queries: [
+      {
+        id: "frontier-labs-release",
+        query: "OpenAI release",
+        candidate_category: "community_lead",
+        verification_policy: "primary_required",
+        allowed_primary_domains: ["openai.com"]
+      }
+    ],
+    retryDelayMs: 0,
+    fetchImpl: async (url) => {
+      if (String(url).includes("gdeltproject")) {
+        throw new Error("fetch failed");
+      }
+      return jsonResponse({
+        results: [
+          {
+            title: "OpenAI example release paper",
+            primary_location: {
+              landing_page_url: "https://openai.com/news/example-release-paper",
+              source: { display_name: "OpenAI" }
+            },
+            publication_date: "2026-05-26",
+            type: "article"
+          }
+        ]
+      });
+    }
+  });
+
+  const audit = collected.source_audit.search_sources;
+  assert.equal(audit.sources.find((source) => source.name === "GDELT").status, "blocked");
+  assert.equal(audit.sources.find((source) => source.name === "OpenAlex").status, "checked");
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].source, "OpenAlex");
+  assert(Number.isInteger(audit.provider_runtime_ms.gdelt));
+  assert(Number.isInteger(audit.provider_runtime_ms.openalex));
+  assert.equal(audit.provider_error_counts.gdelt, 1);
+  assert.equal(audit.provider_error_counts.openalex, 0);
+});
+
 test("sources health checks feed shape and self-hosted base URL requirements", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-sources-health-"));
   const sourcesPath = path.join(tmp, "sources.json");
@@ -2284,6 +2333,28 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
   assert.equal(health.results[0].recent_48h_entries, 1);
   assert.equal(health.results[1].status, "skipped_missing_base_url");
   assert.equal(health.results[2].status, "skipped_manual_source");
+});
+
+test("CLI JSON commands can write clean UTF-8 output files", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-output-"));
+  const outputPath = path.join(tmp, "sources-validate.json");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "sources:validate",
+    "--output",
+    outputPath
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert(parsed.source_count >= 63);
+  assert(!raw.startsWith("\uFEFF"));
 });
 
 test("sources audit merge writes discovery audit groups into the final report JSON", async () => {
@@ -3124,6 +3195,35 @@ test("publish quality degrades strict daily reports missing GitHub Trending Top 
   assert(classification.degraded_sections.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
 });
 
+test("publish quality exposes network-wide source outage even when sections are populated", () => {
+  const report = strictPublishReportFixture();
+  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"]) {
+    const group = report.source_audit[groupName];
+    if (!group) {
+      continue;
+    }
+    group.sources = group.sources.map((source) => ({
+      ...source,
+      status: "blocked",
+      notes: "fetch failed; retry_failed_after_1"
+    }));
+    group.candidates_found = 0;
+    group.included = 0;
+    group.blocked_reason = "fetch_failed";
+  }
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+  const outage = classification.degraded_sections.find((issue) => issue.code === "source_discovery_network_unavailable");
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(outage);
+  assert.equal(outage.section, "source_audit");
+  assert.match(outage.message, /github_trending/);
+  assert.match(outage.message, /content_sources/);
+  assert.match(outage.remediation, /config\.toml/);
+  assert.match(outage.remediation, /workspace-write/);
+});
+
 test("publish quality degrades strict daily reports with duplicate or non-top-10 GitHub ranks", () => {
   const report = strictPublishReportFixture();
   report.github_trending = report.github_trending.map((item, index) => ({
@@ -3267,6 +3367,52 @@ test("report:write derives degraded quality status for blocked content discovery
   assert(report.quality_status.affected_sections.includes("hot_blogs"));
   assert(report.quality_status.degraded_sections.some((issue) => issue.section === "hot_blogs"));
   assert.match(report.quality_status.public_note, /Content source/);
+});
+
+test("report:write includes public network guidance for discovery outages", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.report_date = "2026-06-02";
+  draft.self_check.report_date = "2026-06-02";
+  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"]) {
+    const group = draft.source_audit[groupName];
+    if (!group) {
+      continue;
+    }
+    group.sources = Array.from({ length: 5 }, (_unused, index) => ({
+      ...(group.sources[index % group.sources.length] || {}),
+      name: `${groupName} blocked ${index + 1}`,
+      url: `https://example.com/${groupName}/${index + 1}`,
+      status: "blocked",
+      notes: "fetch failed; retry_failed_after_1"
+    }));
+    group.candidates_found = 0;
+    group.included = 0;
+    group.blocked_reason = "fetch_failed";
+  }
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.reasons.includes("source_discovery_network_unavailable"));
+  assert.match(report.quality_status.public_note, /config\.toml/);
+  assert.match(report.quality_status.public_note, /workspace-write/);
+  assert(
+    report.quality_status.degraded_sections.some(
+      (issue) => issue.code === "source_discovery_network_unavailable" && issue.section === "source_audit"
+    )
+  );
+
+  const input = reportToInteractionInput(report);
+  const qualitySection = input.sections.find((section) => section.title.includes("质量") || section.title.includes("Quality"));
+  assert(qualitySection);
+  assert.match(qualitySection.content, /config\.toml/);
+  assert.match(qualitySection.content, /workspace-write/);
 });
 
 test("report:write keeps low-signal checked sources out of degraded status", async () => {

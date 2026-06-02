@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import fs from "node:fs";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError, toPublishError } from "./errors.js";
@@ -199,6 +200,7 @@ try {
       queriesPath: args.queries || firstJsonPath(argv),
       limit: Number.parseInt(args.limit || positionalNumbers[0] || "40", 10),
       timeoutMs: Number.parseInt(args["timeout-ms"] || positionalNumbers[1] || "15000", 10),
+      providerTimeoutMs: Number.parseInt(args["provider-timeout-ms"] || "0", 10),
       budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
       shadow: args.shadow !== false,
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
@@ -425,15 +427,15 @@ function firstEnablement(args) {
 }
 
 function firstJsonPath(args) {
-  return args.find((token) => /\.json$/i.test(token));
+  return positionalArgs(args).find((token) => /\.json$/i.test(token));
 }
 
 function firstSourcePath(args) {
-  return args.find((token) => /\.json$/i.test(token) || /(^|[\\/])sources([\\/]|$)/i.test(token));
+  return positionalArgs(args).find((token) => /\.json$/i.test(token) || /(^|[\\/])sources([\\/]|$)/i.test(token));
 }
 
 function firstHistoryPath(args) {
-  return args.find((token) => /(^|[\\/])reports-data([\\/]|$)|^reports-data$/i.test(token));
+  return positionalArgs(args).find((token) => /(^|[\\/])reports-data([\\/]|$)|^reports-data$/i.test(token));
 }
 
 function inferProviderList(args) {
@@ -473,7 +475,19 @@ function positionalArgs(args) {
 }
 
 function printJson(value) {
-  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+  const json = `${JSON.stringify(value, null, 2)}\n`;
+  const outputPath = outputPathFromArgs(argv);
+  if (outputPath) {
+    const resolved = path.resolve(outputPath);
+    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+    fs.writeFileSync(resolved, json, "utf8");
+  }
+  process.stdout.write(json);
+}
+
+function outputPathFromArgs(args) {
+  const parsed = parseArgs(args);
+  return typeof parsed.output === "string" && parsed.output.trim() ? parsed.output : "";
 }
 
 function countBy(items, key) {
