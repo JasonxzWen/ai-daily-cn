@@ -2684,6 +2684,25 @@ test("publish quality blocks strict daily reports without automation revision pr
   assert(issues.some((issue) => issue.code === "automation_revision_missing_or_stale"));
 });
 
+test("publish quality blocks strict daily reports whose automation revision does not match the current repo revision", () => {
+  const report = strictPublishReportFixture();
+  const options = strictPublishOptionsFixture();
+  options.currentAutomationRevision = {
+    ...options.currentAutomationRevision,
+    git_commit: "1234567890abcdef1234567890abcdef12345678"
+  };
+
+  const issues = findPublishQualityIssues(report, options);
+
+  assert(
+    issues.some(
+      (issue) =>
+        issue.code === "automation_revision_missing_or_stale" &&
+        issue.revision_mismatches.includes("git_commit")
+    )
+  );
+});
+
 test("publish quality blocks strict daily reports missing requested Chinese source surface", () => {
   const report = strictPublishReportFixture();
   report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
@@ -3764,30 +3783,35 @@ function strictPublishReportFixture() {
       report_date: reportDate,
       main_items: mainItems.length,
       builder_observations: builderObservations.length,
-      automation_revision: {
-        schema_version: 1,
-        git_commit: "abcdef1234567890abcdef1234567890abcdef12",
-        git_commit_short: "abcdef123456",
-        git_branch: "main",
-        prompt_manifest: "prompts/ai-daily/manifest.json",
-        prompt_modules: ["fixed-source-checklist.md"],
-        source_registry_count: 63,
-        source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
-        rules: [
-          "main_items_min_8_when_candidates_available",
-          "content_units_min_18_when_candidates_available",
-          "model_releases_must_mirror_main_items",
-          "github_api_fallback_for_git_transport",
-          "fixed_source_checklist"
-        ]
-      }
+      automation_revision: strictAutomationRevisionFixture()
     }
+  };
+}
+
+function strictAutomationRevisionFixture() {
+  return {
+    schema_version: 1,
+    git_commit: "abcdef1234567890abcdef1234567890abcdef12",
+    git_commit_short: "abcdef123456",
+    git_branch: "main",
+    prompt_manifest: "prompts/ai-daily/manifest.json",
+    prompt_modules: ["fixed-source-checklist.md"],
+    source_registry_count: 63,
+    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    rules: [
+      "main_items_min_8_when_candidates_available",
+      "content_units_min_18_when_candidates_available",
+      "model_releases_must_mirror_main_items",
+      "github_api_fallback_for_git_transport",
+      "fixed_source_checklist"
+    ]
   };
 }
 
 function strictPublishOptionsFixture() {
   return {
-    existingAssetPaths: new Set(["assets/evidence/strict-figure.png"])
+    existingAssetPaths: new Set(["assets/evidence/strict-figure.png"]),
+    currentAutomationRevision: strictAutomationRevisionFixture()
   };
 }
 

@@ -244,7 +244,7 @@ function strictDailyCoverageIssues(report, options = {}) {
   }
 
   return [
-    ...strictAutomationRevisionIssues(report),
+    ...strictAutomationRevisionIssues(report, options),
     ...strictSectionIssues(report),
     ...strictSourceAuditIssues(report),
     ...strictBuilderIssues(report),
@@ -253,17 +253,19 @@ function strictDailyCoverageIssues(report, options = {}) {
   ];
 }
 
-function strictAutomationRevisionIssues(report) {
+function strictAutomationRevisionIssues(report, options = {}) {
   const revision = report?.self_check?.automation_revision;
   const missingRules = AUTOMATION_REVISION_RULES.filter((rule) => !Array.isArray(revision?.rules) || !revision.rules.includes(rule));
   const sourceRegistryCount = Number(revision?.source_registry_count || 0);
   const gitCommit = String(revision?.git_commit || "");
+  const revisionMismatches = automationRevisionMismatches(revision, options.currentAutomationRevision);
 
   if (
     !revision ||
     !/^[0-9a-f]{40}$/i.test(gitCommit) ||
     sourceRegistryCount < STRICT_SOURCE_REGISTRY_MINIMUM ||
-    missingRules.length > 0
+    missingRules.length > 0 ||
+    revisionMismatches.length > 0
   ) {
     return [
       {
@@ -273,6 +275,7 @@ function strictAutomationRevisionIssues(report) {
         count: sourceRegistryCount,
         minimum: STRICT_SOURCE_REGISTRY_MINIMUM,
         missing_rules: missingRules,
+        revision_mismatches: revisionMismatches,
         message: "self_check.automation_revision is missing, stale, or does not prove the fixed source checklist rules were active.",
         remediation: "Regenerate the report through report:write on current main so it records git commit, prompt modules, source registry count, and active hardening rules."
       }
@@ -580,6 +583,48 @@ function hasAuditSource(report, requirement) {
       return true;
     });
   });
+}
+
+function automationRevisionMismatches(revision, currentRevision) {
+  if (!currentRevision) {
+    return [];
+  }
+  if (!revision) {
+    return ["missing"];
+  }
+
+  const mismatches = [];
+  const currentGitCommit = String(currentRevision.git_commit || "");
+  if (!/^[0-9a-f]{40}$/i.test(currentGitCommit)) {
+    mismatches.push("current_git_commit_unavailable");
+  } else if (String(revision.git_commit || "") !== currentGitCommit) {
+    mismatches.push("git_commit");
+  }
+
+  if (currentRevision.prompt_manifest && revision.prompt_manifest !== currentRevision.prompt_manifest) {
+    mismatches.push("prompt_manifest");
+  }
+  if (!arraysEqual(revision.prompt_modules, currentRevision.prompt_modules)) {
+    mismatches.push("prompt_modules");
+  }
+  if (Number(revision.source_registry_count || 0) !== Number(currentRevision.source_registry_count || 0)) {
+    mismatches.push("source_registry_count");
+  }
+  if (!objectsEqual(revision.source_registry_enablement_counts, currentRevision.source_registry_enablement_counts)) {
+    mismatches.push("source_registry_enablement_counts");
+  }
+
+  return mismatches;
+}
+
+function arraysEqual(left, right) {
+  const leftItems = Array.isArray(left) ? left : [];
+  const rightItems = Array.isArray(right) ? right : [];
+  return leftItems.length === rightItems.length && leftItems.every((item, index) => item === rightItems[index]);
+}
+
+function objectsEqual(left, right) {
+  return JSON.stringify(left || {}) === JSON.stringify(right || {});
 }
 
 function hasRankCoverage(items, start, end) {
