@@ -210,6 +210,63 @@ test("publish dry-run stops when a selected report quality status is blocked", a
   );
 });
 
+test("publish dry-run stops when selected strict report was not generated from current origin/main", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
+  report.report_date = "2026-06-02";
+  report.html_path = "reports/2026/06/2026-06-02.html";
+  report.canonical_url = "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html";
+  report.source_window.date_from = "2026-06-02";
+  report.source_window.date_to = "2026-06-02";
+  report.self_check.report_date = "2026-06-02";
+  report.self_check.automation_revision = {
+    schema_version: 1,
+    git_commit: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    git_commit_short: "aaaaaaaaaaaa",
+    git_branch: "main",
+    origin_main_sha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    origin_main_short: "bbbbbbbbbbbb",
+    prompt_manifest: "prompts/ai-daily/manifest.json",
+    prompt_modules: ["fixed-source-checklist.md"],
+    source_registry_count: 63,
+    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    rules: [
+      "main_items_min_8_when_candidates_available",
+      "content_units_min_18_when_candidates_available",
+      "model_releases_must_mirror_main_items",
+      "github_api_fallback_for_git_transport",
+      "fixed_source_checklist"
+    ]
+  };
+  const currentAutomationRevision = {
+    ...report.self_check.automation_revision,
+    git_commit: "cccccccccccccccccccccccccccccccccccccccc",
+    git_commit_short: "cccccccccccc",
+    origin_main_sha: "cccccccccccccccccccccccccccccccccccccccc",
+    origin_main_short: "cccccccccccc"
+  };
+  const dataDir = path.join(repoRoot, "reports-data", "2026", "06");
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(path.join(dataDir, "2026-06-02.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    createPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-06-02",
+      git: fakeGit(),
+      currentAutomationRevision
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "automation_revision_gate_failed" &&
+      error.details.issues.some((issue) => issue.revision_mismatches.includes("origin_main_sha"))
+  );
+});
+
 test("publish dry-run 遇到非发布器管理改动时停止", async () => {
   const repoRoot = await tempRepoWithFixture();
   await assert.rejects(

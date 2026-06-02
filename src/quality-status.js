@@ -334,8 +334,8 @@ function strictAutomationRevisionIssues(report, options = {}) {
         minimum: STRICT_SOURCE_REGISTRY_MINIMUM,
         missing_rules: missingRules,
         revision_mismatches: revisionMismatches,
-        message: "self_check.automation_revision is missing, stale, or does not prove the fixed source checklist rules were active.",
-        remediation: "Regenerate the report through report:write on current main so it records git commit, prompt modules, source registry count, and active hardening rules."
+        message: "self_check.automation_revision is missing, stale, not generated from current origin/main, or does not prove the fixed source checklist rules were active.",
+        remediation: "Regenerate the report through report:write on latest origin/main so it records git commit, origin_main_sha, prompt modules, source registry count, and active hardening rules."
       }
     ];
   }
@@ -786,19 +786,36 @@ function hasAuditSource(report, requirement) {
 }
 
 function automationRevisionMismatches(revision, currentRevision) {
-  if (!currentRevision) {
-    return [];
-  }
   if (!revision) {
     return ["missing"];
   }
 
   const mismatches = [];
+  const revisionGitCommit = String(revision.git_commit || "");
+  const revisionOriginMain = String(revision.origin_main_sha || "");
+  if (/^[0-9a-f]{40}$/i.test(revisionOriginMain) && revisionGitCommit !== revisionOriginMain) {
+    mismatches.push("origin_main_sha");
+  }
+
+  if (!currentRevision) {
+    return mismatches;
+  }
+
   const currentGitCommit = String(currentRevision.git_commit || "");
   if (!/^[0-9a-f]{40}$/i.test(currentGitCommit)) {
     mismatches.push("current_git_commit_unavailable");
-  } else if (String(revision.git_commit || "") !== currentGitCommit) {
+  } else if (revisionGitCommit !== currentGitCommit) {
     mismatches.push("git_commit");
+  }
+
+  const currentOriginMain = String(currentRevision.origin_main_sha || "");
+  if (/^[0-9a-f]{40}$/i.test(currentOriginMain)) {
+    if (revisionOriginMain !== currentOriginMain) {
+      mismatches.push("origin_main_sha");
+    }
+    if (currentGitCommit !== currentOriginMain) {
+      mismatches.push("current_not_origin_main");
+    }
   }
 
   if (currentRevision.prompt_manifest && revision.prompt_manifest !== currentRevision.prompt_manifest) {
@@ -814,7 +831,7 @@ function automationRevisionMismatches(revision, currentRevision) {
     mismatches.push("source_registry_enablement_counts");
   }
 
-  return mismatches;
+  return unique(mismatches);
 }
 
 function arraysEqual(left, right) {

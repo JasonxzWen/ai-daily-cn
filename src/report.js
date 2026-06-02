@@ -9,6 +9,7 @@ import { requirePlainLanguage } from "./plain-language.js";
 import { requireFreshReport } from "./quality-gates.js";
 import { deriveQualityStatus, requirePublishableQuality } from "./quality-status.js";
 import { buildAutomationRevision, defaultAutomationRevision } from "./automation-revision.js";
+import { normalizeOptimizationSuggestions } from "./feedback-contract.js";
 import { withDefaultImportance } from "./importance.js";
 import {
   readCandidatePool,
@@ -111,9 +112,7 @@ export function normalizeReportDraft(draft, options = {}) {
       report_date: report.self_check.report_date || reportDate,
       builder_skill_used: Array.isArray(report.self_check.builder_skill_used) ? report.self_check.builder_skill_used : [],
       fallback_sources: Array.isArray(report.self_check.fallback_sources) ? report.self_check.fallback_sources : [],
-      optimization_suggestions: Array.isArray(report.self_check.optimization_suggestions)
-        ? report.self_check.optimization_suggestions
-        : [],
+      optimization_suggestions: normalizeOptimizationSuggestions(report.self_check.optimization_suggestions),
       automation_revision:
         options.automationRevision || report.self_check.automation_revision || defaultAutomationRevision()
     };

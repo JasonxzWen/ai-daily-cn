@@ -29,6 +29,10 @@ import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
+import {
+  normalizeOptimizationSuggestions,
+  validateFeedbackContract
+} from "../src/feedback-contract.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
 import { classifyPublishQuality, findPublishQualityIssues } from "../src/quality-status.js";
@@ -2728,6 +2732,197 @@ test("report:write importance labels are schema-validated and rendered", async (
   assert(interaction.sections.some((section) => String(section.content || "").includes("==tag-major|重大==")));
 });
 
+test("schema rejects arbitrary optimization_suggestions objects", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.self_check.optimization_suggestions = [{ foo: "bar" }];
+
+  const validation = validateReport(report);
+
+  assert.equal(validation.valid, false);
+  assert(validation.errors.some((error) => error.path.includes("/self_check/optimization_suggestions/0")));
+});
+
+test("optimization suggestions normalize legacy fields into canonical contract", () => {
+  const suggestions = normalizeOptimizationSuggestions([
+    {
+      issue: "历史建议字段不稳定",
+      evidence: "同一字段出现多种 key shape。",
+      suggested_module: "prompts/ai-daily/modules/reflection-loop.md",
+      suggestion: "固定字段名并拒绝任意对象。",
+      expected_benefit: "让反馈能被 validate 和 report:write 稳定消费。",
+      needs_user_confirmation: false
+    }
+  ]);
+
+  assert.deepEqual(suggestions, [
+    {
+      issue: "历史建议字段不稳定",
+      evidence: "同一字段出现多种 key shape。",
+      module: "prompts/ai-daily/modules/reflection-loop.md",
+      suggestion: "固定字段名并拒绝任意对象。",
+      expected_benefit: "让反馈能被 validate 和 report:write 稳定消费。",
+      requires_user_confirmation: false
+    }
+  ]);
+});
+
+test("feedback contract requires P1 ledger items to bind to tests or gates", async () => {
+  const result = await validateFeedbackContract({
+    rootDir,
+    ledger: {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/p1-missing-binding",
+          severity: "P1",
+          status: "confirmed",
+          title: "Missing binding",
+          problem: "Confirmed feedback can drift.",
+          expected_behavior: "Every P1 item binds to validation.",
+          scope: ["src/feedback-contract.js"]
+        }
+      ]
+    },
+    promptModules: {
+      schema_version: 1,
+      modules: []
+    },
+    promptManifest: {
+      schema_version: 1,
+      modules: []
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("feedback/p1-missing-binding")));
+});
+
+test("feedback contract rejects P1 bindings whose test name is not present in tests", async () => {
+  const result = await validateFeedbackContract({
+    rootDir,
+    ledger: {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/p1-missing-test-name",
+          severity: "P1",
+          status: "implemented",
+          title: "Missing test name",
+          problem: "A ledger item can point at a non-existent assertion.",
+          expected_behavior: "The validator proves the named assertion exists.",
+          scope: ["src/feedback-contract.js"],
+          validation: {
+            command: "node --test tests/unit.test.js",
+            test_name: "this test name does not exist",
+            gate: "npm run validate"
+          }
+        }
+      ]
+    },
+    promptModules: { schema_version: 1, modules: [] },
+    promptManifest: { schema_version: 1, modules: [] },
+    testFiles: [
+      {
+        path: "tests/unit.test.js",
+        content: "test(\"some other test\", () => {})"
+      }
+    ],
+    packageJson: {
+      scripts: {
+        validate: "npm run test",
+        test: "node --test tests/unit.test.js"
+      }
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("validation.test_name not found")));
+});
+
+test("feedback contract rejects P1 validation commands outside npm validate", async () => {
+  const result = await validateFeedbackContract({
+    rootDir,
+    ledger: {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/p1-command-not-covered",
+          severity: "P1",
+          status: "implemented",
+          title: "Command not covered",
+          problem: "A ledger item can cite a command that validate never runs.",
+          expected_behavior: "The validator proves the command is covered by npm run validate.",
+          scope: ["src/feedback-contract.js"],
+          validation: {
+            command: "node --test tests/not-in-validate.test.js",
+            test_name: "covered assertion",
+            gate: "npm run validate"
+          }
+        }
+      ]
+    },
+    promptModules: { schema_version: 1, modules: [] },
+    promptManifest: { schema_version: 1, modules: [] },
+    testFiles: [
+      {
+        path: "tests/not-in-validate.test.js",
+        content: "test(\"covered assertion\", () => {})"
+      }
+    ],
+    packageJson: {
+      scripts: {
+        validate: "npm run test",
+        test: "node --test tests/unit.test.js"
+      }
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("validation.command is not covered by npm run validate")));
+});
+
+test("feedback contract rejects P1 scope paths that do not exist", async () => {
+  const result = await validateFeedbackContract({
+    rootDir,
+    ledger: {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/p1-missing-scope",
+          severity: "P1",
+          status: "implemented",
+          title: "Missing scope",
+          problem: "A ledger item can point at no real changed file.",
+          expected_behavior: "Every P1 scope path resolves to a repository file.",
+          scope: ["src/does-not-exist.js"],
+          validation: {
+            command: "node --test tests/unit.test.js",
+            test_name: "covered assertion",
+            gate: "npm run validate"
+          }
+        }
+      ]
+    },
+    promptModules: { schema_version: 1, modules: [] },
+    promptManifest: { schema_version: 1, modules: [] },
+    testFiles: [
+      {
+        path: "tests/unit.test.js",
+        content: "test(\"covered assertion\", () => {})"
+      }
+    ],
+    packageJson: {
+      scripts: {
+        validate: "npm run test",
+        test: "node --test tests/unit.test.js"
+      }
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("scope path does not exist")));
+});
+
 test("report:write records automation revision fingerprint in self_check", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -2740,6 +2935,8 @@ test("report:write records automation revision fingerprint in self_check", async
     prompt_modules: ["fixed-source-checklist.md"],
     source_registry_count: 63,
     source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    origin_main_sha: "abcdef1234567890abcdef1234567890abcdef12",
+    origin_main_short: "abcdef123456",
     rules: ["fixed_source_checklist"]
   };
 
@@ -2762,6 +2959,7 @@ test("automation revision reads git, prompt manifest, and source registry state"
   assert(revision.prompt_modules.includes("fixed-source-checklist.md"));
   assert(revision.source_registry_count >= 63);
   assert(revision.rules.includes("fixed_source_checklist"));
+  assert.match(revision.origin_main_sha, /^(unknown|[0-9a-f]{40})$/);
 });
 
 test("publish quality accepts strict daily reports with full source proof", () => {
@@ -2850,6 +3048,23 @@ test("publish quality blocks strict daily reports whose automation revision does
       (issue) =>
         issue.code === "automation_revision_missing_or_stale" &&
         issue.revision_mismatches.includes("git_commit")
+    )
+  );
+});
+
+test("publish quality blocks strict daily reports not generated from current origin/main", () => {
+  const report = strictPublishReportFixture();
+  const options = strictPublishOptionsFixture();
+  report.self_check.automation_revision.origin_main_sha = "1234567890abcdef1234567890abcdef12345678";
+  report.self_check.automation_revision.origin_main_short = "1234567890ab";
+
+  const issues = findPublishQualityIssues(report, options);
+
+  assert(
+    issues.some(
+      (issue) =>
+        issue.code === "automation_revision_missing_or_stale" &&
+        issue.revision_mismatches.includes("origin_main_sha")
     )
   );
 });
@@ -4158,6 +4373,8 @@ function strictAutomationRevisionFixture() {
     git_commit: "abcdef1234567890abcdef1234567890abcdef12",
     git_commit_short: "abcdef123456",
     git_branch: "main",
+    origin_main_sha: "abcdef1234567890abcdef1234567890abcdef12",
+    origin_main_short: "abcdef123456",
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
     source_registry_count: 63,
