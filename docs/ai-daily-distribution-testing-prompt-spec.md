@@ -22,7 +22,7 @@
 
 包含：
 
-- `ai-2` 生成中文 AI 日报。
+- `ai-daily` 生成中文 AI 日报。
 - 日报 Markdown 转结构化 JSON。
 - 通过 `.codex/skills/effective-interact` 进行静态 HTML 渲染。
 - 首页和 `feed.json` 更新。
@@ -43,7 +43,7 @@
 
 | 名称 | 含义 |
 |---|---|
-| 日报原文 | `report.md`，由 `ai-2` 输出的中文 Markdown |
+| 日报原文 | `report.md`，由 `ai-daily` 输出的中文 Markdown |
 | 结构化数据 | `report.json`，从日报原文和自检字段解析得到 |
 | 发布页面 | `report.html`，单篇日报静态 HTML |
 | 首页索引 | `index.html`，列出最新和历史日报 |
@@ -61,7 +61,7 @@
 第一阶段：
 
 ```text
-ai-2 cron
+ai-daily cron
   -> report.md
   -> report.json
   -> report.html
@@ -74,7 +74,7 @@ ai-2 cron
 第二阶段备选：
 
 ```text
-ai-2 cron
+ai-daily cron
   -> report.md + report.json
   -> commit source artifacts
   -> GitHub Actions build

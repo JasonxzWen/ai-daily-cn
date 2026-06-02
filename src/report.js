@@ -131,8 +131,6 @@ export function normalizeReportDraft(draft, options = {}) {
   requireSourceAudit(validation.value);
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
-  requireModelReleasesInMainItems(validation.value);
-  requireBuilderXObservation(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
   requireExpandedMainItemFormat(validation.value);
   requirePublishableQuality(validation.value, {

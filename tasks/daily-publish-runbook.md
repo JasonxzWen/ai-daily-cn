@@ -6,7 +6,9 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 
 - Confirm the target date in `Asia/Shanghai` as `YYYY-MM-DD`.
 - Review `git status --short --branch` before mutating files.
+- For automation and publish runs, treat the latest `origin/main` as the only authoritative baseline. Unmerged PR branches, detached HEAD work, and local experiment branches must not affect the daily report.
 - Preserve unrelated user changes; do not use `git reset --hard`, force push, or automatic stash.
+- Automation runs must not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`; those files are for human handoff and project iteration sessions.
 - For automation or publish runs, start with:
 
 ```powershell
@@ -33,7 +35,7 @@ npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 ```
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
-- For reports dated `2026-06-02` or later, treat strict publish coverage as a hard gate: final `source_audit` must prove the fixed A-F source surface, GitHub Trending Top 10, follow-builders X, automation revision, and evidence assets before any dry-run or real publish can pass.
+- For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or Pages verification failure. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but the JSON and public HTML must disclose them in `quality_status`.
 - A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
@@ -77,7 +79,7 @@ npm run publish:dry-run
 - Capture changed files, commit message, and expected Pages URL.
 - Confirm every `current_dirty_files` publisher artifact is also present in `will_stage_files`. A `publisher_dirty_outside_publish_plan` error is a real safety gate: repair the publish plan or move unrelated stale artifacts out of the worktree before publishing.
 - Check that every report-linked `evidence_assets[*].local_path` appears in `will_stage_files` as `docs/assets/evidence/...`; local file existence alone is not enough for GitHub Pages.
-- If dry-run fails, keep the generated local HTML/JSON artifacts and report the blocker.
+- If dry-run fails, keep the generated local HTML/JSON artifacts and report the blocker. If it succeeds with `quality_status.status: "degraded"`, capture the `degraded_sections` summary and make sure the public HTML includes `发布质量说明`.
 
 ## Real Publish
 
@@ -99,9 +101,9 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 ```
 
 - Required token source: `GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`.
-- The fallback must still write only publisher-managed `docs/` and `reports-data/` files with `force:false`.
+- The fallback must read the remote `main` commit/tree through the GitHub API, publish only artifacts generated from the latest `origin/main`, write only publisher-managed `docs/` and `reports-data/` files with `force:false`, and report `publish_mode: github-api-fallback` plus `base_commit_sha`.
 
 ## Handoff
 
 - Final response must include the daily HTML path, structured JSON path, validate result, dry-run result, expected Pages URL, real publish verification, and at most three prompt or rule iteration suggestions.
-- Update `progress.md` and `session-handoff.md` when the run changes repo state or publish status.
+- Human-assisted publish runs update `progress.md` and `session-handoff.md` when the run changes repo state or publish status. Scheduled automation runs do not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`.

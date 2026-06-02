@@ -43,7 +43,7 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert(plan.will_stage_files.includes("docs/trends.json"));
 });
 
-test("publish dry-run blocks reports with blocked Builder sources below minimum", async () => {
+test("publish dry-run allows degraded Builder coverage and exposes degraded sections", async () => {
   const repoRoot = await tempRepoWithFixture();
   await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
   const report = JSON.parse(await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8"));
@@ -80,17 +80,21 @@ test("publish dry-run blocks reports with blocked Builder sources below minimum"
   await fs.mkdir(dataDir, { recursive: true });
   await fs.writeFile(path.join(dataDir, "2026-05-15.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
-  await assert.rejects(
-    createPublishPlan({
-      repoRoot,
-      inputDir: "reports-source",
-      dataInputDir: "reports-data",
-      outDir: "docs",
-      generatedAt: fixedGeneratedAt,
-      reportDate: "2026-05-15",
-      git: fakeGit()
-    }),
-    (error) => error instanceof PublisherError && error.code === "builder_coverage_gate_failed"
+  const plan = await createPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-15",
+    git: fakeGit()
+  });
+
+  assert.equal(plan.reports[0].quality_status, "degraded");
+  assert(
+    plan.reports[0].degraded_sections.some(
+      (issue) => issue.code === "builder_coverage_below_minimum" && issue.section === "builder_observations"
+    )
   );
 });
 

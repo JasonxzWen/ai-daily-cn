@@ -83,6 +83,8 @@
         "status": "ok",
         "reasons": [],
         "affected_sections": [],
+        "degraded_sections": [],
+        "blocking_issues": [],
         "public_note": "Core discovery checks completed without blocking degradation."
       }
     },
@@ -200,7 +202,47 @@
           },
           "default": []
         },
+        "degraded_sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quality_issue"
+          },
+          "default": []
+        },
+        "blocking_issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quality_issue"
+          },
+          "default": []
+        },
         "public_note": {
+          "type": "string"
+        }
+      }
+    },
+    "quality_issue": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["code", "section", "message"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "error_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "remediation": {
           "type": "string"
         }
       }

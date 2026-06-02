@@ -291,7 +291,8 @@ try {
         repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
-        publish_error: result.verification_error || ""
+        publish_error: result.verification_error || "",
+        publish_mode: result.publish_mode || result.mode || "publish"
       },
       result
     });
@@ -323,7 +324,8 @@ try {
         repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
-        publish_error: result.verification_error || ""
+        publish_error: result.verification_error || "",
+        publish_mode: result.publish_mode || result.mode || "publish-github-api"
       },
       result
     });
@@ -348,7 +350,8 @@ try {
         repo_updated: Boolean(result.repo_updated ?? result.committed),
         repo_pushed: result.pushed,
         pages_url: result.pages_url || "",
-        publish_error: result.verification_error || ""
+        publish_error: result.verification_error || "",
+        publish_mode: result.publish_mode || result.mode || "publish-resume-push"
       },
       result
     });

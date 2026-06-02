@@ -31,7 +31,7 @@ import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
-import { findPublishQualityIssues } from "../src/quality-status.js";
+import { classifyPublishQuality, findPublishQualityIssues } from "../src/quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -837,9 +837,10 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
   const html = renderReportHtml(validation.value);
-  assert(!html.includes('id="quality-status"'));
-  assert(!html.includes("质量状态"));
-  assert(!html.includes("Some automated discovery sources failed"));
+  assert(html.includes('id="quality-status"'));
+  assert(html.includes("发布质量说明"));
+  assert(html.includes("Some automated discovery sources failed"));
+  assert(html.includes("hot_blogs"));
   assert(!html.includes('id="evidence-assets"'));
   const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="model-releases"'));
   const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
@@ -851,8 +852,10 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(modelHtml.includes("Agentic coding"));
 
   const input = reportToInteractionInput(validation.value);
-  const qualitySection = input.sections.find((section) => section.title === "质量状态");
-  assert.equal(qualitySection, undefined);
+  const qualitySection = input.sections.find((section) => section.title === "发布质量说明");
+  assert(qualitySection);
+  assert(qualitySection.content.includes("hot_blogs"));
+  assert(qualitySection.content.includes("Some automated discovery sources failed"));
   assert(!input.sections.some((section) => section.title === "证据图表"));
   const mainSection = input.sections.find((section) => section.title === "主体信息");
   const modelSection = input.sections.find((section) => section.title === "模型发布");
@@ -2721,7 +2724,7 @@ test("publish quality blocks strict daily reports whose automation revision does
   );
 });
 
-test("publish quality blocks strict daily reports missing requested Chinese source surface", () => {
+test("publish quality degrades strict daily reports missing requested Chinese source surface", () => {
   const report = strictPublishReportFixture();
   report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
     .filter((source) => source.name !== "QbitAI")
@@ -2732,12 +2735,17 @@ test("publish quality blocks strict daily reports missing requested Chinese sour
       notes: "fixture"
     });
 
-  const issues = findPublishQualityIssues(report);
+  const classification = classifyPublishQuality(report);
 
-  assert(issues.some((issue) => issue.code === "fixed_source_d_chinese_media" && issue.missing_sources.includes("QbitAI")));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) => issue.code === "fixed_source_d_chinese_media" && issue.missing_sources.includes("QbitAI")
+    )
+  );
 });
 
-test("publish quality blocks strict daily reports missing OpenAI News RSS source proof", () => {
+test("publish quality degrades strict daily reports missing OpenAI News RSS source proof", () => {
   const report = strictPublishReportFixture();
   report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
     .filter((source) => source.name !== "OpenAI News RSS")
@@ -2748,10 +2756,11 @@ test("publish quality blocks strict daily reports missing OpenAI News RSS source
       notes: "fixture"
     });
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
+  assert.deepEqual(classification.blocking_issues, []);
   assert(
-    issues.some(
+    classification.degraded_sections.some(
       (issue) =>
         issue.code === "fixed_source_b_official_labs" &&
         issue.missing_sources.includes("OpenAI News RSS")
@@ -2759,38 +2768,49 @@ test("publish quality blocks strict daily reports missing OpenAI News RSS source
   );
 });
 
-test("publish quality blocks strict daily reports missing GitHub Trending Top 10 proof", () => {
+test("publish quality degrades strict daily reports missing GitHub Trending Top 10 proof", () => {
   const report = strictPublishReportFixture();
   report.github_trending = report.github_trending.slice(0, 9);
   report.source_audit.github_trending.candidates_found = 9;
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
-  assert(issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(classification.degraded_sections.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
 });
 
-test("publish quality blocks strict daily reports with duplicate or non-top-10 GitHub ranks", () => {
+test("publish quality degrades strict daily reports with duplicate or non-top-10 GitHub ranks", () => {
   const report = strictPublishReportFixture();
   report.github_trending = report.github_trending.map((item, index) => ({
     ...item,
     rank: index + 11
   }));
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
-  assert(issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed" && issue.has_rank_coverage === false));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) => issue.error_code === "github_trending_top10_gate_failed" && issue.has_rank_coverage === false
+    )
+  );
 });
 
-test("publish quality blocks strict daily reports missing follow-builders X status coverage", () => {
+test("publish quality degrades strict daily reports missing follow-builders X status coverage", () => {
   const report = strictPublishReportFixture();
   report.builder_observations[0].url = "https://example.com/not-x-status";
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
-  assert(issues.some((issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false
+    )
+  );
 });
 
-test("publish quality blocks strict daily reports without linked local evidence assets", () => {
+test("publish quality degrades strict daily reports without linked local evidence assets", () => {
   const report = strictPublishReportFixture();
   report.evidence_assets = [
     {
@@ -2803,20 +2823,22 @@ test("publish quality blocks strict daily reports without linked local evidence 
     }
   ];
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
-  assert(issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(classification.degraded_sections.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
 });
 
-test("publish quality blocks strict daily reports when linked local evidence file is missing", () => {
+test("publish quality degrades strict daily reports when linked local evidence file is missing", () => {
   const report = strictPublishReportFixture();
 
-  const issues = findPublishQualityIssues(report, { existingAssetPaths: new Set() });
+  const classification = classifyPublishQuality(report, { existingAssetPaths: new Set() });
 
-  assert(issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(classification.degraded_sections.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
 });
 
-test("publish quality blocks strict daily reports whose model releases are not mirrored in main_items", () => {
+test("publish quality degrades strict daily reports whose model releases are not mirrored in main_items", () => {
   const report = strictPublishReportFixture();
   report.model_releases = [
     {
@@ -2834,9 +2856,10 @@ test("publish quality blocks strict daily reports whose model releases are not m
     }
   ];
 
-  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
-  assert(issues.some((issue) => issue.error_code === "model_release_main_item_gate_failed"));
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(classification.degraded_sections.some((issue) => issue.error_code === "model_release_main_item_gate_failed"));
 });
 
 test("publish quality keeps strict coverage gate scoped to 2026-06-02 and later", () => {
@@ -2879,6 +2902,7 @@ test("report:write derives degraded quality status for blocked content discovery
   assert.equal(report.quality_status.status, "degraded");
   assert(report.quality_status.reasons.includes("content_sources_blocked"));
   assert(report.quality_status.affected_sections.includes("hot_blogs"));
+  assert(report.quality_status.degraded_sections.some((issue) => issue.section === "hot_blogs"));
   assert.match(report.quality_status.public_note, /Content source/);
 });
 
@@ -2936,6 +2960,7 @@ test("report:write flags selection degradation when candidate pool has enough un
   assert.equal(report.quality_status.status, "degraded");
   assert(report.quality_status.reasons.includes("hot_blogs_selection_degraded"));
   assert(report.quality_status.affected_sections.includes("hot_blogs"));
+  assert(report.quality_status.degraded_sections.some((issue) => issue.code === "hot_blogs_selection_degraded"));
 });
 
 test("report:write 缺少候选池时停止", async () => {
@@ -3038,7 +3063,7 @@ test("report:write rejects expanded main items without highlight markers or enou
   );
 });
 
-test("report:write blocks thin main_items when enough main candidates exist", async () => {
+test("report:write marks thin main_items degraded when enough main candidates exist", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseCandidate = candidatePool.candidates[0];
@@ -3054,18 +3079,17 @@ test("report:write blocks thin main_items when enough main candidates exist", as
     });
   }
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "main_items_coverage_gate_failed"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.degraded_sections.some((issue) => issue.section === "main_items"));
 });
 
-test("report:write blocks low content unit density when enough candidates exist", async () => {
+test("report:write marks low content unit density degraded when enough candidates exist", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseCandidate = candidatePool.candidates[0];
@@ -3082,15 +3106,14 @@ test("report:write blocks low content unit density when enough candidates exist"
     });
   }
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "content_units_coverage_gate_failed"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.degraded_sections.some((issue) => issue.section === "content_units"));
 });
 
 test("report:write 拒绝结构化草稿中的泛化套话", async () => {
@@ -3152,7 +3175,7 @@ test("report:write 拒绝未回到一手来源的中介候选进入事实栏目"
   assert.equal(report.main_items[0].candidate_id, candidatePool.candidates[0].id);
 });
 
-test("report:write 拒绝缺少原始 X status 的 Builder 观察", async () => {
+test("report:write marks missing original X status as degraded", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   draft.source_audit.builder_sources.sources = [
@@ -3200,15 +3223,14 @@ test("report:write 拒绝缺少原始 X status 的 Builder 观察", async () => 
     evidence: "fixture"
   });
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "builder_x_observation_missing"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.degraded_sections.some((issue) => issue.section === "builder_observations"));
 });
 
 test("report:write rejects forced manual evidence tables across most main items", async () => {
@@ -3259,7 +3281,7 @@ test("report:write rejects forced manual evidence tables across most main items"
   );
 });
 
-test("report:write blocks publishable drafts when blocked Builder sources stay below minimum", async () => {
+test("report:write marks drafts degraded when blocked Builder sources stay below minimum", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   draft.source_audit.builder_sources.sources = [
@@ -3286,15 +3308,14 @@ test("report:write blocks publishable drafts when blocked Builder sources stay b
     builderCandidateFixture("builder-blog-1", "builder-blog-source", "https://example.com/builder-post", "Example Blog")
   );
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "builder_coverage_gate_failed"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.degraded_sections.some((issue) => issue.section === "builder_observations"));
 });
 
 test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async () => {
@@ -3863,9 +3884,11 @@ function slugId(value) {
     .slice(0, 80);
 }
 
-test("report:write requires model releases to appear in main_items", async () => {
+test("report:write marks model releases missing from main_items as degraded", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.report_date = "2026-06-02";
+  draft.self_check.report_date = "2026-06-02";
   draft.model_releases = [
     {
       candidate_id: "model-missing-main",
@@ -3893,15 +3916,15 @@ test("report:write requires model releases to appear in main_items", async () =>
     evidence: "fixture"
   });
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "model_releases_missing_main_item"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.degraded_sections.some((issue) => issue.error_code === "model_release_main_item_gate_failed"));
 });
 
 function assertPublisherCode(fn, code) {

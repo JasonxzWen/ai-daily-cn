@@ -17,11 +17,13 @@
 ## 当前仍保持禁用
 
 - 不自动修改 GitHub Pages 远端设置。
-- 不自动修改 `C:\Users\Admin\.codex\automations\ai-2\automation.toml`。
+- 不自动修改自动化配置，除非用户明确授权。授权后以 `docs/codex-automation-setup.md` 的提示词为源头同步实际自动化。
 - 不执行 `git reset --hard`、`git push --force`、自动 stash 或覆盖用户未提交改动。
 
 ## 当前发布通道
 
 真实 `publish` 已实现为需要显式 `--confirm-push` 的普通 commit/push 命令。它只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在非发布器管理改动，会停止并返回错误。`publish:dry-run` 仍用于发布前计划检查。
 
-为避免本机定时任务再次被 `.git/index.lock`、ACL 或无法切回 `main` 阻断，仓库同时提供 `publish:github-api` 兜底通道。它同样需要显式 `confirm-push`，并要求 `GH_TOKEN`、`GITHUB_TOKEN` 或当前机器可用的 `gh auth token` 具备 `contents:write` 权限；实现上直接通过 GitHub API 比较远端 `main` 的 tree，只写入远端缺失或内容不同的 `docs/` 与 `reports-data/` 发布产物，并用 `force:false` 更新分支。该通道不会写本机 `.git`，因此适合本机 Git 元数据不可写、无法创建 `index.lock` 或当前工作树没能切回 `main` 但本地产物已经生成并验证通过的场景。
+为避免本机定时任务再次被 `.git/index.lock`、ACL 或无法切回 `main` 阻断，仓库同时提供 `publish:github-api` 兜底通道。它同样需要显式 `confirm-push`，并要求 `GH_TOKEN`、`GITHUB_TOKEN` 或当前机器可用的 `gh auth token` 具备 `contents:write` 权限；实现上直接通过 GitHub API 读取远端 `main` 当前 commit/tree，比较 `docs/` 与 `reports-data/`，只写入远端缺失或内容不同的发布产物，并用 `force:false` 更新分支。该通道不会写本机 `.git`，但只适合发布由最新 `origin/main` 发布工作树生成并验证通过的产物；不得绕过 `remote_ahead`，输出必须记录 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
+
+发布质量采用两级门禁：`blocking_issues` 阻断发布，`degraded_sections` 允许发布但必须写入结构化 JSON，并在公开 HTML 的“发布质量说明”中标注。
