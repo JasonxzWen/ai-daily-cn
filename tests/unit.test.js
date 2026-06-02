@@ -2700,6 +2700,82 @@ test("publish quality blocks strict daily reports missing requested Chinese sour
   assert(issues.some((issue) => issue.code === "fixed_source_d_chinese_media" && issue.missing_sources.includes("QbitAI")));
 });
 
+test("publish quality blocks strict daily reports missing GitHub Trending Top 10 proof", () => {
+  const report = strictPublishReportFixture();
+  report.github_trending = report.github_trending.slice(0, 9);
+  report.source_audit.github_trending.candidates_found = 9;
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
+});
+
+test("publish quality blocks strict daily reports missing follow-builders X status coverage", () => {
+  const report = strictPublishReportFixture();
+  report.builder_observations[0].url = "https://example.com/not-x-status";
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false));
+});
+
+test("publish quality blocks strict daily reports without linked local evidence assets", () => {
+  const report = strictPublishReportFixture();
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Unlinked fixture evidence",
+      source_url: "https://example.com/not-in-report",
+      local_path: "assets/evidence/unlinked.png",
+      caption: "fixture",
+      extraction_status: "source_image"
+    }
+  ];
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+});
+
+test("publish quality blocks strict daily reports whose model releases are not mirrored in main_items", () => {
+  const report = strictPublishReportFixture();
+  report.model_releases = [
+    {
+      candidate_id: "strict-model-missing-main",
+      name: "Strict Model",
+      provider: "Strict AI",
+      availability: "closed_api",
+      release_scope: "provider_official_launch",
+      event_date: report.report_date,
+      url: "https://example.com/strict/model-release",
+      source: "Strict Model Card",
+      summary: "Fixture model release.",
+      notes: "fixture",
+      importance: "major"
+    }
+  ];
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.error_code === "model_release_main_item_gate_failed"));
+});
+
+test("publish quality keeps strict coverage gate scoped to 2026-06-02 and later", () => {
+  const report = strictPublishReportFixture();
+  report.report_date = "2026-06-01";
+  report.github_trending = [];
+  report.builder_observations = [];
+  report.evidence_assets = [];
+  delete report.self_check.automation_revision;
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(!issues.some((issue) => issue.error_code === "automation_revision_gate_failed"));
+  assert(!issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
+  assert(!issues.some((issue) => issue.error_code === "builder_x_coverage_gate_failed"));
+  assert(!issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+});
+
 test("report:write derives degraded quality status for blocked content discovery", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
