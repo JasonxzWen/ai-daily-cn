@@ -28,11 +28,12 @@ npm run prompt:build -- YYYY-MM-DD
 ```powershell
 npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data
 npm run discover:builders -- --date YYYY-MM-DD --limit 20
-npm run discover:content-sources -- --date YYYY-MM-DD --limit 20
+npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3
 npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 ```
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
+- For reports dated `2026-06-02` or later, treat strict publish coverage as a hard gate: final `source_audit` must prove the fixed A-F source surface, GitHub Trending Top 10, follow-builders X, automation revision, and evidence assets before any dry-run or real publish can pass.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.

@@ -31,6 +31,7 @@ import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
+import { findPublishQualityIssues } from "../src/quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -2668,6 +2669,37 @@ test("automation revision reads git, prompt manifest, and source registry state"
   assert(revision.rules.includes("fixed_source_checklist"));
 });
 
+test("publish quality accepts strict daily reports with full source proof", () => {
+  const report = strictPublishReportFixture();
+
+  assert.deepEqual(findPublishQualityIssues(report), []);
+});
+
+test("publish quality blocks strict daily reports without automation revision proof", () => {
+  const report = strictPublishReportFixture();
+  delete report.self_check.automation_revision;
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.code === "automation_revision_missing_or_stale"));
+});
+
+test("publish quality blocks strict daily reports missing requested Chinese source surface", () => {
+  const report = strictPublishReportFixture();
+  report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
+    .filter((source) => source.name !== "QbitAI")
+    .concat({
+      name: "Strict Filler Source",
+      url: "https://example.com/strict-filler.xml",
+      status: "checked",
+      notes: "fixture"
+    });
+
+  const issues = findPublishQualityIssues(report);
+
+  assert(issues.some((issue) => issue.code === "fixed_source_d_chinese_media" && issue.missing_sources.includes("QbitAI")));
+});
+
 test("report:write derives degraded quality status for blocked content discovery", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -3385,6 +3417,284 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
 
 async function readFixture(relativePath) {
   return fs.readFile(path.join(rootDir, "tests/fixtures", relativePath), "utf8");
+}
+
+function strictPublishReportFixture() {
+  const reportDate = "2026-06-02";
+  const mainItems = Array.from({ length: 8 }, (_unused, index) => ({
+    candidate_id: `strict-main-${index + 1}`,
+    title: `Strict main item ${index + 1}`,
+    event_date: reportDate,
+    url: `https://example.com/strict/main-${index + 1}`,
+    source: "Strict Source",
+    tier: "T0",
+    entities: ["Strict AI"],
+    summary: "Fixture main item for strict publish coverage.",
+    bullets: [
+      "**Strict AI** published a dated update with enough detail for the publish gate.",
+      "The item includes ==specific evidence==, source URL, and candidate linkage."
+    ],
+    importance: index < 2 ? "major" : "notable"
+  }));
+  const githubTrending = Array.from({ length: 10 }, (_unused, index) => ({
+    candidate_id: `strict-trending-${index + 1}`,
+    repo: `example/strict-agent-${index + 1}`,
+    name: `example/strict-agent-${index + 1}`,
+    description: "A strict fixture repository for daily GitHub Trending coverage.",
+    url: `https://github.com/example/strict-agent-${index + 1}`,
+    event_date: reportDate,
+    source: "GitHub Trending daily",
+    language: "TypeScript",
+    window: "daily",
+    rank: index + 1,
+    trend: "new",
+    evidence: "GitHub Trending daily fixture.",
+    importance: "general"
+  }));
+  const hotBlogs = Array.from({ length: 3 }, (_unused, index) => ({
+    candidate_id: `strict-blog-${index + 1}`,
+    title: `Strict engineering blog ${index + 1}`,
+    url: `https://example.com/strict/blog-${index + 1}`,
+    publisher: "Strict Engineering",
+    author: "Strict Author",
+    event_date: reportDate,
+    topic: "agent workflow",
+    summary: "Fixture blog for strict publish coverage.",
+    importance: "notable"
+  }));
+  const projects = Array.from({ length: 3 }, (_unused, index) => ({
+    candidate_id: `strict-project-${index + 1}`,
+    name: `strict-project-${index + 1}`,
+    description: "Fixture project with a clear agent workflow use case.",
+    url: `https://github.com/example/strict-project-${index + 1}`,
+    event_date: reportDate,
+    source: "GitHub Trending",
+    signal: "trending",
+    evidence: "Fixture project evidence.",
+    importance: "notable"
+  }));
+  const builderObservations = [
+    {
+      candidate_id: "strict-builder-x",
+      author: "Strict Builder",
+      role: "builder",
+      content: "Original X status about agent workflow practice.",
+      url: "https://x.com/strictbuilder/status/2059000000000000000",
+      event_date: reportDate,
+      source: "follow-builders X feed",
+      evidence: "Fixture X status.",
+      importance: "notable"
+    },
+    {
+      candidate_id: "strict-builder-blog",
+      author: "Strict Maintainer",
+      role: "maintainer",
+      content: "Original blog note about agent evaluation.",
+      url: "https://example.com/strict/builder-blog",
+      event_date: reportDate,
+      source: "follow-builders blog feed",
+      evidence: "Fixture builder blog.",
+      importance: "general"
+    },
+    {
+      candidate_id: "strict-builder-research",
+      author: "Strict Researcher",
+      role: "researcher",
+      content: "Researcher note about model deployment constraints.",
+      url: "https://example.com/strict/research-note",
+      event_date: reportDate,
+      source: "Simon Willison Weblog",
+      evidence: "Fixture researcher note.",
+      importance: "general"
+    }
+  ];
+  const contentSourceNames = [
+    "OpenAI News RSS",
+    "OpenAI Blog RSS",
+    "Anthropic News",
+    "Hugging Face Blog",
+    "GitHub Changelog",
+    "Google Research Blog",
+    "Google DeepMind Blog",
+    "Google DeepMind RSS",
+    "Meta AI Blog",
+    "Microsoft Research Blog",
+    "Apple Machine Learning Research",
+    "NVIDIA Developer Blog",
+    "AWS Machine Learning Blog",
+    "Azure Blog",
+    "Meta Engineering",
+    "xAI News",
+    "ByteDance Seed Tech Blog",
+    "TikTok for Developers Blog",
+    "Tencent AI Business",
+    "Tencent Hunyuan Blog",
+    "Qwen Blog",
+    "Alibaba Cloud Blog",
+    "Moonshot AI Kimi Platform Blog",
+    "Kimi Technical Blog",
+    "MiniMax Blog",
+    "Z.ai Research",
+    "Cloudflare Blog",
+    "Nature Machine Learning",
+    "TechCrunch AI",
+    "The Verge AI",
+    "TechCrunch Enterprise",
+    "The Verge",
+    "Ars Technica",
+    "MIT Technology Review",
+    "VentureBeat AI",
+    "ML Papers of the Week",
+    "HelloGitHub",
+    "RuanYF Weekly",
+    "Product Hunt Trending Feed",
+    "Product Hunt Developer Tools Feed",
+    "Latent.Space",
+    "arXiv cs.AI",
+    "Hacker News Topstories API",
+    "Hugging Face Daily Papers",
+    "Papers with Code API",
+    "Reddit r/MachineLearning",
+    "Smol AI News",
+    "AI News Archive",
+    "Ben's Bites",
+    "Interconnects",
+    "The Magnifier AI",
+    "Fast Company Creator Economy",
+    "Crunchbase News AI",
+    "Planet AI",
+    "HNRSS Frontpage",
+    "36Kr",
+    "QbitAI",
+    "Jiqizhixin",
+    "Leiphone",
+    "InfoQ CN"
+  ];
+  const githubSourceNames = [
+    "GitHub Trending daily",
+    "GitHub Trending weekly",
+    "GitHub Trending Python daily",
+    "GitHub Trending Python weekly",
+    "GitHub Trending TypeScript daily",
+    "GitHub Trending TypeScript weekly",
+    "GitHub Trending Rust daily",
+    "GitHub Trending Rust weekly",
+    "GitHub Trending Go daily",
+    "GitHub Trending Go weekly"
+  ];
+
+  return {
+    report_date: reportDate,
+    title: `AI Daily ${reportDate}`,
+    summary: "Strict publish quality fixture.",
+    main_items: mainItems,
+    github_trending: githubTrending,
+    hot_blogs: hotBlogs,
+    projects,
+    builder_observations: builderObservations,
+    model_releases: [],
+    community_leads: [],
+    evidence_assets: [
+      {
+        type: "figure",
+        title: "Strict evidence figure",
+        source_url: mainItems[0].url,
+        local_path: "assets/evidence/strict-figure.png",
+        caption: "Fixture evidence image.",
+        extraction_status: "source_image"
+      }
+    ],
+    quality_status: {
+      status: "ok",
+      reasons: [],
+      affected_sections: [],
+      public_note: ""
+    },
+    source_audit: {
+      github_trending: {
+        checked: true,
+        sources: githubSourceNames.map((name) => ({
+          name,
+          url: `https://github.com/trending${name === "GitHub Trending daily" ? "?since=daily" : `/${slugId(name)}?since=daily`}`,
+          status: "checked",
+          notes: "fixture"
+        })),
+        candidates_found: 100,
+        included: 10,
+        notes: "fixture"
+      },
+      builder_sources: {
+        checked: true,
+        sources: [
+          {
+            name: "follow-builders X feed",
+            url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+            status: "checked",
+            notes: "fixture"
+          },
+          {
+            name: "follow-builders blog feed",
+            url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
+            status: "checked",
+            notes: "fixture"
+          },
+          {
+            name: "Simon Willison Weblog",
+            url: "https://simonwillison.net/atom/everything/",
+            status: "checked",
+            notes: "fixture"
+          }
+        ],
+        candidates_found: 12,
+        included: 3,
+        notes: "fixture"
+      },
+      content_sources: {
+        checked: true,
+        sources: contentSourceNames.map((name) => ({
+          name,
+          url: `https://example.com/sources/${slugId(name)}.xml`,
+          status: "checked",
+          notes: "fixture"
+        })),
+        candidates_found: 60,
+        included: 12,
+        sources_checked: contentSourceNames.length,
+        enablement_counts: { core: 28, optional: 32 },
+        notes: "fixture"
+      }
+    },
+    self_check: {
+      report_date: reportDate,
+      main_items: mainItems.length,
+      builder_observations: builderObservations.length,
+      automation_revision: {
+        schema_version: 1,
+        git_commit: "abcdef1234567890abcdef1234567890abcdef12",
+        git_commit_short: "abcdef123456",
+        git_branch: "main",
+        prompt_manifest: "prompts/ai-daily/manifest.json",
+        prompt_modules: ["fixed-source-checklist.md"],
+        source_registry_count: 63,
+        source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+        rules: [
+          "main_items_min_8_when_candidates_available",
+          "content_units_min_18_when_candidates_available",
+          "model_releases_must_mirror_main_items",
+          "github_api_fallback_for_git_transport",
+          "fixed_source_checklist"
+        ]
+      }
+    }
+  };
+}
+
+function slugId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
 }
 
 test("report:write requires model releases to appear in main_items", async () => {

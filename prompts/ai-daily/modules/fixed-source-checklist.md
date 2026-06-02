@@ -20,6 +20,8 @@ Map selected items into these six public-topic buckets before rendering:
 
 Same-event multi-source reports must be merged. T3, intermediary, community, and aggregator items must not enter factual sections without primary-source or multi-source confirmation.
 
+From `2026-06-02` onward, this checklist is enforced by the publish quality gate, not only by the prompt. The final `source_audit` must prove these sources were checked, even when individual feeds return `no_signal`; otherwise `publish:dry-run`, local `publish`, and `publish:github-api` must fail instead of publishing a low-coverage report.
+
 Every selected public item should carry an importance label:
 
 - `importance: "major"` renders as `重大` and is reserved for platform/lab launches, high-impact model releases, major funding/M&A/regulatory moves, or events that can change production usage.

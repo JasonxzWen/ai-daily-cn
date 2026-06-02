@@ -1,5 +1,14 @@
 # Session Handoff
 
+## Latest Status
+
+- Current branch: `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`.
+- Latest work adds a strict 2026-06-02+ publish quality gate, so low-coverage or stale-version reports fail before `publish`, including GitHub API fallback.
+- New blockers cover: stale/missing `self_check.automation_revision`, missing fixed A-F source audit proof, GitHub Trending Top 10 gaps, missing follow-builders X original status, missing linked local evidence image, and model releases not mirrored in `main_items`.
+- Updated docs/prompts/runbook to state these are hard publish blockers. `tasks/daily-publish-runbook.md` now uses `discover:content-sources --limit 60 --per-source-limit 3`.
+- Validation passed: `node --test tests\unit.test.js`, `npm run validate`, and `node scripts\harness-validate.mjs`.
+- No daily report was regenerated or published in this follow-up; untracked `docs/assets/evidence/*2026-06-02*` images remain outside the PR scope.
+
 ## Current Status
 
 - Active recovery work is in isolated worktree `D:\tmp\ai-daily-quality-hardening` on branch `codex/ai-daily-quality-hardening`, backing PR #11.

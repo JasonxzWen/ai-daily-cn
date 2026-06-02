@@ -6,7 +6,7 @@ Restore the AI daily automation quality hardening path so scheduled runs use the
 
 ## Status
 
-In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix the generated 2026-06-02 artifacts from `D:\ai-daily-cn`.
+In progress on branch `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`. PR #11 and PR #13 are already merged into `main`; PR #14 is a separate open rendering follow-up. Do not mix generated 2026-06-02 artifacts or untracked evidence images into this strict publish-gate branch.
 
 ## Allowed paths
 
@@ -39,6 +39,7 @@ In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix
 - Prompt build includes Lark-document-aligned coverage: AIGC/content industry, Product Hunt, X/Twitter, follow-builders, 8-12 main items, and GitHub API fallback.
 - `report:write` records an `self_check.automation_revision` fingerprint with git commit, branch, prompt modules, source registry count, and active hardening rules so scheduled runs can prove which repo version generated a report.
 - Public report items carry an `importance` label (`major`, `notable`, `general`) that renders as “重大 / 值得关注 / 一般”, matching the user-provided item format.
+- 2026-06-02+ publish paths block stale/low-coverage reports when final JSON lacks `automation_revision`, A-F source audit proof, GitHub Trending Top 10, follow-builders X original status, linked local evidence assets, or model-release mirroring into `main_items`.
 
 ## Validation commands
 
@@ -59,5 +60,5 @@ In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix
 ## Handoff requirements
 
 - Update automation memory before final response.
-- Summarize PR #11 status, root cause, fixed gates, and validation results.
+- Summarize current PR status, root cause, strict publish gates, and validation results.
 - Include any validation blocker explicitly.
