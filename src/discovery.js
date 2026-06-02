@@ -515,6 +515,21 @@ function withRetryNote(notes, target) {
   return note ? `${notes}; ${note}` : notes;
 }
 
+export function formatDiscoveryErrorNote(error) {
+  const parts = [String(error?.message || error || "unknown_error")];
+  const cause = error?.cause;
+  if (error?.name && error.name !== "Error") {
+    parts.push(`name=${error.name}`);
+  }
+  if (cause && typeof cause === "object") {
+    if (cause.code) parts.push(`cause_code=${cause.code}`);
+    if (cause.errno) parts.push(`errno=${cause.errno}`);
+    if (cause.syscall) parts.push(`syscall=${cause.syscall}`);
+    if (cause.hostname) parts.push(`hostname=${cause.hostname}`);
+  }
+  return parts.join("; ");
+}
+
 function sleep(ms) {
   if (!ms || ms <= 0) {
     return Promise.resolve();
@@ -573,7 +588,7 @@ export async function collectGitHubTrending(options = {}) {
         name: currentSource.name,
         url: currentSource.url,
         status: "blocked",
-        notes: withRetryNote(error.message, error)
+        notes: withRetryNote(formatDiscoveryErrorNote(error), error)
       });
     }
   }
@@ -692,7 +707,7 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
       name: OSSINSIGHT_TRENDING_SOURCE.name,
       url: OSSINSIGHT_TRENDING_SOURCE.url,
       status: "blocked",
-      notes: withRetryNote(error.message, error)
+      notes: withRetryNote(formatDiscoveryErrorNote(error), error)
     });
   }
 }
@@ -819,7 +834,7 @@ export async function collectBuilderFallbacks(options = {}) {
         });
       }
     } catch (error) {
-      const notes = withRetryNote(error.message, error);
+      const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
       markSource(candidateSources.at(-1), "blocked", notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
     }
@@ -908,7 +923,7 @@ async function collectXBuilderSearchFallback({ fetchImpl, reportDate, lookbackDa
         });
       }
     } catch (error) {
-      blockedNote = withRetryNote(error.message, error);
+      blockedNote = withRetryNote(formatDiscoveryErrorNote(error), error);
     }
   }
 
@@ -1044,7 +1059,7 @@ async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, 
       });
     }
   } catch (error) {
-    const notes = withRetryNote(error.message, error);
+    const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
     markSource(candidateSources.at(-1), "blocked", notes);
     sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
   }
@@ -1253,7 +1268,7 @@ export async function collectContentSources(options = {}) {
       markSource(candidateSources.at(-1), status, notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
     } catch (error) {
-      const notes = withRetryNote(error.message, error);
+      const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
       markSource(candidateSources.at(-1), "blocked", notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
     }
@@ -1684,7 +1699,7 @@ export async function collectStatuspageIncidents(options = {}) {
         });
       }
     } catch (error) {
-      markSource(candidateSources.at(-1), "blocked", withRetryNote(error.message, error));
+      markSource(candidateSources.at(-1), "blocked", withRetryNote(formatDiscoveryErrorNote(error), error));
     }
   }
 

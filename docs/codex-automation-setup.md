@@ -45,6 +45,29 @@
 
 当前仓库已具备本地生成、effective-interact HTML 渲染、验证、`publish:dry-run`、显式确认后的安全本机 Git `publish`、不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力，以及 push 后由 GitHub Actions 发布 `docs/` artifact 到 GitHub Pages 的 workflow。远端 Pages 设置必须使用 `GitHub Actions` source；如果仍是 `main /docs` legacy source，先不要切换到“只依赖 workflow”的发布假设。
 
+## 定时任务网络设置提醒
+
+定时任务如果在 `source_audit` 中出现多个固定信源组几乎全部 `status:"blocked"`，并且 notes 集中为 `fetch failed`、`retry_failed_after_1`、DNS、timeout 或 network error，应优先判断为 Codex 定时任务运行环境网络不可用，而不是信源同时失效。
+
+请检查 `$CODEX_HOME/config.toml`、当前项目 `.codex/config.toml` 或 Codex 自动化设置。当沙盒模式为 `workspace-write` 时，需要允许网络访问：
+
+```toml
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = true
+```
+
+在 Codex UI 中对应的提醒文案是：设置“当沙盒设置为工作区写入时允许网络访问”。日报质量门会把这类情况写入 `quality_status.degraded_sections` 的 `source_discovery_network_unavailable`，并在公开 HTML 的发布质量说明中展示。
+
+保存发现命令输出时优先使用脚本级 `--output` 参数，例如：
+
+```powershell
+node src/cli.js discover:content-sources --date YYYY-MM-DD --limit 60 --per-source-limit 3 --output .tmp/content-sources-YYYY-MM-DD.json
+```
+
+不要依赖 `Tee-Object` 保存 JSON；PowerShell 编码、BOM 或 npm 横幅可能污染 stdout。搜索影子运行应使用 `--provider-timeout-ms`，即使某个 provider 失败，也要保留其他 provider 的候选、耗时和错误计数。
+
 发布前工作树整理与预检命令：
 
 ```powershell

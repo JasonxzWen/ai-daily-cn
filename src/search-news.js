@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createDiscoveryFetch } from "./discovery.js";
+import { createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
 import { isValidDateString } from "./time.js";
 
 const DEFAULT_PROVIDERS = ["gdelt", "openalex", "arxiv"];
@@ -205,11 +205,24 @@ export async function collectSearchNews(options = {}) {
   const candidates = [];
   const startedAt = Date.now();
   const budgetMs = Number.isInteger(options.budgetMs) && options.budgetMs > 0 ? options.budgetMs : 300000;
+  const providerTimeoutMs = Number.isInteger(options.providerTimeoutMs) && options.providerTimeoutMs > 0
+    ? options.providerTimeoutMs
+    : Number.isInteger(options["provider-timeout-ms"]) && options["provider-timeout-ms"] > 0
+      ? options["provider-timeout-ms"]
+      : Math.max(positiveInt(options.timeoutMs, 15000), 1) * Math.max(queries.length, 1);
+  const providerRuntimeMs = {};
+  const providerCostUnits = {};
+  const providerErrorCounts = {};
 
   for (const providerName of providers) {
+    const providerStartedAt = Date.now();
+    let providerErrors = 0;
     const provider = PROVIDERS[providerName];
     if (!provider) {
       sourceResults.push(auditSource(`unknown:${providerName}`, "", "blocked", "unknown_provider"));
+      providerRuntimeMs[providerName] = Date.now() - providerStartedAt;
+      providerCostUnits[providerName] = 0;
+      providerErrorCounts[providerName] = 1;
       continue;
     }
 
@@ -228,20 +241,29 @@ export async function collectSearchNews(options = {}) {
     if (provider.keyEnv && !apiKey) {
       markSource(candidateSources.at(-1), "blocked", "skipped_missing_token");
       sourceResults.push(auditSource(provider.label, providerBaseUrl(providerName), "blocked", "skipped_missing_token"));
+      providerRuntimeMs[providerName] = Date.now() - providerStartedAt;
+      providerCostUnits[providerName] = 0;
+      providerErrorCounts[providerName] = 0;
       continue;
     }
 
     let providerHits = 0;
     let providerBlocked = "";
+    let providerRequests = 0;
     for (const query of queries) {
       if (Date.now() - startedAt > budgetMs) {
         providerBlocked = "budget_exceeded";
+        break;
+      }
+      if (Date.now() - providerStartedAt > providerTimeoutMs) {
+        providerBlocked = `provider_timeout_exceeded_${providerTimeoutMs}ms`;
         break;
       }
       if (Array.isArray(query.providers) && query.providers.length > 0 && !query.providers.includes(providerName)) {
         continue;
       }
       try {
+        providerRequests += 1;
         const hits = await runSearchProvider(providerName, provider, query, {
           apiKey,
           fetchImpl,
@@ -268,7 +290,8 @@ export async function collectSearchNews(options = {}) {
           }
         }
       } catch (error) {
-        providerBlocked = sanitizeNoteValue(error.message);
+        providerErrors += 1;
+        providerBlocked = sanitizeNoteValue(formatDiscoveryErrorNote(error));
       }
     }
 
@@ -276,6 +299,9 @@ export async function collectSearchNews(options = {}) {
     const notes = providerBlocked && providerHits > 0 ? `${providerHits} shadow candidates; ${providerBlocked}` : providerBlocked || `${providerHits} shadow candidates`;
     markSource(candidateSources.at(-1), status, notes);
     sourceResults.push(auditSource(provider.label, providerBaseUrl(providerName), status, notes));
+    providerRuntimeMs[providerName] = Date.now() - providerStartedAt;
+    providerCostUnits[providerName] = providerRequests;
+    providerErrorCounts[providerName] = providerErrors;
   }
 
   return {
@@ -286,8 +312,9 @@ export async function collectSearchNews(options = {}) {
         sources: sourceResults,
         candidates_found: candidates.length,
         included: 0,
-        provider_runtime_ms: {},
-        provider_cost_units: {},
+        provider_runtime_ms: providerRuntimeMs,
+        provider_cost_units: providerCostUnits,
+        provider_error_counts: providerErrorCounts,
         notes: "Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes."
       }
     },
