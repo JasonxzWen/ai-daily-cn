@@ -103,7 +103,8 @@
         "这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。",
         "OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。",
         "工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路",
@@ -123,7 +124,8 @@
         "Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。",
         "Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。",
         "这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族",
@@ -143,7 +145,8 @@
         "Fara1.5 的核心信号是小型 agentic 模型正在专门面向浏览器任务训练，而不是只把通用 LLM 通过提示词包装成浏览器 agent。",
         "官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。",
         "对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台",
@@ -165,7 +168,8 @@
         "Iris agents 可检查协议是否符合公司标准、建议修改、请求审批、后台监控义务和风险，并支持团队用 Agent Studio 定制流程。",
         "Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。",
         "这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施",
@@ -185,7 +189,8 @@
         "Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。",
         "文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。",
         "这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "OpenAI 模型给出离散几何单位距离问题的新反例",
@@ -204,7 +209,8 @@
         "该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。",
         "OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。",
         "工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "model_releases": [
@@ -217,7 +223,8 @@
       "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
       "source": "Microsoft Research",
       "summary": "面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
-      "notes": "官方称 4B 和 27B 将很快在 Microsoft Foundry 提供；当前按 research preview 记录，不写成开放权重。"
+      "notes": "官方称 4B 和 27B 将很快在 Microsoft Foundry 提供；当前按 research preview 记录，不写成开放权重。",
+      "importance": "notable"
     }
   ],
   "hot_blogs": [
@@ -229,7 +236,8 @@
       "event_date": "2026-05-20",
       "topic": "agent output / HTML reports / coding workflow",
       "summary": "Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。",
-      "why_it_matters": "这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。"
+      "why_it_matters": "这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。",
+      "importance": "notable"
     },
     {
       "title": "Fara1.5 - A family of frontier computer use agent models",
@@ -239,7 +247,8 @@
       "event_date": "2026-05-21",
       "topic": "computer use agents / browser agents / evaluation",
       "summary": "文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。",
-      "why_it_matters": "CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。"
+      "why_it_matters": "CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。",
+      "importance": "notable"
     },
     {
       "title": "How our partners are putting Opus to work for cybersecurity",
@@ -249,7 +258,8 @@
       "event_date": "2026-05-21",
       "topic": "AI security operations / Opus / vulnerability remediation",
       "summary": "Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。",
-      "why_it_matters": "安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。"
+      "why_it_matters": "安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。",
+      "importance": "notable"
     },
     {
       "title": "Modal's Series C: Raising $355M at a $4.65B valuation",
@@ -259,7 +269,8 @@
       "event_date": "2026-05-21",
       "topic": "AI infrastructure / agent runtime / sandboxes",
       "summary": "Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。",
-      "why_it_matters": "agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。"
+      "why_it_matters": "agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。",
+      "importance": "notable"
     }
   ],
   "projects": [
@@ -271,7 +282,8 @@
       "source": "Trendshift / GitHub repository",
       "signal": "trending",
       "evidence": "Trendshift live ranking 列为当日靠前项目；仓库 README 显示 official, Anthropic-managed directory of high quality Claude Code Plugins。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     },
     {
       "name": "colbymchenry/codegraph",
@@ -281,7 +293,8 @@
       "source": "GitTrend / Trendshift / GitHub repository",
       "signal": "trending",
       "evidence": "GitTrend May 22 排名显示为 #1 trending；仓库 README 给出本地索引、MCP、benchmark 和多 agent 安装说明。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     },
     {
       "name": "Lum1104/Understand-Anything",
@@ -291,7 +304,8 @@
       "source": "GitTrend / Trendshift / GitHub repository",
       "signal": "trending",
       "evidence": "Trendshift 与 GitTrend 均列入 AI coding assistant / AI skills 趋势项目；仓库 README 明确支持多种 coding agent。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     },
     {
       "name": "ChromeDevTools/chrome-devtools-mcp",
@@ -301,7 +315,8 @@
       "source": "Trendshift / GitHub repository",
       "signal": "trending",
       "evidence": "Trendshift live ranking 将其列为 AI agent / AI coding assistant / MCP 项目；仓库 README 描述其为 Chrome DevTools for agents。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     },
     {
       "name": "dotnet/skills",
@@ -311,18 +326,21 @@
       "source": "Trendshift / GitHub repository",
       "signal": "trending",
       "evidence": "Trendshift live ranking 收录该项目；仓库 README 写明这是 .NET team's curated set of core skills and custom agents for coding agents。",
-      "domains": []
+      "domains": [],
+      "importance": "notable"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。",
-      "url": "https://github.com/trending"
+      "url": "https://github.com/trending",
+      "importance": "general"
     },
     {
       "content": "Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。",
-      "url": "https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/"
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/",
+      "importance": "general"
     }
   ],
   "self_check": {

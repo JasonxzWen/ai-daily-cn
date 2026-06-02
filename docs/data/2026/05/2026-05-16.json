@@ -27,7 +27,8 @@
         "该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。",
         "OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。",
         "对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3",
@@ -47,7 +48,8 @@
         "退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。",
         "reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。",
         "文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点",
@@ -67,7 +69,8 @@
         "该模型原本作为 Public Preview 暴露为 `databricks-meta-llama-3-1-405b-instruct`，上下文窗口为 128K，适合多步推理和合成数据等任务。",
         "Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。",
         "使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "GitHub 合并推进 Copilot app 和 cloud agent 自动选模",
@@ -87,7 +90,8 @@
         "Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。",
         "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。",
         "对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Google 为 Genkit 发布 middleware 控制层",
@@ -107,7 +111,8 @@
         "Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。",
         "首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。",
         "这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "projects": [
@@ -115,50 +120,59 @@
       "name": "ChatGPT Finances",
       "description": "ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。",
       "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Grok model retirement guide",
       "description": "xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。",
       "url": "https://docs.x.ai/developers/migration/may-15-retirement",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Databricks Foundation Model APIs",
       "description": "Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。",
       "url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "GitHub Copilot app",
       "description": "GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。",
       "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Genkit Middleware",
       "description": "Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。",
       "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。",
-      "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes"
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
+      "importance": "general"
     },
     {
       "content": "Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。",
-      "url": "https://huggingface.co/blog/continuous_async"
+      "url": "https://huggingface.co/blog/continuous_async",
+      "importance": "general"
     },
     {
       "content": "Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。",
-      "url": "https://www.anthropic.com/news/gates-foundation-partnership"
+      "url": "https://www.anthropic.com/news/gates-foundation-partnership",
+      "importance": "general"
     },
     {
       "content": "AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。",
-      "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/"
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/",
+      "importance": "general"
     }
   ],
   "self_check": {

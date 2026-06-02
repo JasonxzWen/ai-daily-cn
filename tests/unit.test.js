@@ -2404,6 +2404,11 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   const outDir = path.join(tmp, "docs");
   await fs.mkdir(dataInputDir, { recursive: true });
   const structuredReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  for (const sectionName of ["main_items", "model_releases", "hot_blogs", "projects", "github_trending", "builder_observations", "community_leads"]) {
+    for (const item of structuredReport[sectionName] || []) {
+      delete item.importance;
+    }
+  }
   structuredReport.model_releases[0].notes = "同时出现在多个平台；本轮只按官方来源记录可用性。";
   structuredReport.projects = [
     {
@@ -2442,6 +2447,8 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes("官方可用性"));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
+  assert(html.includes(">重大<"));
+  assert(html.includes(">值得关注<"));
   assert(html.includes("今日 +321 stars"));
   assert(!html.includes("备注："));
   assert(!html.includes("信号：trending"));
@@ -2454,6 +2461,9 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("Markdown 原文"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
+  assert.equal(data.main_items[0].importance, "major");
+  assert.equal(data.model_releases[0].importance, "major");
+  assert.equal(data.hot_blogs[0].importance, "notable");
   assert.equal(data.model_releases.length, 1);
   assert.equal(data.hot_blogs.length, 1);
 

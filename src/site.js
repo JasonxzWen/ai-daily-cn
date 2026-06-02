@@ -11,6 +11,7 @@ import { validateFeed, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
+import { withDefaultImportance } from "./importance.js";
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -283,7 +284,7 @@ async function readReportJson(filePath) {
   }
 
   const report = {
-    ...validation.value,
+    ...withDefaultImportanceForReport(validation.value),
     evidence_assets: Array.isArray(validation.value.evidence_assets) ? validation.value.evidence_assets : [],
     quality_status: deriveQualityStatus(validation.value, null)
   };
@@ -295,6 +296,22 @@ async function readReportJson(filePath) {
   }
 
   return finalValidation.value;
+}
+
+function withDefaultImportanceForReport(report) {
+  const result = { ...report };
+  for (const sectionName of [
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "projects",
+    "github_trending",
+    "builder_observations",
+    "community_leads"
+  ]) {
+    result[sectionName] = withDefaultImportance(sectionName, result[sectionName]);
+  }
+  return result;
 }
 
 async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {

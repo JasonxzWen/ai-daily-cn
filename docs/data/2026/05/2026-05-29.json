@@ -214,7 +214,8 @@
       "previous_rank": 1,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "GitHub Trending daily rank 1, 4,685 stars today."
+      "evidence": "GitHub Trending daily rank 1, 4,685 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-affaan-m-ecc",
@@ -230,7 +231,8 @@
       "previous_rank": 4,
       "rank_delta": 2,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 2, 1,388 stars today."
+      "evidence": "GitHub Trending daily rank 2, 1,388 stars today.",
+      "importance": "notable"
     },
     {
       "candidate_id": "trend-leonxlnx-taste-skill",
@@ -246,7 +248,8 @@
       "previous_rank": 6,
       "rank_delta": 3,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 3, 2,235 stars today."
+      "evidence": "GitHub Trending daily rank 3, 2,235 stars today.",
+      "importance": "notable"
     },
     {
       "candidate_id": "trend-hardikpandya-stop-slop",
@@ -262,7 +265,8 @@
       "previous_rank": 3,
       "rank_delta": -1,
       "trend": "down",
-      "evidence": "GitHub Trending daily rank 4, 755 stars today."
+      "evidence": "GitHub Trending daily rank 4, 755 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-twentyhq-twenty",
@@ -278,7 +282,8 @@
       "previous_rank": 10,
       "rank_delta": 5,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 5, 495 stars today."
+      "evidence": "GitHub Trending daily rank 5, 495 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-digitalplatdev-freedomain",
@@ -294,7 +299,8 @@
       "previous_rank": 12,
       "rank_delta": 6,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 6, 1,769 stars today."
+      "evidence": "GitHub Trending daily rank 6, 1,769 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-byoungd-english-level-up-tips",
@@ -310,7 +316,8 @@
       "previous_rank": 14,
       "rank_delta": 7,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 7, 2,015 stars today."
+      "evidence": "GitHub Trending daily rank 7, 2,015 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-microsoft-markitdown",
@@ -326,7 +333,8 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 8, 1,263 stars today."
+      "evidence": "GitHub Trending daily rank 8, 1,263 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-obra-superpowers",
@@ -342,7 +350,8 @@
       "previous_rank": 13,
       "rank_delta": 4,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 9, 1,726 stars today."
+      "evidence": "GitHub Trending daily rank 9, 1,726 stars today.",
+      "importance": "general"
     },
     {
       "candidate_id": "trend-revfactory-harness",
@@ -358,7 +367,8 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 10, 68 stars today."
+      "evidence": "GitHub Trending daily rank 10, 68 stars today.",
+      "importance": "general"
     }
   ],
   "main_items": [
@@ -380,7 +390,8 @@
         "**访问路径**：Bedrock 路径适合需要 Guardrails、Knowledge Bases、区域数据驻留和统一 AWS 管理面的团队；Claude Platform on AWS 更接近 Anthropic 原生控制台与 API 体验。",
         "**模型定位**：AWS 文案把 Opus 4.8 重点放在 agentic coding、professional knowledge work、long-running autonomous tasks，说明新模型的首要落点仍是长任务与企业工作流。",
         "**上线检查**：接入前要重新跑现有 Claude Code、browser agent、长文档综合任务的回归集；供应商声称更少停滞和更会求助，不等于旧 prompt 与权限策略自动适配。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-mistral-ai-now-2026",
@@ -400,7 +411,8 @@
         "**工业工程**：Mistral 明确列出 Airbus、BMW、ASML 等合作场景，目标是用物理模型和工程知识减少仿真瓶颈，而不是只卖通用聊天模型。",
         "**Vibe 变化**：Vibe 被描述为横跨 inbox、calendar、deep research、deliverables、代码请求到 PR 的统一 agent；这会把权限、审计、任务恢复和人工验收变成部署重点。",
         "**检索补齐**：Search Toolkit 公共预览把 ingestion、retrieval、evaluation 放在同一框架里，适合把 RAG 质量问题从 prompt 调参拆回可测的检索质量。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-bedrock-mantle-quotas",
@@ -421,7 +433,8 @@
         "**端点范围**：Bedrock Mantle 支持 OpenAI Responses API、OpenAI Chat Completions API 和 Anthropic Messages API，目标是让既有 OpenAI / Anthropic 应用少改代码迁移到 Bedrock。",
         "**运维变化**：限额进入 Service Quotas 后，团队可以把 token 上限纳入上线前容量评估、告警和扩容申请，而不是等线上请求被限流才排查。",
         "**区域边界**：AWS 列出美国、亚太、欧洲和南美多个可用区域；多区域 agent 服务要把模型可用性、quota、数据驻留和成本倍率一起建表。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "candidate_id": "main-anthropic-social-sciences",
@@ -441,7 +454,8 @@
         "**采用不均**：调研称经济学和政治学使用率高于公共卫生、教育和传播；博士生、博士后和高地位大学研究者采用更早，性别和院校差异也显著。",
         "**用途更窄**：coding agent 用户主要让工具写数据分析代码，97% 报告用于生成代码；真正用来起草论文正文的比例低得多。",
         "**读法边界**：Anthropic 明确说生产率差异只是描述性比较，不应读成因果；团队评估研究 agent 时也应分清 adoption、output count 和研究质量。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "model_releases": [
@@ -455,7 +469,8 @@
       "url": "https://www.anthropic.com/news/claude-opus-4-8",
       "source": "Anthropic",
       "summary": "Anthropic 发布 Claude Opus 4.8，称其相对 Opus 4.7 在 coding、agentic skills、reasoning 和 practical knowledge work 上改进，并更会标记自身不确定性。官方还强调同价可用，system card 给出更完整评估。",
-      "notes": "同日 AWS 宣布该模型可通过 Amazon Bedrock 和 Claude Platform on AWS 使用；日报主体用 AWS URL 记录企业访问路径，避免同一 URL 在 main/model 重复。"
+      "notes": "同日 AWS 宣布该模型可通过 Amazon Bedrock 和 Claude Platform on AWS 使用；日报主体用 AWS URL 记录企业访问路径，避免同一 URL 在 main/model 重复。",
+      "importance": "major"
     }
   ],
   "hot_blogs": [
@@ -468,7 +483,8 @@
       "event_date": "2026-05-28",
       "topic": "RAG search pipelines",
       "content_type": "blog",
-      "summary": "Mistral 的 Search Toolkit 把 ingestion、retrieval、evaluation 合并到一个可替换组件框架里，目标是减少 RAG 团队在文档解析、chunking、索引、混合检索和评测之间反复接线的工作。文章最有用的点是把“回答差”拆成检索质量问题：企业内部 wiki、工单、文件、代码库往往各有结构，如果没有统一处理和评测接口，团队只能调 prompt 或换模型。Search Toolkit 提供标准 adapter、BM25 / dense / hybrid retrieval 和 recall、precision、MRR、NDCG 等指标，适合把 RAG 改成可回归的工程系统。"
+      "summary": "Mistral 的 Search Toolkit 把 ingestion、retrieval、evaluation 合并到一个可替换组件框架里，目标是减少 RAG 团队在文档解析、chunking、索引、混合检索和评测之间反复接线的工作。文章最有用的点是把“回答差”拆成检索质量问题：企业内部 wiki、工单、文件、代码库往往各有结构，如果没有统一处理和评测接口，团队只能调 prompt 或换模型。Search Toolkit 提供标准 adapter、BM25 / dense / hybrid retrieval 和 recall、precision、MRR、NDCG 等指标，适合把 RAG 改成可回归的工程系统。",
+      "importance": "notable"
     },
     {
       "candidate_id": "blog-hf-monet",
@@ -479,7 +495,8 @@
       "event_date": "2026-05-28",
       "topic": "Open image-text dataset and T2I training",
       "content_type": "blog",
-      "summary": "Jasper Research 在 Hugging Face 发布 MONET 和 nano-t2i，重点不是又一个图像模型，而是把训练数据、过滤流程和最小训练代码一起开放。文章给出从 2.9B URL 到 104.9M 样本的筛选路径：美学预过滤、安全过滤、去重、域名与水印治理、多 captioner 描述和有限合成数据混入。值得注意的是，团队用 4B 模型验证数据质量，并强调 100% 合成数据会明显劣化，13% synthetic ratio 反而处在可用区间。对开源图像模型团队，这篇提供的是数据治理与可复现实验模板。"
+      "summary": "Jasper Research 在 Hugging Face 发布 MONET 和 nano-t2i，重点不是又一个图像模型，而是把训练数据、过滤流程和最小训练代码一起开放。文章给出从 2.9B URL 到 104.9M 样本的筛选路径：美学预过滤、安全过滤、去重、域名与水印治理、多 captioner 描述和有限合成数据混入。值得注意的是，团队用 4B 模型验证数据质量，并强调 100% 合成数据会明显劣化，13% synthetic ratio 反而处在可用区间。对开源图像模型团队，这篇提供的是数据治理与可复现实验模板。",
+      "importance": "notable"
     }
   ],
   "projects": [
@@ -497,7 +514,8 @@
       "event_date": "2026-05-28",
       "source": "GitHub",
       "signal": "official_update",
-      "evidence": "Official Mistral repository describes Vibe as a CLI coding assistant powered by Mistral models."
+      "evidence": "Official Mistral repository describes Vibe as a CLI coding assistant powered by Mistral models.",
+      "importance": "general"
     },
     {
       "candidate_id": "project-mistral-search-toolkit-docs",
@@ -513,7 +531,8 @@
       "event_date": "2026-05-28",
       "source": "Mistral Docs",
       "signal": "official_update",
-      "evidence": "Official docs list installation commands and key features for Search Toolkit."
+      "evidence": "Official docs list installation commands and key features for Search Toolkit.",
+      "importance": "general"
     }
   ],
   "builder_observations": [
@@ -525,7 +544,8 @@
       "url": "https://x.com/claudeai/status/2060042702150930686",
       "event_date": "2026-05-28",
       "source": "Claude official X",
-      "evidence": "Original X status referenced by live search results."
+      "evidence": "Original X status referenced by live search results.",
+      "importance": "notable"
     },
     {
       "candidate_id": "builder-simon-product-market-fit",
@@ -535,7 +555,8 @@
       "url": "https://simonwillison.net/2026/May/27/product-market-fit/",
       "event_date": "2026-05-27",
       "source": "Simon Willison Weblog",
-      "evidence": "Original builder blog post published on 2026-05-27."
+      "evidence": "Original builder blog post published on 2026-05-27.",
+      "importance": "notable"
     },
     {
       "candidate_id": "builder-dan-shipper-after-automation-podcast",
@@ -545,7 +566,8 @@
       "url": "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
       "event_date": "2026-05-27",
       "source": "AI & I / Every",
-      "evidence": "follow-builders podcast feed listed the YouTube episode; Every published the transcript on 2026-05-27."
+      "evidence": "follow-builders podcast feed listed the YouTube episode; Every published the transcript on 2026-05-27.",
+      "importance": "notable"
     }
   ],
   "community_leads": [],

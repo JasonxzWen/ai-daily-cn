@@ -27,7 +27,8 @@
         "四个代理都围绕已有 ThreatConnect 情报和 workflow 数据工作，官方说明它们基于 playbook architecture，并在 LLM reasoning layer 之外接入实例内情报和流程数据。",
         "ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。",
         "8.0 同时加入 Playbook Routes 和 Parameter Sets，用更少节点表达分支逻辑并复用 app 参数，这说明安全运营平台的 AI 功能正和既有自动化编排层绑定，而不是只做一个聊天侧栏。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口",
@@ -47,7 +48,8 @@
         "合作伙伴可以用自然语言描述交易、上传 meeting notes、proposals、call transcripts，或 clone 现有 opportunity；代理会抽取信息、补充 customer details 并建议修正缺失上下文或字段。",
         "入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。",
         "该功能已在所有 commercial AWS Regions 提供，说明 Bedrock AgentCore 正被 AWS 用于内部/伙伴业务流程，而不仅是通用 agent 开发样例。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK",
@@ -67,7 +69,8 @@
         "`/parse` 可把 PDF、Word、spreadsheet 等文件转成 LLM-ready Markdown、JSON 或 summary，并标注文件上限为 50 MB，适合 RAG ingestion 和 agent 文档读取。",
         "Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。",
         "Question 和 Highlights format 的重点是上下文压缩：前者返回 page-grounded answer，后者返回匹配 query 的原句、代码块和表格行；对 agent loop 来说，这是把网页读取从“整页塞上下文”改成可控提取。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "xAI 发布 Grok Build 终端 coding agent early beta",
@@ -87,7 +90,8 @@
         "Grok Build 支持 plan mode：复杂任务先生成计划，用户可批准、评论单步或重写计划；批准后变更以 clean diff 方式展示。",
         "官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。",
         "页面还展示 parallel subagents、worktree integrations、headless mode `-p` 和 ACP support；这使它更像一个可脚本化 agent harness，而不仅是交互式 CLI。"
-      ]
+      ],
+      "importance": "major"
     },
     {
       "title": "OpenAI 披露 ChatGPT 在敏感对话中的上下文安全更新",
@@ -107,7 +111,8 @@
         "该工作聚焦 suicide、self-harm 和 harm-to-others 场景；OpenAI 称 safety summaries 不是通用 personalization 或 long-term memory，而是窄范围、限时、只在严重安全担忧相关时使用。",
         "OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。",
         "对构建面向高风险对话的产品团队来说，关键变化是 safety state 成为运行时上下文的一部分；这会影响日志保留、风险升级、用户透明度和普通对话误触发评估。"
-      ]
+      ],
+      "importance": "major"
     }
   ],
   "projects": [
@@ -115,46 +120,54 @@
       "name": "ThreatConnect Agentic AI",
       "description": "ThreatConnect 8.0 的四类安全运营代理，覆盖查询、STRIDE 建模、情报报告和 IR 创建。",
       "url": "https://knowledge.threatconnect.com/docs/8-0-release-notes",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "AWS Partner Central agents MCP",
       "description": "AWS Partner Central agents 的可编程入口，可把 co-sell opportunity creation 接入现有销售工具。",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Firecrawl v2.10",
       "description": "面向 AI agents 的网页和文档提取版本，包含 `/parse`、Lockdown Mode、Question/Highlights format 和多语言 SDK。",
       "url": "https://www.firecrawl.dev/changelog",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Grok Build",
       "description": "xAI 的终端 coding agent early beta，支持计划审批、diff、subagents、worktrees、MCP 和 headless mode。",
       "url": "https://x.ai/news/grok-build-cli",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     },
     {
       "name": "Mux Robots usage update",
       "description": "Mux Robots 调整 workflow unit 计算并延长 free technical preview；本轮作为视频 AI 工作流商业化线索保留。",
       "url": "https://www.mux.com/docs/changelog/robots-pricing-update-may-2026",
-      "domains": []
+      "domains": [],
+      "importance": "general"
     }
   ],
   "builder_observations": [],
   "community_leads": [
     {
       "content": "Mux 在 2026-05-15 更新 Robots workflow unit 计算，并把 free technical preview 延长到 2026-06-15；该条更偏计费和试用期变化，本轮不计入主体。",
-      "url": "https://www.mux.com/docs/changelog/robots-pricing-update-may-2026"
+      "url": "https://www.mux.com/docs/changelog/robots-pricing-update-may-2026",
+      "importance": "general"
     },
     {
       "content": "OpenAI 2026-05-15 的 ChatGPT personal finances 和 xAI 2026-05-15 的 model retirement 已在 2026-05-16 日报主体覆盖，本轮仅作为连续跟踪线索，不重复写入主体。",
-      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes"
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+      "importance": "general"
     },
     {
       "content": "Hugging Face 社区页出现多个近期热度条目，但打开后 Reachy Mini appstore 与 QVAC MedPsy 的明确发布日期分别为 2026-05-06 和 2026-05-07，超出本轮最近 5 天补充窗口。",
-      "url": "https://huggingface.co/blog"
+      "url": "https://huggingface.co/blog",
+      "importance": "general"
     }
   ],
   "self_check": {
