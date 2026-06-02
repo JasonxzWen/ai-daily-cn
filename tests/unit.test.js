@@ -28,6 +28,7 @@ import { validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
+import { buildAutomationRevision } from "../src/automation-revision.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
@@ -2485,10 +2486,47 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.quality_status.status, "ok");
   assert.equal(result.report.source_audit.github_trending.checked, true);
   assert.equal(result.report.source_audit.builder_sources.checked, true);
+  assert.equal(result.report.self_check.automation_revision.schema_version, 1);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
   assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write records automation revision fingerprint in self_check", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const automationRevision = {
+    schema_version: 1,
+    git_commit: "abcdef1234567890abcdef1234567890abcdef12",
+    git_commit_short: "abcdef123456",
+    git_branch: "codex/test",
+    prompt_manifest: "prompts/ai-daily/manifest.json",
+    prompt_modules: ["fixed-source-checklist.md"],
+    source_registry_count: 63,
+    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    rules: ["fixed_source_checklist"]
+  };
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool,
+    automationRevision
+  });
+
+  assert.deepEqual(report.self_check.automation_revision, automationRevision);
+});
+
+test("automation revision reads git, prompt manifest, and source registry state", async () => {
+  const revision = await buildAutomationRevision({ rootDir });
+
+  assert.equal(revision.schema_version, 1);
+  assert.match(revision.git_commit_short, /^[0-9a-f]{7,12}$/);
+  assert.equal(revision.prompt_manifest, "prompts/ai-daily/manifest.json");
+  assert(revision.prompt_modules.includes("fixed-source-checklist.md"));
+  assert(revision.source_registry_count >= 63);
+  assert(revision.rules.includes("fixed_source_checklist"));
 });
 
 test("report:write derives degraded quality status for blocked content discovery", async () => {

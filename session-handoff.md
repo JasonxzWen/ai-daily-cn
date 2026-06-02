@@ -7,10 +7,12 @@
 - `main`/`origin/main` were aligned at `ccdd5cd`; scheduled automation runs `main`, so it could not use the draft PR changes.
 - This recovery adds repo-level hard gates for main-item density, public content density, model-release placement in `main_items`, and Git transport API fallback.
 - It also registers additional AIGC/content-industry and product/funding sources and updates docs/prompts/runbook so the Lark document coverage is encoded in the generation flow.
+- Latest addition: `report:write` now writes `self_check.automation_revision` with git commit, branch, prompt modules, source registry count, and hardening rule names. This gives every future structured JSON report a concrete proof of which repo revision generated it.
 - Full validation passed in the isolated worktree:
   - `npm run validate`
   - `node scripts\harness-validate.mjs`
   - `git diff --check`
+- The latest validation passed after adding the revision fingerprint: full `npm run validate` reported 136 passing tests, build/e2e/OpenSpec success, source registry count 63, and `git diff --check`; `node scripts\harness-validate.mjs` also passed.
 - Do not mix the main worktree's local 2026-06-02 publish artifacts into PR #11 unless explicitly asked.
 - Follow-up source recovery added the user's explicit A-F source surface to repo state:
   - Registry/default discovery now covers ML Papers of the Week, HelloGitHub, RuanYF Weekly, OpenAI Blog RSS, Google DeepMind RSS, MIT Technology Review, VentureBeat AI, arXiv cs.AI, HN API, Hugging Face Daily Papers, Papers with Code API, Reddit r/MachineLearning, Smol AI News, AI News Archive, and Ben's Bites.

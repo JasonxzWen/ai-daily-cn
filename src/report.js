@@ -8,6 +8,7 @@ import { defaultPublishStatus } from "./parser.js";
 import { requirePlainLanguage } from "./plain-language.js";
 import { requireFreshReport } from "./quality-gates.js";
 import { deriveQualityStatus, requirePublishableQuality } from "./quality-status.js";
+import { buildAutomationRevision, defaultAutomationRevision } from "./automation-revision.js";
 import {
   readCandidatePool,
   requireCandidateCoverage,
@@ -30,11 +31,13 @@ export async function writeReportDraft(options = {}) {
     reportDate,
     inputPath: options.candidatePoolPath
   });
+  const automationRevision = options.automationRevision || (await buildAutomationRevision({ rootDir }));
   const report = normalizeReportDraft(draft, {
     reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
-    candidatePool
+    candidatePool,
+    automationRevision
   });
   await requireFreshReport(report, {
     historyDir: outputDir,
@@ -96,7 +99,9 @@ export function normalizeReportDraft(draft, options = {}) {
       fallback_sources: Array.isArray(report.self_check.fallback_sources) ? report.self_check.fallback_sources : [],
       optimization_suggestions: Array.isArray(report.self_check.optimization_suggestions)
         ? report.self_check.optimization_suggestions
-        : []
+        : [],
+      automation_revision:
+        options.automationRevision || report.self_check.automation_revision || defaultAutomationRevision()
     };
   }
 
