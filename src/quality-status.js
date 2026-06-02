@@ -30,6 +30,10 @@ const CANDIDATE_SECTION_MAP = {
   project: "projects",
   builder_observation: "builder_observations"
 };
+const MAINLINE_FACT_SECTIONS = ["main_items", "model_releases"];
+const NON_PRIMARY_ALLOWED_SECTIONS = ["hot_blogs", "projects", "builder_observations", "community_leads"];
+const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source"]);
+const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
 
 const FIXED_SOURCE_REQUIREMENTS = [
   {
@@ -276,6 +280,7 @@ function strictDailyCoverageIssues(report, options = {}) {
   return [
     ...strictAutomationRevisionIssues(report, options),
     ...strictSectionIssues(report),
+    ...strictEditorialIssues(report),
     ...strictSourceAuditIssues(report),
     ...strictBuilderIssues(report),
     ...strictEvidenceIssues(report, options),
@@ -285,7 +290,9 @@ function strictDailyCoverageIssues(report, options = {}) {
 
 function isBlockingPublishQualityIssue(issue) {
   return issue?.error_code === "automation_revision_gate_failed" ||
-    issue?.code === "automation_revision_missing_or_stale";
+    issue?.error_code === "mainline_source_authority_gate_failed" ||
+    issue?.code === "automation_revision_missing_or_stale" ||
+    issue?.code === "mainline_source_authority_failed";
 }
 
 function degradedSectionsFromReasons(reasons, affectedSections) {
@@ -350,6 +357,86 @@ function strictSectionIssues(report) {
         remediation: "Regenerate from the fixed candidate pool and either fill the required section count or keep the report unpublished until source coverage is complete."
       });
     }
+  }
+
+  return issues;
+}
+
+function strictEditorialIssues(report) {
+  const issues = [];
+  const summary = String(report?.summary || "").trim();
+  if (isProcessStatusSummary(summary)) {
+    issues.push({
+      error_code: "editorial_summary_gate_failed",
+      code: "summary_contains_process_status",
+      section: "summary",
+      message: "Public summary reads like a generation/build status instead of an editorial daily lead.",
+      remediation: "Rewrite summary around today's reader-facing AI industry storylines; keep build details in self_check or source_audit only."
+    });
+  }
+
+  const mainItems = Array.isArray(report?.main_items) ? report.main_items : [];
+  if (mainItems.length >= SECTION_MINIMUMS.main_items) {
+    const missingContext = mainItems
+      .map((item, index) => ({
+        index,
+        title: item?.title || item?.url || `main_items[${index}]`,
+        has_why: Boolean(String(item?.why_it_matters || "").trim()),
+        has_reader_relevance: Boolean(String(item?.reader_relevance || "").trim())
+      }))
+      .filter((item) => !item.has_why && !item.has_reader_relevance);
+    if (missingContext.length > 0) {
+      issues.push({
+        error_code: "editorial_context_gate_failed",
+        code: "main_items_editorial_context_missing",
+        section: "main_items",
+        count: mainItems.length - missingContext.length,
+        minimum: mainItems.length,
+        missing_items: missingContext.map((item) => item.title).slice(0, 5),
+        message: "Strict daily main_items must explain why the item matters or how it is relevant to ordinary engineers.",
+        remediation: "Add why_it_matters or reader_relevance to each main item so the report reads as an engineer-facing daily rather than a link list."
+      });
+    }
+  }
+
+  const mainlineLeaks = MAINLINE_FACT_SECTIONS.flatMap((section) => {
+    const items = Array.isArray(report?.[section]) ? report[section] : [];
+    return items
+      .map((item, index) => ({ section, index, item }))
+      .filter(({ item }) => hasNonPrimarySourceSignal(item));
+  });
+  if (mainlineLeaks.length > 0) {
+    const first = mainlineLeaks[0];
+    issues.push({
+      error_code: "mainline_source_authority_gate_failed",
+      code: "mainline_source_authority_failed",
+      section: first.section,
+      count: mainlineLeaks.length,
+      minimum: 0,
+      leaked_items: mainlineLeaks.map(({ section, item }) => `${section}:${item?.title || item?.name || item?.url || "item"}`).slice(0, 8),
+      message: "Factual mainline sections must not rely on intermediary/community/original-social-only sources.",
+      remediation: "Move the item to a viewpoint/community/product-radar section with disclosure, or replace it with an official, primary, paper, GitHub, or multi-source-confirmed URL."
+    });
+  }
+
+  const missingDisclosure = NON_PRIMARY_ALLOWED_SECTIONS.flatMap((section) => {
+    const items = Array.isArray(report?.[section]) ? report[section] : [];
+    return items
+      .map((item, index) => ({ section, index, item }))
+      .filter(({ item }) => hasNonPrimarySourceSignal(item) && !hasNonPrimaryDisclosure(item));
+  });
+  if (missingDisclosure.length > 0) {
+    const first = missingDisclosure[0];
+    issues.push({
+      error_code: "non_primary_source_disclosure_gate_failed",
+      code: "non_primary_source_disclosure_missing",
+      section: first.section,
+      count: missingDisclosure.length,
+      minimum: 0,
+      missing_items: missingDisclosure.map(({ section, item }) => `${section}:${item?.title || item?.name || item?.url || "item"}`).slice(0, 8),
+      message: "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes.",
+      remediation: "Add source_level, verification_status, and verification_note or risk_note before publishing the section."
+    });
   }
 
   return issues;
@@ -562,6 +649,27 @@ function groupHasBlockingSignal(group) {
     return true;
   }
   return Array.isArray(group.sources) && group.sources.some((source) => BLOCKED_SOURCE_STATUSES.has(source?.status));
+}
+
+function isProcessStatusSummary(summary) {
+  return /最新\s*main|重新生成|结构化\s*JSON|内容单元|扩展为\s*\d+\s*条|generated from|regenerated|build log/i.test(summary);
+}
+
+function hasNonPrimarySourceSignal(item = {}) {
+  const sourceLevel = String(item?.source_level || "").trim();
+  const verificationStatus = String(item?.verification_status || "").trim();
+  return Boolean(
+    NON_PRIMARY_VERIFICATION_STATUSES.has(verificationStatus) ||
+    (sourceLevel && !PRIMARY_SOURCE_LEVELS.has(sourceLevel))
+  );
+}
+
+function hasNonPrimaryDisclosure(item = {}) {
+  const sourceLevel = String(item?.source_level || "").trim();
+  const verificationStatus = String(item?.verification_status || "").trim();
+  const verificationNote = String(item?.verification_note || "").trim();
+  const riskNote = String(item?.risk_note || "").trim();
+  return Boolean(sourceLevel && verificationStatus && (verificationNote || riskNote));
 }
 
 function sectionCount(report, section) {

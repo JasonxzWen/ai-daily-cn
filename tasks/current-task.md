@@ -2,64 +2,82 @@
 
 ## Goal
 
-Update this repository's local `.codex/skills` from the latest `D:/harness-hub` while preserving both sides when a local skill and a Harness Hub skill share the same skill name.
+Resolve conflicts on PR #17 (`codex/harden-ai-daily-longform-workflow`) after `origin/main` advanced, while preserving both the upstream Harness Hub task state and this PR's long-form AI daily workflow fixes.
 
-## Status
+PR #17 upgrades the AI daily report from a short technical-news index into a long-form engineer-oriented AI industry daily, while preserving this repository's strengths:
 
-Completed in `C:\Users\Admin\.codex\worktrees\94c6\ai-daily-cn`.
+- static HTML with better visual structure, navigation, cards, and collapsible appendices;
+- structured JSON, candidate back-references, source audit, and publish quality gates;
+- stricter authoritative sourcing for factual mainline stories;
+- support for lower-authority material only in clearly labeled leads, viewpoints, discussions, and analysis sections.
 
-Completed so far:
+## Reader
 
-- Fast-forwarded local `D:/harness-hub` `main` to `origin/main` at `586950abb086828bca7361ec3f17c5397bdd05c3`.
-- Imported Harness Hub-only skills into `.codex/skills`.
-- Preserved local-only `html-work-reports`.
-- For same-name skills, kept existing local active files, copied Hub-only files into the skill directory, and preserved same-path Hub conflicts under `_harness-hub/`.
-- Wrote `.codex/harness-hub-aggregation.json` as the source/merge manifest.
-- Added `tests/skills.test.js` coverage for the aggregation contract.
-- Merged low-risk active `effective-interact` updates from Harness Hub without dropping the AI Daily renderer extensions.
-- Passed `npm run validate`, `node scripts\harness-validate.mjs`, `git diff --check`, and Chromium desktop/mobile visual acceptance.
+普通工程师：有技术能力，对 AI 行业内模型、公司、工具、产品、开源项目、观点、播客和社区讨论都感兴趣。他们更喜欢参考 Lark 文档的信息密度和长日报形态，但本站必须保留更强的 HTML 结构化展示和 source-audit 优势。
+
+## Conflict Context
+
+- `origin/main` advanced from `a985757` to `212302c`.
+- PR #17 became `CONFLICTING` / `DIRTY`.
+- `git rebase origin/main` conflicted only in:
+  - `progress.md`
+  - `session-handoff.md`
+  - `tasks/current-task.md`
+- Resolution policy: preserve upstream Harness Hub aggregation state and this PR's long-form repair state; keep `output/` untracked.
+
+## Decisions
+
+- Facts in `main_items` / major industry dynamics require official, primary, regulatory, paper, GitHub, vendor blog, or multi-source confirmation.
+- Non-primary sources are allowed in `hot_blogs`, `builder_observations`, `community_leads`, product radar, viewpoints, podcasts, and X/Twitter discussion, but must disclose source level, verification state, and risk.
+- The public report summary must be an editorial "today's read" rather than generation/process status.
+- Long-report density should target the referenced document's breadth, but with HTML navigation and structured evidence.
+
+## Planned Changes
+
+- Completed: added schema support for editorial categories, source level, verification state, risk notes, watch-next, and engineer relevance fields.
+- Completed: added candidate and publish quality gates for long-form reports, including editorial summaries, main-item relevance, mainline source authority, and non-primary disclosure.
+- Completed: updated effective-interact report rendering so public summaries and card points read like a daily brief rather than an internal build report.
+- Completed: updated prompt modules and runbook to encode the new editorial contract.
+- Completed: manually repaired `reports-data/2026/06/2026-06-02.json` so the current public report has long-form editorial content, engineer relevance, watch-next notes, and source-disclosure metadata.
+- Completed: reran build, targeted tests, full validation, harness validation, and desktop/mobile screenshot checks after the current-report repair.
 
 ## Allowed paths
 
-- `.codex/harness-hub-aggregation.json`
-- `.codex/skills/**`
-- `tests/skills.test.js`
-- `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
+- `tasks/current-task.md`
+- `schemas/report.schema.json`
+- `schemas/candidates.schema.json`
+- `src/candidates.js`
+- `src/quality-status.js`
+- `src/interaction-report.js`
+- `tests/unit.test.js`
+- `prompts/ai-daily/modules/*.md`
+- `tasks/daily-publish-runbook.md`
+- `docs/data/2026/06/2026-06-02.json`
+- `docs/reports/2026/06/2026-06-02.html`
+- ignored verification artifacts under `output/`
 
 ## Forbidden paths
 
-- Generated daily publish artifacts.
-- `.github/**`
-- Remote GitHub Pages settings.
-- Destructive git operations: `git reset --hard`, `git checkout --`, force push, or automatic stash.
-- Automatic commit or push unless the user explicitly asks.
-
-## Acceptance criteria
-
-- Harness Hub latest source commit is recorded.
-- Hub-only skills are present in `.codex/skills`.
-- Local-only skills are preserved.
-- Same-name skill conflicts preserve both the local active file and the Harness Hub copy.
-- `effective-interact` still passes the existing generator/schema/layout smoke tests.
-- Repository validation and harness validation pass or blockers are explicitly reported.
+- Do not change remote Pages settings or alter automation config.
+- Do not edit `.github/workflows/` or scheduled automation configuration for this task.
+- Do not revert unrelated user changes or published report artifacts.
 
 ## Validation commands
 
-- `node --test tests\skills.test.js`
-- `npm run validate`
-- `node scripts\harness-validate.mjs`
-- `git diff --check`
+- Passed: `node --test tests/unit.test.js --test-name-pattern "generation-log|engineer relevance|mainline facts|intermediary leads|viewpoint sources|日报可以转换"` (Node ran the unit file and passed 111 subtests).
+- Passed: `npm run build`.
+- Passed: Playwright desktop/mobile visual check for `docs/reports/2026/06/2026-06-02.html`.
+- Passed: `npm run validate`.
+- Passed: `node scripts/harness-validate.mjs`.
+- Passed after current-report repair: `npm run build`; `node --test tests/unit.test.js --test-name-pattern "generation-log|engineer relevance|mainline facts|intermediary leads|viewpoint sources|日报可以转换"`; `npm run validate`; `node scripts\harness-validate.mjs`; browser screenshots for desktop and mobile at `http://127.0.0.1:4173/reports/2026/06/2026-06-02.html`.
+- Pending after conflict resolution: rerun `npm run validate` and `node scripts\harness-validate.mjs`.
 
 ## Parallel writes
 
-- No parallel file writes.
-- Read-only inspection and independent validation commands may run in parallel.
+- No parallel writes. Manual edits use `apply_patch`; build output is generated by `npm run build` / `npm run validate`.
 
 ## Handoff requirements
 
-- Report the Harness Hub source commit.
-- Summarize imported, overlapping, local-only, and conflict-preserved counts.
-- List validation commands and outcomes.
-- Call out that no commit, push, Pages setting change, or daily publish was performed.
+- Final response must summarize conflict resolution, validation commands, push result, and PR mergeability state.

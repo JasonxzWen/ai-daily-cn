@@ -338,17 +338,17 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(!/\n\s+- 为什么要改/.test(selfCheckSection.content));
 });
 
-test("HTML 渲染会展示模型发布和热门技术博客", async () => {
+test("HTML 渲染不会展示独立模型栏目但会展示热门技术博客", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const validation = validateReport(report);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
   const html = renderReportHtml(validation.value);
 
-  assert(html.includes('id="model-releases"'));
-  assert(html.includes("模型发布"));
-  assert(html.includes("ExampleModel 2"));
-  assert(html.includes("open_weights"));
+  assert(!html.includes('id="model-releases"'));
+  assert(!html.includes("模型发布"));
+  assert(!html.includes("ExampleModel 2"));
+  assert(!html.includes("open_weights"));
   assert(html.includes('id="hot-blogs"'));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
@@ -525,7 +525,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
     input.heroStats.map((item) => [item.label, item.value, item.detail]),
     [
       ["主体", "2", "重点条目"],
-      ["模型", "1", "发布"],
+      ["AIGC", "1", "产品/内容"],
       ["技术博客", "1", "深读"],
       ["开源", "2", "Top10 + 项目"],
       ["Builder", "0", "观察"],
@@ -560,12 +560,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("作者"));
   assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("日期"));
   assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
-  const modelSection = input.sections.find((section) => section.title === "模型发布");
-  assert(modelSection.content.includes("![Example AI Model Card](data:image/svg+xml;base64,"));
-  assert(modelSection.content.includes("==多平台可见=="));
-  assert(modelSection.content.includes("==官方可用性=="));
-  assert(modelSection.content.includes("example-model-benchmark.png) ![Example model workflow]"));
-  assert(!modelSection.content.includes("备注："));
+  const titles = input.sections.map((section) => section.title);
+  assert(!titles.includes("模型发布"));
+  assert(!JSON.stringify(input.sections).includes("ExampleModel 2"));
+  assert(!JSON.stringify(input.sections).includes("open_weights"));
   const projectsSection = input.sections.find((section) => section.title === "今日值得关注的项目");
   assert(projectsSection.content.includes("![Example Agent Memory](data:image/png;base64,"));
   assert.match(projectsSection.items[0].titleIcon, /^data:image\/png;base64,/);
@@ -584,7 +582,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("\n  - "));
   assert(trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
-  assert.equal(input.intent.audience, "3-10 年经验的研发工程师与技术管理者");
+  assert(input.intent.audience.includes("普通工程师"));
+  assert(input.intent.primaryQuestion.includes("模型、产品、开源、观点和社区动态"));
   assert(input.sections.some((section) => section.title === "主体信息"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
@@ -638,6 +637,47 @@ test("project interaction section uses one card per project", async () => {
   assert(section.items[0].body.includes("agent workflows"));
   assert(section.items[0].points.some((point) => point.value.includes("agent")));
   assert(section.items[1].points.some((point) => point.value.includes("eval dashboards")));
+});
+
+test("interaction input rewrites generation-log summaries into editorial summaries", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.summary = "今天用最新 main 重新生成，扩展为 10 条主体信息和 26 个内容单元。";
+  report.hero_highlights = [
+    {
+      title: "Agent harness 成为今日主线",
+      url: report.main_items[0].url,
+      reason: "工程团队需要把长任务 agent 的规划、执行、审计和回滚拆成可验证边界。"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+
+  assert(!input.summary.includes("最新 main"));
+  assert(!input.summary.includes("重新生成"));
+  assert(input.summary.includes("Agent harness 成为今日主线"));
+  assert(input.summary.includes("工程团队需要"));
+});
+
+test("interaction input discloses non-primary viewpoint sources without polluting factual sections", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hot_blogs[0] = {
+    ...report.hot_blogs[0],
+    source_level: "intermediary",
+    verification_status: "intermediary_only",
+    verification_note: "原文是行业媒体/播客整理，未作为事实主线使用。",
+    risk_note: "观点和产品信号仅供跟进，具体发布事实需要回到官方公告。",
+    reader_relevance: "适合普通工程师判断 agent 平台和工具链的采用顺序。"
+  };
+
+  const input = reportToInteractionInput(report);
+  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
+
+  assert(pointsText.includes("行业媒体/播客整理"));
+  assert(pointsText.includes("仅供跟进"));
+  assert(pointsText.includes("普通工程师"));
+  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  assert(!mainSection.content.includes("行业媒体/播客整理"));
 });
 
 test("builder interaction section omits explicit evidence bullets", async () => {
@@ -815,7 +855,7 @@ test("HTML and interaction input attach evidence assets to matching report items
     {
       type: "table",
       title: "Claude Opus 4.8 performance comparison",
-      source_url: report.model_releases[0].url,
+      source_url: report.main_items[0].url,
       caption: "Transcribed from the official launch image.",
       extraction_status: "extracted_from_image",
       data: [
@@ -842,14 +882,13 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(html.includes("Some automated discovery sources failed"));
   assert(html.includes("hot_blogs"));
   assert(!html.includes('id="evidence-assets"'));
-  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="model-releases"'));
-  const modelHtml = html.slice(html.indexOf('id="model-releases"'), html.indexOf('id="hot-blogs"'));
+  assert(!html.includes('id="model-releases"'));
+  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="hot-blogs"'));
   assert(mainHtml.includes("Coding agent adoption by discipline"));
   assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
   assert.equal((mainHtml.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
-  assert(!mainHtml.includes("Claude Opus 4.8 performance comparison"));
-  assert(modelHtml.includes("Claude Opus 4.8 performance comparison"));
-  assert(modelHtml.includes("Agentic coding"));
+  assert(mainHtml.includes("Claude Opus 4.8 performance comparison"));
+  assert(mainHtml.includes("Agentic coding"));
 
   const input = reportToInteractionInput(validation.value);
   const qualitySection = input.sections.find((section) => section.title === "发布质量说明");
@@ -858,14 +897,12 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(qualitySection.content.includes("Some automated discovery sources failed"));
   assert(!input.sections.some((section) => section.title === "证据图表"));
   const mainSection = input.sections.find((section) => section.title === "主体信息");
-  const modelSection = input.sections.find((section) => section.title === "模型发布");
   assert(mainSection.content.includes("Coding agent adoption by discipline"));
   assert(mainSection.content.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
   assert.equal((mainSection.content.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
-  assert(!mainSection.content.includes("Claude Opus 4.8 performance comparison"));
-  assert(modelSection.content.includes("Claude Opus 4.8 performance comparison"));
-  assert(modelSection.content.includes("Agentic coding"));
-  assert(modelSection.content.indexOf("Agentic coding") < modelSection.content.indexOf("Transcribed from the official launch image."));
+  assert(mainSection.content.includes("Claude Opus 4.8 performance comparison"));
+  assert(mainSection.content.includes("Agentic coding"));
+  assert(mainSection.content.indexOf("Agentic coding") < mainSection.content.indexOf("Transcribed from the official launch image."));
 });
 
 test("interaction source icon cache covers high-frequency AI daily sources and source audit feeds", async () => {
@@ -2461,10 +2498,10 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes("<style>"));
   assert(html.includes("data-html-work-report"));
   assert(html.includes('data-render-mode="pre-rendered"'));
-  assert(html.includes("模型发布"));
-  assert(html.includes("ExampleModel 2"));
-  assert(html.includes("多平台可见"));
-  assert(html.includes("官方可用性"));
+  assert(!html.includes("模型发布"));
+  assert(!html.includes("ExampleModel 2"));
+  assert(!html.includes("多平台可见"));
+  assert(!html.includes("官方可用性"));
   assert(html.includes("热门技术博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes(">重大<"));
@@ -2682,6 +2719,50 @@ test("publish quality accepts strict daily reports with full source proof", () =
   const report = strictPublishReportFixture();
 
   assert.deepEqual(findPublishQualityIssues(report, strictPublishOptionsFixture()), []);
+});
+
+test("publish quality degrades strict daily reports whose summary reads like a generation log", () => {
+  const report = strictPublishReportFixture();
+  report.summary = "今天用最新 main 重新生成，扩展为 10 条主体信息和 26 个内容单元。";
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) => issue.code === "summary_contains_process_status" && issue.section === "summary"
+    )
+  );
+});
+
+test("publish quality degrades strict daily reports missing engineer relevance fields", () => {
+  const report = strictPublishReportFixture();
+  delete report.main_items[0].reader_relevance;
+  delete report.main_items[0].why_it_matters;
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) => issue.code === "main_items_editorial_context_missing" && issue.section === "main_items"
+    )
+  );
+});
+
+test("publish quality blocks strict daily reports when intermediary sources enter mainline facts", () => {
+  const report = strictPublishReportFixture();
+  report.main_items[0].source_level = "intermediary";
+  report.main_items[0].verification_status = "intermediary_only";
+  report.main_items[0].verification_note = "Only an intermediary report was found.";
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert(
+    classification.blocking_issues.some(
+      (issue) => issue.code === "mainline_source_authority_failed" && issue.section === "main_items"
+    )
+  );
 });
 
 test("publish quality accepts strict fixed source proof when a public source is blocked", () => {
@@ -3175,6 +3256,115 @@ test("report:write 拒绝未回到一手来源的中介候选进入事实栏目"
   assert.equal(report.main_items[0].candidate_id, candidatePool.candidates[0].id);
 });
 
+test("report:write allows disclosed intermediary leads in viewpoint sections", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const hotBlogUrl = "https://example.com/blog/intermediary-agent-platforms";
+  draft.hot_blogs = [
+    {
+      candidate_id: "hot-blog-intermediary",
+      title: "Agent platform lessons from an industry roundup",
+      url: hotBlogUrl,
+      publisher: "Industry Roundup",
+      author: "Analyst",
+      event_date: "2026-05-16",
+      topic: "agent platforms",
+      summary: "A useful viewpoint lead about agent platform adoption patterns.",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "行业媒体整理，作为观点线索收录，不写入事实主线。",
+      risk_note: "产品发布事实仍需回到官方公告或仓库确认。",
+      reader_relevance: "帮助普通工程师判断 agent 平台能力和迁移成本。"
+    }
+  ];
+  draft.source_audit.content_sources.candidates_found = 1;
+  draft.source_audit.content_sources.included = 1;
+  candidatePool.sources.push({
+    id: "industry-roundup-source",
+    name: "Industry Roundup",
+    url: "https://example.com/blog",
+    category: "blog",
+    status: "checked",
+    source_level: "intermediary"
+  });
+  candidatePool.candidates.push({
+    id: "hot-blog-intermediary",
+    source_id: "industry-roundup-source",
+    category: "hot_blog",
+    title: "Agent platform lessons from an industry roundup",
+    url: hotBlogUrl,
+    source: "Industry Roundup",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "hot_blogs",
+    intermediary_url: hotBlogUrl,
+    verification_status: "intermediary_only",
+    verification_sources: [],
+    source_level: "intermediary",
+    verification_note: "行业媒体整理，作为观点线索收录，不写入事实主线。",
+    risk_note: "产品发布事实仍需回到官方公告或仓库确认。",
+    reader_relevance: "帮助普通工程师判断 agent 平台能力和迁移成本。"
+  });
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.hot_blogs[0].candidate_id, "hot-blog-intermediary");
+  assert.equal(report.hot_blogs[0].source_level, "intermediary");
+});
+
+test("report:write rejects undisclosed intermediary leads in viewpoint sections", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const hotBlogUrl = "https://example.com/blog/undisclosed-roundup";
+  draft.hot_blogs = [
+    {
+      candidate_id: "hot-blog-undisclosed",
+      title: "Undisclosed intermediary roundup",
+      url: hotBlogUrl,
+      publisher: "Industry Roundup",
+      author: "Analyst",
+      event_date: "2026-05-16",
+      topic: "agent platforms",
+      summary: "A useful viewpoint lead without the required disclosure fields."
+    }
+  ];
+  candidatePool.sources.push({
+    id: "undisclosed-roundup-source",
+    name: "Industry Roundup",
+    url: "https://example.com/blog",
+    category: "blog",
+    status: "checked"
+  });
+  candidatePool.candidates.push({
+    id: "hot-blog-undisclosed",
+    source_id: "undisclosed-roundup-source",
+    category: "hot_blog",
+    title: "Undisclosed intermediary roundup",
+    url: hotBlogUrl,
+    source: "Industry Roundup",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "hot_blogs",
+    intermediary_url: hotBlogUrl,
+    verification_status: "intermediary_only",
+    verification_sources: []
+  });
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "candidate_pool_reference_invalid"
+  );
+});
+
 test("report:write marks missing original X status as degraded", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -3610,6 +3800,11 @@ function strictPublishReportFixture() {
       "**Strict AI** published a dated update with enough detail for the publish gate.",
       "The item includes ==specific evidence==, source URL, and candidate linkage."
     ],
+    editorial_category: "ai_industry",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    why_it_matters: "It changes how engineering teams evaluate AI platform and toolchain choices.",
+    reader_relevance: "Ordinary engineers can use it to judge migration timing, implementation risk, and follow-up reading.",
     importance: index < 2 ? "major" : "notable"
   }));
   const githubTrending = Array.from({ length: 10 }, (_unused, index) => ({
@@ -3625,6 +3820,9 @@ function strictPublishReportFixture() {
     rank: index + 1,
     trend: "new",
     evidence: "GitHub Trending daily fixture.",
+    editorial_category: "open_source",
+    source_level: "github",
+    verification_status: "primary_confirmed",
     importance: "general"
   }));
   const hotBlogs = Array.from({ length: 3 }, (_unused, index) => ({
@@ -3636,6 +3834,10 @@ function strictPublishReportFixture() {
     event_date: reportDate,
     topic: "agent workflow",
     summary: "Fixture blog for strict publish coverage.",
+    editorial_category: "viewpoint_analysis",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    reader_relevance: "Useful background for engineers designing or evaluating agent workflows.",
     importance: "notable"
   }));
   const projects = Array.from({ length: 3 }, (_unused, index) => ({
@@ -3647,6 +3849,10 @@ function strictPublishReportFixture() {
     source: "GitHub Trending",
     signal: "trending",
     evidence: "Fixture project evidence.",
+    editorial_category: "open_source",
+    source_level: "github",
+    verification_status: "primary_confirmed",
+    reader_relevance: "Engineers can inspect the repository before adopting or benchmarking it.",
     importance: "notable"
   }));
   const builderObservations = [
@@ -3659,6 +3865,11 @@ function strictPublishReportFixture() {
       event_date: reportDate,
       source: "follow-builders X feed",
       evidence: "Fixture X status.",
+      editorial_category: "x_discussion",
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      verification_note: "Original X status collected from follow-builders.",
+      risk_note: "Treat as practitioner observation rather than confirmed product fact.",
       importance: "notable"
     },
     {
@@ -3670,6 +3881,9 @@ function strictPublishReportFixture() {
       event_date: reportDate,
       source: "follow-builders blog feed",
       evidence: "Fixture builder blog.",
+      editorial_category: "community_signal",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
       importance: "general"
     },
     {
@@ -3681,6 +3895,9 @@ function strictPublishReportFixture() {
       event_date: reportDate,
       source: "Simon Willison Weblog",
       evidence: "Fixture researcher note.",
+      editorial_category: "community_signal",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
       importance: "general"
     }
   ];

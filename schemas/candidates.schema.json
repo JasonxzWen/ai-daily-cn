@@ -37,6 +37,57 @@
       "type": "string",
       "format": "uri"
     },
+    "editorial_category": {
+      "enum": [
+        "headline",
+        "ai_industry",
+        "engineering_toolchain",
+        "model_release",
+        "company_business",
+        "policy_infra",
+        "content_aigc",
+        "product_radar",
+        "funding",
+        "open_source",
+        "viewpoint_analysis",
+        "podcast",
+        "x_discussion",
+        "community_signal"
+      ]
+    },
+    "source_level": {
+      "enum": [
+        "primary",
+        "official",
+        "paper",
+        "github",
+        "multi_source",
+        "intermediary",
+        "community",
+        "original_social",
+        "unverified",
+        "wechat_primary_like",
+        "wechat_industry_whitelist",
+        "weekly_paper_aggregator",
+        "open_source_aggregator",
+        "tech_weekly_aggregator",
+        "paper_api",
+        "community_api",
+        "paper_aggregator",
+        "ai_news_aggregator",
+        "aigc_content_industry",
+        "ai_funding_product_radar"
+      ]
+    },
+    "verification_status": {
+      "enum": [
+        "primary_confirmed",
+        "multi_source_confirmed",
+        "intermediary_only",
+        "original_social_only",
+        "unverified"
+      ]
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
@@ -75,7 +126,25 @@
           "$ref": "#/$defs/absolute_url"
         },
         "verification_status": {
-          "enum": ["primary_confirmed", "multi_source_confirmed", "intermediary_only", "original_social_only", "unverified"]
+          "$ref": "#/$defs/verification_status"
+        },
+        "editorial_category": {
+          "$ref": "#/$defs/editorial_category"
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "verification_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reader_relevance": {
+          "type": "string",
+          "minLength": 1
         },
         "verification_sources": {
           "type": "array",
@@ -173,7 +242,25 @@
           "$ref": "#/$defs/absolute_url"
         },
         "verification_status": {
-          "enum": ["primary_confirmed", "multi_source_confirmed", "intermediary_only", "original_social_only", "unverified"]
+          "$ref": "#/$defs/verification_status"
+        },
+        "editorial_category": {
+          "$ref": "#/$defs/editorial_category"
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "verification_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reader_relevance": {
+          "type": "string",
+          "minLength": 1
         },
         "verification_sources": {
           "type": "array",

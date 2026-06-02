@@ -32,6 +32,13 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `publish_status`
 - `generated_at`
 
+各内容条目可选但强烈建议填写统一编辑/核验元数据：
+- `editorial_category`：如 `ai_industry`、`engineering_toolchain`、`model_release`、`product_radar`、`open_source`、`viewpoint_analysis`、`podcast`、`x_discussion`、`community_signal`。
+- `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；观点、播客、社区、产品雷达线索可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露。
+- `verification_status`：`main_items` 和 `model_releases` 只接受 `primary_confirmed` 或 `multi_source_confirmed`；`hot_blogs`、`projects`、`builder_observations`、`community_leads` 可保留 `intermediary_only` 或 `original_social_only`，但要写 `verification_note` 或 `risk_note`。
+- `why_it_matters` / `reader_relevance`：`main_items` 必须至少填写其一，说明为什么普通工程师需要看；不要写“本日报后续跟进”之类的生产过程说明。
+- `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客，公开 HTML 会把这些信息压缩成卡片点位或主体条目的补充 bullet。
+
 `main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
 
 - `major`：公开页面显示为“重大”。
@@ -42,7 +49,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
-- AI 核心动态：高信号真实模型发布必须先作为主体新闻写入 `main_items`，并可同步写入 `model_releases` 作为结构化索引；`model_releases` 不能替代主体信息。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
+- AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `main_items`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
 - AIGC 与内容产业动态：事实已回源时写入 `main_items`；只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `main_items`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
@@ -50,19 +57,19 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 内容密度目标：
 
-- 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + model_releases + hot_blogs + projects + builder_observations + community_leads + github_trending`。
+- 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`。
 - `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
 - 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 
-`quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖、schema 校验、候选池回指、远端 `main` 基线、重复旧闻或正文事实来源问题导致日报不能安全发布时使用 `blocked`，并把机器可读问题写入 `blocking_issues`。外部发现源失败、固定覆盖不足、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空或模型发布未镜像到主体新闻，但日报可生成且事实可审计时使用 `degraded`，并填写 `reasons`、`affected_sections`、`degraded_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。`affected_sections` 保留为兼容字段；新草稿应优先使用结构化的 `degraded_sections` / `blocking_issues`，每项至少包含 `code`、`section`、`message`。
+`quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖、schema 校验、候选池回指、远端 `main` 基线、重复旧闻或正文事实来源问题导致日报不能安全发布时使用 `blocked`，并把机器可读问题写入 `blocking_issues`。外部发现源失败、固定覆盖不足、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空或兼容字段非空但未进入主体新闻时使用 `degraded`，并填写 `reasons`、`affected_sections`、`degraded_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。`affected_sections` 保留为兼容字段；新草稿应优先使用结构化的 `degraded_sections` / `blocking_issues`，每项至少包含 `code`、`section`、`message`。
 
 `evidence_assets` 用于把来源链接里的关键图、表或已转写数据挂到对应日报条目旁边；它不是独立图片展板。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
 
 证据图表拉取与展示规范：
-- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`model_releases`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或截图证据时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图一律不拉。
+- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或截图证据时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图一律不拉。
 - 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
-- 模型发布和热门技术博客也适用同一规则：只有原文图能帮助读者理解模型能力、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个板块最多优先展示 1-2 张最重要图片。模型发布中两张来自不同模型条目的关键图会在公开 HTML 中同排展示，但每张图的 `source_url` 仍必须等于对应模型条目的 `url`。
+- 主线条目、热门技术博客和项目都适用同一规则：只有原文图能帮助读者理解能力边界、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个条目最多优先展示 1-2 张最重要图片。每张图的 `source_url` 必须等于对应日报条目的 `url`。
 - 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。若有 `local_path`，页面展示居中的图片和图片下方中文说明；只有没有图片时才用 `data` 退化为表格展示，表格说明必须在表格下方。`title` 必须是短中文图名或表名，`caption` 写清数据/图表来自原文哪个部分。
 - 排版约束：图片必须是可读的原图或清晰裁切，避免整页截图；宽图优先裁到图表本体，移动端不能横向撑破页面。不要为了“有图”而展示图片，不能清晰增强读者理解的图宁可不放。
 
@@ -72,7 +79,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - 不追求每条主体信息都有图表。多数主体信息没有图表是正常状态；宁可留空 `evidence_assets`，也不要为了视觉覆盖率构造表格。
 - 若同一批主体信息中 `manual_table` 覆盖大多数条目，应视为过度包装并重写，只保留真正提升理解的数据或原文图。
 
-`model_releases` 用于结构化追踪真实开源/闭源模型发布，不作为公开日报中替代主体信息的独立新闻池。重大模型发布应在 `main_items` 中讲清楚事实、能力、限制、可用性和影响；没有模型发布时使用空数组；有数据时每项包含：
+`model_releases` 是历史兼容字段，不作为公开日报的独立新闻池，新草稿默认使用空数组。模型类重大动态应在 `main_items` 中讲清楚事实、能力、限制、可用性和影响；若兼容旧数据必须保留该字段，每项包含：
 
 - `name`
 - `provider`
@@ -127,7 +134,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 只放当天最重磅的消息、项目或观点。没有特大新闻时写 1 条今日主线，禁止写“其余条目见后文”或“本版只保留 N 条”。
 
-没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。
+没有热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容；`model_releases` 新草稿也保持空数组。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
 
 `source_audit` 是每日结构化草稿的必填审计字段。它必须合并各发现命令的审计结果，而不是只把命令 stdout 留在本地临时文件里；需要在 `report:write` 后补充独立发现命令审计时，使用 `npm run sources:audit-merge -- --date YYYY-MM-DD --input <audit-output.json>[,<audit-output.json>]` 写回最终 `reports-data` JSON。连续运行验收读取最终 `reports-data` JSON，因此新日报至少包含这些审计组：

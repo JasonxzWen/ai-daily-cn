@@ -1,5 +1,14 @@
 # Progress
 
+## 2026-06-02 PR #17 Conflict Resolution
+
+- Active worktree: `C:\Users\Admin\.codex\worktrees\9650\ai-daily-cn`.
+- Active branch: `codex/harden-ai-daily-longform-workflow`.
+- PR: `https://github.com/JasonxzWen/ai-daily-cn/pull/17`.
+- Upstream `origin/main` advanced from `a985757` to `212302c`, making PR #17 temporarily `CONFLICTING` / `DIRTY`.
+- `git rebase origin/main` produced conflicts only in harness state files: `progress.md`, `session-handoff.md`, and `tasks/current-task.md`.
+- Conflict resolution policy: preserve upstream Harness Hub aggregation notes, preserve the long-form AI daily repair notes, and keep functional PR changes intact.
+
 ## 2026-06-02 Harness Hub Skill Aggregation
 
 - Source updated: `D:/harness-hub` `main` fast-forwarded to `origin/main` commit `586950abb086828bca7361ec3f17c5397bdd05c3`.
@@ -15,6 +24,21 @@
 - Focused validation passed: `node --test tests\skills.test.js`.
 - Full validation passed after installing lockfile dependencies with `npm ci`: `npm run validate`, `node scripts\harness-validate.mjs`, and `git diff --check`.
 - Browser visual acceptance passed on generated `effective-interact` HTML using Chromium desktop 1280x900 and mobile 390x844. Screenshots were written to `.tmp/harness-hub-visual/desktop.png` and `.tmp/harness-hub-visual/mobile.png`; checks confirmed pre-rendered mode, degraded fallback Mermaid state, and no page-level horizontal overflow.
+
+## 2026-06-02 Long-Form Engineer Daily Upgrade
+
+- Current worktree: `C:\Users\Admin\.codex\worktrees\9650\ai-daily-cn` on detached `HEAD`.
+- Goal: make the public AI daily match the referenced Lark document's information density and long-form daily shape while keeping this repo's advantages: static HTML, structured JSON, source audit, candidate back-references, and stronger authority gates.
+- Reader decision: ordinary engineers with technical ability who want broad AI industry coverage, not a single internal business-line audience.
+- Source decision: non-primary sources are allowed in viewpoints, discussions, leads, product radar, podcasts, and community sections, but factual mainline stories still require official/primary/regulatory/paper/GitHub/vendor-blog or multi-source confirmation.
+- Planned implementation: add schema fields for editorial category, source level, verification state, risk notes, and engineer relevance; add editorial quality gates so summaries cannot read like build logs and long reports disclose source trust; update prompts/runbook/rendering and verify with tests plus desktop/mobile visual checks.
+- Implemented schema/candidate support for `editorial_category`, `source_level`, `verification_status`, `why_it_matters`, `reader_relevance`, `verification_note`, `risk_note`, and `watch_next`.
+- Implemented publish quality checks for generation-log summaries, missing engineer relevance in strict main items, non-primary facts in `main_items`/`model_releases`, and undisclosed non-primary material in viewpoint/product/Builder/community sections.
+- Implemented effective-interact rendering changes: process-like summaries are rewritten from `hero_highlights`, reader relevance/risk notes are surfaced in cards/bullets, and the audience contract now targets ordinary engineers.
+- Updated prompt modules and `tasks/daily-publish-runbook.md` with the long-form engineer daily contract.
+- Manually repaired the current `reports-data/2026/06/2026-06-02.json` content so the public report itself now has an editorial summary, per-main-item `why_it_matters` / `reader_relevance` / `watch_next`, richer blog/project notes, and explicit source disclosure for Builder/community leads.
+- Current-report status: regenerated `docs/data/2026/06/2026-06-02.json` is `ok`; the public HTML now shows the long-form engineer daily content instead of a generation-log summary.
+- Post-repair validation passed: `npm run build`, targeted long-form unit tests, `npm run validate`, `node scripts\harness-validate.mjs`, and desktop/mobile browser screenshots for `http://127.0.0.1:4173/reports/2026/06/2026-06-02.html`.
 
 ## 2026-06-02 Automation Worktree And Two-Level Quality Gate
 

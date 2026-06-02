@@ -12,6 +12,10 @@ const REQUIRED_SECTIONS = {
   projects: "project",
   builder_observations: "builder_observation"
 };
+const FACT_SECTION_NAMES = new Set(["main_items", "model_releases"]);
+const NON_PRIMARY_DISCLOSURE_SECTIONS = new Set(["hot_blogs", "projects", "builder_observations"]);
+const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source"]);
+const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
 
 export async function readCandidatePool(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -131,10 +135,16 @@ export function requireCandidateCoverage(report, candidatePool) {
           message: `条目 event_date 必须与候选 event_date 一致：${item.candidate_id}`
         });
       }
-      if (requiresPrimaryVerification(sectionName, candidate) && !hasPrimaryVerification(candidate)) {
+      if (requiresPrimaryVerification(sectionName, candidate, item) && !hasPrimaryVerification(candidate)) {
         errors.push({
           path: `${pathName}.candidate_id`,
           message: `candidate_id 未完成一手或多源核验，不能进入 ${sectionName}：${item.candidate_id}`
+        });
+      }
+      if (requiresNonPrimaryDisclosure(sectionName, candidate, item) && !hasNonPrimaryDisclosure(candidate, item)) {
+        errors.push({
+          path: `${pathName}.candidate_id`,
+          message: `candidate_id 使用非一手来源进入 ${sectionName} 时必须在条目中披露 source_level、verification_status 和 verification_note/risk_note：${item.candidate_id}`
         });
       }
     });
@@ -147,15 +157,60 @@ export function requireCandidateCoverage(report, candidatePool) {
   }
 }
 
-function requiresPrimaryVerification(sectionName, candidate) {
-  if (!["main_items", "model_releases", "hot_blogs", "projects"].includes(sectionName)) {
-    return false;
+function requiresPrimaryVerification(sectionName, candidate, item = {}) {
+  if (FACT_SECTION_NAMES.has(sectionName)) {
+    return Boolean(
+      candidate.verification_status ||
+      candidate.intermediary_url ||
+      candidate.original_url ||
+      item?.verification_status ||
+      item?.source_level
+    );
   }
-  return Boolean(candidate.verification_status || candidate.intermediary_url || candidate.original_url);
+
+  if (sectionName === "projects" && isHighRiskFactCandidate(candidate, item)) {
+    return true;
+  }
+
+  return false;
 }
 
 function hasPrimaryVerification(candidate) {
   return ["primary_confirmed", "multi_source_confirmed"].includes(candidate.verification_status);
+}
+
+function isHighRiskFactCandidate(candidate, item = {}) {
+  const category = String(item?.editorial_category || candidate?.editorial_category || "").trim();
+  return category === "funding";
+}
+
+function requiresNonPrimaryDisclosure(sectionName, candidate, item = {}) {
+  if (!NON_PRIMARY_DISCLOSURE_SECTIONS.has(sectionName)) {
+    return false;
+  }
+  if (requiresPrimaryVerification(sectionName, candidate, item)) {
+    return false;
+  }
+  return hasNonPrimarySignal(candidate) || hasNonPrimarySignal(item);
+}
+
+function hasNonPrimarySignal(value = {}) {
+  const status = String(value?.verification_status || "").trim();
+  const sourceLevel = String(value?.source_level || "").trim();
+  return Boolean(
+    value?.intermediary_url ||
+    value?.original_url ||
+    NON_PRIMARY_VERIFICATION_STATUSES.has(status) ||
+    (sourceLevel && !PRIMARY_SOURCE_LEVELS.has(sourceLevel))
+  );
+}
+
+function hasNonPrimaryDisclosure(candidate, item = {}) {
+  const status = String(item?.verification_status || candidate?.verification_status || "").trim();
+  const sourceLevel = String(item?.source_level || candidate?.source_level || "").trim();
+  const note = String(item?.verification_note || candidate?.verification_note || "").trim();
+  const risk = String(item?.risk_note || candidate?.risk_note || "").trim();
+  return Boolean(sourceLevel && status && (note || risk));
 }
 
 export async function writeCandidatePool(outputDir, reportDate, candidatePool) {

@@ -36,9 +36,10 @@ npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 
 - Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
 - For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or Pages verification failure. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but the JSON and public HTML must disclose them in `quality_status`.
+- Also for reports dated `2026-06-02` or later, enforce the long-form engineer daily gate: public `summary` must be an editorial lead, not a generation log; every `main_items` entry must include `why_it_matters` or `reader_relevance`; `main_items` must use primary, official, paper, GitHub, or multi-source confirmed evidence; non-primary leads may only appear in viewpoint/product/Builder/community sections with `source_level`, `verification_status`, and `verification_note` or `risk_note`; keep `model_releases` empty for new drafts unless preserving legacy data.
 - A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
-- Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
+- Keep `main_items`, `github_trending`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.
 
 ## Report Write
@@ -51,6 +52,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 ```
 
 - Stop and repair the draft when `candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` appears.
+- Stop and repair the draft when `mainline_source_authority_gate_failed` appears. If `editorial_summary_gate_failed`, `editorial_context_gate_failed`, or `non_primary_source_disclosure_gate_failed` appears in `degraded_sections`, repair before publish unless the user explicitly accepts a degraded report.
 - If you commit/push any workflow, prompt, source, renderer, or quality-gate code after `report:write`, rerun `report:write` and `npm run build` so `self_check.automation_revision.git_commit` matches current `HEAD`.
 
 ## Build And Validate

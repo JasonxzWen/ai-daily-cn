@@ -19,12 +19,12 @@
 - 用户不需要关心的执行细节。网络失败、扩窗、空数组只在自检或信源审计中用一句话说明，不进入摘要。
 - 没有事实锚点的判断句；如果一句话删掉形容词后没有新信息，就删掉或改成来源、变化、限制、用途。
 - Product Hunt、融资、X 热点、播客、公众号和内容产业条目尤其要避免榜单复读。必须写清楚“事实是什么、还缺什么确认、对 AI 供给/内容生态/开发者有什么具体影响”。
-- Statuspage、模型网关上架、preview access、区域/账号开放和短时限流要写成 `==轻量运营==` 或待观察线索，不要包装成模型发布。
+- Statuspage、模型网关上架、preview access、区域/账号开放和短时限流要写成 `==轻量运营==` 或待观察线索，不要包装成模型类重大动态。
 - AI 开发工具计费、配额和成本归因条目必须说清生效日期、产品/计划名、额度或计费单位、影响对象和来源。
 
 检查顺序：
 
-1. 先读 `summary`、`main_items[*].bullets`、`model_releases[*].summary`、`hot_blogs[*].summary`、`projects[*].description`、`self_check.notes` 和 `optimization_suggestions`。
+1. 先读 `summary`、`main_items[*].bullets`、`hot_blogs[*].summary`、`projects[*].description`、`self_check.notes` 和 `optimization_suggestions`；只有兼容字段非空时才检查 `model_releases[*].summary` 是否已被主体新闻覆盖。
 2. 删掉重复解释，只保留会影响读者判断的信息。
 3. 对每条主体信息、博客和项目检查是否有明确重点；不要超过 3 处高亮/加粗，不要整句高亮。
 4. 再运行 `npm run report:write`；如果返回 `plain_language_failed`，按错误路径改写，不要绕过校验。
