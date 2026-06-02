@@ -2,6 +2,19 @@
 
 ## Current Status
 
+- Active recovery work is in isolated worktree `D:\tmp\ai-daily-quality-hardening` on branch `codex/ai-daily-quality-hardening`, backing PR #11.
+- The 2026-06-02 scheduled run looked stale because the latest quality/source rules were still draft/unmerged in PR #11, not because local `main` was behind `origin/main`.
+- `main`/`origin/main` were aligned at `ccdd5cd`; scheduled automation runs `main`, so it could not use the draft PR changes.
+- This recovery adds repo-level hard gates for main-item density, public content density, model-release placement in `main_items`, and Git transport API fallback.
+- It also registers additional AIGC/content-industry and product/funding sources and updates docs/prompts/runbook so the Lark document coverage is encoded in the generation flow.
+- Full validation passed in the isolated worktree:
+  - `npm run validate`
+  - `node scripts\harness-validate.mjs`
+  - `git diff --check`
+- Do not mix the main worktree's local 2026-06-02 publish artifacts into PR #11 unless explicitly asked.
+
+## Previous Local Report Status
+
 - Latest user request completed locally: reran the 2026-06-01 AI daily generation and rebuilt the local report for inspection.
 - No publish, push, commit, or remote Pages setting change was performed in this rerun.
 - The regenerated 2026-06-01 report now has 10 `main_items`, 2 true model releases, 5 projects, 3 Builder observations, and 3 community/lightweight operations leads.

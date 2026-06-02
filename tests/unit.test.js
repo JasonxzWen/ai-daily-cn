@@ -1508,6 +1508,9 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("Meta Newsroom"));
   assert(names.includes("Amazon News"));
   assert(names.includes("Product Hunt Trending Feed"));
+  assert(names.includes("The Magnifier AI"));
+  assert(names.includes("Fast Company Creator Economy"));
+  assert(names.includes("Crunchbase News AI"));
 });
 
 test("registered content sources cover frontier AI company official sources", async () => {
@@ -2596,6 +2599,61 @@ test("report:write rejects expanded main items without highlight markers or enou
   );
 });
 
+test("report:write blocks thin main_items when enough main candidates exist", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const baseCandidate = candidatePool.candidates[0];
+
+  for (let index = 2; index <= 8; index += 1) {
+    candidatePool.candidates.push({
+      ...baseCandidate,
+      id: `main-unused-${index}`,
+      title: `Unused main candidate ${index}`,
+      url: `https://example.com/main-unused-${index}`,
+      status: "excluded",
+      included_in: ""
+    });
+  }
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "main_items_coverage_gate_failed"
+  );
+});
+
+test("report:write blocks low content unit density when enough candidates exist", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const baseCandidate = candidatePool.candidates[0];
+
+  for (let index = 1; index <= 17; index += 1) {
+    candidatePool.candidates.push({
+      ...baseCandidate,
+      id: `project-unused-${index}`,
+      category: "project",
+      title: `Unused project candidate ${index}`,
+      url: `https://example.com/project-unused-${index}`,
+      status: "excluded",
+      included_in: ""
+    });
+  }
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "content_units_coverage_gate_failed"
+  );
+});
+
 test("report:write 拒绝结构化草稿中的泛化套话", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   draft.summary = "今天的高信号更新集中在 agent 工具链。";
@@ -2836,7 +2894,21 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
     candidatePool
   });
   const issues = findFreshnessIssues(report);
-  assert.equal(issues[0].code, "same_report_duplicate_url");
+  assert.equal(issues.length, 0);
+
+  report.hot_blogs = [
+    {
+      candidate_id: "blog-report-write",
+      title: "Report Write Blog",
+      url: "https://example.com/report-write",
+      publisher: "Example Blog",
+      author: "Example Author",
+      event_date: "2026-05-16",
+      topic: "report write",
+      summary: "Duplicate blog fixture."
+    }
+  ];
+  assert.equal(findFreshnessIssues(report)[0].code, "same_report_duplicate_url");
 });
 
 test("report:write 拒绝最近 7 天已出现 URL 再进主体信息", async () => {
@@ -3016,6 +3088,47 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
 async function readFixture(relativePath) {
   return fs.readFile(path.join(rootDir, "tests/fixtures", relativePath), "utf8");
 }
+
+test("report:write requires model releases to appear in main_items", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.model_releases = [
+    {
+      candidate_id: "model-missing-main",
+      name: "Missing Main Model",
+      provider: "Example AI",
+      availability: "closed_api",
+      release_scope: "provider_official_launch",
+      event_date: "2026-05-16",
+      url: "https://example.com/model-missing-main",
+      source: "Example AI Model Card",
+      summary: "Model release must also be represented in main_items.",
+      notes: "fixture"
+    }
+  ];
+  candidatePool.candidates.push({
+    id: "model-missing-main",
+    source_id: "source-report-write",
+    category: "model_release",
+    title: "Missing Main Model",
+    url: "https://example.com/model-missing-main",
+    source: "Example AI Model Card",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "model_releases",
+    evidence: "fixture"
+  });
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "model_releases_missing_main_item"
+  );
+});
 
 function assertPublisherCode(fn, code) {
   try {

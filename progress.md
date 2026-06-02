@@ -1,5 +1,15 @@
 # Progress
 
+## 2026-06-02 Automation Version Recovery
+
+- Root cause: `main`/`origin/main` were aligned at `ccdd5cd`, but the broad source/quality fixes were still draft in PR #11, so scheduled runs on `main` could not see them.
+- Confirmed the referenced Lark doc (`QjqfdnpPaosaaxxzRWRcMKhSnxe`, rev `26111`) covers AIGC/content industry, products, podcasts, and X/Twitter discussion.
+- Added repo hard gates for thin candidate-rich reports: `main_items_coverage_gate_failed`, `content_units_coverage_gate_failed`, and `model_releases_missing_main_item`.
+- Extended GitHub API fallback to `git_fetch_unavailable` / `git_push_unavailable`, while keeping `remote_ahead` non-bypassable.
+- Added AIGC/content-industry and funding/product sources: The Magnifier AI, Fast Company Creator Economy, and Crunchbase News AI.
+- Updated docs, runbook, prompts, and tests so the rules are enforced in the generation/publish flow, not only remembered in chat.
+- Validation passed: unit tests, publish tests, sources validate, prompt build grep, harness validate, full `npm run validate`, and `git diff --check`.
+
 ## 2026-06-01 Daily Rerun Source Expansion
 
 - Regenerated the 2026-06-01 AI daily report locally without publishing, pushing, or changing remote Pages.

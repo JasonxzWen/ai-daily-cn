@@ -248,6 +248,30 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://www.interconnects.ai/feed"
   },
   {
+    id: "content-the-magnifier-ai",
+    name: "The Magnifier AI",
+    url: "https://themagnifier.ai/",
+    format: "html_index",
+    linkPattern: "https://themagnifier.ai/",
+    sourceLevel: "aigc_content_industry"
+  },
+  {
+    id: "content-fastcompany-creator-economy",
+    name: "Fast Company Creator Economy",
+    url: "https://www.fastcompany.com/section/creator-economy",
+    format: "html_index",
+    linkPattern: "/section/creator-economy",
+    sourceLevel: "aigc_content_industry"
+  },
+  {
+    id: "content-crunchbase-ai-news",
+    name: "Crunchbase News AI",
+    url: "https://news.crunchbase.com/sections/ai/",
+    format: "html_index",
+    linkPattern: "/",
+    sourceLevel: "ai_funding_product_radar"
+  },
+  {
     id: "content-product-hunt-devtools",
     name: "Product Hunt Developer Tools Feed",
     url: "https://www.producthunt.com/feed?category=developer-tools",

@@ -5,6 +5,7 @@ import { PublisherError, toPublishError } from "./errors.js";
 import {
   checkPublishPreflight,
   createPublishPlan,
+  isGitHubApiFallbackEligibleError,
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
@@ -359,16 +360,20 @@ try {
   }
 } catch (error) {
   const publishError = toPublishError(error);
+  const details = error.details ? { ...error.details } : {};
+  if (isGitHubApiFallbackEligibleError(error)) {
+    details.github_api_fallback_eligible = true;
+  }
   printJson({
     ok: false,
     error: error instanceof PublisherError ? error.code : "unexpected_error",
     message: error.message,
-    details: error.details || undefined,
+    details: Object.keys(details).length > 0 ? details : undefined,
     publish_status: {
       html_generated: false,
-      repo_updated: Boolean(error.details?.repo_updated),
-      repo_pushed: Boolean(error.details?.repo_pushed),
-      pages_url: error.details?.pages_url || "",
+      repo_updated: Boolean(details.repo_updated),
+      repo_pushed: Boolean(details.repo_pushed),
+      pages_url: details.pages_url || "",
       publish_error: publishError
     }
   });

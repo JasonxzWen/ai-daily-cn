@@ -2,56 +2,59 @@
 
 ## Goal
 
-Fix the remaining source icon regression in the 2026-06-01 AI daily page: external links must resolve to cached bitmap favicons instead of generated letter SVG fallbacks, and the regression test must cover both main items and source-audit feed rows.
+Restore the AI daily automation quality hardening path so scheduled runs use the latest rules on `main`: merge PR #11 fixes with additional hard gates for source coverage, main-item density, model-release placement, GitHub API publish fallback, and Lark-document-aligned content coverage.
 
 ## Status
 
-Completed locally; no publish, push, commit, reset, or stash was run.
+In progress in isolated worktree `D:\tmp\ai-daily-quality-hardening`; do not mix the generated 2026-06-02 artifacts from `D:\ai-daily-cn`.
 
-## Root Cause
+## Allowed paths
 
-- The previous repair treated "has any icon" as success, so generated `data:image/svg+xml` letter badges passed.
-- The coverage focused on main items and missed source-audit/feed rows such as `36Kr`, `QbitAI`, `HNRSS Frontpage`, `Ars Technica`, `Tencent Hunyuan Blog`, and `Andrej Karpathy Blog`.
-- Legacy fallback maps in `src/interaction-report.js` could still win unless the generated favicon cache was overlaid after those maps.
+- `config/sources/**`
+- `docs/codex-automation-setup.md`
+- `docs/ai-daily-publish-hardening.md`
+- `prompts/ai-daily/modules/**`
+- `src/**`
+- `tests/**`
+- `tasks/daily-publish-runbook.md`
+- `tasks/current-task.md`
+- `progress.md`
+- `session-handoff.md`
 
-## Scope
+## Forbidden paths
 
-- Add/refresh the generated favicon cache.
-- Ensure cached favicons override legacy generated letter fallbacks.
-- Add regression coverage for high-frequency source names in both main-item and source-audit rendering.
-- Regenerate affected HTML pages.
-- Verify by unit tests, full validation, static HTML icon audit, and in-app browser DOM checks.
+- Main worktree generated 2026-06-02 report artifacts unless the user explicitly asks to publish/regenerate today.
+- `.github/**`
+- Remote GitHub Pages settings.
+- `git reset --hard`, `git push --force`, automatic stash, or overwriting user changes.
 
-## Acceptance Criteria
+## Acceptance criteria
 
-- `docs/reports/2026/06/2026-06-01.html` has 0 external `data:image/svg+xml` source icon fallbacks.
-- Browser DOM check reports 0 broken inline site icons.
-- Remaining SVG icons, if any, are limited to internal controls such as `日报导航` and `结构化 JSON`.
-- `tests/unit.test.js` fails if the high-frequency source list falls back to generated SVG initials.
-- `npm run validate` passes.
+- PR branch explains why 2026-06-02 ran old-looking rules: draft PR #11 was not merged into `main`.
+- `report:write` blocks candidate-rich reports with too few `main_items` or too few public content units.
+- `model_releases` entries must also be represented in `main_items`.
+- Git transport failures (`git_fetch_unavailable` / `git_push_unavailable`) are eligible for GitHub API fallback, but `remote_ahead` is not.
+- AIGC/content-industry and product/funding sources are registered and tested.
+- Prompt build includes Lark-document-aligned coverage: AIGC/content industry, Product Hunt, X/Twitter, follow-builders, 8-12 main items, and GitHub API fallback.
 
-## Validation Commands
+## Validation commands
 
 - `node --test tests\unit.test.js`
-- `npm run build`
-- Static icon audit against `docs/reports/2026/06/2026-06-01.html`
+- `node --test tests\publish.test.js`
+- `npm run sources:validate`
+- `npm run prompt:build -- 2026-06-02`
+- `node scripts\harness-validate.mjs`
 - `npm run validate`
-- In-app browser verification through a temporary localhost server serving `D:\ai-daily-cn\docs`
+- `git diff --check`
 
-## Completion Notes
+## Parallel writes
 
-- Added `src/source-icon-cache.js` with 69 source aliases and 50 normalized domains.
-- Updated `src/interaction-report.js` to overlay `CACHED_SOURCE_ICONS` and `CACHED_DOMAIN_ICONS` after legacy fallback maps.
-- Added/covered missing aliases:
-  - `Andrej Karpathy Blog`
-  - `Tencent Hunyuan Blog`
-  - `Ars Technica`
-  - `HNRSS Frontpage`
-  - `36Kr`
-  - `QbitAI`
-- `npm run validate` passed.
-- Browser DOM metrics for 2026-06-01:
-  - 123 inline site icons
-  - 0 external SVG fallback icons
-  - 0 broken icons
-  - SVG fallback remains only for internal controls: `日报导航`, `结构化 JSON`
+- Do not write to the main worktree while this PR worktree is active.
+- Parallel read-only checks are allowed.
+- Publishing or PR update commands must be run serially.
+
+## Handoff requirements
+
+- Update automation memory before final response.
+- Summarize PR #11 status, root cause, fixed gates, and validation results.
+- Include any validation blocker explicitly.

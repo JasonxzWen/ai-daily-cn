@@ -34,7 +34,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
-- AI 核心动态：真实模型发布写入 `model_releases`；平台、工程、算力、监管、企业采用和重大产品变化写入 `main_items`。
+- AI 核心动态：高信号真实模型发布必须先作为主体新闻写入 `main_items`，并可同步写入 `model_releases` 作为结构化索引；`model_releases` 不能替代主体信息。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
 - AIGC 与内容产业动态：事实已回源时写入 `main_items`；只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `main_items`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
@@ -64,7 +64,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - 不追求每条主体信息都有图表。多数主体信息没有图表是正常状态；宁可留空 `evidence_assets`，也不要为了视觉覆盖率构造表格。
 - 若同一批主体信息中 `manual_table` 覆盖大多数条目，应视为过度包装并重写，只保留真正提升理解的数据或原文图。
 
-`model_releases` 用于独立追踪真实开源/闭源模型发布。没有模型发布时使用空数组；有数据时每项包含：
+`model_releases` 用于结构化追踪真实开源/闭源模型发布，不作为公开日报中替代主体信息的独立新闻池。重大模型发布应在 `main_items` 中讲清楚事实、能力、限制、可用性和影响；没有模型发布时使用空数组；有数据时每项包含：
 
 - `name`
 - `provider`

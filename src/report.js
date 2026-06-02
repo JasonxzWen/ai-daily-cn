@@ -112,12 +112,41 @@ export function normalizeReportDraft(draft, options = {}) {
   requireSourceAudit(validation.value);
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
+  requireModelReleasesInMainItems(validation.value);
   requireBuilderXObservation(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
   requireExpandedMainItemFormat(validation.value);
   requirePublishableQuality(validation.value);
 
   return validation.value;
+}
+
+function requireModelReleasesInMainItems(report) {
+  const modelReleases = Array.isArray(report.model_releases) ? report.model_releases : [];
+  if (modelReleases.length === 0) {
+    return;
+  }
+
+  const mainUrls = new Set(
+    (Array.isArray(report.main_items) ? report.main_items : [])
+      .map((item) => normalizeUrlForEvidenceGate(item.url))
+      .filter(Boolean)
+  );
+  const missing = modelReleases
+    .map((item, index) => ({
+      index,
+      name: item?.name || item?.title || "",
+      url: normalizeUrlForEvidenceGate(item?.url)
+    }))
+    .filter((item) => item.url && !mainUrls.has(item.url));
+
+  if (missing.length > 0) {
+    throw new PublisherError(
+      "model_releases_missing_main_item",
+      "model_releases must be mirrored in main_items so model launches stay part of the main report.",
+      { missing }
+    );
+  }
 }
 
 function requireEvidenceAssetSelectivity(report) {

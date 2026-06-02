@@ -6,11 +6,11 @@
 - 所有资讯收集都必须先和 `reports-data` 中最近至少 7 个日报日的日报正文与候选池比较：先按 URL 去重，再按同一事件、标题、厂商、来源主题和发布时间去重；重复项不得换标题重新包装。
 - 最近 7 天已经进入任何日报正文或项目/博客/模型区的 URL，默认不能再次进入 `main_items`。
 - 如果同一来源在前几天已出现，只有出现新的 dated release、版本、政策、价格、可用范围、基准或工程结论时才能再次入选，并必须在候选池 notes/evidence 中说明新增变化。
-- 同一 URL 不能在同一天同时进入 `main_items`、`model_releases` 或 `hot_blogs`。
+- 同一 URL 不能在同一天同时进入 `main_items` 与 `hot_blogs` 重复包装；真实模型发布可以同 URL 同时进入 `main_items` 与 `model_releases`，但 `model_releases` 只作结构化索引。
 - 48 小时外的内容不能进入 `summary` 或 `main_items`；如确有必要，只能作为补充/背景线索，且每天最多 1 条。
 - 同一厂商同日或同一 48 小时窗口内的多条小更新默认合并为一条厂商动态；只有当它们分别改变不同工程工作流、来源和风险面时才拆分。
 - AI 日报可以收录广义科技、大厂动态和行业趋势，但必须和 AI 生态有明确关系：例如模型/agent 供给、开发者工具、云和算力、芯片、平台政策、浏览器/OS 分发、监管、融资并购或企业采购变化。普通消费科技新闻、泛商业评论和无工程影响的股价波动不入选。
-- `model_releases` 只收真实模型发布：新模型、新模型家族、新权重、官方 API 正式发布或实质模型卡更新。第三方网关上架、产品内开放、preview access、区域/账号可用、状态页 incident/恢复和短时配额变化默认是轻量运营项，写入 `community_leads`；只有影响生产迁移、成本边界、企业采购路径或上线排期时才升格为 `main_items`，但仍不得写入 `model_releases`。
+- `model_releases` 只收真实模型发布：新模型、新模型家族、新权重、官方 API 正式发布或实质模型卡更新。高信号真实模型发布必须先进入 `main_items`，并可同步写入 `model_releases` 做结构化索引；不要用独立模型区替代主体信息。第三方网关上架、产品内开放、preview access、区域/账号可用、状态页 incident/恢复和短时配额变化默认是轻量运营项，写入 `community_leads`；只有影响生产迁移、成本边界、企业采购路径或上线排期时才升格为 `main_items`，但仍不得写入 `model_releases`。
 - 热门技术博客进入 `hot_blogs`，不计入主体信息数量；它不是新闻凑数池，只有高质量工程、研究、agent、coding、eval、harness 或 design 文章才收录。
 - GitHub Trending 进入独立 `github_trending` 板块，默认展示 Top 10 仓库并带排名变化；它不是主体信息凑数池，只有经过额外 release、README、近期 commit 或工程影响核验的项目才再进入 `projects`。
 - 访谈和播客只有在包含明确工程实践、技术路线、成本结构、模型/agent 经验或组织实践时才收录；泛泛宣传只作为社区线索。
