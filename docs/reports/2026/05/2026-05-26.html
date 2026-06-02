@@ -1972,7 +1972,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。</strong></li><li>为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。</li><li><strong>follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。</strong></li><li>为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。</li><li><strong>状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。</strong></li><li>为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。</li></ul>
+<ul><li><strong>当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。</strong>：为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。</li><li><strong>follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。</strong>：为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。</li><li><strong>状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。</strong>：为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：3
 - Builder 观察：0
@@ -1983,12 +1983,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。**
-  - 为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。
-- **follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。**
-  - 为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。
-- **状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。**
-  - 为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。
+- **当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。**：为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。
+- **follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。**：为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。
+- **状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。**：为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json)</template></div>
   </details>

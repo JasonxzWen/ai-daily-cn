@@ -2010,7 +2010,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：10</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：24h/48h 内高质量 T0/T2 信息不足，因此扩展到 2026-05-05 至 2026-05-13；所有主体条目使用官方页面、官方文档或 GitHub Release，并保留真实事件日期。Mistral 3 因页面缺少明确发布日期降级为社区线索。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。</strong>：增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。</li><li>为什么要改：减少低质量硬凑，同时让窗口扩展可审计。</li><li><strong>官方页面没有显式发布日期时缺少统一处理规则。</strong>：要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。</li><li>为什么要改：避免把无法定日的发布写入日报主体。</li><li><strong>Builder 观察在无一手帖子时容易空缺。</strong>：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。</li><li>为什么要改：防止用二手转述填充 builder 区域。</li></ul>
+<ul><li><strong>当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。</strong>：增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则；为什么要改：减少低质量硬凑，同时让窗口扩展可审计。</li><li><strong>官方页面没有显式发布日期时缺少统一处理规则。</strong>：要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体；为什么要改：避免把无法定日的发布写入日报主体。</li><li><strong>Builder 观察在无一手帖子时容易空缺。</strong>：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因；为什么要改：防止用二手转述填充 builder 区域。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：10
 - Builder 观察：0
@@ -2021,12 +2021,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。**：增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。
-  - 为什么要改：减少低质量硬凑，同时让窗口扩展可审计。
-- **官方页面没有显式发布日期时缺少统一处理规则。**：要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。
-  - 为什么要改：避免把无法定日的发布写入日报主体。
-- **Builder 观察在无一手帖子时容易空缺。**：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。
-  - 为什么要改：防止用二手转述填充 builder 区域。
+- **当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。**：增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则；为什么要改：减少低质量硬凑，同时让窗口扩展可审计。
+- **官方页面没有显式发布日期时缺少统一处理规则。**：要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体；为什么要改：避免把无法定日的发布写入日报主体。
+- **Builder 观察在无一手帖子时容易空缺。**：保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因；为什么要改：防止用二手转述填充 builder 区域。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json)</template></div>
   </details>

@@ -2004,7 +2004,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：5</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。PaddleOCR 3.5 Hugging Face 文章从主体条目迁移到 hot_blogs，避免热门工程博客挤占 main_items。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。</strong></li><li>为什么要改：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。</li><li><strong>官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。</strong></li><li>为什么要改：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。</li><li><strong>GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。</strong></li><li>为什么要改：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。</li></ul>
+<ul><li><strong>同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。</strong>：为什么要改：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。</li><li><strong>官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。</strong>：为什么要改：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。</li><li><strong>GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。</strong>：为什么要改：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-19.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：5
 - Builder 观察：0
@@ -2015,12 +2015,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。**
-  - 为什么要改：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。
-- **官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。**
-  - 为什么要改：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。
-- **GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。**
-  - 为什么要改：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。
+- **同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。**：为什么要改：增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。
+- **官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。**：为什么要改：明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。
+- **GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。**：为什么要改：要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-19.json)</template></div>
   </details>

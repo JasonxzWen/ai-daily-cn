@@ -2084,7 +2084,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 6 条，未强行填满 10 条。因 24 小时 T0 一手来源不足，本轮扩展至 2026-05-20；2026-05-20 条目只作为高信号研究补充并保留真实 event_date。Builder 观察为空是因为 follow-builders 中央 feed 当前 fetch failed 且本地缓存过旧。项目表未把 GitHub 官方 Trending 解析失败伪装成成功，改用可访问趋势源和仓库 README 交叉验证。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。</strong></li><li>为什么要改：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。</li><li><strong>follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。</strong></li><li>为什么要改：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。</li><li><strong>周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。</strong></li><li>为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。</li></ul>
+<ul><li><strong>当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。</strong>：为什么要改：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。</li><li><strong>follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。</strong>：为什么要改：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。</li><li><strong>周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。</strong>：为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：6
 - Builder 观察：0
@@ -2095,12 +2095,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。**
-  - 为什么要改：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。
-- **follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。**
-  - 为什么要改：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。
-- **周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。**
-  - 为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。
+- **当前 shell 下 discover:github-trending 全部 fetch failed，Web 文本视图也不能稳定解析官方 GitHub Trending 仓库列表。**：为什么要改：让官方 GitHub Trending、浏览器导出和第三方趋势源形成明确优先级，减少项目表对单一替代源的依赖。
+- **follow-builders 中央 feed fetch failed 时，目前只能写 blocked_reason，无法给出近期 Builder 观察。**：为什么要改：增加备用原始源或明确 fallback 采样清单后，可以避免 Builder 区长期因单点 feed 失败而为空。
+- **周末或低发布日容易扩展到 5 天窗口，但当前摘要只在 notes 里解释扩展原因。**：为什么要改：增加 fallback_reason 或 per-item fallback 标记后，读者能更清楚地区分今日发布、48 小时内更新和 5 天内补充。
 
 - ![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) [结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-23.json)</template></div>
   </details>
