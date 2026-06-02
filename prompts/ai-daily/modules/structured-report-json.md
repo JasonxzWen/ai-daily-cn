@@ -52,10 +52,10 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 - 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + model_releases + hot_blogs + projects + builder_observations + community_leads + github_trending`。
 - `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
-- 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`public_note` 或 `self_check.notes` 说明缺口。
+- 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 
-`quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖或 schema 校验导致日报不能生成时使用 `blocked` 并停止发布；外部发现源失败但日报可生成时使用 `degraded`，并填写 `reasons`、`affected_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。
+`quality_status` 由 `report:write` 按发现审计和候选池自动派生；草稿也可显式填写。启动、依赖、schema 校验、候选池回指、远端 `main` 基线、重复旧闻或正文事实来源问题导致日报不能安全发布时使用 `blocked`，并把机器可读问题写入 `blocking_issues`。外部发现源失败、固定覆盖不足、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空或模型发布未镜像到主体新闻，但日报可生成且事实可审计时使用 `degraded`，并填写 `reasons`、`affected_sections`、`degraded_sections` 和可公开的 `public_note`；核心源正常但低信号时保持 `ok`，可在 `reasons` 里记录 `low_signal`。`affected_sections` 保留为兼容字段；新草稿应优先使用结构化的 `degraded_sections` / `blocking_issues`，每项至少包含 `code`、`section`、`message`。
 
 `evidence_assets` 用于把来源链接里的关键图、表或已转写数据挂到对应日报条目旁边；它不是独立图片展板。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
 

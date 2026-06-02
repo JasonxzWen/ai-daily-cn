@@ -579,6 +579,16 @@
     "affected_sections": [
       "hot_blogs"
     ],
+    "degraded_sections": [
+      {
+        "code": "content_sources_blocked",
+        "error_code": "quality_degraded",
+        "section": "hot_blogs",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      }
+    ],
+    "blocking_issues": [],
     "public_note": "Content source coverage is degraded; some sections may be incomplete."
   },
   "evidence_assets": [

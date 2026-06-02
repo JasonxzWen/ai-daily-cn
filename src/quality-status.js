@@ -145,16 +145,33 @@ export function deriveQualityStatus(report, candidatePool = null) {
     affectedSections.push(...explicit.affected_sections);
   }
 
+  const strictIssues = strictDailyCoverageIssues(report);
+  const blockingIssues = strictIssues.filter(isBlockingPublishQualityIssue);
+  const strictDegradedSections = strictIssues.filter((issue) => !isBlockingPublishQualityIssue(issue));
+  const degradedSections = uniqueQualityIssues([
+    ...(explicit?.degraded_sections || []),
+    ...degradedSectionsFromReasons(reasons, affectedSections),
+    ...strictDegradedSections
+  ]);
+
   const degradedReasons = unique(reasons.filter((reason) => reason !== "low_signal"));
-  const status = degradedReasons.length > 0 ? "degraded" : "ok";
+  const status = blockingIssues.length > 0
+    ? "blocked"
+    : degradedReasons.length > 0 || degradedSections.length > 0
+      ? "degraded"
+      : "ok";
   const finalReasons = status === "degraded"
     ? unique([...reasons, ...degradedReasons])
-    : unique([...(explicit?.reasons || []), ...lowSignalReasons(report)]);
+    : status === "blocked"
+      ? unique([...reasons, ...blockingIssues.map((issue) => issue.code || issue.error_code)])
+      : unique([...(explicit?.reasons || []), ...lowSignalReasons(report)]);
 
   return {
     status,
     reasons: finalReasons,
     affected_sections: unique(affectedSections),
+    degraded_sections: degradedSections,
+    blocking_issues: uniqueQualityIssues([...(explicit?.blocking_issues || []), ...blockingIssues]),
     public_note: publicQualityNote(status, finalReasons, explicit?.status === status ? explicit.public_note : "")
   };
 }
@@ -168,12 +185,14 @@ export function normalizeQualityStatus(value) {
     status,
     reasons: Array.isArray(value.reasons) ? value.reasons.filter(Boolean).map(String) : [],
     affected_sections: Array.isArray(value.affected_sections) ? value.affected_sections.filter(Boolean).map(String) : [],
+    degraded_sections: Array.isArray(value.degraded_sections) ? value.degraded_sections.map(normalizeQualityIssue).filter(Boolean) : [],
+    blocking_issues: Array.isArray(value.blocking_issues) ? value.blocking_issues.map(normalizeQualityIssue).filter(Boolean) : [],
     public_note: String(value.public_note || "").trim()
   };
 }
 
-export function findPublishQualityIssues(report, options = {}) {
-  const issues = [];
+export function classifyPublishQuality(report, options = {}) {
+  const degradedSections = [];
   const reasons = new Set(report?.quality_status?.reasons || []);
   const mainItemCount = sectionCount(report, "main_items");
   const contentUnitCount = countContentUnits(report);
@@ -183,7 +202,7 @@ export function findPublishQualityIssues(report, options = {}) {
   const builderSources = report?.source_audit?.builder_sources;
 
   if (reasons.has("main_items_selection_degraded") && mainItemCount < mainItemMinimum) {
-    issues.push({
+    degradedSections.push({
       error_code: "main_items_coverage_gate_failed",
       code: "main_items_below_minimum",
       section: "main_items",
@@ -194,7 +213,7 @@ export function findPublishQualityIssues(report, options = {}) {
   }
 
   if (reasons.has("content_units_selection_degraded") && contentUnitCount < CONTENT_UNIT_MINIMUM) {
-    issues.push({
+    degradedSections.push({
       error_code: "content_units_coverage_gate_failed",
       code: "content_units_below_minimum",
       section: "content_units",
@@ -205,7 +224,7 @@ export function findPublishQualityIssues(report, options = {}) {
   }
 
   if (groupHasBlockingSignal(builderSources) && builderCount < builderMinimum) {
-    issues.push({
+    degradedSections.push({
       error_code: "builder_coverage_gate_failed",
       code: "builder_coverage_below_minimum",
       section: "builder_observations",
@@ -217,13 +236,22 @@ export function findPublishQualityIssues(report, options = {}) {
     });
   }
 
-  issues.push(...strictDailyCoverageIssues(report, options));
+  const strictIssues = strictDailyCoverageIssues(report, options);
+  const blockingIssues = strictIssues.filter(isBlockingPublishQualityIssue);
+  degradedSections.push(...strictIssues.filter((issue) => !isBlockingPublishQualityIssue(issue)));
 
-  return issues;
+  return {
+    blocking_issues: uniqueQualityIssues(blockingIssues),
+    degraded_sections: uniqueQualityIssues(degradedSections)
+  };
+}
+
+export function findPublishQualityIssues(report, options = {}) {
+  return classifyPublishQuality(report, options).blocking_issues;
 }
 
 export function requirePublishableQuality(report, options = {}) {
-  const issues = findPublishQualityIssues(report, options);
+  const { blocking_issues: issues } = classifyPublishQuality(report, options);
   if (issues.length === 0) {
     return;
   }
@@ -253,6 +281,25 @@ function strictDailyCoverageIssues(report, options = {}) {
     ...strictEvidenceIssues(report, options),
     ...strictModelReleaseIssues(report)
   ];
+}
+
+function isBlockingPublishQualityIssue(issue) {
+  return issue?.error_code === "automation_revision_gate_failed" ||
+    issue?.code === "automation_revision_missing_or_stale";
+}
+
+function degradedSectionsFromReasons(reasons, affectedSections) {
+  const sections = unique(affectedSections);
+  return sections.map((section) => {
+    const reason = reasons.find((item) => String(item || "").includes(section)) || reasons[0] || "coverage_degraded";
+    return {
+      error_code: "quality_degraded",
+      code: reason,
+      section,
+      message: `${section} coverage is degraded and should be disclosed in the public report.`,
+      remediation: "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+    };
+  });
 }
 
 function strictAutomationRevisionIssues(report, options = {}) {
@@ -693,6 +740,59 @@ function normalizeUrl(value) {
   } catch {
     return String(value || "").trim().toLowerCase().replace(/^http:/, "https:").replace(/\/$/, "");
   }
+}
+
+function normalizeQualityIssue(issue) {
+  if (!issue || typeof issue !== "object") {
+    return null;
+  }
+  const code = String(issue.code || issue.error_code || "").trim();
+  const section = String(issue.section || "").trim();
+  if (!code || !section) {
+    return null;
+  }
+  const normalized = {
+    code,
+    error_code: String(issue.error_code || code).trim(),
+    section,
+    message: String(issue.message || "").trim() || `${section} is degraded.`,
+    remediation: String(issue.remediation || "").trim()
+  };
+
+  for (const key of [
+    "count",
+    "minimum",
+    "candidates_found",
+    "audit_sources",
+    "audit_source_minimum",
+    "has_rank_coverage",
+    "has_follow_builders_x",
+    "has_x_observation",
+    "missing_sources",
+    "missing_model_releases",
+    "revision_mismatches",
+    "missing_rules"
+  ]) {
+    if (issue[key] !== undefined) {
+      normalized[key] = issue[key];
+    }
+  }
+
+  return normalized;
+}
+
+function uniqueQualityIssues(issues) {
+  const seen = new Set();
+  const uniqueIssues = [];
+  for (const issue of issues.map(normalizeQualityIssue).filter(Boolean)) {
+    const key = `${issue.error_code}|${issue.code}|${issue.section}|${JSON.stringify(issue.missing_sources || issue.missing_model_releases || issue.revision_mismatches || [])}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    uniqueIssues.push(issue);
+  }
+  return uniqueIssues;
 }
 
 function unique(items) {

@@ -36,6 +36,7 @@ export function renderReportHtml(report) {
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const sourceAudit = report.source_audit && typeof report.source_audit === "object" ? report.source_audit : null;
   const sourceAuditSection = sourceAudit ? `\n    ${renderSourceAudit(sourceAudit)}\n` : "";
+  const qualityStatusSection = renderQualityStatusSection(report.quality_status);
   const metaItems = [
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     githubTrending.length > 0 ? `<span><strong>${githubTrending.length}</strong> GitHub Trending</span>` : "",
@@ -86,6 +87,7 @@ ${defaultStyleCss}
       ${mainItems.map((item) => renderMainItem(report, item, evidenceByUrl)).join("\n")}
     </section>
 ${optionalSections ? `\n    ${optionalSections}\n` : ""}
+${qualityStatusSection ? `\n    ${qualityStatusSection}\n` : ""}
 ${sourceAuditSection}
     <section class="section" id="self-check">
       <h2>自检摘要</h2>
@@ -119,6 +121,42 @@ function renderHeroSummary(report) {
   return `<ul class="summary">${highlights
     .map((item) => `<li><a href="${escapeAttribute(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>${item.reason ? `：${escapeHtml(item.reason)}` : ""}</li>`)
     .join("\n")}</ul>`;
+}
+
+function renderQualityStatusSection(status) {
+  if (!status || typeof status !== "object" || status.status === "ok") {
+    return "";
+  }
+  const issues = [
+    ...(Array.isArray(status.blocking_issues) ? status.blocking_issues : []),
+    ...(Array.isArray(status.degraded_sections) ? status.degraded_sections : []),
+    ...affectedSectionIssues(status)
+  ];
+  const issueList = issues.length > 0
+    ? `<ul>${issues.map((issue) => `<li><strong>${escapeHtml(issue.section || "unknown")}</strong>（${escapeHtml(issue.code || issue.error_code || "quality_issue")}）：${escapeHtml(issue.message || "")}</li>`).join("\n")}</ul>`
+    : "";
+  return `<section class="section" id="quality-status">
+      <h2>发布质量说明</h2>
+      <p><strong>${status.status === "blocked" ? "阻断" : "降级"}</strong>${status.public_note ? `：${escapeHtml(status.public_note)}` : ""}</p>
+      ${issueList}
+    </section>`;
+}
+
+function affectedSectionIssues(status) {
+  if (!Array.isArray(status.affected_sections) || status.affected_sections.length === 0) {
+    return [];
+  }
+  const existing = new Set([
+    ...(Array.isArray(status.blocking_issues) ? status.blocking_issues : []),
+    ...(Array.isArray(status.degraded_sections) ? status.degraded_sections : [])
+  ].map((issue) => issue?.section).filter(Boolean));
+  return status.affected_sections
+    .filter((section) => section && !existing.has(section))
+    .map((section) => ({
+      code: "affected_section_degraded",
+      section,
+      message: "该板块存在公开说明中的降级风险。"
+    }));
 }
 
 export function renderIndexHtml(feed, trends = null) {

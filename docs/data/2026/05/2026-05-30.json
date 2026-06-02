@@ -248,6 +248,16 @@
     "affected_sections": [
       "source_audit"
     ],
+    "degraded_sections": [
+      {
+        "code": "shell_fetch_failed_for_registered_sources",
+        "error_code": "quality_degraded",
+        "section": "source_audit",
+        "message": "source_audit coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      }
+    ],
+    "blocking_issues": [],
     "public_note": "Fixed discovery commands failed in the local shell; this report used verified web fallback sources and keeps the blocked audit trail."
   },
   "github_trending": [

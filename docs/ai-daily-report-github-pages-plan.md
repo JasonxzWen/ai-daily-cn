@@ -2,7 +2,7 @@
 
 ## 目标
 
-把现有 `ai-2` 每日 AI 日报自动化扩展为可发布的静态站点流程：
+把现有 `ai-daily` 每日 AI 日报自动化扩展为可发布的静态站点流程：
 
 - 每日生成中文 AI 日报 Markdown 原文。
 - 将日报标准化为结构化 JSON。
@@ -38,10 +38,10 @@
 
 本地自动化上下文：
 
-- 自动化 ID：`ai-2`。
-- 自动化配置路径：`C:\Users\Admin\.codex\automations\ai-2\automation.toml`。
-- 自动化 memory 路径：`C:\Users\Admin\.codex\automations\ai-2\memory.md`。
-- `ai-2` 当前是 `ACTIVE` 的本地 cron 自动化，计划时间为每日 02:30。
+- 自动化 ID：`ai-daily`。
+- 自动化配置路径：`C:\Users\Admin\.codex\automations\ai-daily\automation.toml`。
+- 自动化 memory 路径：`C:\Users\Admin\.codex\automations\ai-daily\memory.md`。
+- `ai-daily` 当前是 `ACTIVE` 的 cron 自动化，计划时间为每日 02:30。
 - memory 已记录：日报已支持“自检与优化建议”，用户确认后可继续优化自动化 prompt。
 - memory 也已记录：用户希望后续把日报自动渲染为静态 HTML，推送到指定 GitHub 仓库，并通过 GitHub Pages 发布。
 
@@ -59,7 +59,7 @@
 
 核心角色：
 
-- `ai-2`：每日采集、筛选、生成 AI 日报正文，并输出自检 JSON。
+- `ai-daily`：每日采集、筛选、生成 AI 日报正文，并输出自检 JSON。
 - 发布器：把日报 Markdown 转为结构化 JSON 和 HTML，更新首页、feed 和样式资源。
 - 目标仓库：保存所有可发布静态产物和历史日报。
 - GitHub Pages：从 `main` 分支的 `/docs` 目录发布站点。
@@ -76,7 +76,7 @@
 
 - GitHub Pages 支持从指定分支的根目录或 `/docs` 目录发布。
 - GitHub Pages 也支持通过 GitHub Actions 发布自定义构建产物。
-- 如果使用 branch source 且由 GitHub Actions 的 `GITHUB_TOKEN` 推送提交，可能不会触发 Pages build；本方案默认 `ai-2` 是本地自动化，用用户本地 git 凭据推送，因此优先选择 `/docs` 分支源。
+- 如果使用 branch source 且由 GitHub Actions 的 `GITHUB_TOKEN` 推送提交，可能不会触发 Pages build；本方案默认 `ai-daily` 是本地自动化，用用户本地 git 凭据推送，因此优先选择 `/docs` 分支源。
 - 参考 GitHub 官方文档：[Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
 
 ## 目录结构
@@ -117,7 +117,7 @@ docs/
 
 推荐执行流程：
 
-1. `ai-2` 每日 02:30 运行，生成 AI 日报 Markdown。
+1. `ai-daily` 每日 02:30 运行，生成 AI 日报 Markdown。
 2. 从日报正文中提取：
    - 标题。
    - `report_date`。
@@ -429,7 +429,7 @@ HTML 契约：
 - 建议必须来自本次真实问题，不硬凑。
 - 建议必须可执行、可验证。
 - prompt 自动迭代必须等待用户确认。
-- 用户确认后才允许修改 `C:\Users\Admin\.codex\automations\ai-2\automation.toml` 的 `prompt` 字段。
+- 用户确认后才允许修改实际 `ai-daily` 自动化配置的 `prompt` 字段。
 - 修改 prompt 时必须保留 `id`、`status`、`rrule`、`model`、`reasoning_effort`、`execution_environment`、`cwds` 等配置字段。
 - 低风险格式修复，例如“补充 publish_status 字段默认值”“统一日期路径格式”“缺少 pages_url 时给空字符串”，可以列为建议，但不能绕过确认直接改 prompt。
 - 如果只是发布脚本内部 bug，不应写入 prompt 优化建议；应写入 `publish_error` 和工程修复清单。
@@ -458,7 +458,7 @@ HTML 契约：
 
 第三阶段：本地发布器
 
-1. 接入 `ai-2` 的输出。
+1. 接入 `ai-daily` 的输出。
 2. 生成当日 Markdown、JSON、HTML。
 3. 更新首页和 feed。
 4. 执行 git 安全检查。
@@ -467,7 +467,7 @@ HTML 契约：
 
 第四阶段：自动发布
 
-1. 在用户明确允许自动 commit/push 后，把发布器接入 `ai-2`。
+1. 在用户明确允许自动 commit/push 后，把发布器接入 `ai-daily`。
 2. 每次发布前检查工作树和远端状态。
 3. 普通 commit。
 4. 普通 push。
@@ -507,5 +507,5 @@ HTML 契约：
 - 是否需要 RSS/Atom，还是 `feed.json` 即可。
 - 首页是否只展示最近 N 篇，还是展示完整归档。
 - 自动化失败时是否需要额外通知渠道。
-- 是否允许发布器在用户确认后修改 `ai-2` 的 prompt。
+- 是否允许发布器在用户确认后修改 `ai-daily` 的 prompt。
 - 是否要求公开 JSON 中准确展示最终 `repo_pushed` 状态；如果要求，需要确认是否接受二阶段状态提交。

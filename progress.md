@@ -1,19 +1,24 @@
 # Progress
 
-## 2026-06-02 Publish Recovery Completed
+## 2026-06-02 Automation Worktree And Two-Level Quality Gate
 
-- PR #14 and PR #15 were merged into `main`; local `main` was fast-forwarded and verified against `origin/main`.
-- Fixed three systemic publish gates on `main`:
-  - `dbbd731` accepts `status:"blocked"` as fixed-source audit proof when a public source was attempted and recorded, without allowing blocked-source facts into content.
-  - `06a820d` treats `docs/trends.json` as a publisher-managed artifact.
-  - `af29e7e` requires `publish:dry-run` to cover every dirty publisher artifact in `will_stage_files` and stages selected-report `evidence_assets` under `docs/assets/evidence/**`.
-- Generated, validated, and published the 2026-06-02 report with automation revision `af29e7e0f30d4f464b2ce46bd7d9a45645d1cbb9`.
-- Published commit `1e95a7f chore: publish AI daily report 2026-06-02` to `main`.
-- Verification passed: `npm run validate` (153 tests), `npm run sources:phase5-audit -- --date 2026-06-02 --history-dir reports-data --days 3`, `node scripts\harness-validate.mjs`, Playwright desktop/mobile visual checks, `publish:preflight`, `publish:dry-run -- --date 2026-06-02`, and real `npm run publish -- confirm-push 2026-06-02`.
-- Public Pages verification passed: `https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html` returned HTTP 200 and contained `2026-06-02`; all four evidence image URLs returned HTTP 200.
-- Final state after publish: `main...origin/main` clean.
+- Current branch: `codex/automation-worktree-publish-hardening` in `C:\Users\Admin\.codex\worktrees\0744\ai-daily-cn`.
+- Goal: make scheduled AI daily publishing run from a worktree rooted on latest `origin/main`, while preserving the ability to publish reports with non-critical coverage gaps when those gaps are clearly disclosed.
+- Implemented `classifyPublishQuality(...)` in `src/quality-status.js` so publish quality now has `blocking_issues` and `degraded_sections`.
+- Kept automation revision/version proof failures blocking; changed fixed source surface, GitHub Trending Top 10, Builder X, evidence asset, empty-section, main-item/content density, and model-release mirroring gaps to degraded.
+- Added degraded/blocking fields to the report schema defaults and to publish-plan/report output.
+- Added public `发布质量说明` rendering in both effective-interact and legacy HTML renderers when `quality_status.status` is `degraded` or `blocked`.
+- Updated publish/GitHub API output with `publish_mode`; GitHub API fallback remains restricted to remote `main`, `force:false`, and publisher-managed `docs/` / `reports-data/` files.
+- Updated automation setup docs, runbook, prompt modules, publisher decisions, and task template so scheduled runs only trust latest `origin/main`, avoid modifying handoff files, and disclose `degraded_sections` instead of treating every coverage gap as a blocker.
+- Partial validation already passed: `node --test tests\unit.test.js tests\publish.test.js` reported 137 passing tests.
+- Actual `ai-daily` automation config has been synchronized through the Codex app and confirmed to contain latest `origin/main`, `degraded_sections`, `publisher_dirty_outside_publish_plan`, blocked-source audit wording, and `publish_mode: github-api-fallback`.
+- Integrated the safety behavior from upstream commit `af29e7e fix: harden publish plan exactness`: dry-run now rejects publisher-owned dirty files outside `will_stage_files`, and report-linked evidence assets are added to the selected publish plan.
+- Validation passed after integration: `node --test tests\publish.test.js`, `npm run validate` (153 tests plus build/e2e/OpenSpec/diff check), `node scripts\harness-validate.mjs`, and Playwright desktop/mobile visual checks for `发布质量说明`.
+- Repository topology note: `origin/main` later advanced with 2026-06-02 publish artifacts and handoff cleanup commits. Those published artifacts were not merged into this uncommitted worktree; the functional safety change from `af29e7e` was manually incorporated.
 
-## 2026-06-02 Strict Publish Coverage Gate
+## 2026-06-02 Strict Publish Coverage Gate (superseded)
+
+- Superseded by the current two-level quality gate work above: non-critical coverage gaps are now `degraded_sections` that may publish with public disclosure, while version proof, schema, candidate references, stale duplicates, unverified facts, remote baseline, dirty non-publisher files, API fallback metadata, and Pages verification remain blocking.
 
 - Current branch: `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`.
 - PR #11 and PR #13 are already merged into `main`; PR #14 remains open for the suggestion-rendering follow-up. This branch adds the next global guardrail: 2026-06-02+ reports cannot publish unless the final JSON proves the fixed source surface and version state.

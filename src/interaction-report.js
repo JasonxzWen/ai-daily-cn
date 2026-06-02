@@ -176,6 +176,15 @@ export function reportToInteractionInput(report, options = {}) {
       content: signalSections.join("\n\n")
     });
   }
+  const qualityStatus = formatQualityStatus(report.quality_status);
+  if (qualityStatus) {
+    sections.push({
+      type: "markdown",
+      title: "发布质量说明",
+      group: "verification",
+      content: qualityStatus
+    });
+  }
   sections.push(
     {
       type: "markdown",
@@ -257,6 +266,47 @@ function dailyHeroStats(report, collections) {
       detail: sourceWindow.fallback_window_used ? "扩展" : "标准"
     }
   ];
+}
+
+function formatQualityStatus(status) {
+  if (!status || typeof status !== "object" || status.status === "ok") {
+    return "";
+  }
+  const label = status.status === "blocked" ? "阻断" : "降级";
+  const note = String(status.public_note || "").trim();
+  const issues = [
+    ...(Array.isArray(status.blocking_issues) ? status.blocking_issues : []),
+    ...(Array.isArray(status.degraded_sections) ? status.degraded_sections : []),
+    ...affectedSectionIssues(status)
+  ];
+  const lines = [`- **状态**：${label}`];
+  if (note) {
+    lines.push(`- **公开说明**：${note}`);
+  }
+  for (const issue of issues) {
+    const section = issue?.section || "unknown";
+    const code = issue?.code || issue?.error_code || "quality_issue";
+    const message = issue?.message || "";
+    lines.push(`- **${section}**（${code}）：${message}`);
+  }
+  return lines.join("\n");
+}
+
+function affectedSectionIssues(status) {
+  if (!Array.isArray(status.affected_sections) || status.affected_sections.length === 0) {
+    return [];
+  }
+  const existing = new Set([
+    ...(Array.isArray(status.blocking_issues) ? status.blocking_issues : []),
+    ...(Array.isArray(status.degraded_sections) ? status.degraded_sections : [])
+  ].map((issue) => issue?.section).filter(Boolean));
+  return status.affected_sections
+    .filter((section) => section && !existing.has(section))
+    .map((section) => ({
+      code: "affected_section_degraded",
+      section,
+      message: "该板块存在公开说明中的降级风险。"
+    }));
 }
 
 function formatHeroDateRange(dateFrom, dateTo) {

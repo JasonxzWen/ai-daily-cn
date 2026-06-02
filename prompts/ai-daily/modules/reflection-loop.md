@@ -18,4 +18,4 @@
 
 这些建议必须同时写入结构化日报的 `self_check.optimization_suggestions`，其中“改完能解决什么”仍写入 `expected_benefit` 字段；公开页面展示为“为什么要改”。最终回复使用“反思与自动化迭代建议”小节单独列出。即使没有建议，也要说明“本轮无新增建议”，避免建议只存在于内部推理或被 HTML 渲染隐藏。
 
-不得自动修改 `C:\Users\Admin\.codex\automations\ai-2\automation.toml`。不得自动把建议写回提示词模块，除非用户明确确认。
+不得自动修改实际自动化配置。用户明确确认后，才允许按 `docs/codex-automation-setup.md` 同步目标自动化任务；不得自动把建议写回提示词模块，除非用户明确确认。

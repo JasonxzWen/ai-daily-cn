@@ -6,7 +6,7 @@ import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
-import { requirePublishableQuality } from "./quality-status.js";
+import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
 
@@ -232,7 +232,8 @@ export async function createPublishPlan(options = {}) {
       report_date: report.report_date,
       title: report.title,
       canonical_url: report.canonical_url,
-      quality_status: report.quality_status?.status || "ok"
+      quality_status: report.quality_status?.status || "ok",
+      degraded_sections: classifyPublishQuality(report, { rootDir: repoRoot, currentAutomationRevision }).degraded_sections
     }))
   };
 }
@@ -277,6 +278,7 @@ export async function publishGeneratedArtifacts(options = {}) {
   if (publishFiles.length === 0) {
     return {
       mode: "publish",
+      publish_mode: "git",
       branch,
       remote,
       repo_updated: false,
@@ -328,6 +330,7 @@ export async function publishGeneratedArtifacts(options = {}) {
 
   return {
     mode: "publish",
+    publish_mode: "git",
     branch,
     remote,
     committed: true,
@@ -379,6 +382,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   if (publishFiles.length === 0) {
     return {
       mode: "publish-github-api",
+      publish_mode: "github-api-fallback",
       branch,
       source_branch: sourceBranch,
       committed: false,
@@ -435,6 +439,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   if (treeEntries.length === 0) {
     return {
       mode: "publish-github-api",
+      publish_mode: "github-api-fallback",
       branch,
       source_branch: sourceBranch,
       repository,
@@ -475,6 +480,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
 
   return {
     mode: "publish-github-api",
+    publish_mode: "github-api-fallback",
     branch,
     source_branch: sourceBranch,
     repository,
