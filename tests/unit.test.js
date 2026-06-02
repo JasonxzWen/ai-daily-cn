@@ -2481,6 +2481,7 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.publish_status.repo_pushed, false);
   assert.equal(result.report.candidate_pool_path, "data/2026/05/2026-05-16.candidates.json");
   assert.equal(result.report.main_items[0].candidate_id, "main-report-write");
+  assert.equal(result.report.main_items[0].importance, "major");
   assert.deepEqual(result.report.model_releases, []);
   assert.deepEqual(result.report.hot_blogs, []);
   assert.equal(result.report.quality_status.status, "ok");
@@ -2491,6 +2492,33 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write importance labels are schema-validated and rendered", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.main_items[0].importance, "major");
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const invalid = structuredClone(report);
+  invalid.main_items[0].importance = "urgent";
+  const invalidValidation = validateReport(invalid);
+  assert.equal(invalidValidation.valid, false);
+  assert(invalidValidation.errors.some((error) => error.path.includes("/main_items/0/importance")));
+
+  const html = renderReportHtml(report);
+  assert(html.includes(">重大<"));
+
+  const interaction = reportToInteractionInput(report);
+  assert(interaction.sections.some((section) => String(section.content || "").includes("==重大==")));
 });
 
 test("report:write records automation revision fingerprint in self_check", async () => {
@@ -3206,6 +3234,13 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("Industry and funding"));
   assert(prompt.includes("Open-source projects"));
   assert(prompt.includes("Opinions and long-form reads"));
+  assert(prompt.includes("importance"));
+  assert(prompt.includes("major"));
+  assert(prompt.includes("notable"));
+  assert(prompt.includes("general"));
+  assert(prompt.includes("重大"));
+  assert(prompt.includes("值得关注"));
+  assert(prompt.includes("一般"));
   assert(prompt.includes("大厂动态"));
   assert(prompt.includes("行业趋势"));
   assert(prompt.includes("公众号"));
