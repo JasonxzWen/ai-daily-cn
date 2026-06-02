@@ -2681,6 +2681,18 @@ test("publish quality accepts strict daily reports with full source proof", () =
   assert.deepEqual(findPublishQualityIssues(report, strictPublishOptionsFixture()), []);
 });
 
+test("publish quality accepts strict fixed source proof when a public source is blocked", () => {
+  const report = strictPublishReportFixture();
+  const redditSource = report.source_audit.content_sources.sources
+    .find((source) => source.name === "Reddit r/MachineLearning");
+  redditSource.status = "blocked";
+  redditSource.notes = "HTTP 403";
+
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+
+  assert(!issues.some((issue) => issue.code === "fixed_source_e_public_apis"));
+});
+
 test("publish quality blocks strict daily reports without automation revision proof", () => {
   const report = strictPublishReportFixture();
   delete report.self_check.automation_revision;

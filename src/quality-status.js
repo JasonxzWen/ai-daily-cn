@@ -5,6 +5,7 @@ import { AUTOMATION_REVISION_RULES } from "./automation-revision.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 const SOURCE_AVAILABLE_STATUSES = new Set(["checked", "no_signal"]);
+const SOURCE_AUDIT_PROOF_STATUSES = new Set([...SOURCE_AVAILABLE_STATUSES, "blocked"]);
 
 export const STRICT_COVERAGE_EFFECTIVE_DATE = "2026-06-02";
 
@@ -562,7 +563,7 @@ function publicQualityNote(status, reasons, explicitNote) {
 }
 
 function hasAuditSource(report, requirement) {
-  const statuses = new Set(requirement.statuses || SOURCE_AVAILABLE_STATUSES);
+  const statuses = new Set(requirement.statuses || SOURCE_AUDIT_PROOF_STATUSES);
   return (requirement.groups || []).some((groupName) => {
     const sources = report?.source_audit?.[groupName]?.sources;
     if (!Array.isArray(sources)) {
