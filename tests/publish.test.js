@@ -40,6 +40,7 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
   assert(plan.will_write_files.includes("docs/reports/2026/05/2026-05-13.html"));
   assert(plan.will_stage_files.includes("docs/feed.json"));
+  assert(plan.will_stage_files.includes("docs/trends.json"));
 });
 
 test("publish dry-run blocks reports with blocked Builder sources below minimum", async () => {
@@ -100,11 +101,12 @@ test("publish dry-run 允许仅包含发布产物的 dirty worktree", async () =
     inputDir: "reports-source",
     dataInputDir: "reports-data",
     generatedAt: fixedGeneratedAt,
-    git: fakeGit({ status: " M docs/index.html\n?? reports-data/2026/05/2026-05-13.json" })
+    git: fakeGit({ status: " M docs/index.html\n M docs/trends.json\n?? reports-data/2026/05/2026-05-13.json" })
   });
 
-  assert.deepEqual(plan.current_dirty_files, ["docs/index.html", "reports-data/2026/05/2026-05-13.json"]);
+  assert.deepEqual(plan.current_dirty_files, ["docs/index.html", "docs/trends.json", "reports-data/2026/05/2026-05-13.json"]);
   assert(plan.will_stage_files.includes("docs/index.html"));
+  assert(plan.will_stage_files.includes("docs/trends.json"));
 });
 
 test("publish dry-run stops when a selected report quality status is blocked", async () => {
@@ -178,14 +180,14 @@ test("publish dry-run 遇到 remote ahead 停止", async () => {
 
 test("publish preflight 检查分支、远端、工作树和 git 写权限", async () => {
   const result = await checkPublishPreflight({
-    git: fakeGit({ status: " M docs/index.html", pushDryRunOutput: "dry-run ok" }),
+    git: fakeGit({ status: " M docs/index.html\n M docs/trends.json", pushDryRunOutput: "dry-run ok" }),
     gitWritableCheck: async () => ({ ok: true, git_dir: ".git" })
   });
 
   assert.equal(result.mode, "preflight");
   assert.equal(result.git_writable, true);
   assert.equal(result.push_transport.ok, true);
-  assert.deepEqual(result.current_dirty_files, ["docs/index.html"]);
+  assert.deepEqual(result.current_dirty_files, ["docs/index.html", "docs/trends.json"]);
 });
 
 test("publish preflight fails early when push transport is unavailable", async () => {

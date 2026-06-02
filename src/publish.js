@@ -679,6 +679,7 @@ function filterDocsForReportDate(files, outDir, reportDate) {
     `${outPrefix}/assets/style.css`,
     `${outPrefix}/feed.json`,
     `${outPrefix}/index.html`,
+    `${outPrefix}/trends.json`,
     `${outPrefix}/${paths.dataPath}`,
     `${outPrefix}/${paths.candidateDataPath}`,
     `${outPrefix}/${paths.htmlPath}`
@@ -873,6 +874,7 @@ function isPublisherOwnedPath(filePath) {
     filePath === "docs/.nojekyll" ||
     filePath === "docs/feed.json" ||
     filePath === "docs/index.html" ||
+    filePath === "docs/trends.json" ||
     filePath.startsWith("docs/assets/") ||
     filePath.startsWith("docs/data/") ||
     filePath.startsWith("docs/reports/") ||
