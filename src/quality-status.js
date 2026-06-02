@@ -285,7 +285,9 @@ function strictDailyCoverageIssues(report, options = {}) {
 
 function isBlockingPublishQualityIssue(issue) {
   return issue?.error_code === "automation_revision_gate_failed" ||
-    issue?.code === "automation_revision_missing_or_stale";
+    issue?.error_code === "builder_translation_gate_failed" ||
+    issue?.code === "automation_revision_missing_or_stale" ||
+    issue?.code === "builder_original_translation_missing";
 }
 
 function degradedSectionsFromReasons(reasons, affectedSections) {
@@ -420,6 +422,7 @@ function strictSourceAuditIssues(report) {
 }
 
 function strictBuilderIssues(report) {
+  const issues = [];
   const builderSources = report?.source_audit?.builder_sources;
   const builderSourceCount = Array.isArray(builderSources?.sources) ? builderSources.sources.length : 0;
   const hasFollowBuildersX = hasAuditSource(report, {
@@ -430,24 +433,64 @@ function strictBuilderIssues(report) {
   const hasXObservation = (report?.builder_observations || []).some((item) => isXStatusUrl(item?.url));
 
   if (builderSourceCount < STRICT_BUILDER_SOURCE_MINIMUM || !hasFollowBuildersX || !hasXObservation) {
-    return [
-      {
-        error_code: "builder_x_coverage_gate_failed",
-        code: "builder_x_source_or_observation_missing",
-        section: "builder_observations",
-        count: sectionCount(report, "builder_observations"),
-        minimum: SECTION_MINIMUMS.builder_observations,
-        audit_sources: builderSourceCount,
-        audit_source_minimum: STRICT_BUILDER_SOURCE_MINIMUM,
-        has_follow_builders_x: hasFollowBuildersX,
-        has_x_observation: hasXObservation,
-        message: "Builder coverage must prove follow-builders X was checked and include at least one original x.com/twitter.com status.",
-        remediation: "Run discover:builders, preserve follow-builders X source status in source_audit, and include at least one original X status in builder_observations."
-      }
-    ];
+    issues.push({
+      error_code: "builder_x_coverage_gate_failed",
+      code: "builder_x_source_or_observation_missing",
+      section: "builder_observations",
+      count: sectionCount(report, "builder_observations"),
+      minimum: SECTION_MINIMUMS.builder_observations,
+      audit_sources: builderSourceCount,
+      audit_source_minimum: STRICT_BUILDER_SOURCE_MINIMUM,
+      has_follow_builders_x: hasFollowBuildersX,
+      has_x_observation: hasXObservation,
+      message: "Builder coverage must prove follow-builders X was checked and include at least one original x.com/twitter.com status.",
+      remediation: "Run discover:builders, preserve follow-builders X source status in source_audit, and include at least one original X status in builder_observations."
+    });
   }
 
-  return [];
+  const contractViolations = builderObservationContractViolations(report);
+  if (contractViolations.length > 0) {
+    issues.push({
+      error_code: "builder_translation_gate_failed",
+      code: "builder_original_translation_missing",
+      section: "builder_observations",
+      count: sectionCount(report, "builder_observations"),
+      violations: contractViolations,
+      message: "Builder observations must preserve original_text and a complete Chinese translation; content must match translation.",
+      remediation: "Regenerate Builder observations from original posts, fill original_text and translation, and set content to the same complete Chinese translation before report:write or publish."
+    });
+  }
+
+  return issues;
+}
+
+function builderObservationContractViolations(report) {
+  const items = Array.isArray(report?.builder_observations) ? report.builder_observations : [];
+  return items
+    .map((item, index) => {
+      const missing = [];
+      const originalText = String(item?.original_text || "").trim();
+      const translation = String(item?.translation || "").trim();
+      const content = String(item?.content || "").trim();
+      if (!originalText) {
+        missing.push("original_text");
+      }
+      if (!translation) {
+        missing.push("translation");
+      }
+      if (translation && content !== translation) {
+        missing.push("content_matches_translation");
+      }
+      return missing.length > 0
+        ? {
+            index,
+            author: String(item?.author || "").trim(),
+            candidate_id: String(item?.candidate_id || "").trim(),
+            missing
+          }
+        : null;
+    })
+    .filter(Boolean);
 }
 
 function strictEvidenceIssues(report, options = {}) {
@@ -771,7 +814,8 @@ function normalizeQualityIssue(issue) {
     "missing_sources",
     "missing_model_releases",
     "revision_mismatches",
-    "missing_rules"
+    "missing_rules",
+    "violations"
   ]) {
     if (issue[key] !== undefined) {
       normalized[key] = issue[key];
@@ -785,7 +829,7 @@ function uniqueQualityIssues(issues) {
   const seen = new Set();
   const uniqueIssues = [];
   for (const issue of issues.map(normalizeQualityIssue).filter(Boolean)) {
-    const key = `${issue.error_code}|${issue.code}|${issue.section}|${JSON.stringify(issue.missing_sources || issue.missing_model_releases || issue.revision_mismatches || [])}`;
+    const key = `${issue.error_code}|${issue.code}|${issue.section}|${JSON.stringify(issue.missing_sources || issue.missing_model_releases || issue.revision_mismatches || issue.violations || [])}`;
     if (seen.has(key)) {
       continue;
     }

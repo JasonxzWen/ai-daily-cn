@@ -41,6 +41,19 @@ npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20
 - Keep `main_items`, `github_trending`, `model_releases`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
 - Do not bypass freshness, duplicate URL, or source-window gates.
 
+## Public Report Contract
+
+- The hero/date area must state the report coverage window, not only the publish date.
+- Main-item source names are not written into the visible title/body; the source is represented by the source icon and link.
+- Main-item titles are larger links without underline. Body `==...==` markers are inline bold colored keywords, not tag UI.
+- Tags are reserved for importance, trend state, star velocity, topic, and project highlight; renderers must color these tag types differently and de-duplicate identical tags.
+- `model_releases` remains a structured JSON index only. Do not render a public `模型发布` section; model news must be written into `main_items`.
+- `projects` remains highlight metadata for GitHub Trending. Do not render a public `今日值得关注的项目` section, `项目 highlights` subheading, or extra project list; only add a `项目 highlight` tag plus compact domain/use-case text to matching GitHub Trending Top 10 entries.
+- Hot tech blog summaries should be roughly 100-160 Chinese characters split into 2-4 point-style takeaways. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
+- Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
+- GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
+- Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`.
+
 ## Report Write
 
 - Write the structured draft to `.tmp/daily-report.json`.
@@ -62,6 +75,7 @@ npm run build
 ```
 
 - The daily HTML must come from `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode.
+- After build, inspect the affected daily HTML and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the lightbox on desktop and mobile.
 - Run the full gate before any real publish:
 
 ```powershell
@@ -78,7 +92,7 @@ npm run publish:dry-run
 
 - Capture changed files, commit message, and expected Pages URL.
 - Confirm every `current_dirty_files` publisher artifact is also present in `will_stage_files`. A `publisher_dirty_outside_publish_plan` error is a real safety gate: repair the publish plan or move unrelated stale artifacts out of the worktree before publishing.
-- Check that every report-linked `evidence_assets[*].local_path` appears in `will_stage_files` as `docs/assets/evidence/...`; local file existence alone is not enough for GitHub Pages.
+- Check that every report-linked `evidence_assets[*].local_path` appears in `will_stage_files` as `docs/assets/evidence/...`; local file existence alone is not enough for GitHub Pages. If Builder avatars were cached, confirm `docs/assets/avatars/**` is also in `will_stage_files`.
 - If dry-run fails, keep the generated local HTML/JSON artifacts and report the blocker. If it succeeds with `quality_status.status: "degraded"`, capture the `degraded_sections` summary and make sure the public HTML includes `发布质量说明`.
 
 ## Real Publish

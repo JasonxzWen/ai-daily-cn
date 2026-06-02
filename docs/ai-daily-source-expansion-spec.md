@@ -26,11 +26,11 @@
 | 信源 | 类型 | 用途 | 处理规则 |
 |---|---|---|---|
 | `follow-builders` central feed | X/Twitter、播客、官方博客聚合 | Builder 观察、访谈精选、X 讨论线索 | 优先读取 central JSON；保留每条原始 URL；不可用时记录 `blocked_reason` |
-| OpenAI News / RSS | 官方发布、工程、安全、产品 | 主体信息、模型发布、热门技术博客 | 优先一手引用 |
+| OpenAI News / RSS | 官方发布、工程、安全、产品 | 主体信息、模型索引、热门技术博客 | 优先一手引用；公开模型新闻仍进入主体信息 |
 | Anthropic Engineering / News | 工程文章、Claude Code、agent、harness、eval | 热门技术博客、主体信息、访谈背景 | 页面可抓取；若无 RSS，使用页面解析或 `follow-builders` blogs |
-| Google DeepMind / Google Research Blog | 模型、研究、系统、开源 | 模型发布、研究/工程博客 | Google Research RSS 可用；DeepMind 页面解析 |
+| Google DeepMind / Google Research Blog | 模型、研究、系统、开源 | 主体信息、模型索引、研究/工程博客 | Google Research RSS 可用；DeepMind 页面解析；公开页不单列模型发布 |
 | Hugging Face Blog / RSS | 开源模型、agent、推理、训练、社区文章 | 热门技术博客、项目线索 | 原文可作为最终来源 |
-| GitHub Trending / Release / README | 开源项目 | 今日值得关注的项目 | 必须补领域、作用、信号证据 |
+| GitHub Trending / Release / README | 开源项目 | GitHub Trending / 项目 highlight | 必须补领域、作用、信号证据 |
 
 ### P1：高优先发现源
 
@@ -101,7 +101,7 @@
 
 规则：
 
-- 每条 `summary` 为 300-500 中文字。
+- 每条 `summary` 为约 100-160 个中文字符，拆成 2-4 个分点式要点。
 - 摘要必须覆盖：核心问题、方法/论证、关键结论、适用场景或局限。
 - 不再公开渲染 `why_it_matters`，也不再要求新日报写“为什么重要”。
 - 可收录官方工程博客、研究博客、项目维护者博客、知名 builder 个人博客、实验室工程师访谈整理稿。
@@ -109,9 +109,10 @@
 
 验收：
 
-- 新日报 `hot_blogs[*].summary` 中文长度在 300-500 字范围内。
+- 新日报 `hot_blogs[*].summary` 中文长度在约 100-160 个中文字符范围内。
 - HTML 中不出现“为什么重要”。
 - 每条博客有原文 URL 和可确认日期。
+- 贴出的证据图、博客图和卡片 media 图必须能点开放大；来源 icon 和低信息密度封面图不计入合格证据图。
 
 ### Builder 观察
 
@@ -122,6 +123,8 @@
 - 作者是 builder、researcher、founder、maintainer、frontier lab 工程/产品负责人，或高信号开源项目维护者。
 - 内容是原创观点、工程经验、产品发布、技术路线、成本/组织实践、agent 工作流、模型工程或可复现实验。
 - 必须有原始 URL。`follow-builders` central feed 中的 X URL 视为原始 URL。
+- 必须保留 `original_text` 原文和完整、精确、忠于原意的中文 `translation`；`content` 只作为兼容字段，必须与 `translation` 保持一致，不得写成观点摘要。
+- 有 X handle 时填写 `handle`；能取得头像 URL 时填写 `avatar_url`，构建器会 best-effort 缓存为 `docs/assets/avatars/**` 并写入公开数据。
 
 排除标准：
 
@@ -142,22 +145,24 @@
 - 当 central feed 可用且含近日报文时，`builder_observations` 不应因为固定 RSS 失败而为空。
 - `source_audit.builder_sources` 记录 central feed、fallback、候选数、入选数、失败原因和最近成功时间。
 - Builder 观察不计入 `main_items`。
+- 新日报的每条 `builder_observations` 都必须有 `original_text` 和 `translation`，且 `content` 等于完整中文翻译；缺失或概括会被发布质量门阻断。
+- HTML 中 Builder 观察使用类似 Twitter/X 预览的卡片：头像、作者、handle、标签、完整中文翻译正文和可展开原文，不展示 evidence 摘要作为正文替代品。
 
-### 今日值得关注的项目
+### GitHub Trending / 项目 highlight
 
-栏目目标：不仅列项目，还说明它能用在哪、解决什么问题。
+栏目目标：不仅列 GitHub Trending 项目，还说明高价值项目能用在哪、解决什么问题。公开 HTML 不再生成“今日值得关注的项目”独立板块或“项目 highlights”子标题；`projects` 只作为匹配 GitHub Trending Top 10 条目的 highlight tag 和行内说明元数据。
 
 规则：
 
 - 每个项目必须说明 `domain` 或 `domains`：例如 `agent memory`、`coding agent`、`RAG`、`eval harness`、`inference serving`、`voice translation`。
 - 每个项目必须说明 `use_case` 或 `usage`：例如“给 coding agent 提供跨会话记忆”“把代码库打包为 LLM 可读上下文”“用于生产事故调试训练”。
 - 必须保留信号证据：release、trending、star velocity、notable PR、产品榜单、项目 README、官方公告之一。
-- Product Hunt 上榜产品可以作为候选，但需要官网、GitHub、文档或产品页交叉确认后才进入项目区。
+- Product Hunt 上榜产品可以作为候选，但需要官网、GitHub、文档或产品页交叉确认后才进入项目 highlight。
 
 验收：
 
-- HTML 中每个项目都可见“领域”和“作用/用途”。
-- 无法说明用途的项目不得入选项目区，只能进入社区线索或丢弃。
+- HTML 中每个项目 highlight 都只出现在对应 GitHub Trending 条目内，并可见“领域”和“作用/用途”。
+- 无法说明用途的项目不得入选项目 highlight，只能进入社区线索或丢弃。
 
 ### 访谈与播客
 
@@ -222,7 +227,7 @@
       "author": "string",
       "event_date": "YYYY-MM-DD",
       "topic": "agent_harness",
-      "summary": "300-500 字中文摘要",
+      "summary": "约 100-160 个中文字符的分点式摘要",
       "content_type": "blog|interview|podcast|engineering_note"
     }
   ],
@@ -235,6 +240,18 @@
       "use_case": "可用于什么领域、解决什么问题",
       "signal": "release|star_velocity|trending|notable_pr|product_hunt|official_update",
       "evidence": "string"
+    }
+  ],
+  "builder_observations": [
+    {
+      "author": "string",
+      "handle": "string",
+      "role": "builder|researcher|founder|maintainer",
+      "url": "https://x.com/example/status/...",
+      "original_text": "原帖或原始连续摘录",
+      "translation": "完整精确的中文翻译",
+      "content": "与 translation 相同的兼容字段",
+      "avatar_url": "https://example.com/avatar.png"
     }
   ]
 }
@@ -251,10 +268,11 @@
 5. Schema：新增向后兼容字段和新日报质量门。
 6. 渲染：动态生成 sections；空数组不渲染；header 使用 `hero_highlights`；博客不渲染“为什么重要”；项目展示领域/作用。
 7. 卡片重点标注：让热门博客、项目等卡片 body 使用安全 inline Markdown 渲染 `**加粗**` 与 `==高亮==`，同时保持 HTML 转义。
-8. 测试：添加 unit/golden/browser 断言覆盖本规格。
-9. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。
-10. 审计合并：把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON，而不是只保留临时命令输出。
-11. 发布前验证：运行 `npm run validate`；连续运行验收另跑 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
+8. Builder 质量门：`report:write` 和发布质量检查必须阻断缺 `original_text`、缺 `translation` 或 `content` 不等于完整翻译的新日报。
+9. 测试：添加 unit/golden/browser 断言覆盖本规格。
+10. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。
+11. 审计合并：把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON，而不是只保留临时命令输出。
+12. 发布前验证：运行 `npm run validate`；连续运行验收另跑 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
 
 ## 验收清单
 
@@ -265,7 +283,7 @@
 - 新日报 HTML 不包含“为什么重要”。
 - 新日报 HTML 不包含空板块占位文案。
 - 新日报公开正文不包含“高信号”“核心信号”“可观察信号”“更多信号”“预期收益”等泛化词。
-- `hot_blogs[*].summary` 每条 300-500 中文字。
+- `hot_blogs[*].summary` 每条约 100-160 个中文字符。
 - 热门博客和项目卡片支持安全加粗/高亮后，页面中重点标记能和正文区分，且 HTML 注入仍被转义。
 - 每个项目在 JSON 和 HTML 中都有领域和用途说明。
 - Builder 发现器在 `follow-builders` central feed 可用时能产出 X/播客/博客候选。
@@ -281,6 +299,6 @@
 ## 默认决策
 
 1. `follow-builders` central feed 中带原始 X URL 的内容，默认视为可审计 Builder 一手候选。
-2. 热门技术博客摘要对新日报执行 300-500 中文字门禁；旧日报不 retroactive 修复。
-3. 不新增固定“Product Hunt”“精选播客”“Twitter 热点讨论”大栏目；它们先作为候选源，按内容质量进入项目、博客、Builder 或社区线索。
+2. 热门技术博客摘要对新日报执行约 100-160 个中文字符门禁；旧日报不 retroactive 修复。
+3. 不新增固定“Product Hunt”“精选播客”“Twitter 热点讨论”大栏目；它们先作为候选源，按内容质量进入 GitHub Trending 项目 highlight、博客、Builder 或社区线索。
 4. 微信公众号等中文媒体源可以作为发现源，但无法回源时不作为事实最终来源。

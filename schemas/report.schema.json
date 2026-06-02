@@ -617,6 +617,10 @@
           "type": "string",
           "minLength": 1
         },
+        "handle": {
+          "type": "string",
+          "minLength": 1
+        },
         "candidate_id": {
           "$ref": "#/$defs/candidate_id"
         },
@@ -624,6 +628,24 @@
           "$ref": "#/$defs/importance"
         },
         "content": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "translation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "avatar_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "avatar_local_path": {
+          "$ref": "#/$defs/relative_path"
+        },
+        "avatar_data_uri": {
           "type": "string",
           "minLength": 1
         },

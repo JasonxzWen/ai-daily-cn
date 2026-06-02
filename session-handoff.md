@@ -2,41 +2,41 @@
 
 ## Latest Status
 
-- Current branch: `codex/automation-worktree-publish-hardening` in `C:\Users\Admin\.codex\worktrees\0744\ai-daily-cn`.
-- Active goal: implement and verify the approved automation publishing plan.
-- Actual `ai-daily` automation has been updated in the Codex app. It remains `ACTIVE`, `worktree`, model `gpt-5.5`, reasoning `xhigh`, CWD `D:\ai-daily-cn`, and uses the new prompt from `docs/codex-automation-setup.md`.
-- The branch includes code, tests, docs, prompts, harness-state updates, and regenerated public docs/data output from `npm run build`.
-- Upstream commit `af29e7e fix: harden publish plan exactness` was manually incorporated: dry-run rejects publisher-owned dirty files outside `will_stage_files`, and selected-report evidence assets are included in the publish plan.
-- `origin/main` later advanced with 2026-06-02 published report artifacts and handoff cleanup commits. Those published artifacts were not merged into this uncommitted worktree; avoid checkout/reset and integrate them deliberately if this branch is later committed.
+- Current worktree: `D:\ai-daily-cn`.
+- Latest `origin/main` was pulled successfully before implementation.
+- The 2026-06-02 daily report has been regenerated locally using the updated renderer and prompt rules.
+- Follow-up hardening moved the display rules into specs, workflow docs, runbook checks, renderer code, and tests so future runs inherit them.
+- Public static HTML: `D:\ai-daily-cn\docs\reports\2026\06\2026-06-02.html`.
+- Structured JSON: `D:\ai-daily-cn\reports-data\2026\06\2026-06-02.json`.
 
 ## Implemented
 
-- `src/quality-status.js` classifies publish quality as `blocking_issues` plus `degraded_sections`.
-- Automation revision/version proof remains blocking.
-- Fixed source surface, GitHub Trending Top 10, Builder X, evidence asset, empty-section, main-item/content density, and model-release mirroring gaps are degraded instead of blocking.
-- `schemas/report.schema.json` supports `quality_status.degraded_sections` and `quality_status.blocking_issues`.
-- Effective-interact and legacy HTML renderers show `发布质量说明` when quality is degraded or blocked.
-- Publish plans expose degraded sections; Git and GitHub API publish outputs expose `publish_mode`.
-- GitHub API fallback remains restricted to remote `main`, `force:false`, publisher-managed paths, and `base_commit_sha` output.
-- Prompt/runbook/docs say scheduled runs use latest `origin/main`, do not modify handoff files, record blocked sources as audit-only proof, and verify that dry-run stages all publisher artifacts.
+- Hero date area now states the report coverage window.
+- Main-item highlight markers now render as bold colored inline text, not tag UI.
+- Tags and chips now differentiate importance, stars, project highlights, topics, and trend state by color.
+- Main items keep source icons/links but omit visible source-name labels.
+- Main-item titles are larger and not underlined.
+- The public `模型发布` section is removed; model news remains available through main items and JSON.
+- Hot tech blog summaries are expanded into point-style descriptions around the requested density.
+- GitHub star changes render as tags.
+- Duplicate tag rendering is de-duped, including the case where a Trending item is also a project highlight.
+- The standalone project section is removed; project recommendations are merged into GitHub Trending highlights.
+- `docs/codex-automation-setup.md` and `tasks/daily-publish-runbook.md` state the public report contract explicitly.
+- Prompt-build regression tests assert the core contract remains present in the assembled daily prompt.
 
 ## Validation
 
-- `node --test tests\publish.test.js` passed after adding the publish-plan exactness tests.
-- `npm run validate` passed after final integration: source validation, 153 tests, build, e2e, OpenSpec, and `git diff --check`.
-- `node scripts\harness-validate.mjs` passed.
-- Playwright visual verification on `docs/reports/2026/05/2026-05-22.html` passed:
-  - desktop 1280x900: `发布质量说明` visible, no horizontal overflow.
-  - mobile 390x844: `发布质量说明` visible, no horizontal overflow.
-  - screenshots: `.tmp/quality-status-desktop.png`, `.tmp/quality-status-mobile.png`.
+- `npm run validate` passed.
+- Playwright desktop/mobile visual checks passed for the affected page.
+- Final image/tag visual check found no visible broken images, no horizontal overflow, and no duplicate star tags.
+- Harness validation and full validation were rerun after workflow/spec/test hardening.
 
 ## Remaining
 
-- No required validation remains.
-- Final status should mention that the uncommitted branch is behind `origin/main` because remote 2026-06-02 publish artifacts were not merged into this worktree.
+- Current follow-up: GitHub Trending project highlights have been changed to tag-only display on matching Top 10 items; standalone `项目 highlights` subsections/lists and the hero `项目高亮` stat are removed.
+- User decision: commit/PR, publish, or leave as local regenerated output.
+- If publish is requested, run dry-run first and then use the repository publish flow.
 
 ## Boundaries
 
-- No commit, push, reset, stash, force push, or remote Pages setting change has been performed.
-- No daily report publish was performed by this implementation session.
-- Scheduled automation runs must not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`; this human implementation session updated them because the task is non-trivial.
+- No commit, push, publish, reset, stash, force push, or remote Pages setting change was performed.

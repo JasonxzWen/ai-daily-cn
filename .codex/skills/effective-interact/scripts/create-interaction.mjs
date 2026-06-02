@@ -388,11 +388,29 @@ function renderInlineEmphasis(escaped) {
 
 function renderHighlight(value) {
   const text = String(value || "");
+  const keyword = text.match(/^keyword-(major|notable|general)\|(.+)$/);
+  if (keyword) {
+    return `<strong class="text-keyword keyword-${keyword[1]}">${keyword[2]}</strong>`;
+  }
+  const dailyTag = text.match(/^tag-([a-z0-9-]+)\|(.+)$/);
+  if (dailyTag) {
+    return `<mark class="text-highlight daily-tag daily-tag-${safeHighlightClass(dailyTag[1])}">${dailyTag[2]}</mark>`;
+  }
   const trend = text.match(/^trend-(new|up|down|same)\|(.+)$/);
   if (trend) {
-    return `<mark class="text-highlight trend-status trend-status-${trend[1]}">${trend[2]}</mark>`;
+    return `<mark class="text-highlight daily-tag trend-status trend-status-${trend[1]}">${trend[2]}</mark>`;
   }
   return `<mark class="text-highlight">${text}</mark>`;
+}
+
+function safeHighlightClass(value) {
+  return String(value || "").replace(/[^a-z0-9-]/gi, "").toLowerCase() || "topic";
+}
+
+function lightboxImageAttrs(label) {
+  const caption = String(label || "").trim();
+  const ariaLabel = caption ? `点击放大图片：${caption}` : "点击放大图片";
+  return ` data-lightbox-image="true" data-lightbox-caption="${escapeAttr(caption)}" role="button" tabindex="0" aria-label="${escapeAttr(ariaLabel)}"`;
 }
 
 function inlineMarkdown(text) {
@@ -404,8 +422,9 @@ function inlineMarkdown(text) {
     const safe = dataImage || safeLink(src);
     const className = dataImage ? "inline-site-icon" : "markdown-image";
     const loadingAttr = dataImage ? "" : ' loading="lazy"';
+    const lightboxAttrs = dataImage ? "" : lightboxImageAttrs(label);
     const html = safe
-      ? `<img class="${className}" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}"${loadingAttr} decoding="async">`
+      ? `<img class="${className}" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}"${loadingAttr}${lightboxAttrs} decoding="async">`
       : "";
     const token = `\u0000HTML_WORK_REPORT_IMAGE_${images.length}\u0000`;
     images.push(html);
@@ -1131,13 +1150,39 @@ function renderCardTags(tags) {
   if (values.length === 0) {
     return "";
   }
-  return `<div class="card-tags">${values.map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>`;
+  return `<div class="card-tags">${values.map(renderCardTag).join("")}</div>`;
+}
+
+function renderCardTag(tag) {
+  const normalized = normalizeCardTag(tag);
+  const className = ["chip", normalized.kind ? `chip-${safeHighlightClass(normalized.kind)}` : ""].filter(Boolean).join(" ");
+  return `<span class="${escapeAttr(className)}">${escapeHtml(normalized.label)}</span>`;
+}
+
+function normalizeCardTag(tag) {
+  if (tag && typeof tag === "object") {
+    return {
+      label: String(tag.label || tag.text || tag.value || "").trim(),
+      kind: String(tag.kind || tag.type || tag.status || "").trim()
+    };
+  }
+  const text = String(tag || "").trim();
+  const encoded = text.match(/^([a-z0-9-]+)\|(.+)$/i);
+  if (encoded) {
+    return { kind: encoded[1], label: encoded[2] };
+  }
+  if (text === "重大") return { kind: "major", label: text };
+  if (text === "值得关注") return { kind: "notable", label: text };
+  if (text === "一般") return { kind: "general", label: text };
+  if (/stars?/i.test(text)) return { kind: "stars", label: text };
+  return { kind: "", label: text };
 }
 
 function renderCardTitle(item) {
   const title = escapeHtml(item.title || "Untitled");
   const href = safeLink(item.href || item.url || "");
-  const icon = safeDataImage(item.titleIcon || item.title_icon || item.icon || item.iconDataUri || item.icon_data_uri || "");
+  const iconSource = item.titleIcon || item.title_icon || item.icon || item.iconDataUri || item.icon_data_uri || "";
+  const icon = safeDataImage(iconSource) || safeLink(iconSource);
   const iconHtml = icon ? `<img class="inline-site-icon card-title-icon" src="${escapeAttr(icon)}" alt="" loading="lazy" decoding="async">` : "";
   if (!href) {
     return `<h3>${iconHtml}${title}</h3>`;
@@ -1171,7 +1216,8 @@ function renderCardMedia(media) {
       return "";
     }
     const caption = item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : "";
-    return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(item.alt || item.caption || "")}" loading="lazy" decoding="async">${caption}</figure>`;
+    const captionText = item.caption || item.alt || "";
+    return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(item.alt || item.caption || "")}" loading="lazy"${lightboxImageAttrs(captionText)} decoding="async">${caption}</figure>`;
   }).filter(Boolean).join("")}</div>`;
 }
 

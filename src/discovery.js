@@ -940,6 +940,7 @@ function parseXBuilderSearchResults(payload, { sourceItem, reportDate, lookbackD
       }
       const handle = xStatusHandle(url);
       const author = handle ? `@${handle}` : "X builder";
+      const avatarUrl = xAvatarUrl(handle);
       return {
         source_id: sourceItem.id,
         category: "builder_observation",
@@ -948,6 +949,10 @@ function parseXBuilderSearchResults(payload, { sourceItem, reportDate, lookbackD
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
+        author,
+        original_text: content,
+        ...(handle ? { handle } : {}),
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         evidence: summarizeEvidence(content, `${author} posted this original X status.`),
         original_url: url,
         verification_status: "original_social_only",
@@ -1064,7 +1069,9 @@ function parseFollowBuildersXFeed(payload, { sourceItem, reportDate, lookbackDay
       if (!tweet.url || !tweet.text || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
         continue;
       }
-      const author = builder.name || builder.handle || "Builder";
+      const handle = normalizeXHandle(builder.handle || xStatusHandle(tweet.url));
+      const author = builder.name || (handle ? `@${handle}` : "") || "Builder";
+      const avatarUrl = builderAvatarUrl(builder, handle);
       entries.push({
         source_id: sourceItem.id,
         category: "builder_observation",
@@ -1073,6 +1080,13 @@ function parseFollowBuildersXFeed(payload, { sourceItem, reportDate, lookbackDay
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
+        author,
+        original_text: tweet.text,
+        ...(handle ? { handle } : {}),
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+        original_url: tweet.url,
+        verification_status: "original_social_only",
+        verification_sources: [tweet.url],
         evidence: summarizeEvidence(tweet.text, `${author} posted this original X update.`)
       });
     }
@@ -2210,7 +2224,41 @@ function isXStatusUrl(value) {
 function xStatusHandle(value) {
   try {
     const [, handle] = new URL(value).pathname.match(/^\/([^/]+)\/status\/\d+/i) || [];
-    return handle || "";
+    return normalizeXHandle(handle);
+  } catch {
+    return "";
+  }
+}
+
+function normalizeXHandle(value) {
+  const handle = String(value || "").trim().replace(/^@/, "");
+  return /^[A-Za-z0-9_]{1,32}$/.test(handle) ? handle : "";
+}
+
+function builderAvatarUrl(builder, handle) {
+  const explicit = [
+    builder?.avatar_url,
+    builder?.avatarUrl,
+    builder?.profile_image_url,
+    builder?.profileImageUrl,
+    builder?.profileImage,
+    builder?.avatar,
+    builder?.image,
+    builder?.photo
+  ].find(Boolean);
+  const url = normalizeHttpUrl(explicit);
+  return url || xAvatarUrl(handle);
+}
+
+function xAvatarUrl(handle) {
+  const normalized = normalizeXHandle(handle);
+  return normalized ? `https://unavatar.io/x/${encodeURIComponent(normalized)}` : "";
+}
+
+function normalizeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
   } catch {
     return "";
   }

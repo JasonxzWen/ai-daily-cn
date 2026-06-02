@@ -7,7 +7,7 @@ import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
-import { planGeneratedFiles } from "./site.js";
+import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
 
 const execFileAsync = promisify(execFile);
@@ -896,9 +896,7 @@ function isPublisherOwnedPath(filePath) {
 }
 
 function reportEvidenceAssetPaths(report) {
-  return (Array.isArray(report?.evidence_assets) ? report.evidence_assets : [])
-    .map((asset) => asset?.local_path)
-    .filter(Boolean);
+  return reportManagedAssetPaths(report);
 }
 
 function assertDirtyPublisherFilesCovered(statusEntries, stageFiles) {

@@ -132,6 +132,59 @@ h3 {
   background: var(--panel);
 }
 
+.builder-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.builder-card {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.builder-card-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.builder-avatar {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  object-fit: cover;
+}
+
+.builder-card-title {
+  display: grid;
+  gap: 2px;
+}
+
+.builder-card-title strong {
+  line-height: 1.25;
+}
+
+.builder-card-title span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.builder-original {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
 .item-meta,
 .source-line {
   display: flex;
