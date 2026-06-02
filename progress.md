@@ -1,5 +1,18 @@
 # Progress
 
+## 2026-06-02 Publish Recovery Completed
+
+- PR #14 and PR #15 were merged into `main`; local `main` was fast-forwarded and verified against `origin/main`.
+- Fixed three systemic publish gates on `main`:
+  - `dbbd731` accepts `status:"blocked"` as fixed-source audit proof when a public source was attempted and recorded, without allowing blocked-source facts into content.
+  - `06a820d` treats `docs/trends.json` as a publisher-managed artifact.
+  - `af29e7e` requires `publish:dry-run` to cover every dirty publisher artifact in `will_stage_files` and stages selected-report `evidence_assets` under `docs/assets/evidence/**`.
+- Generated, validated, and published the 2026-06-02 report with automation revision `af29e7e0f30d4f464b2ce46bd7d9a45645d1cbb9`.
+- Published commit `1e95a7f chore: publish AI daily report 2026-06-02` to `main`.
+- Verification passed: `npm run validate` (153 tests), `npm run sources:phase5-audit -- --date 2026-06-02 --history-dir reports-data --days 3`, `node scripts\harness-validate.mjs`, Playwright desktop/mobile visual checks, `publish:preflight`, `publish:dry-run -- --date 2026-06-02`, and real `npm run publish -- confirm-push 2026-06-02`.
+- Public Pages verification passed: `https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html` returned HTTP 200 and contained `2026-06-02`; all four evidence image URLs returned HTTP 200.
+- Final state after publish: `main...origin/main` clean.
+
 ## 2026-06-02 Strict Publish Coverage Gate
 
 - Current branch: `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`.

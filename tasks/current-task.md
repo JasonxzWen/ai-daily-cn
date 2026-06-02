@@ -6,7 +6,16 @@ Restore the AI daily automation quality hardening path so scheduled runs use the
 
 ## Status
 
-In progress on branch `codex/harden-daily-publish-coverage` in `D:\ai-daily-cn`. PR #11 and PR #13 are already merged into `main`; PR #14 is a separate open rendering follow-up. Do not mix generated 2026-06-02 artifacts or untracked evidence images into this strict publish-gate branch.
+Complete on `main` in `D:\ai-daily-cn`. PR #14 and PR #15 have been merged, the strict publish gates are on `main`, 2026-06-02 was regenerated with current `self_check.automation_revision`, and the report was published to GitHub Pages.
+
+Latest commits:
+
+- `dbbd731` fixed fixed-source audit proof for blocked public sources.
+- `06a820d` added `docs/trends.json` to publisher-managed artifacts.
+- `af29e7e` hardened dry-run exactness and selected-report evidence staging.
+- `1e95a7f` published AI daily report 2026-06-02.
+
+Final public URL: `https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html` returned HTTP 200 and contained `2026-06-02`.
 
 ## Allowed paths
 
