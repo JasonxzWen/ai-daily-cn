@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { AUTOMATION_REVISION_RULES } from "./automation-revision.js";
 
@@ -168,7 +170,7 @@ export function normalizeQualityStatus(value) {
   };
 }
 
-export function findPublishQualityIssues(report) {
+export function findPublishQualityIssues(report, options = {}) {
   const issues = [];
   const reasons = new Set(report?.quality_status?.reasons || []);
   const mainItemCount = sectionCount(report, "main_items");
@@ -213,13 +215,13 @@ export function findPublishQualityIssues(report) {
     });
   }
 
-  issues.push(...strictDailyCoverageIssues(report));
+  issues.push(...strictDailyCoverageIssues(report, options));
 
   return issues;
 }
 
-export function requirePublishableQuality(report) {
-  const issues = findPublishQualityIssues(report);
+export function requirePublishableQuality(report, options = {}) {
+  const issues = findPublishQualityIssues(report, options);
   if (issues.length === 0) {
     return;
   }
@@ -236,7 +238,7 @@ export function requirePublishableQuality(report) {
   );
 }
 
-function strictDailyCoverageIssues(report) {
+function strictDailyCoverageIssues(report, options = {}) {
   if (!isStrictCoverageReport(report)) {
     return [];
   }
@@ -246,7 +248,7 @@ function strictDailyCoverageIssues(report) {
     ...strictSectionIssues(report),
     ...strictSourceAuditIssues(report),
     ...strictBuilderIssues(report),
-    ...strictEvidenceIssues(report),
+    ...strictEvidenceIssues(report, options),
     ...strictModelReleaseIssues(report)
   ];
 }
@@ -308,6 +310,7 @@ function strictSourceAuditIssues(report) {
   const contentSourceCount = Array.isArray(contentSources?.sources) ? contentSources.sources.length : 0;
   const githubSourceCount = Array.isArray(githubSources?.sources) ? githubSources.sources.length : 0;
   const githubCandidatesFound = Number(githubSources?.candidates_found || 0);
+  const hasGithubTop10Ranks = hasRankCoverage(report?.github_trending, 1, SECTION_MINIMUMS.github_trending);
 
   if (contentSourceCount < STRICT_CONTENT_SOURCE_MINIMUM) {
     issues.push({
@@ -324,7 +327,8 @@ function strictSourceAuditIssues(report) {
   if (
     githubSourceCount < STRICT_GITHUB_TRENDING_SOURCE_MINIMUM ||
     githubCandidatesFound < SECTION_MINIMUMS.github_trending ||
-    sectionCount(report, "github_trending") < SECTION_MINIMUMS.github_trending
+    sectionCount(report, "github_trending") < SECTION_MINIMUMS.github_trending ||
+    !hasGithubTop10Ranks
   ) {
     issues.push({
       error_code: "github_trending_top10_gate_failed",
@@ -335,6 +339,7 @@ function strictSourceAuditIssues(report) {
       candidates_found: githubCandidatesFound,
       audit_sources: githubSourceCount,
       audit_source_minimum: STRICT_GITHUB_TRENDING_SOURCE_MINIMUM,
+      has_rank_coverage: hasGithubTop10Ranks,
       message: "GitHub Trending Top 10 or its daily/weekly/language source audit is missing.",
       remediation: "Run discover:github-trending and include the Top 10 repositories with rank/trend metadata before publishing."
     });
@@ -393,7 +398,7 @@ function strictBuilderIssues(report) {
   return [];
 }
 
-function strictEvidenceIssues(report) {
+function strictEvidenceIssues(report, options = {}) {
   const assets = Array.isArray(report?.evidence_assets) ? report.evidence_assets : [];
   const itemUrls = new Set(
     ["main_items", "model_releases", "hot_blogs", "projects"]
@@ -402,7 +407,7 @@ function strictEvidenceIssues(report) {
       .filter(Boolean)
   );
   const linkedLocalAssets = assets.filter((asset) => {
-    return asset?.local_path && itemUrls.has(normalizeUrl(asset?.source_url));
+    return asset?.local_path && itemUrls.has(normalizeUrl(asset?.source_url)) && evidenceAssetExists(asset.local_path, options);
   });
 
   if (linkedLocalAssets.length === 0) {
@@ -575,6 +580,46 @@ function hasAuditSource(report, requirement) {
       return true;
     });
   });
+}
+
+function hasRankCoverage(items, start, end) {
+  if (!Array.isArray(items)) {
+    return false;
+  }
+  const ranks = new Set(
+    items
+      .map((item) => Number(item?.rank))
+      .filter((rank) => Number.isInteger(rank))
+  );
+  for (let rank = start; rank <= end; rank += 1) {
+    if (!ranks.has(rank)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function evidenceAssetExists(localPath, options = {}) {
+  const normalized = normalizeAssetPath(localPath);
+  if (!normalized) {
+    return false;
+  }
+  if (options.existingAssetPaths) {
+    return options.existingAssetPaths.has(normalized);
+  }
+  if (!options.rootDir) {
+    return true;
+  }
+
+  return fs.existsSync(path.join(options.rootDir, "docs", ...normalized.split("/")));
+}
+
+function normalizeAssetPath(value) {
+  const text = String(value || "").trim().replace(/\\/g, "/").replace(/^\/+/, "");
+  if (!text || text.includes("..")) {
+    return "";
+  }
+  return text;
 }
 
 function isStrictCoverageReport(report) {

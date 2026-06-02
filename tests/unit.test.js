@@ -2672,7 +2672,7 @@ test("automation revision reads git, prompt manifest, and source registry state"
 test("publish quality accepts strict daily reports with full source proof", () => {
   const report = strictPublishReportFixture();
 
-  assert.deepEqual(findPublishQualityIssues(report), []);
+  assert.deepEqual(findPublishQualityIssues(report, strictPublishOptionsFixture()), []);
 });
 
 test("publish quality blocks strict daily reports without automation revision proof", () => {
@@ -2705,16 +2705,28 @@ test("publish quality blocks strict daily reports missing GitHub Trending Top 10
   report.github_trending = report.github_trending.slice(0, 9);
   report.source_audit.github_trending.candidates_found = 9;
 
-  const issues = findPublishQualityIssues(report);
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
 
   assert(issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
+});
+
+test("publish quality blocks strict daily reports with duplicate or non-top-10 GitHub ranks", () => {
+  const report = strictPublishReportFixture();
+  report.github_trending = report.github_trending.map((item, index) => ({
+    ...item,
+    rank: index + 11
+  }));
+
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+
+  assert(issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed" && issue.has_rank_coverage === false));
 });
 
 test("publish quality blocks strict daily reports missing follow-builders X status coverage", () => {
   const report = strictPublishReportFixture();
   report.builder_observations[0].url = "https://example.com/not-x-status";
 
-  const issues = findPublishQualityIssues(report);
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
 
   assert(issues.some((issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false));
 });
@@ -2732,7 +2744,15 @@ test("publish quality blocks strict daily reports without linked local evidence 
     }
   ];
 
-  const issues = findPublishQualityIssues(report);
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
+
+  assert(issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+});
+
+test("publish quality blocks strict daily reports when linked local evidence file is missing", () => {
+  const report = strictPublishReportFixture();
+
+  const issues = findPublishQualityIssues(report, { existingAssetPaths: new Set() });
 
   assert(issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
 });
@@ -2755,7 +2775,7 @@ test("publish quality blocks strict daily reports whose model releases are not m
     }
   ];
 
-  const issues = findPublishQualityIssues(report);
+  const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
 
   assert(issues.some((issue) => issue.error_code === "model_release_main_item_gate_failed"));
 });
@@ -3762,6 +3782,12 @@ function strictPublishReportFixture() {
         ]
       }
     }
+  };
+}
+
+function strictPublishOptionsFixture() {
+  return {
+    existingAssetPaths: new Set(["assets/evidence/strict-figure.png"])
   };
 }
 

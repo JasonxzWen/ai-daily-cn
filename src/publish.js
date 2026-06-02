@@ -187,7 +187,7 @@ export async function createPublishPlan(options = {}) {
     throw new PublisherError("no_reports", `未发现可发布的日报：${options.reportDate || "(any)"}`);
   }
   for (const report of reports) {
-    requirePublishableQuality(report);
+    requirePublishableQuality(report, { rootDir: repoRoot });
   }
 
   const blockedReports = reports.filter((report) => report.quality_status?.status === "blocked");
@@ -719,7 +719,7 @@ async function requirePublishableReportDate(repoRoot, reportDate) {
   const reportPath = path.join(repoRoot, "reports-data", year, month, `${reportDate}.json`);
   try {
     const report = JSON.parse(await fs.readFile(reportPath, "utf8"));
-    requirePublishableQuality(report);
+    requirePublishableQuality(report, { rootDir: repoRoot });
   } catch (error) {
     if (error.code === "ENOENT") {
       return;
