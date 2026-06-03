@@ -157,22 +157,26 @@ export function reportToInteractionInput(report, options = {}) {
   }
   const domesticCommunityLeads = communityLeads.filter(isDomesticCommunityLead);
   const remainingCommunityLeads = communityLeads.filter((item) => !isDomesticCommunityLead(item));
-  const domesticCommunitySection = formatCommunityLeads(domesticCommunityLeads);
-  if (domesticCommunitySection) {
+  const domesticCommunityCards = formatCommunityLeadCards(domesticCommunityLeads);
+  if (domesticCommunityCards.length > 0) {
     sections.push({
-      type: "markdown",
+      type: "filterable-cards",
       title: "国内动态",
       group: "signals",
-      content: domesticCommunitySection
+      cardClass: "community-card",
+      showFilters: false,
+      items: domesticCommunityCards
     });
   }
-  const communitySection = formatCommunityLeads(remainingCommunityLeads);
-  if (communitySection) {
+  const communityCards = formatCommunityLeadCards(remainingCommunityLeads);
+  if (communityCards.length > 0) {
     sections.push({
-      type: "markdown",
+      type: "filterable-cards",
       title: "社区线索",
       group: "signals",
-      content: communitySection
+      cardClass: "community-card",
+      showFilters: false,
+      items: communityCards
     });
   }
   const qualityStatus = formatQualityStatus(report.quality_status);
@@ -1120,24 +1124,40 @@ function formatTwitterDiscussion(items, auditGroup, options = {}) {
   return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
 }
 
-function formatCommunityLeads(items, options = {}) {
+function formatCommunityLeadCards(items) {
   const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
-  if (leads.length === 0) {
-    return "";
-  }
-
-  const content = leads.map((item) => {
-    const details = formatNestedEditorialDetails(item);
-    const line = `- ${formatHighlightTags([importanceTagFor("community_leads", item)].filter(Boolean))}${formatDailyInlineText(item.content, item)} ${markdownLink(item.url, "来源")}`;
-    return details ? `${line}\n${details}` : line;
-  }).join("\n");
-  return options.includeHeading ? `### 社区线索\n\n${content}` : content;
+  return leads.map((item) => ({
+    group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
+    title: communityLeadTitle(item),
+    href: item.url,
+    titleIcon: mainItemIconFor(item),
+    body: formatDailyInlineText(item.content, item),
+    showGroup: false,
+    tags: [
+      cardTag(importanceTagFor("community_leads", item)),
+      item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
+      item.event_date ? cardTag(item.event_date, "date") : ""
+    ].filter(Boolean),
+    points: editorialCardPoints(item)
+  }));
 }
 
 function formatNestedEditorialDetails(item) {
   return editorialBullets(item)
     .map((bullet) => `  - ${bullet}`)
     .join("\n");
+}
+
+function communityLeadTitle(item) {
+  const source = String(item?.source || item?.publisher || "").trim();
+  if (source) {
+    return source;
+  }
+  try {
+    return new URL(String(item?.url || "")).hostname.replace(/^www\./, "");
+  } catch {
+    return "社区线索";
+  }
 }
 
 function signalSectionTitle(builderSection, communitySection) {
