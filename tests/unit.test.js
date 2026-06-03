@@ -48,6 +48,16 @@ const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 const siteUrl = "https://jasonxzwen.github.io/ai-daily-cn/";
 const execFileAsync = promisify(execFile);
 
+function mainMarkdownSections(input) {
+  return input.sections.filter((section) => section.group === "main" && section.type === "markdown");
+}
+
+function mainMarkdownContent(input) {
+  return mainMarkdownSections(input)
+    .map((section) => section.content)
+    .join("\n\n");
+}
+
 test("HTML renders main item bold and highlight markers", async () => {
   const markdown = await readFixture("reports/good/official-release.md");
   const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
@@ -445,6 +455,9 @@ test("日报可以转换为 effective-interact 输入", async () => {
   report.main_items[0].title = "OpenAI Status：Example Agent Platform GA";
   report.main_items[0].source = "OpenAI Status";
   report.main_items[0].url = "https://status.openai.com/incidents/example-agent-platform";
+  report.main_items[0].editorial_category = "ai_industry";
+  report.main_items[0].why_it_matters = "Why metadata should stay in JSON but not render as an extra main bullet.";
+  report.main_items[0].watch_next = "Generic follow-up metadata should not render in main bullets.";
   report.main_items.push({
     title: "Cisco and OpenAI redefine enterprise engineering with Codex",
     event_date: "2026-05-15",
@@ -453,6 +466,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
     tier: "T0",
     entities: ["OpenAI", "Cisco", "Codex"],
     summary: "OpenAI News RSS item for source icon coverage.",
+    editorial_category: "ai_industry",
     bullets: ["OpenAI News RSS uses the same embedded OpenAI icon as other OpenAI-owned sources."]
   });
   report.hero_highlights = [
@@ -551,11 +565,15 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!input.summary.includes("其余条目见后文"));
   assert(!input.sections.some((section) => section.title === "日报概览"));
   assert(!input.sections.some((section) => section.title === "主线摘要"));
-  const mainSection = input.sections.find((section) => section.title === "主体信息");
-  assert(mainSection.content.includes("![OpenAI Status](data:image/png;base64,"));
-  assert(mainSection.content.includes("![OpenAI News RSS](data:image/png;base64,"));
-  assert(mainSection.content.includes("![OpenAI Status](data:image/png;base64,") && mainSection.content.includes("**![OpenAI Status]"));
-  assert(!mainSection.content.includes("来源："));
+  const mainContent = mainMarkdownContent(input);
+  assert(!input.sections.some((section) => section.title === "主体信息"));
+  assert(input.sections.some((section) => section.title === "AI 资讯"));
+  assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
+  assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
+  assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**![OpenAI Status]"));
+  assert(!mainContent.includes("来源："));
+  assert(!mainContent.includes("Why metadata should stay in JSON"));
+  assert(!mainContent.includes("Generic follow-up metadata should not render"));
   const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
@@ -592,7 +610,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("普通工程师"));
   assert(input.intent.primaryQuestion.includes("模型、产品、开源、观点和社区动态"));
-  assert(input.sections.some((section) => section.title === "主体信息"));
+  assert(input.sections.some((section) => section.title === "AI 资讯"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -755,8 +773,7 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   assert(pointsText.includes("行业媒体/播客整理"));
   assert(pointsText.includes("仅供跟进"));
   assert(pointsText.includes("普通工程师"));
-  const mainSection = input.sections.find((section) => section.title === "主体信息");
-  assert(!mainSection.content.includes("行业媒体/播客整理"));
+  assert(!mainMarkdownContent(input).includes("行业媒体/播客整理"));
 });
 
 test("builder interaction section renders translated Twitter-style cards and omits explicit evidence bullets", async () => {
@@ -819,6 +836,43 @@ test("community leads omit low-signal statuspage troubleshooting items", async (
   assert(!JSON.stringify(input).includes("Claude Status"));
   assert(!JSON.stringify(input).includes("elevated errors"));
   assert(!input.sections.some((item) => item.title === "社区线索"));
+});
+
+test("domestic community leads render as a dedicated navigation section", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [];
+  report.community_leads = [
+    {
+      content: "雷峰网报道千问 APP 将向第三方 Agent、Skill 开放；当前作为中文产品生态线索，等待官方产品页确认。",
+      url: "https://www.leiphone.com/category/industrynews/example.html",
+      source: "Leiphone",
+      event_date: "2026-06-03",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "中介来源仅作发现线索，事实性结论需要一手或多源确认。"
+    },
+    {
+      content: "TechCrunch 报道海外企业限制 AI 支出；当前作为成本治理社区线索。",
+      url: "https://techcrunch.com/example",
+      source: "TechCrunch AI",
+      event_date: "2026-06-03",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "中介来源，仅作社区观察。"
+    }
+  ];
+  report.self_check.builder_observations = 0;
+
+  const input = reportToInteractionInput(report);
+  const domesticSection = input.sections.find((section) => section.title === "国内动态");
+  const communitySection = input.sections.find((section) => section.title === "社区线索");
+
+  assert(domesticSection);
+  assert(domesticSection.content.includes("千问 APP"));
+  assert(!domesticSection.content.includes("TechCrunch"));
+  assert(communitySection);
+  assert(communitySection.content.includes("TechCrunch"));
+  assert(!communitySection.content.includes("千问 APP"));
 });
 
 test("X/Twitter discussion section reports checked-source degradation when no status is included", async () => {
@@ -981,13 +1035,13 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(qualitySection.content.includes("hot_blogs"));
   assert(qualitySection.content.includes("Some automated discovery sources failed"));
   assert(!input.sections.some((section) => section.title === "证据图表"));
-  const mainSection = input.sections.find((section) => section.title === "主体信息");
-  assert(mainSection.content.includes("Coding agent adoption by discipline"));
-  assert(mainSection.content.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
-  assert.equal((mainSection.content.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
-  assert(mainSection.content.includes("Claude Opus 4.8 performance comparison"));
-  assert(mainSection.content.includes("Agentic coding"));
-  assert(mainSection.content.indexOf("Agentic coding") < mainSection.content.indexOf("Transcribed from the official launch image."));
+  const mainContent = mainMarkdownContent(input);
+  assert(mainContent.includes("Coding agent adoption by discipline"));
+  assert(mainContent.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
+  assert.equal((mainContent.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
+  assert(mainContent.includes("Claude Opus 4.8 performance comparison"));
+  assert(mainContent.includes("Agentic coding"));
+  assert(mainContent.indexOf("Agentic coding") < mainContent.indexOf("Transcribed from the official launch image."));
 });
 
 test("interaction source icon cache covers high-frequency AI daily sources and source audit feeds", async () => {
@@ -1064,7 +1118,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
   const input = reportToInteractionInput(report);
   const auditSection = input.sections.find((section) => section.group === "verification" && section.content.includes("HNRSS Frontpage"));
   assert(auditSection, "source audit section should be present");
-  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  const mainContent = mainMarkdownContent(input);
 
   for (const source of [
     "Microsoft Foundry Blog",
@@ -1080,9 +1134,9 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
     "QbitAI"
   ]) {
     assert.match(CACHED_SOURCE_ICONS[source], /^data:image\/(?:png|jpe?g|webp|gif);base64,/, source);
-    const section = mainSection.content.includes(source) ? mainSection : auditSection;
-    assert(section.content.includes(`![${source}](${CACHED_SOURCE_ICONS[source]})`), source);
-    assert(!section.content.includes(`![${source}](data:image/svg+xml;base64,`), source);
+    const sectionContent = mainContent.includes(source) ? mainContent : auditSection.content;
+    assert(sectionContent.includes(`![${source}](${CACHED_SOURCE_ICONS[source]})`), source);
+    assert(!sectionContent.includes(`![${source}](data:image/svg+xml;base64,`), source);
   }
 });
 
@@ -1215,10 +1269,10 @@ test("trend annotations are rendered only where they are injected", async () => 
   };
 
   const input = reportToInteractionInput(report, { trendAnnotations });
-  const mainSection = input.sections.find((section) => section.title === "主体信息");
+  const mainContent = mainMarkdownContent(input);
   const trendingSection = input.sections.find((section) => section.title.includes("GitHub Trending"));
 
-  assert(mainSection.content.includes("==tag-topic|coding agent: 7d 8x/4d=="));
+  assert(mainContent.includes("==tag-topic|coding agent: 7d 8x/4d=="));
   assert(trendingSection.content.includes("==tag-topic|coding agent: 7d 8x/4d=="));
   assert(!input.sections.some((section) => section.cardClass === "project-card"));
 });
@@ -3015,8 +3069,8 @@ test("report:write allows explicit network-outage empty reports only", async () 
   );
 
   const interaction = reportToInteractionInput(result.report);
-  const mainSection = interaction.sections.find((section) => section.title === "主体信息");
-  assert(mainSection.content.includes("未写入未核验主体事实"));
+  const aiNewsSection = interaction.sections.find((section) => section.title === "AI 资讯");
+  assert(aiNewsSection.content.includes("未写入未核验主体事实"));
 
   const invalid = structuredClone(result.report);
   invalid.report_status = "normal";
