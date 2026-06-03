@@ -866,9 +866,11 @@ test("domestic community leads render as a dedicated navigation section", async 
   report.self_check.builder_observations = 0;
 
   const input = reportToInteractionInput(report);
+  const builderHeroStat = input.heroStats.find((item) => item.label === "Builder");
   const domesticSection = input.sections.find((section) => section.title === "国内动态");
   const communitySection = input.sections.find((section) => section.title === "社区线索");
 
+  assert.equal(builderHeroStat.value, "0");
   assert(domesticSection);
   assert(domesticSection.content.includes("千问 APP"));
   assert(!domesticSection.content.includes("TechCrunch"));
