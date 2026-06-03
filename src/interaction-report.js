@@ -112,12 +112,7 @@ export function reportToInteractionInput(report, options = {}) {
   const indexHref = publicAssetUrl(report, "index.html");
   const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
   const sections = [
-    {
-      type: "markdown",
-      title: "主体信息",
-      group: "main",
-      content: formatMainItems(mainItems, { report, evidenceByUrl, trendAnnotations })
-    }
+    ...formatMainItemSections(mainItems, { report, evidenceByUrl, trendAnnotations })
   ];
 
   if (hotBlogs.length > 0) {
@@ -160,7 +155,18 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
-  const communitySection = formatCommunityLeads(communityLeads);
+  const domesticCommunityLeads = communityLeads.filter(isDomesticCommunityLead);
+  const remainingCommunityLeads = communityLeads.filter((item) => !isDomesticCommunityLead(item));
+  const domesticCommunitySection = formatCommunityLeads(domesticCommunityLeads);
+  if (domesticCommunitySection) {
+    sections.push({
+      type: "markdown",
+      title: "国内动态",
+      group: "signals",
+      content: domesticCommunitySection
+    });
+  }
+  const communitySection = formatCommunityLeads(remainingCommunityLeads);
   if (communitySection) {
     sections.push({
       type: "markdown",
@@ -505,26 +511,38 @@ function trendTagsFor(annotations, section, index) {
   return match.tags.map((tag) => tag.text || tag.label).filter(Boolean);
 }
 
-function formatMainItems(items, context = {}) {
+function formatMainItemSections(items, context = {}) {
   if (items.length === 0) {
-    if (context.report?.report_status === "empty_due_to_network_outage") {
-      return "本次固定信源发现面全部因网络不可用阻塞，未写入未核验主体事实。请展开“发布质量说明”和“信源审计”查看各来源状态。";
-    }
-    return "暂无主体信息。";
+    return [
+      {
+        type: "markdown",
+        title: "AI 资讯",
+        group: "main",
+        content: emptyMainItemContent(context)
+      }
+    ];
   }
 
   return mainItemContractGroups(items)
-    .map((group) => {
-      const content = group.entries
+    .map((group) => ({
+      type: "markdown",
+      title: group.title,
+      group: "main",
+      content: group.entries
         .map(({ item, originalIndex }, groupIndex) => formatMainItem(item, {
           ...context,
           originalIndex,
           displayIndex: groupIndex + 1
         }))
-        .join("\n\n");
-      return `### ${group.title}\n\n${content}`;
-    })
-    .join("\n\n");
+        .join("\n\n")
+    }));
+}
+
+function emptyMainItemContent(context = {}) {
+  if (context.report?.report_status === "empty_due_to_network_outage") {
+    return "本次固定信源发现面全部因网络不可用阻塞，未写入未核验主体事实。请展开“发布质量说明”和“信源审计”查看各来源状态。";
+  }
+  return "暂无已核验信号。";
 }
 
 function formatMainItem(item, context = {}) {
@@ -543,24 +561,24 @@ function formatMainItem(item, context = {}) {
 function mainItemContractGroups(items) {
   const groups = [
     {
-      title: "AI 行业与模型发布",
+      title: "AI 资讯",
       categories: new Set(["ai_industry", "model_release", "headline"])
     },
     {
-      title: "大厂动作与政策基础设施",
+      title: "大厂与政策",
       categories: new Set(["company_business", "policy_infra", "funding"])
     },
     {
-      title: "产品、工程工具与开源生态",
+      title: "产品与开源",
       categories: new Set(["engineering_toolchain", "product_radar", "open_source"])
     },
     {
-      title: "内容赛道与 AIGC 动态",
+      title: "AIGC 动态",
       categories: new Set(["content_aigc"])
     }
   ].map((group) => ({ ...group, entries: [] }));
   const fallback = {
-    title: "其他已核验信号",
+    title: "其他信号",
     categories: new Set(),
     entries: []
   };
@@ -908,9 +926,7 @@ function hotBlogPointTexts(summary) {
 
 function editorialBullets(item) {
   return [
-    item?.why_it_matters ? item.why_it_matters : "",
     item?.reader_relevance ? item.reader_relevance : "",
-    item?.watch_next ? item.watch_next : "",
     hasNonPrimarySourceSignal(item) && item?.verification_note ? `核验：${item.verification_note}` : "",
     hasNonPrimarySourceSignal(item) && item?.risk_note ? `风险：${item.risk_note}` : ""
   ].filter(Boolean);
@@ -1150,6 +1166,17 @@ function isLowSignalStatuspageLead(item) {
   }
 
   return /elevated errors|resolved|troubleshooting|incident|degraded|outage|error rate|\berrors\b|排障|故障|已恢复|已解决|标记 resolved/i.test(content);
+}
+
+function isDomesticCommunityLead(item) {
+  const text = [
+    item?.source,
+    item?.publisher,
+    item?.content,
+    item?.title,
+    ...(Array.isArray(item?.entities) ? item.entities : [])
+  ].filter(Boolean).join(" ");
+  return /36Kr|QbitAI|Jiqizhixin|Leiphone|InfoQ CN|机器之心|量子位|雷峰|阿里|Alibaba|Qwen|千问|通义|腾讯|Tencent|字节|ByteDance|火山引擎|Volcano|豆包|Doubao|百度|Baidu|MiniMax|Moonshot|Kimi|DeepSeek|智谱|Zhipu|商汤|SenseTime|昆仑|Kunlun|星尘|Astribot|跨维|中国|国内|东方航空|瑞幸|肯德基|蜜雪冰城/i.test(text);
 }
 
 function isStatuspageUrl(value) {

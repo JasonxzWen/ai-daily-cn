@@ -117,6 +117,61 @@
         "test_name": "CLI JSON commands can write clean UTF-8 output files",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-main-visible-bullets-no-generic-watch-next",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep generic watch-next metadata out of visible main bullets",
+      "problem": "The pre-rendered daily report surfaced generic `watch_next` and `why_it_matters` metadata as repeated visible bullets such as `继续跟踪客户案例、官方后续数据和多源验证。` after main items.",
+      "expected_behavior": "Main-item visible bullets render factual bullets, reader relevance, and explicit non-primary verification/risk notes only; generic `why_it_matters` and `watch_next` metadata remains in structured JSON and does not appear as repeated prose in the main section.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/interaction-report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "日报可以转换为 effective-interact 输入",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-main-groups-first-level-navigation",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Promote main item groups into first-level navigation",
+      "problem": "The public report used a parent `主体信息` section with child headings, making navigation noisy and hiding the actual main-topic groups.",
+      "expected_behavior": "The public report does not render `主体信息` as a top-level section or navigation item; main-item groups render as first-level navigation sections with concise labels such as `AI 资讯`, `大厂与政策`, and `产品与开源`.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/interaction-report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "日报可以转换为 effective-interact 输入",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-domestic-dynamics-public-visibility",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Surface domestic dynamics without weakening source gates",
+      "problem": "Domestic Chinese AI dynamics could be present in the candidate pool but remain buried in source audit or mixed community leads, making the public report look dominated by overseas vendor updates.",
+      "expected_behavior": "When qualified Chinese or domestic candidates exist, public content preserves domestic visibility; official or primary domestic facts may enter `main_items`, while unresolved high-risk intermediary facts render as a dedicated `国内动态` navigation section with verification/risk disclosure instead of being promoted to factual main items.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "src/interaction-report.js",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "domestic community leads render as a dedicated navigation section",
+        "gate": "npm run validate"
+      }
     }
   ]
 }
