@@ -228,11 +228,11 @@ test("publish dry-run stops when selected strict report was not generated from c
     origin_main_short: "bbbbbbbbbbbb",
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
-    source_registry_count: 63,
-    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    source_registry_count: 68,
+    source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
       "main_items_min_8_when_candidates_available",
-      "content_units_min_18_when_candidates_available",
+      "content_units_min_27_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",
       "fixed_source_checklist"

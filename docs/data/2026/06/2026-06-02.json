@@ -2424,11 +2424,33 @@
   },
   "generated_at": "2026-06-02T06:14:41.487Z",
   "quality_status": {
-    "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
+    "status": "degraded",
+    "reasons": [
+      "builder_sources_blocked",
+      "builder_observations_below_strict_minimum"
+    ],
+    "affected_sections": [
+      "builder_observations"
+    ],
+    "degraded_sections": [
+      {
+        "code": "builder_sources_blocked",
+        "error_code": "quality_degraded",
+        "section": "builder_observations",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      },
+      {
+        "code": "builder_observations_below_strict_minimum",
+        "error_code": "strict_section_coverage_gate_failed",
+        "section": "builder_observations",
+        "message": "builder_observations below strict publish minimum: 3/5.",
+        "remediation": "Regenerate from the fixed candidate pool and either fill the required section count or keep the report unpublished until source coverage is complete.",
+        "count": 3,
+        "minimum": 5
+      }
+    ],
     "blocking_issues": [],
-    "public_note": "当前日报已按长日报口径重写：独立模型栏目移除，主体覆盖平台、资本、计费、agent 基础设施、AIGC 内容工具和产业线索。"
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete."
   }
 }

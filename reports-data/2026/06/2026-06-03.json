@@ -1609,7 +1609,7 @@
         "issue": "定时 shell 环境没有外网访问，固定发现面全量 EACCES。",
         "evidence": "GitHub Trending、Builder、content-sources、search-news、sources:health 与 statuspage 输出均为 fetch failed / EACCES，候选数为 0。",
         "module": "Codex automation network config",
-        "suggestion": "在 Codex 自动化或 `$CODEX_HOME/config.toml` 中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程。",
+        "suggestion": "在 Codex 自动化配置中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程。",
         "expected_benefit": "恢复一手来源采样，避免日报只能发布网络阻塞审计。",
         "requires_user_confirmation": true
       },

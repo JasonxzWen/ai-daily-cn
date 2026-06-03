@@ -51,6 +51,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 - If all active fixed source lanes are blocked by network errors and no factual item can be verified, write `report_status:"empty_due_to_network_outage"` with `main_items: []`. The report is publishable only as degraded output: keep the blocked `source_audit`, disclose `empty_due_to_network_outage` in `quality_status.degraded_sections`, and do not add placeholder main items.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
+- When `discover:builders` or the final candidate pool has at least five qualified Builder candidates, publish 5-20 `builder_observations`; fewer than five must be disclosed as degraded Builder coverage with the selection/filter reason.
 - Do not bypass freshness, duplicate URL, or source-window gates.
 
 ## Public Report Contract
@@ -64,7 +65,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 - Hot tech blog summaries should be roughly 100-160 Chinese characters split into 2-4 point-style takeaways. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
 - Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
 - GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
-- Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`.
+- Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`. The target public count is 5-20 when qualified candidates exist.
 
 ## Report Write
 

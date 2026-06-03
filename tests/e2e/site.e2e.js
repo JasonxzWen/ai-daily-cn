@@ -99,6 +99,19 @@ structuredReport.builder_observations = [
     avatar_data_uri: builderAvatarDataUri,
     url: "https://x.com/examplebuilder/status/2059000000000000000",
     evidence: "Original X status URL was collected from follow-builders central feed."
+  },
+  {
+    author: "Long Thread Builder",
+    handle: "longbuilder",
+    role: "researcher",
+    event_date: "2026-05-15",
+    source: "follow-builders X feed",
+    original_text: "Long-form builder posts should not make a neighboring X card stretch into empty space. The card should be a horizontal row with identity metadata on the left and translated content on the right.",
+    translation: "长文本 Builder 帖子不应该让相邻 X 卡片被拉成大块空白。卡片应使用横向行：左侧放作者和标签，右侧放翻译正文与原文。",
+    content: "长文本 Builder 帖子不应该让相邻 X 卡片被拉成大块空白。卡片应使用横向行：左侧放作者和标签，右侧放翻译正文与原文。",
+    avatar_data_uri: builderAvatarDataUri,
+    url: "https://x.com/longbuilder/status/2059000000000000001",
+    evidence: "Original X status URL was collected from follow-builders central feed."
   }
 ];
 structuredReport.self_check.builder_observations = structuredReport.builder_observations.length;
@@ -160,7 +173,7 @@ try {
   assert.equal(await page.locator("#report-top .hero-summary-text").count(), 1);
   assert.match(await page.locator("#report-top .hero-stat-grid").textContent(), /主体/);
   assert.equal(await page.locator("#report-top .hero-decision-grid").count(), 0);
-  assert.equal(await page.locator("nav.report-nav").count(), 0);
+  assert.equal(await page.locator("nav.report-nav").count(), 1);
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
   assert.match(await page.locator("#report-top").textContent(), /日报导航/);
   assert.match(await page.locator("body").textContent(), /主体信息/);
@@ -184,11 +197,13 @@ try {
   assert.equal(await allImagesLoaded(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
   assert.equal(await page.locator(".blog-card").count(), 2);
-  assert.equal(await page.locator(".builder-card").count(), 1);
-  assert.equal(await page.locator(".builder-card .card-title-icon").count(), 1);
-  assert.match(await page.locator(".builder-card").textContent(), /Coding agent 在无人值守工作之前需要 eval loops/);
-  assert.match(await page.locator(".builder-card").textContent(), /Coding agents need eval loops before unattended work/);
-  assert.doesNotMatch(await page.locator(".builder-card").textContent(), /Original X status URL was collected/);
+  assert.equal(await page.locator(".builder-card").count(), 2);
+  assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
+  const builderCardsText = await page.locator(".builder-card-grid").textContent();
+  assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
+  assert.match(builderCardsText, /Coding agents need eval loops before unattended work/);
+  assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
+  assert.equal(await builderCardsUseHorizontalRows(page), true);
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await page.locator(".project-card-grid").count(), 0);
@@ -197,6 +212,7 @@ try {
   await page.setViewportSize({ width: 375, height: 812 });
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
+  assert.equal(await builderCardsCollapseOnMobile(page), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 } finally {
   await browser.close();
@@ -329,6 +345,50 @@ async function noMediaBlogCardsUseReadableSingleColumn(page) {
         && termRects.every((rect) => rect.width <= 2 && rect.height <= 2)
         && detailRects.length > 0
         && detailRects.every((rect) => rect.width >= detailMinWidth);
+    });
+  });
+}
+
+async function builderCardsUseHorizontalRows(page) {
+  return page.evaluate(() => {
+    const grid = document.querySelector(".builder-card-grid");
+    const cards = Array.from(document.querySelectorAll(".builder-card"));
+    if (!grid || cards.length < 2) return false;
+
+    const gridColumns = getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/);
+    if (gridColumns.length !== 1) return false;
+
+    return cards.every((card) => {
+      const styles = getComputedStyle(card);
+      const columns = styles.gridTemplateColumns.trim().split(/\s+/);
+      const areas = styles.gridTemplateAreas;
+      const titleRect = card.querySelector("h3")?.getBoundingClientRect();
+      const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
+      const detailRect = card.querySelector(".card-detail-list")?.getBoundingClientRect();
+      return columns.length === 2
+        && areas.includes("builder-title")
+        && areas.includes("builder-body")
+        && Boolean(titleRect && bodyRect && bodyRect.left > titleRect.left + 120)
+        && Boolean(detailRect && titleRect && detailRect.left > titleRect.left + 120);
+    });
+  });
+}
+
+async function builderCardsCollapseOnMobile(page) {
+  return page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll(".builder-card"));
+    if (cards.length === 0) return false;
+
+    return cards.every((card) => {
+      const styles = getComputedStyle(card);
+      const columns = styles.gridTemplateColumns.trim().split(/\s+/);
+      const areas = styles.gridTemplateAreas;
+      const titleRect = card.querySelector("h3")?.getBoundingClientRect();
+      const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
+      return columns.length === 1
+        && areas.includes("builder-title")
+        && areas.includes("builder-body")
+        && Boolean(titleRect && bodyRect && Math.abs(bodyRect.left - titleRect.left) < 8);
     });
   });
 }

@@ -1,4 +1,4 @@
-import { createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
+import { contentSourceRequestUrl, contentSourceSkipReason, createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
 import { loadSourceRegistry, normalizeEnablements } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 
@@ -28,7 +28,7 @@ export async function checkSourcesHealth(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(source.url, {
+      const response = await fetchImpl(contentSourceRequestUrl(source), {
         headers: {
           accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
@@ -88,10 +88,7 @@ function skipReasonForSource(source) {
   if (source.source_kind === "manual") {
     return "skipped_manual_source";
   }
-  if ((source.source_kind === "rsshub" || source.source_kind === "rss_bridge") && source.base_url_env && !process.env[source.base_url_env]) {
-    return "skipped_missing_base_url";
-  }
-  return "";
+  return contentSourceSkipReason(source);
 }
 
 function healthResult(source, status, extra = {}) {

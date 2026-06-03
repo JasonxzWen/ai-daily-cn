@@ -17,14 +17,16 @@
 - AIGC 与内容产业：RCTV、The Magnifier AI、Fast Company Creator Economy、Crunchbase News AI，以及中文内容产业媒体、平台公告、活动页面和公司公告可作为候选源。覆盖 AI 视频、短剧/漫剧、音乐/配音、广告创意、创作者工具、内容平台政策和商业化，但事实性入选必须回到官方、产品页、监管文件、投资方公告或多源确认。
 - 播客平台：小宇宙、喜马拉雅等只作为具体节目或单集发现入口；最终需要单集页、RSS episode、原始音频或可信 transcript。小宇宙可通过 RSSHub `/xiaoyuzhou/podcast/:id`；喜马拉雅可通过 RSSHub `/ximalaya/:type/:id/:all/:shownote?`，但通常需要 `XIMALAYA_TOKEN` 且默认不输出 ShowNote，缺少授权或单集证据时必须说明不可用。
 - 公众号与中介媒体：普通微信公众号、自媒体和行业媒体是重要线索源，但不是最终报道实体；必须先尝试拿到其引用的一手信源。`wechat_primary_like` 可作为半一手，`wechat_industry_whitelist` 可用于低风险行业动态和观点分析进入主体信息；无法回源且不在白名单时只进入 `community_leads` 并标记待验证。
+- 公众号文章链接输入：优先使用日期级输入 `$CODEX_HOME/automations/ai-daily/inputs/wechat/YYYY-MM-DD.json` 或 `--wechat-input <json>`；每条必须保留原始 `mp.weixin.qq.com` URL、账号名、发布时间、风险等级、验证备注和可选一手回源 URL。候选池和公开页面只能展示清洗后的公众号 URL、账号与验证状态，不能暴露本机路径、输入文件路径、私有 feed URL、cookie、token 或自动化目录。
+- 公众号 RSS/聚合器：RSSHub NewRank、Wechat2RSS、RSS-Bridge、Miniflux/FreshRSS 等只能作为用户显式配置的私有发现源；未配置时记录 `skipped_missing_base_url` / `skipped_missing_token`，不阻断日报。聚合器内容不提升事实等级，高风险事实仍需 T0/T1/T2 或多源确认。
 - 聚合站：Planet AI、RSS 索引仓库等只作发现和交叉验证，最终链接尽量回到原文。
 
 扩容目标：
 
-- 新日报目标是 22-30 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 只作为 GitHub Trending highlights 展示。
+- 新日报目标是 33-45 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 只作为 GitHub Trending highlights 展示。
 - `main_items` 目标是 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报并使用 `**加粗**` / `==高亮词==` 标重点。高亮词会渲染成加粗变色文字，不是 tag/chip。主体信息只写新闻事实、数据、图表、限制和影响，不写对日报自身的“后续跟进/报道口径/扩容建议”。
 - 高信号真实模型发布必须纳入 `main_items`，`model_releases` 只作为结构化索引和可用性字段集合，不能让主体信息因此减少。
-- 扩容通过增加候选池实现，不通过降低高风险事实门槛实现。正文少于 18 个内容单元时，不凑数；在 `quality_status` 或 `self_check.notes` 写明缺口来源。
+- 扩容通过增加候选池实现，不通过降低高风险事实门槛实现。正文少于 27 个内容单元时，不凑数；在 `quality_status` 或 `self_check.notes` 写明缺口来源。
 
 禁止：
 

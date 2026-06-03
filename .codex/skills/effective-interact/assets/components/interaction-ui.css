@@ -1082,18 +1082,25 @@ body.lightbox-open {
 }
 
 .builder-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: stretch;
 }
 
 .builder-card {
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
 .builder-card h3 {
+  grid-area: builder-title;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -1124,18 +1131,24 @@ body.lightbox-open {
 }
 
 .builder-card .card-tags {
+  grid-area: builder-tags;
   gap: 6px;
+  align-content: start;
 }
 
 .builder-card > p {
+  grid-area: builder-body;
   margin: 0;
   color: #25231f;
   font-size: 15px;
   line-height: 1.7;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list {
+  grid-area: builder-details;
   gap: 10px;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list div {
@@ -1172,6 +1185,15 @@ body.lightbox-open {
 
   .builder-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-body"
+      "builder-details";
   }
 
   .project-card {

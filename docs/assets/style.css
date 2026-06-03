@@ -134,13 +134,19 @@ h3 {
 
 .builder-card-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .builder-card {
   display: grid;
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-header builder-body"
+    "builder-meta builder-body"
+    ". builder-original";
+  gap: 10px 18px;
+  align-items: start;
   margin: 0;
   padding: 16px;
   border: 1px solid var(--line);
@@ -149,6 +155,7 @@ h3 {
 }
 
 .builder-card-header {
+  grid-area: builder-header;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -178,11 +185,22 @@ h3 {
 }
 
 .builder-original {
+  grid-area: builder-original;
   margin: 0;
   padding-top: 10px;
   border-top: 1px solid var(--line);
   color: var(--muted);
   white-space: pre-wrap;
+}
+
+.builder-card > .item-meta {
+  grid-area: builder-meta;
+  align-content: start;
+}
+
+.builder-card > p:not(.builder-original) {
+  grid-area: builder-body;
+  min-width: 0;
 }
 
 .item-meta,
@@ -335,6 +353,15 @@ h3 {
 
   h1 {
     font-size: 1.55rem;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-header"
+      "builder-meta"
+      "builder-body"
+      "builder-original";
   }
 
   .project-table {

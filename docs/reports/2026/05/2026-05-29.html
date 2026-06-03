@@ -1091,18 +1091,25 @@ body.lightbox-open {
 }
 
 .builder-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: stretch;
 }
 
 .builder-card {
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
 .builder-card h3 {
+  grid-area: builder-title;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -1133,18 +1140,24 @@ body.lightbox-open {
 }
 
 .builder-card .card-tags {
+  grid-area: builder-tags;
   gap: 6px;
+  align-content: start;
 }
 
 .builder-card > p {
+  grid-area: builder-body;
   margin: 0;
   color: #25231f;
   font-size: 15px;
   line-height: 1.7;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list {
+  grid-area: builder-details;
   gap: 10px;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list div {
@@ -1181,6 +1194,15 @@ body.lightbox-open {
 
   .builder-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-body"
+      "builder-details";
   }
 
   .project-card {
@@ -2250,7 +2272,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-05-29 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-27 至 2026-05-29</div>
@@ -2273,7 +2295,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </header>
 
     <div class="report-layout">
-
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="主体信息" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-2" title="热门技术博客" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-github-trending-top-10-3" title="GitHub Trending · Top 10" data-nav-link data-nav-index="3" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 10</span></a>
+<a href="#section-x-twitter-4" title="X/Twitter 讨论" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-html-work-report-5" title="发布质量说明" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="info"><span>发布质量说明</span></a>
+<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+    </div>
+  </nav>
       <div class="report-section-stack" data-report-region="sections">
         <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -2283,7 +2318,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjMyZjNlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmOTkwMCI+QVdTPC90ZXh0Pjwvc3ZnPg==" alt="AWS What&amp;#39;s New" decoding="async"> <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/" rel="noopener noreferrer">Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 29x/5d</mark>（2026-05-28，T0）</li></ol>
+    <div class="rendered-markdown"><h4>其他已核验信号</h4>
+<ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjMyZjNlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmOTkwMCI+QVdTPC90ZXh0Pjwvc3ZnPg==" alt="AWS What&amp;#39;s New" decoding="async"> <a href="https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/" rel="noopener noreferrer">Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 29x/5d</mark>（2026-05-28，T0）</li></ol>
 <ul><li><strong>访问路径</strong>：Bedrock 路径适合需要 Guardrails、Knowledge Bases、区域数据驻留和统一 AWS 管理面的团队；Claude Platform on AWS 更接近 Anthropic 原生控制台与 API 体验。</li><li><strong>模型定位</strong>：AWS 文案把 Opus 4.8 重点放在 agentic coding、professional knowledge work、long-running autonomous tasks，说明新模型的首要落点仍是长任务与企业工作流。</li><li><strong>上线检查</strong>：接入前要重新跑现有 Claude Code、browser agent、长文档综合任务的回归集；供应商声称更少停滞和更会求助，不等于旧 prompt 与权限策略自动适配。</li></ul>
 <ol start="2"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjZmY3MDAwIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TTwvdGV4dD48L3N2Zz4=" alt="Mistral AI" decoding="async"> <a href="https://mistral.ai/news/ai-now-summit-2026/" rel="noopener noreferrer">Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-28，T0）</li></ol>
 <ul><li><strong>工业工程</strong>：Mistral 明确列出 Airbus、BMW、ASML 等合作场景，目标是用物理模型和工程知识减少仿真瓶颈，而不是只卖通用聊天模型。</li><li><strong>Vibe 变化</strong>：Vibe 被描述为横跨 inbox、calendar、deep research、deliverables、代码请求到 PR 的统一 agent；这会把权限、审计、任务恢复和人工验收变成部署重点。</li><li><strong>检索补齐</strong>：Search Toolkit 公共预览把 ingestion、retrieval、evaluation 放在同一框架里，适合把 RAG 质量问题从 prompt 调参拆回可测的检索质量。</li></ul>
@@ -2293,7 +2329,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <ul><li><strong>采用不均</strong>：调研称经济学和政治学使用率高于公共卫生、教育和传播；博士生、博士后和高地位大学研究者采用更早，性别和院校差异也显著。</li><li><strong>用途更窄</strong>：coding agent 用户主要让工具写数据分析代码，97% 报告用于生成代码；真正用来起草论文正文的比例低得多。</li><li><strong>读法边界</strong>：Anthropic 明确说生产率差异只是描述性比较，不应读成因果；团队评估研究 agent 时也应分清 adoption、output count 和研究质量。</li></ul>
 <p><img class="markdown-image" src="../../../assets/evidence/anthropic-coding-agents-social-sciences-figure-1.jpg" alt="各学科 coding agent 采用率" loading="lazy" data-lightbox-image="true" data-lightbox-caption="各学科 coding agent 采用率" role="button" tabindex="0" aria-label="点击放大图片：各学科 coding agent 采用率" decoding="async"></p>
 <p><em>各学科 coding agent 采用率：Anthropic 官方图表，展示不同社科学科的 coding agent 使用率和总体 AI 使用率。</em></p></div>
-    <template data-rich-source data-source-fallback>1. **![AWS What&#39;s New](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjMyZjNlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmOTkwMCI+QVdTPC90ZXh0Pjwvc3ZnPg==) [Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径](https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/)** ==tag-major|重大== ==tag-topic|coding agent: 7d 29x/5d==（2026-05-28，T0）
+    <template data-rich-source data-source-fallback>### 其他已核验信号
+
+1. **![AWS What&#39;s New](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjMyZjNlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmOTkwMCI+QVdTPC90ZXh0Pjwvc3ZnPg==) [Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径](https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/)** ==tag-major|重大== ==tag-topic|coding agent: 7d 29x/5d==（2026-05-28，T0）
   - **访问路径**：Bedrock 路径适合需要 Guardrails、Knowledge Bases、区域数据驻留和统一 AWS 管理面的团队；Claude Platform on AWS 更接近 Anthropic 原生控制台与 API 体验。
   - **模型定位**：AWS 文案把 Opus 4.8 重点放在 agentic coding、professional knowledge work、long-running autonomous tasks，说明新模型的首要落点仍是长任务与企业工作流。
   - **上线检查**：接入前要重新跑现有 Claude Code、browser agent、长文档综合任务的回归集；供应商声称更少停滞和更会求助，不等于旧 prompt 与权限策略自动适配。
@@ -2409,10 +2447,11 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><strong>状态</strong>：降级</li><li><strong>公开说明</strong>：Content source coverage is degraded; some sections may be incomplete.</li><li><strong>hot_blogs</strong>（content_sources_blocked）：hot_blogs coverage is degraded and should be disclosed in the public report.</li></ul></div>
+    <div class="rendered-markdown"><ul><li><strong>状态</strong>：降级</li><li><strong>公开说明</strong>：Content source coverage is degraded; some sections may be incomplete.</li><li><strong>hot_blogs</strong>（content_sources_blocked）：hot_blogs coverage is degraded and should be disclosed in the public report.</li><li><strong>builder_observations</strong>（builder_sources_blocked）：builder_observations coverage is degraded and should be disclosed in the public report.</li></ul></div>
     <template data-rich-source data-source-fallback>- **状态**：降级
 - **公开说明**：Content source coverage is degraded; some sections may be incomplete.
-- **hot_blogs**（content_sources_blocked）：hot_blogs coverage is degraded and should be disclosed in the public report.</template>
+- **hot_blogs**（content_sources_blocked）：hot_blogs coverage is degraded and should be disclosed in the public report.
+- **builder_observations**（builder_sources_blocked）：builder_observations coverage is degraded and should be disclosed in the public report.</template>
   </section>
 <details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">

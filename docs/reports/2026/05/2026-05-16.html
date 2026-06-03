@@ -1091,18 +1091,25 @@ body.lightbox-open {
 }
 
 .builder-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: stretch;
 }
 
 .builder-card {
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
 .builder-card h3 {
+  grid-area: builder-title;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -1133,18 +1140,24 @@ body.lightbox-open {
 }
 
 .builder-card .card-tags {
+  grid-area: builder-tags;
   gap: 6px;
+  align-content: start;
 }
 
 .builder-card > p {
+  grid-area: builder-body;
   margin: 0;
   color: #25231f;
   font-size: 15px;
   line-height: 1.7;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list {
+  grid-area: builder-details;
   gap: 10px;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list div {
@@ -1181,6 +1194,15 @@ body.lightbox-open {
 
   .builder-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-body"
+      "builder-details";
   }
 
   .project-card {
@@ -2250,7 +2272,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-05-16 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-14 至 2026-05-16</div>
@@ -2273,7 +2295,17 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </header>
 
     <div class="report-layout">
-
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="主体信息" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-2" title="社区线索" data-nav-link data-nav-index="2" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
+<a href="#section-html-work-report-3" title="信源审计" data-nav-link data-nav-index="3" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-4" title="自检与产物" data-nav-link data-nav-index="4" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+    </div>
+  </nav>
       <div class="report-section-stack" data-report-region="sections">
         <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -2283,7 +2315,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0hDPC90ZXh0Pjwvc3ZnPg==" alt="OpenAI Help Center" decoding="async"> <a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">OpenAI 在 ChatGPT 中推出个人财务体验</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-15，T0）</li></ol>
+    <div class="rendered-markdown"><h4>其他已核验信号</h4>
+<ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0hDPC90ZXh0Pjwvc3ZnPg==" alt="OpenAI Help Center" decoding="async"> <a href="https://help.openai.com/en/articles/6825453-chatgpt-reles-notes" rel="noopener noreferrer">OpenAI 在 ChatGPT 中推出个人财务体验</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-15，T0）</li></ol>
 <ul><li>该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。</li><li>OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。</li><li>对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。</li></ul>
 <ol start="2"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+WEQ8L3RleHQ+PC9zdmc+" alt="xAI Docs" decoding="async"> <a href="https://docs.x.ai/developers/migration/may-15-retirement" rel="noopener noreferrer">xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-15，T0）</li></ol>
 <ul><li>退役列表包括 `grok-4-1-fast-reasoning`、`grok-4-fast-reasoning`、`grok-4-0709`、`grok-code-fast-1`、`grok-3` 和 `grok-imagine-image-pro` 等。</li><li>reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。</li><li>文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。</li></ul>
@@ -2293,7 +2326,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <ul><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，并在一个工作台里查看计划、diff、命令、预览、测试和 pull request。</li><li>Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。</li><li>对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。</li></ul>
 <ol start="5"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0RCPC90ZXh0Pjwvc3ZnPg==" alt="Google Developers Blog" decoding="async"> <a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer">Google 为 Genkit 发布 middleware 控制层</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-14，T0）</li></ol>
 <ul><li>Genkit 的 `generate()` 会运行工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务结束；middleware 可挂在 generate、model 和 tool 三层。</li><li>首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。</li><li>这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。</li></ul></div>
-    <template data-rich-source data-source-fallback>1. **![OpenAI Help Center](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0hDPC90ZXh0Pjwvc3ZnPg==) [OpenAI 在 ChatGPT 中推出个人财务体验](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)** ==tag-major|重大==（2026-05-15，T0）
+    <template data-rich-source data-source-fallback>### 其他已核验信号
+
+1. **![OpenAI Help Center](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0hDPC90ZXh0Pjwvc3ZnPg==) [OpenAI 在 ChatGPT 中推出个人财务体验](https://help.openai.com/en/articles/6825453-chatgpt-reles-notes)** ==tag-major|重大==（2026-05-15，T0）
   - 该体验覆盖 web 和 iOS，面向支出、账单、订阅、净资产、投资信息、即将付款和预算规划等场景，当前为逐步 rollout。
   - OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。
   - 对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。
