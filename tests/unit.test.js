@@ -873,11 +873,20 @@ test("domestic community leads render as a dedicated navigation section", async 
 
   assert.equal(builderHeroStat.value, "0");
   assert(domesticSection);
-  assert(domesticSection.content.includes("千问 APP"));
-  assert(!domesticSection.content.includes("TechCrunch"));
+  assert.equal(domesticSection.type, "filterable-cards");
+  assert.equal(domesticSection.cardClass, "community-card");
+  assert.equal(domesticSection.items.length, 1);
+  assert.equal(domesticSection.items[0].title, "Leiphone");
+  assert(domesticSection.items[0].body.includes("千问 APP"));
+  assert(!JSON.stringify(domesticSection.items).includes("TechCrunch"));
   assert(communitySection);
-  assert(communitySection.content.includes("TechCrunch"));
-  assert(!communitySection.content.includes("千问 APP"));
+  assert.equal(communitySection.type, "filterable-cards");
+  assert.equal(communitySection.cardClass, "community-card");
+  assert.equal(communitySection.items.length, 1);
+  assert.equal(communitySection.items[0].title, "TechCrunch AI");
+  assert(communitySection.items[0].body.includes("TechCrunch"));
+  assert(communitySection.items[0].points.some((point) => point.label === "核验"));
+  assert(!JSON.stringify(communitySection.items).includes("千问 APP"));
 });
 
 test("X/Twitter discussion section reports checked-source degradation when no status is included", async () => {

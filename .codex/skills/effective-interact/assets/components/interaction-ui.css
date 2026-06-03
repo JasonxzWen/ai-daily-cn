@@ -1179,6 +1179,64 @@ body.lightbox-open {
   overflow-wrap: anywhere;
 }
 
+.community-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.community-card {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.community-card h3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+.community-card .card-title-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafc;
+  object-fit: contain;
+}
+
+.community-card .card-title-link {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.community-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.community-card > p {
+  color: #25231f;
+  line-height: 1.62;
+}
+
+.community-card .card-detail-list {
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.community-card .card-detail-list div {
+  padding-top: 0;
+  border-top: 0;
+}
+
 @media (max-width: 760px) {
   .blog-card {
     grid-template-columns: 1fr;
