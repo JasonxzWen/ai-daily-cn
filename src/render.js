@@ -925,8 +925,6 @@ function renderBuilderObservation(item) {
   const metaHtml = meta.length > 0 ? `<div class="item-meta">${meta.map((value) => `<span>${escapeHtml(value)}</span>`).join("")}</div>` : "";
   const handle = builderHandle(item);
   const handleHtml = handle ? `<span>@${escapeHtml(handle)}</span>` : "";
-  const original = builderOriginalText(item);
-  const originalHtml = original ? `<p class="builder-original"><strong>原文：</strong>${escapeHtml(original)}</p>` : "";
   return `<article class="builder-card">
       <div class="builder-card-header">
         <img class="builder-avatar" src="${escapeAttribute(builderAvatarSrc(item))}" alt="" loading="lazy" decoding="async">
@@ -934,12 +932,7 @@ function renderBuilderObservation(item) {
       </div>
       ${metaHtml}
       <p>${escapeHtml(builderTranslationText(item))}</p>
-      ${originalHtml}
     </article>`;
-}
-
-function builderOriginalText(item) {
-  return String(item?.original_text || item?.originalText || item?.raw_text || "").trim();
 }
 
 function builderTranslationText(item) {

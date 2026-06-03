@@ -201,7 +201,7 @@ try {
   assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
   const builderCardsText = await page.locator(".builder-card-grid").textContent();
   assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
-  assert.match(builderCardsText, /Coding agents need eval loops before unattended work/);
+  assert.doesNotMatch(builderCardsText, /Coding agents need eval loops before unattended work/);
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
   assert.equal(await builderCardsUseHorizontalRows(page), true);
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
