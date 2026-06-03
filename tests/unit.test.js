@@ -2776,6 +2776,101 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(await exists(result.candidatePoolPath), true);
 });
 
+test("report:write allows explicit network-outage empty reports only", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-empty-outage-"));
+  const reportDate = "2026-06-03";
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const draftPath = path.join(tmp, "daily-report.json");
+  const candidatePoolPath = path.join(tmp, "source-candidates.json");
+
+  Object.assign(draft, {
+    report_date: reportDate,
+    report_status: "empty_due_to_network_outage",
+    title: `AI 日报 ${reportDate}`,
+    summary: "固定信源网络阻塞，本轮未写入未核验主体事实。",
+    hero_highlights: [],
+    source_window: {
+      date_from: reportDate,
+      date_to: reportDate,
+      fallback_window_used: false,
+      notes: "network outage fixture"
+    },
+    source_audit: networkOutageSourceAuditFixture(),
+    main_items: [],
+    github_trending: [],
+    model_releases: [],
+    hot_blogs: [],
+    projects: [],
+    builder_observations: [],
+    community_leads: [],
+    evidence_assets: [],
+    self_check: {
+      ...draft.self_check,
+      report_date: reportDate,
+      main_items: 0,
+      builder_observations: 0,
+      notes: "network outage fixture",
+      optimization_suggestions: []
+    }
+  });
+
+  Object.assign(candidatePool, {
+    report_date: reportDate,
+    generated_at: "2026-06-03T02:35:00+08:00",
+    sources: [
+      {
+        id: "source-network-outage",
+        name: "Network outage fixture",
+        url: "https://example.com/network-outage",
+        category: "other",
+        status: "blocked",
+        checked_at: "2026-06-03T02:35:00+08:00",
+        notes: "fetch failed EACCES"
+      }
+    ],
+    candidates: []
+  });
+
+  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
+
+  const result = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: draftPath,
+    outputDir: "reports-data",
+    candidatePoolPath,
+    siteUrl,
+    generatedAt: "2026-06-03T02:35:00+08:00",
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  assert.equal(result.report.report_status, "empty_due_to_network_outage");
+  assert.deepEqual(result.report.main_items, []);
+  assert.equal(result.report.quality_status.status, "degraded");
+  assert(result.report.quality_status.reasons.includes("empty_due_to_network_outage"));
+  assert(
+    result.report.quality_status.degraded_sections.some(
+      (issue) => issue.code === "empty_due_to_network_outage" && issue.section === "main_items"
+    )
+  );
+  assert(
+    !result.report.quality_status.degraded_sections.some(
+      (issue) => issue.code === "empty_due_to_network_outage" && issue.section !== "main_items"
+    )
+  );
+
+  const interaction = reportToInteractionInput(result.report);
+  const mainSection = interaction.sections.find((section) => section.title === "主体信息");
+  assert(mainSection.content.includes("未写入未核验主体事实"));
+
+  const invalid = structuredClone(result.report);
+  invalid.report_status = "normal";
+  const invalidValidation = validateReport(invalid);
+  assert.equal(invalidValidation.valid, false);
+  assert(invalidValidation.errors.some((error) => error.path === "/main_items"));
+});
+
 test("report:write importance labels are schema-validated and rendered", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -4686,6 +4781,61 @@ function sourceAuditFixture() {
       candidates_found: 0,
       included: 0,
       notes: "fixture"
+    }
+  };
+}
+
+function networkOutageSourceAuditFixture() {
+  const blockedSources = (prefix, count) =>
+    Array.from({ length: count }, (_, index) => ({
+      name: `${prefix} ${index + 1}`,
+      url: `https://example.com/${slugId(prefix)}-${index + 1}`,
+      status: "blocked",
+      notes: "fetch failed EACCES"
+    }));
+
+  return {
+    github_trending: {
+      checked: true,
+      sources: blockedSources("GitHub Trending", 3),
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: "fetch_failed",
+      notes: "network outage fixture"
+    },
+    builder_sources: {
+      checked: true,
+      sources: blockedSources("Builder Source", 3),
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: "fetch_failed",
+      last_successful_feed_at: null,
+      notes: "network outage fixture"
+    },
+    content_sources: {
+      checked: true,
+      sources: blockedSources("Content Source", 50),
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: "fetch_failed",
+      notes: "network outage fixture"
+    },
+    search_sources: {
+      checked: true,
+      shadow: true,
+      sources: blockedSources("Search Source", 3),
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: "fetch_failed",
+      notes: "network outage fixture"
+    },
+    sources_health: {
+      checked: true,
+      sources: blockedSources("Source Health", 3),
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: "fetch_failed",
+      notes: "network outage fixture"
     }
   };
 }
