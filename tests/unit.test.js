@@ -803,9 +803,10 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert.equal(section.type, "filterable-cards");
   assert.equal(section.cardClass, "builder-card");
   assert.equal(section.items[0].title, "Example Builder");
+  assert.equal(section.items[0].subtitle, "@examplebuilder");
   assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
   assert(!JSON.stringify(section.items[0].points).includes("unattended work"));
-  assert(section.items[0].points.some((point) => point.label === "账号" && point.value === "@examplebuilder"));
+  assert(!section.items[0].points.some((point) => point.label === "账号"));
   assert(!JSON.stringify(section).includes("Original X URL was collected"));
   assert(!JSON.stringify(section).includes("证据："));
 });
