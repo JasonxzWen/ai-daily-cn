@@ -299,7 +299,7 @@ function dailyIntent(report) {
 
 function dailyHeroStats(report, collections) {
   const sourceWindow = report.source_window || {};
-  const builderCount = collections.builderObservations.length + collections.communityLeads.length;
+  const builderCount = collections.builderObservations.length;
   const aigcCount = countAigcSignals(collections);
   return [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
