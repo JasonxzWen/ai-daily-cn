@@ -855,15 +855,12 @@ function formatBuilderObservationCards(items, report) {
   return items.map((item) => {
     const translation = builderTranslationText(item);
     const handle = builderHandle(item);
-    const points = [];
-    if (handle) {
-      points.push({ label: "账号", value: `@${handle}` });
-    }
 
     return {
       group: "X/Twitter",
       title: item.author,
       href: item.url,
+      subtitle: handle ? `@${handle}` : "",
       titleIcon: builderAvatarIcon(report, item),
       body: formatDailyInlineText(translation, item),
       showGroup: false,
@@ -872,7 +869,7 @@ function formatBuilderObservationCards(items, report) {
         item.role ? cardTag(item.role, "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points
+      points: []
     };
   });
 }

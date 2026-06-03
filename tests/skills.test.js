@@ -570,6 +570,7 @@ test("effective-interact filterable cards render linked project subcards", async
               group: "PROJECTS",
               title: "Project Alpha",
               href: "https://example.com/project-alpha",
+              subtitle: "@projectalpha",
               titleIcon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=",
               body: "A **reusable** plugin set for ==agent workflows==. <script>alert(1)</script>",
               tags: ["daily signal"],
@@ -603,6 +604,7 @@ test("effective-interact filterable cards render linked project subcards", async
   assert.match(html, /project-card-grid/);
   assert.match(html, /<h3><img class="[^"]*\binline-site-icon\b[^"]*"/);
   assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
+  assert.match(html, /class="card-subtitle">@projectalpha<\/span>/);
   assert.match(html, /card-detail-list/);
   assert.match(html, /card-detail-icon/);
   assert.match(html, /<dt>领域<\/dt>/);
@@ -672,7 +674,7 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(html, /blog-card-grid/);
   assert.match(card, /data-filter-value="LOCAL SPEECH-TO-SPEECH AGENT STACK"/);
   assert.doesNotMatch(card, /<div class="meta">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/div>/);
-  assert.match(card, /<h3><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
+  assert.match(card, /<h3><span class="card-title-text"><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
   assert.match(card, /<span class="chip">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/span>/);
   assert.match(card, /card-media-grid/);
   assert.match(card, /data-lightbox-image="true"/);

@@ -824,6 +824,21 @@ p.hero-summary-text {
   overflow-wrap: anywhere;
 }
 
+.card-title-text {
+  display: inline-flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .card-media-grid {
   display: grid;
   grid-template-columns: 1fr;

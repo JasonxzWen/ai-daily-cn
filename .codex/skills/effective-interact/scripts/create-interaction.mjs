@@ -1192,14 +1192,16 @@ function normalizeCardTag(tag) {
 
 function renderCardTitle(item) {
   const title = escapeHtml(item.title || "Untitled");
+  const subtitle = String(item.subtitle || item.subTitle || item.sub_title || "").trim();
+  const subtitleHtml = subtitle ? `<span class="card-subtitle">${escapeHtml(subtitle)}</span>` : "";
   const href = safeLink(item.href || item.url || "");
   const iconSource = item.titleIcon || item.title_icon || item.icon || item.iconDataUri || item.icon_data_uri || "";
   const icon = safeDataImage(iconSource) || safeLink(iconSource);
   const iconHtml = icon ? `<img class="inline-site-icon card-title-icon" src="${escapeAttr(icon)}" alt="" loading="lazy" decoding="async">` : "";
   if (!href) {
-    return `<h3>${iconHtml}${title}</h3>`;
+    return `<h3>${iconHtml}<span class="card-title-text"><span>${title}</span>${subtitleHtml}</span></h3>`;
   }
-  return `<h3>${iconHtml}<a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a></h3>`;
+  return `<h3>${iconHtml}<span class="card-title-text"><a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a>${subtitleHtml}</span></h3>`;
 }
 
 function renderCardDetails(points) {

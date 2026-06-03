@@ -200,6 +200,7 @@ try {
   assert.equal(await page.locator(".builder-card").count(), 2);
   assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
   const builderCardsText = await page.locator(".builder-card-grid").textContent();
+  assert.match(builderCardsText, /@examplebuilder/);
   assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
   assert.doesNotMatch(builderCardsText, /Coding agents need eval loops before unattended work/);
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
@@ -365,11 +366,12 @@ async function builderCardsUseHorizontalRows(page) {
       const titleRect = card.querySelector("h3")?.getBoundingClientRect();
       const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
       const detailRect = card.querySelector(".card-detail-list")?.getBoundingClientRect();
+      const detailOk = !detailRect || (titleRect && detailRect.left > titleRect.left + 120);
       return columns.length === 2
         && areas.includes("builder-title")
         && areas.includes("builder-body")
         && Boolean(titleRect && bodyRect && bodyRect.left > titleRect.left + 120)
-        && Boolean(detailRect && titleRect && detailRect.left > titleRect.left + 120);
+        && Boolean(detailOk);
     });
   });
 }
