@@ -305,9 +305,8 @@ function dailyHeroStats(report, collections) {
   const sourceWindow = report.source_window || {};
   const builderCount = collections.builderObservations.length;
   const aigcCount = countAigcSignals(collections);
-  return [
+  const stats = [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "AIGC", value: String(aigcCount), detail: "产品/内容" },
     { label: "技术博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
@@ -317,6 +316,10 @@ function dailyHeroStats(report, collections) {
       detail: sourceWindow.fallback_window_used ? "扩展时间范围" : "标准时间范围"
     }
   ];
+  if (aigcCount > 0) {
+    stats.splice(1, 0, { label: "AIGC", value: String(aigcCount), detail: "产品/内容" });
+  }
+  return stats;
 }
 
 function dailyHeroEyebrow(report) {
@@ -359,7 +362,7 @@ function countAigcSignals(collections) {
     ]
       .filter(Boolean)
       .join(" ");
-    return /\bAIGC\b|video|image|creator|content|cover|AI PC|agent PC|Grok Imagine|Cosmos|MoneyPrinter|Qwen Code|Model Studio/i.test(text);
+    return /\bAIGC\b|video|image|creator|content|cover|multimodal|object detection|vision-language|speech|audio|TTS|AI PC|agent PC|Grok Imagine|Cosmos|MoneyPrinter|Qwen Code|Model Studio|多模态|图像|图片|视觉|视频|语音|声音|音频|目标检测|内容生成|生成内容|文生|生图|创作者|内容产业|文娱|短剧|数字人|具身智能/i.test(text);
   }).length;
 }
 

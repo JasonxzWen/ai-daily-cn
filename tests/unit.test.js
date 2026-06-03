@@ -889,6 +889,38 @@ test("domestic community leads render as a dedicated navigation section", async 
   assert(!JSON.stringify(communitySection.items).includes("千问 APP"));
 });
 
+test("AIGC hero stat counts Chinese signals and omits zero-value cards", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items = [
+    {
+      ...report.main_items[0],
+      title: "示例模型支持多模态图像生成",
+      content: "官方介绍多模态图像生成能力，适合 AIGC 产品团队跟进。",
+      summary: "多模态图像生成能力。",
+      editorial_category: "model_release"
+    }
+  ];
+  report.hot_blogs = [];
+  report.github_trending = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.community_leads = [];
+  report.self_check.builder_observations = 0;
+
+  const input = reportToInteractionInput(report);
+  const aigcStat = input.heroStats.find((item) => item.label === "AIGC");
+  assert.deepEqual([aigcStat.label, aigcStat.value, aigcStat.detail], ["AIGC", "1", "产品/内容"]);
+
+  report.main_items[0] = {
+    ...report.main_items[0],
+    title: "示例模型发布",
+    content: "官方介绍推理能力和 API 可用性。",
+    summary: "推理能力和 API 可用性。"
+  };
+  const noAigcInput = reportToInteractionInput(report);
+  assert(!noAigcInput.heroStats.some((item) => item.label === "AIGC"));
+});
+
 test("X/Twitter discussion section reports checked-source degradation when no status is included", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
