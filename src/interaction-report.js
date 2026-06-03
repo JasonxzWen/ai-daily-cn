@@ -507,6 +507,9 @@ function trendTagsFor(annotations, section, index) {
 
 function formatMainItems(items, context = {}) {
   if (items.length === 0) {
+    if (context.report?.report_status === "empty_due_to_network_outage") {
+      return "本次固定信源发现面全部因网络不可用阻塞，未写入未核验主体事实。请展开“发布质量说明”和“信源审计”查看各来源状态。";
+    }
     return "暂无主体信息。";
   }
 

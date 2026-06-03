@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-02T09:17:18.235Z",
+  "generated_at": "2026-06-03T02:51:35.110Z",
   "window_days": 7,
   "source": {
-    "report_count": 20,
-    "date_from": "2026-05-27",
-    "date_to": "2026-06-02"
+    "report_count": 21,
+    "date_from": "2026-05-28",
+    "date_to": "2026-06-03"
   },
   "thresholds": {
     "watching": {
@@ -32,8 +32,8 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 37,
-      "active_days": 7,
+      "occurrences": 33,
+      "active_days": 6,
       "sections": [
         "builder_observations",
         "github_trending",
@@ -53,7 +53,6 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-05-27",
         "2026-05-28",
         "2026-05-29",
         "2026-05-30",
@@ -62,7 +61,6 @@
         "2026-06-02"
       ],
       "related_reports": [
-        "2026-05-27",
         "2026-05-28",
         "2026-05-29",
         "2026-05-30",
@@ -74,9 +72,9 @@
     {
       "id": "mcp",
       "label": "MCP",
-      "status": "hot",
-      "occurrences": 5,
-      "active_days": 4,
+      "status": "active",
+      "occurrences": 4,
+      "active_days": 3,
       "sections": [
         "builder_observations",
         "hot_blogs",
@@ -84,17 +82,14 @@
       ],
       "entities": [
         "AWS",
-        "Claude Code",
-        "GitHub Copilot"
+        "Claude Code"
       ],
       "dates": [
-        "2026-05-27",
         "2026-05-28",
         "2026-06-01",
         "2026-06-02"
       ],
       "related_reports": [
-        "2026-05-27",
         "2026-05-28",
         "2026-06-01",
         "2026-06-02"
@@ -104,8 +99,8 @@
       "id": "enterprise-agent-governance",
       "label": "enterprise agent governance",
       "status": "active",
-      "occurrences": 4,
-      "active_days": 4,
+      "occurrences": 3,
+      "active_days": 3,
       "sections": [
         "github_trending",
         "hot_blogs",
@@ -115,17 +110,14 @@
         "Claude Code",
         "Codex",
         "GitHub",
-        "GitHub Copilot",
         "Google"
       ],
       "dates": [
-        "2026-05-27",
         "2026-05-28",
         "2026-05-30",
         "2026-06-02"
       ],
       "related_reports": [
-        "2026-05-27",
         "2026-05-28",
         "2026-05-30",
         "2026-06-02"
@@ -135,8 +127,8 @@
   "candidate_topics": [
     {
       "term": "github",
-      "occurrences": 82,
-      "active_days": 7,
+      "occurrences": 81,
+      "active_days": 6,
       "display": false
     },
     {
@@ -158,15 +150,15 @@
       "display": false
     },
     {
-      "term": "agent",
-      "occurrences": 63,
-      "active_days": 7,
-      "display": false
-    },
-    {
       "term": "trending daily",
       "occurrences": 61,
       "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "agent",
+      "occurrences": 58,
+      "active_days": 6,
       "display": false
     },
     {
@@ -237,20 +229,20 @@
     },
     {
       "term": "code",
-      "occurrences": 27,
-      "active_days": 7,
+      "occurrences": 25,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "claude",
-      "occurrences": 26,
-      "active_days": 7,
+      "occurrences": 24,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "api",
-      "occurrences": 21,
-      "active_days": 7,
+      "occurrences": 19,
+      "active_days": 6,
       "display": false
     }
   ],
@@ -1385,6 +1377,10 @@
           ]
         }
       ]
+    },
+    "2026-06-03": {
+      "main_items": [],
+      "github_trending": []
     }
   }
 }

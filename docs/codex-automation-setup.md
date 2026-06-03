@@ -60,6 +60,8 @@ network_access = true
 
 在 Codex UI 中对应的提醒文案是：设置“当沙盒设置为工作区写入时允许网络访问”。日报质量门会把这类情况写入 `quality_status.degraded_sections` 的 `source_discovery_network_unavailable`，并在公开 HTML 的发布质量说明中展示。
 
+如果全部活跃固定信源都因网络错误阻塞，并且没有任何事实可以被一手或可信来源核验，结构化草稿应显式使用 `report_status:"empty_due_to_network_outage"` 与 `main_items: []`。这只能作为降级日报发布，必须保留最终 `source_audit` 的 blocked 证据，并在 `quality_status.degraded_sections` 中公开标注 `empty_due_to_network_outage`；不要为了通过 schema 添加占位主体条目。
+
 保存发现命令输出时优先使用脚本级 `--output` 参数，例如：
 
 ```powershell

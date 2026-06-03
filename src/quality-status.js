@@ -123,6 +123,11 @@ export function deriveQualityStatus(report, candidatePool = null) {
   const affectedSections = [];
   const audit = report?.source_audit || {};
 
+  if (isEmptyNetworkOutageReport(report)) {
+    reasons.push("empty_due_to_network_outage");
+    affectedSections.push("main_items");
+  }
+
   addSourceDegradation({
     group: audit.github_trending,
     reason: "github_trending_blocked",
@@ -307,7 +312,16 @@ function isBlockingPublishQualityIssue(issue) {
 function degradedSectionsFromReasons(reasons, affectedSections) {
   const sections = unique(affectedSections);
   return sections.map((section) => {
-    const reason = reasons.find((item) => String(item || "").includes(section)) || reasons[0] || "coverage_degraded";
+    if (section === "main_items" && reasons.includes("empty_due_to_network_outage")) {
+      return {
+        error_code: "empty_report_network_outage",
+        code: "empty_due_to_network_outage",
+        section,
+        message: "All fixed source lanes were blocked by network errors, so the report intentionally contains no unverified main_items.",
+        remediation: "Enable workspace-write network access and rerun discovery before publishing a factual daily report."
+      };
+    }
+    const reason = degradedReasonForSection(reasons, section);
     return {
       error_code: "quality_degraded",
       code: reason,
@@ -316,6 +330,21 @@ function degradedSectionsFromReasons(reasons, affectedSections) {
       remediation: "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
     };
   });
+}
+
+function degradedReasonForSection(reasons, section) {
+  const mapped = {
+    github_trending: "github_trending_blocked",
+    hot_blogs: "content_sources_blocked",
+    builder_observations: "builder_sources_blocked"
+  }[section];
+  if (mapped && reasons.includes(mapped)) {
+    return mapped;
+  }
+  return reasons.find((item) => String(item || "").includes(section)) ||
+    reasons.find((item) => item !== "empty_due_to_network_outage") ||
+    reasons[0] ||
+    "coverage_degraded";
 }
 
 function strictAutomationRevisionIssues(report, options = {}) {
@@ -814,6 +843,11 @@ function sectionCount(report, section) {
   return Array.isArray(value) ? value.length : 0;
 }
 
+function isEmptyNetworkOutageReport(report) {
+  return report?.report_status === "empty_due_to_network_outage" &&
+    sectionCount(report, "main_items") === 0;
+}
+
 function countContentUnits(report) {
   return [
     "main_items",
@@ -840,6 +874,10 @@ function publicQualityNote(status, reasons, explicitNote) {
     return explicitNote || "Report generation is blocked by a startup or validation failure.";
   }
   if (status === "degraded") {
+    if (reasons.includes("empty_due_to_network_outage")) {
+      return explicitNote ||
+        `本轮固定信源发现面因网络不可用全部阻塞，日报未写入未核验主体事实。${WORKSPACE_WRITE_NETWORK_REMINDER}`;
+    }
     if (reasons.includes("source_discovery_network_unavailable")) {
       return explicitNote ||
         `本轮固定信源发现面疑似网络不可用，日报可能沿用了旧候选或只保留 blocked 审计。${WORKSPACE_WRITE_NETWORK_REMINDER}`;

@@ -20,6 +20,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `source_window`
 - `source_audit`
 - `quality_status`
+- `report_status`：默认 `normal`。仅当全部活跃固定信源都因网络错误阻塞，且没有任何可核验事实可写入主体时，才使用 `empty_due_to_network_outage` 并保持 `main_items: []`。
 - `github_trending`
 - `main_items`
 - `model_releases`
@@ -59,6 +60,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 - 新日报目标为 22-30 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
 - `main_items` 目标为 8-12 条，默认 10 条；每条用 2-4 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。`==...==` 只用于正文关键词，公开页会渲染为加粗变色文字，不是 tag/chip。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
+- 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
 - 低于 18 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 

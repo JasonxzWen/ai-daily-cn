@@ -72,6 +72,7 @@ export function normalizeReportDraft(draft, options = {}) {
   const report = {
     ...draft,
     schema_version: 1,
+    report_status: draft.report_status || "normal",
     report_date: reportDate,
     canonical_url: draft.canonical_url || canonicalUrl,
     html_path: draft.html_path || paths.htmlPath,
@@ -83,6 +84,7 @@ export function normalizeReportDraft(draft, options = {}) {
     },
     hero_highlights: Array.isArray(draft.hero_highlights) ? draft.hero_highlights : [],
     candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
+    main_items: Array.isArray(draft.main_items) ? draft.main_items : [],
     github_trending: Array.isArray(draft.github_trending) ? draft.github_trending : [],
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
