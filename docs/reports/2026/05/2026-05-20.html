@@ -1091,18 +1091,25 @@ body.lightbox-open {
 }
 
 .builder-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: stretch;
 }
 
 .builder-card {
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
 .builder-card h3 {
+  grid-area: builder-title;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -1133,18 +1140,24 @@ body.lightbox-open {
 }
 
 .builder-card .card-tags {
+  grid-area: builder-tags;
   gap: 6px;
+  align-content: start;
 }
 
 .builder-card > p {
+  grid-area: builder-body;
   margin: 0;
   color: #25231f;
   font-size: 15px;
   line-height: 1.7;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list {
+  grid-area: builder-details;
   gap: 10px;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list div {
@@ -1181,6 +1194,15 @@ body.lightbox-open {
 
   .builder-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-body"
+      "builder-details";
   }
 
   .project-card {
@@ -2250,7 +2272,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-05-20 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-19 至 2026-05-20</div>
@@ -2273,7 +2295,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </header>
 
     <div class="report-layout">
-
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="主体信息" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-html-work-report-2" title="热门技术博客" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>热门技术博客</span></a>
+<a href="#section-html-work-report-3" title="社区线索" data-nav-link data-nav-index="3" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
+<a href="#section-html-work-report-4" title="信源审计" data-nav-link data-nav-index="4" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-5" title="自检与产物" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+    </div>
+  </nav>
       <div class="report-section-stack" data-report-region="sections">
         <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -2283,7 +2316,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0I8L3RleHQ+PC9zdmc+" alt="Google Blog" decoding="async"> <a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/" rel="noopener noreferrer">Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">enterprise agent governance: 7d 5x/3d</mark>（2026-05-19，T0）</li></ol>
+    <div class="rendered-markdown"><h4>其他已核验信号</h4>
+<ol><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0I8L3RleHQ+PC9zdmc+" alt="Google Blog" decoding="async"> <a href="https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/" rel="noopener noreferrer">Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">enterprise agent governance: 7d 5x/3d</mark>（2026-05-19，T0）</li></ol>
 <ul><li>Antigravity 2.0 作为独立桌面应用，强调多 agent 并行、动态 subagents、定时任务和与 AI Studio、Android、Firebase 的集成。</li><li>Gemini API Managed Agents 用单次 API 调用创建可运行工具和代码的隔离 Linux 环境，并能通过 AGENTS.md 与 SKILL.md 定义可版本化 agent。</li><li>AI Studio 增加 Workspace 集成、导出到 Antigravity、原生 Android prompt-to-app 和 Google Play 内测发布路径，目标是把原型、代码、测试和部署压到同一工作面。</li></ul>
 <ol start="2"><li><strong><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> <a href="https://github.blog/changelog/month/05-2026/" rel="noopener noreferrer">GitHub Copilot 接入 Gemini 3.5 Flash，并把代码评审建议批量交给 cloud agent 修复</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-19，T0）</li></ol>
 <ul><li>Gemini 3.5 Flash 面向 Copilot Pro、Pro+、Business 和 Enterprise 用户滚动开放，可在 VS Code、Visual Studio、JetBrains、Xcode 和 Eclipse 中选择。</li><li>Fix with Copilot 会在 handoff 前弹出对话框，让用户选择是直接改当前 PR、开新 PR、选择模型还是补充指令。</li><li>批量修复入口意味着 Copilot code review 不再只是评论生成器，而是把 review comments 变成 cloud agent 的可执行任务队列。</li></ul>
@@ -2295,7 +2329,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <ul><li>KPMG 的 Digital Gateway 是客户和员工执行实际业务的软件入口，Claude 被放入审计、税务、法务、网络安全和 PE 服务上下文。</li><li>这类部署要求模型输出可审计、可追责，并能适配受监管行业的安全、权限和数据治理要求。</li><li>对企业 AI 平台团队而言，关键不只是采购模型，而是把模型能力嵌入已有业务系统、客户交付流程和行业合规边界。</li></ul>
 <ol start="6"><li><strong><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+REw8L3RleHQ+PC9zdmc+" alt="dbt Labs" decoding="async"> <a href="https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026" rel="noopener noreferrer">dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 16x/6d</mark> <mark class="text-highlight daily-tag daily-tag-topic">MCP: 7d 12x/3d</mark>（2026-05-19，T0）</li></ol>
 <ul><li>Developer Agent 面向 dbt 项目图、lineage、校验和模型构建，不是通用 coding agent 直接改 SQL 文件。</li><li>MCP OAuth 让 Claude、ChatGPT、Glean 等 OAuth-enabled AI tools 能用现有 dbt 登录连接，不必手工分发 token。</li><li>Remote MCP Server 新增 Admin API 和产品文档工具，AI assistant 能排查 job error 并回到实时官方文档，而不是只生成查询。</li></ul></div>
-    <template data-rich-source data-source-fallback>1. **![Google Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0I8L3RleHQ+PC9zdmc+) [Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈](https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/)** ==tag-major|重大== ==tag-topic|enterprise agent governance: 7d 5x/3d==（2026-05-19，T0）
+    <template data-rich-source data-source-fallback>### 其他已核验信号
+
+1. **![Google Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0I8L3RleHQ+PC9zdmc+) [Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈](https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/)** ==tag-major|重大== ==tag-topic|enterprise agent governance: 7d 5x/3d==（2026-05-19，T0）
   - Antigravity 2.0 作为独立桌面应用，强调多 agent 并行、动态 subagents、定时任务和与 AI Studio、Android、Firebase 的集成。
   - Gemini API Managed Agents 用单次 API 调用创建可运行工具和代码的隔离 Linux 环境，并能通过 AGENTS.md 与 SKILL.md 定义可版本化 agent。
   - AI Studio 增加 Workspace 集成、导出到 Antigravity、原生 Android prompt-to-app 和 Google Play 内测发布路径，目标是把原型、代码、测试和部署压到同一工作面。

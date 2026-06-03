@@ -38,6 +38,7 @@ import {
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
 import { classifyPublishQuality, findPublishQualityIssues } from "../src/quality-status.js";
+import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -530,7 +531,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.renderMode, "pre-rendered");
   assert.equal(input.heroMode, "daily-report");
   assert.equal(input.heroTitle, "2026-05-15");
-  assert.equal(input.hideNavigation, true);
+  assert.equal(input.hideNavigation, false);
   assert.equal(input.heroEyebrow, "AI 日报 · 覆盖 2026-05-15");
   assert(input.summary.includes("Google 把模型和 agent 工具放进同一条链路"));
   assert.deepEqual(
@@ -663,6 +664,58 @@ test("project interaction content is only shown as GitHub Trending item tags", a
   assert(section.content.includes("==tag-highlight|项目 highlight=="));
   assert(!section.content.includes("Project Beta"));
   assert(!section.content.includes("eval dashboards"));
+});
+
+test("GitHub Trending project highlights deduplicate overlapping project text", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      name: "example/headroom",
+      repo: "example/headroom",
+      description: "压缩工具输出、日志、文件和 RAG chunks，在进入 LLM 前减少 token。",
+      url: "https://github.com/example/headroom",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "all",
+      window: "daily",
+      rank: 1,
+      previous_rank: 1,
+      rank_delta: 0,
+      trend: "same",
+      evidence: "GitHub Trending daily rank #1 with 1,265 stars today."
+    }
+  ];
+  report.projects = [
+    {
+      name: "example/headroom",
+      description: "在 LLM 前压缩工具输出、日志、文件和 RAG chunks，目标是减少 token 同时保持回答质量。",
+      url: "https://github.com/example/headroom",
+      domains: ["LLM 工具链", "RAG", "MCP"],
+      use_case: "把长日志、工具输出或检索片段送入模型前做压缩，降低上下文成本。",
+      event_date: "2026-05-15",
+      source: "GitHub",
+      signal: "trending",
+      evidence: "GitHub Trending daily appeared in discovery."
+    }
+  ];
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const input = reportToInteractionInput(validation.value);
+  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+  assert(section.content.includes("压缩工具输出、日志、文件和 RAG chunks"));
+  assert(section.content.includes("领域：LLM 工具链、RAG、MCP"));
+  assert(section.content.includes("==tag-highlight|项目 highlight=="));
+  assert(!section.content.includes("目标是减少 token 同时保持回答质量"));
+  assert(!section.content.includes("把长日志、工具输出或检索片段"));
+
+  const html = renderReportHtml(validation.value);
+  const githubSection = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="builder-observations"'));
+  assert(githubSection.includes("压缩工具输出、日志、文件和 RAG chunks"));
+  assert(githubSection.includes("领域：LLM 工具链、RAG、MCP"));
+  assert(!githubSection.includes("目标是减少 token 同时保持回答质量"));
+  assert(!githubSection.includes("把长日志、工具输出或检索片段"));
 });
 
 test("interaction input rewrites generation-log summaries into editorial summaries", async () => {
@@ -1855,6 +1908,78 @@ test("content source discovery keeps self-media as intermediary leads requiring 
   assert.match(candidate.notes, /primary_verification_required=true/);
 });
 
+test("content source discovery reads date-scoped WeChat article input without leaking local paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-wechat-input-"));
+  const inputPath = path.join(tmp, "2026-05-26.json");
+  await fs.writeFile(inputPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-05-26",
+    articles: [
+      {
+        url: "https://mp.weixin.qq.com/s/example?scene=21&from=timeline",
+        account_name: "AI Product Notes",
+        published_at: "2026-05-26T09:00:00+08:00",
+        title: "AI video tools reshape creator workflows",
+        summary: "A whitelist WeChat article tracks product and creator workflow changes.",
+        risk_level: "low",
+        allowed_sections: ["community_leads", "opinion_analysis"],
+        verification_notes: "Low-risk industry interpretation; product claims require primary confirmation.",
+        risk_notes: "No funding, pricing, benchmark, safety, or regulatory claim is used as fact.",
+        reader_relevance: "Useful for AIGC content-industry monitoring."
+      }
+    ]
+  }), "utf8");
+
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [],
+    wechatInputPath: inputPath,
+    fetchImpl: async () => textResponse(emptyRssFixture())
+  });
+
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].category, "community_lead");
+  assert.equal(collected.candidates[0].source_level, "wechat_industry_whitelist");
+  assert.equal(collected.candidates[0].url, "https://mp.weixin.qq.com/s/example");
+  assert.match(collected.candidates[0].notes, /input_path_redacted=true/);
+  assert.doesNotMatch(JSON.stringify(collected), new RegExp(escapeRegExp(tmp)));
+  const auditSource = collected.source_audit.content_sources.sources.find((source) => source.name === "WeChat Article Link Input");
+  assert.equal(auditSource.status, "checked");
+  assert.doesNotMatch(auditSource.notes, /ai-daily-wechat-input/);
+});
+
+test("content source discovery rejects WeChat article input containing local machine paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-wechat-input-"));
+  const inputPath = path.join(tmp, "2026-05-26.json");
+  await fs.writeFile(inputPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-05-26",
+    articles: [
+      {
+        url: "https://mp.weixin.qq.com/s/example",
+        account_name: "AI Product Notes",
+        published_at: "2026-05-26T09:00:00+08:00",
+        title: "AI video tools reshape creator workflows",
+        summary: "Draft came from C:\\Users\\Admin\\.codex\\automations\\ai-daily\\inputs\\wechat\\2026-05-26.json",
+        risk_level: "low",
+        verification_notes: "Low-risk industry interpretation."
+      }
+    ]
+  }), "utf8");
+
+  await assert.rejects(
+    () => collectContentSources({
+      reportDate: "2026-05-26",
+      generatedAt: fixedGeneratedAt,
+      sources: [],
+      wechatInputPath: inputPath,
+      fetchImpl: async () => textResponse(emptyRssFixture())
+    }),
+    (error) => error.code === "wechat_input_privacy_violation"
+  );
+});
+
 test("content source discovery accepts X hotspot feeds only when original post URL is preserved", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
@@ -2313,6 +2438,18 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
           enablement: "manual",
           verification_policy: "community_only",
           requires_original_url: false
+        },
+        {
+          id: "health-wechat2rss",
+          name: "Health Wechat2RSS",
+          url: "https://wechat2rss.example.invalid/feed.xml",
+          source_kind: "aggregator",
+          candidate_category: "community_lead",
+          tier: "T3",
+          authority: "aggregator",
+          enablement: "manual",
+          verification_policy: "primary_required",
+          url_env: "AI_DAILY_TEST_WECHAT2RSS_FEED_URL"
         }
       ]
     }),
@@ -2333,6 +2470,23 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
   assert.equal(health.results[0].recent_48h_entries, 1);
   assert.equal(health.results[1].status, "skipped_missing_base_url");
   assert.equal(health.results[2].status, "skipped_manual_source");
+  assert.equal(health.results[3].status, "skipped_missing_base_url");
+});
+
+test("public artifact privacy scan blocks local machine path leakage", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-privacy-scan-"));
+  await fs.mkdir(path.join(tmp, "docs/reports"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs/data"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "reports-data"), { recursive: true });
+  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>C:\\Users\\Admin\\.codex\\automations\\ai-daily</p>", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
+  const blocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
+  assert.equal(blocked.ok, false);
+  assert(blocked.findings.some((finding) => finding.pattern === "windows_user_path"));
+
+  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>https://mp.weixin.qq.com/s/example</p>", "utf8");
+  const clean = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
+  assert.equal(clean.ok, true, JSON.stringify(clean.findings));
 });
 
 test("CLI JSON commands can write clean UTF-8 output files", async () => {
@@ -3099,8 +3253,8 @@ test("report:write records automation revision fingerprint in self_check", async
     git_branch: "codex/test",
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
-    source_registry_count: 63,
-    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    source_registry_count: 68,
+    source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     origin_main_sha: "abcdef1234567890abcdef1234567890abcdef12",
     origin_main_short: "abcdef123456",
     rules: ["fixed_source_checklist"]
@@ -3346,6 +3500,26 @@ test("publish quality degrades strict daily reports missing follow-builders X st
   assert(
     classification.degraded_sections.some(
       (issue) => issue.error_code === "builder_x_coverage_gate_failed" && issue.has_x_observation === false
+    )
+  );
+});
+
+test("publish quality degrades strict daily reports with fewer than five Builder observations", () => {
+  const report = strictPublishReportFixture();
+  report.builder_observations = report.builder_observations.slice(0, 3);
+  report.self_check.builder_observations = report.builder_observations.length;
+  report.source_audit.builder_sources.candidates_found = 12;
+  report.source_audit.builder_sources.included = report.builder_observations.length;
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) =>
+        issue.error_code === "strict_section_coverage_gate_failed" &&
+        issue.code === "builder_observations_below_strict_minimum" &&
+        issue.minimum === 5
     )
   );
 });
@@ -3698,7 +3872,7 @@ test("report:write marks low content unit density degraded when enough candidate
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseCandidate = candidatePool.candidates[0];
 
-  for (let index = 1; index <= 17; index += 1) {
+  for (let index = 1; index <= 27; index += 1) {
     candidatePool.candidates.push({
       ...baseCandidate,
       id: `project-unused-${index}`,
@@ -3717,6 +3891,7 @@ test("report:write marks low content unit density degraded when enough candidate
   });
 
   assert.equal(report.quality_status.status, "degraded");
+  assert(report.quality_status.reasons.includes("content_units_selection_degraded"));
   assert(report.quality_status.degraded_sections.some((issue) => issue.section === "content_units"));
 });
 
@@ -4441,6 +4616,38 @@ function strictPublishReportFixture() {
       source_level: "primary",
       verification_status: "primary_confirmed",
       importance: "general"
+    },
+    {
+      candidate_id: "strict-builder-founder",
+      author: "Strict Founder",
+      role: "founder",
+      original_text: "Founder note about enterprise agent adoption.",
+      translation: "关于企业 agent 采用的创始人笔记。",
+      content: "关于企业 agent 采用的创始人笔记。",
+      url: "https://example.com/strict/founder-note",
+      event_date: reportDate,
+      source: "follow-builders blog feed",
+      evidence: "Fixture founder note.",
+      editorial_category: "community_signal",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      importance: "general"
+    },
+    {
+      candidate_id: "strict-builder-maintainer",
+      author: "Strict Tool Maintainer",
+      role: "maintainer",
+      original_text: "Maintainer note about coding agent memory.",
+      translation: "关于 coding agent 记忆的维护者笔记。",
+      content: "关于 coding agent 记忆的维护者笔记。",
+      url: "https://example.com/strict/maintainer-note",
+      event_date: reportDate,
+      source: "Simon Willison Weblog",
+      evidence: "Fixture maintainer note.",
+      editorial_category: "community_signal",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      importance: "general"
     }
   ];
   const contentSourceNames = [
@@ -4581,7 +4788,7 @@ function strictPublishReportFixture() {
           }
         ],
         candidates_found: 12,
-        included: 3,
+        included: 5,
         notes: "fixture"
       },
       content_sources: {
@@ -4595,7 +4802,7 @@ function strictPublishReportFixture() {
         candidates_found: 60,
         included: 12,
         sources_checked: contentSourceNames.length,
-        enablement_counts: { core: 28, optional: 32 },
+        enablement_counts: { core: 28, optional: 35 },
         notes: "fixture"
       }
     },
@@ -4618,11 +4825,11 @@ function strictAutomationRevisionFixture() {
     origin_main_short: "abcdef123456",
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
-    source_registry_count: 63,
-    source_registry_enablement_counts: { core: 28, optional: 32, manual: 3 },
+    source_registry_count: 68,
+    source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
       "main_items_min_8_when_candidates_available",
-      "content_units_min_18_when_candidates_available",
+      "content_units_min_27_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",
       "fixed_source_checklist"
@@ -5302,4 +5509,8 @@ function jsonResponse(value, status = 200) {
     text: async () => JSON.stringify(value),
     json: async () => value
   };
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

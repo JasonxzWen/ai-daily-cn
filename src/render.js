@@ -408,13 +408,19 @@ h3 {
 
 .builder-card-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .builder-card {
   display: grid;
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-header builder-body"
+    "builder-meta builder-body"
+    ". builder-original";
+  gap: 10px 18px;
+  align-items: start;
   margin: 0;
   padding: 16px;
   border: 1px solid var(--line);
@@ -423,6 +429,7 @@ h3 {
 }
 
 .builder-card-header {
+  grid-area: builder-header;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -452,11 +459,22 @@ h3 {
 }
 
 .builder-original {
+  grid-area: builder-original;
   margin: 0;
   padding-top: 10px;
   border-top: 1px solid var(--line);
   color: var(--muted);
   white-space: pre-wrap;
+}
+
+.builder-card > .item-meta {
+  grid-area: builder-meta;
+  align-content: start;
+}
+
+.builder-card > p:not(.builder-original) {
+  grid-area: builder-body;
+  min-width: 0;
 }
 
 .item-meta,
@@ -611,6 +629,15 @@ h3 {
     font-size: 1.55rem;
   }
 
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-header"
+      "builder-meta"
+      "builder-body"
+      "builder-original";
+  }
+
   .project-table {
     display: block;
     overflow-x: auto;
@@ -701,8 +728,9 @@ function renderGithubTrending(items, projects = []) {
 }
 
 function renderGithubTrendDetails(item, project = null) {
-  const projectDetail = project ? ` ${renderProjectHighlightText(project)}` : "";
-  return `<p>${escapeHtml(cleanGithubTrendDescription(item))}${escapeHtml(projectDetail)}</p>`;
+  const description = cleanGithubTrendDescription(item);
+  const projectDetail = project ? renderProjectHighlightText(project, description) : "";
+  return `<p>${escapeHtml([description, projectDetail].filter(Boolean).join(" "))}</p>`;
 }
 
 function githubStarsTag(item) {
@@ -711,10 +739,68 @@ function githubStarsTag(item) {
   return match ? `今日 +${match[1]} stars` : "";
 }
 
-function renderProjectHighlightText(project) {
-  const domains = Array.isArray(project.domains) && project.domains.length > 0 ? `领域：${project.domains.join("、")}。` : "";
-  const useCase = project.use_case ? `适合：${project.use_case}` : "";
-  return [cleanProjectDescription(project.description), domains, useCase].filter(Boolean).join(" ");
+function renderProjectHighlightText(project, baseDescription = "") {
+  const hasBaseDescription = Boolean(String(baseDescription || "").trim());
+  const projectDescription = cleanProjectDescription(project.description);
+  const description = hasBaseDescription || isNearDuplicateRenderText(projectDescription, baseDescription) ? "" : projectDescription;
+  const hasDomains = Array.isArray(project.domains) && project.domains.length > 0;
+  const domains = hasDomains ? `领域：${project.domains.join("、")}。` : "";
+  const useCaseText = String(project.use_case || "").trim();
+  const useCase = useCaseText && !(hasBaseDescription && hasDomains) && !isNearDuplicateRenderText(useCaseText, [baseDescription, description].filter(Boolean).join(" "))
+    ? `适合：${useCaseText}`
+    : "";
+  return uniqueRenderTextFragments([description, domains, useCase]).join(" ");
+}
+
+function uniqueRenderTextFragments(fragments) {
+  const result = [];
+  for (const fragment of fragments.map((item) => String(item || "").trim()).filter(Boolean)) {
+    if (!result.some((existing) => isNearDuplicateRenderText(fragment, existing))) {
+      result.push(fragment);
+    }
+  }
+  return result;
+}
+
+function isNearDuplicateRenderText(left, right) {
+  const leftTokens = semanticRenderTokens(left);
+  const rightTokens = semanticRenderTokens(right);
+  if (leftTokens.length === 0 || rightTokens.length === 0) {
+    return false;
+  }
+
+  const leftText = normalizeRenderSemanticText(left);
+  const rightText = normalizeRenderSemanticText(right);
+  if (leftText.length >= 16 && rightText.length >= 16 && (leftText.includes(rightText) || rightText.includes(leftText))) {
+    return true;
+  }
+
+  const rightSet = new Set(rightTokens);
+  const shared = new Set(leftTokens.filter((token) => rightSet.has(token))).size;
+  const smaller = Math.min(new Set(leftTokens).size, rightSet.size);
+  return smaller >= 4 && shared / smaller >= 0.45;
+}
+
+function semanticRenderTokens(value) {
+  const text = normalizeRenderSemanticText(value);
+  if (!text) {
+    return [];
+  }
+  const tokens = text.match(/[a-z0-9][a-z0-9+#._-]*/g) || [];
+  const cjk = text.replace(/[^\p{Script=Han}]/gu, "");
+  for (let index = 0; index < cjk.length - 1; index += 1) {
+    tokens.push(cjk.slice(index, index + 2));
+  }
+  return [...new Set(tokens.filter((token) => token.length > 1))];
+}
+
+function normalizeRenderSemanticText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^\p{L}\p{N}+#._-]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function indexProjectsForRender(projects) {

@@ -233,14 +233,23 @@
   "quality_status": {
     "status": "degraded",
     "reasons": [
+      "builder_sources_blocked",
       "shell_fetch_failed_for_registered_sources"
     ],
     "affected_sections": [
+      "builder_observations",
       "source_audit"
     ],
     "degraded_sections": [
       {
-        "code": "shell_fetch_failed_for_registered_sources",
+        "code": "builder_sources_blocked",
+        "error_code": "quality_degraded",
+        "section": "builder_observations",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      },
+      {
+        "code": "builder_sources_blocked",
         "error_code": "quality_degraded",
         "section": "source_audit",
         "message": "source_audit coverage is degraded and should be disclosed in the public report.",

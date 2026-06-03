@@ -14,7 +14,7 @@
 
 ## 当前落地状态
 
-- 已新增 `.codex/skills/html-work-reports/`，来源为 `D:\skill-hub` 的 `html-work-reports` 技能资产。
+- 已新增 `.codex/skills/html-work-reports/`，来源为本地 skill hub 的 `html-work-reports` 技能资产。
 - 已新增根级 `AGENTS.md`，把中文回复、仓库边界、HTML 工作汇报路由和验证门写入 agent 指令面。
 - 已新增 `tests/skills.test.js`，用内置 fixture 生成单文件 HTML，并运行 `validate-html-report.mjs --skip-browser` 校验结构、证据、代码行号、diff、自包含与交互控制。
 - 已把技能 smoke 测试纳入 `npm test`，因此 `npm run validate` 会覆盖该能力。

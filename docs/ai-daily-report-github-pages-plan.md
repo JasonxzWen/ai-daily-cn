@@ -39,8 +39,8 @@
 本地自动化上下文：
 
 - 自动化 ID：`ai-daily`。
-- 自动化配置路径：`C:\Users\Admin\.codex\automations\ai-daily\automation.toml`。
-- 自动化 memory 路径：`C:\Users\Admin\.codex\automations\ai-daily\memory.md`。
+- 自动化配置路径：`$CODEX_HOME/automations/ai-daily/automation.toml`。
+- 自动化 memory 路径：`$CODEX_HOME/automations/ai-daily/memory.md`。
 - `ai-daily` 当前是 `ACTIVE` 的 cron 自动化，计划时间为每日 02:30。
 - memory 已记录：日报已支持“自检与优化建议”，用户确认后可继续优化自动化 prompt。
 - memory 也已记录：用户希望后续把日报自动渲染为静态 HTML，推送到指定 GitHub 仓库，并通过 GitHub Pages 发布。

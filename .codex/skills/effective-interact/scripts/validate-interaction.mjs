@@ -265,7 +265,7 @@ function collectNavigationOrderIssues(documentMarkup) {
     .filter((id) => id && id !== "report-top");
   if (navIds.length === 0) return issues;
 
-  const sectionIds = [...documentMarkup.matchAll(/<section\b[^>]*>/gi)]
+  const sectionIds = [...documentMarkup.matchAll(/<(?:section|details)\b[^>]*>/gi)]
     .map((match) => match[0])
     .filter((tag) => tag.includes("data-section-type=") || /id="(?:evidence|verification|next-actions)"/i.test(tag))
     .map((tag) => attrValue(tag, "id"))

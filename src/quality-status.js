@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
-import { AUTOMATION_REVISION_RULES } from "./automation-revision.js";
+import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./automation-revision.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 const SOURCE_AVAILABLE_STATUSES = new Set(["checked", "no_signal"]);
@@ -14,10 +14,10 @@ export const SECTION_MINIMUMS = {
   github_trending: 10,
   hot_blogs: 3,
   projects: 3,
-  builder_observations: 3
+  builder_observations: 5
 };
 
-export const CONTENT_UNIT_MINIMUM = 18;
+export const CONTENT_UNIT_MINIMUM = 27;
 export const STRICT_CONTENT_SOURCE_MINIMUM = 50;
 export const STRICT_SOURCE_REGISTRY_MINIMUM = 60;
 export const STRICT_GITHUB_TRENDING_SOURCE_MINIMUM = 10;
@@ -349,7 +349,13 @@ function degradedReasonForSection(reasons, section) {
 
 function strictAutomationRevisionIssues(report, options = {}) {
   const revision = report?.self_check?.automation_revision;
-  const missingRules = AUTOMATION_REVISION_RULES.filter((rule) => !Array.isArray(revision?.rules) || !revision.rules.includes(rule));
+  const revisionRules = Array.isArray(revision?.rules) ? revision.rules : [];
+  const missingRules = AUTOMATION_REVISION_RULES.filter((rule) => {
+    if (revisionRules.includes(rule)) {
+      return false;
+    }
+    return !(AUTOMATION_REVISION_RULE_ALIASES[rule] || []).some((alias) => revisionRules.includes(alias));
+  });
   const sourceRegistryCount = Number(revision?.source_registry_count || 0);
   const gitCommit = String(revision?.git_commit || "");
   const revisionMismatches = automationRevisionMismatches(revision, options.currentAutomationRevision);

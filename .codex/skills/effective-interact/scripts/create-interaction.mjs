@@ -1521,7 +1521,7 @@ function renderHeroLinks(input) {
     .join("\n");
 }
 
-function renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge }) {
+function renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge, intent }) {
   const heroLinks = renderHeroLinks(input);
   const heroBrief = heroSummary || heroStats
     ? `<div class="hero-brief hero-brief-single">
@@ -1529,7 +1529,7 @@ function renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compa
         ${heroStats}
       </div>`
     : "";
-  return `<header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+  return `<header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
       <div class="title-row">
         <div>
           <div class="eyebrow">${escapeHtml(input.heroEyebrow || "AI 日报")}</div>
@@ -1683,7 +1683,7 @@ async function createInteraction(input, options = {}) {
       <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
     </header>`
     : showDailyReportHero
-      ? renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge })
+      ? renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge, intent })
     : `<header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
       <div class="title-row">
         <div>

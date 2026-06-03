@@ -1091,18 +1091,25 @@ body.lightbox-open {
 }
 
 .builder-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: stretch;
 }
 
 .builder-card {
-  gap: 10px;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
 .builder-card h3 {
+  grid-area: builder-title;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -1133,18 +1140,24 @@ body.lightbox-open {
 }
 
 .builder-card .card-tags {
+  grid-area: builder-tags;
   gap: 6px;
+  align-content: start;
 }
 
 .builder-card > p {
+  grid-area: builder-body;
   margin: 0;
   color: #25231f;
   font-size: 15px;
   line-height: 1.7;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list {
+  grid-area: builder-details;
   gap: 10px;
+  min-width: 0;
 }
 
 .builder-card .card-detail-list div {
@@ -1181,6 +1194,15 @@ body.lightbox-open {
 
   .builder-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-body"
+      "builder-details";
   }
 
   .project-card {
@@ -2250,7 +2272,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-03 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-06-03</div>
@@ -2273,7 +2295,18 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </header>
 
     <div class="report-layout">
-
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-html-work-report-1" title="主体信息" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>主体信息</span></a>
+<a href="#section-x-twitter-2" title="X/Twitter 讨论" data-nav-link data-nav-index="2" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-html-work-report-3" title="发布质量说明" data-nav-link data-nav-index="3" data-nav-group-name="verification" data-nav-status="info"><span>发布质量说明</span></a>
+<a href="#section-html-work-report-4" title="信源审计" data-nav-link data-nav-index="4" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
+<a href="#section-html-work-report-5" title="自检与产物" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
+    </div>
+  </nav>
       <div class="report-section-stack" data-report-region="sections">
         <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -2546,7 +2579,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="collapsible-content">
     <div class="rendered-markdown"><ul><li>主体信息：0</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：全源发现命令在定时任务 shell 中返回 EACCES/fetch failed；未写入未核验主体事实。</li></ul>
 <h4>提示词与规则迭代建议</h4>
-<ul><li><strong>定时 shell 环境没有外网访问，固定发现面全量 EACCES。</strong>：在 Codex 自动化或 `$CODEX_HOME/config.toml` 中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程；为什么要改：恢复一手来源采样，避免日报只能发布网络阻塞审计。</li><li><strong>报告 schema 要求至少 1 条 main_item，导致全源阻塞时只能用运行事实占位。</strong>：增加显式 `empty_due_to_network_outage` 报告状态，允许 `main_items: []` 并只渲染发布质量说明与 source_audit；为什么要改：全源阻塞时页面语义更准确，不需要把运行事实伪装成主体新闻。</li><li><strong>本地 Git worktree 元数据不可写，普通发布路径无法切回 main 或创建 index.lock。</strong>：修复 `.git/worktrees` ACL，或给定时环境配置具备 contents:write 的 `GH_TOKEN` 以稳定使用 GitHub API fallback；为什么要改：在验证通过且无 remote_ahead 时，发布路径不再受本机 Git 元数据权限阻塞。</li></ul>
+<ul><li><strong>定时 shell 环境没有外网访问，固定发现面全量 EACCES。</strong>：在 Codex 自动化配置中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程；为什么要改：恢复一手来源采样，避免日报只能发布网络阻塞审计。</li><li><strong>报告 schema 要求至少 1 条 main_item，导致全源阻塞时只能用运行事实占位。</strong>：增加显式 `empty_due_to_network_outage` 报告状态，允许 `main_items: []` 并只渲染发布质量说明与 source_audit；为什么要改：全源阻塞时页面语义更准确，不需要把运行事实伪装成主体新闻。</li><li><strong>本地 Git worktree 元数据不可写，普通发布路径无法切回 main 或创建 index.lock。</strong>：修复 `.git/worktrees` ACL，或给定时环境配置具备 contents:write 的 `GH_TOKEN` 以稳定使用 GitHub API fallback；为什么要改：在验证通过且无 remote_ahead 时，发布路径不再受本机 Git 元数据权限阻塞。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-03.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
     <template data-rich-source data-source-fallback>- 主体信息：0
 - Builder 观察：0
@@ -2557,7 +2590,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 ### 提示词与规则迭代建议
 
-- **定时 shell 环境没有外网访问，固定发现面全量 EACCES。**：在 Codex 自动化或 `$CODEX_HOME/config.toml` 中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程；为什么要改：恢复一手来源采样，避免日报只能发布网络阻塞审计。
+- **定时 shell 环境没有外网访问，固定发现面全量 EACCES。**：在 Codex 自动化配置中为 workspace-write sandbox 启用 `[sandbox_workspace_write] network_access = true`，然后重跑本日发现流程；为什么要改：恢复一手来源采样，避免日报只能发布网络阻塞审计。
 - **报告 schema 要求至少 1 条 main_item，导致全源阻塞时只能用运行事实占位。**：增加显式 `empty_due_to_network_outage` 报告状态，允许 `main_items: []` 并只渲染发布质量说明与 source_audit；为什么要改：全源阻塞时页面语义更准确，不需要把运行事实伪装成主体新闻。
 - **本地 Git worktree 元数据不可写，普通发布路径无法切回 main 或创建 index.lock。**：修复 `.git/worktrees` ACL，或给定时环境配置具备 contents:write 的 `GH_TOKEN` 以稳定使用 GitHub API fallback；为什么要改：在验证通过且无 remote_ahead 时，发布路径不再受本机 Git 元数据权限阻塞。
 

@@ -574,10 +574,12 @@
   "quality_status": {
     "status": "degraded",
     "reasons": [
-      "content_sources_blocked"
+      "content_sources_blocked",
+      "builder_sources_blocked"
     ],
     "affected_sections": [
-      "hot_blogs"
+      "hot_blogs",
+      "builder_observations"
     ],
     "degraded_sections": [
       {
@@ -585,6 +587,13 @@
         "error_code": "quality_degraded",
         "section": "hot_blogs",
         "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      },
+      {
+        "code": "builder_sources_blocked",
+        "error_code": "quality_degraded",
+        "section": "builder_observations",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
         "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
       }
     ],

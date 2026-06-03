@@ -179,6 +179,7 @@ try {
       sourcesPath: args.sources,
       registryPath: args.registry,
       enablement: args.enablement || firstEnablement(argv) || "core,optional",
+      wechatInputPath: args["wechat-input"],
       limit: Number.parseInt(args.limit || positionalNumbers[0] || "20", 10),
       perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
       budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),

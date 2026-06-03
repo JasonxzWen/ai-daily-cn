@@ -219,7 +219,7 @@ export function reportToInteractionInput(report, options = {}) {
       { label: "日报导航", href: indexHref, icon: siteIconForUrl(indexHref, "AI") },
       { label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }
     ],
-    hideNavigation: true,
+    hideNavigation: false,
     status: "complete",
     template: "research-explainer",
     renderMode: "pre-rendered",
@@ -513,17 +513,65 @@ function formatMainItems(items, context = {}) {
     return "暂无主体信息。";
   }
 
-  return items
-    .map((item, index) => {
-      const bullets = [...item.bullets, ...editorialBullets(item)]
-        .map((bullet) => `  - ${formatDailyInlineText(bullet, item)}`)
-        .join("\n");
-      const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
-      const trendTags = formatHighlightTags([importanceTagFor("main_items", item), ...trendTagsFor(context.trendAnnotations, "main_items", index)].filter(Boolean));
-      const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
-      return `${index + 1}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+  return mainItemContractGroups(items)
+    .map((group) => {
+      const content = group.entries
+        .map(({ item, originalIndex }, groupIndex) => formatMainItem(item, {
+          ...context,
+          originalIndex,
+          displayIndex: groupIndex + 1
+        }))
+        .join("\n\n");
+      return `### ${group.title}\n\n${content}`;
     })
     .join("\n\n");
+}
+
+function formatMainItem(item, context = {}) {
+  const bullets = [...item.bullets, ...editorialBullets(item)]
+    .map((bullet) => `  - ${formatDailyInlineText(bullet, item)}`)
+    .join("\n");
+  const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
+  const trendTags = formatHighlightTags([
+    importanceTagFor("main_items", item),
+    ...trendTagsFor(context.trendAnnotations, "main_items", context.originalIndex)
+  ].filter(Boolean));
+  const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+  return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+}
+
+function mainItemContractGroups(items) {
+  const groups = [
+    {
+      title: "AI 行业与模型发布",
+      categories: new Set(["ai_industry", "model_release", "headline"])
+    },
+    {
+      title: "大厂动作与政策基础设施",
+      categories: new Set(["company_business", "policy_infra", "funding"])
+    },
+    {
+      title: "产品、工程工具与开源生态",
+      categories: new Set(["engineering_toolchain", "product_radar", "open_source"])
+    },
+    {
+      title: "内容赛道与 AIGC 动态",
+      categories: new Set(["content_aigc"])
+    }
+  ].map((group) => ({ ...group, entries: [] }));
+  const fallback = {
+    title: "其他已核验信号",
+    categories: new Set(),
+    entries: []
+  };
+
+  items.forEach((item, originalIndex) => {
+    const category = String(item?.editorial_category || "").trim();
+    const group = groups.find((entry) => entry.categories.has(category)) || fallback;
+    group.entries.push({ item, originalIndex });
+  });
+
+  return [...groups, fallback].filter((group) => group.entries.length > 0);
 }
 
 function formatGithubTrending(items, context = {}) {
@@ -560,7 +608,7 @@ function githubTrendDetails(item, project) {
     bullets.push(description);
   }
 
-  const projectDetail = projectHighlightDetail(project);
+  const projectDetail = projectHighlightDetail(project, description);
   if (projectDetail) {
     bullets.push(projectDetail);
   }
@@ -649,16 +697,73 @@ function normalizeRepoKey(value) {
   return String(value || "").trim().replace(/^https?:\/\/github\.com\//i, "").replace(/\/$/, "").toLowerCase();
 }
 
-function projectHighlightDetail(project) {
+function projectHighlightDetail(project, baseDescription = "") {
   if (!project) {
     return "";
   }
-  const description = cleanProjectDescription(project.description);
-  const domains = Array.isArray(project.domains) && project.domains.length > 0
+  const hasBaseDescription = Boolean(String(baseDescription || "").trim());
+  const projectDescription = cleanProjectDescription(project.description);
+  const description = hasBaseDescription || isNearDuplicateText(projectDescription, baseDescription) ? "" : projectDescription;
+  const hasDomains = Array.isArray(project.domains) && project.domains.length > 0;
+  const domains = hasDomains
     ? `领域：${project.domains.join("、")}`
     : "";
-  const useCase = project.use_case ? `适合：${project.use_case}` : "";
-  return [description, domains, useCase].filter(Boolean).join(" ");
+  const useCaseText = String(project.use_case || "").trim();
+  const useCase = useCaseText && !(hasBaseDescription && hasDomains) && !isNearDuplicateText(useCaseText, [baseDescription, description].filter(Boolean).join(" "))
+    ? `适合：${useCaseText}`
+    : "";
+  return uniqueTextFragments([description, domains, useCase]).join(" ");
+}
+
+function uniqueTextFragments(fragments) {
+  const result = [];
+  for (const fragment of fragments.map((item) => String(item || "").trim()).filter(Boolean)) {
+    if (!result.some((existing) => isNearDuplicateText(fragment, existing))) {
+      result.push(fragment);
+    }
+  }
+  return result;
+}
+
+function isNearDuplicateText(left, right) {
+  const leftTokens = semanticTokens(left);
+  const rightTokens = semanticTokens(right);
+  if (leftTokens.length === 0 || rightTokens.length === 0) {
+    return false;
+  }
+
+  const leftText = normalizeSemanticText(left);
+  const rightText = normalizeSemanticText(right);
+  if (leftText.length >= 16 && rightText.length >= 16 && (leftText.includes(rightText) || rightText.includes(leftText))) {
+    return true;
+  }
+
+  const rightSet = new Set(rightTokens);
+  const shared = new Set(leftTokens.filter((token) => rightSet.has(token))).size;
+  const smaller = Math.min(new Set(leftTokens).size, rightSet.size);
+  return smaller >= 4 && shared / smaller >= 0.45;
+}
+
+function semanticTokens(value) {
+  const text = normalizeSemanticText(value);
+  if (!text) {
+    return [];
+  }
+  const tokens = text.match(/[a-z0-9][a-z0-9+#._-]*/g) || [];
+  const cjk = text.replace(/[^\p{Script=Han}]/gu, "");
+  for (let index = 0; index < cjk.length - 1; index += 1) {
+    tokens.push(cjk.slice(index, index + 2));
+  }
+  return [...new Set(tokens.filter((token) => token.length > 1))];
+}
+
+function normalizeSemanticText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^\p{L}\p{N}+#._-]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function trimText(value, maxLength) {

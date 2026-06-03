@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "general-news-google-ai",
+      "name": "Google News AI RSS",
+      "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20OR%20generative%20AI%20when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "ai_news_aggregator",
+      "notes": "Broad news discovery lane. Use only as a lead and trace selected facts back to primary or multi-source confirmation."
+    },
+    {
+      "id": "general-news-google-ai-policy",
+      "name": "Google News AI Policy RSS",
+      "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "ai_news_aggregator",
+      "notes": "Broad policy/news discovery lane. Use only as a lead and trace selected facts back to primary or multi-source confirmation."
+    },
+    {
+      "id": "general-news-google-aigc-content",
+      "name": "Google News AIGC Content Industry RSS",
+      "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "aigc_content_industry",
+      "notes": "Broad AIGC/content-industry discovery lane. Use only as a lead and trace selected facts back to primary or multi-source confirmation."
+    }
+  ]
+}

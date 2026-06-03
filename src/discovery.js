@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { loadSourceRegistry } from "./source-registry.js";
+import { loadWeChatArticleInput, WECHAT_ARTICLE_INPUT_SOURCE } from "./wechat-input.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -1171,6 +1172,22 @@ export async function collectContentSources(options = {}) {
   const startedAt = Date.now();
   const budgetMs = Number.isInteger(options.budgetMs) && options.budgetMs > 0 ? options.budgetMs : 300000;
 
+  if (shouldCheckWeChatArticleInput(options)) {
+    const wechatInput = await loadWeChatArticleInput({
+      reportDate,
+      inputPath: options.wechatInputPath,
+      env: options.env || process.env
+    });
+    const status = wechatInput.status === "checked" ? "checked" : "no_signal";
+    const notes = appendSentence(wechatInput.notes, "input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true");
+    sourceResults.push(auditSource(WECHAT_ARTICLE_INPUT_SOURCE.name, WECHAT_ARTICLE_INPUT_SOURCE.url, status, notes));
+    candidateSources.push(toCandidateSource(WECHAT_ARTICLE_INPUT_SOURCE, "community", generatedAt, status, notes));
+
+    for (const article of wechatInput.articles.slice(0, Math.max(limit - candidates.length, 0))) {
+      candidates.push(wechatArticleCandidate(article, candidates));
+    }
+  }
+
   for (const rawSource of sources) {
     const currentSource = normalizeGenericSource(rawSource, "content");
     const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
@@ -1180,6 +1197,12 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata"));
       continue;
     }
+    const skipped = contentSourceSkipReason(currentSource, options.env || process.env);
+    if (skipped) {
+      markSource(candidateSources.at(-1), "blocked", skipped);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, skipped, skipped));
+      continue;
+    }
     if (Date.now() - startedAt > budgetMs) {
       markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
@@ -1187,7 +1210,7 @@ export async function collectContentSources(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(contentSourceRequestUrl(currentSource), {
+      const response = await fetchImpl(contentSourceRequestUrl(currentSource, options.env || process.env), {
         headers: {
           accept: "application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
@@ -1292,6 +1315,50 @@ export async function collectContentSources(options = {}) {
     },
     sources: candidateSources,
     candidates: candidates.slice(0, limit)
+  };
+}
+
+function shouldCheckWeChatArticleInput(options = {}) {
+  if (options.includeWeChatInput === false) {
+    return false;
+  }
+  if (options.wechatInputPath) {
+    return true;
+  }
+  return !Array.isArray(options.sources) && !options.sourcesPath;
+}
+
+function wechatArticleCandidate(article, candidates) {
+  const hasPrimarySources = article.primary_urls.length > 0;
+  const notes = [
+    "input_source=wechat_article_input",
+    `account=${sanitizeNoteValue(article.account_name)}`,
+    `risk_level=${article.risk_level}`,
+    `allowed_sections=${sanitizeNoteValue(article.allowed_sections.join(","))}`,
+    `primary_verification_required=${hasPrimarySources ? "false" : "true"}`,
+    "input_path_redacted=true"
+  ].join("; ");
+  return {
+    id: uniqueCandidateId(candidates, `${WECHAT_ARTICLE_INPUT_SOURCE.id}-${article.account_name}-${article.title}`),
+    source_id: WECHAT_ARTICLE_INPUT_SOURCE.id,
+    category: "community_lead",
+    title: article.title,
+    url: article.url,
+    source: `WeChat · ${article.account_name}`,
+    author: article.account_name,
+    event_date: article.event_date,
+    status: "excluded",
+    evidence: appendSentence(article.summary, "White-listed WeChat article input; treat as a viewpoint or industry lead unless primary verification is present."),
+    notes,
+    intermediary_url: article.url,
+    original_url: article.url,
+    verification_status: hasPrimarySources ? "primary_confirmed" : "intermediary_only",
+    source_level: article.source_level,
+    verification_note: article.verification_notes,
+    risk_note: `risk_level=${article.risk_level}; ${article.risk_notes}`,
+    reader_relevance: article.reader_relevance,
+    verification_sources: article.primary_urls,
+    ...(hasPrimarySources ? { primary_url: article.primary_urls[0] } : {})
   };
 }
 
@@ -2319,11 +2386,35 @@ function parseContentSourceEntries(content, sourceInfo) {
   return parseFeedEntries(content);
 }
 
-function contentSourceRequestUrl(sourceInfo) {
+export function contentSourceSkipReason(sourceInfo, env = process.env) {
+  if ((sourceInfo.source_kind === "rsshub" || sourceInfo.source_kind === "rss_bridge") && sourceInfo.base_url_env && !env[sourceInfo.base_url_env]) {
+    return "skipped_missing_base_url";
+  }
+  if (sourceInfo.url_env && !env[sourceInfo.url_env]) {
+    return "skipped_missing_base_url";
+  }
+  const requiredEnv = Array.isArray(sourceInfo.required_env) ? sourceInfo.required_env : sourceInfo.required_env ? [sourceInfo.required_env] : [];
+  if (requiredEnv.some((name) => !env[name])) {
+    return "skipped_missing_token";
+  }
+  return "";
+}
+
+export function contentSourceRequestUrl(sourceInfo, env = process.env) {
+  if (sourceInfo.url_env && env[sourceInfo.url_env]) {
+    return env[sourceInfo.url_env];
+  }
+  if ((sourceInfo.source_kind === "rsshub" || sourceInfo.source_kind === "rss_bridge") && sourceInfo.base_url_env && env[sourceInfo.base_url_env] && sourceInfo.route_path) {
+    return new URL(sourceInfo.route_path, withTrailingSlash(env[sourceInfo.base_url_env])).toString();
+  }
   if (sourceInfo.id === "content-papers-with-code-api" && /\/api\/v1\/?$/i.test(sourceInfo.url || "")) {
     return `${String(sourceInfo.url).replace(/\/?$/, "/")}papers/`;
   }
   return sourceInfo.url;
+}
+
+function withTrailingSlash(value) {
+  return String(value || "").endsWith("/") ? String(value) : `${value}/`;
 }
 
 function looksLikeJson(content) {
