@@ -444,7 +444,7 @@ test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () =
   assert(!html.includes("GitHub Trending daily 显示 123 stars today"));
   assert(!html.includes("在 GitHub Trending daily 中出现"));
   assert(html.includes("我发布了一个具体的 agent harness 工作流"));
-  assert(html.includes("I shipped a concrete agent harness workflow"));
+  assert(!html.includes("I shipped a concrete agent harness workflow"));
   assert(!html.includes("原始帖子链接可访问"));
 });
 
@@ -804,7 +804,7 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert.equal(section.cardClass, "builder-card");
   assert.equal(section.items[0].title, "Example Builder");
   assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
-  assert(section.items[0].points.some((point) => point.label === "原文" && point.value.includes("unattended work")));
+  assert(!JSON.stringify(section.items[0].points).includes("unattended work"));
   assert(section.items[0].points.some((point) => point.label === "账号" && point.value === "@examplebuilder"));
   assert(!JSON.stringify(section).includes("Original X URL was collected"));
   assert(!JSON.stringify(section).includes("证据："));

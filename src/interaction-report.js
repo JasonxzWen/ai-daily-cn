@@ -853,13 +853,9 @@ function formatHotBlogCards(items, context = {}) {
 
 function formatBuilderObservationCards(items, report) {
   return items.map((item) => {
-    const originalText = builderOriginalText(item);
     const translation = builderTranslationText(item);
     const handle = builderHandle(item);
     const points = [];
-    if (originalText) {
-      points.push({ label: "原文", value: originalText });
-    }
     if (handle) {
       points.push({ label: "账号", value: `@${handle}` });
     }
@@ -879,10 +875,6 @@ function formatBuilderObservationCards(items, report) {
       points
     };
   });
-}
-
-function builderOriginalText(item) {
-  return String(item?.original_text || item?.originalText || item?.raw_text || "").trim();
 }
 
 function builderTranslationText(item) {
