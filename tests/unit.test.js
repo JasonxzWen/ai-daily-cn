@@ -567,6 +567,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!input.sections.some((section) => section.title === "主线摘要"));
   const mainContent = mainMarkdownContent(input);
   assert(!input.sections.some((section) => section.title === "主体信息"));
+  assert(!JSON.stringify(input.sections).includes("主体信息"));
+  assert(JSON.stringify(input.sections).includes("主线条目："));
   assert(input.sections.some((section) => section.title === "AI 资讯"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
