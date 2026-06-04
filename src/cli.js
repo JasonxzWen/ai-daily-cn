@@ -5,8 +5,10 @@ import { DEFAULT_SITE } from "./config.js";
 import { PublisherError, toPublishError } from "./errors.js";
 import {
   checkPublishPreflight,
+  createDailyPublishPlan,
   createPublishPlan,
   isGitHubApiFallbackEligibleError,
+  prepareCleanPublishWorktree,
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
@@ -28,6 +30,12 @@ import { generateReportDraft } from "./draft.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
+import {
+  applyQualityRepairContract,
+  repairReportQuality,
+  reviewReportQuality
+} from "./quality-loop.js";
+import { runDailyWorkflow } from "./daily-runner.js";
 
 const [command, ...argv] = process.argv.slice(2);
 
@@ -47,6 +55,29 @@ try {
       out_dir: result.outDir,
       reports: result.reports.map((report) => report.report_date),
       written_files: result.writtenFiles
+    });
+  } else if (command === "publish:dry-run:daily") {
+    const args = parseArgs(argv);
+    const plan = await createDailyPublishPlan({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      inputDir: args.input || "reports-source",
+      dataInputDir: args["data-input"] || "reports-data",
+      outDir: args.out || "docs",
+      siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      generatedAt: args["generated-at"],
+      reportDate: args.date || firstPositionalDate(argv)
+    });
+    printJson({
+      ok: true,
+      publish_status: {
+        html_generated: false,
+        repo_updated: false,
+        repo_pushed: false,
+        pages_url: plan.expected_pages_url,
+        publish_error: ""
+      },
+      plan
     });
   } else if (command === "publish:dry-run") {
     const args = parseArgs(argv);
@@ -71,6 +102,28 @@ try {
       },
       plan
     });
+  } else if (command === "daily:run") {
+    const args = parseArgs(argv);
+    const result = await runDailyWorkflow({
+      launcherRoot: path.resolve(args["launcher-root"] || args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      publish: Boolean(args.publish),
+      maxReviewRepairLoops: args["max-review-repair-loops"],
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      worktreeDir: args["worktree-dir"],
+      restart: Boolean(args.restart)
+    });
+    const ok = !["blocked", "failed"].includes(result.summary.final_status);
+    printJson({
+      ok,
+      summary_path: result.summaryPath,
+      final_status: result.summary.final_status,
+      next_action: result.summary.next_action,
+      summary: result.summary
+    });
+    if (!ok) {
+      process.exitCode = 1;
+    }
   } else if (command === "publish:preflight") {
     const args = parseArgs(argv);
     const preflight = await checkPublishPreflight({
@@ -105,6 +158,28 @@ try {
         publish_error: prepared.publish_blocker
           ? `${prepared.publish_blocker.code}: ${prepared.publish_blocker.message}`
           : ""
+      },
+      prepared
+    });
+  } else if (command === "publish:prepare-clean-worktree") {
+    const args = parseArgs(argv);
+    const prepared = await prepareCleanPublishWorktree({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      worktreeDir: args["worktree-dir"],
+      remoteUrl: args["remote-url"],
+      allowExternalWorktree: Boolean(args["allow-external-worktree"]),
+      installDependencies: args["no-install"] !== true,
+      forceInstall: Boolean(args["force-install"])
+    });
+    printJson({
+      ok: true,
+      publish_status: {
+        html_generated: false,
+        repo_updated: false,
+        repo_pushed: false,
+        pages_url: "",
+        publish_error: ""
       },
       prepared
     });
@@ -175,6 +250,65 @@ try {
       evidence_assets: result.assets,
       skipped: result.skipped
     });
+  } else if (command === "quality:review") {
+    const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
+    const inputPath = args.input || positional[0];
+    const reviewOutputPath = args.output || positional[1] || "";
+    const candidatePoolPath = args["candidate-pool"] || positional[2] || "";
+    if (!inputPath) {
+      throw new PublisherError("quality_review_input_required", "quality:review requires --input <daily-report.json>.");
+    }
+    const report = JSON.parse(fs.readFileSync(path.resolve(inputPath), "utf8"));
+    const candidatePool = candidatePoolPath
+      ? JSON.parse(fs.readFileSync(path.resolve(candidatePoolPath), "utf8"))
+      : null;
+    const review = reviewReportQuality(report, { candidatePool });
+    printJson({
+      ok: review.ok,
+      review
+    }, reviewOutputPath);
+    if (!review.ok && args["fail-on-issues"]) {
+      process.exitCode = 1;
+    }
+  } else if (command === "quality:repair") {
+    const args = parseArgs(argv);
+    const positional = positionalArgs(argv);
+    const inputPath = args.input || positional[0];
+    if (!inputPath) {
+      throw new PublisherError("quality_repair_input_required", "quality:repair requires --input <daily-report.json>.");
+    }
+    const outPath = args.out || positional[1] || (args["in-place"] ? inputPath : "");
+    const repairOutputPath = args.output || positional[2] || "";
+    if (!outPath) {
+      throw new PublisherError("quality_repair_output_required", "quality:repair requires --out <daily-report.optimized.json> or --in-place.");
+    }
+    const qualityRepairPaths = resolveQualityRepairExtras(args, positional.slice(3));
+    const candidatePool = qualityRepairPaths.candidatePoolPath
+      ? JSON.parse(fs.readFileSync(path.resolve(qualityRepairPaths.candidatePoolPath), "utf8"))
+      : null;
+    const report = JSON.parse(fs.readFileSync(path.resolve(inputPath), "utf8"));
+    const safeRepair = repairReportQuality(report, null, { candidatePool });
+    let finalReport = safeRepair.report;
+    let contractResult = null;
+    const contractPath = qualityRepairPaths.contractPath;
+    if (contractPath) {
+      const contract = JSON.parse(fs.readFileSync(path.resolve(contractPath), "utf8"));
+      contractResult = applyQualityRepairContract(finalReport, contract);
+      finalReport = contractResult.report;
+    }
+    const resolvedOut = path.resolve(outPath);
+    fs.mkdirSync(path.dirname(resolvedOut), { recursive: true });
+    fs.writeFileSync(resolvedOut, `${JSON.stringify(finalReport, null, 2)}\n`, "utf8");
+    const finalReview = reviewReportQuality(finalReport, { candidatePool });
+    printJson({
+      ok: finalReview.ok,
+      path: resolvedOut,
+      safe_repairs: safeRepair.repairs,
+      contract_applied: contractResult?.applied || [],
+      contract_rejected: contractResult?.rejected || [],
+      review: finalReview
+    }, repairOutputPath);
   } else if (command === "discover:github-trending") {
     const args = parseArgs(argv);
     const positional = positionalArgs(argv);
@@ -506,6 +640,25 @@ function draftInputPaths(args, parsed, options = {}) {
   return [...explicit, ...positional].filter((value) => !excluded.has(path.resolve(value)));
 }
 
+function resolveQualityRepairExtras(parsed, extraPositionals) {
+  let contractPath = parsed["repair-contract"] || parsed.repair || "";
+  let candidatePoolPath = parsed["candidate-pool"] || "";
+  for (const item of extraPositionals) {
+    if (!candidatePoolPath && /(?:source-candidates|\.candidates\.json$)/i.test(String(item))) {
+      candidatePoolPath = item;
+      continue;
+    }
+    if (!contractPath) {
+      contractPath = item;
+      continue;
+    }
+    if (!candidatePoolPath) {
+      candidatePoolPath = item;
+    }
+  }
+  return { contractPath, candidatePoolPath };
+}
+
 function splitInputPathToken(value) {
   return String(value).split(/[,\s]+/).map((token) => token.trim()).filter(Boolean);
 }
@@ -526,9 +679,9 @@ function positionalArgs(args) {
   return values;
 }
 
-function printJson(value) {
+function printJson(value, explicitOutputPath = "") {
   const json = `${JSON.stringify(value, null, 2)}\n`;
-  const outputPath = outputPathFromArgs(argv);
+  const outputPath = explicitOutputPath || outputPathFromArgs(argv);
   if (outputPath) {
     const resolved = path.resolve(outputPath);
     fs.mkdirSync(path.dirname(resolved), { recursive: true });

@@ -938,6 +938,9 @@
       "additionalProperties": false,
       "required": ["content", "url"],
       "properties": {
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
         "content": {
           "type": "string",
           "minLength": 1

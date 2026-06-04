@@ -24,9 +24,9 @@
 
 目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报。主产物是由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成的自包含静态 HTML 和结构化 JSON；验证通过后只发布 `docs/` 与 `reports-data/`，由 GitHub Actions Pages workflow 部署到 GitHub Pages。
 
-执行准则：先阅读并遵守 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md`。开始时运行 `npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"`；如果该步骤仅报告 `.git` 不可写、`git_fetch_unavailable` 或 `git_push_unavailable`，不要停止日报生成，继续生成、验证并保留产物。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
+执行准则：先阅读并遵守 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md`。始终从 launcher worktree 调用 `npm run daily:run -- --date YYYY-MM-DD --publish`；runner 负责 clean checkout、阶段顺序、contract、状态、校验、`sources:phase5-audit`、`publish:dry-run:daily`、真实 publish 或 GitHub API 兜底。定时任务不要展开旧手工流水线，不要使用 `publish:prepare-worktree`，不要提交、stash、切换或清理 launcher worktree。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
 
-必须运行并记录：`npm run prompt:build -- YYYY-MM-DD`、`npm run sources:validate`、必要的发现命令、`npm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json`、`npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`、`npm run build`、`npm run validate`、`npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`、`npm run publish:dry-run`。涉及页面元素时必须做桌面/移动视觉验收；如果浏览器环境阻塞，必须报告阻塞原因。
+必须运行并记录：`npm run daily:run -- --date YYYY-MM-DD --publish` 和 `.tmp/run-summary-YYYY-MM-DD.json`。读取 summary 中的 `final_status`、`stages` 和 `next_action`；当 `next_action.kind` 为 `codex_ai_repair_contract` 时，由 Codex 根据 `ai_review_tasks`、候选池、`source_audit`、`original_text` 和原始链接写入 `.tmp/quality-ai-repair-YYYY-MM-DD.json`，只修改 public text 字段，然后用同一 runner 命令继续。publish 模式最多 5 次 `review -> AI repair contract -> repair -> review`；如果同日状态需要丢弃，显式使用 `--restart`。涉及页面元素时必须确认 runner 的 page-check/validate 结果；如果浏览器环境阻塞，必须报告阻塞原因。
 
 日报公开页面必须遵守固定展示合同：顶部日期区显示本期覆盖时间范围；主体信息只用 icon/link 表示来源，不显示来源名称；主体标题不加下划线；正文 `==...==` 关键词渲染为加粗变色文字而不是 tag；tag 只用于重要级别、趋势、star 变化、主题和项目 highlight，并且必须按类型区分颜色且去重；`model_releases` 只保留结构化 JSON 索引，不渲染公开“模型发布”板块，相关新闻合入 `main_items`；`projects` 只作为 GitHub Trending 的 `项目 highlight` 元数据，不渲染公开“今日值得关注的项目”板块、“项目 highlights”子标题或额外项目列表；国内/中文动态并入现有主体分组、热门博客、GitHub Trending 或共享“社区线索”，不渲染独立“国内动态”导航项；热门技术博客摘要为约 100-160 个中文字符的 2-4 个分点，原文有信息密度高的证据图时通过 `evidence_assets` 贴图；正文证据图和热门技术博客/卡片图片必须可点开放大，来源 icon 不参与放大；GitHub Trending 默认展示 Top 10，star 变化必须做成 tag，项目 highlight 只能作为匹配 Top 10 条目的 tag，并把领域和作用压进行内说明。
 
@@ -34,11 +34,11 @@
 
 发布质量分两级处理：`blocking_issues` 必须阻断发布，包括 validate 失败、`self_check.automation_revision.git_commit` 未证明来自当前 `origin/main` / `origin_main_sha`、schema 或候选池回指失败、最近 7 天重复旧闻、正文事实缺少一手/可信来源、无法确认远端 `main` 基线、`remote_ahead`、非发布产物会被提交、GitHub API 兜底无法读取 `base_commit_sha` 或 token 权限不足、Pages HTTP 200 验证失败。`degraded_sections` 允许发布但必须公开标注，包括固定信源面部分不可用、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空、模型发布未同步进入主体条目、截图验收受阻但静态校验通过。降级信息必须写入 `quality_status.degraded_sections`，并在公开 HTML 的“发布质量说明”和最终回复中列出。
 
-真实发布优先运行 `npm run publish -- confirm-push YYYY-MM-DD`。`publish:dry-run` 必须证明 `current_dirty_files` 中所有发布器管理文件都出现在 `will_stage_files`；如果出现 `publisher_dirty_outside_publish_plan`，先修复发布计划或归档与本次日期无关的悬空产物。特别确认 `docs/trends.json`、`docs/feed.json`、`docs/index.html`、当日 `docs/data/**`、`docs/reports/**`、`reports-data/**`、日报引用的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 都进入本次 stage 计划。如果本机 Git 元数据、分支切换或 Git 传输失败阻塞发布，在验证和 dry-run 通过且不存在 `remote_ahead` 后运行 `npm run publish:github-api -- confirm-push YYYY-MM-DD` 兜底；允许使用 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token`。API 兜底必须通过 GitHub API 读取远端 `main` 的当前 commit/tree，使用 `force:false`，只写 `docs/` 与 `reports-data/`，并在输出中记录 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
+真实发布由 runner 在 `--publish` 模式内执行。runner 内部的 `publish:dry-run:daily` 必须证明 `current_dirty_files` 中所有发布器管理文件都出现在 `will_stage_files`；如果出现 `publisher_dirty_outside_publish_plan`，runner 必须停止并报告 blocker。特别确认 `docs/trends.json`、`docs/feed.json`、`docs/index.html`、当日 `docs/data/**`、`docs/reports/**`、`reports-data/**`、日报引用的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 都进入本次 stage 计划。如果 clean checkout 已通过验证和 dry-run，但本机 Git 元数据或 Git 传输失败阻塞发布且不存在 `remote_ahead`，runner 可使用 GitHub API 兜底；允许使用 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token`。API 兜底必须通过 GitHub API 读取远端 `main` 的当前 commit/tree，使用 `force:false`，只写 `docs/` 与 `reports-data/`，并在输出中记录 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
 
 发布后必须验证当日 Pages URL 返回 HTTP 200 且包含 `YYYY-MM-DD`。如果同一会话随后要做项目迭代，必须新建 `codex/...` 分支或独立工作树；发布工作树只用于日报发布，不继续写项目改动。
 
-最终回复必须包含：HTML 路径、结构化 JSON 路径、`validate` 结果、`publish:dry-run` 结果、真实发布或 API 兜底结果、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要、今日采样与规则差距、最多 3 条提示词或规则迭代建议。
+最终回复必须包含：`.tmp/run-summary-YYYY-MM-DD.json`、HTML 路径、结构化 JSON 路径、`validate` 结果、`publish:dry-run:daily` 结果、真实发布或 API 兜底结果、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要、今日采样与规则差距、最多 3 条提示词或规则迭代建议。
 ```
 
 ## 当前发布边界
@@ -70,13 +70,15 @@ node src/cli.js discover:content-sources --date YYYY-MM-DD --limit 60 --per-sour
 
 不要依赖 `Tee-Object` 保存 JSON；PowerShell 编码、BOM 或 npm 横幅可能污染 stdout。搜索影子运行应使用 `--provider-timeout-ms`，即使某个 provider 失败，也要保留其他 provider 的候选、耗时和错误计数。
 
-发布前工作树整理与预检命令：
+runner 内部会准备 clean checkout；下面的命令只保留给人工诊断 clean checkout 准备问题：
 
 ```powershell
-npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"
+npm run publish:prepare-clean-worktree
 ```
 
-该命令不会生成日报，也不会 push；它会先把当前分支本地改动提交到当前分支，再切回 `main` 并检查远端状态、`.git` 写权限和 Git 传输可用性。定时任务只以最新 `origin/main` 为权威基线；如果无法确认远端基线或存在 `remote_ahead`，真实发布必须停止，但仍可保留已生成产物供人工诊断。`.git` 不可写或 Git fetch/push 传输不可用只会标记真实发布暂不可用，不再阻塞后续日报生成和验证。
+该命令不会生成日报，也不会 push；它会在 `.tmp/publish-worktrees/main` 准备一个独立 clean clone，确认远端 `main` 当前 SHA，并输出 `prepared.next_cwd`。如需用 `AI_DAILY_PUBLISH_WORKTREE` 或 `--worktree-dir` 指向仓库外目录，必须同时传入 `--allow-external-worktree`。定时任务不要手工切换目录；只从 launcher worktree 调用 `daily:run`，由 runner 使用 clean checkout 执行生成、验证和发布。launcher worktree 中的未提交改动、detached HEAD 或实验分支不得被提交、stash、清理或切换。
+
+旧命令 `npm run publish:prepare-worktree` 会保存并切换当前工作树，只保留给人工恢复场景；定时任务不要使用它。
 
 底层只读预检命令仍保留给人工诊断：
 
@@ -124,3 +126,6 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 - `statuspage-incidents`：运行 `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20`，把 OpenAI/Claude 等 Statuspage Atom/RSS 的近期 incident 转成候选池条目；这些条目仍需通过去重、新鲜度和 `candidate_id` 回指门禁后才能进入正文。
 
 结构化草稿必须把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 都合并进最终 `source_audit`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因；只保留命令 stdout 不算连续运行证据。GitHub trending 条目进入 `github_trending` 时应填写 `rank`、`previous_rank`、`rank_delta`、`trend`、`event_date`、`source`、`evidence`；进入 `projects` 时还应填写 `domains`、`use_case`、`signal`，并确保它会作为 GitHub Trending highlight 呈现。如果 shell 网络受限但浏览器能保存 GitHub Trending HTML 或采样 JSON，可运行 `npm run discover:github-trending -- --browser-export <path>` 复用同一解析器。Builder 来源受阻时必须在 `source_audit.builder_sources` 填写 `blocked_reason` 与 `last_successful_feed_at`，不要只写进 notes；如果 Builder 候选存在但未入选，也必须写明过滤原因。Builder 条目进入 `builder_observations` 时必须填写 `original_text`、`translation`、`role`、`event_date`、`source`、`evidence`，并让 `content` 等于完整中文 `translation`；有 handle/头像时填写 `handle` 和 `avatar_url`，构建器会 best-effort 缓存为本地头像。合格候选足够时公开入选 5-20 条；没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。
+## Codex-native runner prompt
+
+定时任务 prompt 应保持很薄：从 launcher worktree 调用 `npm run daily:run -- --date YYYY-MM-DD`，真实发布时调用 `npm run daily:run -- --date YYYY-MM-DD --publish`。runner 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `final_status` 和 `next_action`；当 `next_action.kind` 是 `codex_ai_repair_contract` 时，由 Codex 写 `.tmp/quality-ai-repair-YYYY-MM-DD.json` 后用同一命令继续 runner。需要丢弃同日未完成状态时显式加 `--restart`。调度 dry-run 只允许 `publish:dry-run:daily`，旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。

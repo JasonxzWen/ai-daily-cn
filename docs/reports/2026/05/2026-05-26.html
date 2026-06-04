@@ -833,6 +833,21 @@ p.hero-summary-text {
   overflow-wrap: anywhere;
 }
 
+.card-title-text {
+  display: inline-flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .card-media-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1171,6 +1186,64 @@ body.lightbox-open {
 
 .builder-card .card-detail-list dd span {
   overflow-wrap: anywhere;
+}
+
+.community-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.community-card {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.community-card h3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+.community-card .card-title-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafc;
+  object-fit: contain;
+}
+
+.community-card .card-title-link {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.community-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.community-card > p {
+  color: #25231f;
+  line-height: 1.62;
+}
+
+.community-card .card-detail-list {
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.community-card .card-detail-list div {
+  padding-top: 0;
+  border-top: 0;
 }
 
 @media (max-width: 760px) {
@@ -2278,17 +2351,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-25 至 2026-05-26</div>
           <h1 class="report-title report-date-title">2026-05-26</h1>
         </div>
-        <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QTwvdGV4dD48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
+        <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
 <img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json" rel="noopener noreferrer">结构化 JSON</a></div>
       </div>
       <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>2026-05-26 这版日报保留 3 条主体信息：Salesforce Agentforce 的 Claude Sonnet 4 路由切换今天生效，Google Workspace 的 Gemini Chat 与 Drive 能力在 Scheduled Release 域继续展开，Claude Status 记录了 2026-05-25 Opus 4.7 错误率 incident 并已恢复</li><li>GitHub Trending 与 Builder feed 在当前环境抓取失败，没有用旧项目或旧帖子补齐页面</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>3</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>0</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>技术博客</span><strong>1</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>0</strong><small>Top 10</small></div>
-<div class="hero-stat"><span>Builder</span><strong>1</strong><small>观察</small></div>
+<div class="hero-stat"><span>Builder</span><strong>0</strong><small>观察</small></div>
 <div class="hero-stat"><span>覆盖</span><strong>05-25..05-26</strong><small>标准时间范围</small></div>
   </div>
       </div>
@@ -2351,7 +2423,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field blog-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Platform governance for AI-generated code" data-search-target="html-work-report">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UEU8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/" rel="noopener noreferrer">AI Debt, Shadow AI Force a Platform Rethink</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UEU8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/" rel="noopener noreferrer">AI Debt, Shadow AI Force a Platform Rethink</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Platform governance for AI-generated code</span></div>
 
     <p>文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。</p>
@@ -2371,7 +2443,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <template data-rich-source data-source-fallback>- **降级说明**：本轮已检查 X/Twitter 相关来源，但未形成可入选的原始 status 条目。原因：fetch_failed
 - **检查来源**：follow-builders prepare-digest:blocked（node prepare-digest.js failed with fetch failed.）；follow-builders local cache:no_signal（Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.）</template>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>社区线索</h2>
@@ -2379,8 +2451,17 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 <img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=" alt="来源" decoding="async"> <a href="https://www.benchflow.ai/blog" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>-  ==tag-general|一般==BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。 ![来源](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+PzwvdGV4dD48L3N2Zz4=) [来源](https://www.benchflow.ai/blog)</template>
+
+    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QkE8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.benchflow.ai/blog" rel="noopener noreferrer">benchflow.ai</a></span></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
+    <p>BenchFlow News 列出 Agent Skills &#39;26 workshop 于 2026-05-26 在 ACM CAIS 举行；可作为后续跟踪 agent skill 评测、安全和供应链讨论的线索。</p>
+
+  </article>
+    </div>
   </section>
 <section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
@@ -2446,11 +2527,11 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
-    <div class="rendered-markdown"><ul><li>主体信息：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。</li></ul>
+    <div class="rendered-markdown"><ul><li>主线条目：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。</strong>：为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。</li><li><strong>follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。</strong>：为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。</li><li><strong>状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。</strong>：为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
-    <template data-rich-source data-source-fallback>- 主体信息：3
+    <template data-rich-source data-source-fallback>- 主线条目：3
 - Builder 观察：0
 - 一手链接：通过
 - 无禁用表达：通过

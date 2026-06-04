@@ -40,6 +40,13 @@ import {
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
 import { classifyPublishQuality, findPublishQualityIssues } from "../src/quality-status.js";
+import {
+  applyQualityRepairContract,
+  repairReportQuality,
+  reviewReportQuality
+} from "../src/quality-loop.js";
+import { runDailyWorkflow } from "../src/daily-runner.js";
+import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 
@@ -2629,6 +2636,421 @@ test("CLI JSON commands can write clean UTF-8 output files", async () => {
   assert(!raw.startsWith("\uFEFF"));
 });
 
+test("daily workflow contract validates repository workflow markers", async () => {
+  const result = await validateDailyWorkflowContract({ rootDir });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
+  assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
+});
+
+test("daily runner writes launcher summary and stops before real publish by default", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-launcher-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage, context) => {
+      calls.push({ id: stage.id, cwd: context.cleanRoot });
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.mode, "dry-run");
+  assert.equal(result.summary.final_status, "generated_only");
+  assert.equal(result.summary.next_action.kind, "none");
+  assert.equal(result.summary.launcher_root, launcherRoot);
+  assert.equal(result.summary.clean_repo_root, cleanRoot);
+  assert.equal(result.summaryPath, path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json"));
+  assert(calls.some((call) => call.id === "sources_phase5_audit"));
+  assert(calls.some((call) => call.id === "publish_dry_run_daily"));
+  assert(!calls.some((call) => call.id === "publish_real"));
+  assert(calls.every((call) => call.cwd === cleanRoot));
+
+  const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
+  assert.equal(saved.final_status, "generated_only");
+});
+
+test("daily runner hands AI repair back to Codex with publish review budget", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-repair-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "2222222222222222222222222222222222222222"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          needsAiRepair: true,
+          output: {
+            ai_review_tasks: [{ kind: "translation_fidelity", path: "builder_observations[0]" }]
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.mode, "publish");
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
+  assert.equal(result.summary.next_action.max_review_repair_loops, 5);
+  assert.equal(result.summary.next_action.remaining_review_repair_loops, 4);
+  assert.match(result.summary.next_action.contract_path, /quality-ai-repair-2026-06-04\.json$/);
+  assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
+});
+
+test("daily runner allows one AI repair loop in default dry-run mode", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-dry-repair-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "3333333333333333333333333333333333333333"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
+  assert.equal(result.summary.next_action.max_review_repair_loops, 1);
+  assert.equal(result.summary.next_action.remaining_review_repair_loops, 0);
+});
+
+test("daily runner resumes from AI repair contract and continues with optimized report", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-resume-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  let prepareCalls = 0;
+  const first = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      prepareCalls += 1;
+      return {
+        ok: true,
+        next_cwd: cleanRoot,
+        remote_main_sha: "4444444444444444444444444444444444444444"
+      };
+    },
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "translation_fidelity", path: "builder_observations[0].translation" }]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+  const contractPath = first.summary.next_action.contract_path;
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    edits: [
+      {
+        path: "builder_observations[0].translation",
+        value: "修复后的译文。",
+        reason: "Preserve original meaning."
+      }
+    ]
+  }, null, 2), "utf8");
+
+  const calls = [];
+  const resumed = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      prepareCalls += 1;
+      throw new Error("prepare should not run during repair resume");
+    },
+    runStage: async (stage) => {
+      calls.push(stage);
+      if (stage.id === "quality_review") {
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(prepareCalls, 1);
+  assert.equal(resumed.summary.final_status, "published");
+  assert.deepEqual(calls.map((stage) => stage.id), [
+    "quality_ai_repair",
+    "quality_review",
+    "report_write",
+    "build",
+    "quality_page_check",
+    "validate",
+    "sources_phase5_audit",
+    "publish_dry_run_daily",
+    "publish_real"
+  ]);
+  const repairStage = calls.find((stage) => stage.id === "quality_ai_repair");
+  assert(repairStage.command.args.includes(contractPath));
+  const reportWriteStage = calls.find((stage) => stage.id === "report_write");
+  assert(reportWriteStage.command.args.includes(".tmp/daily-report.optimized.json"));
+});
+
+test("daily runner restart discards pending AI repair state and prepares again", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-restart-"));
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json");
+  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: path.join(launcherRoot, ".tmp", "publish-worktrees", "main"),
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-06-04.json")
+    }
+  }, null, 2), "utf8");
+
+  let prepareCalls = 0;
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    restart: true,
+    prepareCleanWorktree: async () => {
+      prepareCalls += 1;
+      return {
+        ok: true,
+        next_cwd: path.join(launcherRoot, ".tmp", "publish-worktrees", "fresh"),
+        remote_main_sha: "5555555555555555555555555555555555555555"
+      };
+    },
+    runStage: async (stage) => ({ ok: true, output: { stage: stage.id } })
+  });
+
+  assert.equal(prepareCalls, 1);
+  assert.equal(result.summary.final_status, "published");
+  assert.equal(result.summary.review_repair_attempts, 0);
+  assert(result.summary.stages.some((stage) => stage.id === "prepare_clean_worktree"));
+});
+
+test("quality review flags AI tone highlight and translation issues", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.summary = "Today has a high-signal platform shift with more signal for builders.";
+  report.main_items[0].bullets = [
+    "==OpenAI shipped a broad platform update with a very long highlighted sentence that should not be entirely marked because it makes the page noisy and hides the real keyword.=="
+  ];
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      original_text: "Coding agents need eval loops before unattended work.",
+      translation: "Coding agent 在无人值守工作之前需要 eval loops。",
+      content: "Coding agents need eval loops before unattended work.",
+      url: "https://x.com/examplebuilder/status/2059000000000000000"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("plain_language_stock_phrase"));
+  assert(codes.includes("highlight_too_large"));
+  assert(codes.includes("builder_content_translation_mismatch"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "translation_fidelity"));
+});
+
+test("quality review requires candidate pool and flags autodraft template prose", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_window = {
+    date_from: report.report_date,
+    date_to: report.report_date,
+    fallback_window_used: false,
+    notes: "report:draft 自动从固定发现候选池选取；一手候选进入主体。"
+  };
+  report.self_check = {
+    ...report.self_check,
+    builder_skill_used: ["candidate-pool-autodraft"],
+    notes: "report:draft 已从候选池自动选取并写回 included 标记。"
+  };
+  report.main_items = [
+    {
+      ...report.main_items[0],
+      candidate_id: "main-auto",
+      bullets: [
+        "**OpenAI** 发布或更新了这条信号；==它进入主体的原因是来源可回溯且与 AI 产品、模型、工具链或内容生成工作流相关==。"
+      ]
+    }
+  ];
+  report.github_trending = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.community_leads = [];
+  report.model_releases = [];
+
+  const missingPool = reviewReportQuality(report);
+  const missingCodes = missingPool.issues.map((issue) => issue.code);
+  assert.equal(missingPool.ok, false);
+  assert(missingCodes.includes("candidate_pool_not_checked"));
+  assert(missingCodes.includes("autodraft_template_phrase"));
+  assert(missingPool.ai_review_tasks.some((task) => task.kind === "rewrite_autodraft_template"));
+
+  const withPool = reviewReportQuality(report, {
+    candidatePool: {
+      schema_version: 1,
+      report_date: report.report_date,
+      candidates: [
+        {
+          id: "main-auto",
+          status: "included",
+          included_in: "main_items"
+        }
+      ]
+    }
+  });
+  const withPoolCodes = withPool.issues.map((issue) => issue.code);
+  assert(!withPoolCodes.includes("candidate_pool_not_checked"));
+  assert(withPoolCodes.includes("autodraft_template_phrase"));
+  assert.equal(withPool.checklist.find((item) => item.id === "candidate_backrefs").status, "passed");
+});
+
+test("quality review validates autodraft candidate backreferences", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.self_check = {
+    ...report.self_check,
+    builder_skill_used: ["candidate-pool-autodraft"],
+    notes: "candidate-pool-autodraft"
+  };
+  report.main_items = [
+    {
+      ...report.main_items[0],
+      candidate_id: "main-auto",
+      bullets: [
+        "**OpenAI** added ==source-linked evidence== for the daily report workflow."
+      ]
+    }
+  ];
+  report.github_trending = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.community_leads = [];
+  report.model_releases = [];
+
+  const review = reviewReportQuality(report, {
+    candidatePool: {
+      schema_version: 1,
+      report_date: report.report_date,
+      candidates: [
+        {
+          id: "main-auto",
+          status: "excluded",
+          included_in: "hot_blogs"
+        }
+      ]
+    }
+  });
+  const issues = review.issues.filter((issue) => issue.code === "candidate_pool_reference_invalid");
+  assert.equal(review.ok, false);
+  assert.equal(issues.length, 2);
+  assert.equal(review.checklist.find((item) => item.id === "candidate_backrefs").status, "failed");
+});
+
+test("quality repair only applies safe text and highlight fixes", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0].bullets = [
+    "==OpenAI shipped a broad platform update with a very long highlighted sentence that should not be entirely marked because it makes the page noisy and hides the real keyword.=="
+  ];
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      original_text: "Coding agents need eval loops before unattended work.",
+      translation: "Coding agent 在无人值守工作之前需要 eval loops。",
+      content: "Coding agents need eval loops before unattended work.",
+      url: "https://x.com/examplebuilder/status/2059000000000000000"
+    }
+  ];
+
+  const { report: repaired, repairs } = repairReportQuality(report);
+
+  assert.equal(repaired.builder_observations[0].content, "Coding agent 在无人值守工作之前需要 eval loops。");
+  assert.equal(repaired.builder_observations[0].url, report.builder_observations[0].url);
+  assert.equal(repaired.main_items[0].bullets[0].includes("=="), false);
+  assert(repairs.some((repair) => repair.code === "builder_content_translation_mismatch"));
+  assert(repairs.some((repair) => repair.code === "highlight_too_large"));
+});
+
+test("AI repair contract cannot change source facts or links", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const originalUrl = report.main_items[0].url;
+  const result = applyQualityRepairContract(report, {
+    schema_version: 1,
+    report_date: report.report_date,
+    edits: [
+      {
+        path: "main_items[0].bullets[0]",
+        value: "**OpenAI** added ==source-linked evidence== for the daily report workflow.",
+        reason: "Make the public bullet concise and specific.",
+        evidence_path: "main_items[0].url"
+      },
+      {
+        path: "main_items[0].url",
+        value: "https://example.com/rewritten-source",
+        reason: "This must be rejected."
+      }
+    ]
+  });
+
+  assert.equal(result.report.main_items[0].bullets[0], "**OpenAI** added ==source-linked evidence== for the daily report workflow.");
+  assert.equal(result.report.main_items[0].url, originalUrl);
+  assert.deepEqual(result.applied.map((edit) => edit.path), ["main_items[0].bullets[0]"]);
+  assert.equal(result.rejected[0].path, "main_items[0].url");
+  assert.equal(result.rejected[0].code, "path_not_allowed");
+});
+
 test("sources audit merge writes discovery audit groups into the final report JSON", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-audit-merge-"));
   const historyDir = path.join(tmp, "reports-data", "2026", "05");
@@ -3082,6 +3504,12 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   ));
   assert(drafted.report.source_audit.content_sources.included <= drafted.report.source_audit.content_sources.candidates_found);
   assert(drafted.report.source_audit.github_trending.included <= drafted.report.source_audit.github_trending.candidates_found);
+
+  const draftReview = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  const draftReviewCodes = draftReview.issues.map((issue) => issue.code);
+  assert(!draftReviewCodes.includes("autodraft_template_phrase"));
+  assert(!draftReviewCodes.includes("candidate_pool_reference_invalid"));
+  assert.equal(draftReview.checklist.find((item) => item.id === "candidate_backrefs").status, "passed");
 
   const written = await writeReportDraft({
     rootDir: tmp,
@@ -4710,7 +5138,12 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("最终发布产物是自包含、可读性好的静态 HTML，不是 Markdown"));
   assert(prompt.includes(".codex/skills/effective-interact"));
   assert(prompt.includes('renderMode: "pre-rendered"'));
-  assert(prompt.includes("定时任务假定已经在本仓库根目录启动"));
+  assert(prompt.includes("定时任务和长程发布任务必须从 launcher worktree 启动"));
+  assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD"));
+  assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD --publish"));
+  assert(prompt.includes(".tmp/run-summary-YYYY-MM-DD.json"));
+  assert(prompt.includes("publish:dry-run:daily"));
+  assert(prompt.includes("--restart"));
   assert(prompt.includes("反思与迭代建议"));
   assert(prompt.includes("去套话检查"));
   assert(prompt.includes("plain_language_failed"));

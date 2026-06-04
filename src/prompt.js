@@ -31,7 +31,7 @@ export async function assemblePrompt(options = {}) {
   parts.push("- 最终发布主产物是 `docs/reports/YYYY/MM/YYYY-MM-DD.html`。");
   parts.push("- 结构化数据写入 `reports-data/YYYY/MM/YYYY-MM-DD.json`，再由仓库工具渲染 HTML。");
   parts.push("- 公开日报 HTML 由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成。");
-  parts.push("- 发布前必须通过 `npm run validate` 和 `npm run publish:dry-run`。");
+  parts.push(`- 发布前必须通过 \`npm run validate\` 和 \`npm run publish:dry-run -- --date ${reportDate}\`。`);
   parts.push("- 真实 commit/push 或 GitHub API 远端写入只有在用户已授权的发布命令中执行。");
   parts.push("- 真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200 且页面内容包含当日 `report_date`。");
   parts.push("- 最终回复必须单独列出“反思与自动化迭代建议”，内容来自 `self_check.optimization_suggestions`；没有建议时说明本轮无新增建议。");

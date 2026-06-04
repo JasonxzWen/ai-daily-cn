@@ -4,6 +4,15 @@
 
 Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-MM-DD`.
 
+## Runner
+
+- Start from the launcher worktree with `npm run daily:run -- --date YYYY-MM-DD`.
+- Use `npm run daily:run -- --date YYYY-MM-DD --publish` only when real publish is explicitly allowed.
+- Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status` and `next_action`.
+- If `next_action.kind` is `codex_ai_repair_contract`, write the requested contract and resume with the same `daily:run` command.
+- Use `--restart` only when intentionally discarding same-date runner state.
+- Scheduled dry-run uses `publish:dry-run:daily`.
+
 ## Assumptions
 
 - Date is interpreted in `Asia/Shanghai`.
@@ -20,6 +29,8 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 ## Worktree / Branch
 
 - Record `git status --short --branch`.
+- Automation and publish runs start from the launcher worktree by invoking `daily:run`; the runner prepares and uses the clean publish checkout internally.
+- Use `npm run publish:prepare-clean-worktree` only for manual checkout diagnostics.
 - Record whether the run is local generation only, dry-run only, or real publish.
 
 ## Allowed paths
@@ -43,8 +54,9 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 
 - Candidate pool and structured draft pass report-write gates.
 - All collected information is compared against recent `reports-data` reports/candidate pools and deduped before selection.
+- Runner records `sources:phase5-audit` before dry-run/publish completion.
 - `npm run validate` passes.
-- `npm run publish:dry-run` reports the publish plan and expected Pages URL.
+- `npm run publish:dry-run:daily -- --date YYYY-MM-DD` reports the date-scoped publish plan and expected Pages URL.
 - Real publish, when approved, verifies the final Pages URL.
 
 ## Validation commands
@@ -53,7 +65,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`
 - `npm run build`
 - `npm run validate`
-- `npm run publish:dry-run`
+- `npm run publish:dry-run:daily -- --date YYYY-MM-DD`
 
 ## Parallel writes
 

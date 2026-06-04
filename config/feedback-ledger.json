@@ -57,6 +57,30 @@
       }
     },
     {
+      "id": "feedback/p1-clean-publish-checkout",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Use a clean publish checkout for scheduled runs",
+      "problem": "Scheduled daily runs could start from a feature branch, detached HEAD, dirty launcher worktree, or unavailable current `.git` metadata, causing generation or publish to fail after content was already prepared.",
+      "expected_behavior": "Scheduled daily runs first prepare a dedicated clean checkout from current `origin/main`, switch to `prepared.next_cwd`, and run generation, validation, date-scoped dry-run, and publish there without committing, stashing, switching, or cleaning the launcher worktree.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "package.json",
+        "src/cli.js",
+        "src/publish.js",
+        "tasks/daily-publish-runbook.md",
+        "prompts/ai-daily/modules/publish-workflow.md",
+        "docs/codex-automation-setup.md",
+        "tasks/templates/daily-publish-task.md",
+        "tests/publish.test.js"
+      ],
+      "validation": {
+        "command": "npm run test",
+        "test_name": "publish prepare-clean-worktree clones a dedicated main checkout without touching launcher changes",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-source-outage-disclosure",
       "severity": "P1",
       "status": "implemented",
@@ -170,6 +194,30 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "domestic community leads stay inside the shared community section",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-ai-quality-review-loop",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Run AI-ready quality review before publish",
+      "problem": "Daily drafts could pass structural gates while still retaining AI-flavored wording, automatic draft template prose, noisy highlights, thin bullets, Builder translation drift, or unchecked candidate-pool back-references.",
+      "expected_behavior": "Daily publish runs review draft JSON and source candidate pools before report:write, allow only safe automatic text repairs or restricted AI repair contracts, and run a targeted Playwright page checklist after build.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "package.json",
+        "src/cli.js",
+        "src/quality-loop.js",
+        "src/page-checklist.js",
+        "scripts/check-daily-page.mjs",
+        "tasks/daily-publish-runbook.md",
+        "tests/unit.test.js",
+        "tests/e2e/site.e2e.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "quality review flags AI tone highlight and translation issues",
         "gate": "npm run validate"
       }
     }

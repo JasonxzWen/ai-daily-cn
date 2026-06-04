@@ -833,6 +833,21 @@ p.hero-summary-text {
   overflow-wrap: anywhere;
 }
 
+.card-title-text {
+  display: inline-flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .card-media-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1171,6 +1186,64 @@ body.lightbox-open {
 
 .builder-card .card-detail-list dd span {
   overflow-wrap: anywhere;
+}
+
+.community-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.community-card {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.community-card h3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+.community-card .card-title-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafc;
+  object-fit: contain;
+}
+
+.community-card .card-title-link {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.community-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.community-card > p {
+  color: #25231f;
+  line-height: 1.62;
+}
+
+.community-card .card-detail-list {
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.community-card .card-detail-list div {
+  padding-top: 0;
+  border-top: 0;
 }
 
 @media (max-width: 760px) {
@@ -2278,17 +2351,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-19 至 2026-05-21</div>
           <h1 class="report-title report-date-title">2026-05-21</h1>
         </div>
-        <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QTwvdGV4dD48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
+        <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
 <img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json" rel="noopener noreferrer">结构化 JSON</a></div>
       </div>
       <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker OpenAI-compatible API、Claude Managed Agents 企业级执行边界，以及 GitHub Trending 中持续升温的 coding-agent 基础设施项目</li><li>本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>6</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>0</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>技术博客</span><strong>3</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>0</strong><small>Top 10</small></div>
-<div class="hero-stat"><span>Builder</span><strong>8</strong><small>观察</small></div>
+<div class="hero-stat"><span>Builder</span><strong>4</strong><small>观察</small></div>
 <div class="hero-stat"><span>覆盖</span><strong>05-19..05-21</strong><small>扩展时间范围</small></div>
   </div>
       </div>
@@ -2366,7 +2438,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field blog-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="model serving / OpenAI-compatible API" data-search-target="html-work-report">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/" rel="noopener noreferrer">Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">model serving</span><span class="chip chip-topic">OpenAI-compatible API</span></div>
 
     <p>SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。</p>
@@ -2374,7 +2446,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="managed agents / MCP / sandboxing" data-search-target="html-work-report">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://claude.com/blog/claude-managed-agents-updates" rel="noopener noreferrer">New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">managed agents</span><span class="chip chip-topic">MCP</span><span class="chip chip-topic">sandboxing</span></div>
 
     <p>Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。</p>
@@ -2382,7 +2454,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="reranker / RAG" data-search-target="html-work-report">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAeFBMVEVHcEz09PT8/f3u7u7+/v7////6+vqIiIghISH////6+vrX19fk5OT/0h7/1R7/nAH/////mgH/lwD/rAr/vhUxND3/ow/8xxv/thH/2Rz/kwP/zRz/0KcfLD7+LT0EFD//4Mf/vHr/q03/8ebEpCpYTjqJdTSmNTzTbJ3eAAAADXRSTlMAR4o0o+peAQXDdRUjQZpc5AAABYdJREFUWIW1V4l2ozgQxCfYCQIJkLgcfM///+FWtcAG7Eyy+95qXt4kkrrorj4VBP/bCsfrv0j/sPGz9GK/3m1SrM1uvf38FxhybbtLZ2u9+h0E73ysKXFpT2erjbHnU3sUTba/gMB5RPHjyRj9XKY+C8a2V/Bvn9/iXpsYnUDOZlwWvyVQpcXJ7uNvCDyC7UdtcN/mTg2ryTNgeIjt9wi0HrSfIa7LRqn4ufBHngDCXsDmd0Rgd4XPU/lyIj1gEKKGErv3Onj5tk50Fr+Ke4jSJOb0DQL1F3mTvxcXCAczzu8RsLOR77vv5YHQJKLD8gUBf+/S40/yXEAAD4sZgvj/Agt/lI9jMImgCucAIfyn9V/sfyyH73hnThRYp63R2S/kY1VqDRo+pwDwAOLnF+JEsEl9mXgCBizTdmxA5Vw1kalc/NxwRp8nKoRRQAWSQV65W9fdmqd8de267v5AUBlVGLFAF4CBhwJVcSiKw60ayRdF0V0fCjphIYjCUQzABf5cxeoKeQg8Ae+yIYiqZ8FILIwsqBPvgrx0AnA4dOXDpPtBECoe0zKVa3OkDYMFKyZhLi5CAWnirjhc78VDY3UtrrfD4V71x3HcGN2mm4GEMNinJ208PVi5unbXqhq5QeGv4qb8seNGQj9EngSJorP2PsjlE+pNQqvqoaD4ASSsvAagYJfqPgpVnjcvsiOU/hjRCEdugwFgk9a6/E0YP4G0uaT7B0D6CjCHm/0tbuirAgEucwB1bSYkuusUwXmA6FsAh9B1lRrE7133FmDQ4JUDh1Do7lf6T11v3aHoJsk1N2GTzmtBxdBDNN5ulB7i+GnTQGI4uNFqi17wbAd9+BfF8N/9GZe8BzciGR5xsEQk6sYakzWKN5hQ3SDuM8vJPk9LNM7SJhYVIRoAFignaDtY6Ao5tMlVdTsUhz9ff+QHCsAC9Ef0HMub+OfzOfQdZceKjJaU4SDTHqc5QPbriz9fByQiJSHIY3w/QTKl69ADfHCYoFilcuAIhmmUE1lZfyR4E2uppCWF0AC1XfLRdyTKo6LwGipTrtlfVd3L18wj3FCKCB4MA4BOfUlAR6kTmSEQCqw1zFYpkKoSPhhPxMxJvmE282sm8ZU1QC7DBa4BKvtSo00jpd8XNM+8QGr5dCYfAWwslXUfcCY5sR6qBqMMhpLcUBE9bRJE5LagZILuY2kZUIPWVwO0fyJYjekENI1D00nRVxm8A/mk4fc0a8pWNGhhj+UmyjXYN7CTao6yA47lHsM1M/5j4NGyz2OsIIdGi+YNETJjFZvwEyGR35saJJVyz8Fc44OJPQU2xbk1CXmzmVIkOqaKzhMAbeSrrlFNzUuZMaWLsY26iIrckjyQkphsVHmUG5od+LCjVIKhhmOUL6wLP1gkzpOYzJjPewUmpaC2ziekdHmOVpxDLcfKJnPjq32pNpNio8qcsVGSg5YcLNiVSgcXlvF0PETwUHU3G1zIYVZjkPXNBSawrRHTmMn3GU3UoDHzgpuJvhW8ShNWbKwSWnE5BXASfcSxU4BSbmfCQRQEfjwVDqYKgLy8wcrmw5/nAAnIkZOBIOmM/JgM2H3O4tnAItCMT8CB9iNruoqCCMmQXk61uAJGDBM+q4p/cxADDp2M/pr9PUUyAiBCLBFC7sE5NkMPZtUzx+OxxTriLOlfH3gD8Vb/gFmwNYVA+JQn1vGkaykssurz5fniakWZZHj+tHK0jiJOCCEQACHvLP/Qot3+zn67Xy7326Wgn2W/f4AhDz8CyktVFYjXl97mk3U7lLI/fwMuqHnUD8weARjhYrkb34kea4S+2e3xgoy8+GNQHDCwEX2uFovVh78TPU5QOLj/GQVBGM3EJxDjFfaN4/Xo7XvcP9Pf3nk5GEn/A/yV0CV1sqntAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://huggingface.co/blog/ettin-reranker" rel="noopener noreferrer">Introducing the Ettin Reranker Family</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">reranker</span><span class="chip chip-topic">RAG</span></div>
 
     <p>Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。</p>
@@ -2402,39 +2474,39 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field builder-card-grid" data-focus-field="x-twitter">
       <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUs8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/karpathy/status/2056753169888334312" rel="noopener noreferrer">Andrej Karpathy</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUs8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/karpathy/status/2056753169888334312" rel="noopener noreferrer">Andrej Karpathy</a><span class="card-subtitle">@karpathy</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Anthropic researcher / AI educator</span><span class="chip chip-date">2026-05-21</span></div>
 
     <p>公开宣布加入 Anthropic，回到 frontier LLM R&amp;D，同时表示会继续教育方向工作。这是模型研发人才流向与教育内容生产并行的明确信号。</p>
-    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@karpathy</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Slc8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/joshwoodward/status/2056873495116845485" rel="noopener noreferrer">Josh Woodward</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Slc8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/joshwoodward/status/2056873495116845485" rel="noopener noreferrer">Josh Woodward</a><span class="card-subtitle">@joshwoodward</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Google Labs / Gemini App / AI Studio product lead</span><span class="chip chip-date">2026-05-21</span></div>
 
     <p>介绍 Gemini Spark：面向个人任务管理的 24/7 personal AI agent，先进入 trusted testers，并计划面向 US Google AI Ultra beta。这与 I/O 主线中的 agentic Gemini 相互印证。</p>
-    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@joshwoodward</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R1I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/rauchg/status/2056735989830471977" rel="noopener noreferrer">Guillermo Rauch</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R1I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/rauchg/status/2056735989830471977" rel="noopener noreferrer">Guillermo Rauch</a><span class="card-subtitle">@rauchg</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Vercel CEO</span><span class="chip chip-date">2026-05-21</span></div>
 
     <p>把 Claude Managed Agents 与 Vercel Sandbox 绑定成 agent 运行时信号，强调 sandbox、凭证和网络边界对生产级 agent 的价值。</p>
-    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@rauchg</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
 
-    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><a class="card-title-link" href="https://x.com/swyx/status/2056877529991205072" rel="noopener noreferrer">Swyx</a></h3>
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/swyx/status/2056877529991205072" rel="noopener noreferrer">Swyx</a><span class="card-subtitle">@swyx</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI Engineer / Latent Space</span><span class="chip chip-date">2026-05-21</span></div>
 
     <p>把 AI SDLC 拆成测试、浏览器 E2E、视觉检查和 agent 工作流约束，说明 coding agent 流程正在转向可验证工程系统。</p>
-    <dl class="card-detail-list"><div><dt>账号</dt><dd><span>@swyx</span></dd></div></dl>
+
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-4" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>社区线索</h2>
@@ -2442,11 +2514,41 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><ul><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="来源" decoding="async"> <a href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">来源</a></li><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="来源" decoding="async"> <a href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">来源</a></li><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="来源" decoding="async"> <a href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">来源</a></li><li><mark class="text-highlight daily-tag daily-tag-general">一般</mark>Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 <img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC" alt="来源" decoding="async"> <a href="https://x.com/GoogleLabs/status/2056872996988756228" rel="noopener noreferrer">来源</a></li></ul></div>
-    <template data-rich-source data-source-fallback>-  ==tag-general|一般==karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [来源](https://github.com/karpathy/autoresearch)
--  ==tag-general|一般==anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [来源](https://github.com/anthropics/claude-plugins-official)
--  ==tag-general|一般==HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) [来源](https://github.com/HKUDS/CLI-Anything)
--  ==tag-general|一般==Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。 ![来源](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC) [来源](https://x.com/GoogleLabs/status/2056872996988756228)</template>
+
+    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://github.com/karpathy/autoresearch" rel="noopener noreferrer">github.com</a></span></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
+    <p>karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://github.com/anthropics/claude-plugins-official" rel="noopener noreferrer">github.com</a></span></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
+    <p>anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://github.com/HKUDS/CLI-Anything" rel="noopener noreferrer">github.com</a></span></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
+    <p>HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
+
+    <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD////f398QEBAgICDv7+9wcHBAQECAgIC/v7/Pz8+vr6+QkJAwMDBQUFCfn59gYGBA/ZVxAAAA2ElEQVQ4jc1SSRLDIAzD7GuS/7+2yKQNENJrqwMMFiBbthB/gkSMrY/F/qik8d4bo69QJt9fd2SFOCh8An7k8aAIseMaw1KaslBSKig1kUL1NMFRxsIiWko98xBxWCx4s+CFihCJRquIqwsUJFZMvFKdYcFYmgvsEKAdHgQ4exOw3EucRfKXL2BoehSpBRo29EkkkbXN0LUIdzA1Q7clj3fvrt1FNoq8O9rhapj5Wv7ZoUzHWfDAXx1uUxHGjioJA07wVLCrQ4HdKdPufexD04jW/4Dl2PwELxkCBNiT/pD8AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/GoogleLabs/status/2056872996988756228" rel="noopener noreferrer">x.com</a></span></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
+    <p>Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。</p>
+
+  </article>
+    </div>
   </section>
 <details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
@@ -2504,11 +2606,11 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
-    <div class="rendered-markdown"><ul><li>主体信息：6</li><li>Builder 观察：4</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。</li></ul>
+    <div class="rendered-markdown"><ul><li>主线条目：6</li><li>Builder 观察：4</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。</li></ul>
 <h4>提示词与规则迭代建议</h4>
 <ul><li><strong>把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。</strong>：把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff</li><li><strong>为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。</strong>：为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间</li><li><strong>为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。</strong>：为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率</li></ul>
 <ul><li><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> <a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-21.json" rel="noopener noreferrer">结构化 JSON</a></li></ul></div>
-    <template data-rich-source data-source-fallback>- 主体信息：6
+    <template data-rich-source data-source-fallback>- 主线条目：6
 - Builder 观察：4
 - 一手链接：通过
 - 无禁用表达：通过

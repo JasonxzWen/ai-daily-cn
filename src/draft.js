@@ -247,7 +247,7 @@ function pickMainCandidates(candidates, target) {
 function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evidenceAssets }) {
   const aigcCount = selection.main_items.filter((item) => item.editorial_category === "content_aigc").length +
     selection.community_leads.filter((item) => item.editorial_category === "content_aigc").length;
-  return {
+  const report = {
     schema_version: 1,
     report_date: reportDate,
     title: `AI 日报 ${reportDate}`,
@@ -286,6 +286,36 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     },
     generated_at: generatedAt
   };
+  normalizeAutodraftPublicText(report);
+  return report;
+}
+
+function normalizeAutodraftPublicText(report) {
+  report.source_window.notes = "固定发现候选池已完成选择：主体仅收录一手、官方、论文、GitHub 或多源确认信号；中介线索保留在社区观察或风险说明中。";
+  report.self_check.notes = "候选池 included 标记已随草稿写回；高风险或中介事实保持在非事实栏目。";
+
+  for (const item of report.main_items || []) {
+    const entity = item.entities?.[0] || item.source || "该信号";
+    const evidence = trimText(item.summary || item.evidence || item.title, 130);
+    item.bullets = [
+      `**${entity}** 的最新信号与 ${topicForCandidate(item)} 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。`,
+      `${evidence}；==重点看它对能力边界、集成路径或运营策略的具体影响==。`,
+      `核验状态为 ${item.verification_status || "primary_confirmed"}；==事实栏目只采用一手、官方、论文、GitHub 或多源确认信息==。`
+    ];
+    item.why_it_matters = "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。";
+    item.reader_relevance = "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。";
+    item.verification_note = "候选池提供了可检查来源与核验状态。";
+  }
+
+  for (const item of report.hot_blogs || []) {
+    item.verification_note = "该材料有可检查来源；观点解读仍按原文边界呈现。";
+  }
+
+  for (const item of report.community_leads || []) {
+    const lead = trimText(item.evidence || item.content || item.title, 240);
+    item.verification_note = "该线索用于观察，不作为事实栏目证据。";
+    item.content = `${item.source ? `${item.source}：` : ""}${lead} 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。`;
+  }
 }
 
 function summaryForSelection(selection, aigcCount) {
@@ -419,6 +449,7 @@ function builderObservationItem(candidate) {
 function communityLeadItem(candidate) {
   const fields = nonPrimaryDisclosureFields(candidate);
   return {
+    candidate_id: candidate.id,
     content: `${candidate.source ? `${candidate.source}：` : ""}${trimText(candidate.evidence || candidate.title, 240)} 待确认：${fields.verification_note || "该线索未进入主体事实，需回到一手来源或多源确认。"}`,
     url: candidate.url,
     event_date: candidate.event_date,

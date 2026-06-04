@@ -8,9 +8,11 @@ import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import {
   checkPublishPreflight,
+  createDailyPublishPlan,
   createPublishPlan,
   isGitHubApiFallbackEligibleError,
   parsePorcelain,
+  prepareCleanPublishWorktree,
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
@@ -41,6 +43,37 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert(plan.will_write_files.includes("docs/reports/2026/05/2026-05-13.html"));
   assert(plan.will_stage_files.includes("docs/feed.json"));
   assert(plan.will_stage_files.includes("docs/trends.json"));
+});
+
+test("daily dry-run requires an explicit report date and stays date-scoped", async () => {
+  const repoRoot = await tempRepoWithFixture();
+
+  await assert.rejects(
+    createDailyPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      git: fakeGit()
+    }),
+    (error) => error instanceof PublisherError && error.code === "daily_report_date_required"
+  );
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit()
+  });
+
+  assert.equal(plan.mode, "daily-dry-run");
+  assert.equal(plan.reports.length, 1);
+  assert.equal(plan.reports[0].report_date, "2026-05-13");
+  assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
 });
 
 test("publish dry-run allows degraded Builder coverage and exposes degraded sections", async () => {
@@ -462,6 +495,84 @@ test("publish prepare-worktree 先提交本地改动再切回发布分支", asyn
   assert.deepEqual(calls.map((call) => call.name), ["addAll", "commit", "checkout"]);
 });
 
+test("publish prepare-clean-worktree clones a dedicated main checkout without touching launcher changes", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-launcher-"));
+  const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await prepareCleanPublishWorktree({
+    repoRoot,
+    worktreeDir,
+    remoteUrl: "git@github.com:owner/repo.git",
+    installDependencies: false,
+    commandRunner: fakeCommandRunner({ calls })
+  });
+
+  assert.equal(result.mode, "prepare-clean-worktree");
+  assert.equal(result.repo_root, worktreeDir);
+  assert.equal(result.remote_main_sha, "1111111111111111111111111111111111111111");
+  assert.equal(result.cloned, true);
+  assert.equal(result.clean, true);
+  assert.equal(result.dependency_status.required, false);
+  assert.deepEqual(
+    calls.map((call) => call.args.slice(0, 2).join(" ")),
+    [
+      "ls-remote git@github.com:owner/repo.git",
+      "clone --branch",
+      "rev-parse --abbrev-ref",
+      "rev-parse HEAD",
+      "status --porcelain"
+    ]
+  );
+});
+
+test("publish prepare-clean-worktree resets only the dedicated checkout when it already exists", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-existing-"));
+  const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
+  await fs.mkdir(path.join(worktreeDir, ".git"), { recursive: true });
+  const calls = [];
+
+  const result = await prepareCleanPublishWorktree({
+    repoRoot,
+    worktreeDir,
+    remoteUrl: "git@github.com:owner/repo.git",
+    installDependencies: false,
+    commandRunner: fakeCommandRunner({ calls })
+  });
+
+  assert.equal(result.cloned, false);
+  assert.equal(result.reset_to_remote, true);
+  assert.deepEqual(
+    calls.map((call) => call.args.slice(0, 2).join(" ")),
+    [
+      "ls-remote git@github.com:owner/repo.git",
+      "fetch origin",
+      "checkout -B",
+      "reset --hard",
+      "clean -fd",
+      "rev-parse --abbrev-ref",
+      "rev-parse HEAD",
+      "status --porcelain"
+    ]
+  );
+});
+
+test("publish prepare-clean-worktree rejects external paths unless explicitly allowed", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-safe-"));
+  const externalDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-external-"));
+
+  await assert.rejects(
+    prepareCleanPublishWorktree({
+      repoRoot,
+      worktreeDir: externalDir,
+      remoteUrl: "git@github.com:owner/repo.git",
+      installDependencies: false,
+      commandRunner: fakeCommandRunner()
+    }),
+    (error) => error instanceof PublisherError && error.code === "publish_worktree_outside_repo"
+  );
+});
+
 test("publish 需要显式确认参数", async () => {
   await assert.rejects(
     publishGeneratedArtifacts({ git: fakeGit({ status: " M docs/index.html" }) }),
@@ -837,6 +948,29 @@ function fakeGit(overrides = {}) {
     async remoteUrl() {
       return overrides.remoteUrl || "git@github.com:owner/repo.git";
     }
+  };
+}
+
+function fakeCommandRunner(options = {}) {
+  const calls = options.calls || [];
+  return async (file, args, commandOptions = {}) => {
+    calls.push({ file, args, cwd: commandOptions.cwd });
+    if (options.fail && options.fail(args)) {
+      throw new Error(options.failMessage || "command failed");
+    }
+    if (args[0] === "ls-remote") {
+      return `${options.remoteSha || "1111111111111111111111111111111111111111"}\trefs/heads/main\n`;
+    }
+    if (args[0] === "rev-parse" && args[1] === "--abbrev-ref") {
+      return options.branch || "main";
+    }
+    if (args[0] === "rev-parse" && args[1] === "HEAD") {
+      return options.headSha || options.remoteSha || "1111111111111111111111111111111111111111";
+    }
+    if (args[0] === "status") {
+      return options.status || "";
+    }
+    return "";
   };
 }
 

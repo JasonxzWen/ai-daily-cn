@@ -62,6 +62,7 @@ const requiredPackageScripts = {
   'validate:openspec': ['scripts/validate-openspec.mjs'],
   validate: ['npm run test', 'npm run build', 'npm run test:e2e', 'npm run validate:openspec', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
+  'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],
   'publish:dry-run': ['src/cli.js', 'publish:dry-run', '--out docs'],
   'publish:github-api': ['src/cli.js', 'publish:github-api'],

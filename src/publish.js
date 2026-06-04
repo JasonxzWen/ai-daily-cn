@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
+import os from "node:os";
 import { promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
@@ -143,6 +144,140 @@ export async function preparePublishWorktree(options = {}) {
   };
 }
 
+export async function prepareCleanPublishWorktree(options = {}) {
+  const launcherRepoRoot = path.resolve(options.repoRoot || process.cwd());
+  const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
+  const run = options.commandRunner || runExternalCommand;
+  const remoteUrl =
+    options.remoteUrl ||
+    (await runGitCommand(launcherRepoRoot, ["remote", "get-url", "origin"], {
+      run,
+      errorCode: "git_remote_unavailable",
+      errorMessage: "Unable to read origin remote URL from the launcher worktree."
+    }));
+  const worktreeDir = resolveCleanPublishWorktreeDir({
+    launcherRepoRoot,
+    allowedBranch,
+    worktreeDir: options.worktreeDir
+  });
+  assertSafeCleanPublishWorktreeDir(launcherRepoRoot, worktreeDir, options.allowExternalWorktree);
+
+  const remoteMainSha = await resolveRemoteBranchSha({
+    launcherRepoRoot,
+    remoteUrl,
+    allowedBranch,
+    run
+  });
+  const targetExists = await pathExists(worktreeDir);
+  const targetIsGitCheckout = targetExists && (await pathExists(path.join(worktreeDir, ".git")));
+
+  if (targetExists && !targetIsGitCheckout) {
+    throw new PublisherError(
+      "publish_worktree_invalid",
+      "Clean publish worktree path exists but is not a git checkout.",
+      { worktreeDir }
+    );
+  }
+
+  if (!targetExists) {
+    await fs.mkdir(path.dirname(worktreeDir), { recursive: true });
+    await runGitCommand(launcherRepoRoot, ["clone", "--branch", allowedBranch, "--single-branch", remoteUrl, worktreeDir], {
+      run,
+      errorCode: "git_clone_unavailable",
+      errorMessage: "Unable to clone the clean publish worktree.",
+      timeoutMs: options.cloneTimeoutMs || 10 * 60 * 1000
+    });
+  } else {
+    await runGitCommand(worktreeDir, ["fetch", "origin", allowedBranch, "--prune"], {
+      run,
+      errorCode: "git_fetch_unavailable",
+      errorMessage: "Unable to fetch origin/main in the clean publish worktree.",
+      timeoutMs: options.fetchTimeoutMs || 5 * 60 * 1000
+    });
+    await runGitCommand(worktreeDir, ["checkout", "-B", allowedBranch, `origin/${allowedBranch}`], {
+      run,
+      errorCode: "git_not_writable",
+      errorMessage: "Unable to checkout origin/main in the clean publish worktree."
+    });
+    await runGitCommand(worktreeDir, ["reset", "--hard", `origin/${allowedBranch}`], {
+      run,
+      errorCode: "git_not_writable",
+      errorMessage: "Unable to reset the clean publish worktree to origin/main."
+    });
+    await runGitCommand(worktreeDir, ["clean", "-fd"], {
+      run,
+      errorCode: "git_not_writable",
+      errorMessage: "Unable to clean untracked files in the clean publish worktree."
+    });
+  }
+
+  const branch = await runGitCommand(worktreeDir, ["rev-parse", "--abbrev-ref", "HEAD"], {
+    run,
+    errorCode: "git_not_writable",
+    errorMessage: "Unable to read the clean publish worktree branch."
+  });
+  const headSha = await runGitCommand(worktreeDir, ["rev-parse", "HEAD"], {
+    run,
+    errorCode: "git_not_writable",
+    errorMessage: "Unable to read the clean publish worktree HEAD."
+  });
+
+  if (branch !== allowedBranch || headSha !== remoteMainSha) {
+    throw new PublisherError(
+      "publish_worktree_not_at_remote_main",
+      "Clean publish worktree is not checked out at the current remote main commit.",
+      {
+        branch,
+        allowedBranch,
+        headSha,
+        remoteMainSha
+      }
+    );
+  }
+
+  const statusEntries = parsePorcelain(
+    await runGitCommand(worktreeDir, ["status", "--porcelain"], {
+      run,
+      errorCode: "git_not_writable",
+      errorMessage: "Unable to inspect the clean publish worktree status."
+    })
+  );
+  if (statusEntries.length > 0) {
+    throw new PublisherError(
+      "publish_worktree_dirty",
+      "Clean publish worktree still has local changes after reset and clean.",
+      { status: statusEntries.map((entry) => `${entry.code} ${entry.path}`) }
+    );
+  }
+
+  const dependencyStatus = await ensurePublishWorktreeDependencies(worktreeDir, {
+    run,
+    installDependencies: options.installDependencies !== false,
+    forceInstall: Boolean(options.forceInstall),
+    timeoutMs: options.installTimeoutMs || 10 * 60 * 1000
+  });
+
+  return {
+    mode: "prepare-clean-worktree",
+    launcher_repo_root: launcherRepoRoot,
+    repo_root: worktreeDir,
+    branch,
+    allowed_branch: allowedBranch,
+    remote_main_sha: remoteMainSha,
+    remote_url: redactRemoteUrl(remoteUrl),
+    cloned: !targetExists,
+    reset_to_remote: targetExists,
+    clean: true,
+    dependency_status: dependencyStatus,
+    next_cwd: worktreeDir,
+    next_steps: [
+      `Set-Location ${quotePowerShellPath(worktreeDir)}`,
+      "npm run prompt:build -- YYYY-MM-DD",
+      "npm run publish:dry-run:daily -- --date YYYY-MM-DD"
+    ]
+  };
+}
+
 export async function createPublishPlan(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
@@ -237,6 +372,18 @@ export async function createPublishPlan(options = {}) {
       quality_status: report.quality_status?.status || "ok",
       degraded_sections: classifyPublishQuality(report, { rootDir: repoRoot, currentAutomationRevision }).degraded_sections
     }))
+  };
+}
+
+export async function createDailyPublishPlan(options = {}) {
+  const reportDate = requireDailyReportDate(options.reportDate);
+  const plan = await createPublishPlan({
+    ...options,
+    reportDate
+  });
+  return {
+    ...plan,
+    mode: "daily-dry-run"
   };
 }
 
@@ -736,6 +883,16 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
   return existing;
 }
 
+function requireDailyReportDate(reportDate) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(reportDate || ""))) {
+    throw new PublisherError(
+      "daily_report_date_required",
+      "publish:dry-run:daily requires an explicit --date YYYY-MM-DD."
+    );
+  }
+  return reportDate;
+}
+
 async function requirePublishableReportDate(repoRoot, reportDate, qualityOptions = {}) {
   if (!reportDate) {
     return;
@@ -1058,6 +1215,185 @@ async function runGit(cwd, args, options = {}) {
     maxBuffer: 1024 * 1024
   });
   return options.trim === false ? stdout : stdout.trim();
+}
+
+async function runExternalCommand(file, args, options = {}) {
+  const { stdout } = await execFileAsync(file, args, {
+    cwd: options.cwd,
+    encoding: "utf8",
+    maxBuffer: options.maxBuffer || 10 * 1024 * 1024,
+    timeout: options.timeoutMs
+  });
+  return options.trim === false ? stdout : stdout.trim();
+}
+
+async function runGitCommand(cwd, args, options = {}) {
+  try {
+    return await options.run("git", args, {
+      cwd,
+      timeoutMs: options.timeoutMs,
+      trim: options.trim
+    });
+  } catch (error) {
+    throw new PublisherError(options.errorCode || "git_command_failed", options.errorMessage || error.message, {
+      cwd,
+      args,
+      cause: error.message
+    });
+  }
+}
+
+async function resolveRemoteBranchSha(options) {
+  const output = await runGitCommand(
+    options.launcherRepoRoot,
+    ["ls-remote", options.remoteUrl, `refs/heads/${options.allowedBranch}`],
+    {
+      run: options.run,
+      errorCode: "git_fetch_unavailable",
+      errorMessage: "Unable to read the current remote main commit.",
+      timeoutMs: options.timeoutMs || 2 * 60 * 1000
+    }
+  );
+  const [sha] = output.trim().split(/\s+/);
+  if (!/^[0-9a-f]{40}$/i.test(sha || "")) {
+    throw new PublisherError("remote_main_unavailable", "Remote main did not return a valid commit SHA.", {
+      allowedBranch: options.allowedBranch,
+      output
+    });
+  }
+  return sha;
+}
+
+function resolveCleanPublishWorktreeDir(options) {
+  if (options.worktreeDir) {
+    return path.resolve(options.worktreeDir);
+  }
+  if (process.env.AI_DAILY_PUBLISH_WORKTREE) {
+    return path.resolve(process.env.AI_DAILY_PUBLISH_WORKTREE);
+  }
+  return path.join(
+    options.launcherRepoRoot,
+    ".tmp",
+    "publish-worktrees",
+    sanitizePathSegment(options.allowedBranch)
+  );
+}
+
+function assertSafeCleanPublishWorktreeDir(launcherRepoRoot, worktreeDir, allowExternalWorktree) {
+  if (worktreeDir === launcherRepoRoot) {
+    throw new PublisherError("publish_worktree_invalid", "Clean publish worktree cannot be the launcher worktree.", {
+      launcherRepoRoot,
+      worktreeDir
+    });
+  }
+
+  if (allowExternalWorktree) {
+    return;
+  }
+
+  const relative = path.relative(launcherRepoRoot, worktreeDir);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new PublisherError(
+      "publish_worktree_outside_repo",
+      "Clean publish worktree must be under the launcher repo unless --allow-external-worktree is set.",
+      { launcherRepoRoot, worktreeDir }
+    );
+  }
+
+  const parts = relative.split(path.sep);
+  if (!parts.includes(".tmp")) {
+    throw new PublisherError(
+      "publish_worktree_outside_tmp",
+      "Clean publish worktree must live under .tmp unless --allow-external-worktree is set.",
+      { launcherRepoRoot, worktreeDir }
+    );
+  }
+}
+
+async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
+  if (!(await pathExists(path.join(repoRoot, "package.json")))) {
+    return {
+      required: false,
+      installed: false,
+      ok: true
+    };
+  }
+
+  const nodeModulesPath = path.join(repoRoot, "node_modules");
+  if (!options.forceInstall && (await pathExists(nodeModulesPath))) {
+    return {
+      required: true,
+      installed: false,
+      ok: true,
+      reason: "node_modules_present"
+    };
+  }
+
+  if (!options.installDependencies) {
+    return {
+      required: true,
+      installed: false,
+      ok: false,
+      reason: "node_modules_missing",
+      command: "npm ci"
+    };
+  }
+
+  try {
+    await options.run(npmExecutable(), ["ci"], {
+      cwd: repoRoot,
+      timeoutMs: options.timeoutMs,
+      trim: false
+    });
+  } catch (error) {
+    throw new PublisherError("dependency_install_failed", "Unable to install dependencies in the clean publish worktree.", {
+      repoRoot,
+      command: "npm ci",
+      cause: error.message
+    });
+  }
+
+  return {
+    required: true,
+    installed: true,
+    ok: true,
+    command: "npm ci"
+  };
+}
+
+async function pathExists(filePath) {
+  try {
+    await fs.stat(filePath);
+    return true;
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return false;
+    }
+    throw error;
+  }
+}
+
+function sanitizePathSegment(value) {
+  return String(value || "main").replace(/[^a-z0-9._-]+/gi, "-");
+}
+
+function quotePowerShellPath(filePath) {
+  return `'${filePath.replaceAll("'", "''")}'`;
+}
+
+function redactRemoteUrl(remoteUrl) {
+  try {
+    const parsed = new URL(remoteUrl);
+    parsed.username = parsed.username ? "REDACTED" : "";
+    parsed.password = parsed.password ? "REDACTED" : "";
+    return parsed.toString();
+  } catch {
+    return remoteUrl;
+  }
+}
+
+function npmExecutable() {
+  return os.platform() === "win32" ? "npm.cmd" : "npm";
 }
 
 async function assertGitDirectoryWritable(repoRoot, git, gitWritableCheck) {
