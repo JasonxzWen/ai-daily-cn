@@ -2,20 +2,31 @@
 
 Use this runbook for daily AI report generation and GitHub Pages publishing.
 
+## Codex-Native Runner Contract
+
+- Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:run -- --date YYYY-MM-DD`.
+- Dry-run-only mode is the default. It stops after `publish:dry-run:daily`, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
+- Real publish requires `npm run daily:run -- --date YYYY-MM-DD --publish`. Publish mode may run the final `publish` stage and uses max 5 review -> AI repair contract -> repair -> review loops.
+- The runner owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Codex owns semantic AI repair when `next_action.kind` is `codex_ai_repair_contract`; save the contract as `.tmp/quality-ai-repair-YYYY-MM-DD.json` before resuming with the same `daily:run` command.
+- Use `--restart` only when you intentionally discard the same-date `.tmp/run-summary-YYYY-MM-DD.json` state and start over.
+- Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
+
 ## Preflight
 
 - Confirm the target date in `Asia/Shanghai` as `YYYY-MM-DD`.
 - Review `git status --short --branch` before mutating files.
 - For automation and publish runs, treat the latest `origin/main` as the only authoritative baseline. Unmerged PR branches, detached HEAD work, and local experiment branches must not affect the daily report.
 - User-confirmed feedback that must persist is P1 by default. It must be recorded in `config/feedback-ledger.json` with existing scope files, a validation command covered by `npm run validate`, and an existing test assertion or runtime gate; otherwise it is only a session-local suggestion.
-- Preserve unrelated user changes; do not use `git reset --hard`, force push, or automatic stash.
+- Preserve unrelated user changes in the launcher worktree; do not run manual `git reset --hard`, force push, or automatic stash there.
 - Automation runs must not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`; those files are for human handoff and project iteration sessions.
-- For automation or publish runs, start with:
+- The runner prepares a dedicated clean publish checkout internally before generation. Use the command below only for manual diagnostics or when debugging checkout preparation:
 
 ```powershell
-npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"
+npm run publish:prepare-clean-worktree
 ```
 
+- When run manually, read `prepared.next_cwd` from the command output before executing lower-level generation commands. The default location is `.tmp/publish-worktrees/main` under the launcher repository; it is an isolated clone that may be reset to `origin/main` without touching user work in the launcher worktree.
+- Do not use `publish:prepare-worktree` for scheduled automation. It is retained only for manual recovery sessions where the user explicitly wants to save and switch the current worktree.
 - Use `npm run publish:preflight` as the read-only publish boundary check when generation is not yet needed.
 
 ## Source Discovery
@@ -75,6 +86,30 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 - GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
 - Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`. The target public count is 5-20 when qualified candidates exist.
 
+## AI Quality Review And Repair
+
+- After writing `.tmp/daily-report.json` and before `report:write`, run the local quality review:
+
+```powershell
+npm run quality:review -- .tmp/daily-report.json .tmp/quality-review-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+```
+
+- The review checks public text for AI stock phrasing, automatic `report:draft` template wording, overly broad or missing inline `==...==` highlights, thin main-item bullets, Builder translation/content mismatches, and selected-item back-references to `.tmp/source-candidates-YYYY-MM-DD.json`. Treat `ai_review_tasks` as the Codex/AI semantic review checklist; translation fidelity and factual wording may be fixed only from existing `candidate_pool`, `source_audit`, original links, or `original_text`.
+- Apply safe automatic repairs to a new optimized draft rather than mutating facts in place:
+
+```powershell
+npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+```
+
+- If Codex or another AI reviewer proposes wording changes, save them as a repair contract and apply them through the restricted contract gate:
+
+```powershell
+npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/quality-ai-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+```
+
+- AI repair contracts may edit only public text fields. They must not change URLs, dates, source names, `candidate_id`, `source_audit`, `quality_status`, evidence paths, or publish metadata. If the optimized draft still has blocking review issues after the runner's mode budget is exhausted, stop and report `.tmp/run-summary-YYYY-MM-DD.json`, `.tmp/quality-review-YYYY-MM-DD.json`, and `.tmp/quality-repair-YYYY-MM-DD.json`; dry-run defaults to 1 review/repair loop, publish mode defaults to max 5.
+- Use `.tmp/daily-report.optimized.json` as the input to `report:write` when repairs were applied.
+
 ## Report Write
 
 - The structured draft should already be written by `npm run report:draft`; if you edit it manually, rerun `report:draft` or update `.tmp/source-candidates-YYYY-MM-DD.json` so every selected item still points to an included candidate.
@@ -97,6 +132,11 @@ npm run build
 ```
 
 - The daily HTML must come from `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode.
+- Run the targeted page checklist for the affected daily page:
+
+```powershell
+npm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
+```
 - After build, inspect the affected daily HTML and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the lightbox on desktop and mobile.
 - Run the full gate before any real publish:
 
@@ -109,7 +149,7 @@ npm run validate
 - Preview the publish plan:
 
 ```powershell
-npm run publish:dry-run
+npm run publish:dry-run:daily -- --date YYYY-MM-DD
 ```
 
 - Capture changed files, commit message, and expected Pages URL.

@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
+import { evaluateDailyPageChecklist } from "../../src/page-checklist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
@@ -25,6 +26,10 @@ await fs.copyFile(
 const structuredReport = JSON.parse(
   await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8")
 );
+structuredReport.main_items[0].bullets = [
+  "**OpenAI** added ==keyword-notable|source-linked evidence== for page checklist validation.",
+  "The fixture keeps enough public text to exercise inline highlight rendering and card layout."
+];
 const firstModel = structuredReport.model_releases[0];
 const builderAvatarDataUri = `data:image/svg+xml;base64,${Buffer.from(
   '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="22" fill="#111827"/><text x="22" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff">EB</text></svg>',
@@ -185,6 +190,8 @@ try {
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const reportBody = await page.locator("body").textContent();
+  const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
   assert.doesNotMatch(reportBody, /模型发布/);
   assert.doesNotMatch(reportBody, /ExampleModel 2/);
   assert.equal(await page.locator("#model-releases").count(), 0);
@@ -211,6 +218,8 @@ try {
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.setViewportSize({ width: 375, height: 812 });
+  const mobileChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   assert.equal(await builderCardsCollapseOnMobile(page), true);

@@ -5,20 +5,22 @@
 ## 失败模式
 
 1. Windows 旧产物 ACL 可能导致历史 `docs/` 或 `.tmp/` 文件不可写。构建必须跳过内容未变化的文件，并避免复用固定 scratch 路径。
-2. 定时任务只以最新 `origin/main` 为权威基线；本地实验分支、未合并 PR 或 detached HEAD 不能影响日报。发布前必须确认远端 `main` 基线，并用 `git push --dry-run origin main` 检查 SSH/HTTPS 凭据和网络。
+2. 定时任务只以最新 `origin/main` 为权威基线；本地实验分支、未合并 PR 或 detached HEAD 不能影响日报。发布前必须通过 `npm run publish:prepare-clean-worktree` 进入专用 clean checkout，并在那里确认远端 `main` 基线与发布能力。
 3. `publish` 已经创建本地提交后，如果最终 push 失败，不能把状态报告成“未更新仓库”。错误必须包含本地提交已创建、Pages 未部署、可恢复命令。
 4. GitHub API 兜底不能只看 dirty worktree。工作树干净但本地产物已生成或已提交时，也要能按计划文件比对远端 tree 并发布 `docs/` 与 `reports-data/`。
 
 ## 推荐恢复顺序
 
-1. `npm run publish:preflight`
-   先检查分支、远端领先、`.git` 写权限和 push dry-run。
-2. `npm run publish:resume-push -- confirm-push YYYY-MM-DD`
+1. `npm run publish:prepare-clean-worktree`
+   先准备专用 clean checkout，读取 `prepared.next_cwd`，后续生成、验证和发布都在该目录执行。
+2. `npm run publish:preflight`
+   在 clean checkout 内检查分支、远端领先、`.git` 写权限和 push dry-run。
+3. `npm run publish:resume-push -- confirm-push YYYY-MM-DD`
    当本地 `main` 已领先远端且工作树干净时，优先续推已有提交，并验证 Pages。
-3. `npm run publish:github-api -- confirm-push YYYY-MM-DD`
+4. `npm run publish:github-api -- confirm-push YYYY-MM-DD`
    GitHub API 兜底适用于本机 Git 元数据不可写，或 Git fetch/push 传输返回 `git_fetch_unavailable` / `git_push_unavailable` 的情况；该路径只发布由最新 `origin/main` 发布工作树生成并验证通过的 `docs/` 与 `reports-data/` 文件，使用 `force:false`，不得绕过 `remote_ahead`。
    当本机 Git 元数据或 push 通道不可用，但 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token` 可用时，用 API 读取远端 `main` 当前 commit/tree 并写入远端提交。输出必须包含 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
-4. 仍失败时只报告 `publish_error`、失败原因和修复建议，不执行 `reset --hard`、`push --force`、自动 `stash` 或覆盖用户改动。
+5. 仍失败时只报告 `publish_error`、失败原因和修复建议，不在 launcher worktree 执行 `reset --hard`、`push --force`、自动 `stash` 或覆盖用户改动。
 
 ## 验收要求
 
@@ -29,7 +31,7 @@
 ```powershell
 npm run test
 npm run validate
-npm run publish:dry-run -- YYYY-MM-DD
+npm run publish:dry-run -- --date YYYY-MM-DD
 npm run publish:preflight
 ```
 
