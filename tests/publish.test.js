@@ -573,11 +573,18 @@ test("publish prepare-clean-worktree installs dependencies with the configured n
     commandRunner: fakeCommandRunner({ calls })
   });
 
-  const npmCall = calls.find((call) => call.file === "npm" || call.file === "npm.cmd");
+  const npmCall = calls.find((call) => call.file === "npm" || call.file === "npm.cmd" || call.file === "cmd.exe");
   assert.ok(npmCall, "expected npm ci to run");
-  assert.deepEqual(npmCall.args, ["ci", "--cache", npmCache]);
+  if (os.platform() === "win32") {
+    assert.equal(npmCall.file, "cmd.exe");
+    assert.deepEqual(npmCall.args.slice(0, 3), ["/d", "/s", "/c"]);
+    assert.match(npmCall.args[3], /^npm ci --cache /);
+    assert.match(npmCall.args[3], /npm-cache/);
+  } else {
+    assert.deepEqual(npmCall.args, ["ci", "--cache", npmCache]);
+  }
   assert.equal(npmCall.env.NPM_CONFIG_CACHE, npmCache);
-  assert.equal(npmCall.env.npm_config_cache, npmCache);
+  assert.equal(npmCall.env.npm_config_cache, undefined);
   assert.equal(result.dependency_status.command, `npm ci --cache ${npmCache}`);
   assert.equal(result.dependency_status.npm_cache, npmCache);
 });

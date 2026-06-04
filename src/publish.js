@@ -1221,12 +1221,29 @@ async function runGit(cwd, args, options = {}) {
 async function runExternalCommand(file, args, options = {}) {
   const { stdout } = await execFileAsync(file, args, {
     cwd: options.cwd,
-    env: options.env ? { ...process.env, ...options.env } : process.env,
+    env: mergeCommandEnv(options.env),
     encoding: "utf8",
     maxBuffer: options.maxBuffer || 10 * 1024 * 1024,
     timeout: options.timeoutMs
   });
   return options.trim === false ? stdout : stdout.trim();
+}
+
+function mergeCommandEnv(overrides = {}) {
+  const env = { ...process.env };
+  const normalizedOverrides = overrides || {};
+
+  if (os.platform() === "win32") {
+    for (const key of Object.keys(normalizedOverrides)) {
+      for (const existingKey of Object.keys(env)) {
+        if (existingKey !== key && existingKey.toLowerCase() === key.toLowerCase()) {
+          delete env[existingKey];
+        }
+      }
+    }
+  }
+
+  return { ...env, ...normalizedOverrides };
 }
 
 async function runGitCommand(cwd, args, options = {}) {
@@ -1347,14 +1364,14 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
   if (npmCache) {
     npmArgs.push("--cache", npmCache);
     npmEnv.NPM_CONFIG_CACHE = npmCache;
-    npmEnv.npm_config_cache = npmCache;
   }
   npmEnv.NPM_CONFIG_AUDIT = process.env.NPM_CONFIG_AUDIT || "false";
   npmEnv.NPM_CONFIG_FUND = process.env.NPM_CONFIG_FUND || "false";
   const npmCommand = `npm ${npmArgs.join(" ")}`;
+  const npmInvocation = npmInvocationForArgs(npmArgs);
 
   try {
-    await options.run(npmExecutable(), npmArgs, {
+    await options.run(npmInvocation.file, npmInvocation.args, {
       cwd: repoRoot,
       env: npmEnv,
       timeoutMs: options.timeoutMs,
@@ -1411,6 +1428,28 @@ function redactRemoteUrl(remoteUrl) {
 
 function npmExecutable() {
   return os.platform() === "win32" ? "npm.cmd" : "npm";
+}
+
+function npmInvocationForArgs(args) {
+  if (os.platform() !== "win32") {
+    return {
+      file: npmExecutable(),
+      args
+    };
+  }
+
+  return {
+    file: "cmd.exe",
+    args: ["/d", "/s", "/c", ["npm", ...args.map(quoteCmdArg)].join(" ")]
+  };
+}
+
+function quoteCmdArg(value) {
+  const text = String(value);
+  if (!/[ \t"&|<>^]/.test(text)) {
+    return text;
+  }
+  return `"${text.replaceAll('"', '\\"')}"`;
 }
 
 async function assertGitDirectoryWritable(repoRoot, git, gitWritableCheck) {
