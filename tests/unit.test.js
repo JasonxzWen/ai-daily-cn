@@ -3526,6 +3526,50 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert.equal(written.report.quality_status.status, "degraded");
 });
 
+test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-dedupe-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push({
+    id: "hot-blog-duplicate-main-url",
+    source_id: "content-openai-news",
+    category: "hot_blog",
+    title: "Duplicate OpenAI blog wrapper",
+    url: "https://example.com/official/1",
+    source: "OpenAI News RSS",
+    author: "OpenAI",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Same URL as a main candidate; should not be wrapped again as a hot blog.",
+    verification_status: "primary_confirmed",
+    source_level: "primary",
+    primary_url: "https://example.com/official/1",
+    verification_sources: ["https://example.com/official/1"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const historyDir = path.join(tmp, "reports-data", "2026", "05");
+  await fs.mkdir(historyDir, { recursive: true });
+  await fs.writeFile(
+    path.join(historyDir, "2026-05-25.json"),
+    `${JSON.stringify({ report_date: "2026-05-25", main_items: [{ url: "https://example.com/official/2" }] }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert.equal(mainUrls.has("https://example.com/official/2"), false);
+  assert(!drafted.report.hot_blogs.some((item) => mainUrls.has(item.url)));
+});
+
 test("evidence cache downloads image_url candidates into local evidence assets", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-cache-"));
   const result = await cacheEvidenceImages({

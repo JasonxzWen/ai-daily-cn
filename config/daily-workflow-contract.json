@@ -76,7 +76,7 @@
   ],
   "external_automation_prompt": {
     "contains": [
-      "npm run daily:run",
+      "node src/cli.js daily:run",
       ".tmp/run-summary-YYYY-MM-DD.json",
       "next_action",
       "publish:dry-run:daily"

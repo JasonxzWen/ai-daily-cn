@@ -34,7 +34,8 @@ export async function generateReportDraft(options = {}) {
   const inputPaths = normalizeInputPaths(options.inputPaths || options.inputs || options.input);
   const loaded = await loadDiscoveryInputs(rootDir, inputPaths);
   const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
-  const selection = selectReportItems(merged, { reportDate });
+  const recentMainUrls = await loadRecentMainUrls(rootDir, reportDate);
+  const selection = selectReportItems(merged, { reportDate, recentMainUrls });
   const candidatePool = {
     schema_version: 1,
     report_date: reportDate,
@@ -140,6 +141,7 @@ function selectReportItems(merged, options = {}) {
   const candidates = cloneCandidates(merged.candidates);
   const metaById = merged.metaById || new Map();
   const selectedIds = new Set();
+  const recentMainUrls = options.recentMainUrls || new Set();
   const derived = [];
   const includedCandidates = [...candidates];
   const githubSourceCandidates = candidates
@@ -160,6 +162,7 @@ function selectReportItems(merged, options = {}) {
 
   const mainPool = candidates
     .filter((candidate) => !selectedIds.has(candidate.id))
+    .filter((candidate) => !recentMainUrls.has(normalizeUrl(candidate.url)))
     .filter((candidate) => canPromoteToMain(candidate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
   const mainSeeds = pickMainCandidates(mainPool, MAIN_TARGET);
@@ -187,6 +190,7 @@ function selectReportItems(merged, options = {}) {
 
   const hotBlogSeeds = candidates
     .filter((candidate) => candidate.category === "hot_blog" && !selectedIds.has(candidate.id))
+    .filter((candidate) => !mainItems.some((item) => normalizeUrl(item.url) === normalizeUrl(candidate.url)))
     .sort((left, right) => candidateScore(right) - candidateScore(left))
     .slice(0, 3);
   const hotBlogs = hotBlogSeeds.map((candidate) => {
@@ -224,6 +228,40 @@ function selectReportItems(merged, options = {}) {
     builder_observations: builderObservations,
     community_leads: communityLeads
   };
+}
+
+async function loadRecentMainUrls(rootDir, reportDate, lookbackDays = 7) {
+  const urls = new Set();
+  const baseDate = parseReportDate(reportDate);
+  for (let offset = 1; offset <= lookbackDays; offset += 1) {
+    const date = new Date(baseDate.getTime());
+    date.setUTCDate(date.getUTCDate() - offset);
+    const dateString = formatReportDate(date);
+    const [year, month] = dateString.split("-");
+    const reportPath = path.join(rootDir, "reports-data", year, month, `${dateString}.json`);
+    let parsed;
+    try {
+      parsed = JSON.parse(await fs.readFile(reportPath, "utf8"));
+    } catch (error) {
+      if (error.code === "ENOENT") continue;
+      continue;
+    }
+    for (const item of Array.isArray(parsed?.main_items) ? parsed.main_items : []) {
+      const key = normalizeUrl(item?.url);
+      if (key) urls.add(key);
+    }
+  }
+  return urls;
+}
+
+function parseReportDate(reportDate) {
+  const validDate = requireReportDate(reportDate);
+  const [year, month, day] = validDate.split("-").map((part) => Number.parseInt(part, 10));
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function formatReportDate(date) {
+  return date.toISOString().slice(0, 10);
 }
 
 function pickMainCandidates(candidates, target) {
