@@ -18,6 +18,7 @@ const DEFAULT_FOLLOW_BUILDERS_FEEDS = {
 };
 const X_SNOWFLAKE_EPOCH_MS = 1288834974657n;
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
+const DEFAULT_SOURCE_CACHE_TTL_DAYS = 7;
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
   "coding agents",
@@ -1217,22 +1218,47 @@ export async function collectContentSources(options = {}) {
         },
         ...timeoutInit(currentSource.timeoutMs || currentSource.timeout_ms || 15000)
       });
+      let responseText = "";
+      let responseForRetryNote = response;
+      let cacheFallbackNote = "";
       if (!response.ok) {
         const notes = withRetryNote(`HTTP ${response.status}`, response);
-        markSource(candidateSources.at(-1), "blocked", notes);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
-        continue;
+        const cached = await readContentSourceCache({
+          rootDir: options.rootDir || process.cwd(),
+          sourceInfo: currentSource,
+          maxAgeDays: options.cacheTtlDays || currentSource.cache_ttl_days || DEFAULT_SOURCE_CACHE_TTL_DAYS,
+          enabled: options.cacheFallback !== false
+        });
+        if (!cached) {
+          markSource(candidateSources.at(-1), "blocked", notes);
+          sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+          continue;
+        }
+        responseText = cached.content;
+        responseForRetryNote = null;
+        cacheFallbackNote = `cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}`;
+      } else {
+        responseText = await response.text();
+        await writeContentSourceCache({
+          rootDir: options.rootDir || process.cwd(),
+          sourceInfo: currentSource,
+          content: responseText,
+          fetchedAt: generatedAt,
+          enabled: options.cacheFallback !== false
+        });
       }
 
       const parsedEntries = await hydrateSearchApiEntries(
-        parseContentSourceEntries(await response.text(), currentSource),
+        parseContentSourceEntries(responseText, currentSource),
         currentSource,
         fetchImpl
       );
       const entries = parsedEntries
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
-      let notes = withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, response);
+      let notes = cacheFallbackNote
+        ? `${entries.length} recent ${entryLabel} entries parsed; ${cacheFallbackNote}`
+        : withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, responseForRetryNote);
       let confirmedProductCrossChecks = 0;
       let unresolvedProductCrossChecks = 0;
       let skippedOriginalUrlChecks = 0;
@@ -1258,6 +1284,7 @@ export async function collectContentSources(options = {}) {
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
+          ...contentCandidateImageFields(entry),
           ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
         };
 
@@ -1292,8 +1319,53 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
     } catch (error) {
       const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
-      markSource(candidateSources.at(-1), "blocked", notes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+      const cached = await readContentSourceCache({
+        rootDir: options.rootDir || process.cwd(),
+        sourceInfo: currentSource,
+        maxAgeDays: options.cacheTtlDays || currentSource.cache_ttl_days || DEFAULT_SOURCE_CACHE_TTL_DAYS,
+        enabled: options.cacheFallback !== false
+      });
+      if (!cached) {
+        markSource(candidateSources.at(-1), "blocked", notes);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+        continue;
+      }
+      const parsedEntries = await hydrateSearchApiEntries(
+        parseContentSourceEntries(cached.content, currentSource),
+        currentSource,
+        fetchImpl
+      );
+      const entries = parsedEntries
+        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
+      const status = entries.length > 0 ? "checked" : "no_signal";
+      const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
+        ? currentSource.maxItemsPerRun
+        : perSourceLimit;
+      let skippedOriginalUrlChecks = 0;
+      for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+        const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
+        if (requiresOriginalUrl(currentSource) && !originalUrl) {
+          skippedOriginalUrlChecks += 1;
+          continue;
+        }
+        candidates.push({
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          source_id: currentSource.id,
+          category: candidateCategory,
+          title: entry.title,
+          url: originalUrl || entry.url,
+          source: currentSource.name,
+          event_date: entry.event_date,
+          status: "excluded",
+          evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
+          notes: contentCandidateNotes(entry, currentSource, originalUrl),
+          ...contentVerificationFields(entry, currentSource, originalUrl),
+          ...contentCandidateImageFields(entry)
+        });
+      }
+      const cacheNotes = `${entries.length} recent ${entryLabel} entries parsed; cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}${skippedOriginalUrlChecks > 0 ? `; ${skippedOriginalUrlChecks} skipped without original URL` : ""}`;
+      markSource(candidateSources.at(-1), status, cacheNotes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes));
     }
   }
 
@@ -2413,6 +2485,56 @@ export function contentSourceRequestUrl(sourceInfo, env = process.env) {
   return sourceInfo.url;
 }
 
+async function writeContentSourceCache({ rootDir, sourceInfo, content, fetchedAt, enabled }) {
+  if (!enabled || !isCacheFallbackSource(sourceInfo) || !content) {
+    return;
+  }
+  const target = contentSourceCachePath(rootDir, sourceInfo);
+  await fs.mkdir(path.dirname(target), { recursive: true });
+  await fs.writeFile(target, `${JSON.stringify({
+    schema_version: 1,
+    source_id: sourceInfo.id,
+    url: contentSourceRequestUrl(sourceInfo),
+    fetched_at: fetchedAt || new Date().toISOString(),
+    content
+  })}\n`, "utf8");
+}
+
+async function readContentSourceCache({ rootDir, sourceInfo, maxAgeDays, enabled }) {
+  if (!enabled || !isCacheFallbackSource(sourceInfo)) {
+    return null;
+  }
+  try {
+    const payload = JSON.parse(await fs.readFile(contentSourceCachePath(rootDir, sourceInfo), "utf8"));
+    if (!payload || payload.source_id !== sourceInfo.id || typeof payload.content !== "string") {
+      return null;
+    }
+    if (isCacheExpired(payload.fetched_at, maxAgeDays)) {
+      return null;
+    }
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function contentSourceCachePath(rootDir, sourceInfo) {
+  return path.resolve(rootDir || process.cwd(), ".tmp", "source-cache", "content", `${slugId(sourceInfo.id || sourceInfo.name || sourceInfo.url)}.json`);
+}
+
+function isCacheFallbackSource(sourceInfo = {}) {
+  return /arxiv|reddit/i.test(`${sourceInfo.id || ""} ${sourceInfo.name || ""} ${sourceInfo.url || ""}`);
+}
+
+function isCacheExpired(fetchedAt, maxAgeDays) {
+  const ttlDays = Number.isFinite(Number(maxAgeDays)) && Number(maxAgeDays) > 0 ? Number(maxAgeDays) : DEFAULT_SOURCE_CACHE_TTL_DAYS;
+  const date = new Date(fetchedAt);
+  if (Number.isNaN(date.getTime())) {
+    return true;
+  }
+  return Date.now() - date.getTime() > ttlDays * 24 * 60 * 60 * 1000;
+}
+
 function withTrailingSlash(value) {
   return String(value || "").endsWith("/") ? String(value) : `${value}/`;
 }
@@ -2494,13 +2616,30 @@ function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
     sourceInfo.url
   );
   const summary = cleanText(firstString(item.abstract, item.summary, item.excerpt, item.selftext, item.text, item.description));
+  const imageUrl = absoluteUrl(
+    firstString(
+      item.image_url,
+      item.imageUrl,
+      item.image,
+      item.thumbnail_url,
+      item.thumbnailUrl,
+      item.thumbnail,
+      item.social_image,
+      item.socialImage,
+      item.og_image,
+      item.ogImage,
+      looksLikeImageUrl(item.url_overridden_by_dest) ? item.url_overridden_by_dest : ""
+    ),
+    sourceInfo.url
+  );
 
   return {
     title: cleanText(firstString(item.title, item.name, item.paper_title)),
     url,
     event_date: jsonDateOnly(firstString(item.published, item.published_at, item.date, item.created_at, item.createdAt, item.updated_at, item.time, item.created_utc)),
     summary,
-    links: extractHtmlLinks(summary, url)
+    links: extractHtmlLinks(summary, url),
+    ...entryImageFields(imageUrl, "json_api")
   };
 }
 
@@ -2541,12 +2680,14 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
       continue;
     }
 
+    const imageUrl = extractHtmlImageUrl(block, url);
     seenUrls.add(url);
     entries.push({
       title,
       url,
       event_date: eventDate,
-      summary: extractHtmlSummary(block)
+      summary: extractHtmlSummary(block),
+      ...(imageUrl ? { image_url: imageUrl, image_source: "html_index" } : {})
     });
   }
 
@@ -2554,33 +2695,130 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
 }
 
 function parseAtomEntry(block) {
+  const url = atomLink(block) || xmlText(block, "link");
+  const summary = xmlText(block, "summary") || xmlText(block, "content");
   return normalizeFeedEntry({
     title: xmlText(block, "title"),
-    url: atomLink(block) || xmlText(block, "link"),
+    url,
     date: xmlText(block, "updated") || xmlText(block, "published"),
-    summary: xmlText(block, "summary") || xmlText(block, "content")
+    summary,
+    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url),
+    image_source: "feed"
   });
 }
 
 function parseRssItem(block) {
+  const url = xmlText(block, "link") || atomLink(block);
+  const summary = xmlText(block, "description") || xmlText(block, "encoded") || xmlText(block, "summary");
   return normalizeFeedEntry({
     title: xmlText(block, "title"),
-    url: xmlText(block, "link") || atomLink(block),
+    url,
     date: xmlText(block, "pubDate") || xmlText(block, "date") || xmlText(block, "updated"),
-    summary: xmlText(block, "description") || xmlText(block, "encoded") || xmlText(block, "summary")
+    summary,
+    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url),
+    image_source: "feed"
   });
 }
 
 function normalizeFeedEntry(entry) {
   const url = cleanText(entry.url);
   const rawSummary = entry.summary || "";
+  const imageUrl = normalizeImageUrl(entry.image_url, url);
   return {
     title: cleanText(entry.title),
     url,
     event_date: dateOnly(entry.date),
     summary: cleanText(rawSummary),
-    links: extractHtmlLinks(rawSummary, url)
+    links: extractHtmlLinks(rawSummary, url),
+    ...(imageUrl ? { image_url: imageUrl, image_source: entry.image_source || "feed" } : {})
   };
+}
+
+function contentCandidateImageFields(entry = {}) {
+  const imageUrl = normalizeImageUrl(entry.image_url, entry.url);
+  if (!imageUrl) {
+    return {};
+  }
+  return {
+    image_url: imageUrl,
+    image_alt: cleanText(entry.image_alt || entry.title || ""),
+    image_source: cleanText(entry.image_source || "feed_or_page")
+  };
+}
+
+function entryImageFields(imageUrl, source) {
+  const normalized = normalizeImageUrl(imageUrl);
+  if (!normalized) {
+    return {};
+  }
+  return {
+    image_url: normalized,
+    image_source: source
+  };
+}
+
+function extractFeedImageUrl(block, baseUrl) {
+  const mediaTag =
+    block.match(/<(?:media:)?(?:content|thumbnail)\b[^>]*(?:url|href)=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>/i)?.[0] ||
+    block.match(/<enclosure\b[^>]*(?:url|href)=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>/i)?.[0] ||
+    block.match(/<itunes:image\b[^>]*(?:href|url)=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>/i)?.[0] ||
+    "";
+  const direct = mediaTag ? extractAttribute(mediaTag, "url") || extractAttribute(mediaTag, "href") : "";
+  const imageText = xmlText(block, "image") || xmlText(block, "thumbnail");
+  return normalizeImageUrl(direct || imageText, baseUrl);
+}
+
+function extractHtmlImageUrl(html, baseUrl) {
+  const decoded = decodeXml(html);
+  const metaTag =
+    decoded.match(/<meta\b[^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
+    decoded.match(/<meta\b[^>]*content=["'][^"']+["'][^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
+    "";
+  const metaImage = metaTag ? extractAttribute(metaTag, "content") : "";
+  if (metaImage) {
+    return normalizeImageUrl(metaImage, baseUrl);
+  }
+
+  for (const match of decoded.matchAll(/<(?:img|source)\b[^>]*>/gi)) {
+    const tag = match[0];
+    const src = extractAttribute(tag, "src") || firstSrcsetUrl(extractAttribute(tag, "srcset"));
+    const imageUrl = normalizeImageUrl(src, baseUrl);
+    if (imageUrl) {
+      return imageUrl;
+    }
+  }
+  return "";
+}
+
+function normalizeImageUrl(value, baseUrl = "") {
+  const raw = String(value || "").trim();
+  if (!raw || raw.startsWith("data:")) {
+    return "";
+  }
+  const url = absoluteUrl(raw, baseUrl);
+  return looksLikeImageUrl(url) ? url : "";
+}
+
+function looksLikeImageUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    if (!/^https?:$/i.test(url.protocol)) {
+      return false;
+    }
+    return /\.(?:png|jpe?g|webp|gif|avif|svg)(?:$|[?#])/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function firstSrcsetUrl(value) {
+  return String(value || "").split(",")[0]?.trim().split(/\s+/)[0] || "";
+}
+
+function extractAttribute(tag, name) {
+  const pattern = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]+)"|'([^']+)'|([^\\s>]+))`, "i");
+  const match = String(tag || "").match(pattern);
+  return decodeXml(match?.[1] || match?.[2] || match?.[3] || "");
 }
 
 function extractHtmlLinks(html, baseUrl) {

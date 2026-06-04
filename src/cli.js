@@ -24,6 +24,8 @@ import { checkSourcesHealth } from "./source-health.js";
 import { auditSourceRunHistory } from "./source-phase5.js";
 import { mergeSourceAuditIntoReport } from "./source-audit.js";
 import { validateSourceRegistryPath } from "./source-registry.js";
+import { generateReportDraft } from "./draft.js";
+import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
 
@@ -132,6 +134,46 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       canonical_url: result.report.canonical_url
+    });
+  } else if (command === "report:draft") {
+    const args = parseArgs(argv);
+    const reportDate = args.date || firstPositionalDate(argv);
+    const outputPath = args.output || args.out || path.join(".tmp", "daily-report.json");
+    const candidateOutputPath = args["candidate-output"] || args["candidate-pool"] || path.join(".tmp", `source-candidates-${reportDate}.json`);
+    const result = await generateReportDraft({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate,
+      generatedAt: args["generated-at"] || firstPositionalDateTime(argv),
+      inputPaths: draftInputPaths(argv, args, { outputPath, candidateOutputPath }),
+      outputPath,
+      candidateOutputPath,
+      evidenceOutDir: args["evidence-out"] || "docs",
+      maxEvidenceAssets: Number.parseInt(args["max-evidence-assets"] || "3", 10),
+      cacheEvidence: args["no-evidence-cache"] !== true
+    });
+    printJson({
+      ok: true,
+      report_date: result.report.report_date,
+      path: result.path,
+      candidate_pool_path: result.candidatePoolPath,
+      evidence_assets: result.evidence_assets,
+      evidence_skipped: result.evidence_skipped,
+      counts: result.counts
+    });
+  } else if (command === "evidence:cache") {
+    const args = parseArgs(argv);
+    const result = await cacheEvidenceImages({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      candidatePoolPath: args["candidate-pool"],
+      outDir: args.out || "docs",
+      maxAssets: Number.parseInt(args.max || args.limit || "3", 10)
+    });
+    printJson({
+      ok: true,
+      report_date: args.date || firstPositionalDate(argv),
+      evidence_assets: result.assets,
+      skipped: result.skipped
     });
   } else if (command === "discover:github-trending") {
     const args = parseArgs(argv);
@@ -455,6 +497,15 @@ function auditInputPaths(args, parsed) {
   return [...explicit, ...positional].filter((value) => !excluded.has(path.resolve(value)));
 }
 
+function draftInputPaths(args, parsed, options = {}) {
+  const explicit = [parsed.input, parsed.inputs].filter(Boolean).flatMap(splitInputPathToken);
+  const positional = positionalArgs(args).flatMap(splitInputPathToken).filter((token) => /\.json$/i.test(token));
+  const excluded = new Set([options.outputPath, options.candidateOutputPath]
+    .filter(Boolean)
+    .map((value) => path.resolve(value)));
+  return [...explicit, ...positional].filter((value) => !excluded.has(path.resolve(value)));
+}
+
 function splitInputPathToken(value) {
   return String(value).split(/[,\s]+/).map((token) => token.trim()).filter(Boolean);
 }
@@ -487,6 +538,9 @@ function printJson(value) {
 }
 
 function outputPathFromArgs(args) {
+  if (command === "report:draft") {
+    return "";
+  }
   const parsed = parseArgs(args);
   return typeof parsed.output === "string" && parsed.output.trim() ? parsed.output : "";
 }

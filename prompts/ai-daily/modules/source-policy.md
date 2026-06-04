@@ -14,7 +14,7 @@
 - 高质量个人/社区技术博客与访谈：Latent.Space、Interconnects、Simon Willison、Chip Huyen、Karpathy、BAIR Blog，以及对 OpenAI、Anthropic、Google、Meta 等大型实验室工程师的原始访谈或 transcript。
 - 产品发现：Product Hunt、新产品榜单、项目官网和 GitHub README 可作为候选源；最终事实尽量回到产品官网、GitHub、官方文档或原始发布页。
 - AI 开发工具商业化：固定检查 coding agent、IDE、API gateway、云平台、评测/观测工具的价格页、changelog、Service Quotas、usage dashboard、rate limit 和 credit/seat/usage-based billing 变化。
-- AIGC 与内容产业：RCTV、The Magnifier AI、Fast Company Creator Economy、Crunchbase News AI，以及中文内容产业媒体、平台公告、活动页面和公司公告可作为候选源。覆盖 AI 视频、短剧/漫剧、音乐/配音、广告创意、创作者工具、内容平台政策和商业化，但事实性入选必须回到官方、产品页、监管文件、投资方公告或多源确认。
+- AIGC 与内容产业：Runway、Pika、Luma、Kling、Adobe Firefly、Unity Muse、RCTV、The Magnifier AI、Fast Company Creator Economy、Crunchbase News AI，以及中文内容产业媒体、平台公告、活动页面和公司公告可作为候选源。覆盖图片生成、视频生成、短剧/漫剧、音乐/配音、广告创意、创作者工具、AI 辅助游戏创作、内容平台政策和商业化，但事实性入选必须回到官方、产品页、监管文件、投资方公告或多源确认。
 - 播客平台：小宇宙、喜马拉雅等只作为具体节目或单集发现入口；最终需要单集页、RSS episode、原始音频或可信 transcript。小宇宙可通过 RSSHub `/xiaoyuzhou/podcast/:id`；喜马拉雅可通过 RSSHub `/ximalaya/:type/:id/:all/:shownote?`，但通常需要 `XIMALAYA_TOKEN` 且默认不输出 ShowNote，缺少授权或单集证据时必须说明不可用。
 - 公众号与中介媒体：普通微信公众号、自媒体和行业媒体是重要线索源，但不是最终报道实体；必须先尝试拿到其引用的一手信源。`wechat_primary_like` 可作为半一手，`wechat_industry_whitelist` 可用于低风险行业动态和观点分析进入主体信息；无法回源且不在白名单时只进入 `community_leads` 并标记待验证。
 - 公众号文章链接输入：优先使用日期级输入 `$CODEX_HOME/automations/ai-daily/inputs/wechat/YYYY-MM-DD.json` 或 `--wechat-input <json>`；每条必须保留原始 `mp.weixin.qq.com` URL、账号名、发布时间、风险等级、验证备注和可选一手回源 URL。候选池和公开页面只能展示清洗后的公众号 URL、账号与验证状态，不能暴露本机路径、输入文件路径、私有 feed URL、cookie、token 或自动化目录。

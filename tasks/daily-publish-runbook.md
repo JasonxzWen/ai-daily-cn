@@ -43,7 +43,13 @@ node src/cli.js discover:search-news --date YYYY-MM-DD --providers gdelt,openale
 node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual --output .tmp/sources-health-YYYY-MM-DD.json
 ```
 
-- Write source successes, failures, and empty results into `.tmp/source-candidates-YYYY-MM-DD.json`.
+- Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
+
+```powershell
+npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+```
+
+- `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
 - For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, report generation commit not proving latest `origin/main` through `origin_main_sha`, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or Pages verification failure. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but the JSON and public HTML must disclose them in `quality_status`.
 - Also for reports dated `2026-06-02` or later, enforce the long-form engineer daily gate: public `summary` must be an editorial lead, not a generation log; every `main_items` entry must include `why_it_matters` or `reader_relevance`; `main_items` must use primary, official, paper, GitHub, or multi-source confirmed evidence; non-primary leads may only appear in viewpoint/product/Builder/community sections with `source_level`, `verification_status`, and `verification_note` or `risk_note`; keep `model_releases` empty for new drafts unless preserving legacy data.
 - A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
@@ -62,6 +68,8 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 - Tags are reserved for importance, trend state, star velocity, topic, and project highlight; renderers must color these tag types differently and de-duplicate identical tags.
 - `model_releases` remains a structured JSON index only. Do not render a public `模型发布` section; model news must be written into `main_items`.
 - `projects` remains highlight metadata for GitHub Trending. Do not render a public `今日值得关注的项目` section, `项目 highlights` subheading, or extra project list; only add a `项目 highlight` tag plus compact domain/use-case text to matching GitHub Trending Top 10 entries.
+- Domestic / Chinese dynamics remain visible inside existing main groups, hot blogs, GitHub Trending, or the shared `社区线索` section. Do not render a separate public `国内动态` navigation item.
+- AIGC, image generation, video generation, creator tools, and AI-assisted game-creation signals should appear as the existing `AIGC 动态` main group when they pass primary/official/paper/GitHub/multi-source verification. Intermediary AIGC leads stay in community leads with verification notes.
 - Hot tech blog summaries should be roughly 100-160 Chinese characters split into 2-4 point-style takeaways. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
 - Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
 - GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
@@ -69,7 +77,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 
 ## Report Write
 
-- Write the structured draft to `.tmp/daily-report.json`.
+- The structured draft should already be written by `npm run report:draft`; if you edit it manually, rerun `report:draft` or update `.tmp/source-candidates-YYYY-MM-DD.json` so every selected item still points to an included candidate.
 - Normalize it with:
 
 ```powershell

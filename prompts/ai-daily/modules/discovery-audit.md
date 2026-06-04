@@ -27,7 +27,7 @@
    - 至少检查 OpenAI、Anthropic Engineering/News、GitHub Changelog、Google DeepMind/Research、Meta AI、Microsoft Research、Hugging Face Blog 中可访问的官方或工程博客源。
    - AI 日报不局限在狭义 AI：也要检查科技行业、大厂动态、平台政策、开发者生态、算力/芯片、云服务、产品分发和产业趋势。广义来源已注册为 `optional`，包括 TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Product Hunt、Latent.Space、Interconnects、Planet AI 等。
    - 至少检查一个高质量博客/访谈聚合源，例如 Latent.Space、Interconnects、Planet AI、Product Hunt、TechCrunch AI、The Verge AI 或 Follow AI Builders。
-   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。`--per-source-limit` 用于避免单一大源挤掉其他来源。
+   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、Runway/Pika/Luma/Kling/Adobe/Unity 等 AIGC 图片/视频/游戏创作产品源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。arXiv/Reddit 等易限流固定源成功抓取后可写入 `.tmp/source-cache`，后续 429/5xx/timeout 时使用未过期缓存并在 `source_audit` 标注 `cache_fallback_used`。`--per-source-limit` 用于避免单一大源挤掉其他来源。
    - Product Hunt 和新产品榜单只产生候选；入选项目区前必须用官网、GitHub、文档或 README 交叉确认，并补充“领域”和“作用”。
    - Product Hunt 必须同时覆盖 developer-tools feed 和 Product Hunt Trending feed；Product Hunt 本身只证明“上榜/热度”，不证明产品事实。
    - 普通微信公众号、华尔街见闻、自媒体和中文科技媒体默认作为 `category:"intermediary"` 的中介发现源；入选事实性栏目之前，必须先追溯它们引用的一手来源。用户确认的公众号白名单可使用 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，低风险行业动态可进入 `main_items`，但必须保留公众号名、发布时间、待核验点和风险等级。
@@ -136,3 +136,4 @@
 - `npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json` 把独立发现命令输出中的审计组合并进最终日报 JSON，并在写回前运行 report schema 校验。
 - `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 读取最近 3 个日报日的 source audit 和候选池，输出连续运行验收状态；只有返回 `phase5_complete:true` 才能宣称 Phase 5 完成。
 - `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `community_lead` 轻量运营候选。状态页、模型网关上架、preview access、区域/账号可用性和短时限流默认不写入 `model_releases`；只有影响生产迁移、成本边界或上线排期时才可人工升格为 `main_items`。
+- `npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 必须在 `report:write` 前运行；它从候选池自动选取主体、AIGC、GitHub Trending、Builder、博客和社区线索，回写 `included` 标记，并 best-effort 缓存候选 `image_url` 到 `docs/assets/evidence/**`。
