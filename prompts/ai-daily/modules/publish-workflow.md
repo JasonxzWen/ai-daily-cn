@@ -18,7 +18,7 @@
 
 1. 运行 `npm run publish:prepare-worktree -- --message "chore: save local changes before AI daily report YYYY-MM-DD"`；如果当前分支有本地改动，先提交到当前分支；如果当前分支不是 `main`，再切回 `main` 并执行发布预检。`wrong_branch` 和非发布产物脏改动必须先用本步骤消解，不能直接拦截日报生成。
 2. 如果 `publish:prepare-worktree` 返回 `publish_status.publish_error`，但命令本身 `ok: true`，继续生成、构建和验证日报；该错误只表示真实发布暂时不可用。只有提交本地改动失败、切分支失败、无法回到可写工作区等会破坏用户改动的情况，才停止。
-3. 生成 `.tmp/daily-report.json` 草稿。
+3. 运行 `npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json`，从候选池自动生成 `.tmp/daily-report.json` 草稿和 included 回写候选池；不要用临时手工脚本重写 JSON。
 4. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 写入 `reports-data/`。
 5. 运行 `npm run build` 生成 `docs/` 静态站点。
 5a. 如果本轮在 `report:write` 之后提交并 push 了发布器、质量门、渲染器、提示词或信源配置改动，必须重新运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 和 `npm run build`，让 `self_check.automation_revision.git_commit` 等于当前 `HEAD`，并让 `origin_main_sha` 记录最新 `origin/main`。

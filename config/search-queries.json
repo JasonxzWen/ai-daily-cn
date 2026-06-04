@@ -47,15 +47,56 @@
   },
   {
     "id": "aigc-content-industry",
-    "query": "(AIGC OR \"AI video\" OR \"generative video\" OR \"creator economy\" OR \"AI short drama\" OR \"AI music\") (launch OR policy OR platform OR funding OR product)",
+    "query": "(AIGC OR \"AI video\" OR \"AI image\" OR \"generative video\" OR \"generative media\" OR \"creator economy\" OR \"AI short drama\" OR \"AI music\" OR \"AI game tools\") (launch OR policy OR platform OR funding OR product OR changelog OR API)",
     "candidate_category": "community_lead",
-    "verification_policy": "primary_required"
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "runwayml.com",
+      "pika.art",
+      "lumalabs.ai",
+      "docs.lumalabs.ai",
+      "kling.art",
+      "blog.adobe.com",
+      "adobe.com",
+      "unity.com",
+      "openai.com",
+      "deepmind.google"
+    ]
   },
   {
     "id": "china-aigc-content-industry",
-    "query": "(AI短剧 OR AI漫剧 OR AIGC OR AI视频 OR AI配音) (平台 OR 政策 OR 融资 OR 发布 OR 分成)",
+    "query": "(AI短剧 OR AI漫剧 OR AIGC OR AI视频 OR AI图片 OR AI配音 OR AI游戏 OR 生视频 OR 文生视频) (平台 OR 政策 OR 融资 OR 发布 OR 分成 OR 产品 OR 模型)",
     "candidate_category": "community_lead",
-    "verification_policy": "primary_required"
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "kling.art",
+      "kuaishou.com",
+      "jimeng.jianying.com",
+      "seed.bytedance.com",
+      "developers.tiktok.com",
+      "qwen.ai",
+      "www.minimax.io",
+      "hailuoai.video",
+      "www.tencent.com"
+    ]
+  },
+  {
+    "id": "aigc-product-launches-video-image-game",
+    "query": "(Runway OR Pika OR Luma OR Kling OR Firefly OR Sora OR Veo OR Midjourney OR \"Unity Muse\" OR \"AI game\") (changelog OR release OR launch OR API OR \"game worlds\" OR video OR image)",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "runwayml.com",
+      "pika.art",
+      "lumalabs.ai",
+      "docs.lumalabs.ai",
+      "kling.art",
+      "blog.adobe.com",
+      "adobe.com",
+      "unity.com",
+      "openai.com",
+      "deepmind.google"
+    ]
   },
   {
     "id": "ai-product-launches",

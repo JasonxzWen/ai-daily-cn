@@ -134,6 +134,7 @@ export function normalizeReportDraft(draft, options = {}) {
   requireCandidateCoverage(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
   requireExpandedMainItemFormat(validation.value);
+  requireChineseGithubTrendingDescriptions(validation.value);
   requirePublishableQuality(validation.value, {
     rootDir: options.rootDir,
     currentAutomationRevision: options.automationRevision
@@ -274,6 +275,33 @@ function requireExpandedMainItemFormat(report) {
       { errors }
     );
   }
+}
+
+function requireChineseGithubTrendingDescriptions(report) {
+  const errors = [];
+  for (const [index, item] of (Array.isArray(report.github_trending) ? report.github_trending : []).entries()) {
+    const description = String(item?.description || "").trim();
+    if (description && !hasChineseText(description)) {
+      errors.push({
+        code: "github_trending_description_not_chinese",
+        path: `github_trending[${index}].description`,
+        repo: item?.repo || item?.name || "",
+        message: "GitHub Trending description must be a Chinese rewrite, not a copied English repo description."
+      });
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new PublisherError(
+      "github_trending_description_not_chinese",
+      "GitHub Trending description 必须中文改写，不能直接复制英文仓库描述。",
+      { errors }
+    );
+  }
+}
+
+function hasChineseText(value) {
+  return /\p{Script=Han}/u.test(String(value || ""));
 }
 
 function requireBuilderXObservation(report, candidatePool) {

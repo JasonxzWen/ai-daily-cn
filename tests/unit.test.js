@@ -24,6 +24,8 @@ import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
+import { generateReportDraft } from "../src/draft.js";
+import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
@@ -561,6 +563,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   );
   assert(input.heroLinks.some((item) => item.label === "结构化 JSON" && item.href.endsWith("/data/2026/05/2026-05-15.json")));
   assert(input.heroLinks.every((item) => item.icon));
+  assert(input.heroLinks.find((item) => item.label === "日报导航")?.icon.startsWith("data:image/svg+xml;base64,"));
   assert(!input.summary.includes("Agent harness 成为今日主线"));
   assert(!input.summary.includes("其余条目见后文"));
   assert(!input.sections.some((section) => section.title === "日报概览"));
@@ -774,7 +777,9 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
 
   assert(pointsText.includes("行业媒体/播客整理"));
   assert(pointsText.includes("仅供跟进"));
-  assert(pointsText.includes("普通工程师"));
+  assert(!pointsText.includes("普通工程师"));
+  assert(!pointsText.includes("看点"));
+  assert(!pointsText.includes("风险"));
   assert(!mainMarkdownContent(input).includes("行业媒体/播客整理"));
 });
 
@@ -841,7 +846,7 @@ test("community leads omit low-signal statuspage troubleshooting items", async (
   assert(!input.sections.some((item) => item.title === "社区线索"));
 });
 
-test("domestic community leads render as a dedicated navigation section", async () => {
+test("domestic community leads stay inside the shared community section", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.community_leads = [
@@ -868,25 +873,23 @@ test("domestic community leads render as a dedicated navigation section", async 
 
   const input = reportToInteractionInput(report);
   const builderHeroStat = input.heroStats.find((item) => item.label === "Builder");
-  const domesticSection = input.sections.find((section) => section.title === "国内动态");
   const communitySection = input.sections.find((section) => section.title === "社区线索");
 
   assert.equal(builderHeroStat.value, "0");
-  assert(domesticSection);
-  assert.equal(domesticSection.type, "filterable-cards");
-  assert.equal(domesticSection.cardClass, "community-card");
-  assert.equal(domesticSection.items.length, 1);
-  assert.equal(domesticSection.items[0].title, "Leiphone");
-  assert(domesticSection.items[0].body.includes("千问 APP"));
-  assert(!JSON.stringify(domesticSection.items).includes("TechCrunch"));
+  assert(!input.sections.some((section) => section.title === "国内动态"));
   assert(communitySection);
   assert.equal(communitySection.type, "filterable-cards");
   assert.equal(communitySection.cardClass, "community-card");
-  assert.equal(communitySection.items.length, 1);
-  assert.equal(communitySection.items[0].title, "TechCrunch AI");
-  assert(communitySection.items[0].body.includes("TechCrunch"));
-  assert(communitySection.items[0].points.some((point) => point.label === "核验"));
-  assert(!JSON.stringify(communitySection.items).includes("千问 APP"));
+  assert.equal(communitySection.items.length, 2);
+  const leiphone = communitySection.items.find((item) => item.title === "Leiphone");
+  const techcrunch = communitySection.items.find((item) => item.title === "TechCrunch AI");
+  assert(leiphone);
+  assert(leiphone.body.includes("千问 APP"));
+  assert(leiphone.body.includes("待确认：中介来源仅作发现线索"));
+  assert.equal(leiphone.points.length, 0);
+  assert(techcrunch);
+  assert(techcrunch.body.includes("TechCrunch"));
+  assert.equal(techcrunch.points.length, 0);
 });
 
 test("AIGC hero stat counts Chinese signals and omits zero-value cards", async () => {
@@ -1142,6 +1145,16 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
       entities: ["Nature"],
       summary: "fixture",
       bullets: ["**Nature** fixture."]
+    },
+    {
+      title: "arXiv update",
+      event_date: "2026-05-15",
+      url: "https://arxiv.org/abs/2605.00001",
+      source: "arXiv cs.AI",
+      tier: "T2",
+      entities: ["arXiv"],
+      summary: "fixture",
+      bullets: ["**arXiv** fixture."]
     }
   ];
   report.source_audit = {
@@ -1184,6 +1197,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
     assert(sectionContent.includes(`![${source}](${CACHED_SOURCE_ICONS[source]})`), source);
     assert(!sectionContent.includes(`![${source}](data:image/svg+xml;base64,`), source);
   }
+  assert(mainContent.includes("![arXiv cs.AI](data:image/svg+xml;base64,"));
 });
 
 test("trend index uses controlled topics, conservative thresholds, and scoped annotations", async () => {
@@ -1744,6 +1758,8 @@ test("content source discovery parses hot blog and interview feeds", async () =>
   assert.equal(collected.candidates[0].source_id, "latent-space");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].url, "https://example.com/interview");
+  assert.equal(collected.candidates[0].image_url, "https://example.com/assets/harness.png");
+  assert.equal(collected.candidates[0].image_source, "feed");
   assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
 });
 
@@ -2153,6 +2169,8 @@ test("content source discovery parses official HTML pages and Product Hunt proje
   assert.equal(collected.candidates[0].source_id, "anthropic-news");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
   assert.equal(collected.candidates[0].url, "https://example.com/news/claude-code-internals");
+  assert.equal(collected.candidates[0].image_url, "https://example.com/assets/claude-code.png");
+  assert.equal(collected.candidates[0].image_source, "html_index");
   assert.match(collected.candidates[0].evidence, /Claude Code team explained/);
   assert.equal(collected.sources[1].category, "project");
   assert.equal(collected.candidates[1].category, "project");
@@ -3030,6 +3048,144 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(await exists(result.candidatePoolPath), true);
 });
 
+test("report:draft 从发现候选池自动选取并写出可 report:write 的草稿", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.counts.main_items, 8);
+  assert.equal(drafted.counts.github_trending, 10);
+  assert(drafted.report.main_items.some((item) => item.editorial_category === "content_aigc"));
+  assert(!drafted.report.main_items.some((item) => item.source === "OpenAI Status"));
+  assert(!drafted.report.main_items.some((item) => item.source === "Product Hunt Trending Feed"));
+  assert(!drafted.report.main_items.some((item) => item.source === "TechCrunch AI"));
+  assert(!drafted.report.main_items.some((item) => item.source === "OpenAlex"));
+  assert(drafted.candidatePool.candidates.some((candidate) =>
+    candidate.status === "included" &&
+    candidate.included_in === "main_items" &&
+    candidate.category === "main_item"
+  ));
+  assert(drafted.candidatePool.candidates.some((candidate) =>
+    candidate.status === "included" &&
+    candidate.included_in === "github_trending" &&
+    candidate.category === "github_trending"
+  ));
+  assert(drafted.report.source_audit.content_sources.included <= drafted.report.source_audit.content_sources.candidates_found);
+  assert(drafted.report.source_audit.github_trending.included <= drafted.report.source_audit.github_trending.candidates_found);
+
+  const written = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: drafted.path,
+    outputDir: path.join(tmp, "reports-data"),
+    candidatePoolPath: drafted.candidatePoolPath,
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+
+  assert.equal(written.report.report_date, reportDate);
+  assert.equal(written.report.main_items.length, 8);
+  assert.equal(written.report.github_trending.length, 10);
+  assert.equal(written.report.quality_status.status, "degraded");
+});
+
+test("evidence cache downloads image_url candidates into local evidence assets", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-cache-"));
+  const result = await cacheEvidenceImages({
+    rootDir: tmp,
+    reportDate: "2026-05-26",
+    outDir: "docs",
+    candidates: [
+      {
+        id: "main-aigc-image",
+        title: "Runway video model update",
+        url: "https://runwayml.com/en/changelog/example",
+        source: "Runway Changelog",
+        status: "included",
+        included_in: "main_items",
+        verification_status: "primary_confirmed",
+        editorial_category: "content_aigc",
+        image_url: "https://example.com/runway.png",
+        image_alt: "Runway product screenshot",
+        image_source: "feed"
+      }
+    ],
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([["content-type", "image/png"]]),
+      arrayBuffer: async () => Buffer.alloc(256, 7)
+    })
+  });
+
+  assert.equal(result.assets.length, 1);
+  assert.equal(result.assets[0].source_url, "https://runwayml.com/en/changelog/example");
+  assert.match(result.assets[0].local_path, /^assets\/evidence\/runway-video-model-update-2026-05-26\.png$/);
+  assert.equal(await exists(path.join(tmp, "docs", result.assets[0].local_path)), true);
+});
+
+test("content source discovery uses cache fallback for blocked arXiv or Reddit sources", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-cache-"));
+  const reportDate = "2026-05-26";
+  const redditSource = {
+    id: "content-reddit-machinelearning",
+    name: "Reddit r/MachineLearning",
+    url: "https://www.reddit.com/r/MachineLearning/.json",
+    source_kind: "search_api",
+    category: "intermediary",
+    source_level: "community_api",
+    maxItemsPerRun: 3
+  };
+  const redditPayload = {
+    data: {
+      children: [
+        {
+          data: {
+            title: "[D] AI video workflows for games",
+            url: "https://www.reddit.com/r/MachineLearning/comments/example/ai_video_games/",
+            created_utc: 1779746400,
+            selftext: "Developers discuss AI video and game asset generation workflows."
+          }
+        }
+      ]
+    }
+  };
+  await collectContentSources({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    sources: [redditSource],
+    fetchRetries: 0,
+    cacheTtlDays: 999,
+    fetchImpl: async () => textResponse(JSON.stringify(redditPayload))
+  });
+
+  const fallback = await collectContentSources({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    sources: [redditSource],
+    fetchRetries: 0,
+    cacheTtlDays: 999,
+    fetchImpl: async () => textResponse("", 429)
+  });
+
+  assert.equal(fallback.source_audit.content_sources.sources[0].status, "checked");
+  assert.match(fallback.source_audit.content_sources.sources[0].notes, /cache_fallback_used/);
+  assert.match(fallback.source_audit.content_sources.sources[0].notes, /original_error=HTTP_429/);
+  assert.equal(fallback.candidates.length, 1);
+  assert.equal(fallback.candidates[0].url, "https://www.reddit.com/r/MachineLearning/comments/example/ai_video_games/");
+});
+
 test("report:write allows explicit network-outage empty reports only", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-empty-outage-"));
   const reportDate = "2026-06-03";
@@ -3900,6 +4056,68 @@ test("report:write rejects source audit groups whose included count exceeds cand
   );
 });
 
+test("report:write rejects GitHub Trending descriptions copied in English", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const trendUrl = "https://github.com/example/agent-workflows";
+
+  draft.github_trending = [
+    {
+      candidate_id: "github-trending-english-description",
+      name: "example/agent-workflows",
+      repo: "example/agent-workflows",
+      description: "A reusable plugin set for agent workflows.",
+      url: trendUrl,
+      event_date: "2026-05-16",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 1,
+      trend: "new",
+      evidence: "GitHub Trending daily fixture."
+    }
+  ];
+  draft.source_audit.github_trending.candidates_found = 1;
+  draft.source_audit.github_trending.included = 1;
+  candidatePool.sources.push({
+    id: "github-trending-daily",
+    name: "GitHub Trending daily",
+    url: "https://github.com/trending?since=daily",
+    category: "github_trending",
+    status: "checked"
+  });
+  candidatePool.candidates.push({
+    id: "github-trending-english-description",
+    source_id: "github-trending-daily",
+    category: "github_trending",
+    title: "example/agent-workflows",
+    url: trendUrl,
+    source: "GitHub Trending daily",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "github_trending",
+    evidence: "fixture"
+  });
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "github_trending_description_not_chinese"
+  );
+
+  draft.github_trending[0].description = "面向 agent 工作流的可复用插件集合，用于打包研究、写作和交付流程。";
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  assert.equal(report.github_trending[0].description, draft.github_trending[0].description);
+});
+
 test("report:write rejects expanded main items without highlight markers or enough detail", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -4622,7 +4840,7 @@ function strictPublishReportFixture() {
     candidate_id: `strict-trending-${index + 1}`,
     repo: `example/strict-agent-${index + 1}`,
     name: `example/strict-agent-${index + 1}`,
-    description: "A strict fixture repository for daily GitHub Trending coverage.",
+    description: "用于验证每日 GitHub Trending 覆盖的严格 fixture 仓库，聚焦 agent 工作流。",
     url: `https://github.com/example/strict-agent-${index + 1}`,
     event_date: reportDate,
     source: "GitHub Trending daily",
@@ -5254,6 +5472,7 @@ function contentSourceRssFixture() {
       <title>How OpenAI engineers build coding agents</title>
       <link>https://example.com/interview</link>
       <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
+      <media:content url="https://example.com/assets/harness.png" medium="image" />
       <description>OpenAI engineer interview about harnesses, evals, and workflow design.</description>
     </item>
   </channel>
@@ -5268,6 +5487,7 @@ function anthropicNewsHtmlFixture() {
   return `<!doctype html>
 <main>
   <a href="/news/claude-code-internals">
+    <img src="/assets/claude-code.png" alt="Claude Code harness">
     <h2>Inside Claude Code's agent harness</h2>
     <time>May 26, 2026</time>
     <p>Claude Code team explained how they isolate tools, replay evaluations, and keep coding agents observable.</p>
@@ -5483,6 +5703,291 @@ function trendReport(reportDate, options = {}) {
         ]
       : [],
     model_releases: []
+  };
+}
+
+function autodraftDiscoveryFixture(reportDate) {
+  const contentCandidates = Array.from({ length: 8 }, (_, index) => {
+    const number = index + 1;
+    const isAigc = index === 0;
+    return {
+      id: `official-${number}`,
+      source_id: "content-runway-changelog",
+      category: "community_lead",
+      title: isAigc
+        ? "Runway updates AI video creation workflow for game worlds"
+        : `Official AI platform update ${number}`,
+      url: `https://example.com/official/${number}`,
+      source: isAigc ? "Runway Changelog" : "OpenAI News RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: isAigc
+        ? "Official changelog describes AI video generation and game-world creation workflow updates."
+        : "Official source describes a product, model, platform, or governance update relevant to engineering teams.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      verification_sources: [`https://example.com/official/${number}`],
+      primary_url: `https://example.com/official/${number}`,
+      editorial_category: isAigc ? "content_aigc" : "ai_industry",
+      ...(isAigc ? {
+        image_url: "https://example.com/assets/runway.png",
+        image_alt: "Runway video generation UI",
+        image_source: "feed"
+      } : {})
+    };
+  });
+  const githubCandidates = Array.from({ length: 10 }, (_, index) => ({
+    id: `github-project-${index + 1}`,
+    source_id: "github-github-trending-daily",
+    category: "project",
+    title: `example/agent-project-${index + 1}`,
+    repo: `example/agent-project-${index + 1}`,
+    url: `https://github.com/example/agent-project-${index + 1}`,
+    source: "GitHub Trending daily",
+    event_date: reportDate,
+    status: "excluded",
+    rank: index + 1,
+    trend: "new",
+    language: "TypeScript",
+    window: "daily",
+    description: "Agent workflow toolkit for local AI engineering.",
+    evidence: `GitHub Trending daily rank #${index + 1} with recent stars today.`,
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: `https://github.com/example/agent-project-${index + 1}`,
+    verification_sources: [`https://github.com/example/agent-project-${index + 1}`]
+  }));
+  const builderCandidate = {
+    id: "builder-x-status",
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: "@builder: AI agents need eval loops",
+    url: "https://x.com/builder/status/1794993600000000000",
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    status: "excluded",
+    author: "Example Builder",
+    handle: "builder",
+    original_text: "AI agents need eval loops before unattended production use.",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: "https://x.com/builder/status/1794993600000000000"
+  };
+  const hotBlogCandidate = {
+    id: "hot-blog-axiom",
+    source_id: "content-latent-space",
+    category: "hot_blog",
+    title: "Scaling Past Informal AI",
+    url: "https://www.latent.space/p/axiom",
+    source: "Latent.Space",
+    author: "Latent.Space",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Interview about formal math, verified generation, and AI research workflows.",
+    verification_status: "primary_confirmed",
+    source_level: "primary",
+    primary_url: "https://www.latent.space/p/axiom",
+    verification_sources: ["https://www.latent.space/p/axiom"]
+  };
+  const statuspageCandidate = {
+    id: "status-openai-gpt-image",
+    source_id: "status-openai",
+    category: "community_lead",
+    title: "OpenAI Status: codex-gpt-image-2-does-not-exist-errors",
+    url: "https://status.openai.com/incidents/example",
+    source: "OpenAI Status",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Statuspage incident about a temporary GPT image API error.",
+    verification_status: "primary_confirmed",
+    source_level: "official",
+    primary_url: "https://status.openai.com/incidents/example",
+    verification_sources: ["https://status.openai.com/incidents/example"]
+  };
+  const productHuntCandidate = {
+    id: "product-hunt-aigc",
+    source_id: "content-product-hunt-trending",
+    category: "project",
+    title: "AIGC Game Asset Maker",
+    url: "https://www.producthunt.com/posts/aigc-game-asset-maker",
+    source: "Product Hunt Trending Feed",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Product Hunt listing for a generative game asset tool.",
+    verification_status: "primary_confirmed",
+    source_level: "official",
+    primary_url: "https://www.producthunt.com/posts/aigc-game-asset-maker",
+    verification_sources: ["https://www.producthunt.com/posts/aigc-game-asset-maker"],
+    editorial_category: "content_aigc"
+  };
+  const mediaAigcCandidate = {
+    id: "media-aigc-techcrunch",
+    source_id: "content-techcrunch-ai",
+    category: "community_lead",
+    title: "TechCrunch reports an AI video product rumor",
+    url: "https://techcrunch.com/example-ai-video-product",
+    source: "TechCrunch AI",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Media report about an AI video product rumor.",
+    verification_status: "primary_confirmed",
+    source_level: "aigc_content_industry",
+    primary_url: "https://techcrunch.com/example-ai-video-product",
+    verification_sources: ["https://techcrunch.com/example-ai-video-product"],
+    editorial_category: "content_aigc"
+  };
+  const searchAigcCandidate = {
+    id: "search-openalex-aigc",
+    source_id: "search-openalex",
+    category: "community_lead",
+    title: "Exploring platform generative AI in online work",
+    url: "https://openalex.org/works/example",
+    source: "OpenAlex",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Search shadow candidate for an AIGC paper.",
+    verification_status: "primary_confirmed",
+    source_level: "primary",
+    primary_url: "https://openalex.org/works/example",
+    verification_sources: ["https://openalex.org/works/example"],
+    editorial_category: "content_aigc"
+  };
+
+  return {
+    source_audit: {
+      github_trending: {
+        checked: true,
+        sources: [
+          {
+            name: "GitHub Trending daily",
+            url: "https://github.com/trending?since=daily",
+            status: "checked",
+            notes: "10 repositories parsed"
+          }
+        ],
+        candidates_found: githubCandidates.length,
+        included: 0,
+        notes: "GitHub Trending fixed source checked."
+      },
+      builder_sources: {
+        checked: true,
+        sources: [
+          {
+            name: "follow-builders X feed",
+            url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+            status: "checked",
+            notes: "1 recent original X status parsed"
+          }
+        ],
+        candidates_found: 1,
+        included: 0,
+        notes: "Builder fixed source checked."
+      },
+      content_sources: {
+        checked: true,
+        sources: [
+          {
+            name: "Runway Changelog",
+            url: "https://runwayml.com/en/changelog",
+            status: "checked",
+            notes: "1 recent AIGC entry parsed"
+          },
+          {
+            name: "OpenAI News RSS",
+            url: "https://openai.com/news/rss.xml",
+            status: "checked",
+            notes: "7 recent official entries parsed"
+          },
+          {
+            name: "Latent.Space",
+            url: "https://www.latent.space/feed",
+            status: "checked",
+            notes: "1 recent blog entry parsed"
+          }
+        ],
+        candidates_found: contentCandidates.length + 1,
+        included: 0,
+        sources_checked: 3,
+        notes: "Content fixed sources checked."
+      },
+      search_sources: {
+        checked: true,
+        shadow: true,
+        sources: [
+          {
+            name: "arXiv",
+            url: "https://export.arxiv.org/",
+            status: "no_signal",
+            notes: "0 shadow candidates"
+          }
+        ],
+        candidates_found: 0,
+        included: 0,
+        provider_runtime_ms: { arxiv: 1 },
+        provider_cost_units: { arxiv: 1 },
+        provider_error_counts: { arxiv: 0 },
+        notes: "Search shadow checked."
+      },
+      sources_health: {
+        checked: true,
+        sources: [
+          {
+            name: "Health",
+            url: "https://example.com/health",
+            status: "checked",
+            notes: "fixture health"
+          }
+        ],
+        candidates_found: 0,
+        included: 0,
+        notes: "Health checked."
+      }
+    },
+    sources: [
+      {
+        id: "content-runway-changelog",
+        name: "Runway Changelog",
+        url: "https://runwayml.com/en/changelog",
+        category: "blog",
+        status: "checked",
+        checked_at: fixedGeneratedAt
+      },
+      {
+        id: "content-latent-space",
+        name: "Latent.Space",
+        url: "https://www.latent.space/feed",
+        category: "blog",
+        status: "checked",
+        checked_at: fixedGeneratedAt
+      },
+      {
+        id: "github-github-trending-daily",
+        name: "GitHub Trending daily",
+        url: "https://github.com/trending?since=daily",
+        category: "github_trending",
+        status: "checked",
+        checked_at: fixedGeneratedAt
+      },
+      {
+        id: "builder-follow-builders-x-feed",
+        name: "follow-builders X feed",
+        url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+        category: "builder",
+        status: "checked",
+        checked_at: fixedGeneratedAt
+      }
+    ],
+    candidates: [
+      ...contentCandidates,
+      hotBlogCandidate,
+      statuspageCandidate,
+      productHuntCandidate,
+      mediaAigcCandidate,
+      searchAigcCandidate,
+      ...githubCandidates,
+      builderCandidate
+    ]
   };
 }
 

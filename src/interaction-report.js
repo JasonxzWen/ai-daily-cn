@@ -25,9 +25,13 @@ const OPENAI_STATUS_ICON =
 const GITHUB_BLOG_ICON =
   "data:image/png;base64," +
   "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC";
+const AI_DAILY_ICON = generatedDailyIcon();
+const ARXIV_ICON = generatedSiteIcon("arXiv", "#b31b1b", "#ffffff");
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
+  ["arXiv", ARXIV_ICON],
+  ["arXiv cs.AI", ARXIV_ICON],
   ["OpenAI", OPENAI_STATUS_ICON],
   ["OpenAI News", OPENAI_STATUS_ICON],
   ["OpenAI News RSS", OPENAI_STATUS_ICON],
@@ -69,6 +73,8 @@ const DOMAIN_ICONS = new Map([
   ["github.com", GITHUB_BLOG_ICON],
   ["github.blog", GITHUB_BLOG_ICON],
   ["raw.githubusercontent.com", GITHUB_BLOG_ICON],
+  ["arxiv.org", ARXIV_ICON],
+  ["export.arxiv.org", ARXIV_ICON],
   ["huggingface.co", HUGGING_FACE_ICON],
   ["aws.amazon.com", SOURCE_ICONS.get("AWS What's New")],
   ["amazon.com", SOURCE_ICONS.get("AWS What's New")],
@@ -155,20 +161,7 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
-  const domesticCommunityLeads = communityLeads.filter(isDomesticCommunityLead);
-  const remainingCommunityLeads = communityLeads.filter((item) => !isDomesticCommunityLead(item));
-  const domesticCommunityCards = formatCommunityLeadCards(domesticCommunityLeads);
-  if (domesticCommunityCards.length > 0) {
-    sections.push({
-      type: "filterable-cards",
-      title: "国内动态",
-      group: "signals",
-      cardClass: "community-card",
-      showFilters: false,
-      items: domesticCommunityCards
-    });
-  }
-  const communityCards = formatCommunityLeadCards(remainingCommunityLeads);
+  const communityCards = formatCommunityLeadCards(communityLeads);
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -226,7 +219,7 @@ export function reportToInteractionInput(report, options = {}) {
       communityLeads
     }),
     heroLinks: [
-      { label: "日报导航", href: indexHref, icon: siteIconForUrl(indexHref, "AI") },
+      { label: "日报导航", href: indexHref, icon: AI_DAILY_ICON },
       { label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }
     ],
     hideNavigation: false,
@@ -851,7 +844,7 @@ function formatHotBlogCards(items, context = {}) {
       tags: [cardTag(importanceTagFor("hot_blogs", item)), ...hotBlogTags(item).map((tag) => cardTag(tag, "topic"))].filter(Boolean),
       points: [
         ...points.map((value, index) => ({ label: `要点 ${index + 2}`, value })),
-        ...editorialCardPoints(item)
+        ...editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false })
       ],
       ...(media.length > 0 ? { media } : {})
     };
@@ -928,23 +921,25 @@ function editorialBullets(item) {
   ].filter(Boolean);
 }
 
-function editorialCardPoints(item) {
+function editorialCardPoints(item, options = {}) {
+  const includeReaderRelevance = options.includeReaderRelevance !== false;
+  const includeWatchNext = options.includeWatchNext === true;
   const points = [];
-  if (item?.reader_relevance) {
-    points.push({ label: "看点", value: item.reader_relevance });
+  if (includeReaderRelevance && item?.reader_relevance) {
+    points.push({ label: "关联", value: item.reader_relevance });
   }
-  if (item?.watch_next) {
-    points.push({ label: "继续看", value: item.watch_next });
+  if (includeWatchNext && item?.watch_next) {
+    points.push({ label: "后续", value: item.watch_next });
   }
   if (hasNonPrimarySourceSignal(item)) {
     if (item?.source_level) {
-      points.push({ label: "来源层级", value: sourceLevelLabel(item.source_level) });
+      points.push({ label: "来源", value: sourceLevelLabel(item.source_level) });
     }
     if (item?.verification_note) {
-      points.push({ label: "核验", value: item.verification_note });
+      points.push({ label: "待确认", value: item.verification_note });
     }
     if (item?.risk_note) {
-      points.push({ label: "风险", value: item.risk_note });
+      points.push({ label: "边界", value: item.risk_note });
     }
   }
   return points;
@@ -1134,15 +1129,24 @@ function formatCommunityLeadCards(items) {
     title: communityLeadTitle(item),
     href: item.url,
     titleIcon: mainItemIconFor(item),
-    body: formatDailyInlineText(item.content, item),
+    body: formatDailyInlineText(communityLeadBody(item), item),
     showGroup: false,
     tags: [
       cardTag(importanceTagFor("community_leads", item)),
       item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
       item.event_date ? cardTag(item.event_date, "date") : ""
     ].filter(Boolean),
-    points: editorialCardPoints(item)
+    points: []
   }));
+}
+
+function communityLeadBody(item) {
+  const body = String(item?.content || "").trim();
+  const disclosure = [
+    item?.verification_note ? `待确认：${stripTrailingSentencePunctuation(item.verification_note)}` : "",
+    item?.risk_note ? `边界：${stripTrailingSentencePunctuation(item.risk_note)}` : ""
+  ].filter(Boolean).join("；");
+  return disclosure ? `${body}\n\n${disclosure}。` : body;
 }
 
 function formatNestedEditorialDetails(item) {
@@ -1178,17 +1182,6 @@ function isLowSignalStatuspageLead(item) {
   }
 
   return /elevated errors|resolved|troubleshooting|incident|degraded|outage|error rate|\berrors\b|排障|故障|已恢复|已解决|标记 resolved/i.test(content);
-}
-
-function isDomesticCommunityLead(item) {
-  const text = [
-    item?.source,
-    item?.publisher,
-    item?.content,
-    item?.title,
-    ...(Array.isArray(item?.entities) ? item.entities : [])
-  ].filter(Boolean).join(" ");
-  return /36Kr|QbitAI|Jiqizhixin|Leiphone|InfoQ CN|机器之心|量子位|雷峰|阿里|Alibaba|Qwen|千问|通义|腾讯|Tencent|字节|ByteDance|火山引擎|Volcano|豆包|Doubao|百度|Baidu|MiniMax|Moonshot|Kimi|DeepSeek|智谱|Zhipu|商汤|SenseTime|昆仑|Kunlun|星尘|Astribot|跨维|中国|国内|东方航空|瑞幸|肯德基|蜜雪冰城/i.test(text);
 }
 
 function isStatuspageUrl(value) {
@@ -1432,6 +1425,11 @@ function siteColor(host) {
 function generatedSiteIcon(label, background, foreground) {
   const text = escapeSvgText(String(label || "?").slice(0, 3).toUpperCase());
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="${background}"/><text x="16" y="21" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${text.length > 2 ? 10 : 13}" font-weight="700" fill="${foreground}">${text}</text></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
+}
+
+function generatedDailyIcon() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#0f172a"/><stop offset=".55" stop-color="#0891b2"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs><rect width="32" height="32" rx="7" fill="url(#g)"/><path d="M9 9.5h14a2 2 0 0 1 2 2v12H9a2 2 0 0 1-2-2v-10a2 2 0 0 1 2-2Z" fill="#fff" opacity=".94"/><path d="M11 14h7M11 18h10M11 22h6" stroke="#0f172a" stroke-width="1.7" stroke-linecap="round"/><circle cx="22.5" cy="13.5" r="2" fill="#06b6d4"/><path d="M18.5 20.5 22 17l3 2.8" stroke="#ef4444" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
 }
 

@@ -1,8 +1,9 @@
 ## 结构化数据
 
-先生成一个结构化日报 JSON 草稿，再用仓库命令标准化写入：
+先用候选池自动生成结构化日报 JSON 草稿，再用仓库命令标准化写入：
 
 ```powershell
+npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 ```
 
@@ -38,7 +39,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；观点、播客、社区、产品雷达线索可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露。
 - `verification_status`：`main_items` 和 `model_releases` 只接受 `primary_confirmed` 或 `multi_source_confirmed`；`hot_blogs`、`projects`、`builder_observations`、`community_leads` 可保留 `intermediary_only` 或 `original_social_only`，但要写 `verification_note` 或 `risk_note`。
 - `why_it_matters` / `reader_relevance`：`main_items` 必须至少填写其一，说明为什么普通工程师需要看；不要写“本日报后续跟进”之类的生产过程说明。
-- `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客，公开 HTML 会把这些信息压缩成卡片点位或主体条目的补充 bullet。
+- `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客。公开 HTML 只展示必要的来源层级、待确认边界或风险说明；热门技术博客和社区线索不要把读者画像、后续跟进或风险模板渲染成重复卡片分点。
 
 `main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
 
@@ -51,7 +52,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
 - AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `main_items`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
-- AIGC 与内容产业动态：事实已回源时写入 `main_items`；只有中介线索或待验证时写入 `community_leads`。
+- AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Adobe/Unity 等公司产品动作；事实已回源时写入 `main_items` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `main_items`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
 - X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括。
