@@ -254,6 +254,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
     run,
     installDependencies: options.installDependencies !== false,
     forceInstall: Boolean(options.forceInstall),
+    npmCache: options.npmCache,
     timeoutMs: options.installTimeoutMs || 10 * 60 * 1000
   });
 
@@ -1220,6 +1221,7 @@ async function runGit(cwd, args, options = {}) {
 async function runExternalCommand(file, args, options = {}) {
   const { stdout } = await execFileAsync(file, args, {
     cwd: options.cwd,
+    env: options.env ? { ...process.env, ...options.env } : process.env,
     encoding: "utf8",
     maxBuffer: options.maxBuffer || 10 * 1024 * 1024,
     timeout: options.timeoutMs
@@ -1339,16 +1341,30 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
     };
   }
 
+  const npmCache = options.npmCache || process.env.NPM_CONFIG_CACHE || process.env.npm_config_cache || "";
+  const npmArgs = ["ci"];
+  const npmEnv = {};
+  if (npmCache) {
+    npmArgs.push("--cache", npmCache);
+    npmEnv.NPM_CONFIG_CACHE = npmCache;
+    npmEnv.npm_config_cache = npmCache;
+  }
+  npmEnv.NPM_CONFIG_AUDIT = process.env.NPM_CONFIG_AUDIT || "false";
+  npmEnv.NPM_CONFIG_FUND = process.env.NPM_CONFIG_FUND || "false";
+  const npmCommand = `npm ${npmArgs.join(" ")}`;
+
   try {
-    await options.run(npmExecutable(), ["ci"], {
+    await options.run(npmExecutable(), npmArgs, {
       cwd: repoRoot,
+      env: npmEnv,
       timeoutMs: options.timeoutMs,
       trim: false
     });
   } catch (error) {
     throw new PublisherError("dependency_install_failed", "Unable to install dependencies in the clean publish worktree.", {
       repoRoot,
-      command: "npm ci",
+      command: npmCommand,
+      npm_cache: npmCache || null,
       cause: error.message
     });
   }
@@ -1357,7 +1373,8 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
     required: true,
     installed: true,
     ok: true,
-    command: "npm ci"
+    command: npmCommand,
+    npm_cache: npmCache || null
   };
 }
 

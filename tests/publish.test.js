@@ -557,6 +557,31 @@ test("publish prepare-clean-worktree resets only the dedicated checkout when it 
   );
 });
 
+test("publish prepare-clean-worktree installs dependencies with the configured npm cache", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-npm-cache-"));
+  const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
+  const npmCache = path.join(repoRoot, ".tmp", "npm-cache");
+  await fs.mkdir(path.join(worktreeDir, ".git"), { recursive: true });
+  await fs.writeFile(path.join(worktreeDir, "package.json"), JSON.stringify({ scripts: {} }));
+  const calls = [];
+
+  const result = await prepareCleanPublishWorktree({
+    repoRoot,
+    worktreeDir,
+    remoteUrl: "git@github.com:owner/repo.git",
+    npmCache,
+    commandRunner: fakeCommandRunner({ calls })
+  });
+
+  const npmCall = calls.find((call) => call.file === "npm" || call.file === "npm.cmd");
+  assert.ok(npmCall, "expected npm ci to run");
+  assert.deepEqual(npmCall.args, ["ci", "--cache", npmCache]);
+  assert.equal(npmCall.env.NPM_CONFIG_CACHE, npmCache);
+  assert.equal(npmCall.env.npm_config_cache, npmCache);
+  assert.equal(result.dependency_status.command, `npm ci --cache ${npmCache}`);
+  assert.equal(result.dependency_status.npm_cache, npmCache);
+});
+
 test("publish prepare-clean-worktree rejects external paths unless explicitly allowed", async () => {
   const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-safe-"));
   const externalDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-external-"));
@@ -954,7 +979,7 @@ function fakeGit(overrides = {}) {
 function fakeCommandRunner(options = {}) {
   const calls = options.calls || [];
   return async (file, args, commandOptions = {}) => {
-    calls.push({ file, args, cwd: commandOptions.cwd });
+    calls.push({ file, args, cwd: commandOptions.cwd, env: commandOptions.env || {} });
     if (options.fail && options.fail(args)) {
       throw new Error(options.failMessage || "command failed");
     }
