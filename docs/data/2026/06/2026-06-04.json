@@ -1,0 +1,1983 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-06-04",
+  "title": "AI 日报 2026-06-04",
+  "summary": "今日主线：主体覆盖 10 条一手或可信信号，GitHub Trending Top 10，Builder/X 观察 6 条；社区线索保留中介来源和核验边界。",
+  "source_window": {
+    "date_from": "2026-06-04",
+    "date_to": "2026-06-04",
+    "fallback_window_used": false,
+    "notes": "固定发现候选池已完成选择：主体仅收录一手、官方、论文、GitHub 或多源确认信号；中介线索保留在社区观察或风险说明中。"
+  },
+  "hero_highlights": [
+    {
+      "title": "The next chapter in flood resilience: Open sourcing Google’s hydrology framework",
+      "url": "https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework/",
+      "reason": "Google Research Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Climate & Sustainability"
+    },
+    {
+      "title": "How Endava is redesigning software delivery around AI agents",
+      "url": "https://openai.com/index/endava-frontiers",
+      "reason": "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to ac..."
+    },
+    {
+      "title": "Introducing new capabilities to GPT-Rosalind",
+      "url": "https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind",
+      "reason": "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；GPT-Rosalind advances life sciences research with enhanced biological re..."
+    }
+  ],
+  "source_audit": {
+    "github_trending": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily",
+          "status": "checked",
+          "notes": "15 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending weekly",
+          "url": "https://github.com/trending?since=weekly",
+          "status": "checked",
+          "notes": "22 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python daily",
+          "url": "https://github.com/trending/python?since=daily",
+          "status": "checked",
+          "notes": "17 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Python weekly",
+          "url": "https://github.com/trending/python?since=weekly",
+          "status": "checked",
+          "notes": "18 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript daily",
+          "url": "https://github.com/trending/typescript?since=daily",
+          "status": "checked",
+          "notes": "13 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending TypeScript weekly",
+          "url": "https://github.com/trending/typescript?since=weekly",
+          "status": "checked",
+          "notes": "18 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust daily",
+          "url": "https://github.com/trending/rust?since=daily",
+          "status": "checked",
+          "notes": "19 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Rust weekly",
+          "url": "https://github.com/trending/rust?since=weekly",
+          "status": "checked",
+          "notes": "13 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go daily",
+          "url": "https://github.com/trending/go?since=daily",
+          "status": "checked",
+          "notes": "20 repositories parsed"
+        },
+        {
+          "name": "GitHub Trending Go weekly",
+          "url": "https://github.com/trending/go?since=weekly",
+          "status": "checked",
+          "notes": "16 repositories parsed"
+        }
+      ],
+      "candidates_found": 132,
+      "included": 13,
+      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 7 个日期、109 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
+    },
+    "builder_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "follow-builders X feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+          "status": "checked",
+          "notes": "38 recent original entries parsed"
+        },
+        {
+          "name": "follow-builders podcast feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
+          "status": "checked",
+          "notes": "1 recent original entries parsed"
+        },
+        {
+          "name": "follow-builders blog feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Simon Willison Weblog",
+          "url": "https://simonwillison.net/atom/everything/",
+          "status": "checked",
+          "notes": "7 recent original entries parsed"
+        },
+        {
+          "name": "Chip Huyen Blog",
+          "url": "https://huyenchip.com/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        },
+        {
+          "name": "Andrej Karpathy Blog",
+          "url": "https://karpathy.github.io/feed.xml",
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
+        }
+      ],
+      "candidates_found": 27,
+      "included": 6,
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-04T10:54:55.230Z",
+      "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
+    },
+    "content_sources": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "WeChat Article Link Input",
+          "url": "https://mp.weixin.qq.com/",
+          "status": "no_signal",
+          "notes": "no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true"
+        },
+        {
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "status": "checked",
+          "notes": "9 recent blog/interview entries parsed"
+        },
+        {
+          "name": "OpenAI Blog RSS",
+          "url": "https://openai.com/blog/rss.xml",
+          "status": "checked",
+          "notes": "9 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/feed/",
+          "status": "checked",
+          "notes": "10 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Google DeepMind RSS",
+          "url": "https://deepmind.google/blog/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Microsoft Research Blog",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "status": "checked",
+          "notes": "3 recent blog/interview entries parsed"
+        },
+        {
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "checked",
+          "notes": "8 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "checked",
+          "notes": "4 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Runway Changelog",
+          "url": "https://runwayml.com/en/changelog",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Luma Changelog",
+          "url": "https://lumalabs.ai/changelog",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Adobe Blog AI",
+          "url": "https://blog.adobe.com/en/topics/ai",
+          "status": "blocked",
+          "notes": "HTTP 404"
+        },
+        {
+          "name": "Pika Product Updates",
+          "url": "https://pika.art/",
+          "status": "blocked",
+          "notes": "HTTP 429; retry_failed_after_1"
+        },
+        {
+          "name": "Kling Product Updates",
+          "url": "https://kling.art/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Unity Muse",
+          "url": "https://unity.com/muse",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "status": "checked",
+          "notes": "18 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "status": "no_signal",
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "status": "checked",
+          "notes": "1 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "status": "checked",
+          "notes": "7 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "status": "checked",
+          "notes": "10 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "status": "checked",
+          "notes": "3 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "status": "checked",
+          "notes": "10 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/feed/",
+          "status": "checked",
+          "notes": "5 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "VentureBeat AI",
+          "url": "https://venturebeat.com/category/ai/feed",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "ML Papers of the Week",
+          "url": "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "HelloGitHub",
+          "url": "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "RuanYF Weekly",
+          "url": "https://github.com/ruanyf/weekly/commits/master.atom",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
+        },
+        {
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "status": "checked",
+          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
+        },
+        {
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "status": "checked",
+          "notes": "6 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "arXiv cs.AI",
+          "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Hacker News Topstories API",
+          "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+          "status": "checked",
+          "notes": "14 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Hugging Face Daily Papers",
+          "url": "https://huggingface.co/papers",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Papers with Code API",
+          "url": "https://paperswithcode.com/api/v1/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Reddit r/MachineLearning",
+          "url": "https://www.reddit.com/r/MachineLearning/.json",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Smol AI News",
+          "url": "https://news.smol.ai/rss.xml",
+          "status": "checked",
+          "notes": "2 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "AI News Archive",
+          "url": "https://buttondown.com/ainews/rss",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Ben's Bites",
+          "url": "https://bensbites.com/feed",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "status": "checked",
+          "notes": "1 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "The Magnifier AI",
+          "url": "https://themagnifier.ai/",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Fast Company Creator Economy",
+          "url": "https://www.fastcompany.com/section/creator-economy",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Crunchbase News AI",
+          "url": "https://news.crunchbase.com/sections/ai/",
+          "status": "checked",
+          "notes": "5 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "status": "checked",
+          "notes": "49 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Google News AI RSS",
+          "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20OR%20generative%20AI%20when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "100 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Google News AI Policy RSS",
+          "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "69 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Google News AIGC Content Industry RSS",
+          "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "54 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Google News AIGC Video Image Game RSS",
+          "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "55 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "36Kr",
+          "url": "https://36kr.com/feed",
+          "status": "checked",
+          "notes": "30 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "status": "checked",
+          "notes": "10 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Jiqizhixin",
+          "url": "https://www.jiqizhixin.com/rss",
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        },
+        {
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "status": "checked",
+          "notes": "20 recent intermediary lead entries parsed"
+        }
+      ],
+      "candidates_found": 60,
+      "included": 21,
+      "sources_checked": 71,
+      "enablement_counts": {
+        "core": 28,
+        "optional": 42
+      },
+      "tier_counts": {
+        "T0": 28,
+        "T1": 4,
+        "T2": 18,
+        "T3": 20
+      },
+      "source_kind_counts": {
+        "rss": 42,
+        "html_index": 24,
+        "search_api": 4
+      },
+      "blocked_reason": "",
+      "last_successful_feed_at": "2026-06-04T10:54:59.147Z",
+      "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
+    },
+    "search_sources": {
+      "checked": true,
+      "shadow": true,
+      "sources": [
+        {
+          "name": "GDELT",
+          "url": "https://api.gdeltproject.org/",
+          "status": "blocked",
+          "notes": "provider_timeout_exceeded_45000ms"
+        },
+        {
+          "name": "OpenAlex",
+          "url": "https://api.openalex.org/",
+          "status": "checked",
+          "notes": "36 shadow candidates"
+        },
+        {
+          "name": "arXiv",
+          "url": "https://export.arxiv.org/",
+          "status": "blocked",
+          "notes": "provider_timeout_exceeded_45000ms"
+        }
+      ],
+      "candidates_found": 36,
+      "included": 0,
+      "provider_runtime_ms": {
+        "gdelt": 46135,
+        "openalex": 7620,
+        "arxiv": 45016
+      },
+      "provider_cost_units": {
+        "gdelt": 4,
+        "openalex": 11,
+        "arxiv": 1
+      },
+      "notes": "Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes."
+    },
+    "sources_health": {
+      "checked": true,
+      "sources": [
+        {
+          "name": "OpenAI News RSS",
+          "url": "https://openai.com/news/rss.xml",
+          "status": "checked",
+          "notes": "990 feed entries parsed; 5 within 48h"
+        },
+        {
+          "name": "OpenAI Blog RSS",
+          "url": "https://openai.com/blog/rss.xml",
+          "status": "checked",
+          "notes": "990 feed entries parsed; 5 within 48h"
+        },
+        {
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/feed.xml",
+          "status": "checked",
+          "notes": "791 feed entries parsed; 2 within 48h"
+        },
+        {
+          "name": "GitHub Changelog",
+          "url": "https://github.blog/changelog/feed/",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 1 within 48h"
+        },
+        {
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/rss/",
+          "status": "checked",
+          "notes": "100 feed entries parsed; 1 within 48h"
+        },
+        {
+          "name": "Google DeepMind Blog",
+          "url": "https://deepmind.google/discover/blog/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Google DeepMind RSS",
+          "url": "https://deepmind.google/blog/rss.xml",
+          "status": "no_signal",
+          "notes": "100 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Meta AI Blog",
+          "url": "https://ai.meta.com/blog/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Microsoft Research Blog",
+          "url": "https://www.microsoft.com/en-us/research/feed/",
+          "status": "no_signal",
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Apple Machine Learning Research",
+          "url": "https://machinelearning.apple.com/rss.xml",
+          "status": "no_signal",
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/feed/",
+          "status": "checked",
+          "notes": "100 feed entries parsed; 2 within 48h"
+        },
+        {
+          "name": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 4 within 48h"
+        },
+        {
+          "name": "Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/feed/",
+          "status": "no_signal",
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Meta Engineering",
+          "url": "https://engineering.fb.com/feed/",
+          "status": "no_signal",
+          "notes": "9 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "xAI News",
+          "url": "https://x.ai/news",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "ByteDance Seed Tech Blog",
+          "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "TikTok for Developers Blog",
+          "url": "https://developers.tiktok.com/blogs/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Runway Changelog",
+          "url": "https://runwayml.com/en/changelog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Luma Changelog",
+          "url": "https://lumalabs.ai/changelog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Adobe Blog AI",
+          "url": "https://blog.adobe.com/en/topics/ai",
+          "status": "blocked",
+          "notes": "HTTP 404"
+        },
+        {
+          "name": "Pika Product Updates",
+          "url": "https://pika.art/",
+          "status": "blocked",
+          "notes": "HTTP 429"
+        },
+        {
+          "name": "Kling Product Updates",
+          "url": "https://kling.art/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Unity Muse",
+          "url": "https://unity.com/muse",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Tencent Hunyuan Blog",
+          "url": "https://llm.hunyuan.tencent.com/#/Blog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Qwen Blog",
+          "url": "https://qwen.ai/blog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Moonshot AI Kimi Platform Blog",
+          "url": "https://platform.kimi.com/blog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Kimi Technical Blog",
+          "url": "https://www.kimi.com/blog/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "MiniMax Blog",
+          "url": "https://www.minimax.io/blog",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Z.ai Research",
+          "url": "https://www.zhipuai.cn/en/research",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Cloudflare Blog",
+          "url": "https://blog.cloudflare.com/rss/",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 1 within 48h"
+        },
+        {
+          "name": "Nature Machine Learning",
+          "url": "https://www.nature.com/subjects/machine-learning.rss",
+          "status": "checked",
+          "notes": "30 feed entries parsed; 3 within 48h"
+        },
+        {
+          "name": "TechCrunch AI",
+          "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 8 within 48h"
+        },
+        {
+          "name": "The Verge AI",
+          "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 6 within 48h"
+        },
+        {
+          "name": "TechCrunch Enterprise",
+          "url": "https://techcrunch.com/category/enterprise/feed/",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 2 within 48h"
+        },
+        {
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "name": "Ars Technica",
+          "url": "https://feeds.arstechnica.com/arstechnica/index",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 11 within 48h"
+        },
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/feed/",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 2 within 48h"
+        },
+        {
+          "name": "VentureBeat AI",
+          "url": "https://venturebeat.com/category/ai/feed",
+          "status": "no_signal",
+          "notes": "7 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "ML Papers of the Week",
+          "url": "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+          "status": "no_signal",
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "HelloGitHub",
+          "url": "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+          "status": "no_signal",
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "RuanYF Weekly",
+          "url": "https://github.com/ruanyf/weekly/commits/master.atom",
+          "status": "no_signal",
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Product Hunt Trending Feed",
+          "url": "https://www.producthunt.com/feed",
+          "status": "checked",
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "name": "Product Hunt Developer Tools Feed",
+          "url": "https://www.producthunt.com/feed?category=developer-tools",
+          "status": "checked",
+          "notes": "50 feed entries parsed; 48 within 48h"
+        },
+        {
+          "name": "Latent.Space",
+          "url": "https://www.latent.space/feed",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 4 within 48h"
+        },
+        {
+          "name": "arXiv cs.AI",
+          "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "name": "Hacker News Topstories API",
+          "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+          "status": "blocked",
+          "notes": "response is not feed-like"
+        },
+        {
+          "name": "Hugging Face Daily Papers",
+          "url": "https://huggingface.co/papers",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Papers with Code API",
+          "url": "https://paperswithcode.com/api/v1/",
+          "status": "blocked",
+          "notes": "response is not feed-like"
+        },
+        {
+          "name": "Reddit r/MachineLearning",
+          "url": "https://www.reddit.com/r/MachineLearning/.json",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Smol AI News",
+          "url": "https://news.smol.ai/rss.xml",
+          "status": "no_signal",
+          "notes": "647 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "AI News Archive",
+          "url": "https://buttondown.com/ainews/rss",
+          "status": "no_signal",
+          "notes": "10 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Ben's Bites",
+          "url": "https://bensbites.com/feed",
+          "status": "no_signal",
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "Interconnects",
+          "url": "https://www.interconnects.ai/feed",
+          "status": "no_signal",
+          "notes": "20 feed entries parsed; 0 within 48h"
+        },
+        {
+          "name": "The Magnifier AI",
+          "url": "https://themagnifier.ai/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Fast Company Creator Economy",
+          "url": "https://www.fastcompany.com/section/creator-economy",
+          "status": "blocked",
+          "notes": "HTTP 403"
+        },
+        {
+          "name": "Crunchbase News AI",
+          "url": "https://news.crunchbase.com/sections/ai/",
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Planet AI",
+          "url": "https://www.planet-ai.net/rss.xml",
+          "status": "checked",
+          "notes": "50 feed entries parsed; 50 within 48h"
+        },
+        {
+          "name": "HNRSS Frontpage",
+          "url": "https://hnrss.org/frontpage",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "name": "Google News AI RSS",
+          "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20OR%20generative%20AI%20when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "100 feed entries parsed; 100 within 48h"
+        },
+        {
+          "name": "Google News AI Policy RSS",
+          "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "69 feed entries parsed; 48 within 48h"
+        },
+        {
+          "name": "Google News AIGC Content Industry RSS",
+          "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "54 feed entries parsed; 40 within 48h"
+        },
+        {
+          "name": "Google News AIGC Video Image Game RSS",
+          "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+          "status": "checked",
+          "notes": "54 feed entries parsed; 45 within 48h"
+        },
+        {
+          "name": "36Kr",
+          "url": "https://36kr.com/feed",
+          "status": "checked",
+          "notes": "30 feed entries parsed; 30 within 48h"
+        },
+        {
+          "name": "QbitAI",
+          "url": "https://www.qbitai.com/feed",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 10 within 48h"
+        },
+        {
+          "name": "Jiqizhixin",
+          "url": "https://www.jiqizhixin.com/rss",
+          "status": "blocked",
+          "notes": "response is not feed-like"
+        },
+        {
+          "name": "Leiphone",
+          "url": "https://www.leiphone.com/feed",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "name": "InfoQ CN",
+          "url": "https://www.infoq.cn/feed",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 20 within 48h"
+        },
+        {
+          "name": "SSPAI",
+          "url": "https://sspai.com/feed",
+          "status": "checked",
+          "notes": "10 feed entries parsed; 7 within 48h"
+        },
+        {
+          "name": "iFanr",
+          "url": "https://www.ifanr.com/feed",
+          "status": "checked",
+          "notes": "20 feed entries parsed; 9 within 48h"
+        },
+        {
+          "name": "WeChat Industry Whitelist Manual Intake",
+          "url": "https://mp.weixin.qq.com/",
+          "status": "skipped_manual_source",
+          "notes": "skipped_manual_source"
+        },
+        {
+          "name": "RSSHub NewRank WeChat Route",
+          "url": "https://rsshub.example.invalid/newrank/wechat/example",
+          "status": "skipped_missing_base_url",
+          "notes": "skipped_missing_base_url"
+        },
+        {
+          "name": "Wechat2RSS Private Feed",
+          "url": "https://wechat2rss.example.invalid/feed.xml",
+          "status": "skipped_missing_base_url",
+          "notes": "skipped_missing_base_url"
+        }
+      ],
+      "candidates_found": 0,
+      "included": 0,
+      "notes": "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
+    }
+  },
+  "main_items": [
+    {
+      "title": "The next chapter in flood resilience: Open sourcing Google’s hydrology framework",
+      "candidate_id": "main-content-google-research-the-next-chapter-in-flood-resilience-open-sourcing-googl",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework/",
+      "source": "Google Research Blog",
+      "tier": "T0",
+      "entities": [
+        "Google Research Blog"
+      ],
+      "summary": "Google Research Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Climate & Sustainability",
+      "bullets": [
+        "**Google Research Blog** 的最新信号与 research / evaluation 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。",
+        "Google Research Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Climate & Sustainability；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "How Endava is redesigning software delivery around AI agents",
+      "candidate_id": "main-content-openai-news-how-endava-is-redesigning-software-delivery-around-ai-agents",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-04",
+      "url": "https://openai.com/index/endava-frontiers",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to accelerate software delivery, automate workflows,...",
+      "bullets": [
+        "**OpenAI News RSS** 的最新信号与 AI engineering tools 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。",
+        "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to accelerate s...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "Introducing new capabilities to GPT-Rosalind",
+      "candidate_id": "main-content-openai-news-introducing-new-capabilities-to-gpt-rosalind",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；GPT-Rosalind advances life sciences research with enhanced biological reasoning, medicinal chemistry expertise, genomic...",
+      "bullets": [
+        "**OpenAI News RSS** 的最新信号与 AI industry 直接相关；来源链路清晰，可用于判断是否需要跟进产品或工程变化。",
+        "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；GPT-Rosalind advances life sciences research with enhanced biological reasoning, m...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "How Wasmer used Codex to build a Node.js runtime for the edge",
+      "candidate_id": "main-content-openai-news-how-wasmer-used-codex-to-build-a-node-js-runtime-for-the-edg",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://openai.com/index/wasmer",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；See how Wasmer used Codex with GPT-5.5 to build a Node.js runtime for the edge, accelerating development 10x to 20x and...",
+      "bullets": [
+        "**OpenAI News RSS** 的最新信号与 AI industry 直接相关；来源链路清晰，可用于判断是否需要跟进产品或工程变化。",
+        "OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；See how Wasmer used Codex with GPT-5.5 to build a Node.js runtime for the edge, ac...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "Introducing the Services Track and Partner Hub of the Claude Partner Network",
+      "candidate_id": "main-content-anthropic-news-introducing-the-services-track-and-partner-hub-of-the-cla",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://www.anthropic.com/news/services-track-partner-hub",
+      "source": "Anthropic News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic News"
+      ],
+      "summary": "Anthropic News 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Claude Partner Network Jun 3, 2026 Poli...",
+      "bullets": [
+        "**Anthropic News** 的最新信号与 AI industry 直接相关；来源链路清晰，可用于判断是否需要跟进产品或工程变化。",
+        "Anthropic News 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Cla...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "Alibaba Cloud Data Security Center",
+      "candidate_id": "main-content-alibaba-cloud-blog-alibaba-cloud-data-security-center",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-data-security-center_603202",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；CloudSecurity June 3, 2026",
+      "bullets": [
+        "**Alibaba Cloud Blog** 的最新信号与 AI industry 直接相关；来源链路清晰，可用于判断是否需要跟进产品或工程变化。",
+        "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；CloudSecurity June 3, 2026；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "When DuckDB Embraces MySQL in the AI Era",
+      "candidate_id": "main-content-alibaba-cloud-blog-when-duckdb-embraces-mysql-in-the-ai-era",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-04",
+      "url": "https://www.alibabacloud.com/blog/when-duckdb-embraces-mysql-in-the-ai-era_603217",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；AliSQL enhances MySQL with DuckDB-powered analytical instances for high-performance HTAP capabilities while maintaining...",
+      "bullets": [
+        "**Alibaba Cloud Blog** 的最新信号与 AI industry 直接相关；来源链路清晰，可用于判断是否需要跟进产品或工程变化。",
+        "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；AliSQL enhances MySQL with DuckDB-powered analytical instances for high-perform...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "Deep Dive into Source Code: How Hermes Agent Achieves Self-Improving",
+      "candidate_id": "main-content-alibaba-cloud-blog-deep-dive-into-source-code-how-hermes-agent-achieves",
+      "editorial_category": "engineering_toolchain",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-04",
+      "url": "https://www.alibabacloud.com/blog/deep-dive-into-source-code-how-hermes-agent-achieves-self-improving_603216",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；This article dissects Hermes's source code to see exactly how this Self-Improving loop works. At the end, we'll also di...",
+      "bullets": [
+        "**Alibaba Cloud Blog** 的最新信号与 AI engineering tools 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。",
+        "Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；This article dissects Hermes's source code to see exactly how this Self-Improvi...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "How to build self-driving AI operations on Amazon Bedrock at scale",
+      "candidate_id": "main-content-aws-machine-learning-how-to-build-self-driving-ai-operations-on-amazon-b",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://aws.amazon.com/blogs/machine-learning/how-to-build-self-driving-ai-operations-on-amazon-bedrock-at-scale/",
+      "source": "AWS Machine Learning Blog",
+      "tier": "T0",
+      "entities": [
+        "AWS Machine Learning Blog"
+      ],
+      "summary": "AWS Machine Learning Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；In this post, we introduce Amazon Bedrock Ops Alert, a three-layer automated monitoring solution that proactively detec...",
+      "bullets": [
+        "**AWS Machine Learning Blog** 的最新信号与 AI industry 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。",
+        "AWS Machine Learning Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；In this post, we introduce Amazon Bedrock Ops Alert, a three-layer autom...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    },
+    {
+      "title": "Fundamental’s Large Tabular Model NEXUS is now available on Amazon SageMaker JumpStart",
+      "candidate_id": "main-content-aws-machine-learning-fundamental-s-large-tabular-model-nexus-is-now-avai",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-03",
+      "url": "https://aws.amazon.com/blogs/machine-learning/fundamentals-large-tabular-model-nexus-is-now-available-on-amazon-sagemaker-jumpstart/",
+      "source": "AWS Machine Learning Blog",
+      "tier": "T0",
+      "entities": [
+        "AWS Machine Learning Blog"
+      ],
+      "summary": "AWS Machine Learning Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；In this post, we show you how to get started with NEXUS on Amazon SageMaker JumpStart, walk through the deployment proc...",
+      "bullets": [
+        "**AWS Machine Learning Blog** 的最新信号与 AI industry 直接相关；==来源链路清晰，可用于判断是否需要跟进产品或工程变化==。",
+        "AWS Machine Learning Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；In this post, we show you how to get started with NEXUS on Amazon SageMa...；==重点看它对能力边界、集成路径或运营策略的具体影响==。",
+        "核验状态为 primary_confirmed；事实栏目只采用一手、官方、论文、GitHub 或多源确认信息。"
+      ],
+      "why_it_matters": "该条进入主体，是因为候选池提供了足够明确的一手或可信证据。",
+      "reader_relevance": "工程团队可据此判断是否需要跟进能力变化、工具接入、内容生成工作流或平台策略。",
+      "verification_note": "候选池提供了可检查来源与核验状态。",
+      "risk_note": "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。",
+      "importance": "major"
+    }
+  ],
+  "github_trending": [
+    {
+      "name": "chopratejas/headroom",
+      "repo": "chopratejas/headroom",
+      "candidate_id": "trend-project-chopratejas-headroom",
+      "description": "chopratejas/headroom 是围绕 agent、RAG 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/chopratejas/headroom",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 1,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "chopratejas/headroom appeared on GitHub Trending daily with 3,530 stars today. 近 7 天本地记录曾在 2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    },
+    {
+      "name": "harry0703/MoneyPrinterTurbo",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "candidate_id": "trend-project-harry0703-moneyprinterturbo",
+      "description": "harry0703 / MoneyPrinterTurbo 利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending weekly",
+      "language": "all",
+      "window": "weekly",
+      "rank": 1,
+      "previous_rank": 4,
+      "rank_delta": 3,
+      "trend": "up",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending weekly with 18,553 stars this week. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31、2026-06-01、2026-06-02、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "affaan-m/ECC",
+      "repo": "affaan-m/ECC",
+      "candidate_id": "trend-project-affaan-m-ecc",
+      "description": "affaan-m/ECC 是围绕 agent 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/affaan-m/ECC",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": 3,
+      "rank_delta": 1,
+      "trend": "up",
+      "evidence": "affaan-m/ECC appeared on GitHub Trending daily with 2,141 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-06-01、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "heygen-com/hyperframes",
+      "repo": "heygen-com/hyperframes",
+      "candidate_id": "trend-project-heygen-com-hyperframes",
+      "description": "heygen-com/hyperframes 是围绕 agent、AIGC 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/heygen-com/hyperframes",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending TypeScript daily",
+      "language": "typescript",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "heygen-com/hyperframes appeared on GitHub Trending TypeScript daily with 393 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "notable"
+    },
+    {
+      "name": "JuliusBrussee/caveman",
+      "repo": "JuliusBrussee/caveman",
+      "candidate_id": "trend-project-juliusbrussee-caveman",
+      "description": "JuliusBrussee/caveman 是围绕 AI tooling 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/JuliusBrussee/caveman",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "JuliusBrussee/caveman appeared on GitHub Trending daily with 471 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "notable"
+    },
+    {
+      "name": "TanStack/query",
+      "repo": "TanStack/query",
+      "candidate_id": "trend-project-tanstack-query",
+      "description": "TanStack/query 是围绕 infra 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/TanStack/query",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending TypeScript daily",
+      "language": "typescript",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "TanStack/query appeared on GitHub Trending TypeScript daily with 25 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "notable"
+    },
+    {
+      "name": "aquasecurity/trivy",
+      "repo": "aquasecurity/trivy",
+      "candidate_id": "trend-project-aquasecurity-trivy",
+      "description": "aquasecurity/trivy 是围绕 AI tooling 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/aquasecurity/trivy",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "aquasecurity/trivy appeared on GitHub Trending daily with 24 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "general"
+    },
+    {
+      "name": "Lum1104/Understand-Anything",
+      "repo": "Lum1104/Understand-Anything",
+      "candidate_id": "trend-project-lum1104-understand-anything",
+      "description": "Lum1104/Understand-Anything 是围绕 AI tooling 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/Lum1104/Understand-Anything",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending weekly",
+      "language": "all",
+      "window": "weekly",
+      "rank": 4,
+      "previous_rank": 2,
+      "rank_delta": -2,
+      "trend": "down",
+      "evidence": "Lum1104/Understand-Anything appeared on GitHub Trending weekly with 12,726 stars this week. 近 7 天本地记录曾在 2026-05-28、2026-06-01、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    },
+    {
+      "name": "NousResearch/hermes-agent",
+      "repo": "NousResearch/hermes-agent",
+      "candidate_id": "trend-project-nousresearch-hermes-agent",
+      "description": "NousResearch/hermes-agent 是围绕 agent 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/NousResearch/hermes-agent",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "NousResearch/hermes-agent appeared on GitHub Trending daily with 1,735 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "general"
+    },
+    {
+      "name": "revfactory/harness",
+      "repo": "revfactory/harness",
+      "candidate_id": "trend-project-revfactory-harness",
+      "description": "revfactory/harness 是围绕 agent 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "url": "https://github.com/revfactory/harness",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending weekly",
+      "language": "all",
+      "window": "weekly",
+      "rank": 5,
+      "previous_rank": 10,
+      "rank_delta": 5,
+      "trend": "up",
+      "evidence": "revfactory/harness appeared on GitHub Trending weekly with 2,005 stars this week. 近 7 天本地记录曾在 2026-05-29、2026-06-01、2026-06-02、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    }
+  ],
+  "model_releases": [],
+  "hot_blogs": [
+    {
+      "title": "Jun 3, 2026 Policy What we learned mapping a year’s worth of AI-enabled cyber threats",
+      "candidate_id": "content-anthropic-news-jun-3-2026-policy-what-we-learned-mapping-a-year-s-worth",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该材料有可检查来源；观点解读仍按原文边界呈现。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "url": "https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack",
+      "publisher": "Anthropic News",
+      "author": "Anthropic News",
+      "event_date": "2026-06-03",
+      "topic": "AI industry",
+      "summary": "Anthropic News 发布这条深读或观点材料。Jun 3, 2026 Policy What we learned mapping a year’s worth of AI-enabled cyber threats Jun 2, 2026 Announcements Expanding Project Glasswing...",
+      "content_type": "blog",
+      "importance": "notable"
+    },
+    {
+      "title": "Expanding Project Glasswing",
+      "candidate_id": "content-anthropic-news-expanding-project-glasswing",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该材料有可检查来源；观点解读仍按原文边界呈现。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "url": "https://www.anthropic.com/news/expanding-project-glasswing",
+      "publisher": "Anthropic News",
+      "author": "Anthropic News",
+      "event_date": "2026-06-02",
+      "topic": "AI industry",
+      "summary": "Anthropic News 发布这条深读或观点材料。Jun 2, 2026 Announcements Expanding Project Glasswing Jun 1, 2026 Announcements Anthropic confidentially submits draft S-1 to the SEC May 2...",
+      "content_type": "blog",
+      "importance": "notable"
+    },
+    {
+      "title": "Build Personal AI Agents on Windows PCs with New Tools from Microsoft and NVIDIA",
+      "candidate_id": "content-nvidia-developer-blog-build-personal-ai-agents-on-windows-pcs-with-new-t",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该材料有可检查来源；观点解读仍按原文边界呈现。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "url": "https://developer.nvidia.com/blog/build-personal-ai-agents-on-windows-pcs-with-new-tools-from-microsoft-and-nvidia/",
+      "publisher": "NVIDIA Developer Blog",
+      "author": "NVIDIA Developer Blog",
+      "event_date": "2026-06-03",
+      "topic": "AI engineering tools",
+      "summary": "NVIDIA Developer Blog 发布这条深读或观点材料。AI agents are changing how you interact with your PC. Creators, developers, and AI enthusiasts are already using these agents extensively t...",
+      "content_type": "blog",
+      "importance": "notable"
+    }
+  ],
+  "projects": [
+    {
+      "name": "chopratejas/headroom",
+      "candidate_id": "project-chopratejas-headroom",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "description": "chopratejas/headroom 是围绕 agent、RAG 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "domains": [
+        "agent",
+        "RAG",
+        "infra"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/chopratejas/headroom",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "chopratejas/headroom appeared on GitHub Trending daily with 3,530 stars today. 近 7 天本地记录曾在 2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "harry0703/MoneyPrinterTurbo",
+      "candidate_id": "project-harry0703-moneyprinterturbo",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "description": "harry0703 / MoneyPrinterTurbo 利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
+      "domains": [
+        "AIGC"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending weekly",
+      "signal": "trending",
+      "evidence": "harry0703/MoneyPrinterTurbo appeared on GitHub Trending weekly with 18,553 stars this week. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-05-30、2026-05-31、2026-06-01、2026-06-02、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "affaan-m/ECC",
+      "candidate_id": "project-affaan-m-ecc",
+      "editorial_category": "open_source",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "description": "affaan-m/ECC 是围绕 agent 的开源项目，今日出现在 GitHub Trending；适合作为工程雷达线索。",
+      "domains": [
+        "agent"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/affaan-m/ECC",
+      "event_date": "2026-06-04",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "evidence": "affaan-m/ECC appeared on GitHub Trending daily with 2,141 stars today. 近 7 天本地记录曾在 2026-05-28、2026-05-29、2026-06-01、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    }
+  ],
+  "builder_observations": [
+    {
+      "author": "Josh Woodward",
+      "handle": "joshwoodward",
+      "candidate_id": "follow-builders-x-josh-woodward-a-short-backstory-on-this-one-a-small-google-lab",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "这条背后有个小故事：Google Labs 的一个小团队想做一款应用，把用户连接到真正重要的内容，同时避开无尽滚动。当时走廊里的提案是“希望式滚动，而不是灾难式滚动”。团队得到“去做吧”的回应。今天，这个小实验开始推出。Dreambeans 是每天为你新鲜冲泡的一剂灵感，我们很期待听到你的反馈。",
+      "original_text": "A short backstory on this one: A small Google Labs team had an idea to make an app designed to connect you with what matters, without the endless scroll. \"Hope scrolling, not doom scrolling\" was the hallway pitch. \"Go for it.\" And today, that little experiment is rolling out. Meet Dreambeans, a daily dose of inspiration, brewed fresh for you. We're excited to see what you think!",
+      "translation": "这条背后有个小故事：Google Labs 的一个小团队想做一款应用，把用户连接到真正重要的内容，同时避开无尽滚动。当时走廊里的提案是“希望式滚动，而不是灾难式滚动”。团队得到“去做吧”的回应。今天，这个小实验开始推出。Dreambeans 是每天为你新鲜冲泡的一剂灵感，我们很期待听到你的反馈。",
+      "avatar_url": "https://unavatar.io/x/joshwoodward",
+      "url": "https://x.com/joshwoodward/status/2062217728824651848",
+      "role": "builder",
+      "event_date": "2026-06-03",
+      "source": "follow-builders X feed",
+      "evidence": "A short backstory on this one: A small Google Labs team had an idea to make an app designed to connect you with what matters, without the endless scroll. \"Hope scrolling, not doom scrolling\" was the hallway pitch. \"Go for it.\" And today, th",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-joshwoodward.png"
+    },
+    {
+      "author": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "candidate_id": "follow-builders-x-thibault-sottiaux-lots-of-little-vectors-at-openai-all-pointin",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "OpenAI 内部有很多小向量都指向同一个方向。很期待看到它们在接下来几周逐步累加并汇合到一起。",
+      "original_text": "Lots of little vectors at OpenAI all pointing in the same direction. Excited to see it all add up and come together over the coming weeks.",
+      "translation": "OpenAI 内部有很多小向量都指向同一个方向。很期待看到它们在接下来几周逐步累加并汇合到一起。",
+      "avatar_url": "https://unavatar.io/x/thsottiaux",
+      "url": "https://x.com/thsottiaux/status/2062423528927015414",
+      "role": "builder",
+      "event_date": "2026-06-04",
+      "source": "follow-builders X feed",
+      "evidence": "Lots of little vectors at OpenAI all pointing in the same direction. Excited to see it all add up and come together over the coming weeks.",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-thsottiaux.png"
+    },
+    {
+      "author": "Cat Wu",
+      "handle": "_catwu",
+      "candidate_id": "follow-builders-x-cat-wu-excited-to-share-how-anthropic-s-data-team-has-automate",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "很高兴分享 Anthropic 数据团队如何用 Claude 自动化 95% 的业务分析查询。博客文章介绍了我们如何做评测、消融实验和在线验证。https://t.co/sMPtM0GscN",
+      "original_text": "Excited to share how Anthropic's data team has automated 95% of business analytics queries with Claude. Blog post covers how we approach evals, ablations, and online validation! https://t.co/sMPtM0GscN",
+      "translation": "很高兴分享 Anthropic 数据团队如何用 Claude 自动化 95% 的业务分析查询。博客文章介绍了我们如何做评测、消融实验和在线验证。https://t.co/sMPtM0GscN",
+      "avatar_url": "https://unavatar.io/x/_catwu",
+      "url": "https://x.com/_catwu/status/2062408623565984209",
+      "role": "builder",
+      "event_date": "2026-06-04",
+      "source": "follow-builders X feed",
+      "evidence": "Excited to share how Anthropic's data team has automated 95% of business analytics queries with Claude. Blog post covers how we approach evals, ablations, and online validation! https://t.co/sMPtM0GscN",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-catwu.png"
+    },
+    {
+      "author": "Google Labs",
+      "handle": "GoogleLabs",
+      "candidate_id": "follow-builders-x-google-labs-new-experiment-dreambeans-is-a-new-experimental-mo",
+      "editorial_category": "x_discussion",
+      "source_level": "official",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "新实验：Dreambeans 是一款新的实验性移动应用，使用 Personal Intelligence 连接你的 Google 应用。它每天提供个性化故事集合，把你可能错过的内容和与你相关的话题浮现出来，帮助你更深入地了解最关心的事情。今天起，符合条件的美国 Google AI Ultra 用户（18 岁以上）可以使用，官网也开放了 waitlist。了解更多：https://t.co/jCdAzMHvOD",
+      "original_text": "🚨 NEW EXPERIMENT 🚨 Dreambeans is a new, experimental mobile app that uses Personal Intelligence to connect to your Google apps. Every day, it delivers collections of personalized stories, surfacing things you might otherwise miss, alongside topics that are relevant to you, to help you dive deeper into the things you care about most. Available starting today for eligible US-based Google AI Ultra users (+18), with an open waitlist found on our website below! Learn more at https://t.co/jCdAzMHvOD",
+      "translation": "新实验：Dreambeans 是一款新的实验性移动应用，使用 Personal Intelligence 连接你的 Google 应用。它每天提供个性化故事集合，把你可能错过的内容和与你相关的话题浮现出来，帮助你更深入地了解最关心的事情。今天起，符合条件的美国 Google AI Ultra 用户（18 岁以上）可以使用，官网也开放了 waitlist。了解更多：https://t.co/jCdAzMHvOD",
+      "avatar_url": "https://unavatar.io/x/GoogleLabs",
+      "url": "https://x.com/GoogleLabs/status/2062206479026069544",
+      "role": "builder",
+      "event_date": "2026-06-03",
+      "source": "follow-builders X feed",
+      "evidence": "🚨 NEW EXPERIMENT 🚨 Dreambeans is a new, experimental mobile app that uses Personal Intelligence to connect to your Google apps. Every day, it delivers collections of personalized stories, surfacing things you might otherwise miss, alongsi",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-googlelabs.png"
+    },
+    {
+      "author": "Swyx",
+      "handle": "swyx",
+      "candidate_id": "follow-builders-x-swyx-hamiltonmusical-the-most-viral-thing-i-have-ever-done-and",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "@HamiltonMusical 我做过最病毒式传播的东西，是一个非官方 Hamilton sitzprobe，而不是任何 AI 相关内容。https://t.co/yYq6VTP0TT",
+      "original_text": "@HamiltonMusical the most viral thing i have ever done and its a bootleg hamilton sitzprobe not anything ai related https://t.co/yYq6VTP0TT",
+      "translation": "@HamiltonMusical 我做过最病毒式传播的东西，是一个非官方 Hamilton sitzprobe，而不是任何 AI 相关内容。https://t.co/yYq6VTP0TT",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2062396031812481476",
+      "role": "builder",
+      "event_date": "2026-06-04",
+      "source": "follow-builders X feed",
+      "evidence": "@HamiltonMusical the most viral thing i have ever done and its a bootleg hamilton sitzprobe not anything ai related https://t.co/yYq6VTP0TT",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-swyx.png"
+    },
+    {
+      "author": "Swyx",
+      "handle": "swyx",
+      "candidate_id": "follow-builders-x-swyx-you-guys-know-where-this-is-going-right-t-co-xpo8yualmd-t",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "content": "你们知道这会走向哪里，对吧。https://t.co/xPo8yualmd https://t.co/qGDrXayZET",
+      "original_text": "you guys know where this is going right https://t.co/xPo8yualmd https://t.co/qGDrXayZET",
+      "translation": "你们知道这会走向哪里，对吧。https://t.co/xPo8yualmd https://t.co/qGDrXayZET",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2062371515937800468",
+      "role": "builder",
+      "event_date": "2026-06-04",
+      "source": "follow-builders X feed",
+      "evidence": "you guys know where this is going right https://t.co/xPo8yualmd https://t.co/qGDrXayZET",
+      "importance": "notable",
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-04-swyx.png"
+    }
+  ],
+  "community_leads": [
+    {
+      "candidate_id": "status-openai-increased-latency-for-codex-compaction-for-a-subset-of-users",
+      "content": "OpenAI Status：Status: Resolved All impacted services have now fully recovered. Affected components App (Operational) VS Code extension (Operational) Codex API (Operational) Codex Web (Operational) CLI (Operational) 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.openai.com//incidents/01KT890WC7YQYMX39GY5VG9QAB",
+      "event_date": "2026-06-04",
+      "source": "OpenAI Status",
+      "evidence": "Status: Resolved All impacted services have now fully recovered. Affected components App (Operational) VS Code extension (Operational) Codex API (Operational) Codex Web (Operational) CLI (Operational)",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-openai-elevated-error-rates-on-codex-chatgpt-and-responses-api",
+      "content": "OpenAI Status：Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Conversations (Operational) Responses (Operational) Codex Web (Operational) App (Operational) 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.openai.com//incidents/01KT5XJ5ATD6RMYP908WS69FVD",
+      "event_date": "2026-06-03",
+      "source": "OpenAI Status",
+      "evidence": "Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Conversations (Operational) Responses (Operational) Codex Web (Operational) App (Operational)",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-openai-elevated-errors-for-chatgpt-pro",
+      "content": "OpenAI Status：Status: Resolved All impacted services have now fully recovered. Affected components Search (Operational) Conversations (Operational) Compliance API (Operational) GPTs (Operational) Agent (Operational) Deep Research (Operational) Voice mode 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.openai.com//incidents/01KT5AMWGKRTMQW2BAHD70PC4X",
+      "event_date": "2026-06-03",
+      "source": "OpenAI Status",
+      "evidence": "Status: Resolved All impacted services have now fully recovered. Affected components Search (Operational) Conversations (Operational) Compliance API (Operational) GPTs (Operational) Agent (Operational) Deep Research (Operational) Voice mode",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-openai-codex-gpt-image-2-does-not-exist-errors",
+      "content": "OpenAI Status：Status: Resolved All impacted services have now fully recovered. Affected components VS Code extension (Operational) Codex API (Operational) Codex Web (Operational) CLI (Operational) App (Operational) 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.openai.com//incidents/01KT5B2V94YX1T1M88BVQHB58J",
+      "event_date": "2026-06-03",
+      "source": "OpenAI Status",
+      "evidence": "Status: Resolved All impacted services have now fully recovered. Affected components VS Code extension (Operational) Codex API (Operational) Codex Web (Operational) CLI (Operational) App (Operational)",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-openai-guest-users-are-experiencing-elevated-error-rate-when-using-chatgp",
+      "content": "OpenAI Status：Status: Resolved All impacted services have now fully recovered. Affected components Conversations (Operational) 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.openai.com//incidents/01KT43GBSRNH7HG9YE93GPNG63",
+      "event_date": "2026-06-02",
+      "source": "OpenAI Status",
+      "evidence": "Status: Resolved All impacted services have now fully recovered. Affected components Conversations (Operational)",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-claude-elevated-errors-on-opus-4-7",
+      "content": "Claude Status：Jun 3 , 07:38 UTC Resolved - This incident has been resolved. Jun 3 , 07:28 UTC Monitoring - A fix has been implemented and we are monitoring the results. Jun 3 , 07:10 UTC Investigating - We are currently investigating this issue. 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.claude.com/incidents/thp2kyjx60qn",
+      "event_date": "2026-06-03",
+      "source": "Claude Status",
+      "evidence": "Jun 3 , 07:38 UTC Resolved - This incident has been resolved. Jun 3 , 07:28 UTC Monitoring - A fix has been implemented and we are monitoring the results. Jun 3 , 07:10 UTC Investigating - We are currently investigating this issue.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-claude-issue-affecting-some-claude-code-services",
+      "content": "Claude Status：Jun 3 , 07:36 UTC Resolved - This incident has been resolved. Jun 3 , 04:17 UTC Investigating - We have identified an issue which is resulting in some Claude Code services being degraded. As a result of this issue, users will see issues wit 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.claude.com/incidents/0w1blp7cngrr",
+      "event_date": "2026-06-03",
+      "source": "Claude Status",
+      "evidence": "Jun 3 , 07:36 UTC Resolved - This incident has been resolved. Jun 3 , 04:17 UTC Investigating - We have identified an issue which is resulting in some Claude Code services being degraded. As a result of this issue, users will see issues wit",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-claude-elevated-errors-on-multiple-models",
+      "content": "Claude Status：Jun 2 , 11:49 UTC Resolved - This incident has been resolved. Jun 2 , 10:42 UTC Monitoring - A fix has been implemented and we are monitoring the results. Jun 2 , 09:33 UTC Update - We are continuing to work on a fix for this issue. Jun 2 , 待确认：该线索没有进入事实栏目，仍需回到原始来源或多源确认。",
+      "url": "https://status.claude.com/incidents/zkr25thltwc9",
+      "event_date": "2026-06-02",
+      "source": "Claude Status",
+      "evidence": "Jun 2 , 11:49 UTC Resolved - This incident has been resolved. Jun 2 , 10:42 UTC Monitoring - A fix has been implemented and we are monitoring the results. Jun 2 , 09:33 UTC Update - We are continuing to work on a fix for this issue. Jun 2 ,",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "verification_note": "该线索用于观察，不作为事实栏目证据。",
+      "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
+      "importance": "general"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "The next chapter in flood resilience: Open sourcing Google’s hydrology framework",
+      "source_url": "https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework/",
+      "local_path": "assets/evidence/the-next-chapter-in-flood-resilience-open-sourcing-google-s-hydrology-framework-2026-06-04.png",
+      "caption": "图片来自 Google Research Blog，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "Alibaba Cloud Data Security Center",
+      "source_url": "https://www.alibabacloud.com/blog/alibaba-cloud-data-security-center_603202",
+      "local_path": "assets/evidence/alibaba-cloud-data-security-center-2026-06-04.png",
+      "caption": "图片来自 Alibaba Cloud Blog，由 html_index 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image"
+    },
+    {
+      "type": "figure",
+      "title": "When DuckDB Embraces MySQL in the AI Era",
+      "source_url": "https://www.alibabacloud.com/blog/when-duckdb-embraces-mysql-in-the-ai-era_603217",
+      "local_path": "assets/evidence/when-duckdb-embraces-mysql-in-the-ai-era-2026-06-04.png",
+      "caption": "图片来自 Alibaba Cloud Blog，由 html_index 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image"
+    }
+  ],
+  "self_check": {
+    "report_date": "2026-06-04",
+    "main_items": 10,
+    "builder_observations": 6,
+    "builder_skill_used": [
+      "candidate-pool-autodraft"
+    ],
+    "fallback_sources": [],
+    "primary_links": true,
+    "no_banned_words": true,
+    "no_unsourced_numbers": true,
+    "notes": "候选池 included 标记已随草稿写回；高风险或中介事实保持在非事实栏目。",
+    "optimization_suggestions": [],
+    "automation_revision": {
+      "schema_version": 1,
+      "git_commit": "1c4d1e120e8263822b52507976379e263db0d17d",
+      "git_commit_short": "1c4d1e120e82",
+      "git_branch": "main",
+      "origin_main_sha": "1c4d1e120e8263822b52507976379e263db0d17d",
+      "origin_main_short": "1c4d1e120e82",
+      "prompt_manifest": "prompts/ai-daily/manifest.json",
+      "prompt_modules": [
+        "base.md",
+        "date-scope.md",
+        "discovery-audit.md",
+        "candidate-pool.md",
+        "source-policy.md",
+        "fixed-source-checklist.md",
+        "selection-rules.md",
+        "plain-language.md",
+        "output-html.md",
+        "effective-interact-output.md",
+        "structured-report-json.md",
+        "publish-workflow.md",
+        "reflection-loop.md"
+      ],
+      "source_registry_count": 75,
+      "source_registry_enablement_counts": {
+        "core": 28,
+        "optional": 42,
+        "manual": 5
+      },
+      "rules": [
+        "main_items_min_8_when_candidates_available",
+        "content_units_min_27_when_candidates_available",
+        "model_releases_must_mirror_main_items",
+        "github_api_fallback_for_git_transport",
+        "fixed_source_checklist"
+      ]
+    }
+  },
+  "generated_at": "2026-06-04T10:58:43.815Z",
+  "report_status": "normal",
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-04.html",
+  "html_path": "reports/2026/06/2026-06-04.html",
+  "candidate_pool_path": "data/2026/06/2026-06-04.candidates.json",
+  "publish_status": {
+    "html_generated": true,
+    "repo_updated": true,
+    "repo_pushed": false,
+    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-04.html",
+    "publish_error": ""
+  },
+  "quality_status": {
+    "status": "degraded",
+    "reasons": [
+      "github_trending_top10_missing"
+    ],
+    "affected_sections": [],
+    "degraded_sections": [
+      {
+        "code": "github_trending_top10_missing",
+        "error_code": "github_trending_top10_gate_failed",
+        "section": "github_trending",
+        "message": "GitHub Trending Top 10 or its daily/weekly/language source audit is missing.",
+        "remediation": "Run discover:github-trending and include the Top 10 repositories with rank/trend metadata before publishing.",
+        "count": 10,
+        "minimum": 10,
+        "candidates_found": 132,
+        "audit_sources": 10,
+        "audit_source_minimum": 10,
+        "has_rank_coverage": false
+      }
+    ],
+    "blocking_issues": [],
+    "public_note": "Some discovery coverage is degraded; this report may be incomplete."
+  }
+}
