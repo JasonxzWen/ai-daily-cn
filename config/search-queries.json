@@ -117,6 +117,68 @@
     "verification_policy": "primary_required"
   },
   {
+    "id": "big-tech-company-watch",
+    "query": "(OpenAI OR Anthropic OR Google OR Microsoft OR Apple OR Meta OR Amazon OR NVIDIA OR xAI) (earnings OR layoffs OR reorganization OR regulation OR partnership OR product OR conference OR GitHub OR \"open source\")",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "openai.com",
+      "anthropic.com",
+      "blog.google",
+      "blogs.microsoft.com",
+      "apple.com",
+      "about.fb.com",
+      "aboutamazon.com",
+      "nvidia.com",
+      "github.com",
+      "huggingface.co",
+      "x.ai"
+    ]
+  },
+  {
+    "id": "china-big-tech-company-watch",
+    "query": "(Tencent OR ByteDance OR Alibaba OR Meituan OR Baidu OR DeepSeek OR MiniMax OR Moonshot OR Kimi OR Zhipu OR Qwen) (earnings OR layoffs OR reorganization OR regulation OR partnership OR product OR GitHub OR \"open source\" OR \"Hugging Face\")",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "www.tencent.com",
+      "www.bytedance.com",
+      "www.alibabagroup.com",
+      "www.alibabacloud.com",
+      "www.meituan.com",
+      "ir.baidu.com",
+      "www.deepseek.com",
+      "github.com",
+      "huggingface.co",
+      "qwen.ai",
+      "platform.kimi.com",
+      "www.kimi.com",
+      "www.minimax.io",
+      "www.zhipuai.cn",
+      "z.ai"
+    ]
+  },
+  {
+    "id": "official-open-source-account-watch",
+    "query": "(OpenAI OR Anthropic OR DeepSeek OR Qwen OR Kimi OR Moonshot OR MiniMax OR Hunyuan OR Zhipu OR \"Meta Llama\") (GitHub OR Hugging Face OR open-source OR \"model weights\")",
+    "candidate_category": "community_lead",
+    "verification_policy": "primary_required",
+    "allowed_primary_domains": [
+      "github.com",
+      "huggingface.co",
+      "openai.com",
+      "anthropic.com",
+      "www.deepseek.com",
+      "qwen.ai",
+      "platform.kimi.com",
+      "www.kimi.com",
+      "www.minimax.io",
+      "www.tencent.com",
+      "www.zhipuai.cn",
+      "z.ai"
+    ]
+  },
+  {
     "id": "ai-papers-systems",
     "query": "(LLM OR agent OR inference OR evaluation OR retrieval)",
     "candidate_category": "community_lead",

@@ -1976,6 +1976,114 @@ test("registered content sources include fixed daily tracking leaderboards", asy
   }
 });
 
+test("registered source registry covers official company news lanes", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional"
+  });
+  const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const expected = [
+    ["content-google-keyword", "https://blog.google/rss/"],
+    ["content-microsoft-official-blog", "https://blogs.microsoft.com/feed/"],
+    ["content-apple-newsroom", "https://www.apple.com/newsroom/rss-feed.rss"],
+    ["content-meta-newsroom", "https://about.fb.com/news/feed/"],
+    ["content-amazon-news", "https://www.aboutamazon.com/news/rss"],
+    ["content-tencent-media-center", "https://www.tencent.com/en-us/media.html"],
+    ["content-alibaba-group-press-releases", "https://www.alibabagroup.com/en-US/news-press-releases"],
+    ["content-meituan-investor-relations", "https://www.meituan.com/en-US/investor-relations"]
+  ];
+
+  for (const [id, url] of expected) {
+    const source = sourcesById.get(id);
+    assert(source, `missing company news source ${id}`);
+    assert.equal(source.url, url);
+    assert.equal(source.candidate_category, "community_lead");
+    assert.equal(source.authority, "primary");
+    assert.equal(source.verification_policy, "primary_allowed");
+    assert.equal(source.source_level, "official_company_news");
+  }
+});
+
+test("registered source registry covers official open-source account lanes", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional"
+  });
+  const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const expected = [
+    ["content-github-openai-org", "https://github.com/openai.atom", "official_open_source_account"],
+    ["content-github-anthropics-org", "https://github.com/anthropics.atom", "official_open_source_account"],
+    ["content-github-google-deepmind-org", "https://github.com/google-deepmind.atom", "official_open_source_account"],
+    ["content-github-meta-llama-org", "https://github.com/meta-llama.atom", "official_open_source_account"],
+    ["content-github-deepseek-ai-org", "https://github.com/deepseek-ai.atom", "official_open_source_account"],
+    ["content-github-qwenlm-org", "https://github.com/QwenLM.atom", "official_open_source_account"],
+    ["content-github-moonshotai-org", "https://github.com/moonshotai.atom", "official_open_source_account"],
+    ["content-github-minimax-ai-org", "https://github.com/MiniMax-AI.atom", "official_open_source_account"],
+    ["content-github-tencent-hunyuan-org", "https://github.com/Tencent-Hunyuan.atom", "official_open_source_account"],
+    ["content-huggingface-openai", "https://huggingface.co/openai", "official_model_host_account"],
+    ["content-huggingface-deepseek-ai", "https://huggingface.co/deepseek-ai", "official_model_host_account"],
+    ["content-huggingface-qwen", "https://huggingface.co/Qwen", "official_model_host_account"],
+    ["content-huggingface-moonshotai", "https://huggingface.co/moonshotai", "official_model_host_account"],
+    ["content-huggingface-meta-llama", "https://huggingface.co/meta-llama", "official_model_host_account"]
+  ];
+
+  for (const [id, url, sourceLevel] of expected) {
+    const source = sourcesById.get(id);
+    assert(source, `missing official open-source source ${id}`);
+    assert.equal(source.url, url);
+    assert.equal(source.candidate_category, "community_lead");
+    assert.equal(source.authority, "primary");
+    assert.equal(source.verification_policy, "primary_allowed");
+    assert.equal(source.source_level, sourceLevel);
+  }
+});
+
+test("general news registry includes company and open-source discovery lanes", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional"
+  });
+  const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const expected = [
+    ["general-news-google-big-tech-company-watch", ["layoffs", "reorganization", "earnings", "GitHub"]],
+    ["general-news-google-china-big-tech-company-watch", ["Tencent", "ByteDance", "Meituan", "Hugging%20Face"]],
+    ["general-news-google-official-open-source-watch", ["GitHub", "Hugging%20Face", "model%20weights"]]
+  ];
+
+  for (const [id, fragments] of expected) {
+    const source = sourcesById.get(id);
+    assert(source, `missing general news lane ${id}`);
+    assert.equal(source.candidate_category, "community_lead");
+    assert.equal(source.authority, "aggregator");
+    assert.equal(source.verification_policy, "primary_required");
+    for (const fragment of fragments) {
+      assert(source.url.includes(fragment), `${id} url missing ${fragment}`);
+    }
+  }
+});
+
+test("search queries include company and official open-source watches", async () => {
+  const queries = JSON.parse(await fs.readFile(path.join(rootDir, "config/search-queries.json"), "utf8"));
+  const queriesById = new Map(queries.map((query) => [query.id, query]));
+  const expected = [
+    ["big-tech-company-watch", ["blog.google", "blogs.microsoft.com", "aboutamazon.com", "github.com", "huggingface.co"]],
+    ["china-big-tech-company-watch", ["www.tencent.com", "www.bytedance.com", "www.alibabagroup.com", "www.meituan.com", "github.com", "huggingface.co"]],
+    ["official-open-source-account-watch", ["github.com", "huggingface.co", "qwen.ai", "www.minimax.io", "z.ai"]]
+  ];
+
+  for (const [id, domains] of expected) {
+    const query = queriesById.get(id);
+    assert(query, `missing search query ${id}`);
+    assert.equal(query.candidate_category, "community_lead");
+    assert.equal(query.verification_policy, "primary_required");
+    assert.match(query.query, /GitHub/i);
+    assert.match(query.query, /open[-\s]source/i);
+    for (const domain of domains) {
+      assert(query.allowed_primary_domains.includes(domain), `${id} missing allowed domain ${domain}`);
+    }
+  }
+});
+
 test("search shadow queries allow primary domains for China frontier AI labs", async () => {
   const queries = JSON.parse(await fs.readFile(path.join(rootDir, "config/search-queries.json"), "utf8"));
   const query = queries.find((item) => item.id === "china-frontier-labs-release");
