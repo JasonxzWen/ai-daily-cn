@@ -1994,7 +1994,9 @@ test("registered source registry covers official company news lanes", async () =
     ["content-nvidia-newsroom-rss", "https://nvidianews.nvidia.com/rss.xml"],
     ["content-github-blog-feed", "https://github.blog/feed/"],
     ["content-tencent-media-center", "https://www.tencent.com/en-us/media.html"],
+    ["content-bytedance-news", "https://www.bytedance.com/en/news"],
     ["content-alibaba-group-press-releases", "https://www.alibabagroup.com/en-US/news-press-releases"],
+    ["content-baidu-press-releases", "https://ir.baidu.com/index.php/press-releases"],
     ["content-meituan-investor-relations", "https://www.meituan.com/en-US/investor-relations"]
   ];
 
