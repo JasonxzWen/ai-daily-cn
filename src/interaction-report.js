@@ -27,6 +27,7 @@ const GITHUB_BLOG_ICON =
   "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABqlBMVEVHcEwYGBgXFxcZFxcYFhYZGRkYFhYYFhYUFBQAAAAcHBwYFRUYFhYZFhYYFRUXFhYXFxcYFhYYFhYYFhYZFhYXFxcYFhYYFhYYFhYaGhoWFhYAAAAAAAAYFRUXFxcYFhYXFxcZFhYYFhYAAAAkJCQAAAAZFBQYFBQSEhIZFRUaFhYgEBAYFhYYFBQYFhYYFhYYFxcYFhYYFhYXFRUXFxcYFhYYFhYYFRUXFhYzAAAXFxcWFhYYFhYYFRUYFhYYGBgZFhYYFRUYFhYYFhYXFxcXFxcYFxcYFhYYFRUYFhYVFRUYFhYXFRUYFhYYFhYZFhYqAAAXFxcZFhYZFRUWFhYZFRUYFxcZFhYZFhYYFhYZFhYZGRkXFxcZFxcYFhYVFRUYFhYXFhYYFhYZFhYYFRUZFhYYFhYYFhYXFRUaFxceDw8YFRUYFhYVFRUZFRUWFhYXFxcYFhYYFhYQEBAaFhYTExMaGhoaGhoYFhYYFhYXFxcaFRUWFhYZFxcYFxcqKioaFBQXFxcYFRUWFhYYFhYYFxcaFBQYFhYYFhYYFRUXFhYaFhYZFhYYFhathGCcAAAAjXRSTlMAICxw/Cnt/hkCCVSxUbOkWfPj9GdD9mnTCiIBBUpa1Tem+wMHBDQ/DptGENtLq8L56qptC3OVSboFWC73a3YqXFbn7FdCqcdfagzBeKz52gZkaD4vSJJyup9HHy16+jB+5OldYa+49WNaEb+MJJAjb7aXEDsbHRT9ghY8Ony/BjIhp0TNkyfx3FX6Rc+4kjohAAABpElEQVQ4y22T5XvCQAzGM6DCYLDB3McGzN3d3d3d3d3d7n9eL6Vr6TVf3iS/9+lzd0kBNJFoyttKTuLSwTBKN9c3CEaEYyWUwaFzPNHE8sRgME8dILqIHdXyzn7CRLRN5ZECMQhLssKTLMQwCkdkLrZIhbPGnKuilC6TXZKlbTSk0VY4gNfcXm+Limrq7Yu0AsTQ7jHlC3iANv29w2jXcyBlUyTwheAYxva+9EIRmDXqDXXYLkqHaUwqmadN6ECQCouoY+xsWhEcgpOKEMcaRDSUwyQVt8F0E9GQDztU5hNYQzca1uAI9Yw1NCBIgyxUG2sYQrALZlQHayhAsAo+VKFCz6vlse2B1YXJR7ZuFNHyWKX0ipD7N54Iz36vQjOy7YG5l0nVtZu4Kr4+6TY7rRRXOWqVveAzaeNOeqj3skJ1pDH/i1OC9cMrIcViScFvfo5sMCm8xyo3noqI5aeUe7kJHCEkwF2icqhHnnyX592GZQQZmjn1Upy8sDlaQ2y89tqZWXQzL+Qinv4U4/oN8NkvhRM5nSGe4lmDBTg/VTK/qHb/AERH3u9xwIrQAAAAAElFTkSuQmCC";
 const AI_DAILY_ICON = generatedDailyIcon();
 const ARXIV_ICON = generatedSiteIcon("arXiv", "#b31b1b", "#ffffff");
+const PUBLIC_BODY_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -277,8 +278,8 @@ function editorialSummary(report) {
   const highlightSummary = highlights
     .slice(0, 3)
     .map((item) => {
-      const title = String(item?.title || "").trim();
-      const reason = String(item?.reason || "").trim();
+      const title = stripPublicBodySourcePrefix(item?.title, item);
+      const reason = stripPublicBodySourcePrefix(item?.reason, item);
       if (!title) return "";
       return reason ? `${title}：${reason}` : title;
     })
@@ -1106,8 +1107,46 @@ function stripSourcePrefix(title, source) {
   }
   const escapedSource = escapeRegex(sourceText);
   return text
-    .replace(new RegExp(`^${escapedSource}\\s*[：:｜|\\-—–]?\\s*`, "i"), "")
+    .replace(new RegExp(`^(?:\\*\\*)?${escapedSource}(?:\\*\\*)?\\s*[：:｜|\\-—–]?\\s*`, "i"), "")
     .trim() || text;
+}
+
+function stripPublicBodySourcePrefix(value, item = {}) {
+  let text = String(value || "").trim();
+  if (!text) {
+    return "";
+  }
+  for (const source of publicBodySourceLabels(item)) {
+    text = stripPublicBodyExactSourcePrefix(text, source);
+  }
+  const withoutKnownPrefix = text.replace(PUBLIC_BODY_SOURCE_PREFIX_RE, "").trim();
+  if (withoutKnownPrefix) {
+    text = withoutKnownPrefix;
+  }
+  return text
+    .replace(/\s*。?\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
+    .trim();
+}
+
+function stripPublicBodyExactSourcePrefix(value, source) {
+  const text = String(value || "").trim();
+  const sourceText = String(source || "").trim();
+  if (!sourceText) {
+    return text;
+  }
+  const escapedSource = escapeRegex(sourceText);
+  return text
+    .replace(new RegExp(`^(?:\\*\\*)?${escapedSource}(?:\\*\\*)?\\s*[：:]\\s*`, "i"), "")
+    .trim() || text;
+}
+
+function publicBodySourceLabels(item = {}) {
+  return [
+    item.source,
+    item.publisher,
+    item.source_name,
+    item.source_title
+  ].map((value) => String(value || "").trim()).filter(Boolean);
 }
 
 function escapeRegex(value) {
@@ -1172,7 +1211,7 @@ function importanceTagFor(sectionName, item) {
 
 function formatDailyInlineText(value, item = {}) {
   const kind = normalizeImportance(item.importance) || "notable";
-  return String(value || "").replace(/==([^=\n]+)==/g, (_match, text) => {
+  return stripPublicBodySourcePrefix(value, item).replace(/==([^=\n]+)==/g, (_match, text) => {
     const inner = String(text || "").trim();
     if (/^(?:keyword|tag|trend)-/.test(inner)) {
       return `==${inner}==`;

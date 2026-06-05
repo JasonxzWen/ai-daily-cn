@@ -42,6 +42,7 @@ const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
 const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u;
+const PUBLIC_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
 
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
@@ -127,6 +128,7 @@ export function reviewReportQuality(report, options = {}) {
     collectEnglishToneIssues(entry, issues);
     collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks);
     collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks);
+    collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report);
     collectPublicUntranslatedIssues(entry, issues, aiReviewTasks);
     collectHighlightIssues(entry, issues, limits);
   }
@@ -339,6 +341,48 @@ function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
     path: entry.path,
     instruction: "Rewrite this public body text as concrete reader-facing facts. Remove impact/watch labels and generic advice such as checking README, permissions, pricing, or whether a team should follow up unless those details are specific to this source."
   });
+}
+
+function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary)|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+    return;
+  }
+  const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+  const exactSourcePrefix = publicSourceLabelsForPath(report, entry.path)
+    .some((source) => new RegExp(`^${escapeRegex(source)}\\s*[：:]\\s*`, "i").test(plain));
+  if (!PUBLIC_SOURCE_PREFIX_RE.test(plain) && !exactSourcePrefix) {
+    return;
+  }
+  issues.push({
+    code: "public_source_prefix",
+    severity: "error",
+    path: entry.path,
+    message: "Public report body should use icons/links for sources and must not repeat source names as text prefixes.",
+    repairable: true
+  });
+  aiReviewTasks.push({
+    kind: "public_editorial_rewrite",
+    path: entry.path,
+    instruction: "Remove the source-name prefix from this public text. Keep the source represented by the existing icon/link and rewrite any remaining excerpt as reader-facing Chinese."
+  });
+}
+
+function publicSourceLabelsForPath(report, pathName) {
+  const match = String(pathName || "").match(/^([a-z_]+)\[(\d+)\]/);
+  if (!match) {
+    return [];
+  }
+  const [, sectionName, indexText] = match;
+  const item = report?.[sectionName]?.[Number(indexText)];
+  if (!item || typeof item !== "object") {
+    return [];
+  }
+  return [
+    item.source,
+    item.publisher,
+    item.source_name,
+    item.source_title
+  ].map((value) => String(value || "").trim()).filter((value) => value.length >= 3);
 }
 
 function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
@@ -719,8 +763,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "public_editorial_quality",
-      ok: !failedCodes.has("public_text_untranslated") && !failedCodes.has("public_template_body"),
-      status: failedCodes.has("public_text_untranslated") || failedCodes.has("public_template_body") ? "failed" : "passed"
+      ok: !failedCodes.has("public_text_untranslated") && !failedCodes.has("public_template_body") && !failedCodes.has("public_source_prefix"),
+      status: failedCodes.has("public_text_untranslated") || failedCodes.has("public_template_body") || failedCodes.has("public_source_prefix") ? "failed" : "passed"
     },
     {
       id: "hot_blog_editorial_quality",
@@ -831,6 +875,10 @@ function stripRootPath(pathName) {
 
 function stripMarkup(value) {
   return String(value || "").replace(/==([^=\n]+)==/g, "$1").replace(/\*\*([^*]+)\*\*/g, "$1");
+}
+
+function escapeRegex(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function visibleHighlightText(value) {
