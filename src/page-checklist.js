@@ -1,12 +1,18 @@
-const FORBIDDEN_TEXT = [
+const FORBIDDEN_SECTION_TEXT = [
   "\u6a21\u578b\u53d1\u5e03",
   "\u4eca\u65e5\u503c\u5f97\u5173\u6ce8\u7684\u9879\u76ee",
   "\u9879\u76ee highlights"
 ];
+const FORBIDDEN_SECTION_SELECTORS = [
+  "#model-releases",
+  "#projects",
+  ".project-card-grid",
+  ".project-card"
+];
 
 export async function evaluateDailyPageChecklist(page, options = {}) {
   await eagerLoadPageImages(page, options.imageTimeoutMs || 5000);
-  const result = await page.evaluate(({ reportDate, forbiddenText }) => {
+  const result = await page.evaluate(({ reportDate, forbiddenSectionText, forbiddenSectionSelectors }) => {
     const checks = [];
     const issues = [];
     const addCheck = (id, ok, message, details = {}) => {
@@ -15,7 +21,6 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         issues.push({ id, message, details });
       }
     };
-    const text = document.body?.textContent || "";
     const hero = document.querySelector("#report-top");
 
     addCheck(
@@ -38,7 +43,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       !Array.from(document.scripts).some((script) => /^https?:\/\//i.test(script.src || "")),
       "Public report should not depend on remote scripts."
     );
-    const forbiddenHits = forbiddenText.filter((item) => text.includes(item));
+    const sectionTextTargets = Array.from(document.querySelectorAll("section h1, section h2, section h3, nav a, [data-section-title]"))
+      .map((node) => node.textContent?.replace(/\s+/g, " ").trim() || "")
+      .filter(Boolean);
+    const forbiddenTextHits = forbiddenSectionText.filter((item) =>
+      sectionTextTargets.some((text) => text.includes(item))
+    );
+    const forbiddenSelectorHits = forbiddenSectionSelectors.filter((selector) =>
+      document.querySelector(selector)
+    );
+    const forbiddenHits = [...forbiddenTextHits, ...forbiddenSelectorHits];
     addCheck(
       "forbidden_sections_absent",
       forbiddenHits.length === 0,
@@ -139,7 +153,8 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     };
   }, {
     reportDate: options.reportDate || "",
-    forbiddenText: options.forbiddenText || FORBIDDEN_TEXT
+    forbiddenSectionText: options.forbiddenSectionText || options.forbiddenText || FORBIDDEN_SECTION_TEXT,
+    forbiddenSectionSelectors: options.forbiddenSectionSelectors || FORBIDDEN_SECTION_SELECTORS
   });
 
   return {
