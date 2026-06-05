@@ -28,7 +28,7 @@ import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { generateReportDraft } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
-import { CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
+import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
@@ -1277,6 +1277,16 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
       bullets: ["**Alibaba Cloud** fixture."]
     },
     {
+      title: "Baidu IR update",
+      event_date: "2026-05-15",
+      url: "https://ir.baidu.com/news-releases/news-release-details/example",
+      source: "Baidu Press Releases",
+      tier: "T2",
+      entities: ["Baidu"],
+      summary: "fixture",
+      bullets: ["**Baidu** fixture."]
+    },
+    {
       title: "Nature update",
       event_date: "2026-05-15",
       url: "https://www.nature.com/articles/example",
@@ -1324,6 +1334,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
     "NVIDIA Developer Blog",
     "MiniMax model page",
     "Alibaba Cloud Blog",
+    "Baidu Press Releases",
     "Nature Communications",
     "Andrej Karpathy Blog",
     "Tencent Hunyuan Blog",
@@ -1337,6 +1348,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
     assert(sectionContent.includes(`![${source}](${CACHED_SOURCE_ICONS[source]})`), source);
     assert(!sectionContent.includes(`![${source}](data:image/svg+xml;base64,`), source);
   }
+  assert.equal(CACHED_DOMAIN_ICONS["ir.baidu.com"], CACHED_SOURCE_ICONS["Baidu Press Releases"]);
   assert(mainContent.includes("![arXiv cs.AI](data:image/svg+xml;base64,"));
 });
 
