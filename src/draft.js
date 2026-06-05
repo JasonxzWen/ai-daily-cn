@@ -535,13 +535,14 @@ function dailyTrackingItems(reportDate, sourceAudit) {
       change_status: audit.changeStatus,
       change_summary: audit.changeSummary,
       publish_to_public: publishToPublic,
-      summary: blocked ? `${tracker.summary} 本轮自动抓取未取得可解析快照，读者需要点开官方页人工核对最新榜单。` : tracker.summary,
-      watch_points: tracker.watchPoints,
-      metrics: tracker.metrics,
+      summary: audit.summary || (blocked ? `${tracker.summary} 本轮自动抓取未取得可解析快照，读者需要点开官方页人工核对最新榜单。` : tracker.summary),
+      watch_points: audit.watchPoints || tracker.watchPoints,
+      metrics: audit.metrics || tracker.metrics,
       evidence: `${tracker.evidence} ${audit.evidenceNote}`.trim(),
       verification_note: audit.verificationNote,
       risk_note: tracker.riskNote,
-      watch_next: tracker.watchNext
+      watch_next: audit.watchNext || tracker.watchNext,
+      ...(audit.snapshot ? { snapshot: audit.snapshot } : {})
     };
   });
 }
@@ -632,6 +633,22 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       verificationNote: "未在本轮发现输出中看到该入口的 source_audit 记录；已保留官方 URL 作为固定追踪目标。"
     };
   }
+  const snapshot = sanitizeDailyTrackingSnapshot(source.snapshot);
+  if (tracker.id === "openrouter-rankings" && isCompleteOpenRouterSnapshot(snapshot)) {
+    return {
+      status: source.status,
+      verificationStatus: "primary_confirmed",
+      changeStatus: "changed",
+      changeSummary: openRouterSnapshotChangeSummary(snapshot),
+      summary: openRouterSnapshotSummary(snapshot),
+      watchPoints: openRouterSnapshotWatchPoints(snapshot),
+      metrics: openRouterSnapshotMetrics(snapshot),
+      snapshot,
+      evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} OpenRouter top models parsed from public_page_snapshot`,
+      verificationNote: `已解析 OpenRouter 公开 Rankings 页面的 This Week Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是平台用量信号，不是全市场份额或能力评测。`,
+      watchNext: "若榜首、Top 10 构成或周变化继续异常，回到模型发布、价格页和状态页核验是发布驱动、价格驱动还是平台内工作流迁移。"
+    };
+  }
   if (source.status === "checked" || source.status === "no_signal") {
     return {
       status: source.status,
@@ -654,6 +671,88 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
     evidenceNote: `source_audit status=${source.status || "blocked"}${source.notes ? `; notes=${source.notes}` : ""}`,
     verificationNote: `本轮固定入口抓取受阻：${source.notes || source.status || "blocked"}。`
   };
+}
+
+function isCompleteOpenRouterSnapshot(snapshot) {
+  return snapshot?.snapshot_status === "complete" &&
+    Array.isArray(snapshot.top_entries) &&
+    snapshot.top_entries.length === 10 &&
+    snapshot.top_entries.every((entry, index) => entry.rank === index + 1 && entry.model && entry.provider && entry.tokens && entry.change);
+}
+
+function openRouterSnapshotChangeSummary(snapshot) {
+  const top = snapshot.top_entries.slice(0, 3);
+  const fastest = snapshot.top_entries
+    .filter((entry) => /%$/.test(entry.change))
+    .sort((left, right) => Number.parseFloat(right.change) - Number.parseFloat(left.change))[0];
+  const topText = top.map((entry) => `#${entry.rank} ${entry.model} ${entry.tokens}`).join("；");
+  return fastest
+    ? `OpenRouter 本周 Top 10 已解析：${topText}；${fastest.model} 周变化 ${fastest.change}。`
+    : `OpenRouter 本周 Top 10 已解析：${topText}。`;
+}
+
+function openRouterSnapshotSummary(snapshot) {
+  const top = snapshot.top_entries[0];
+  const providers = providerMix(snapshot.top_entries);
+  const newEntries = snapshot.top_entries.filter((entry) => /^new$/i.test(entry.change));
+  return [
+    `OpenRouter 公开榜单显示，本周调用热度第一是 ${top.model}（${top.provider}，${top.tokens}，周变化 ${top.change}）。`,
+    `Top 10 供应商分布为 ${providers}，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。`,
+    newEntries.length > 0 ? `新进榜模型包括 ${newEntries.map((entry) => entry.model).join("、")}，应继续核对是否来自新发布、免费额度或价格变化。` : "该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。"
+  ].join(" ");
+}
+
+function openRouterSnapshotWatchPoints(snapshot) {
+  const fastest = snapshot.top_entries
+    .filter((entry) => /%$/.test(entry.change))
+    .sort((left, right) => Number.parseFloat(right.change) - Number.parseFloat(left.change))[0];
+  const newEntries = snapshot.top_entries.filter((entry) => /^new$/i.test(entry.change));
+  return [
+    fastest ? `${fastest.model} 的周变化为 ${fastest.change}，需要结合发布、价格、免费额度和上下文窗口变化判断原因。` : "继续观察 Top 10 排名是否持续换位，而不是只看单日截图。",
+    newEntries.length > 0 ? `新进榜模型：${newEntries.map((entry) => `${entry.model}（${entry.provider}）`).join("、")}。` : "若没有新进榜，重点看榜首和供应商份额是否迁移。",
+    "OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。"
+  ];
+}
+
+function openRouterSnapshotMetrics(snapshot) {
+  const topMetrics = snapshot.top_entries.map((entry) => ({
+    label: `#${entry.rank}`,
+    value: `${entry.model}（${entry.provider}）：${entry.tokens}，周变化 ${entry.change}`,
+    trend: dailyTrackingTrendForChange(entry.change)
+  }));
+  return [
+    { label: "榜单范围", value: `This Week Top ${snapshot.top_entries.length}`, trend: "same" },
+    { label: "供应商分布", value: providerMix(snapshot.top_entries), trend: "unknown" },
+    ...topMetrics
+  ];
+}
+
+function dailyTrackingTrendForChange(change) {
+  if (/^new$/i.test(change)) {
+    return "new";
+  }
+  const value = Number.parseFloat(String(change || "").replace("%", ""));
+  if (Number.isNaN(value)) {
+    return "unknown";
+  }
+  if (value > 0) {
+    return "up";
+  }
+  if (value < 0) {
+    return "down";
+  }
+  return "same";
+}
+
+function providerMix(entries) {
+  const counts = new Map();
+  for (const entry of entries) {
+    counts.set(entry.provider, (counts.get(entry.provider) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([provider, count]) => `${provider} ${count}`)
+    .join("、");
 }
 
 function nonPrimaryDisclosureFields(candidate) {
@@ -723,11 +822,40 @@ function sanitizeReportAuditGroup(group) {
 }
 
 function sanitizeReportAuditSource(source) {
+  const snapshot = sanitizeDailyTrackingSnapshot(source?.snapshot);
   return {
     name: source?.name || "Unknown source",
     url: isHttpUrl(source?.url) ? source.url : "https://example.com/",
     status: source?.status || "no_signal",
-    ...(source?.notes ? { notes: String(source.notes) } : {})
+    ...(source?.notes ? { notes: String(source.notes) } : {}),
+    ...(snapshot ? { snapshot } : {})
+  };
+}
+
+function sanitizeDailyTrackingSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") {
+    return null;
+  }
+  const topEntries = Array.isArray(snapshot.top_entries)
+    ? snapshot.top_entries
+      .map((entry) => ({
+        rank: Number(entry?.rank),
+        model: String(entry?.model || "").trim(),
+        provider: String(entry?.provider || "").trim(),
+        tokens: String(entry?.tokens || "").trim(),
+        change: String(entry?.change || "").trim(),
+        ...(isHttpUrl(entry?.url) ? { url: entry.url } : {})
+      }))
+      .filter((entry) => Number.isInteger(entry.rank) && entry.rank > 0 && entry.model && entry.provider && entry.tokens && entry.change)
+    : [];
+  return {
+    type: String(snapshot.type || "daily_tracking_snapshot"),
+    collection_method: String(snapshot.collection_method || "public_page_playwright"),
+    snapshot_status: String(snapshot.snapshot_status || (topEntries.length > 0 ? "partial" : "blocked")),
+    snapshot_as_of: String(snapshot.snapshot_as_of || new Date().toISOString()),
+    source_url: isHttpUrl(snapshot.source_url) ? snapshot.source_url : "https://example.com/",
+    top_entries: topEntries,
+    ...(snapshot.notes ? { notes: String(snapshot.notes) } : {})
   };
 }
 

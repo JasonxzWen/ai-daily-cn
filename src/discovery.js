@@ -19,6 +19,8 @@ const DEFAULT_FOLLOW_BUILDERS_FEEDS = {
 const X_SNOWFLAKE_EPOCH_MS = 1288834974657n;
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
 const DEFAULT_SOURCE_CACHE_TTL_DAYS = 7;
+const OPENROUTER_RANKINGS_SOURCE_KIND = "openrouter_rankings_public_playwright";
+const GITHUB_REPORT_MARKDOWN_SOURCE_KIND = "github_report_markdown";
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
   "coding agents",
@@ -157,22 +159,34 @@ export const DEFAULT_CONTENT_SOURCES = [
   {
     id: "content-ml-papers-week",
     name: "ML Papers of the Week",
-    url: "https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom",
+    url: "https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md",
     category: "intermediary",
+    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
+    latest_report_link_pattern: "years/\\d{4}\\.md#",
+    lookback_days: 14,
+    maxItemsPerRun: 8,
     sourceLevel: "weekly_paper_aggregator"
   },
   {
     id: "content-hellogithub",
     name: "HelloGitHub",
-    url: "https://github.com/521xueweihan/HelloGitHub/commits/master.atom",
+    url: "https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md",
     category: "intermediary",
+    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
+    latest_report_link_pattern: "/content/HelloGitHub\\d+\\.md",
+    lookback_days: 45,
+    maxItemsPerRun: 8,
     sourceLevel: "open_source_aggregator"
   },
   {
     id: "content-ruanyf-weekly",
     name: "RuanYF Weekly",
-    url: "https://github.com/ruanyf/weekly/commits/master.atom",
+    url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
     category: "intermediary",
+    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
+    latest_report_link_pattern: "docs/issue-\\d+\\.md",
+    lookback_days: 14,
+    maxItemsPerRun: 8,
     sourceLevel: "tech_weekly_aggregator"
   },
   {
@@ -1209,6 +1223,60 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
       continue;
     }
+    if (currentSource.source_kind === OPENROUTER_RANKINGS_SOURCE_KIND) {
+      const result = await collectOpenRouterRankingsSource(currentSource, {
+        ...options,
+        generatedAt,
+        reportDate
+      });
+      markSource(candidateSources.at(-1), result.status, result.notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
+        snapshot: result.snapshot
+      }));
+      continue;
+    }
+    if (currentSource.source_kind === GITHUB_REPORT_MARKDOWN_SOURCE_KIND) {
+      try {
+        const result = await collectGitHubReportMarkdownSource({
+          sourceInfo: currentSource,
+          fetchImpl,
+          reportDate,
+          generatedAt,
+          options
+        });
+        const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
+        const entries = result.entries
+          .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
+        const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
+          ? currentSource.maxItemsPerRun
+          : perSourceLimit;
+        for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+          candidates.push({
+            id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+            source_id: currentSource.id,
+            category: candidateCategory,
+            title: entry.title,
+            url: entry.url,
+            source: currentSource.name,
+            event_date: entry.event_date,
+            status: "excluded",
+            evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
+            notes: [contentCandidateNotes(entry, currentSource, ""), `source_report_url=${sanitizeNoteValue(entry.source_report_url || currentSource.url)}`].filter(Boolean).join("; "),
+            ...contentVerificationFields({ ...entry, url: entry.source_report_url || entry.url }, currentSource, ""),
+            ...(candidateCategory === "project" ? { signal: currentSource.signal || "github_report" } : {})
+          });
+        }
+        const status = entries.length > 0 ? result.status : "no_signal";
+        const notes = `${result.notes}; ${entries.length} within ${sourceLookbackDays}d source window`;
+        markSource(candidateSources.at(-1), status, notes);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
+      } catch (error) {
+        const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
+        markSource(candidateSources.at(-1), "blocked", notes);
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+      }
+      continue;
+    }
 
     try {
       const response = await fetchImpl(contentSourceRequestUrl(currentSource, options.env || process.env), {
@@ -1253,8 +1321,9 @@ export async function collectContentSources(options = {}) {
         currentSource,
         fetchImpl
       );
+      const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
       const entries = parsedEntries
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
+        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
       let notes = cacheFallbackNote
         ? `${entries.length} recent ${entryLabel} entries parsed; ${cacheFallbackNote}`
@@ -1335,8 +1404,9 @@ export async function collectContentSources(options = {}) {
         currentSource,
         fetchImpl
       );
+      const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
       const entries = parsedEntries
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays));
+        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
       const status = entries.length > 0 ? "checked" : "no_signal";
       const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
         ? currentSource.maxItemsPerRun
@@ -2321,8 +2391,8 @@ function markSource(sourceItem, status, notes) {
   sourceItem.notes = notes;
 }
 
-function auditSource(name, url, status, notes) {
-  return { name, url, status, notes };
+function auditSource(name, url, status, notes, extra = {}) {
+  return { name, url, status, notes, ...extra };
 }
 
 function inferBuilderBlockedReason(sourceResults, candidates = []) {
@@ -2452,10 +2522,472 @@ function parseContentSourceEntries(content, sourceInfo) {
   if (sourceInfo.format === "html_index") {
     return parseHtmlIndexEntries(content, sourceInfo);
   }
+  if (sourceInfo.source_kind === GITHUB_REPORT_MARKDOWN_SOURCE_KIND) {
+    return parseGitHubReportMarkdownEntries(content, sourceInfo);
+  }
   if (sourceInfo.source_kind === "search_api" && looksLikeJson(content)) {
     return parseJsonSearchApiEntries(content, sourceInfo);
   }
   return parseFeedEntries(content);
+}
+
+async function collectGitHubReportMarkdownSource({ sourceInfo, fetchImpl, reportDate, generatedAt, options = {} }) {
+  const indexResponse = await fetchImpl(contentSourceRequestUrl(sourceInfo, options.env || process.env), {
+    headers: {
+      accept: "text/markdown, text/plain, text/html, */*",
+      "user-agent": "ai-daily-cn-static-publisher"
+    },
+    ...timeoutInit(sourceInfo.timeoutMs || sourceInfo.timeout_ms || 15000)
+  });
+  if (!indexResponse.ok) {
+    return {
+      status: "blocked",
+      notes: withRetryNote(`HTTP ${indexResponse.status}`, indexResponse),
+      entries: []
+    };
+  }
+
+  const indexMarkdown = await indexResponse.text();
+  const latest = latestGitHubReportLink(indexMarkdown, sourceInfo);
+  let reportMarkdown = indexMarkdown;
+  let reportUrl = sourceInfo.url;
+  let reportTitle = sourceInfo.name;
+  let reportResponse = indexResponse;
+  if (latest.url && latest.url !== sourceInfo.url) {
+    reportUrl = latest.url;
+    reportTitle = latest.title || sourceInfo.name;
+    reportResponse = await fetchImpl(reportUrl, {
+      headers: {
+        accept: "text/markdown, text/plain, text/html, */*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      },
+      ...timeoutInit(sourceInfo.timeoutMs || sourceInfo.timeout_ms || 15000)
+    });
+    if (!reportResponse.ok) {
+      return {
+        status: "blocked",
+        notes: withRetryNote(`latest_report_fetch_failed; HTTP ${reportResponse.status}; latest_report_url=${sanitizeNoteValue(reportUrl)}`, reportResponse),
+        entries: []
+      };
+    }
+    reportMarkdown = await reportResponse.text();
+  }
+
+  const sectionMarkdown = latest.hash
+    ? markdownSectionForGitHubAnchor(reportMarkdown, latest.hash) || reportMarkdown
+    : reportMarkdown;
+  const entries = parseGitHubReportMarkdownEntries(sectionMarkdown, {
+    ...sourceInfo,
+    url: reportUrl,
+    report_url: reportUrl,
+    report_title: reportTitle,
+    fallback_event_date: githubReportEventDate(reportTitle, reportDate),
+    generated_at: generatedAt
+  });
+  const status = entries.length > 0 ? "checked" : "no_signal";
+  return {
+    status,
+    notes: withRetryNote(`${entries.length} report entries parsed; latest_report_url=${sanitizeNoteValue(reportUrl)}; report_title=${sanitizeNoteValue(reportTitle)}`, reportResponse),
+    entries
+  };
+}
+
+function latestGitHubReportLink(markdown, sourceInfo = {}) {
+  const pattern = sourceInfo.latest_report_link_pattern
+    ? new RegExp(sourceInfo.latest_report_link_pattern, "i")
+    : /\.md(?:#[-\w]+)?$/i;
+  for (const link of markdownLinks(markdown)) {
+    if (!link.href || link.image || !pattern.test(link.href)) {
+      continue;
+    }
+    const url = resolveGitHubMarkdownUrl(link.href, sourceInfo.url);
+    if (url) {
+      return { ...link, url, hash: new URL(url).hash.replace(/^#/, "") };
+    }
+  }
+  return { title: sourceInfo.name || "", url: sourceInfo.url || "", hash: "" };
+}
+
+function resolveGitHubMarkdownUrl(href, baseUrl) {
+  const rawHref = String(href || "").trim();
+  if (!rawHref || rawHref.startsWith("#") || /^(?:mailto|javascript):/i.test(rawHref)) {
+    return "";
+  }
+  try {
+    const base = new URL(baseUrl);
+    if (base.hostname === "raw.githubusercontent.com") {
+      const resolved = rawHref.startsWith("/")
+        ? rawGitHubRootRelativeUrl(rawHref, base)
+        : new URL(rawHref, base).toString();
+      return resolved || "";
+    }
+    const url = new URL(rawHref, base);
+    if (url.hostname === "github.com" && /\/blob\//.test(url.pathname)) {
+      const [, owner, repo, , ref, ...parts] = url.pathname.split("/");
+      return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${parts.join("/")}${url.hash}`;
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function markdownLinks(markdown) {
+  const links = [];
+  const pattern = /(!)?\[([^\]]{1,220})\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  for (const match of String(markdown || "").matchAll(pattern)) {
+    links.push({
+      image: Boolean(match[1]),
+      title: cleanText(match[2]),
+      href: decodeXml(match[3]),
+      index: match.index || 0
+    });
+  }
+  return links;
+}
+
+export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
+  const reportUrl = sourceInfo.report_url || sourceInfo.url || "";
+  const eventDate = sourceInfo.fallback_event_date || dateOnly(sourceInfo.generated_at) || "";
+  const entries = [];
+  const seen = new Set();
+  const text = String(markdown || "");
+
+  const tableRowPattern = /(?:^|\n)\s*\|\s*\d+\)\s+\*\*([^*]{2,180})\*\*\s*[-:：]?\s*([\s\S]*?)\|\s*([\s\S]*?)\s*\|/g;
+  for (const match of text.matchAll(tableRowPattern)) {
+    const link = markdownLinks(match[3]).find((candidate) => !candidate.image);
+    if (!link) {
+      continue;
+    }
+    addMarkdownReportEntry(entries, seen, {
+      title: match[1],
+      href: link.href,
+      summary: match[2],
+      markdown: text,
+      index: match.index || 0,
+      sourceInfo,
+      reportUrl,
+      eventDate
+    });
+  }
+
+  const numberedPattern = /(?:^|\n)\s*\d+[、.)]\s*\[([^\]]{2,160})\]\(([^)\s]+)(?:\s+"[^"]*")?\)\s*[：:，,-]?\s*([^\n]{0,360})/g;
+  for (const match of text.matchAll(numberedPattern)) {
+    addMarkdownReportEntry(entries, seen, {
+      title: match[1],
+      href: match[2],
+      summary: match[3],
+      markdown: text,
+      index: match.index || 0,
+      sourceInfo,
+      reportUrl,
+      eventDate
+    });
+  }
+
+  const bulletPattern = /(?:^|\n)\s*[-*]\s+\[([^\]]{2,180})\]\(([^)\s]+)(?:\s+"[^"]*")?\)\s*[：:，,-]?\s*([^\n]{0,360})/g;
+  for (const match of text.matchAll(bulletPattern)) {
+    addMarkdownReportEntry(entries, seen, {
+      title: match[1],
+      href: match[2],
+      summary: match[3],
+      markdown: text,
+      index: match.index || 0,
+      sourceInfo,
+      reportUrl,
+      eventDate
+    });
+  }
+
+  for (const link of markdownLinks(text)) {
+    if (entries.length >= 30) {
+      break;
+    }
+    addMarkdownReportEntry(entries, seen, {
+      title: link.title,
+      href: link.href,
+      summary: markdownLineAround(text, link.index),
+      markdown: text,
+      index: link.index,
+      sourceInfo,
+      reportUrl,
+      eventDate,
+      image: link.image
+    });
+  }
+
+  return entries.slice(0, 30);
+}
+
+function addMarkdownReportEntry(entries, seen, { title, href, summary, markdown, index, sourceInfo, reportUrl, eventDate, image }) {
+  const url = resolveGitHubReportEntryUrl(href, reportUrl || sourceInfo.url);
+  if (!isUsefulReportEntryUrl(url, sourceInfo) || image) {
+    return;
+  }
+  const key = url.replace(/#.*$/, "");
+  if (seen.has(key)) {
+    return;
+  }
+  const cleanedTitle = cleanText(title);
+  if (!cleanedTitle || isBoilerplateReportTitle(cleanedTitle)) {
+    return;
+  }
+  seen.add(key);
+  const localSummary = cleanText(summary) || markdownLineAround(markdown, index);
+  entries.push({
+    title: cleanedTitle,
+    url,
+    event_date: eventDate,
+    summary: appendSentence(
+      localSummary,
+      `${sourceInfo.name || "GitHub report"} latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion.`
+    ),
+    source_report_url: reportUrl || sourceInfo.url,
+    source_report_title: sourceInfo.report_title || sourceInfo.name || ""
+  });
+}
+
+function resolveGitHubReportEntryUrl(href, baseUrl) {
+  const rawHref = String(href || "").trim();
+  if (!rawHref || rawHref.startsWith("#") || /^(?:mailto|javascript):/i.test(rawHref)) {
+    return "";
+  }
+  try {
+    const url = new URL(rawHref, baseUrl);
+    if (url.hostname === "hellogithub.com" && url.pathname.includes("/periodical/statistics/click")) {
+      const target = url.searchParams.get("target");
+      return target ? new URL(target).toString() : url.toString();
+    }
+    if (url.hostname === "github.com" && /\/blob\//.test(url.pathname)) {
+      const [, owner, repo, , ref, ...parts] = url.pathname.split("/");
+      return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${parts.join("/")}${url.hash}`;
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function rawGitHubRootRelativeUrl(href, base) {
+  const parts = base.pathname.split("/").filter(Boolean);
+  if (parts.length < 3) {
+    return "";
+  }
+  const [owner, repo, ref] = parts;
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}${href}`;
+}
+
+function isUsefulReportEntryUrl(url, sourceInfo = {}) {
+  if (!isHttpUrl(url) || looksLikeImageUrl(url)) {
+    return false;
+  }
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    const pathName = parsed.pathname.toLowerCase();
+    if (/^(?:cdn\.|raw\.githubusercontent\.com$)/i.test(host) && looksLikeImageUrl(url)) {
+      return false;
+    }
+    if (host === "github.com" && /\/(?:issues|pull|discussions)\/\d+$/i.test(pathName)) {
+      return false;
+    }
+    const sourceHost = sourceInfo.url ? new URL(sourceInfo.url).hostname.toLowerCase() : "";
+    if (sourceHost && host === sourceHost && /(?:readme|contributors|license|commits)/i.test(pathName)) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isBoilerplateReportTitle(title) {
+  return /^(官网|更新发布|贡献者|推荐或自荐|subscribe|newsletter|readme|english|中文|日本語|paper|papers|tweet|tweets?|post|website|code|github|pdf|demo)$/i.test(title);
+}
+
+function markdownLineAround(markdown, index) {
+  const text = String(markdown || "");
+  const start = text.lastIndexOf("\n", Math.max(0, index - 1)) + 1;
+  const end = text.indexOf("\n", index);
+  return cleanText(text.slice(start, end >= 0 ? end : text.length)).slice(0, 360);
+}
+
+function markdownSectionForGitHubAnchor(markdown, hash) {
+  const target = String(hash || "").replace(/^#/, "");
+  if (!target) {
+    return "";
+  }
+  const headingPattern = /^(#{1,6})\s+(.+)$/gm;
+  const headings = [...String(markdown || "").matchAll(headingPattern)];
+  for (let index = 0; index < headings.length; index += 1) {
+    const heading = headings[index];
+    if (githubMarkdownAnchor(heading[2]) !== target) {
+      continue;
+    }
+    const level = heading[1].length;
+    const start = heading.index || 0;
+    const next = headings.slice(index + 1).find((candidate) => candidate[1].length <= level);
+    return String(markdown || "").slice(start, next?.index || undefined);
+  }
+  return "";
+}
+
+function githubMarkdownAnchor(value) {
+  return cleanText(value)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+function githubReportEventDate(title, reportDate) {
+  const fromEnglish = latestEnglishMonthDate(title, reportDate);
+  return fromEnglish || reportDate;
+}
+
+function latestEnglishMonthDate(value, reportDate) {
+  const matches = [...String(value || "").matchAll(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+(\d{1,2})\b/gi)];
+  const last = matches.at(-1);
+  if (!last) {
+    return "";
+  }
+  const month = monthNumber(last[1]);
+  if (!month) {
+    return "";
+  }
+  const day = last[2].padStart(2, "0");
+  const reportYear = String(reportDate || "").slice(0, 4) || String(new Date().getUTCFullYear());
+  return `${reportYear}-${month}-${day}`;
+}
+
+async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
+  try {
+    if (
+      typeof options.openrouterRankingsText !== "string" &&
+      typeof options.openrouterRankingsTextFetcher !== "function" &&
+      Object.hasOwn(options, "fetchImpl") &&
+      options.openrouterRankingsLive !== true
+    ) {
+      throw new Error("browser_snapshot_disabled_for_mock_fetch");
+    }
+    const text = typeof options.openrouterRankingsText === "string"
+      ? options.openrouterRankingsText
+      : await readOpenRouterRankingsText(sourceInfo, options);
+    const entries = parseOpenRouterRankingsText(text);
+    const snapshot = openRouterRankingsSnapshot(entries, sourceInfo, options.generatedAt);
+    const complete = snapshot.snapshot_status === "complete";
+    return {
+      status: complete ? "checked" : "no_signal",
+      notes: complete
+        ? `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; collection_method=playwright_dom`
+        : `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; top10_incomplete`,
+      snapshot
+    };
+  } catch (error) {
+    return {
+      status: "blocked",
+      notes: withRetryNote(formatDiscoveryErrorNote(error), error),
+      snapshot: {
+        type: "openrouter_rankings_public_page",
+        collection_method: "public_page_playwright",
+        snapshot_status: "blocked",
+        snapshot_as_of: options.generatedAt || new Date().toISOString(),
+        source_url: sourceInfo.url,
+        top_entries: [],
+        notes: sanitizeNoteValue(error?.message || error)
+      }
+    };
+  }
+}
+
+async function readOpenRouterRankingsText(sourceInfo, options = {}) {
+  if (typeof options.openrouterRankingsTextFetcher === "function") {
+    return options.openrouterRankingsTextFetcher(sourceInfo);
+  }
+  const { chromium } = await import("@playwright/test");
+  const timeoutMs = Number.isInteger(sourceInfo.timeoutMs) && sourceInfo.timeoutMs > 0
+    ? sourceInfo.timeoutMs
+    : Number.isInteger(sourceInfo.timeout_ms) && sourceInfo.timeout_ms > 0
+      ? sourceInfo.timeout_ms
+      : 30000;
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
+    await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
+    return await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+  } finally {
+    await browser.close();
+  }
+}
+
+export function parseOpenRouterRankingsText(text) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => cleanText(line))
+    .filter(Boolean);
+  const start = lines.indexOf("This Week");
+  const end = start >= 0 ? lines.indexOf("Show more", start) : -1;
+  const rankingLines = start >= 0 && end > start ? lines.slice(start + 1, end) : lines;
+  const entries = [];
+
+  for (let index = 0; index < rankingLines.length; index += 1) {
+    const rankMatch = rankingLines[index].match(/^(\d+)\.$/);
+    if (!rankMatch) {
+      continue;
+    }
+    const rank = Number(rankMatch[1]);
+    const model = rankingLines[index + 1];
+    const byLabel = rankingLines[index + 2];
+    const provider = rankingLines[index + 3];
+    const tokens = rankingLines[index + 4];
+    const change = rankingLines[index + 5];
+    if (!rank || !model || byLabel !== "by" || !provider || !/tokens$/i.test(tokens || "") || !change) {
+      continue;
+    }
+    entries.push({
+      rank,
+      model,
+      provider,
+      tokens,
+      change
+    });
+    index += 5;
+  }
+
+  return entries;
+}
+
+function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt) {
+  const topEntries = entries.slice(0, 10).map((entry) => ({
+    rank: entry.rank,
+    model: entry.model,
+    provider: entry.provider,
+    tokens: entry.tokens,
+    change: entry.change
+  }));
+  return {
+    type: "openrouter_rankings_public_page",
+    collection_method: "public_page_playwright",
+    snapshot_status: hasCompleteTop10(topEntries) ? "complete" : "partial",
+    snapshot_as_of: generatedAt || new Date().toISOString(),
+    source_url: sourceInfo.url,
+    top_entries: topEntries,
+    notes: "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof."
+  };
+}
+
+function hasCompleteTop10(entries) {
+  if (!Array.isArray(entries) || entries.length !== 10) {
+    return false;
+  }
+  return entries.every((entry, index) =>
+    entry.rank === index + 1 &&
+    entry.model &&
+    entry.provider &&
+    /tokens$/i.test(entry.tokens || "") &&
+    entry.change
+  );
 }
 
 export function contentSourceSkipReason(sourceInfo, env = process.env) {
