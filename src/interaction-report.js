@@ -65,7 +65,7 @@ const SOURCE_ICONS = new Map([
   ["Claude official X", generatedSiteIcon("X", "#111111", "#ffffff")],
   ["Simon Willison Weblog", generatedSiteIcon("SW", "#2f6f9f", "#ffffff")],
   ["AI & I / Every", generatedSiteIcon("E", "#111827", "#f7f1e8")],
-  ["OpenRouter Rankings", generatedSiteIcon("OR", "#111827", "#f97316")],
+  ["OpenRouter Rankings", CACHED_SOURCE_ICONS["OpenRouter Rankings"] || generatedSiteIcon("OR", "#111827", "#f97316")],
   ["Artificial Analysis Intelligence Index", generatedSiteIcon("AA", "#0f172a", "#38bdf8")],
   ["Scale Labs SWE-Bench Pro", generatedSiteIcon("SB", "#111827", "#84cc16")]
 ]);

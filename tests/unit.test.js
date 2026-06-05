@@ -689,6 +689,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(trackingSection.items.length, 1);
   assert.equal(trackingSection.items[0].title, "OpenRouter");
   assert.equal(trackingSection.items[0].href, "https://openrouter.ai/rankings");
+  assert.match(trackingSection.items[0].titleIcon, /^data:image\/png;base64,/);
+  assert(!trackingSection.items[0].titleIcon.includes("PHN2Zy"));
   assert(trackingSection.items[0].body.includes("开发者正在用什么"));
   assert(trackingSection.items[0].tags.includes("topic|模型使用"));
   assert(trackingSection.items[0].points.some((point) => point.label === "核心指标"));
