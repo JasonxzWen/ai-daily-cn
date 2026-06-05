@@ -775,6 +775,37 @@ test("每日追踪没有可核验变化时不渲染公开正文板块", async ()
   assert(!input.heroStats.some((item) => item.label === "追踪"));
 });
 
+test("interaction input strips source-name prefixes from public body text", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.summary = "generated from latest main";
+  report.hero_highlights = [
+    {
+      title: "Google Keyword Blog：生成式媒体行业视角",
+      url: "https://example.com/generative-media",
+      reason: "Google Keyword Blog：Google 汇总生成式媒体初创公司的行业视角，重点看影像、音乐、游戏和营销内容生产。"
+    }
+  ];
+  report.main_items[0] = {
+    ...report.main_items[0],
+    title: "Google Keyword Blog：生成式媒体行业视角",
+    source: "Google Keyword Blog",
+    url: "https://example.com/generative-media",
+    editorial_category: "content_aigc",
+    bullets: [
+      "Google Keyword Blog：Google 汇总生成式媒体初创公司的行业视角，重点看影像、音乐、游戏和营销内容生产。"
+    ]
+  };
+
+  const input = reportToInteractionInput(report);
+  const mainContent = mainMarkdownContent(input);
+
+  assert(input.summary.includes("生成式媒体行业视角：Google 汇总生成式媒体初创公司的行业视角"));
+  assert(!input.summary.includes("Google Keyword Blog："));
+  assert(!mainContent.includes("Google Keyword Blog："));
+  assert(mainContent.includes("Google 汇总生成式媒体初创公司的行业视角"));
+});
+
 test("project interaction content is only shown as GitHub Trending item tags", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.github_trending = [
@@ -3786,6 +3817,43 @@ test("quality review rejects templated impact and watch prose in public body", a
   assert.equal(review.ok, false);
   assert(issuePaths.includes("main_items[0].bullets[1]"));
   assert(issuePaths.includes("main_items[0].bullets[2]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
+test("quality review rejects source-name prefixes in public body text", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hero_highlights = [
+    {
+      title: "Google 汇总生成式媒体初创公司的行业视角",
+      url: "https://example.com/generative-media",
+      reason: "Google Keyword Blog：Google 汇总生成式媒体初创公司的行业视角，重点看影像、音乐、游戏和营销内容生产。"
+    }
+  ];
+  report.main_items[0] = {
+    ...report.main_items[0],
+    title: "Google 汇总生成式媒体初创公司的行业视角",
+    summary: "Google 汇总生成式媒体初创公司的行业视角，重点看影像、音乐、游戏和营销内容生产。",
+    bullets: [
+      "**要点**：Google 汇总生成式媒体初创公司的行业视角。",
+      "Google Keyword Blog：Google 汇总生成式媒体初创公司的行业视角，重点看影像、音乐、游戏和营销内容生产。"
+    ]
+  };
+  report.community_leads = [
+    {
+      ...report.community_leads[0],
+      source: "OpenAlex",
+      content: "OpenAlex：Zenodo 记录了一个待确认研究线索，事实性结论仍需回到一手来源或多源确认。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_source_prefix").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("hero_highlights[0].reason"));
+  assert(issuePaths.includes("main_items[0].bullets[1]"));
+  assert(issuePaths.includes("community_leads[0].content"));
   assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
