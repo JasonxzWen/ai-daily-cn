@@ -3709,6 +3709,62 @@ test("quality review flags untranslated main item source excerpts", async () => 
   assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
 });
 
+test("quality review flags mixed English changelog excerpts in main item body", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    summary: "GitHub Changelog：Fix with Copilot for failing Actions now in Pro, Pro+, and Max。读者应先看原文给出的变化、适用对象和落地边界；When a GitHub Actions job fails, Copilot Pro, Pro+, and Max subscribers can now ask Copilot cloud agent to fix it in one click.",
+    bullets: [
+      "**GitHub Changelog**：Fix with Copilot for failing Actions now in Pro, Pro+, and Max；When a GitHub Actions job fails, Copilot Pro, Pro+, and Max subscribers can now ask Copilot cloud agent to fix it in one click。",
+      "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("main_item_untranslated"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[0]"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
+test("quality review flags untranslated English excerpts in public observation sections", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hero_highlights = [
+    {
+      title: "Industry leaders share new perspectives on generative media for startups",
+      url: "https://example.com",
+      reason: "Google Keyword Blog：Industry leaders share new perspectives on generative media for startups。这条内容生成线索的关键信息是：Future of AI hero. Treat this as a community lead unless it is backed by a primary source."
+    }
+  ];
+  report.builder_observations = [
+    {
+      ...report.builder_observations[0],
+      content: "这条原帖讨论 AI 工具或 agent 实践：Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours.",
+      translation: "这条原帖讨论 AI 工具或 agent 实践：Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours."
+    }
+  ];
+  report.community_leads = [
+    {
+      ...report.community_leads[0],
+      content: "Apple Newsroom：Apple and Major League Baseball have announced the July schedule for Friday Night Baseball on Apple TV, featuring several marquee matchups. Treat this as a community lead unless it is backed by a primary source."
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_text_untranslated").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("hero_highlights[0].reason"));
+  assert(issuePaths.includes("builder_observations[0].content"));
+  assert(issuePaths.includes("builder_observations[0].translation"));
+  assert(issuePaths.includes("community_leads[0].content"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [

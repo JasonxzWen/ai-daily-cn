@@ -125,6 +125,7 @@ export function reviewReportQuality(report, options = {}) {
   for (const entry of textEntries) {
     collectEnglishToneIssues(entry, issues);
     collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks);
+    collectPublicUntranslatedIssues(entry, issues, aiReviewTasks);
     collectHighlightIssues(entry, issues, limits);
   }
 
@@ -314,6 +315,39 @@ function collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks) {
     kind: "rewrite_autodraft_template",
     path: entry.path,
     instruction: "Rewrite this automatic draft template into concise, source-grounded editorial wording without changing facts, dates, links, or candidate IDs."
+  });
+}
+
+function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
+  if (!/^(hero_highlights|builder_observations|community_leads)\[\d+\]\.(?:title|reason|content|translation)$/.test(entry.path)) {
+    return;
+  }
+  const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+  if (!plain || !looksLikeUntranslatedEnglish(plain)) {
+    return;
+  }
+  const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+  if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS) {
+    return;
+  }
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
+  issues.push({
+    code: "public_text_untranslated",
+    severity: "error",
+    path: entry.path,
+    message: "Public report text must be reader-facing Chinese, not an untranslated English source excerpt.",
+    repairable: true,
+    details: {
+      chinese_ratio: Number(chineseRatio.toFixed(3)),
+      latin_chars: latinChars
+    }
+  });
+  aiReviewTasks.push({
+    kind: "public_editorial_rewrite",
+    path: entry.path,
+    instruction: "Rewrite this public report text in Chinese for readers. Keep the same source meaning, but do not paste an untranslated English excerpt into the public page."
   });
 }
 
@@ -512,7 +546,9 @@ function lacksHotBlogEditorialCoverage(value) {
 function looksLikeUntranslatedEnglish(value) {
   const text = String(value || "").trim();
   const englishSentences = text.match(/\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/g) || [];
-  return englishSentences.length >= 1;
+  const englishRunWithoutSentenceStop = text.match(/\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/+.-]{55,}(?=；|。|，|$)/g) || [];
+  const sourceColonExcerpt = /\b[A-Z][A-Za-z0-9 +.-]{2,}\s*(?:Blog|Changelog|Press Releases|News|Research|RSS|Feed)?[:：]\s*[A-Z][A-Za-z0-9 ,;:'"()[\]\/+.-]{35,}/.test(text);
+  return englishSentences.length >= 1 || englishRunWithoutSentenceStop.length >= 1 || sourceColonExcerpt;
 }
 
 function collectCandidatePoolIssues(report, candidatePool, issues, context = {}) {
@@ -657,6 +693,11 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
       id: "main_item_editorial_quality",
       ok: !failedCodes.has("main_item_untranslated"),
       status: failedCodes.has("main_item_untranslated") ? "failed" : "passed"
+    },
+    {
+      id: "public_editorial_quality",
+      ok: !failedCodes.has("public_text_untranslated"),
+      status: failedCodes.has("public_text_untranslated") ? "failed" : "passed"
     },
     {
       id: "hot_blog_editorial_quality",
