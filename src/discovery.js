@@ -20,6 +20,7 @@ const X_SNOWFLAKE_EPOCH_MS = 1288834974657n;
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
 const DEFAULT_SOURCE_CACHE_TTL_DAYS = 7;
 const OPENROUTER_RANKINGS_SOURCE_KIND = "openrouter_rankings_public_playwright";
+const ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND = "artificial_analysis_index_public_playwright";
 const GITHUB_REPORT_MARKDOWN_SOURCE_KIND = "github_report_markdown";
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
@@ -591,7 +592,8 @@ export async function collectGitHubTrending(options = {}) {
         name: currentSource.name,
         url: currentSource.url,
         status: parsed.length > 0 ? "checked" : "no_signal",
-        notes: withRetryNote(`${parsed.length} repositories parsed`, response)
+        notes: withRetryNote(`${parsed.length} repositories parsed`, response),
+        parsed_count: parsed.length
       });
 
       for (const candidate of parsed) {
@@ -655,7 +657,8 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
       name: exportSource.name,
       url: exportSource.url,
       status: parsed.length > 0 ? "checked" : "no_signal",
-      notes: `${parsed.length} repositories parsed from browser export`
+      notes: `${parsed.length} repositories parsed from browser export`,
+      parsed_count: parsed.length
     });
 
     for (const candidate of parsed) {
@@ -710,7 +713,8 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
       name: OSSINSIGHT_TRENDING_SOURCE.name,
       url: OSSINSIGHT_TRENDING_SOURCE.url,
       status: parsed.length > 0 ? "checked" : "no_signal",
-      notes: withRetryNote(`${parsed.length} repositories parsed from OSSInsight API fallback`, response)
+      notes: withRetryNote(`${parsed.length} repositories parsed from OSSInsight API fallback`, response),
+      parsed_count: parsed.length
     });
 
     for (const candidate of parsed) {
@@ -1225,6 +1229,18 @@ export async function collectContentSources(options = {}) {
     }
     if (currentSource.source_kind === OPENROUTER_RANKINGS_SOURCE_KIND) {
       const result = await collectOpenRouterRankingsSource(currentSource, {
+        ...options,
+        generatedAt,
+        reportDate
+      });
+      markSource(candidateSources.at(-1), result.status, result.notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
+        snapshot: result.snapshot
+      }));
+      continue;
+    }
+    if (currentSource.source_kind === ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND) {
+      const result = await collectArtificialAnalysisIndexSource(currentSource, {
         ...options,
         generatedAt,
         reportDate
@@ -2988,6 +3004,175 @@ function hasCompleteTop10(entries) {
     /tokens$/i.test(entry.tokens || "") &&
     entry.change
   );
+}
+
+async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
+  try {
+    if (
+      typeof options.artificialAnalysisIndexText !== "string" &&
+      typeof options.artificialAnalysisIndexTextFetcher !== "function" &&
+      Object.hasOwn(options, "fetchImpl") &&
+      options.artificialAnalysisIndexLive !== true
+    ) {
+      throw new Error("browser_snapshot_disabled_for_mock_fetch");
+    }
+    const text = typeof options.artificialAnalysisIndexText === "string"
+      ? options.artificialAnalysisIndexText
+      : await readArtificialAnalysisIndexText(sourceInfo, options);
+    const entries = parseArtificialAnalysisIndexText(text);
+    const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt);
+    const complete = snapshot.snapshot_status === "complete";
+    return {
+      status: complete ? "checked" : "no_signal",
+      notes: complete
+        ? `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; collection_method=playwright_dom`
+        : `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; top10_incomplete`,
+      snapshot
+    };
+  } catch (error) {
+    return {
+      status: "blocked",
+      notes: withRetryNote(formatDiscoveryErrorNote(error), error),
+      snapshot: {
+        type: "artificial_analysis_intelligence_index_public_page",
+        collection_method: "public_page_playwright",
+        snapshot_status: "blocked",
+        snapshot_as_of: options.generatedAt || new Date().toISOString(),
+        source_url: sourceInfo.url,
+        top_entries: [],
+        notes: sanitizeNoteValue(error?.message || error)
+      }
+    };
+  }
+}
+
+async function readArtificialAnalysisIndexText(sourceInfo, options = {}) {
+  if (typeof options.artificialAnalysisIndexTextFetcher === "function") {
+    return options.artificialAnalysisIndexTextFetcher(sourceInfo);
+  }
+  const { chromium } = await import("@playwright/test");
+  const timeoutMs = Number.isInteger(sourceInfo.timeoutMs) && sourceInfo.timeoutMs > 0
+    ? sourceInfo.timeoutMs
+    : Number.isInteger(sourceInfo.timeout_ms) && sourceInfo.timeout_ms > 0
+      ? sourceInfo.timeout_ms
+      : 30000;
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
+    await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
+    return await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+  } finally {
+    await browser.close();
+  }
+}
+
+export function parseArtificialAnalysisIndexText(text) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => cleanText(line))
+    .filter(Boolean);
+  const resultsIndex = lines.findIndex((line) => /Artificial Analysis Intelligence Index:\s*Results/i.test(line));
+  const scanLines = resultsIndex >= 0 ? lines.slice(resultsIndex + 1) : lines;
+  const addModelIndex = scanLines.findIndex((line) => /Add model from specific provider/i.test(line));
+  const tableLines = addModelIndex >= 0 ? scanLines.slice(addModelIndex + 1) : scanLines;
+  const scoreStartIndex = tableLines.findIndex((line) => /^\d{1,3}(?:\.\d+)?$/.test(line));
+  if (scoreStartIndex >= 0) {
+    const models = tableLines.slice(0, scoreStartIndex)
+      .filter((line) => artificialAnalysisProviderForModel(line));
+    const scores = tableLines.slice(scoreStartIndex)
+      .filter((line) => /^\d{1,3}(?:\.\d+)?$/.test(line))
+      .filter((line) => {
+        const value = Number(line);
+        return value >= 0 && value <= 100;
+      });
+    return models
+      .slice(0, 10)
+      .map((model, index) => ({
+        rank: index + 1,
+        model,
+        provider: artificialAnalysisProviderForModel(model),
+        tokens: `${scores[index]} 分`,
+        change: "AA Index"
+      }))
+      .filter((entry) => entry.tokens !== "undefined 分");
+  }
+
+  const entries = [];
+  const seen = new Set();
+
+  for (let index = 0; index < scanLines.length && entries.length < 10; index += 1) {
+    const model = scanLines[index];
+    const provider = artificialAnalysisProviderForModel(model);
+    if (!provider || seen.has(model.toLowerCase())) {
+      continue;
+    }
+    const score = firstArtificialAnalysisScore(scanLines, index + 1);
+    if (!score) {
+      continue;
+    }
+    seen.add(model.toLowerCase());
+    entries.push({
+      rank: entries.length + 1,
+      model,
+      provider,
+      tokens: `${score} 分`,
+      change: "AA Index"
+    });
+  }
+
+  return entries;
+}
+
+function firstArtificialAnalysisScore(lines, startIndex) {
+  for (let offset = 0; offset < 6; offset += 1) {
+    const line = lines[startIndex + offset];
+    if (/^\d{1,3}(?:\.\d+)?$/.test(line || "")) {
+      const value = Number(line);
+      if (value >= 0 && value <= 100) {
+        return line;
+      }
+    }
+  }
+  return "";
+}
+
+function artificialAnalysisProviderForModel(model) {
+  const text = String(model || "").toLowerCase();
+  if (/claude|anthropic/.test(text)) return "anthropic";
+  if (/\bgpt\b|gpt-|o3|o4|openai/.test(text)) return "openai";
+  if (/gemini|gemma|google/.test(text)) return "google";
+  if (/qwen|alibaba/.test(text)) return "alibaba";
+  if (/minimax/.test(text)) return "minimax";
+  if (/kimi|moonshot/.test(text)) return "moonshot";
+  if (/mimo|xiaomi/.test(text)) return "xiaomi";
+  if (/deepseek/.test(text)) return "deepseek";
+  if (/grok|xai/.test(text)) return "xai";
+  if (/nemotron|nvidia/.test(text)) return "nvidia";
+  if (/glm|zhipu/.test(text)) return "zhipu";
+  if (/mistral|mixtral/.test(text)) return "mistral";
+  if (/nova|amazon/.test(text)) return "amazon";
+  if (/solar|upstage/.test(text)) return "upstage";
+  return "";
+}
+
+function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt) {
+  const topEntries = entries.slice(0, 10).map((entry) => ({
+    rank: entry.rank,
+    model: entry.model,
+    provider: entry.provider,
+    tokens: entry.tokens,
+    change: entry.change
+  }));
+  return {
+    type: "artificial_analysis_intelligence_index_public_page",
+    collection_method: "public_page_playwright",
+    snapshot_status: topEntries.length === 10 ? "complete" : topEntries.length > 0 ? "partial" : "blocked",
+    snapshot_as_of: generatedAt || new Date().toISOString(),
+    source_url: sourceInfo.url,
+    top_entries: topEntries,
+    notes: "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof."
+  };
 }
 
 export function contentSourceSkipReason(sourceInfo, env = process.env) {

@@ -24,6 +24,7 @@ export const STRICT_SOURCE_REGISTRY_MINIMUM = 60;
 export const STRICT_GITHUB_TRENDING_SOURCE_MINIMUM = 10;
 export const STRICT_BUILDER_SOURCE_MINIMUM = 3;
 
+const REQUIRED_GITHUB_TRENDING_PARSED_MINIMUM = 10;
 const SOURCE_OUTAGE_BLOCKED_RATIO = 0.8;
 const SOURCE_OUTAGE_MIN_BLOCKED = 3;
 const SOURCE_OUTAGE_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
@@ -540,6 +541,7 @@ function strictSourceAuditIssues(report) {
     });
   }
 
+  issues.push(...strictGitHubTrendingSourceSignalIssues(githubSources));
   issues.push(...strictSourceAvailabilityIssues(report));
 
   for (const requirement of FIXED_SOURCE_REQUIREMENTS) {
@@ -621,6 +623,59 @@ function strictSourceAvailabilityIssues(report) {
     message: `${summary.group} has a high blocked-source ratio: ${summary.blocked_count}/${summary.total_sources} blocked.`,
     remediation: "Keep blocked sources out of factual text, disclose the degraded source lane publicly, and repair the source path before relying on this lane for selection."
   }));
+}
+
+function strictGitHubTrendingSourceSignalIssues(group) {
+  const sources = Array.isArray(group?.sources) ? group.sources : [];
+  const requiredSources = sources.filter(isRequiredGitHubTrendingSource);
+  if (requiredSources.length === 0) {
+    return [];
+  }
+
+  const weakSources = requiredSources
+    .map((source) => ({
+      name: String(source?.name || "").trim(),
+      url: String(source?.url || "").trim(),
+      status: String(source?.status || ""),
+      parsed_count: githubTrendingParsedCount(source),
+      notes: String(source?.notes || "").trim()
+    }))
+    .filter((source) =>
+      source.status !== "checked" ||
+      !Number.isInteger(source.parsed_count) ||
+      source.parsed_count < REQUIRED_GITHUB_TRENDING_PARSED_MINIMUM
+    );
+
+  if (weakSources.length === 0) {
+    return [];
+  }
+
+  return [
+    {
+      error_code: "github_trending_source_signal_gate_failed",
+      code: "github_trending_required_source_weak_signal",
+      section: "source_audit.github_trending",
+      count: requiredSources.length - weakSources.length,
+      minimum: requiredSources.length,
+      parsed_minimum: REQUIRED_GITHUB_TRENDING_PARSED_MINIMUM,
+      weak_sources: weakSources,
+      message: "One or more required GitHub Trending pages did not parse enough repositories for reliable daily coverage.",
+      remediation: "Re-run discover:github-trending, inspect GitHub HTML selectors or network responses for weak sources, and disclose the degraded GitHub Trending source lane before publishing."
+    }
+  ];
+}
+
+function isRequiredGitHubTrendingSource(source) {
+  const name = String(source?.name || "").trim();
+  return /^GitHub Trending (?:(?:Python|TypeScript|Rust|Go) )?(?:daily|weekly)$/i.test(name);
+}
+
+function githubTrendingParsedCount(source) {
+  if (Number.isInteger(source?.parsed_count)) {
+    return source.parsed_count;
+  }
+  const match = String(source?.notes || "").match(/(\d+)\s+repositories parsed/i);
+  return match ? Number.parseInt(match[1], 10) : null;
 }
 
 function sourceAuditGroupSummary(groupName, group) {
@@ -932,6 +987,9 @@ function publicQualityNote(status, reasons, explicitNote) {
       return explicitNote ||
         `本轮固定信源发现面疑似网络不可用，日报可能沿用了旧候选或只保留 blocked 审计。${WORKSPACE_WRITE_NETWORK_REMINDER}`;
     }
+    if (reasons.includes("github_trending_required_source_weak_signal")) {
+      return explicitNote || "本轮 GitHub Trending 必查子源覆盖不足；公开 Top 10 可读，但语言/周期榜单审计可能不完整。";
+    }
     if (reasons.includes("content_sources_blocked") && reasons.includes("builder_sources_blocked")) {
       return explicitNote || "Content source and Builder source coverage is degraded; those sections may be incomplete.";
     }
@@ -1124,6 +1182,8 @@ function normalizeQualityIssue(issue) {
     "checked_count",
     "no_signal_count",
     "skipped_count",
+    "parsed_minimum",
+    "weak_sources",
     "affected_groups",
     "group_summaries",
     "missing_sources",

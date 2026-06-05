@@ -17,11 +17,17 @@ import {
   collectStatuspageIncidents,
   parseGitHubTrendingHtml,
   parseGitHubReportMarkdownEntries,
-  parseOpenRouterRankingsText
+  parseOpenRouterRankingsText,
+  parseArtificialAnalysisIndexText
 } from "../src/discovery.js";
 import { collectSearchNews } from "../src/search-news.js";
 import { checkSourcesHealth } from "../src/source-health.js";
 import { auditSourceRunHistory } from "../src/source-phase5.js";
+import {
+  extractSourceStatusRecords,
+  findSourcesWithoutEffectiveSignal,
+  mergeSourceStatusRecords
+} from "../src/source-status-history.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
@@ -133,6 +139,41 @@ function openRouterSnapshotFixture(rows = 10) {
       url: `https://openrouter.ai/${entry.provider}/${entry.model.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`
     })),
     notes: "Public OpenRouter rankings page snapshot."
+  };
+}
+
+function artificialAnalysisIndexSampleText(rows = 10) {
+  const entries = [
+    ["Claude Opus 4.8 (Adaptive Reasoning, Max Effort)", "61"],
+    ["GPT-5.5 (xhigh)", "60"],
+    ["GPT-5.5 (high)", "59"],
+    ["Claude Opus 4.7 (Max Effort)", "57"],
+    ["Gemini 3.1 Pro Preview", "57"],
+    ["Qwen3.7 Max", "57"],
+    ["Gemini 3.5 Flash", "55"],
+    ["MiniMax-M3", "55"],
+    ["Kimi K2.6", "54"],
+    ["MiMo-V2.5-Pro", "54"]
+  ].slice(0, rows);
+  return [
+    "Artificial Analysis Intelligence Index",
+    "Artificial Analysis Intelligence Index: Results",
+    "Add model from specific provider",
+    ...entries.map(([model]) => model),
+    ...entries.map(([, score]) => score),
+    "About the Data"
+  ].join("\n");
+}
+
+function artificialAnalysisSnapshotFixture(rows = 10) {
+  return {
+    type: "artificial_analysis_intelligence_index_public_page",
+    collection_method: "public_page_playwright",
+    snapshot_status: rows === 10 ? "complete" : "partial",
+    snapshot_as_of: fixedGeneratedAt,
+    source_url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    top_entries: parseArtificialAnalysisIndexText(artificialAnalysisIndexSampleText(rows)),
+    notes: "Public Artificial Analysis Intelligence Index snapshot."
   };
 }
 
@@ -676,7 +717,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(input.sections.some((section) => section.title === "AI 资讯"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
-  assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**![OpenAI Status]"));
+  assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
   assert(!mainContent.includes("来源："));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
   assert(!mainContent.includes("Reader relevance metadata should stay in JSON"));
@@ -722,7 +763,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(trendingSection.summary, undefined);
   assert(trendingSection.content.includes("example/agent-memory"));
   assert(trendingSection.content.includes("![example/agent-memory](data:image/png;base64,"));
-  assert(trendingSection.content.includes("1. **![example/agent-memory]"));
+  assert(trendingSection.content.includes("1. **[![example/agent-memory]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
   assert(trendingSection.content.includes("==tag-stars|本周 +456 stars=="));
   assert.equal((trendingSection.content.match(/==tag-stars\|/g) || []).length, 1);
@@ -1198,7 +1239,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   const input = reportToInteractionInput(validation.value);
   const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
   assert(trendingSection);
-  assert(trendingSection.content.includes("3. **![hardikpandya/stop-slop]"));
+  assert(trendingSection.content.includes("3. **[![hardikpandya/stop-slop]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
   assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
   assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
@@ -1565,6 +1606,7 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
 
   assert.equal(collected.source_audit.github_trending.checked, true);
   assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
+  assert.equal(collected.source_audit.github_trending.sources[0].parsed_count, 2);
   assert.equal(collected.source_audit.github_trending.candidates_found, 2);
   assert.equal(collected.candidates[0].trend, "up");
   assert.equal(collected.candidates[0].previous_rank, 4);
@@ -1587,6 +1629,7 @@ test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () =>
 
   assert.equal(collected.source_audit.github_trending.checked, true);
   assert.equal(collected.source_audit.github_trending.sources[0].status, "checked");
+  assert.equal(collected.source_audit.github_trending.sources[0].parsed_count, 2);
   assert.match(collected.source_audit.github_trending.sources[0].notes, /browser export/);
   assert.equal(collected.source_audit.github_trending.candidates_found, 2);
   assert.equal(collected.candidates[0].repo, "example/trending-agent");
@@ -1626,6 +1669,7 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   assert.equal(collected.source_audit.github_trending.sources[0].status, "blocked");
   assert.equal(collected.source_audit.github_trending.sources[1].name, "OSSInsight Trending Repos API");
   assert.equal(collected.source_audit.github_trending.sources[1].status, "checked");
+  assert.equal(collected.source_audit.github_trending.sources[1].parsed_count, 1);
   assert.equal(collected.source_audit.github_trending.candidates_found, 1);
   assert.equal(collected.candidates[0].repo, "example/agent-runtime");
   assert.equal(collected.candidates[0].category, "project");
@@ -2157,7 +2201,11 @@ test("registered content sources include fixed daily tracking leaderboards", asy
     const source = sourcesById.get(id);
     assert(source, `missing source ${id}`);
     assert.equal(normalizedSourceUrl(source.url), normalizedSourceUrl(url));
-    assert.equal(source.source_kind, id === "content-openrouter-rankings" ? "openrouter_rankings_public_playwright" : "html_index");
+    const expectedSourceKind = new Map([
+      ["content-openrouter-rankings", "openrouter_rankings_public_playwright"],
+      ["content-artificial-analysis-intelligence-index", "artificial_analysis_index_public_playwright"]
+    ]);
+    assert.equal(source.source_kind, expectedSourceKind.get(id) || "html_index");
     assert.equal(source.candidate_category, "community_lead");
     assert.equal(source.authority, "primary");
     assert.equal(source.enablement, "core");
@@ -2237,6 +2285,52 @@ test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomple
   assert.equal(source.snapshot.top_entries.length, 8);
 });
 
+test("parseArtificialAnalysisIndexText extracts public Intelligence Index Top 10 rows", () => {
+  const rows = parseArtificialAnalysisIndexText(artificialAnalysisIndexSampleText());
+
+  assert.equal(rows.length, 10);
+  assert.deepEqual(rows[0], {
+    rank: 1,
+    model: "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+    provider: "anthropic",
+    tokens: "61 分",
+    change: "AA Index"
+  });
+  assert.equal(rows[1].provider, "openai");
+  assert.equal(rows[4].provider, "google");
+  assert.equal(rows[9].provider, "xiaomi");
+});
+
+test("collectContentSources stores Artificial Analysis public page snapshot without candidate pollution", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-artificial-analysis-intelligence-index",
+        name: "Artificial Analysis Intelligence Index",
+        url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        source_kind: "artificial_analysis_index_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    artificialAnalysisIndexText: artificialAnalysisIndexSampleText()
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.match(source.notes, /public_page_snapshot/);
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.collection_method, "public_page_playwright");
+  assert.equal(source.snapshot.top_entries.length, 10);
+  assert.equal(source.snapshot.top_entries[0].model, "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)");
+  assert.equal(collected.candidates.length, 0);
+});
+
 test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-openrouter-snapshot-"));
   const reportDate = "2026-06-05";
@@ -2281,6 +2375,55 @@ test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "榜首" && stat.value === "DeepSeek V4 Flash"));
   assert(!JSON.stringify(trackingSection).includes("Playwright"));
   assert(!JSON.stringify(trackingSection).includes("DOM"));
+});
+
+test("report:draft publishes Artificial Analysis snapshot as reader-facing daily tracking card", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-artificial-analysis-snapshot-"));
+  const reportDate = "2026-06-05";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.content_sources.sources.push(
+    {
+      name: "Artificial Analysis Intelligence Index",
+      url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      status: "no_signal",
+      notes: "0 recent intermediary lead entries parsed"
+    },
+    {
+      name: "Artificial Analysis Intelligence Index",
+      url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      status: "checked",
+      notes: "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
+      snapshot: artificialAnalysisSnapshotFixture()
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const tracking = drafted.report.daily_tracking.find((item) => item.id === "artificial-analysis-intelligence-index");
+  assert.equal(tracking.publish_to_public, true);
+  assert.equal(tracking.change_status, "changed");
+  assert.equal(tracking.verification_status, "primary_confirmed");
+  assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert(tracking.summary.includes("Claude Opus 4.8"));
+  assert(tracking.metrics.some((metric) => metric.label === "#10" && metric.value.includes("54 分")));
+
+  const input = reportToInteractionInput(drafted.report);
+  const trackingSection = input.sections.find((section) => section.items?.some((item) => item.title === "Artificial Analysis"));
+  assert(trackingSection);
+  const card = trackingSection.items.find((item) => item.title === "Artificial Analysis");
+  assert.equal(card.points.length, 0);
+  assert.equal(card.table.rows.length, 10);
+  assert(card.table.columns.some((column) => column.key === "tokens" && column.label === "分数"));
+  assert(card.table.columns.some((column) => column.key === "change" && column.label === "指标"));
+  assert(card.table.rows.some((row) => row.rank === "#1" && row.tokens === "61 分"));
 });
 
 test("registered source registry covers official company news lanes", async () => {
@@ -4475,6 +4618,130 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(await exists(result.candidatePoolPath), true);
 });
 
+test("source status history dedupes same-day records and flags 10-day stale sources", () => {
+  const staleUrl = "https://example.com/stale-feed.xml";
+  const currentRecords = extractSourceStatusRecords({
+    content_sources: {
+      checked: true,
+      sources: [
+        {
+          name: "Stale Feed",
+          url: staleUrl,
+          status: "blocked",
+          notes: "latest run blocked"
+        },
+        {
+          name: "Healthy Feed",
+          url: "https://example.com/healthy-feed.xml",
+          status: "checked",
+          notes: "latest run parsed items"
+        }
+      ],
+      candidates_found: 0,
+      included: 0
+    }
+  }, {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+  const staleHistory = datesThrough("2026-05-07", 9).map((date) => ({
+    date,
+    group: "content_sources",
+    source_key: staleUrl,
+    name: "Stale Feed",
+    url: staleUrl,
+    status: "no_signal",
+    notes: "no dated items"
+  }));
+  const healthyHistory = datesThrough("2026-05-07", 9).map((date, index) => ({
+    date,
+    group: "content_sources",
+    source_key: "https://example.com/healthy-feed.xml",
+    name: "Healthy Feed",
+    url: "https://example.com/healthy-feed.xml",
+    status: index === 4 ? "checked" : "no_signal",
+    notes: "mixed status"
+  }));
+  const firstMerge = mergeSourceStatusRecords({
+    schema_version: 1,
+    records: [...staleHistory, ...healthyHistory]
+  }, currentRecords, {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+  const secondMerge = mergeSourceStatusRecords(firstMerge, currentRecords.map((record) =>
+    record.url === staleUrl ? { ...record, notes: "second same-day run" } : record
+  ), {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+
+  const staleRecords = secondMerge.records.filter((record) => record.url === staleUrl);
+  assert.equal(staleRecords.length, 10);
+  assert.equal(staleRecords.filter((record) => record.date === "2026-05-16").length, 1);
+  assert.equal(staleRecords.find((record) => record.date === "2026-05-16").notes, "second same-day run");
+
+  const staleSources = findSourcesWithoutEffectiveSignal(secondMerge, {
+    reportDate: "2026-05-16",
+    days: 10
+  });
+
+  assert.equal(staleSources.length, 1);
+  assert.equal(staleSources[0].name, "Stale Feed");
+  assert.equal(staleSources[0].blocked_count, 1);
+  assert.equal(staleSources[0].no_signal_count, 9);
+});
+
+test("report:write tracks source status history and appends stale source optimization suggestion", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-status-"));
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const staleUrl = "https://example.com/stale-feed.xml";
+  draft.source_audit.content_sources.sources.push({
+    name: "Stale Feed",
+    url: staleUrl,
+    status: "no_signal",
+    notes: "no dated items returned"
+  });
+  const draftPath = path.join(tmp, "daily-report.json");
+  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
+
+  const historyPath = path.join(tmp, "reports-data", "source-status-history.json");
+  await fs.mkdir(path.dirname(historyPath), { recursive: true });
+  await fs.writeFile(historyPath, `${JSON.stringify({
+    schema_version: 1,
+    records: datesThrough("2026-05-07", 9).map((date) => ({
+      date,
+      group: "content_sources",
+      source_key: staleUrl,
+      name: "Stale Feed",
+      url: staleUrl,
+      status: date === "2026-05-12" ? "blocked" : "no_signal",
+      notes: "historical no signal"
+    }))
+  }, null, 2)}\n`, "utf8");
+
+  const result = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: draftPath,
+    outputDir: "reports-data",
+    candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+
+  assert.equal(result.sourceStatusHistoryPath, historyPath);
+  assert.equal(await exists(result.sourceStatusHistoryPath), true);
+  const history = JSON.parse(await fs.readFile(historyPath, "utf8"));
+  const staleRecords = history.records.filter((record) => record.url === staleUrl);
+  assert.equal(staleRecords.length, 10);
+  assert.equal(staleRecords.filter((record) => record.date === "2026-05-16").length, 1);
+  assert.equal(result.report.self_check.source_status_history.stale_sources, 1);
+  assert(result.report.self_check.optimization_suggestions.some((item) =>
+    item.issue.includes("过去 10 天存在持续无有效信号的固定信源") &&
+    item.evidence.includes("Stale Feed")
+  ));
+});
+
 test("report:draft 从发现候选池自动选取并写出可 report:write 的草稿", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-"));
   const reportDate = "2026-05-26";
@@ -4825,6 +5092,11 @@ test("report:draft favors plain-reader utility over hardcore research details", 
     0,
     "pure benchmark papers should stay out of main_items when enough reader-utility candidates exist"
   );
+  assert(drafted.report.github_trending.length > 0);
+  for (const item of drafted.report.github_trending) {
+    assert.match(item.description, /进入 GitHub Trending Top 10/);
+    assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
+  }
 });
 
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
@@ -5492,6 +5764,28 @@ test("publish quality degrades strict daily reports missing GitHub Trending Top 
 
   assert.deepEqual(classification.blocking_issues, []);
   assert(classification.degraded_sections.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
+});
+
+test("publish quality degrades strict daily reports when a required GitHub Trending source has weak signal", () => {
+  const report = strictPublishReportFixture();
+  const weakSource = report.source_audit.github_trending.sources.find((source) => source.name === "GitHub Trending Rust daily");
+  weakSource.status = "no_signal";
+  weakSource.notes = "0 repositories parsed";
+  weakSource.parsed_count = 0;
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+  const qualityStatus = deriveQualityStatus(report);
+  const issue = classification.degraded_sections.find(
+    (candidate) => candidate.error_code === "github_trending_source_signal_gate_failed"
+  );
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(issue);
+  assert.equal(issue.section, "source_audit.github_trending");
+  assert.equal(issue.parsed_minimum, 10);
+  assert(issue.weak_sources.some((source) => source.name === "GitHub Trending Rust daily"));
+  assert(qualityStatus.reasons.includes("github_trending_required_source_weak_signal"));
+  assert.match(qualityStatus.public_note, /GitHub Trending/);
 });
 
 test("publish quality exposes network-wide source outage even when sections are populated", () => {
@@ -6915,7 +7209,8 @@ function strictPublishReportFixture() {
           name,
           url: `https://github.com/trending${name === "GitHub Trending daily" ? "?since=daily" : `/${slugId(name)}?since=daily`}`,
           status: "checked",
-          notes: "fixture"
+          notes: "10 repositories parsed",
+          parsed_count: 10
         })),
         candidates_found: 100,
         included: 10,
@@ -7070,6 +7365,15 @@ async function exists(filePath) {
   } catch {
     return false;
   }
+}
+
+function datesThrough(startDate, count) {
+  const start = new Date(`${startDate}T00:00:00Z`);
+  return Array.from({ length: count }, (_unused, index) => {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
 }
 
 function sourceAuditFixture() {

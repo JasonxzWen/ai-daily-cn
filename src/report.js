@@ -13,6 +13,11 @@ import { normalizeOptimizationSuggestions } from "./feedback-contract.js";
 import { withDefaultImportance } from "./importance.js";
 import { normalizeUrlIdentity } from "./url.js";
 import {
+  appendSourceStatusSuggestionsToDraft,
+  prepareSourceStatusHistoryUpdate,
+  writeSourceStatusHistory
+} from "./source-status-history.js";
+import {
   readCandidatePool,
   requireCandidateCoverage,
   reportCandidatePoolPublicPath,
@@ -35,7 +40,16 @@ export async function writeReportDraft(options = {}) {
     inputPath: options.candidatePoolPath
   });
   const automationRevision = options.automationRevision || (await buildAutomationRevision({ rootDir }));
-  const report = normalizeReportDraft(draft, {
+  const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
+    rootDir,
+    outputDir,
+    reportDate,
+    generatedAt: options.generatedAt || draft.generated_at,
+    sourceAudit: draft.source_audit,
+    days: options.sourceStatusWindowDays || 10
+  });
+  const draftWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(draft, sourceStatusUpdate);
+  const report = normalizeReportDraft(draftWithSourceSuggestions, {
     reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
@@ -54,11 +68,13 @@ export async function writeReportDraft(options = {}) {
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.writeFile(target, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   const candidatePoolPath = await writeCandidatePool(outputDir, report.report_date, candidatePool);
+  const sourceStatusHistoryPath = await writeSourceStatusHistory(sourceStatusUpdate);
 
   return {
     report,
     path: target,
-    candidatePoolPath
+    candidatePoolPath,
+    sourceStatusHistoryPath
   };
 }
 
@@ -277,8 +293,8 @@ function requireExpandedMainItemFormat(report) {
     if (bullets.length < 1 || bullets.length > 3) {
       errors.push(`main_items[${index}].bullets must contain 1-3 factual bullets`);
     }
-    if (!/\*\*[^*]+\*\*/.test(text)) {
-      errors.push(`main_items[${index}] missing bold emphasis`);
+    if (!/\*\*[^*]+\*\*/.test(text) && !/==[^=\n]+==/.test(text)) {
+      errors.push(`main_items[${index}] missing emphasis`);
     }
     const totalChars = bullets.reduce((sum, bullet) => sum + bullet.length, 0);
     if (totalChars < 40) {

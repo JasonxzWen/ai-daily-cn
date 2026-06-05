@@ -69,7 +69,47 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       document.querySelectorAll(".project-card-grid, .project-card").length === 0,
       "Project highlights should stay inside GitHub Trending entries, not a standalone project card section."
     );
-    const weakTrackingCards = Array.from(document.querySelectorAll(".tracking-card"))
+    const unlinkedMarkdownIcons = Array.from(document.querySelectorAll("main .rendered-markdown li img.inline-site-icon"))
+      .filter((image) => !image.closest("details"))
+      .filter((image) => !image.closest("a"));
+    const unlinkedCardTitleIcons = Array.from(document.querySelectorAll(".interactive-card h3 img.card-title-icon"))
+      .filter((image) => !image.closest("a.card-title-link"));
+    addCheck(
+      "source_icons_linked",
+      unlinkedMarkdownIcons.length === 0 && unlinkedCardTitleIcons.length === 0,
+      "Source icons in public titles should be part of the same clickable link as the title.",
+      {
+        markdown_icons: unlinkedMarkdownIcons.map((image) => image.closest("li")?.textContent?.replace(/\s+/g, " ").trim().slice(0, 140) || ""),
+        card_icons: unlinkedCardTitleIcons.map((image) => image.closest(".interactive-card")?.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim().slice(0, 140) || "")
+      }
+    );
+    const githubTrendingSection = document.querySelector("section[id*='github-trending']");
+    const githubTrendRows = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll("ol > li")) : [];
+    const weakGithubTrendRows = githubTrendRows
+      .map((row, index) => {
+        const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
+        const prose = text
+          .replace(/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/g, "")
+          .replace(/\b(?:GitHub|Trending|Top|README|AI|RAG|AIGC|agent|infra|eval|NEW|SAME|DOWN|UP|stars)\b/gi, "")
+          .replace(/https?:\/\/\S+/gi, "");
+        const longEnglishRun = /[A-Za-z][A-Za-z0-9 ,;:'"()[\]/.!?+~`#-]{45,}/.test(prose);
+        const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+        return longEnglishRun || chineseChars < 10
+          ? { index, text: text.slice(0, 220), long_english_run: longEnglishRun, chinese_chars: chineseChars }
+          : null;
+      })
+      .filter(Boolean);
+    addCheck(
+      "github_trending_reader_facing_top10",
+      githubTrendRows.length === 10 && weakGithubTrendRows.length === 0,
+      "GitHub Trending should render exactly Top 10 with Chinese reader-facing inline descriptions, not raw English repository excerpts.",
+      {
+        count: githubTrendRows.length,
+        weak_rows: weakGithubTrendRows
+      }
+    );
+    const trackingCards = Array.from(document.querySelectorAll(".tracking-card"));
+    const weakTrackingCards = trackingCards
       .map((card, index) => {
         const hasVisualData = Boolean(
           card.querySelector("[data-card-data-table]") ||
@@ -94,9 +134,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       .filter(Boolean);
     addCheck(
       "daily_tracking_visualized",
-      weakTrackingCards.length === 0,
-      "Daily tracking cards should be visual/table-first and must not render leaderboard rows as text detail logs.",
-      { weak_cards: weakTrackingCards }
+      trackingCards.length > 0 && weakTrackingCards.length === 0,
+      "Daily tracking should render at least one visual/table-first public card and must not render leaderboard rows as text detail logs.",
+      { count: trackingCards.length, weak_cards: weakTrackingCards }
     );
     const weakBuilderCards = Array.from(document.querySelectorAll(".builder-card"))
       .map((card, index) => {

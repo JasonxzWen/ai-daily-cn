@@ -235,6 +235,7 @@ try {
       ok: true,
       report_date: result.report.report_date,
       path: result.path,
+      source_status_history_path: result.sourceStatusHistoryPath,
       canonical_url: result.report.canonical_url
     });
   } else if (command === "report:draft") {
@@ -258,6 +259,7 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       candidate_pool_path: result.candidatePoolPath,
+      source_status_history_path: result.sourceStatusHistoryPath,
       evidence_assets: result.evidence_assets,
       evidence_skipped: result.evidence_skipped,
       counts: result.counts

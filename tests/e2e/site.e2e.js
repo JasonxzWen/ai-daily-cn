@@ -76,23 +76,27 @@ structuredReport.projects = [
     evidence: "GitHub Trending daily showed 98 stars today."
   }
 ];
-structuredReport.github_trending = [
-  {
-    name: "example/agent-memory",
-    repo: "example/agent-memory",
-    description: "Agent memory engine.",
-    url: "https://github.com/example/agent-memory",
+structuredReport.github_trending = Array.from({ length: 10 }, (_, index) => {
+  const rank = index + 1;
+  const repo = index === 0 ? "example/agent-memory" : `example/agent-tool-${rank}`;
+  return {
+    name: repo,
+    repo,
+    description: `${repo}：进入 GitHub Trending Top 10，可作为 agent 工具方向的实现线索。优先核对 README 示例、许可证、近期维护和本地复现门槛。`,
+    url: `https://github.com/${repo}`,
     event_date: "2026-05-15",
     source: "GitHub Trending daily",
     language: "TypeScript",
     window: "daily",
-    rank: 1,
-    previous_rank: 3,
-    rank_delta: 2,
-    trend: "up",
-    evidence: "example/agent-memory appeared on GitHub Trending daily with 123 stars today."
-  }
-];
+    rank,
+    previous_rank: index === 0 ? 3 : null,
+    rank_delta: index === 0 ? 2 : null,
+    trend: index === 0 ? "up" : "new",
+    evidence: index === 0
+      ? "example/agent-memory appeared on GitHub Trending daily with 123 stars today."
+      : `${repo} appeared on GitHub Trending daily.`
+  };
+});
 structuredReport.hot_blogs.push({
   title: "No Media Blog Layout",
   url: "https://example.com/blog/no-media-layout",
@@ -140,6 +144,43 @@ structuredReport.community_leads = [
     source_level: "official",
     verification_status: "primary_confirmed",
     verification_note: "事实来自可回看的原始链接。"
+  }
+];
+structuredReport.daily_tracking = [
+  {
+    id: "openrouter-rankings",
+    name: "OpenRouter",
+    url: "https://openrouter.ai/rankings",
+    event_date: "2026-05-15",
+    source: "OpenRouter Rankings",
+    category: "model_usage",
+    importance: "notable",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    change_status: "changed",
+    change_summary: "OpenRouter Top 10 fixture.",
+    publish_to_public: true,
+    summary: "OpenRouter public ranking fixture renders daily tracking as a visual table and provider bars.",
+    watch_points: ["Review the top model, provider mix, and new entries together."],
+    metrics: [{ label: "Scope", value: "This Week Top 10", trend: "same" }],
+    evidence: "OpenRouter public rankings fixture.",
+    verification_note: "Fixture snapshot is primary-confirmed for e2e rendering.",
+    risk_note: "OpenRouter reflects platform usage, not market share.",
+    watch_next: "Continue watching provider mix.",
+    snapshot: {
+      type: "openrouter_rankings_public_page",
+      collection_method: "public_page_playwright",
+      snapshot_status: "complete",
+      snapshot_as_of: fixedGeneratedAt,
+      source_url: "https://openrouter.ai/rankings",
+      top_entries: Array.from({ length: 10 }, (_, index) => ({
+        rank: index + 1,
+        model: index === 0 ? "DeepSeek V4 Flash" : `Fixture Model ${index + 1}`,
+        provider: index < 3 ? "deepseek" : index < 6 ? "anthropic" : "openrouter",
+        tokens: index === 0 ? "2.9T tokens" : `${10 - index}00B tokens`,
+        change: index === 7 ? "new" : `${10 + index}%`
+      }))
+    }
   }
 ];
 structuredReport.evidence_assets = [

@@ -441,8 +441,8 @@ function inlineMarkdown(text) {
     return token;
   });
   return renderInlineEmphasis(withLinkTokens)
-    .replace(/\u0000HTML_WORK_REPORT_IMAGE_(\d+)\u0000/g, (_match, index) => images[Number(index)] || "")
-    .replace(/\u0000HTML_WORK_REPORT_LINK_(\d+)\u0000/g, (_match, index) => links[Number(index)] || "");
+    .replace(/\u0000HTML_WORK_REPORT_LINK_(\d+)\u0000/g, (_match, index) => links[Number(index)] || "")
+    .replace(/\u0000HTML_WORK_REPORT_IMAGE_(\d+)\u0000/g, (_match, index) => images[Number(index)] || "");
 }
 
 function parseHeroSummaryItems(value) {
@@ -1201,7 +1201,7 @@ function renderCardTitle(item) {
   if (!href) {
     return `<h3>${iconHtml}<span class="card-title-text"><span>${title}</span>${subtitleHtml}</span></h3>`;
   }
-  return `<h3>${iconHtml}<span class="card-title-text"><a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${title}</a>${subtitleHtml}</span></h3>`;
+  return `<h3><a class="card-title-link" href="${escapeAttr(href)}" rel="noreferrer">${iconHtml}<span class="card-title-text"><span>${title}</span>${subtitleHtml}</span></a></h3>`;
 }
 
 function renderCardDetails(points) {
