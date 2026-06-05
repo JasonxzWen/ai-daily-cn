@@ -74,7 +74,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
         const pointCount = [bodyText, ...summaryPointText].filter(Boolean).length;
         const untranslatedEnglish = /\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/.test(plain);
-        const ok = plain.length >= 100 && chineseChars >= 60 && chineseRatio >= 0.45 && pointCount >= 2 && pointCount <= 4 && !untranslatedEnglish;
+        const hotBlogTemplate = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
+        const coveragePatterns = [
+          /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
+          /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
+          /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
+        ];
+        const coverageHits = coveragePatterns.filter((pattern) => pattern.test(plain)).length;
+        const weakPointText = [bodyText, ...summaryPointText].some((point) => point.length > 0 && point.length < 18);
+        const templateOrLowInfo = hotBlogTemplate.test(plain) || coverageHits < 2 || weakPointText;
+        const ok = plain.length >= 100 && chineseChars >= 60 && chineseRatio >= 0.45 && pointCount >= 2 && pointCount <= 4 && !untranslatedEnglish && !templateOrLowInfo;
         return ok
           ? null
           : {
@@ -84,7 +93,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
               point_count: pointCount,
               chinese_chars: chineseChars,
               chinese_ratio: Number(chineseRatio.toFixed(3)),
-              untranslated_english: untranslatedEnglish
+              untranslated_english: untranslatedEnglish,
+              template_or_low_information: templateOrLowInfo,
+              coverage_hits: coverageHits,
+              weak_point_text: weakPointText
             };
       })
       .filter(Boolean);

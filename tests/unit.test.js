@@ -3136,6 +3136,24 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
 });
 
+test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hot_blogs = [
+    {
+      ...report.hot_blogs[0],
+      summary: "这篇文章的看点不是单个技术名词，而是它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界。读者可以重点看是否有代码、接口、README、案例或失败模式，而不只看作者结论。对非 AI 直接从业者，价值在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issue = review.issues.find((item) => item.path === "hot_blogs[0].summary");
+
+  assert.equal(review.ok, false);
+  assert.equal(issue?.code, "hot_blog_summary_template");
+  assert(issue.details.problems.includes("template_or_low_information"));
+  assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
+});
+
 test("quality review requires candidate pool and flags autodraft template prose", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_window = {
