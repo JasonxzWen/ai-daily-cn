@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2501,6 +2659,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/comprehensive-observability-for-amazon-sagemaker-ai-llm-inference-from-gpu-utilization-to-llm-quality/" rel="noopener noreferrer">Comprehensive observability for Amazon SageMaker AI LLM inference</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">LLM inference observability and quality monitoring</span></div>
     <div class="card-media-grid" data-count="1"><figure><img src="../../../assets/evidence/aws-sagemaker-llm-observability-architecture.png" alt="SageMaker LLM 推理可观测性架构图" loading="lazy" data-lightbox-image="true" data-lightbox-caption="SageMaker LLM 推理可观测性架构图：AWS Machine Learning Blog 原文首图：SageMaker endpoint、Inference Components、CloudWatch 与 Grafana 的监控链路。" role="button" tabindex="0" aria-label="点击放大图片：SageMaker LLM 推理可观测性架构图：AWS Machine Learning Blog 原文首图：SageMaker endpoint、Inference Components、CloudWatch 与 Grafana 的监控链路。" decoding="async"><figcaption>SageMaker LLM 推理可观测性架构图：AWS Machine Learning Blog 原文首图：SageMaker endpoint、Inference Components、CloudWatch 与 Grafana 的监控链路。</figcaption></figure></div>
+
     <p>AWS 这篇文章把 LLM 推理可观测性拆成两个维度：服务基础设施的 quantity 指标和输出质量的 quality 指标。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>前者覆盖 invocation、latency、error、GPU/CPU 使用率和推理组件维度，后者通过采样与评测捕捉模型漂移、回答不一致或安全问题。</span></dd></div><div><dt>要点 3</dt><dd><span>它给出的架构使用 SageMaker AI Inference Components、CloudWatch 和 Amazon Managed Grafana，把不同 LLM 或不同 inference component 放在同一 endpoint 下观察。</span></dd></div><div><dt>要点 4</dt><dd><span>对生产团队来说，重点是不要只看 GPU 和延迟；</span></dd></div></dl>
   </article>
@@ -2509,6 +2668,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://aws.amazon.com/blogs/awsforsap/building-agentic-enterprises-on-aws-using-aws-for-sap-mcp-server-on-amazon-bedrock-agentcore/" rel="noopener noreferrer">Building Agentic Enterprises on AWS with the AWS for SAP MCP Server</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">MCP server</span><span class="chip chip-topic">SAP business data and Bedrock AgentCore</span></div>
     <div class="card-media-grid" data-count="1"><figure><img src="../../../assets/evidence/aws-sap-mcp-agentcore-architecture.png" alt="AWS for SAP MCP Server 架构图" loading="lazy" data-lightbox-image="true" data-lightbox-caption="AWS for SAP MCP Server 架构图：AWS for SAP Blog 原文架构图：MCP Server 运行在 Bedrock AgentCore Runtime 并连接 SAP OData API。" role="button" tabindex="0" aria-label="点击放大图片：AWS for SAP MCP Server 架构图：AWS for SAP Blog 原文架构图：MCP Server 运行在 Bedrock AgentCore Runtime 并连接 SAP OData API。" decoding="async"><figcaption>AWS for SAP MCP Server 架构图：AWS for SAP Blog 原文架构图：MCP Server 运行在 Bedrock AgentCore Runtime 并连接 SAP OData API。</figcaption></figure></div>
+
     <p>AWS 说明 AWS for SAP MCP Server 如何运行在 Amazon Bedrock AgentCore Runtime 上，把 SAP OData API 暴露为 MCP tools，让 MCP client 和 agent 访问财务、采购、物流等业务流程。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>文章强调解耦 agent 与工具，使用 MCP 连接外部数据和工具，同时用 A2A 支持 agent 间协作。</span></dd></div><div><dt>要点 3</dt><dd><span>部署侧，它把 MCP server 作为容器镜像运行在客户 VPC 中，并结合 Bedrock AgentCore Identity、私有连接和会话隔离处理企业安全边界。</span></dd></div><div><dt>要点 4</dt><dd><span>对大型企业来说，这类方案的价值在于把 agent 从 demo 接入推进到真实 ERP 数据和流程，但也要求团队先整理 SAP API、权限、网络路径和审计责任。</span></dd></div></dl>
   </article>
@@ -2516,6 +2676,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.microsoft.com/en-us/research/blog/data-formulator-0-7-ai-powered-data-analytics-for-enterprise-data/" rel="noopener noreferrer">Data Formulator 0.7: AI-powered data analytics for enterprise data</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI agents for enterprise data analytics</span></div>
+
 
     <p>Microsoft Research 发布 Data Formulator 0.7，把企业数据连接、agent-guided exploration 和可视化迭代放进一个共享工作区。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>Data Connectors 支持数据库、数仓、BI 系统、对象存储和本地文件的持久连接、认证、预览和 metadata；</span></dd></div><div><dt>要点 3</dt><dd><span>context-aware agents 可以查看分析工作区、已加载表、既有图表和用户目标，再通过工具准备数据、写代码、生成 chart spec 并展示中间步骤。</span></dd></div><div><dt>要点 4</dt><dd><span>文章值得关注的是交互形态：它不是单轮聊天生成图表，而是把长分析会话、分支探索、图表直接编辑和可复现代码串在一起，适合企业数据团队评估 AI analytics 是否能进入 governed workflow。</span></dd></div></dl>
@@ -2557,6 +2718,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R1I8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/rauchg/status/2060787704166776927" rel="noopener noreferrer">Guillermo Rauch</a><span class="card-subtitle">@rauchg</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Vercel CEO</span><span class="chip chip-date">2026-05-30</span></div>
 
+
     <p>Rauch 提到 Vercel AI Gateway 的 per-API key spend caps。对 builder 来说，模型路由之外的关键变化是按项目、环境或客户拆分预算，减少共享 key 带来的成本不可解释问题。</p>
 
   </article>
@@ -2565,6 +2727,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Ukw8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/ryolu_/status/2060766674203353190" rel="noopener noreferrer">Ryo Lu</a><span class="card-subtitle">@ryolu_</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Cursor product/design builder</span><span class="chip chip-date">2026-05-30</span></div>
 
+
     <p>Ryo Lu 说 Cursor auto-review 会解释命令和风险，让新开发者更容易判断下一步。这里的观察点是 agent 工具正在把风险提示、命令解释和执行确认做成默认交互。</p>
 
   </article>
@@ -2572,6 +2735,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UFM8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/steipete/status/2060678430031597696" rel="noopener noreferrer">Peter Steinberger</a><span class="card-subtitle">@steipete</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Builder / engineer</span><span class="chip chip-date">2026-05-30</span></div>
+
 
     <p>Steinberger 说 GPT-5.5、/goal、autoreview 和 crabbox 让自己的 prompts 从约 30-60 分钟延长到 4-10 小时任务。长任务的验收、回滚和成本上限会成为 coding agent 日常管理项。</p>
 
@@ -2592,6 +2756,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/" rel="noopener noreferrer">github.blog</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
 
     <p>模型可用性：Claude Opus 4.8 在 GitHub Copilot 中 GA 属于产品入口可用性更新，本轮从模型发布移出，作为 Copilot 管理员策略和用户入口变更记录。</p>
 

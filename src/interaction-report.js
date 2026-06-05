@@ -138,7 +138,7 @@ export function reportToInteractionInput(report, options = {}) {
       group: "signals",
       cardClass: "tracking-card",
       showFilters: false,
-      items: formatDailyTrackingCards(publicDailyTracking)
+      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl })
     });
   }
   if (hotBlogs.length > 0) {
@@ -867,35 +867,240 @@ function formatProjectCards(items) {
   });
 }
 
-function formatDailyTrackingCards(items) {
+function formatDailyTrackingCards(items, context = {}) {
   return items.map((item) => {
-    const metrics = Array.isArray(item.metrics) ? item.metrics : [];
-    const watchPoints = Array.isArray(item.watch_points) ? item.watch_points : [];
-    const points = [
-      ...metrics.map((metric) => ({
-        label: metric.label || "指标",
-        value: metric.value
-      })),
-      ...watchPoints.map((value, index) => ({ label: `看点 ${index + 1}`, value })),
-      item.watch_next ? { label: "下一步", value: item.watch_next } : null,
-      item.verification_note ? { label: "核验", value: item.verification_note } : null,
-      item.risk_note ? { label: "边界", value: item.risk_note } : null
-    ].filter(Boolean);
+    const entries = dailyTrackingLeaderboardEntries(item);
+    const stats = dailyTrackingStats(item, entries);
+    const bars = dailyTrackingProviderBars(entries);
+    const table = dailyTrackingTable(item, entries);
+    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
     return {
       group: dailyTrackingCategoryLabel(item.category),
       title: item.name,
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || item.name),
-      body: formatDailyInlineText(item.summary, item),
+      body: formatDailyTrackingBody(item, entries),
       showGroup: true,
       tags: [
         cardTag(importanceTagFor("daily_tracking", item)),
         cardTag(dailyTrackingCategoryLabel(item.category), "topic"),
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points
+      points: [],
+      ...(media.length > 0 ? { media } : {}),
+      ...(stats.length > 0 ? { stats } : {}),
+      ...(bars.rows.length > 0 ? { bars } : {}),
+      ...(table.rows.length > 0 ? { table } : {})
     };
   });
+}
+
+function dailyTrackingLeaderboardEntries(item) {
+  const snapshotEntries = Array.isArray(item?.snapshot?.top_entries) ? item.snapshot.top_entries : [];
+  const normalized = snapshotEntries
+    .map((entry, index) => normalizeDailyTrackingEntry(entry, index))
+    .filter(Boolean);
+  if (normalized.length > 0) {
+    return normalized.slice(0, 10);
+  }
+
+  const metrics = Array.isArray(item?.metrics) ? item.metrics : [];
+  return metrics
+    .map((metric, index) => parseDailyTrackingMetricEntry(metric, index))
+    .filter(Boolean)
+    .slice(0, 10);
+}
+
+function normalizeDailyTrackingEntry(entry, index) {
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+  const rank = Number(entry.rank || index + 1);
+  const model = String(entry.model || entry.name || entry.title || "").trim();
+  const provider = String(entry.provider || entry.vendor || entry.source || "").trim();
+  const tokens = String(entry.tokens || entry.usage || entry.value || "").trim();
+  const change = normalizeTrackingChange(entry.change || entry.weekly_change || entry.delta || "");
+  if (!model && !tokens) {
+    return null;
+  }
+  return {
+    rank: Number.isFinite(rank) && rank > 0 ? rank : index + 1,
+    model: model || "未命名条目",
+    provider,
+    tokens,
+    change
+  };
+}
+
+function parseDailyTrackingMetricEntry(metric, index) {
+  const label = String(metric?.label || "").trim();
+  if (!/^#\d+/.test(label)) {
+    return null;
+  }
+  const value = String(metric?.value || "").trim();
+  const rank = Number(label.replace(/[^\d]/g, "")) || index + 1;
+  const match = value.match(/^\s*(.+?)(?:[（(]([^)）]+)[)）])?\s*[：:]\s*(.+?)(?:[，,；;]\s*(?:周变化|change)\s*(.+))?$/i);
+  if (!match) {
+    return {
+      rank,
+      model: value || label,
+      provider: "",
+      tokens: "",
+      change: normalizeTrackingChange(metric?.trend || "")
+    };
+  }
+  return {
+    rank,
+    model: String(match[1] || "").trim(),
+    provider: String(match[2] || "").trim(),
+    tokens: String(match[3] || "").trim(),
+    change: normalizeTrackingChange(match[4] || metric?.trend || "")
+  };
+}
+
+function normalizeTrackingChange(value) {
+  const text = String(value || "").replace(/^周变化\s*/u, "").trim();
+  if (!text) {
+    return "";
+  }
+  if (/^new$/i.test(text)) {
+    return "NEW";
+  }
+  const percent = text.match(/-?\d+(?:\.\d+)?\s*%/);
+  if (percent) {
+    const compact = percent[0].replace(/\s+/g, "");
+    return compact.startsWith("-") ? compact : `+${compact}`;
+  }
+  return text;
+}
+
+function dailyTrackingStats(item, entries) {
+  if (entries.length > 0) {
+    const top = entries[0];
+    const biggest = biggestTrackingChange(entries);
+    const newEntries = entries.filter((entry) => entry.change === "NEW");
+    return [
+      { label: "覆盖", value: `Top ${entries.length}`, detail: dailyTrackingSnapshotStatus(item) },
+      {
+        label: "榜首",
+        value: top.model,
+        detail: [top.provider, top.tokens, top.change].filter(Boolean).join(" / ")
+      },
+      biggest ? {
+        label: "最大变化",
+        value: biggest.model,
+        detail: biggest.change
+      } : null,
+      newEntries.length > 0 ? {
+        label: "新进榜",
+        value: newEntries.map((entry) => entry.model).join("、"),
+        detail: `${newEntries.length} 个条目`
+      } : null
+    ].filter(Boolean);
+  }
+
+  const metrics = Array.isArray(item?.metrics) ? item.metrics.filter((metric) => metric?.label || metric?.value) : [];
+  return [
+    metrics[0] ? { label: metrics[0].label || "核心指标", value: metrics[0].value || "", detail: dailyTrackingCategoryLabel(item.category) } : null,
+    item.event_date ? { label: "日期", value: item.event_date, detail: "公开追踪" } : null
+  ].filter(Boolean);
+}
+
+function dailyTrackingSnapshotStatus(item) {
+  const status = String(item?.snapshot?.snapshot_status || "").trim();
+  if (status === "complete") {
+    return "公开榜单已解析";
+  }
+  if (status === "partial") {
+    return "公开榜单部分解析";
+  }
+  return "公开页面";
+}
+
+function biggestTrackingChange(entries) {
+  return entries
+    .map((entry) => ({ entry, value: numericTrackingChange(entry.change) }))
+    .filter((item) => Number.isFinite(item.value))
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))[0]?.entry || null;
+}
+
+function numericTrackingChange(value) {
+  const match = String(value || "").match(/-?\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : Number.NaN;
+}
+
+function dailyTrackingProviderBars(entries) {
+  const counts = new Map();
+  for (const entry of entries) {
+    const provider = entry.provider || "unknown";
+    counts.set(provider, (counts.get(provider) || 0) + 1);
+  }
+  const rows = Array.from(counts.entries())
+    .map(([label, value]) => ({ label, value, status: `${value}/${entries.length}` }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+  return {
+    title: "供应商分布",
+    rows
+  };
+}
+
+function dailyTrackingTable(item, entries) {
+  if (entries.length > 0) {
+    return {
+      title: "Top 10 榜单",
+      columns: [
+        { key: "rank", label: "排名", width: "64px", align: "center" },
+        { key: "model", label: "模型" },
+        { key: "provider", label: "供应商", width: "120px" },
+        { key: "tokens", label: "调用量", width: "130px", align: "right" },
+        { key: "change", label: "周变化", width: "96px", align: "right" }
+      ],
+      rows: entries.map((entry) => ({
+        rank: `#${entry.rank}`,
+        model: entry.model,
+        provider: entry.provider || "未知",
+        tokens: entry.tokens || "未披露",
+        change: entry.change || "未披露"
+      }))
+    };
+  }
+
+  const rows = Array.isArray(item?.metrics)
+    ? item.metrics
+        .filter((metric) => metric?.label || metric?.value)
+        .map((metric) => ({
+          label: metric.label || "指标",
+          value: metric.value || ""
+        }))
+    : [];
+  return {
+    title: "追踪指标",
+    columns: [
+      { key: "label", label: "指标", width: "150px" },
+      { key: "value", label: "当前值" }
+    ],
+    rows
+  };
+}
+
+function formatDailyTrackingBody(item, entries) {
+  if (entries.length > 0) {
+    const top = entries[0];
+    const biggest = biggestTrackingChange(entries);
+    const newEntries = entries.filter((entry) => entry.change === "NEW");
+    const parts = [
+      `这是公开榜单信号，不等同模型能力评测。榜首 ${top.model}${top.provider ? `（${top.provider}）` : ""}${top.tokens ? `，${top.tokens}` : ""}${top.change ? `，${top.change}` : ""}`,
+      biggest && biggest !== top ? `最大周变化是 ${biggest.model}（${biggest.change}）` : "",
+      newEntries.length > 0 ? `新进榜：${newEntries.map((entry) => entry.model).join("、")}` : ""
+    ].filter(Boolean);
+    return formatDailyInlineText(`${parts.join("；")}。`, item);
+  }
+
+  const summary = stripPublicBodySourcePrefix(item.summary, item)
+    .replace(/\s+/g, " ")
+    .trim();
+  const firstSentence = summary.split(/(?<=[。！？!?；;])\s*/u).find(Boolean) || summary;
+  return formatDailyInlineText(firstSentence, item);
 }
 
 function isPublicDailyTrackingChange(item) {

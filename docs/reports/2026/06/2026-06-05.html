@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2483,8 +2641,88 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer">OpenRouter</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-05</span></div>
 
-    <p>OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，2.9T tokens，周变化 18%）。 Top 10 供应商分布为 deepseek 3、anthropic 2、xiaomi 2、minimax 1、openrouter 1、tencent 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 新进榜模型包括 MiniMax M3，应继续核对是否来自新发布、免费额度或价格变化。</p>
-    <dl class="card-detail-list"><div><dt>榜单范围</dt><dd><span>This Week Top 10</span></dd></div><div><dt>供应商分布</dt><dd><span>deepseek 3、anthropic 2、xiaomi 2、minimax 1、openrouter 1、tencent 1</span></dd></div><div><dt>#1</dt><dd><span>DeepSeek V4 Flash（deepseek）：2.9T tokens，周变化 18%</span></dd></div><div><dt>#2</dt><dd><span>Hy3 preview（tencent）：2.7T tokens，周变化 13%</span></dd></div><div><dt>#3</dt><dd><span>MiMo-V2.5（xiaomi）：2.31T tokens，周变化 450%</span></dd></div><div><dt>#4</dt><dd><span>Owl Alpha（openrouter）：1.99T tokens，周变化 44%</span></dd></div><div><dt>#5</dt><dd><span>Claude Sonnet 4.6（anthropic）：1.77T tokens，周变化 14%</span></dd></div><div><dt>#6</dt><dd><span>Claude Opus 4.7（anthropic）：1.41T tokens，周变化 47%</span></dd></div><div><dt>#7</dt><dd><span>DeepSeek V4 Pro（deepseek）：1.34T tokens，周变化 11%</span></dd></div><div><dt>#8</dt><dd><span>MiniMax M3（minimax）：1.22T tokens，周变化 new</span></dd></div><div><dt>#9</dt><dd><span>MiMo-V2.5-Pro（xiaomi）：1.12T tokens，周变化 37%</span></dd></div><div><dt>#10</dt><dd><span>DeepSeek V3.2（deepseek）：1.11T tokens，周变化 15%</span></dd></div><div><dt>看点 1</dt><dd><span>MiMo-V2.5 的周变化为 450%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。</span></dd></div><div><dt>看点 2</dt><dd><span>新进榜模型：MiniMax M3（minimax）。</span></dd></div><div><dt>看点 3</dt><dd><span>OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。</span></dd></div><div><dt>下一步</dt><dd><span>若榜首、Top 10 构成或周变化继续异常，回到模型发布、价格页和状态页核验是发布驱动、价格驱动还是平台内工作流迁移。</span></dd></div><div><dt>核验</dt><dd><span>已解析 OpenRouter 公开 Rankings 页面的 This Week Top 10；快照时间 2026-06-05T10:59:57.437Z，这是平台用量信号，不是全市场份额或能力评测。</span></dd></div><div><dt>边界</dt><dd><span>OpenRouter 反映平台内使用结构，不能直接代表全市场份额，也不能当成模型能力结论。</span></dd></div></dl>
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">覆盖</span>
+      <strong>Top 10</strong>
+      <span class="card-stat-detail">公开榜单已解析</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">榜首</span>
+      <strong>DeepSeek V4 Flash</strong>
+      <span class="card-stat-detail">deepseek / 2.9T tokens / +18%</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">最大变化</span>
+      <strong>MiMo-V2.5</strong>
+      <span class="card-stat-detail">+450%</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">新进榜</span>
+      <strong>MiniMax M3</strong>
+      <span class="card-stat-detail">1 个条目</span>
+    </div></div><div class="card-visual card-bars" data-card-bars>
+    <div class="card-visual-title">供应商分布</div>
+    <div class="chart-bars" aria-hidden="true">
+    <div class="chart-bar-row">
+        <span class="chart-bar-label">deepseek</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
+        <span class="chart-bar-value">3</span>
+        <span class="chart-bar-status">3/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">anthropic</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
+        <span class="chart-bar-value">2</span>
+        <span class="chart-bar-status">2/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">xiaomi</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
+        <span class="chart-bar-value">2</span>
+        <span class="chart-bar-status">2/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">minimax</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">openrouter</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">tencent</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+  </div>
+  </div><div class="card-visual card-table" data-card-table>
+    <div class="card-visual-title">Top 10 榜单</div>
+
+    <div class="table-scroll card-table-scroll" data-table-wrap>
+      <table class="report-data-table card-data-table" data-report-data-table data-card-data-table>
+        <colgroup><col style="width:64px"><col><col style="width:120px"><col style="width:130px"><col style="width:96px"></colgroup>
+        <thead><tr><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0" data-align="center">排名</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1" data-align="left">模型</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2" data-align="left">供应商</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3" data-align="right">调用量</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4" data-align="right">周变化</th></tr></thead>
+        <tbody><tr><td tabindex="0" data-table-cell data-table-row="1" data-table-column="0" data-align="center">#1</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="1" data-align="left">DeepSeek V4 Flash</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="3" data-align="right">2.9T tokens</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="4" data-align="right">+18%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="2" data-table-column="0" data-align="center">#2</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="1" data-align="left">Hy3 preview</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="2" data-align="left">tencent</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="3" data-align="right">2.7T tokens</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="4" data-align="right">+13%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="3" data-table-column="0" data-align="center">#3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="1" data-align="left">MiMo-V2.5</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="2" data-align="left">xiaomi</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="3" data-align="right">2.31T tokens</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="4" data-align="right">+450%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="4" data-table-column="0" data-align="center">#4</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="1" data-align="left">Owl Alpha</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="2" data-align="left">openrouter</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="3" data-align="right">1.99T tokens</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="4" data-align="right">+44%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="5" data-table-column="0" data-align="center">#5</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="1" data-align="left">Claude Sonnet 4.6</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="3" data-align="right">1.77T tokens</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="4" data-align="right">+14%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="6" data-table-column="0" data-align="center">#6</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="1" data-align="left">Claude Opus 4.7</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="3" data-align="right">1.41T tokens</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="4" data-align="right">+47%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="7" data-table-column="0" data-align="center">#7</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="1" data-align="left">DeepSeek V4 Pro</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="3" data-align="right">1.34T tokens</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="4" data-align="right">+11%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="8" data-table-column="0" data-align="center">#8</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="1" data-align="left">MiniMax M3</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="2" data-align="left">minimax</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="3" data-align="right">1.22T tokens</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="4" data-align="right">NEW</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="9" data-table-column="0" data-align="center">#9</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="1" data-align="left">MiMo-V2.5-Pro</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="2" data-align="left">xiaomi</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="3" data-align="right">1.12T tokens</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="4" data-align="right">+37%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="10" data-table-column="0" data-align="center">#10</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="1" data-align="left">DeepSeek V3.2</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="3" data-align="right">1.11T tokens</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="4" data-align="right">+15%</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+    <p>这是公开榜单信号，不等同模型能力评测。榜首 DeepSeek V4 Flash（deepseek），2.9T tokens，+18%；最大周变化是 MiMo-V2.5（+450%）；新进榜：MiniMax M3。</p>
+
   </article>
     </div>
   </section>
@@ -2503,6 +2741,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://huggingface.co/blog/hf-cli-for-agents" rel="noopener noreferrer">Designing the hf CLI as an agent-optimized way to work with the Hub</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
+
     <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>需要核对真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。</span></dd></div><div><dt>要点 3</dt><dd><span>适合判断这类工具是否值得试点、采购或进入内部自动化路线图。</span></dd></div></dl>
   </article>
@@ -2511,6 +2750,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://openai.com/index/endava-frontiers" rel="noopener noreferrer">OpenAI 用 Endava 案例说明企业如何把 ChatGPT Enterprise、Codex 和 agent 工作流放进软件交付流程</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
+
     <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>需要核对代码、接口、README、案例或失败模式，判断作者结论是否能复用。</span></dd></div><div><dt>要点 3</dt><dd><span>适合判断这类工具是否值得试点、采购或进入内部自动化路线图。</span></dd></div></dl>
   </article>
@@ -2518,6 +2758,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://developer.nvidia.com/blog/nvidia-nemotron-3-ultra-powers-faster-more-efficient-reasoning-for-long-running-agents/" rel="noopener noreferrer">NVIDIA 介绍 Nemotron 3 Ultra 面向长程 agent 的推理能力，重点在多轮上下文、工具使用和推理效率</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
+
 
     <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>需要核对真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。</span></dd></div><div><dt>要点 3</dt><dd><span>适合判断这类工具是否值得试点、采购或进入内部自动化路线图。</span></dd></div></dl>
@@ -2559,6 +2800,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-mattturck.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/mattturck/status/2062587004261748887" rel="noopener noreferrer">Matt Turck</a><span class="card-subtitle">@mattturck</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-04</span></div>
 
+
     <p>Matt Turck 提到与 OpenAI 的 Dan 相关访谈已同步到播客和 YouTube；这是访谈入口线索，适合后续核对是否包含产品或模型路线图信息。</p>
 
   </article>
@@ -2566,6 +2808,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-swyx.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/swyx/status/2062611218196771017" rel="noopener noreferrer">Swyx</a><span class="card-subtitle">@swyx</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-04</span></div>
+
 
     <p>Swyx 关注 Cog 推出的首个 eval，并把它与 METR 约 16 小时任务上限作对比；看点是企业私有 eval 是否已能覆盖更长任务并给出财务保证。</p>
 
@@ -2575,6 +2818,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-joshwoodward.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/joshwoodward/status/2062667951485108354" rel="noopener noreferrer">Josh Woodward</a><span class="card-subtitle">@joshwoodward</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-04</span></div>
 
+
     <p>Josh Woodward 提到 macOS 版 Gemini 的一个新功能体验；这是产品体验线索，后续需要回到官方说明或截图核对具体能力。</p>
 
   </article>
@@ -2582,6 +2826,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-thsottiaux.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/thsottiaux/status/2062734215494664697" rel="noopener noreferrer">Thibault Sottiaux</a><span class="card-subtitle">@thsottiaux</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-05</span></div>
+
 
     <p>Thibault Sottiaux 提到可通过 Python SDK 在自有程序中调用 Codex，并给出安装入口；看点是 Codex 是否能被嵌入内部工具链。</p>
 
@@ -2591,6 +2836,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-catwu.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/_catwu/status/2062659533047259212" rel="noopener noreferrer">Cat Wu</a><span class="card-subtitle">@_catwu</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-04</span></div>
 
+
     <p>Cat Wu 发布 Claude Code 的 PM 招聘信息，岗位重点是模型表现和 agentic eval；这说明 Claude Code 团队在把评估能力与产品性能改进结合。</p>
 
   </article>
@@ -2598,6 +2844,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-05-levie.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/levie/status/2062728257359790292" rel="noopener noreferrer">Aaron Levie</a><span class="card-subtitle">@levie</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-05</span></div>
+
 
     <p>Aaron Levie 引用 Anthropic 文章讨论 AI 乐观情景，重点是组织能否发现并清除瓶颈，从而承接模型带来的大量新想法、工具和模拟。</p>
 
@@ -2619,6 +2866,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.apple.com/newsroom/2026/06/apple-and-major-league-baseball-announce-july-friday-night-baseball-schedule/" rel="noopener noreferrer">Apple Newsroom</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">官方来源</span><span class="chip chip-date">2026-06-04</span></div>
 
+
     <p>Apple 公布 Apple TV 上 “Friday Night Baseball” 的 7 月赛程；这是娱乐内容和平台排期线索，不进入 AI 主体事实。待确认：事实来自可回看的原始链接。
 
 待确认：事实来自可回看的原始链接；边界：融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。</p>
@@ -2628,6 +2876,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.apple.com/newsroom/2026/06/mini-football-legends-family-feud-pocket-and-seven-more-hits-join-apple-arcade/" rel="noopener noreferrer">Apple Newsroom</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">官方来源</span><span class="chip chip-date">2026-06-04</span></div>
+
 
     <p>Apple Arcade 将新增 9 款游戏，包括 My Talking Tom 2+ 和 Coffee Inc 2+；这是平台内容供给线索，不进入 AI 主体事实。待确认：事实来自可回看的原始链接。
 
@@ -2639,6 +2888,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://about.fb.com/news/2026/06/reels-is-shaping-indias-video-first-future-across-gen-z-women-bharat/" rel="noopener noreferrer">Meta Newsroom</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2026-06-04</span></div>
 
+
     <p>Meta 引用 IPSOS 研究称印度视频经济正在全国化，Reels 被描述为推动发现、文化、创作者互动和商业转化的短视频平台；这是平台市场线索，不进入主体事实。待确认：事实来自可回看的原始链接。
 
 待确认：事实来自可回看的原始链接；边界：融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。</p>
@@ -2648,6 +2898,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://doi.org/10.5281/zenodo.18864873" rel="noopener noreferrer">OpenAlex</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2027-01-01</span></div>
+
 
     <p>Zenodo (CERN European Organization for Nuclear Research) 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认。
 
@@ -2659,6 +2910,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://doi.org/10.5281/zenodo.18864874" rel="noopener noreferrer">OpenAlex</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2027-01-01</span></div>
 
+
     <p>Zenodo (CERN European Organization for Nuclear Research) 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认。
 
 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认；边界：融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。</p>
@@ -2668,6 +2920,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://doi.org/10.5281/zenodo.18734869" rel="noopener noreferrer">OpenAlex</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2026-12-22</span></div>
+
 
     <p>Zenodo (CERN European Organization for Nuclear Research) 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认。
 
@@ -2679,6 +2932,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://doi.org/10.5281/zenodo.19458845" rel="noopener noreferrer">OpenAlex</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2026-06-05</span></div>
 
+
     <p>Zenodo (CERN European Organization for Nuclear Research) 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认。
 
 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认；边界：融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。</p>
@@ -2688,6 +2942,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://doi.org/10.5281/zenodo.19458846" rel="noopener noreferrer">OpenAlex</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">一手来源</span><span class="chip chip-date">2026-06-05</span></div>
+
 
     <p>Zenodo (CERN European Organization for Nuclear Research) 待确认：该来源仅作为线索，事实性结论需要一手来源或多源确认。
 

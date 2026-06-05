@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2514,6 +2672,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://huggingface.co/blog/Hcompany/holo31" rel="noopener noreferrer">Holo3.1: Fast &amp; Local Computer Use Agents</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">computer-use agent</span></div>
 
+
     <p>1. 聚焦本地、快速的 computer-use agent，适合观察桌面自动化从云端演示走向本地执行；</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>2. 价值在于延迟、隐私和可控性，但仍要验证真实 UI 失败恢复；</span></dd></div><div><dt>要点 3</dt><dd><span>3. 可作为 RPA、浏览器 agent 和终端自动化的评测样本。</span></dd></div></dl>
   </article>
@@ -2522,6 +2681,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://huggingface.co/blog/ibm-research/agent-logic-and-scalable-ai-adoption" rel="noopener noreferrer">Beyond LLMs: Why Scalable Enterprise AI Adoption Depends on Agent Logic</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">enterprise agent logic</span></div>
 
+
     <p>1. IBM Research 把企业 AI 采用问题落到 agent logic，而不是单纯模型能力；</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>2. 重点是流程状态、工具调用、权限和治理如何组合；</span></dd></div><div><dt>要点 3</dt><dd><span>3. 适合做企业 agent 平台的人检查 orchestration、observability 与审计设计。</span></dd></div></dl>
   </article>
@@ -2529,6 +2689,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.alibabacloud.com/blog/ontology-is-trending-again--can-it-improve-my-ai-agents-performance_603207" rel="noopener noreferrer">Ontology Is Trending Again. Can It Improve My AI Agent&#39;s Performance?</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">ontology for agents</span></div>
+
 
     <p>1. 文章把 ontology 作为结构化领域知识层，服务企业运维 agent 的准确性和可解释性；</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>2. 核心启发是把隐性知识显式建模，再交给 agent 调用；</span></dd></div><div><dt>要点 3</dt><dd><span>3. 适合知识密集型客服、运维、合规和内部工具场景。</span></dd></div></dl>
@@ -2570,6 +2731,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-levie.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/levie/status/2061974298760495132" rel="noopener noreferrer">Aaron Levie</a><span class="card-subtitle">@levie</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Box CEO</span><span class="chip chip-date">2026-06-03</span></div>
 
+
     <p>随着 token 预算在运营支出中占比越来越大，模型路由会成为必然结果。这也会成为应用层 AI 长期差异化最大的领域之一。理解你所在领域的不同工作模式，并为该领域建立强评测，你就能有效优化成本与性能。眼下多数用例可能仍需要前沿模型表现；但很快，当某些单独用例的质量足够时，你就能把它们转给更低成本的模型。企业单独在大规模上解决这件事可能并不现实，因此能把这些 workflow 智能路由到合适模型层级的产品，会处在聚合更多需求的强位置。</p>
 
   </article>
@@ -2577,6 +2739,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-petergyang.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/petergyang/status/2061846283263103274" rel="noopener noreferrer">Peter Yang</a><span class="card-subtitle">@petergyang</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Product builder</span><span class="chip chip-date">2026-06-02</span></div>
+
 
     <p>大家说 SaaS 没死。我认为能完成多种工作的较大企业 SaaS 大概没问题，比如 Figma。但如果你在做一个窄场景的简单 SaaS，现在变现会更难：AI skills 经常能以更灵活、更个性化的方式解决同一问题；Codex、Claude Code 这类 AI-native agents 拥有用户个人上下文和记忆，比独立 SaaS 网站或 chatbot 更了解用户问题；人们愿意为服务付出几百或几千美元，但每月 20 美元的 SaaS 会被拿来和 Claude/ChatGPT 订阅比较。</p>
 
@@ -2586,6 +2749,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-trq212.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/trq212/status/2061907538741006796" rel="noopener noreferrer">Thariq</a><span class="card-subtitle">@trq212</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI workflow builder</span><span class="chip chip-date">2026-06-02</span></div>
 
+
     <p>Workflows 是 Claude Code 自 skills 和 subagents 以来最大的能力升级。我和 Sid 深入研究了它，整理最佳实践、示例等内容。我尤其期待它能为 Claude Code 打开的非技术任务。</p>
 
   </article>
@@ -2593,6 +2757,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-rauchg.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/rauchg/status/2061934154732974376" rel="noopener noreferrer">Guillermo Rauch</a><span class="card-subtitle">@rauchg</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Vercel CEO</span><span class="chip chip-date">2026-06-02</span></div>
+
 
     <p>YES-CODE。整个 no-code 软件类别建立在代码昂贵、困难且稀缺的假设上。Coding agents 永久改变了这个等式：代码现在便宜、容易且充足。我们要做的是为 agents 创造最容易使用、但永远不需要毕业离开的云。</p>
 
@@ -2602,6 +2767,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-amasad.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/amasad/status/2061878314311266552" rel="noopener noreferrer">Amjad Masad</a><span class="card-subtitle">@amasad</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Replit CEO</span><span class="chip chip-date">2026-06-02</span></div>
 
+
     <p>SWE benchmarks 不一定能捕捉应用构建能力，ViBench 可以。</p>
 
   </article>
@@ -2609,6 +2775,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-03-joshwoodward.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/joshwoodward/status/2062025667852812583" rel="noopener noreferrer">Josh Woodward</a><span class="card-subtitle">@joshwoodward</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Google / Gemini product lead</span><span class="chip chip-date">2026-06-03</span></div>
+
 
     <p>小问题修好了：Thinking Levels 现在已经在 Gemini 的 Web、iOS 和 Android 上可用。</p>
 
@@ -2630,6 +2797,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/" rel="noopener noreferrer">TechCrunch AI</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-02</span></div>
 
+
     <p>TechCrunch 报道 Uber 在四个月内超出 AI 使用预算后限制员工 AI 支出；这是 AI 成本治理线索，进入社区观察而非事实主线。
 
 待确认：中介来源仅作发现线索，事实性结论需要一手或多源确认；边界：涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。</p>
@@ -2639,6 +2807,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAJ1BMVEVHcExSAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP+IbbjWAAAADHRSTlMAX0GgcRDMJrb04oZMw6usAAABqUlEQVRYhdWWyYKDMAxDWQIUmP//3mlgWvwSL0DnUh3jxMiy7LZpvh9thK58MSHc9D8BHmWChdFuDhL0JQFEn/weFxOA8jg8RbiWYEAFKR8FNRQJEoLb0XopwVjHpsV6qySAhPNfi30ZmQB0s4R1Y9wEZNuq1igBI7Fl+vGYNrydDCtDwlUntjQ2Bvl+FqkhTWsnwD1Z22QFCgKoALXJTs7VAL8ArRY7tBrvaRjeIjnjPQpdJgYhj1ED5qic8iaWkYM8lWHIWEUzHAkzsNoqfhmQqTYLZJy1CjwJK4aKGyGz2mlfRjZaFUl+onYjJ1Z7TxkrjnChMW/Y+GUFIDDoCTrnI3ChOSzSapSREhoEPBlBzl4YWG1wIyQ094Uj4xkJNwryYjrOIaGzMzkwR6mn1s0O+O1dKyRUJ/X4lipjr6bVgZl7ZZVndg+Vy61Slythhuz43rBw1RBSsN2N8bK7wElftwGuSKgBLgx6qGFABTcIwIUpvl9BuvBjCe/0UJ+u84ALvb9fFuDCTyXUflBD/KuEdwhgtm+8h4ThJlEACZ1fAxNJ4IaJvgW/0z1C3l9aXhAAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.theverge.com/tech/942302/google-search-ai-overviews-uk-cma-publisher-opt-out" rel="noopener noreferrer">The Verge AI</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
+
 
     <p>The Verge 报道英国 CMA 要求 Google 允许出版商选择退出 AI Search features；这是平台政策线索，需回到监管文件或 Google 官方说明再升格。
 
@@ -2650,6 +2819,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://36kr.com/p/3836973710423429?f=rss" rel="noopener noreferrer">36Kr</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
+
     <p>36Kr 提到火山引擎 MaaS 与 Seedance 2.0 商业化进展；因涉及营收数字，当前仅作中文产业线索，需公司或多源验证。
 
 待确认：中介来源仅作发现线索，事实性结论需要一手或多源确认；边界：涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。</p>
@@ -2659,6 +2829,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/wsfm6yIgeRQ9ij1X.html" rel="noopener noreferrer">Leiphone</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
+
 
     <p>雷峰网报道千问 APP 将向第三方 Agent、Skill 开放并引入品牌服务测试；当前作为中文产品生态线索，等待官方产品页确认。
 
@@ -2670,6 +2841,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://36kr.com/p/3836068296209537?f=rss" rel="noopener noreferrer">36Kr</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
+
     <p>36Kr 报道深圳具身智能公司星尘智能完成新一轮融资并出现产业订单线索；因涉及融资额、估值和订单，当前仅作国内具身智能融资热度线索，需公司、投资方或多源验证。
 
 待确认：中介来源仅作发现线索，融资额、估值和订单需公司公告、投资方公告或至少两个独立可信来源确认；边界：融资、估值和订单属于高风险商业事实，不进入主体事实主线。</p>
@@ -2679,6 +2851,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.qbitai.com/2026/06/428435.html" rel="noopener noreferrer">QbitAI</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
+
 
     <p>QbitAI 线索称国内团队跨维智能在 WorldArena 相关榜单出现排名变化；因涉及 benchmark/榜单，当前只作为国内模型评测线索，需回到 WorldArena 原始榜单或论文/项目页确认。
 

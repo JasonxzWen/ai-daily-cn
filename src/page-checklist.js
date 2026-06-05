@@ -69,6 +69,35 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       document.querySelectorAll(".project-card-grid, .project-card").length === 0,
       "Project highlights should stay inside GitHub Trending entries, not a standalone project card section."
     );
+    const weakTrackingCards = Array.from(document.querySelectorAll(".tracking-card"))
+      .map((card, index) => {
+        const hasVisualData = Boolean(
+          card.querySelector("[data-card-data-table]") ||
+          card.querySelector("[data-card-bars]") ||
+          card.querySelector(".card-media-grid img")
+        );
+        const rankDetailLabels = Array.from(card.querySelectorAll(".card-detail-list dt"))
+          .map((node) => node.textContent?.trim() || "")
+          .filter((text) => /^#\d+/.test(text));
+        const detailRows = card.querySelectorAll(".card-detail-list div").length;
+        const ok = hasVisualData && rankDetailLabels.length === 0 && detailRows <= 2;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              has_visual_data: hasVisualData,
+              rank_detail_labels: rankDetailLabels,
+              detail_rows: detailRows
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_visualized",
+      weakTrackingCards.length === 0,
+      "Daily tracking cards should be visual/table-first and must not render leaderboard rows as text detail logs.",
+      { weak_cards: weakTrackingCards }
+    );
     const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";

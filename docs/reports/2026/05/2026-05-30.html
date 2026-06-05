@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2427,6 +2585,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0hDPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://help.openai.com/en/articles/6825453-chatgpt-on-whatsapp-update" rel="noopener noreferrer">ChatGPT release notes: GPT-5.5 Instant 更新与旧模型退场日期</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">ChatGPT 产品更新与模型生命周期</span></div>
 
+
     <p>OpenAI Help Center 的更新记录把 GPT-5.5 Instant 的写作与代码输出调整、canvas 调用变化、以及 ChatGPT 内 OpenAI o3 与 GPT-4.5 的退场日期放在同一条 release note 中。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>这里最值得产品团队核对的是界面行为：复杂写作和代码将更多以聊天内代码块完成，而不是自动进入 canvas。</span></dd></div><div><dt>要点 3</dt><dd><span>其次是模型生命周期：ChatGPT 产品里的 o3 和 GPT-4.5 有明确退场日，但说明同时写明这些退场不影响 API。</span></dd></div><div><dt>要点 4</dt><dd><span>做内部模型选择器或用户文档时，应把 ChatGPT UI 的变化与 API 可用性分开记录。</span></dd></div></dl>
   </article>
@@ -2435,6 +2594,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/claude-opus-4-8-is-now-available-on-aws/" rel="noopener noreferrer">Claude Opus 4.8 is now available on AWS</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Bedrock 上的 Claude Opus 4.8 集成</span></div>
 
+
     <p>AWS 这篇文章不是再宣布一次模型发布，而是把 Claude Opus 4.8 在 Bedrock 与 Claude Platform on AWS 两条路径中的接入方式写成可执行说明。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>它列出 Bedrock 控制台试用、Anthropic Messages API 通过 bedrock-runtime 调用、Converse API 调用、模型 ID、权限前提和区域可用性。</span></dd></div><div><dt>要点 3</dt><dd><span>对已经在 Bedrock 做多模型网关的团队，文章的价值在于把模型能力描述和接入细节放在同一处：可以直接核对 IAM、SDK、区域、调用 API 和是否需要 Claude Platform 原生体验。</span></dd></div></dl>
   </article>
@@ -2442,6 +2602,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAADN0lEQVQ4jZ2US2icVRTHf+d+r3k0GZXYGAwzbRBFlDYQcCNIFbFUUExLXVTqA6QI3SSFUlAQEXQjqbgtWVSkokELPgo2YhMEpWIXQZSWWkiMFpOaNI/JZOab7373uJgkbZKRUg/czeF/fpz/PedeoUnooZ6AP/K9pGYv0I3QBSYGueZMdN6QniGOh2R01G6slU2w/Y/0kngDWLONenBDpgLigwQ4L0TFjGPkiP/VZ1/8J1Bfe+g4sd9HHMBSCPWwAVJpSCUEE64CQTxAXvG/PPXhKsOswT7YOkDbch9hCq0xZBPwLKgDtAJcRxzKutJhbzH49OamDICeDZ/jnmo/7VXIptBWg9Z6max7G9/bLsMjLTL8XRth1CFijoEsgDvjRcmzMnqyts6yDuHRGl1hISxxLd+wWon+ZCq7SwZ/GW86tGf2F+m48285cSLZNBT9OXoaK1+zbGA+gGW/TlV2yKGZy81gtwqfIDiA78AHwgRmdVAOLv4vGICvWn8Y8RFfIAfYdLCZsPtddc3yRh1uZVkyWu8z6upFFBCDGoHOysXb6cghII0Tm6BkNimqhdztAJEbq+wwvg9MovaOVJU6ik3TB4Efm5SOKgqkgNdgQRdQXH0fAtN+Cr86Z3fUcCwqVFQPNAOOvS5PbMztfMedFqG4llAmjHN8PK9Qdo45VWZUXv3kp+j+Wzl94L3qduvFe6xYEhPjcE6Eb0WH8M4XuTKtlCoqJPhcVX/y93ph18nHpyaawToHf7vLxuZsKtITJVsI0wxRkj938Vj2SSPPk6rQDzCjhnHn8Y8GxVmTH9t57tE37x3Z07lGGnlrS3j6/RdmspculPN/9cTh4ppZMfrGyj02YuAHMzDpcv3zRCxohsu2iyXNs0QLqYZl6/LXnYYlTQpQ64SkgNhWgqRArtoxMHX4vqPrgAD7vm8/vqi5viVyXLUl6uSINYNiUDxSF6JpHhe3g22BtAWJt360fPCplxFRuOn7Avj8sekjVc3sm3MtExYh1nBleAZVQcRiTA0RC+rPitQOL7+4+6VV2KYOV6PnQk8wPretN5XcXpBukC7AojKFRmMuLXxTNnefYvfRysbafwFOiFhxqOMpZwAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://research.google/blog/a-new-era-of-innovation-google-research-at-io-2026/" rel="noopener noreferrer">A New Era of Innovation: Google Research at I/O 2026</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Google I</span><span class="chip chip-topic">O 2026 研究工具汇总</span></div>
+
 
     <p>Google Research 的 I/O 回顾把 Gemini for Science、ERA、Co-Scientist、Computational Discovery、Hypothesis Generation、Literature Insights 和 Science Skills 放在一条研究产品线里。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>文章值得单独读，是因为它没有只讲单个模型，而是展示 Google 如何把代码搜索、论文综合、多 agent 假设生成和科研工作流串成工具集合。</span></dd></div><div><dt>要点 3</dt><dd><span>对于做内部研究助理、实验自动化或文献分析的团队，这篇文章提供了拆分模块的线索：代码优化、假设生成、可点击引用、结构化文献结果和领域技能应该分别验证。</span></dd></div></dl>
@@ -2483,6 +2644,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QzwvdGV4dD48L3N2Zz4=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/claudeai/status/2060042702150930686" rel="noopener noreferrer">Claude</a><span class="card-subtitle">@claudeai</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Anthropic official product account</span><span class="chip chip-date">2026-05-28</span></div>
 
+
     <p>Claude 官方 X status 将 Opus 4.8 表述为面向更长独立工作、更清晰进度自检和更强判断力的版本。今天不再把它作为主体重复发布，只保留为 Builder 来源门所需的原始 X 观察。</p>
 
   </article>
@@ -2491,6 +2653,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U1c8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://techcrunch.com/2026/05/29/cognitions-scott-wu-says-ai-coding-agents-shouldnt-replace-humans/" rel="noopener noreferrer">Scott Wu</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Cognition CEO</span><span class="chip chip-date">2026-05-29</span></div>
 
+
     <p>Scott Wu 在 TechCrunch 访谈中把 Devin 描述为帮助程序员构建更多东西的伙伴，而不是替代程序员。他同时承认 Devin 可独立完成部分任务，但更强调把维护、迁移等长尾工作从程序员手中移走，让人继续负责判断和创造。</p>
 
   </article>
@@ -2498,6 +2661,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExODI3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0E8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/" rel="noopener noreferrer">Gary Abel</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Fourth Eon Biosecurity Co-Founder and Chief Scientist</span><span class="chip chip-date">2026-05-29</span></div>
+
 
     <p>OpenAI 的 Rosalind Biodefense 文章把 GPT-Rosalind 的使用放进 Fourth Eon Biosecurity 等伙伴场景中，强调分析、筛查和生物防御准备。这里可见的 Builder 取向是先限定用户和任务，再讨论模型能力。</p>
 
