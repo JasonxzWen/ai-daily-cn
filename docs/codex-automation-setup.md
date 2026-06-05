@@ -1,5 +1,9 @@
 # Codex 自动化创建参数
 
+## 21:30 状态自检自动化
+
+每天 21:30 另设一个 `status:self-check` 定时任务，输出 `.tmp/status-self-check-YYYY-MM-DD.json`。它只做状态自检，不生成新日报、不真实 publish；检查 `sources:phase5-audit`、`publish:dry-run:daily`、Pages HTTP、信源健康和自动化清单。若发现 `multiple_active_daily_publish_automations`，必须作为 blocking issue 报告。
+
 ## 推荐参数
 
 | 字段 | 值 |

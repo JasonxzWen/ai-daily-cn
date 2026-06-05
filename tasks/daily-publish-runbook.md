@@ -10,6 +10,8 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 - The runner owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Codex owns semantic AI repair when `next_action.kind` is `codex_ai_repair_contract`; save the contract as `.tmp/quality-ai-repair-YYYY-MM-DD.json` before resuming with the same `daily:run` command.
 - Use `--restart` only when you intentionally discard the same-date `.tmp/run-summary-YYYY-MM-DD.json` state and start over.
 - Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
+- A separate 21:30 status self-check runs `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
+- `status:self-check` checks current artifacts, Pages HTTP, `quality_status`, `sources:health`, `publish:dry-run:daily`, and active Codex automations; `multiple_active_daily_publish_automations` is a blocking issue.
 
 ## Preflight
 

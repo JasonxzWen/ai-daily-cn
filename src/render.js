@@ -6,6 +6,7 @@ import {
   projectHeatTags
 } from "./presentation.js";
 import { importanceLabel } from "./importance.js";
+import { normalizeUrlIdentity } from "./url.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -841,13 +842,7 @@ function repoFromGithubUrlForRender(value) {
 }
 
 function normalizeUrlForRender(value) {
-  try {
-    const parsed = new URL(String(value || ""));
-    parsed.hash = "";
-    return parsed.toString().replace(/\/$/, "");
-  } catch {
-    return String(value || "").trim().replace(/\/$/, "");
-  }
+  return normalizeUrlIdentity(value);
 }
 
 function renderProjectsSection(projects) {

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
+import { normalizeUrlIdentity } from "./url.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
@@ -1290,13 +1291,7 @@ function isHttpUrl(value) {
 }
 
 function normalizeUrl(value) {
-  try {
-    const url = new URL(value);
-    url.hash = "";
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return "";
-  }
+  return normalizeUrlIdentity(value);
 }
 
 function dateOnly(value) {

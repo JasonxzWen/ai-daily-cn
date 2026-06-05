@@ -1,5 +1,7 @@
 ## Codex-native runner contract
 
+Status self-check: the 21:30 automation must call `status:self-check` after the daily publish window. It records `.tmp/status-self-check-YYYY-MM-DD.json`, verifies `sources:phase5-audit`/`publish:dry-run:daily` still pass from the clean runner baseline, and treats `multiple_active_daily_publish_automations` as a blocking issue.
+
 定时任务和长程发布任务必须从 launcher worktree 启动，只调用 runner：
 
 ```powershell

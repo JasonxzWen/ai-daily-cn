@@ -11,6 +11,7 @@ import { deriveQualityStatus, requirePublishableQuality } from "./quality-status
 import { buildAutomationRevision, defaultAutomationRevision } from "./automation-revision.js";
 import { normalizeOptimizationSuggestions } from "./feedback-contract.js";
 import { withDefaultImportance } from "./importance.js";
+import { normalizeUrlIdentity } from "./url.js";
 import {
   readCandidatePool,
   requireCandidateCoverage,
@@ -198,13 +199,7 @@ function requireEvidenceAssetSelectivity(report) {
 }
 
 function normalizeUrlForEvidenceGate(value) {
-  try {
-    const url = new URL(String(value || ""));
-    url.hash = "";
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return String(value || "").trim().replace(/\/$/, "");
-  }
+  return normalizeUrlIdentity(value);
 }
 
 function requireSourceAudit(report) {

@@ -1,7 +1,6 @@
 import { execFile } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
-import os from "node:os";
 import { promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
@@ -10,6 +9,7 @@ import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
+import { mergeCommandEnv, npmCommandText, npmInvocationForArgs } from "./process-runner.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -1229,23 +1229,6 @@ async function runExternalCommand(file, args, options = {}) {
   return options.trim === false ? stdout : stdout.trim();
 }
 
-function mergeCommandEnv(overrides = {}) {
-  const env = { ...process.env };
-  const normalizedOverrides = overrides || {};
-
-  if (os.platform() === "win32") {
-    for (const key of Object.keys(normalizedOverrides)) {
-      for (const existingKey of Object.keys(env)) {
-        if (existingKey !== key && existingKey.toLowerCase() === key.toLowerCase()) {
-          delete env[existingKey];
-        }
-      }
-    }
-  }
-
-  return { ...env, ...normalizedOverrides };
-}
-
 async function runGitCommand(cwd, args, options = {}) {
   try {
     return await options.run("git", args, {
@@ -1367,7 +1350,7 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
   }
   npmEnv.NPM_CONFIG_AUDIT = process.env.NPM_CONFIG_AUDIT || "false";
   npmEnv.NPM_CONFIG_FUND = process.env.NPM_CONFIG_FUND || "false";
-  const npmCommand = `npm ${npmArgs.join(" ")}`;
+  const npmCommand = npmCommandText(npmArgs);
   const npmInvocation = npmInvocationForArgs(npmArgs);
 
   try {
@@ -1424,32 +1407,6 @@ function redactRemoteUrl(remoteUrl) {
   } catch {
     return remoteUrl;
   }
-}
-
-function npmExecutable() {
-  return os.platform() === "win32" ? "npm.cmd" : "npm";
-}
-
-function npmInvocationForArgs(args) {
-  if (os.platform() !== "win32") {
-    return {
-      file: npmExecutable(),
-      args
-    };
-  }
-
-  return {
-    file: "cmd.exe",
-    args: ["/d", "/s", "/c", ["npm", ...args.map(quoteCmdArg)].join(" ")]
-  };
-}
-
-function quoteCmdArg(value) {
-  const text = String(value);
-  if (!/[ \t"&|<>^]/.test(text)) {
-    return text;
-  }
-  return `"${text.replaceAll('"', '\\"')}"`;
 }
 
 async function assertGitDirectoryWritable(repoRoot, git, gitWritableCheck) {

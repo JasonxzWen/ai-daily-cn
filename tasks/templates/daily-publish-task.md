@@ -12,6 +12,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - If `next_action.kind` is `codex_ai_repair_contract`, write the requested contract and resume with the same `daily:run` command.
 - Use `--restart` only when intentionally discarding same-date runner state.
 - Scheduled dry-run uses `publish:dry-run:daily`.
+- 21:30 status self-check uses `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.
 
 ## Assumptions
 

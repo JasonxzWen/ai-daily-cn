@@ -19,8 +19,15 @@
     },
     "scheduled_dry_run_script": "publish:dry-run:daily"
   },
+  "status_self_check": {
+    "script": "status:self-check",
+    "schedule": "21:30",
+    "summary_path_template": ".tmp/status-self-check-YYYY-MM-DD.json",
+    "blocking_issue": "multiple_active_daily_publish_automations"
+  },
   "required_package_scripts": {
     "daily:run": "node src/cli.js daily:run",
+    "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
     "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs"
   },
@@ -36,6 +43,9 @@
         ".tmp/run-summary-YYYY-MM-DD.json",
         "quality-ai-repair-YYYY-MM-DD.json",
         "sources:phase5-audit",
+        "status:self-check",
+        "21:30",
+        "multiple_active_daily_publish_automations",
         "--restart",
         "max 5"
       ]
@@ -46,6 +56,7 @@
         "npm run daily:run",
         "publish:dry-run:daily",
         "sources:phase5-audit",
+        "status:self-check",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "next_action",
         "Codex-native runner",
@@ -58,6 +69,9 @@
         "npm run daily:run",
         "publish:dry-run:daily",
         "sources:phase5-audit",
+        "status:self-check",
+        "21:30",
+        "multiple_active_daily_publish_automations",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "next_action",
         "--restart"
@@ -69,6 +83,7 @@
         "npm run daily:run",
         "publish:dry-run:daily",
         "sources:phase5-audit",
+        "status:self-check",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "--restart"
       ]
@@ -81,5 +96,16 @@
       "next_action",
       "publish:dry-run:daily"
     ]
+  },
+  "external_automation_inventory": {
+    "require_single_active_publish": true,
+    "project_cwds": [
+      "D:\\ai-daily-cn"
+    ],
+    "allowed_daily_publish_ids": [
+      "ai-2",
+      "ai-daily"
+    ],
+    "require_active_status_self_check": true
   }
 }
