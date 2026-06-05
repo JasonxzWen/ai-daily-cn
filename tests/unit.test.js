@@ -1993,11 +1993,21 @@ test("registered source registry covers official company news lanes", async () =
     ["content-amazon-news", "https://www.aboutamazon.com/news/rss"],
     ["content-nvidia-newsroom-rss", "https://nvidianews.nvidia.com/rss.xml"],
     ["content-github-blog-feed", "https://github.blog/feed/"],
+    ["content-openai-company-news", "https://openai.com/news/rss.xml"],
+    ["content-anthropic-company-news", "https://www.anthropic.com/news"],
+    ["content-xai-company-news", "https://x.ai/news"],
     ["content-tencent-media-center", "https://www.tencent.com/en-us/media.html"],
+    ["content-huawei-newsroom", "https://www.huawei.com/en/news/"],
     ["content-bytedance-news", "https://www.bytedance.com/en/news"],
     ["content-alibaba-group-press-releases", "https://www.alibabagroup.com/en-US/news-press-releases"],
     ["content-baidu-press-releases", "https://ir.baidu.com/index.php/press-releases"],
-    ["content-meituan-investor-relations", "https://www.meituan.com/en-US/investor-relations"]
+    ["content-xiaomi-investor-relations", "https://ir.mi.com/"],
+    ["content-jd-investor-news", "https://ir.jd.com/news-releases/"],
+    ["content-netease-company-news", "https://ir.netease.com/news-releases"],
+    ["content-kuaishou-company-news", "https://kuaishou.gcs-web.com/news-events/company-news"],
+    ["content-meituan-investor-relations", "https://www.meituan.com/en-US/investor-relations"],
+    ["content-moonshot-kimi-company-news", "https://platform.kimi.com/blog"],
+    ["content-minimax-company-news", "https://www.minimax.io/blog"]
   ];
 
   for (const [id, url] of expected) {
@@ -2399,6 +2409,48 @@ test("content source discovery parses official HTML pages and Product Hunt proje
   assert.equal(collected.candidates[1].source_id, "product-hunt-devtools");
   assert.equal(collected.candidates[1].signal, "product_hunt");
   assert.equal(collected.candidates[1].url, "https://www.producthunt.com/products/agent-debugger");
+});
+
+test("content source discovery parses company news HTML with dotted dates before links", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-06",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-kuaishou-company-news",
+        name: "Kuaishou Company News",
+        url: "https://kuaishou.example.com/news-events/company-news",
+        source_kind: "html_index",
+        candidate_category: "community_lead",
+        authority: "primary",
+        verification_policy: "primary_allowed",
+        format: "html_index",
+        linkPattern: "/news-releases/news-release-details/",
+        source_level: "official_company_news"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <main>
+        <article>
+          <span>2026.05.06</span>
+          <a href="/news-releases/news-release-details/kuaishou-reports-quarterly-results">
+            Kuaishou Technology to Report 2026 First Quarter Financial Results
+          </a>
+          Official company news covering results timing, management commentary, and investor-facing operating signals.
+          <img alt="Hero image" loading="lazy"
+        </article>
+      </main>
+    `)
+  });
+
+  assert.equal(collected.source_audit.content_sources.candidates_found, 1);
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.candidates[0].source_id, "content-kuaishou-company-news");
+  assert.equal(collected.candidates[0].category, "community_lead");
+  assert.equal(collected.candidates[0].event_date, "2026-05-06");
+  assert.equal(collected.candidates[0].verification_status, "primary_confirmed");
+  assert.equal(collected.candidates[0].url, "https://kuaishou.example.com/news-releases/news-release-details/kuaishou-reports-quarterly-results");
+  assert(!collected.candidates[0].evidence.includes("<img"));
 });
 
 test("content source discovery parses JSON API sources", async () => {
