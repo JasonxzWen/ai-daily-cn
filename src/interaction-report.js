@@ -570,7 +570,7 @@ function emptyMainItemContent(context = {}) {
 }
 
 function formatMainItem(item, context = {}) {
-  const bullets = [...item.bullets, ...editorialBullets(item)]
+  const bullets = mainItemPublicBullets(item)
     .map((bullet) => `  - ${formatDailyInlineText(bullet, item)}`)
     .join("\n");
   const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
@@ -580,6 +580,19 @@ function formatMainItem(item, context = {}) {
   ].filter(Boolean));
   const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
   return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+}
+
+function mainItemPublicBullets(item) {
+  return (Array.isArray(item?.bullets) ? item.bullets : [])
+    .map((bullet) => String(bullet || "").trim())
+    .filter(Boolean)
+    .filter((bullet) => !isMainItemTemplateBullet(bullet));
+}
+
+function isMainItemTemplateBullet(value) {
+  const text = String(value || "");
+  return /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]/u.test(text) ||
+    /(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u.test(text);
 }
 
 function mainItemContractGroups(items) {

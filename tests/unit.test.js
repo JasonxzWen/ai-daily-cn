@@ -535,6 +535,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   report.main_items[0].url = "https://status.openai.com/incidents/example-agent-platform";
   report.main_items[0].editorial_category = "ai_industry";
   report.main_items[0].why_it_matters = "Why metadata should stay in JSON but not render as an extra main bullet.";
+  report.main_items[0].reader_relevance = "Reader relevance metadata should stay in JSON and not render as an extra main bullet.";
   report.main_items[0].watch_next = "Generic follow-up metadata should not render in main bullets.";
   report.main_items.push({
     title: "Cisco and OpenAI redefine enterprise engineering with Codex",
@@ -678,7 +679,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**![OpenAI Status]"));
   assert(!mainContent.includes("来源："));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
+  assert(!mainContent.includes("Reader relevance metadata should stay in JSON"));
   assert(!mainContent.includes("Generic follow-up metadata should not render"));
+  assert(!mainContent.includes("==影响=="));
+  assert(!mainContent.includes("==留意=="));
   const trackingSection = input.sections.find((section) => section.title === "每日追踪");
   assert.equal(trackingSection.type, "filterable-cards");
   assert.equal(trackingSection.cardClass, "tracking-card");
@@ -3765,6 +3769,27 @@ test("quality review flags untranslated English excerpts in public observation s
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
 
+test("quality review rejects templated impact and watch prose in public body", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    bullets: [
+      "**要点**：GitHub Copilot 增加更大上下文窗口和可配置推理级别。",
+      "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。",
+      "==留意==：看仓库活跃度、README、许可证、模型卡、下载限制和是否有真实案例。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_template_body").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("main_items[0].bullets[1]"));
+  assert(issuePaths.includes("main_items[0].bullets[2]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [
@@ -5825,7 +5850,7 @@ test("report:write rejects GitHub Trending descriptions copied in English", asyn
   assert.equal(report.github_trending[0].description, draft.github_trending[0].description);
 });
 
-test("report:write rejects expanded main items without highlight markers or enough detail", async () => {
+test("report:write rejects expanded main items with templated prose or thin detail", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseItem = draft.main_items[0];
@@ -5841,7 +5866,7 @@ test("report:write rejects expanded main items without highlight markers or enou
       url,
       bullets: [
         `**Fixture ${index + 1}** describes an important AI industry update.`,
-        "It keeps a second factual point but deliberately omits highlight markers."
+        "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。"
       ]
     };
   });

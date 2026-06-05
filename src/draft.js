@@ -411,9 +411,7 @@ function mainItem(candidate, original) {
     entities: [entity].filter(Boolean),
     summary,
     bullets: [
-      `**要点**：${sourceGroundedFact(candidate, original)}。`,
-      `==影响==：${impact}。`,
-      `==留意==：${watch}。`
+      `**要点**：${sourceGroundedFact(candidate, original)}。`
     ],
     why_it_matters: impact,
     reader_relevance: audienceRelevanceForCandidate(candidate, category),
