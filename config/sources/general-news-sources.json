@@ -64,6 +64,54 @@
       "timeout_ms": 15000,
       "source_level": "aigc_content_industry",
       "notes": "Broad discovery lane for image/video generation, creative AI products, and AI-assisted game tooling. Use only as a lead and trace facts back to official product pages, changelogs, or multi-source confirmation."
+    },
+    {
+      "id": "general-news-google-big-tech-company-watch",
+      "name": "Google News Big Tech Company Watch RSS",
+      "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20Google%20OR%20Microsoft%20OR%20Apple%20OR%20Meta%20OR%20Amazon%20OR%20NVIDIA%20OR%20xAI)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20conference%20OR%20GitHub%20OR%20%22open%20source%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "big_tech_company_watch",
+      "notes": "Broad discovery lane for company-level tech signals. Use only as a lead and trace selected facts back to official sources or multi-source confirmation."
+    },
+    {
+      "id": "general-news-google-china-big-tech-company-watch",
+      "name": "Google News China Big Tech Company Watch RSS",
+      "url": "https://news.google.com/rss/search?q=(Tencent%20OR%20ByteDance%20OR%20Alibaba%20OR%20Meituan%20OR%20Baidu%20OR%20DeepSeek%20OR%20MiniMax%20OR%20Moonshot%20OR%20Kimi%20OR%20Zhipu%20OR%20Qwen)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20GitHub%20OR%20%22open%20source%22%20OR%20%22Hugging%20Face%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "china_big_tech_company_watch",
+      "notes": "Broad discovery lane for China big-tech and frontier-lab company signals. Use only as a lead and trace selected facts back to official sources or multi-source confirmation."
+    },
+    {
+      "id": "general-news-google-official-open-source-watch",
+      "name": "Google News Official Open Source Watch RSS",
+      "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "aggregator",
+      "enablement": "optional",
+      "verification_policy": "primary_required",
+      "requires_original_url": false,
+      "max_items_per_run": 5,
+      "timeout_ms": 15000,
+      "source_level": "official_open_source_watch",
+      "notes": "Broad discovery lane for official GitHub/Hugging Face/model-weight signals. Use only as a lead and trace selected facts back to official repositories or model cards."
     }
   ]
 }
