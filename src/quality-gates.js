@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
+import { normalizeUrlIdentity } from "./url.js";
 
 const CURRENT_SECTIONS = ["main_items", "model_releases", "hot_blogs"];
 const MODEL_MAIN_DUPLICATE_SECTIONS = new Set(["main_items", "model_releases"]);
@@ -195,19 +196,5 @@ function dateToDayNumber(date) {
 }
 
 function normalizeUrl(value) {
-  if (!value) {
-    return "";
-  }
-  try {
-    const url = new URL(value);
-    url.hash = "";
-    const params = [...url.searchParams.entries()].filter(([key]) => !/^utm_/i.test(key));
-    url.search = "";
-    for (const [key, paramValue] of params) {
-      url.searchParams.append(key, paramValue);
-    }
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return String(value).trim();
-  }
+  return normalizeUrlIdentity(value);
 }

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./automation-revision.js";
+import { normalizeUrlIdentity } from "./url.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 const SOURCE_AVAILABLE_STATUSES = new Set(["checked", "no_signal"]);
@@ -1088,14 +1089,7 @@ function isXStatusUrl(value) {
 }
 
 function normalizeUrl(value) {
-  try {
-    const url = new URL(String(value || ""));
-    url.hash = "";
-    url.hostname = url.hostname.toLowerCase().replace(/^www\./, "");
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return String(value || "").trim().toLowerCase().replace(/^http:/, "https:").replace(/\/$/, "");
-  }
+  return normalizeUrlIdentity(value);
 }
 
 function normalizeQualityIssue(issue) {

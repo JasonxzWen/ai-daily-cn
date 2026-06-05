@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { normalizeUrlIdentity } from "./url.js";
 
 const DEFAULT_MAX_ASSETS = 3;
 const DEFAULT_PUBLIC_PREFIX = "assets/evidence";
@@ -147,13 +148,7 @@ function trimText(value, maxLength) {
 }
 
 function normalizeUrl(value) {
-  try {
-    const url = new URL(value);
-    url.hash = "";
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return "";
-  }
+  return normalizeUrlIdentity(value);
 }
 
 function requireReportDate(reportDate) {

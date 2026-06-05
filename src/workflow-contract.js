@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { inspectAutomationInventory } from "./automation-inventory.js";
 
 const DEFAULT_CONTRACT_PATH = path.join("config", "daily-workflow-contract.json");
 
@@ -32,6 +33,7 @@ export async function validateDailyWorkflowContract(options = {}) {
   await validateFileMarkers({ rootDir, markerGroups: contract.required_markers || [], failures, checkedFiles });
   await validateForbiddenMarkers({ rootDir, markerGroups: contract.forbidden_markers || [], failures, checkedFiles });
   await validateExternalAutomationPrompt({ rootDir, contract, options, failures, warnings, checkedFiles });
+  await validateExternalAutomationInventory({ contract, options, failures, warnings, checkedFiles });
 
   return {
     ok: failures.length === 0,
@@ -39,6 +41,55 @@ export async function validateDailyWorkflowContract(options = {}) {
     warnings,
     checked_files: uniqueSorted(checkedFiles)
   };
+}
+
+async function validateExternalAutomationInventory({ contract, options, failures, warnings, checkedFiles }) {
+  const inventoryConfig = contract.external_automation_inventory;
+  if (!inventoryConfig) return;
+
+  const inventory = await inspectAutomationInventory({
+    automationsDir: options.automationsDir,
+    projectCwds: inventoryConfig.project_cwds || options.projectCwds
+  });
+  if (!inventory.available) {
+    warnings.push(`external automation inventory not found: ${inventory.automations_dir || inventory.error}`);
+    return;
+  }
+
+  for (const automation of inventory.automations || []) {
+    checkedFiles.push(toPortablePath(automation.path));
+  }
+
+  const activePublish = inventory.active_publish_automations || [];
+  if (inventoryConfig.require_single_active_publish !== false && activePublish.length !== 1) {
+    failures.push(`external automations: expected exactly one active daily publish automation, found ${activePublish.length}.`);
+  }
+
+  const allowedPublishIds = new Set(inventoryConfig.allowed_daily_publish_ids || []);
+  for (const automation of activePublish) {
+    if (allowedPublishIds.size > 0 && !allowedPublishIds.has(automation.id)) {
+      failures.push(`external automations: active daily publish automation ${automation.id} is not allowed.`);
+    }
+    if (automation.legacy_flow) {
+      failures.push(`external automations: active daily publish automation ${automation.id} still uses the legacy publish flow.`);
+    }
+  }
+
+  if (inventoryConfig.require_active_status_self_check) {
+    const activeSelfChecks = inventory.active_self_check_automations || [];
+    if (activeSelfChecks.length < 1) {
+      failures.push("external automations: expected an active status:self-check automation.");
+    }
+    if (activeSelfChecks.length > 1) {
+      failures.push(`external automations: expected one active status:self-check automation, found ${activeSelfChecks.length}.`);
+    }
+    for (const marker of inventoryConfig.status_self_check_contains || []) {
+      if (!activeSelfChecks.some((automation) => automation.path && automation.status_self_check && automation.id.includes(marker))) {
+        // Marker compatibility is handled by prompt parsing; keep this optional field future-proof.
+        continue;
+      }
+    }
+  }
 }
 
 async function validatePackageScripts({ rootDir, contract, failures, checkedFiles }) {

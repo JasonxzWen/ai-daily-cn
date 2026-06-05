@@ -46,6 +46,9 @@ import {
   reviewReportQuality
 } from "../src/quality-loop.js";
 import { runDailyWorkflow } from "../src/daily-runner.js";
+import { runStatusSelfCheck } from "../src/status-self-check.js";
+import { npmInvocationForArgs } from "../src/process-runner.js";
+import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
@@ -2803,6 +2806,29 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
   assert.equal(health.results[3].status, "skipped_missing_base_url");
 });
 
+test("shared URL identity normalizes tracking parameters for dedupe gates", () => {
+  assert.equal(
+    normalizeUrlIdentity("https://www.Example.com/news/item/?utm_source=newsletter&ref=feed#section"),
+    "https://example.com/news/item?ref=feed"
+  );
+  assert.equal(
+    normalizeUrlIdentity("https://example.com/news/item?ref=feed&utm_campaign=daily"),
+    "https://example.com/news/item?ref=feed"
+  );
+});
+
+test("shared npm invocation wraps npm through cmd on Windows", () => {
+  const windows = npmInvocationForArgs(["ci", "--cache", "C:\\tmp\\npm cache"], { platform: "win32" });
+  assert.equal(windows.file, "cmd.exe");
+  assert.deepEqual(windows.args.slice(0, 3), ["/d", "/s", "/c"]);
+  assert.match(windows.args[3], /^npm ci --cache /);
+  assert.match(windows.args[3], /npm cache/);
+
+  const linux = npmInvocationForArgs(["ci"], { platform: "linux" });
+  assert.equal(linux.file, "npm");
+  assert.deepEqual(linux.args, ["ci"]);
+});
+
 test("public artifact privacy scan blocks local machine path leakage", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-privacy-scan-"));
   await fs.mkdir(path.join(tmp, "docs/reports"), { recursive: true });
@@ -2841,8 +2867,216 @@ test("CLI JSON commands can write clean UTF-8 output files", async () => {
   assert(!raw.startsWith("\uFEFF"));
 });
 
+test("status:self-check blocks when multiple daily publish automations are active", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-"));
+  await writeSelfCheckReportFixture(tmp, "2026-06-04", {
+    quality_status: { status: "ok", reasons: [], degraded_sections: [], blocking_issues: [] }
+  });
+  const automationsDir = path.join(tmp, "automations");
+  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  await fs.mkdir(path.join(automationsDir, "ai-push-github-pages"), { recursive: true });
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily", "automation.toml"),
+    [
+      'id = "ai-daily"',
+      'kind = "cron"',
+      'name = "AI 日报生成、push 与 GitHub Pages 发布"',
+      'prompt = "node src/cli.js daily:run --publish publish:dry-run:daily"',
+      'status = "ACTIVE"',
+      'rrule = "RRULE:FREQ=WEEKLY;BYHOUR=2;BYMINUTE=30;BYDAY=SU,MO,TU,WE,TH,FR,SA"'
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(automationsDir, "ai-push-github-pages", "automation.toml"),
+    [
+      'id = "ai-push-github-pages"',
+      'kind = "cron"',
+      'name = "AI 日报生成、push 与 GitHub Pages 发布"',
+      'prompt = "npm run publish:prepare-worktree && npm run publish:dry-run"',
+      'status = "ACTIVE"',
+      'rrule = "RRULE:FREQ=WEEKLY;BYHOUR=2;BYMINUTE=30;BYDAY=SU,MO,TU,WE,TH,FR,SA"'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await runStatusSelfCheck({
+    rootDir: tmp,
+    reportDate: "2026-06-04",
+    automationsDir,
+    fetchImpl: async () => textResponse("2026-06-04"),
+    prepareCleanPublishWorktreeImpl: async () => ({
+      mode: "prepare-clean-worktree",
+      repo_root: tmp,
+      launcher_repo_root: tmp,
+      branch: "main",
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    buildSiteImpl: async () => ({ reports: [{ report_date: "2026-06-04" }], writtenFiles: [] }),
+    createDailyPublishPlanImpl: async () => ({ mode: "daily-dry-run", reports: [] }),
+    checkSourcesHealthImpl: async () => ({
+      results: [{ status: "checked" }],
+      source_audit: { sources_health: { checked: true, sources: [{ status: "checked" }] } }
+    }),
+    validateWorkflowImpl: async () => ({ ok: true, failures: [], warnings: [] }),
+    validateSourcesImpl: async () => ({ ok: true })
+  });
+
+  assert.equal(result.status, "blocked");
+  assert(result.blocking_issues.some((issue) => issue.code === "multiple_active_daily_publish_automations"));
+  assert.equal(result.automation.active_publish_automations.length, 2);
+});
+
+test("status:self-check reports degraded published state without blocking", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-ok-"));
+  await writeSelfCheckReportFixture(tmp, "2026-06-04", {
+    quality_status: {
+      status: "degraded",
+      reasons: ["content_sources_blocked"],
+      degraded_sections: [{ code: "content_sources_blocked", section: "hot_blogs" }],
+      blocking_issues: []
+    }
+  });
+  const automationsDir = path.join(tmp, "automations");
+  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily", "automation.toml"),
+    [
+      'id = "ai-daily"',
+      'kind = "cron"',
+      'name = "AI 日报生成、push 与 GitHub Pages 发布"',
+      'prompt = "node src/cli.js daily:run --publish publish:dry-run:daily"',
+      'status = "ACTIVE"'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await runStatusSelfCheck({
+    rootDir: tmp,
+    reportDate: "2026-06-04",
+    automationsDir,
+    fetchImpl: async () => textResponse("AI daily 2026-06-04"),
+    prepareCleanPublishWorktreeImpl: async () => ({
+      mode: "prepare-clean-worktree",
+      repo_root: tmp,
+      launcher_repo_root: tmp,
+      branch: "main",
+      remote_main_sha: "2222222222222222222222222222222222222222"
+    }),
+    buildSiteImpl: async () => ({ reports: [{ report_date: "2026-06-04" }], writtenFiles: [] }),
+    createDailyPublishPlanImpl: async () => ({ mode: "daily-dry-run", reports: [{ report_date: "2026-06-04" }] }),
+    checkSourcesHealthImpl: async () => ({
+      results: [{ status: "checked" }, { status: "blocked" }],
+      source_audit: { sources_health: { checked: true, sources: [{ status: "checked" }, { status: "blocked" }] } }
+    }),
+    validateWorkflowImpl: async () => ({ ok: true, failures: [], warnings: [] }),
+    validateSourcesImpl: async () => ({ ok: true })
+  });
+
+  assert.equal(result.status, "degraded");
+  assert.deepEqual(result.blocking_issues, []);
+  assert(result.degraded_sections.some((issue) => issue.code === "content_sources_blocked"));
+  assert(result.degraded_sections.some((issue) => issue.code === "sources_health_blocked"));
+});
+
+test("status:self-check runs publish checks from the prepared clean worktree", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-launcher-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  await writeSelfCheckReportFixture(cleanRoot, "2026-06-04");
+  const automationsDir = path.join(launcherRoot, "automations");
+  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily", "automation.toml"),
+    [
+      'id = "ai-daily"',
+      'kind = "cron"',
+      'prompt = "node src/cli.js daily:run --publish publish:dry-run:daily"',
+      'status = "ACTIVE"'
+    ].join("\n"),
+    "utf8"
+  );
+  const seenRoots = [];
+
+  const result = await runStatusSelfCheck({
+    rootDir: launcherRoot,
+    reportDate: "2026-06-04",
+    automationsDir,
+    outputPath: ".tmp/status-self-check-2026-06-04.json",
+    fetchImpl: async () => textResponse("AI daily 2026-06-04"),
+    prepareCleanPublishWorktreeImpl: async () => ({
+      mode: "prepare-clean-worktree",
+      repo_root: cleanRoot,
+      launcher_repo_root: launcherRoot,
+      branch: "main",
+      remote_main_sha: "3333333333333333333333333333333333333333"
+    }),
+    buildSiteImpl: async ({ rootDir: checkRoot }) => {
+      seenRoots.push(["build", checkRoot]);
+      return { reports: [{ report_date: "2026-06-04" }], writtenFiles: [] };
+    },
+    createDailyPublishPlanImpl: async ({ repoRoot: checkRoot }) => {
+      seenRoots.push(["dry-run", checkRoot]);
+      return { mode: "daily-dry-run", reports: [{ report_date: "2026-06-04" }] };
+    },
+    checkSourcesHealthImpl: async ({ rootDir: checkRoot }) => {
+      seenRoots.push(["sources-health", checkRoot]);
+      return {
+        results: [{ status: "checked" }],
+        source_audit: { sources_health: { checked: true, sources: [{ status: "checked" }] } }
+      };
+    },
+    validateWorkflowImpl: async ({ rootDir: checkRoot }) => {
+      seenRoots.push(["workflow", checkRoot]);
+      return { ok: true, failures: [], warnings: [] };
+    },
+    validateSourcesImpl: async ({ rootDir: checkRoot }) => {
+      seenRoots.push(["sources-validate", checkRoot]);
+      return { ok: true };
+    }
+  });
+
+  assert.equal(result.status, "ok");
+  assert.equal(result.launcher_root, launcherRoot.replace(/\\/g, "/"));
+  assert.equal(result.checked_repo_root, cleanRoot.replace(/\\/g, "/"));
+  assert(seenRoots.every(([, checkRoot]) => checkRoot === cleanRoot));
+  const saved = JSON.parse(await fs.readFile(path.join(launcherRoot, ".tmp", "status-self-check-2026-06-04.json"), "utf8"));
+  assert.equal(saved.checked_repo_root, cleanRoot.replace(/\\/g, "/"));
+});
+
 test("daily workflow contract validates repository workflow markers", async () => {
-  const result = await validateDailyWorkflowContract({ rootDir });
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-daily"',
+      'kind = "cron"',
+      'prompt = "node src/cli.js daily:run --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action publish:dry-run:daily"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
+    [
+      'id = "ai-daily-status-self-check"',
+      'kind = "cron"',
+      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
 
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
@@ -4097,7 +4331,7 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
   await fs.mkdir(historyDir, { recursive: true });
   await fs.writeFile(
     path.join(historyDir, "2026-05-25.json"),
-    `${JSON.stringify({ report_date: "2026-05-25", main_items: [{ url: "https://example.com/official/2" }] }, null, 2)}\n`,
+    `${JSON.stringify({ report_date: "2026-05-25", main_items: [{ url: "https://www.example.com/official/2/?utm_source=feed#seen" }] }, null, 2)}\n`,
     "utf8"
   );
 
@@ -7159,6 +7393,49 @@ function normalizedSourceUrl(value) {
   } catch {
     return text.toLowerCase().replace(/^http:/, "https:").replace(/\/$/, "");
   }
+}
+
+async function writeSelfCheckReportFixture(root, reportDate, overrides = {}) {
+  const [year, month] = reportDate.split("-");
+  const report = {
+    report_date: reportDate,
+    title: `AI 日报 ${reportDate}`,
+    canonical_url: `https://example.com/reports/${year}/${month}/${reportDate}.html`,
+    main_items: [
+      {
+        title: "Fixture item",
+        url: "https://example.com/news/fixture",
+        event_date: reportDate,
+        source: "Example",
+        bullets: ["Fixture"]
+      }
+    ],
+    source_audit: {
+      sources_health: {
+        checked: true,
+        sources: [{ name: "Example", url: "https://example.com/feed.xml", status: "checked" }]
+      }
+    },
+    quality_status: {
+      status: "ok",
+      reasons: [],
+      degraded_sections: [],
+      blocking_issues: []
+    },
+    ...overrides
+  };
+  const dataDir = path.join(root, "reports-data", year, month);
+  const docsDataDir = path.join(root, "docs", "data", year, month);
+  const htmlDir = path.join(root, "docs", "reports", year, month);
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.mkdir(docsDataDir, { recursive: true });
+  await fs.mkdir(htmlDir, { recursive: true });
+  await fs.writeFile(path.join(dataDir, `${reportDate}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(docsDataDir, `${reportDate}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(htmlDir, `${reportDate}.html`), `<main>${reportDate}</main>`, "utf8");
+  await fs.writeFile(path.join(root, "docs", "index.html"), `<a>${reportDate}</a>`, "utf8");
+  await fs.writeFile(path.join(root, "docs", "feed.json"), JSON.stringify({ reports: [{ report_date: reportDate }] }), "utf8");
+  await fs.writeFile(path.join(root, "docs", "trends.json"), JSON.stringify({ reports: [{ report_date: reportDate }] }), "utf8");
 }
 
 function textResponse(text, status = 200, finalUrl = "") {

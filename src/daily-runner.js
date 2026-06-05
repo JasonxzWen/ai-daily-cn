@@ -4,6 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { PublisherError } from "./errors.js";
 import { prepareCleanPublishWorktree } from "./publish.js";
+import { mergeCommandEnv, npmInvocationForArgs } from "./process-runner.js";
 
 const execFileAsync = promisify(execFile);
 const DEFAULT_PUBLISH_MAX_REVIEW_REPAIR_LOOPS = 5;
@@ -746,16 +747,9 @@ function resolveStageCommand(stage) {
     if (npmCache) {
       env.NPM_CONFIG_CACHE = npmCache;
     }
-    if (process.platform === "win32") {
-      return {
-        file: "cmd.exe",
-        args: ["/d", "/s", "/c", ["npm", ...stage.command.args.map(quoteCmdArg)].join(" ")],
-        env
-      };
-    }
+    const invocation = npmInvocationForArgs(stage.command.args);
     return {
-      file: "npm",
-      args: stage.command.args,
+      ...invocation,
       env
     };
   }
@@ -766,31 +760,6 @@ function resolveStageCommand(stage) {
     };
   }
   throw new PublisherError("daily_runner_unknown_stage_tool", `Unknown stage tool: ${stage.command.tool}`);
-}
-
-function mergeCommandEnv(overrides = {}) {
-  const env = { ...process.env };
-  const normalizedOverrides = overrides || {};
-
-  if (process.platform === "win32") {
-    for (const key of Object.keys(normalizedOverrides)) {
-      for (const existingKey of Object.keys(env)) {
-        if (existingKey !== key && existingKey.toLowerCase() === key.toLowerCase()) {
-          delete env[existingKey];
-        }
-      }
-    }
-  }
-
-  return { ...env, ...normalizedOverrides };
-}
-
-function quoteCmdArg(value) {
-  const text = String(value);
-  if (!/[ \t"&|<>^]/.test(text)) {
-    return text;
-  }
-  return `"${text.replaceAll('"', '\\"')}"`;
 }
 
 function parseJsonOutput(stdout) {

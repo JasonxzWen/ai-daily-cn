@@ -36,6 +36,7 @@ import {
   reviewReportQuality
 } from "./quality-loop.js";
 import { runDailyWorkflow } from "./daily-runner.js";
+import { runStatusSelfCheck } from "./status-self-check.js";
 
 const [command, ...argv] = process.argv.slice(2);
 
@@ -122,6 +123,32 @@ try {
       summary: result.summary
     });
     if (!ok) {
+      process.exitCode = 1;
+    }
+  } else if (command === "status:self-check") {
+    const args = parseArgs(argv);
+    const result = await runStatusSelfCheck({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      automationsDir: args["automations-dir"],
+      automationPromptPath: args["automation-prompt"],
+      projectCwds: args["automation-cwd"] ? [args["automation-cwd"]] : undefined,
+      sourcesPath: args.sources,
+      enablement: args.enablement,
+      inputDir: args.input,
+      dataInputDir: args["data-input"],
+      outDir: args.out,
+      siteUrl: args["site-url"],
+      outputPath: args.output,
+      worktreeDir: args["worktree-dir"],
+      allowExternalWorktree: Boolean(args["allow-external-worktree"]),
+      installDependencies: args["no-install"] !== true,
+      forceInstall: Boolean(args["force-install"]),
+      cleanWorktree: args["skip-clean-worktree"] !== true
+    });
+    printJson(result);
+    if (result.status === "blocked") {
       process.exitCode = 1;
     }
   } else if (command === "publish:preflight") {

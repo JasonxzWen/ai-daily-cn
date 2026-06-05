@@ -8,7 +8,8 @@ const rootDir = path.resolve(args["repo-root"] || process.cwd());
 const result = await validateDailyWorkflowContract({
   rootDir,
   contractPath: args.contract,
-  automationPromptPath: args["automation-prompt"]
+  automationPromptPath: args["automation-prompt"],
+  automationsDir: args["automations-dir"]
 });
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

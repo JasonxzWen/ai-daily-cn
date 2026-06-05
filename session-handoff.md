@@ -2,58 +2,47 @@
 
 ## Current Status
 
-- Harness Hub source and current AI daily skill snapshot now include `package-release-sniffer`.
-- Implementation and validation are complete.
-- User authorized PR creation with `提PR`.
-- Draft PR creation is in progress on branches based on latest `origin/main`.
+- The 21:30 status self-check implementation is in place.
+- Real Codex automation inventory has been updated: app-visible `ai-2` is the active 02:30 daily generation automation, `ai` is the active 21:30 self-check automation, and legacy `ai-daily` / `ai-push-github-pages` are paused.
+- Focused unit tests, `npm run workflow:validate`, and full `npm run validate` pass.
+- Validation/build generated `docs/data/**` empty `daily_tracking` default changes; those generated artifacts were restored and are not part of the handoff diff.
 
 ## Changed Files
 
-Hub source repo `D:\harness-hub`:
-
-- `skills/package-release-sniffer/SKILL.md`
-- `capabilities/index.json`
-- `docs/skill-routing.md`
-- `docs/source-projects.md`
-- `docs/source-skill-inventory.md`
-- `docs/capability-map.md`
-- `skills/effective-interact/assets/fixtures/harness-vocabulary-explainer-report.json`
-- `skills/workflow-router/scripts/skill-activation-check.mjs`
-- `tests/fixtures/skill-routing-cases.json`
-- `tests/skillRoutingCases.test.ts`
-- `.harness-hub/state/current-task.md`
-- `.harness-hub/state/decisions.md`
-- `.harness-hub/state/progress.md`
-- `.harness-hub/state/session-handoff.md`
-
-Current target repo:
-
-- `.codex/skills/package-release-sniffer/SKILL.md`
-- `.codex/harness-hub-aggregation.json`
-- `.codex/skills/effective-interact/assets/fixtures/harness-vocabulary-explainer-report.json`
-- `.codex/skills/workflow-router/scripts/skill-activation-check.mjs`
+- `config/daily-workflow-contract.json`
+- `docs/codex-automation-setup.md`
+- `package.json`
+- `prompts/ai-daily/modules/publish-workflow.md`
+- `scripts/validate-daily-workflow-contract.mjs`
+- `src/automation-inventory.js`
+- `src/cli.js`
+- `src/daily-runner.js`
+- `src/draft.js`
+- `src/evidence-cache.js`
+- `src/process-runner.js`
+- `src/publish.js`
+- `src/quality-gates.js`
+- `src/quality-status.js`
+- `src/render.js`
+- `src/report.js`
+- `src/status-self-check.js`
+- `src/url.js`
+- `src/workflow-contract.js`
 - `tasks/current-task.md`
+- `tasks/daily-publish-runbook.md`
+- `tasks/templates/daily-publish-task.md`
 - `progress.md`
 - `session-handoff.md`
-
-Note: an earlier validation run on the older detached base produced `docs/reports/...` changes, but after rebasing onto latest `origin/main`, `npm run validate` wrote no files and the target PR diff does not include generated report HTML.
+- `tests/unit.test.js`
 
 ## Validation Evidence
 
-- Hub targeted tests passed: 17 tests, 0 failures.
-- Hub skill validation passed for 45 skills.
-- Hub activation fixture check passed: 113/113 routing cases.
-- Hub `bun run validate` passed: 298 tests passed, 0 failures; artifact policy and skill validation passed.
-- Hub `git diff --check` passed.
-- Target `node scripts\harness-validate.mjs` passed.
-- Target `npm run validate` passed after `npm ci` restored missing local `node_modules`: source validation ok, workflow validation ok, 205 tests passed, build `written_files: []`, privacy/e2e/OpenSpec/diff-check passed.
-- Target visual smoke passed: Playwright opened `docs/reports/2026/06/2026-06-03.html` at 1440x1000 and 390x844; page was non-empty, had 203 links, no horizontal overflow, and no unreadable same-color text.
-
-## Residual Risk
-
-- The new helper is guidance-only; it does not add automated package registry monitoring.
-- No target `docs/reports/**` diff remains after rebasing onto latest `origin/main`.
+- Focused unit run passed: 155 tests, 0 failures.
+- `npm run workflow:validate` passed against real automation inventory.
+- `npm run validate` passed: feedback, workflow, sources, 213 tests, build, privacy, e2e, OpenSpec, and diff-check all passed.
+- `git diff --check` passed.
+- `node scripts/harness-validate.mjs` passed.
 
 ## Next Action
 
-- Stage, commit, push, and open draft PRs.
+- Report final results.
