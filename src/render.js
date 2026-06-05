@@ -1091,6 +1091,7 @@ function renderAuditGroup(title, group) {
   const counts = sourceStatusCounts(group.sources);
   const meta = [
     `status checked=${counts.checked} no_signal=${counts.no_signal} blocked=${counts.blocked} skipped=${counts.skipped}`,
+    "scope=this run fetched and parsed these sources; not exhaustive proof of no omitted updates",
     status,
     `${group.candidates_found} 候选`,
     `${group.included} 入选`,

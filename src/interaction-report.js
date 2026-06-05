@@ -1046,14 +1046,24 @@ function dailyTrackingProviderBars(entries) {
 
 function dailyTrackingTable(item, entries) {
   if (entries.length > 0) {
+    const valueLabel = item?.category === "model_benchmark"
+      ? "分数"
+      : item?.category === "coding_benchmark"
+        ? "结果"
+        : "调用量";
+    const changeLabel = item?.category === "model_benchmark"
+      ? "指标"
+      : item?.category === "coding_benchmark"
+        ? "变化"
+        : "周变化";
     return {
       title: "Top 10 榜单",
       columns: [
         { key: "rank", label: "排名", width: "64px", align: "center" },
         { key: "model", label: "模型" },
         { key: "provider", label: "供应商", width: "120px" },
-        { key: "tokens", label: "调用量", width: "130px", align: "right" },
-        { key: "change", label: "周变化", width: "96px", align: "right" }
+        { key: "tokens", label: valueLabel, width: "130px", align: "right" },
+        { key: "change", label: changeLabel, width: "96px", align: "right" }
       ],
       rows: entries.map((entry) => ({
         rank: `#${entry.rank}`,
@@ -1669,6 +1679,7 @@ function formatAuditGroup(title, group) {
     : "- 未记录具体来源。";
   const details = [
     `- Source status: checked=${counts.checked}; no_signal=${counts.no_signal}; blocked=${counts.blocked}; skipped=${counts.skipped}`,
+    "- 审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。",
     `- 检查状态：${group.checked ? "已检查" : "未检查"}`,
     `- 候选 / 入选：${group.candidates_found} / ${group.included}`,
     group.blocked_reason ? `- 阻塞原因：${group.blocked_reason}` : "",
@@ -1719,8 +1730,11 @@ function stripTrailingSentencePunctuation(value) {
 
 function markdownLink(url, label, options = {}) {
   const icon = options.icon === false ? "" : options.icon || siteIconForUrl(url, label);
-  const iconMarkdown = icon ? `${markdownImage(icon, options.iconLabel || label)} ` : "";
-  return `${iconMarkdown}[${escapeMarkdownText(label || url)}](${String(url)})`;
+  const text = escapeMarkdownText(label || url);
+  if (!icon) {
+    return `[${text}](${String(url)})`;
+  }
+  return `[${markdownImage(icon, options.iconLabel || label)} ${text}](${String(url)})`;
 }
 
 function markdownImage(url, label) {

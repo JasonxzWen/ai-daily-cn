@@ -1527,6 +1527,10 @@
         "notes": {
           "type": "string"
         },
+        "parsed_count": {
+          "type": "integer",
+          "minimum": 0
+        },
         "snapshot": {
           "$ref": "#/$defs/daily_tracking_snapshot"
         }

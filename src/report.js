@@ -277,8 +277,8 @@ function requireExpandedMainItemFormat(report) {
     if (bullets.length < 1 || bullets.length > 3) {
       errors.push(`main_items[${index}].bullets must contain 1-3 factual bullets`);
     }
-    if (!/\*\*[^*]+\*\*/.test(text)) {
-      errors.push(`main_items[${index}] missing bold emphasis`);
+    if (!/\*\*[^*]+\*\*/.test(text) && !/==[^=\n]+==/.test(text)) {
+      errors.push(`main_items[${index}] missing emphasis`);
     }
     const totalChars = bullets.reduce((sum, bullet) => sum + bullet.length, 0);
     if (totalChars < 40) {

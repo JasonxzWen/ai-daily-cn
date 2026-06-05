@@ -2760,12 +2760,34 @@
   },
   "generated_at": "2026-06-03T13:11:20.271Z",
   "quality_status": {
-    "status": "ok",
-    "reasons": [],
+    "status": "degraded",
+    "reasons": [
+      "github_trending_required_source_weak_signal"
+    ],
     "affected_sections": [],
-    "degraded_sections": [],
+    "degraded_sections": [
+      {
+        "code": "github_trending_required_source_weak_signal",
+        "error_code": "github_trending_source_signal_gate_failed",
+        "section": "source_audit.github_trending",
+        "message": "One or more required GitHub Trending pages did not parse enough repositories for reliable daily coverage.",
+        "remediation": "Re-run discover:github-trending, inspect GitHub HTML selectors or network responses for weak sources, and disclose the degraded GitHub Trending source lane before publishing.",
+        "count": 9,
+        "minimum": 10,
+        "parsed_minimum": 10,
+        "weak_sources": [
+          {
+            "name": "GitHub Trending TypeScript daily",
+            "url": "https://github.com/trending/typescript?since=daily",
+            "status": "no_signal",
+            "parsed_count": 0,
+            "notes": "0 repositories parsed"
+          }
+        ]
+      }
+    ],
     "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "本轮 GitHub Trending 必查子源覆盖不足；公开 Top 10 可读，但语言/周期榜单审计可能不完整。"
   },
   "daily_tracking": []
 }

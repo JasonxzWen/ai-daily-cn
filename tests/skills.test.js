@@ -471,7 +471,7 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
           type: "markdown",
           title: "GitHub Trending",
           content: [
-            "1. ![GitHub](data:image/png;base64,iVBORw0KGgo=) **[example/repo](https://github.com/example/repo)** ==trend-new|NEW==：示例项目。",
+            "1. **[![GitHub](data:image/png;base64,iVBORw0KGgo=) example/repo](https://github.com/example/repo)** ==trend-new|NEW==：示例项目。",
             "2. **[example/up](https://github.com/example/up)** ==trend-up|↑ UP +2==：上升项目。",
             "3. **[example/down](https://github.com/example/down)** ==trend-down|↓ DOWN -1==：下降项目。",
             "4. **[example/same](https://github.com/example/same)** ==trend-same|SAME==：持平项目。",
@@ -495,8 +495,8 @@ test("effective-interact pre-rendered markdown keeps ordered lists and highlight
 
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /<ol><li><img class="inline-site-icon"/);
-  const sourceIcon = html.match(/<ol><li><img[^>]+>/)?.[0] || "";
+  assert.match(html, /<ol><li><strong><a href="https:\/\/github\.com\/example\/repo" rel="noreferrer"><img class="inline-site-icon"/);
+  const sourceIcon = html.match(/<ol><li><strong><a[^>]+><img[^>]+>/)?.[0] || "";
   assert.doesNotMatch(sourceIcon, /data-lightbox-image/);
   assert.match(html, /<strong><a href="https:\/\/github\.com\/example\/repo"/);
   assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-new">NEW<\/mark>/);
@@ -602,8 +602,7 @@ test("effective-interact filterable cards render linked project subcards", async
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /project-card/);
   assert.match(html, /project-card-grid/);
-  assert.match(html, /<h3><img class="[^"]*\binline-site-icon\b[^"]*"/);
-  assert.match(html, /class="card-title-link" href="https:\/\/example\.com\/project-alpha"/);
+  assert.match(html, /<h3><a class="card-title-link" href="https:\/\/example\.com\/project-alpha" rel="noreferrer"><img class="[^"]*\binline-site-icon\b[^"]*\bcard-title-icon\b[^"]*"/);
   assert.match(html, /class="card-subtitle">@projectalpha<\/span>/);
   assert.match(html, /card-detail-list/);
   assert.match(html, /card-detail-icon/);
@@ -752,7 +751,7 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(html, /blog-card-grid/);
   assert.match(card, /data-filter-value="LOCAL SPEECH-TO-SPEECH AGENT STACK"/);
   assert.doesNotMatch(card, /<div class="meta">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/div>/);
-  assert.match(card, /<h3><span class="card-title-text"><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini"/);
+  assert.match(card, /<h3><a class="card-title-link" href="https:\/\/huggingface\.co\/blog\/reachy-mini" rel="noreferrer"><span class="card-title-text">/);
   assert.match(card, /<span class="chip">LOCAL SPEECH-TO-SPEECH AGENT STACK<\/span>/);
   assert.match(card, /card-media-grid/);
   assert.match(card, /data-lightbox-image="true"/);
