@@ -278,6 +278,21 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'official docs',
     'sdk docs',
   ]) || (includesAny(text, ['docs', 'documentation']) && includesAny(text, ['current', 'latest', 'official']));
+  const packageReleaseSignal = (
+    includesAny(text, [
+      'new package',
+      'new packages',
+      'newly published',
+      'package release',
+      'package releases',
+      'published package',
+      'registry feed',
+      'release feeds',
+    ]) || (
+      includesAny(text, ['npm', 'pypi', 'registry', 'registries'])
+      && includesAny(text, ['ai', 'developer-tool', 'package', 'packages', 'release', 'sniff'])
+    )
+  ) && !documentationLookupSignal;
   const webArtifactsSignal = includesAny(text, [
     'browser artifact',
     'bundled components',
@@ -542,6 +557,10 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
 
   if (documentationLookupSignal && canLoad(metadata, 'documentation-lookup', ['current library', 'documentation'])) {
     return 'documentation-lookup';
+  }
+
+  if (packageReleaseSignal && canLoad(metadata, 'package-release-sniffer', ['newly published package', 'release feeds'])) {
+    return 'package-release-sniffer';
   }
 
   if (claudeApiSignal && canLoad(metadata, 'claude-api', ['claude api', 'anthropic sdk'])) {
