@@ -63,7 +63,10 @@ const SOURCE_ICONS = new Map([
   ["Nature Communications", generatedSiteIcon("N", "#0f172a", "#ffffff")],
   ["Claude official X", generatedSiteIcon("X", "#111111", "#ffffff")],
   ["Simon Willison Weblog", generatedSiteIcon("SW", "#2f6f9f", "#ffffff")],
-  ["AI & I / Every", generatedSiteIcon("E", "#111827", "#f7f1e8")]
+  ["AI & I / Every", generatedSiteIcon("E", "#111827", "#f7f1e8")],
+  ["OpenRouter Rankings", generatedSiteIcon("OR", "#111827", "#f97316")],
+  ["Artificial Analysis Intelligence Index", generatedSiteIcon("AA", "#0f172a", "#38bdf8")],
+  ["Scale Labs SWE-Bench Pro", generatedSiteIcon("SB", "#111827", "#84cc16")]
 ]);
 
 const DOMAIN_ICONS = new Map([
@@ -93,7 +96,11 @@ const DOMAIN_ICONS = new Map([
   ["x.com", SOURCE_ICONS.get("Claude official X")],
   ["twitter.com", SOURCE_ICONS.get("Claude official X")],
   ["simonwillison.net", SOURCE_ICONS.get("Simon Willison Weblog")],
-  ["every.to", SOURCE_ICONS.get("AI & I / Every")]
+  ["every.to", SOURCE_ICONS.get("AI & I / Every")],
+  ["openrouter.ai", SOURCE_ICONS.get("OpenRouter Rankings")],
+  ["artificialanalysis.ai", SOURCE_ICONS.get("Artificial Analysis Intelligence Index")],
+  ["scale.com", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")],
+  ["labs.scale.com", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")]
 ]);
 
 for (const [source, icon] of Object.entries(CACHED_SOURCE_ICONS)) {
@@ -107,6 +114,8 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
 export function reportToInteractionInput(report, options = {}) {
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
+  const dailyTracking = Array.isArray(report.daily_tracking) ? report.daily_tracking : [];
+  const publicDailyTracking = dailyTracking.filter(isPublicDailyTrackingChange);
   const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
@@ -121,6 +130,16 @@ export function reportToInteractionInput(report, options = {}) {
     ...formatMainItemSections(mainItems, { report, evidenceByUrl, trendAnnotations })
   ];
 
+  if (publicDailyTracking.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "每日追踪",
+      group: "signals",
+      cardClass: "tracking-card",
+      showFilters: false,
+      items: formatDailyTrackingCards(publicDailyTracking)
+    });
+  }
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -213,6 +232,7 @@ export function reportToInteractionInput(report, options = {}) {
     heroStats: dailyHeroStats(report, {
       mainItems,
       hotBlogs,
+      dailyTracking: publicDailyTracking,
       githubTrending,
       projects,
       builderObservations,
@@ -311,6 +331,10 @@ function dailyHeroStats(report, collections) {
   ];
   if (aigcCount > 0) {
     stats.splice(1, 0, { label: "AIGC", value: String(aigcCount), detail: "产品/内容" });
+  }
+  if ((collections.dailyTracking?.length || 0) > 0) {
+    const insertAt = aigcCount > 0 ? 2 : 1;
+    stats.splice(insertAt, 0, { label: "追踪", value: String(collections.dailyTracking.length), detail: "榜单变化" });
   }
   return stats;
 }
@@ -827,6 +851,54 @@ function formatProjectCards(items) {
       points
     };
   });
+}
+
+function formatDailyTrackingCards(items) {
+  return items.map((item) => {
+    const metrics = Array.isArray(item.metrics) ? item.metrics : [];
+    const watchPoints = Array.isArray(item.watch_points) ? item.watch_points : [];
+    const points = [
+      ...metrics.map((metric) => ({
+        label: metric.label || "指标",
+        value: metric.value
+      })),
+      ...watchPoints.map((value, index) => ({ label: `看点 ${index + 1}`, value })),
+      item.watch_next ? { label: "下一步", value: item.watch_next } : null,
+      item.verification_note ? { label: "核验", value: item.verification_note } : null,
+      item.risk_note ? { label: "边界", value: item.risk_note } : null
+    ].filter(Boolean);
+    return {
+      group: dailyTrackingCategoryLabel(item.category),
+      title: item.name,
+      href: item.url,
+      titleIcon: siteIconForUrl(item.url, item.source || item.name),
+      body: formatDailyInlineText(item.summary, item),
+      showGroup: true,
+      tags: [
+        cardTag(importanceTagFor("daily_tracking", item)),
+        cardTag(dailyTrackingCategoryLabel(item.category), "topic"),
+        item.event_date ? cardTag(item.event_date, "date") : ""
+      ].filter(Boolean),
+      points
+    };
+  });
+}
+
+function isPublicDailyTrackingChange(item) {
+  if (item?.publish_to_public !== true) {
+    return false;
+  }
+  if (String(item?.change_status || "") !== "changed") {
+    return false;
+  }
+  return item?.verification_status === "primary_confirmed" || item?.verification_status === "multi_source_confirmed";
+}
+
+function dailyTrackingCategoryLabel(category) {
+  if (category === "model_usage") return "模型使用";
+  if (category === "model_benchmark") return "模型基准";
+  if (category === "coding_benchmark") return "代码基准";
+  return "每日追踪";
 }
 
 function formatHotBlogCards(items, context = {}) {

@@ -312,6 +312,7 @@ function withDefaultImportanceForReport(report) {
     "main_items",
     "model_releases",
     "hot_blogs",
+    "daily_tracking",
     "projects",
     "github_trending",
     "builder_observations",
