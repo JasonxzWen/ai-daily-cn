@@ -2987,6 +2987,35 @@ test("quality review flags AI tone highlight and translation issues", async () =
   assert(review.ai_review_tasks.some((task) => task.kind === "translation_fidelity"));
 });
 
+test("quality review flags untranslated or thin hot blog summaries", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hot_blogs = [
+    {
+      ...report.hot_blogs[0],
+      summary: "This post validates blog cards without evidence images. It should use a full-width title and body instead of leaving an empty media column."
+    },
+    {
+      ...report.hot_blogs[0],
+      title: "Thin Blog",
+      url: "https://example.com/blog/thin",
+      summary: "这篇文章提到 agent 工具。读者可以继续观察。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("hot_blog_summary_untranslated"));
+  assert(review.issues.some((issue) =>
+    issue.path === "hot_blogs[1].summary" &&
+    Array.isArray(issue.details?.problems) &&
+    issue.details.problems.includes("summary_too_short")
+  ));
+  assert(review.ai_review_tasks.some((task) => task.kind === "hot_blog_editorial_rewrite" && task.path === "hot_blogs[0].summary"));
+  assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
+});
+
 test("quality review requires candidate pool and flags autodraft template prose", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_window = {
@@ -3642,6 +3671,11 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(!drafted.report.main_items.some((item) => item.source === "TechCrunch AI"));
   assert(!drafted.report.main_items.some((item) => item.source === "OpenAlex"));
   assert(!drafted.report.builder_observations.some((item) => item.original_text?.includes("not anything ai related")));
+  assert(drafted.report.hot_blogs.every((item) => {
+    const summary = String(item.summary || "");
+    const points = summary.split(/(?<=[。！？!?；;])\s*/u).map((part) => part.trim()).filter(Boolean);
+    return summary.length >= 100 && /\p{Script=Han}/u.test(summary) && points.length >= 2 && points.length <= 4;
+  }));
   const publicAutodraftText = JSON.stringify({
     summary: drafted.report.summary,
     main_items: drafted.report.main_items,
@@ -3676,7 +3710,11 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   const draftReviewCodes = draftReview.issues.map((issue) => issue.code);
   assert(!draftReviewCodes.includes("autodraft_template_phrase"));
   assert(!draftReviewCodes.includes("candidate_pool_reference_invalid"));
+  assert(!draftReviewCodes.includes("hot_blog_summary_untranslated"));
+  assert(!draftReviewCodes.includes("hot_blog_summary_too_thin"));
+  assert(!draftReviewCodes.includes("hot_blog_points_invalid"));
   assert.equal(draftReview.checklist.find((item) => item.id === "candidate_backrefs").status, "passed");
+  assert.equal(draftReview.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "passed");
 
   const written = await writeReportDraft({
     rootDir: tmp,

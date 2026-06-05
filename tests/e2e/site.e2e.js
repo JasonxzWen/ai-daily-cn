@@ -89,7 +89,7 @@ structuredReport.hot_blogs.push({
   author: "Example Author",
   event_date: "2026-05-15",
   topic: "layout regression",
-  summary: "This post validates blog cards without evidence images\u3002It should use a full-width title and body instead of leaving an empty media column\u3002Its extra points should render as readable bullets rather than visible labels\u3002"
+  summary: "这篇博客用于验证没有证据图时的卡片布局，重点是普通读者能否顺畅扫读。它应让标题、正文和要点占满可读宽度，而不是留下空媒体栏。读者看到的是清楚的中文正文层级、要点分组和链接状态，不会被英文测试文案干扰。"
 });
 structuredReport.builder_observations = [
   {
