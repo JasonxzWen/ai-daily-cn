@@ -157,8 +157,25 @@ structuredReport.evidence_assets = [
     extraction_status: "source_image"
   }
 ];
+const weakBuilderReport = structuredClone(structuredReport);
+weakBuilderReport.report_date = "2026-05-17";
+weakBuilderReport.title = "AI 日报 2026-05-17";
+weakBuilderReport.html_path = "reports/2026/05/2026-05-17.html";
+weakBuilderReport.canonical_url = "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-17.html";
+weakBuilderReport.builder_observations = [
+  {
+    ...structuredReport.builder_observations[0],
+    author: "Untranslated Builder",
+    handle: "rawbuilder",
+    url: "https://x.com/rawbuilder/status/2059000000000000002",
+    translation: "这条原帖讨论模型或产品变化：This great conversation with @danintheory of @OpenAI is also available on Spotify, Apple Podcasts and here on YouTube.",
+    content: "这条原帖讨论模型或产品变化：This great conversation with @danintheory of @OpenAI is also available on Spotify, Apple Podcasts and here on YouTube."
+  }
+];
+weakBuilderReport.self_check.builder_observations = weakBuilderReport.builder_observations.length;
 await fs.writeFile(path.join(dataInputDir, "structured-report.json"), JSON.stringify(structuredReport, null, 2), "utf8");
 await fs.writeFile(path.join(dataInputDir, "weak-hot-blog-report.json"), JSON.stringify(weakHotBlogReport, null, 2), "utf8");
+await fs.writeFile(path.join(dataInputDir, "weak-builder-report.json"), JSON.stringify(weakBuilderReport, null, 2), "utf8");
 
 await buildSite({
   rootDir: tmp,
@@ -242,6 +259,11 @@ try {
   const weakHotBlogChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-16" });
   assert.equal(weakHotBlogChecklist.ok, false);
   assert(weakHotBlogChecklist.issues.some((issue) => issue.id === "hot_blog_cards_reader_facing"));
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-17.html`);
+  const weakBuilderChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-17" });
+  assert.equal(weakBuilderChecklist.ok, false);
+  assert(weakBuilderChecklist.issues.some((issue) => issue.id === "builder_cards_translated"));
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));
