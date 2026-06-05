@@ -55,6 +55,45 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       document.querySelectorAll(".project-card-grid, .project-card").length === 0,
       "Project highlights should stay inside GitHub Trending entries, not a standalone project card section."
     );
+    const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
+      .map((card, index) => {
+        const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const pointRows = Array.from(card.querySelectorAll(".card-detail-list div"));
+        const summaryPointText = pointRows
+          .filter((row) => /^要点\s*\d+/.test(row.querySelector("dt")?.textContent || ""))
+          .map((row) => row.querySelector("dd")?.textContent?.replace(/\s+/g, " ").trim() || "")
+          .filter(Boolean);
+        const detailText = Array.from(card.querySelectorAll(".card-detail-list dd"))
+          .map((item) => item.textContent.replace(/\s+/g, " ").trim())
+          .filter(Boolean);
+        const editorialText = [bodyText, ...detailText].join(" ");
+        const plain = editorialText.replace(/[#*_=`~]/g, "").trim();
+        const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+        const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+        const ratioBase = chineseChars + latinChars;
+        const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+        const pointCount = [bodyText, ...summaryPointText].filter(Boolean).length;
+        const untranslatedEnglish = /\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/.test(plain);
+        const ok = plain.length >= 100 && chineseChars >= 60 && chineseRatio >= 0.45 && pointCount >= 2 && pointCount <= 4 && !untranslatedEnglish;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              length: plain.length,
+              point_count: pointCount,
+              chinese_chars: chineseChars,
+              chinese_ratio: Number(chineseRatio.toFixed(3)),
+              untranslated_english: untranslatedEnglish
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "hot_blog_cards_reader_facing",
+      weakBlogCards.length === 0,
+      "Hot blog cards should render as reader-facing Chinese analysis with 2-4 readable points, not untranslated excerpts or thin summaries.",
+      { weak_cards: weakBlogCards }
+    );
     const contentImages = Array.from(document.images).filter((image) =>
       image.getAttribute("src") && !image.closest(".image-lightbox[hidden]")
     );

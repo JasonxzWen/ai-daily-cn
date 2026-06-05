@@ -29,6 +29,11 @@ const AUTO_DRAFT_TEMPLATE_PHRASES = [
   "report:draft 已从候选池自动选取"
 ];
 
+const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
+const HOT_BLOG_SUMMARY_MAX_LENGTH = 260;
+const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
+const HOT_BLOG_MIN_CHINESE_CHARS = 60;
+
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
   "github_trending",
@@ -116,6 +121,7 @@ export function reviewReportQuality(report, options = {}) {
   }
 
   collectMainItemDensityIssues(report, issues);
+  collectHotBlogSummaryIssues(report, issues, aiReviewTasks);
   collectBuilderTranslationIssues(report, issues, aiReviewTasks);
   collectCandidatePoolIssues(report, candidatePool, issues, { autoDraft });
 
@@ -367,6 +373,81 @@ function collectMainItemDensityIssues(report, issues) {
   });
 }
 
+function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
+  const items = Array.isArray(report?.hot_blogs) ? report.hot_blogs : [];
+  items.forEach((item, index) => {
+    const pathName = `hot_blogs[${index}].summary`;
+    const summary = String(item?.summary || "").replace(/\s+/g, " ").trim();
+    const plain = stripMarkup(summary);
+    const sentenceCount = hotBlogPublicPoints(summary).length;
+    const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+    const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+    const ratioBase = chineseChars + latinChars;
+    const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+    const problems = [];
+
+    if (plain.length < HOT_BLOG_SUMMARY_MIN_LENGTH) {
+      problems.push("summary_too_short");
+    }
+    if (plain.length > HOT_BLOG_SUMMARY_MAX_LENGTH) {
+      problems.push("summary_too_long");
+    }
+    if (sentenceCount < 2 || sentenceCount > 4) {
+      problems.push("points_not_2_to_4");
+    }
+    if (chineseChars < HOT_BLOG_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
+      problems.push("not_chinese_editorial_summary");
+    }
+
+    if (problems.length === 0) {
+      return;
+    }
+
+    const code = problems.includes("not_chinese_editorial_summary")
+      ? "hot_blog_summary_untranslated"
+      : problems.includes("points_not_2_to_4")
+        ? "hot_blog_points_invalid"
+        : "hot_blog_summary_too_thin";
+    issues.push({
+      code,
+      severity: "error",
+      path: pathName,
+      message: "Hot blog summaries must be reader-facing Chinese analysis: 2-4 points, about 100-160 Chinese characters, and no untranslated English excerpt.",
+      repairable: false,
+      details: {
+        problems,
+        length: plain.length,
+        sentence_count: sentenceCount,
+        chinese_chars: chineseChars,
+        chinese_ratio: Number(chineseRatio.toFixed(3))
+      }
+    });
+    aiReviewTasks.push({
+      kind: "hot_blog_editorial_rewrite",
+      path: pathName,
+      instruction: "Rewrite the hot blog summary in Chinese for general readers: 2-4 concise points, about 100-160 Chinese characters total, explain what the article says, why it matters, and what to watch without changing facts or links."
+    });
+  });
+}
+
+function hotBlogPublicPoints(summary) {
+  const text = String(summary || "").replace(/\s+/g, " ").trim();
+  if (!text) {
+    return [];
+  }
+  const parts = text
+    .split(/(?<=[。！？!?；;])\s*/u)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.length > 0 ? parts : [text];
+}
+
+function looksLikeUntranslatedEnglish(value) {
+  const text = String(value || "").trim();
+  const englishSentences = text.match(/\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/g) || [];
+  return englishSentences.length >= 1;
+}
+
 function collectCandidatePoolIssues(report, candidatePool, issues, context = {}) {
   if (!context.autoDraft && !candidatePool) {
     return;
@@ -504,6 +585,11 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
       id: "content_density",
       ok: !warningCodes.has("content_too_thin"),
       status: warningCodes.has("content_too_thin") ? "warning" : "passed"
+    },
+    {
+      id: "hot_blog_editorial_quality",
+      ok: !failedCodes.has("hot_blog_summary_untranslated") && !failedCodes.has("hot_blog_points_invalid") && !failedCodes.has("hot_blog_summary_too_thin"),
+      status: failedCodes.has("hot_blog_summary_untranslated") || failedCodes.has("hot_blog_points_invalid") || failedCodes.has("hot_blog_summary_too_thin") ? "failed" : "passed"
     },
     {
       id: "autodraft_editorial_rewrite",
