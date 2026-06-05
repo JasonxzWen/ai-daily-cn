@@ -2673,20 +2673,21 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
       continue;
     }
 
-    const block = html.slice(match.index, Math.min(html.length, match.index + 1800));
-    const title = extractHtmlTitle(match[4]) || extractHtmlTitle(block);
-    const eventDate = extractHtmlDate(block);
+    const forwardBlock = html.slice(match.index, Math.min(html.length, match.index + 1800));
+    const surroundingBlock = html.slice(Math.max(0, match.index - 600), Math.min(html.length, match.index + 1800));
+    const title = extractHtmlTitle(match[4]) || extractHtmlTitle(forwardBlock);
+    const eventDate = extractHtmlDate(forwardBlock) || extractHtmlDate(surroundingBlock);
     if (!title || !eventDate) {
       continue;
     }
 
-    const imageUrl = extractHtmlImageUrl(block, url);
+    const imageUrl = extractHtmlImageUrl(forwardBlock, url);
     seenUrls.add(url);
     entries.push({
       title,
       url,
       event_date: eventDate,
-      summary: extractHtmlSummary(block),
+      summary: extractHtmlSummary(forwardBlock),
       ...(imageUrl ? { image_url: imageUrl, image_source: "html_index" } : {})
     });
   }
@@ -2852,7 +2853,7 @@ function atomLink(block) {
 }
 
 function stripTags(value) {
-  return String(value).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]*>/g, " ");
+  return String(value).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]*(?:>|$)/g, " ");
 }
 
 function decodeXml(value) {
@@ -2879,6 +2880,11 @@ function dateOnly(value) {
   const ymdMatch = rawValue.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
   if (ymdMatch) {
     return `${ymdMatch[1]}-${ymdMatch[2]}-${ymdMatch[3]}`;
+  }
+
+  const dottedYmdMatch = rawValue.match(/\b(\d{4})\.(\d{2})\.(\d{2})\b/);
+  if (dottedYmdMatch) {
+    return `${dottedYmdMatch[1]}-${dottedYmdMatch[2]}-${dottedYmdMatch[3]}`;
   }
 
   const monthDateMatch = rawValue.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),\s+(\d{4})\b/i);
@@ -3041,7 +3047,7 @@ function extractHtmlTitle(block) {
 
 function cleanHtmlTitle(value) {
   return String(value || "")
-    .replace(/^(?:[A-Z][a-z]+\.?\s+\d{1,2},\s+\d{4}\s+)?(?:Announcements|Blog|Company|Featured|Product|Research)\s+/i, "")
+    .replace(/^(?:(?:[A-Z][a-z]+\.?\s+\d{1,2},\s+\d{4}|\d{4}[.-]\d{2}[.-]\d{2})\s+)?(?:Announcements|Blog|Company|Featured|Product|Research)\s+/i, "")
     .trim();
 }
 
@@ -3055,6 +3061,7 @@ function extractHtmlDate(block) {
   const text = cleanText(block);
   const explicitDate =
     text.match(/\b\d{4}-\d{2}-\d{2}\b/)?.[0] ||
+    text.match(/\b\d{4}\.\d{2}\.\d{2}\b/)?.[0] ||
     text.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},\s+\d{4}\b/i)?.[0];
   return dateOnly(explicitDate);
 }
