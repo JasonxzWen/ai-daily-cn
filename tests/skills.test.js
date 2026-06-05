@@ -619,6 +619,84 @@ test("effective-interact filterable cards render linked project subcards", async
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
+test("effective-interact filterable cards render card stats, bars, and tables", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-card-visuals-"));
+  const inputPath = path.join(tmp, "card-visuals.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-06-05",
+      summary: "Tracking card visual check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "每日追踪",
+          group: "signals",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "模型使用",
+              title: "OpenRouter",
+              href: "https://openrouter.ai/rankings",
+              body: "公开榜单信号，不等同模型能力评测。",
+              stats: [
+                { label: "覆盖", value: "Top 10", detail: "公开榜单已解析" },
+                { label: "榜首", value: "DeepSeek V4 Flash", detail: "2.9T tokens / +18%" }
+              ],
+              bars: {
+                title: "供应商分布",
+                rows: [
+                  { label: "deepseek", value: 3, status: "3/10" },
+                  { label: "anthropic", value: 2, status: "2/10" }
+                ]
+              },
+              table: {
+                title: "Top 10 榜单",
+                columns: [
+                  { key: "rank", label: "排名", width: "64px" },
+                  { key: "model", label: "模型" },
+                  { key: "tokens", label: "调用量" }
+                ],
+                rows: [
+                  { rank: "#1", model: "DeepSeek V4 Flash", tokens: "2.9T tokens" },
+                  { rank: "#2", model: "Hy3 preview", tokens: "2.7T tokens" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "card-visuals", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /card-stat-grid/);
+  assert.match(html, /data-card-bars/);
+  assert.match(html, /data-card-data-table/);
+  assert.match(html, /DeepSeek V4 Flash/);
+  assert.match(html, /2\.9T tokens/);
+  assert.doesNotMatch(html, /<dl class="card-detail-list"/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact filterable cards can hide visual group labels", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hidden-card-group-"));
   const inputPath = path.join(tmp, "hidden-card-group.json");

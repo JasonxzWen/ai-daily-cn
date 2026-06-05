@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2444,6 +2602,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" rel="noopener noreferrer">openai.com</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
+
     <p>OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。</p>
 
   </article>
@@ -2452,6 +2611,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+REc8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/" rel="noopener noreferrer">developers.googleblog.com</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
+
     <p>Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。</p>
 
   </article>
@@ -2459,6 +2619,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RFg8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://docs.x.ai/developers/models?cluster=us-east-1" rel="noopener noreferrer">docs.x.ai</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
+
 
     <p>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。</p>
 

@@ -1216,6 +1216,92 @@ function renderCardDetails(points) {
   }).join("")}</dl>`;
 }
 
+function renderCardStats(stats) {
+  const items = Array.isArray(stats) ? stats.filter((item) => item && (item.label || item.value || item.detail)).slice(0, 6) : [];
+  if (items.length === 0) {
+    return "";
+  }
+  return `<div class="card-stat-grid" data-card-stats>${items.map((item) => `
+    <div class="card-stat">
+      <span class="card-stat-label">${escapeHtml(item.label || "")}</span>
+      <strong>${inlineMarkdown(item.value || "")}</strong>
+      ${item.detail ? `<span class="card-stat-detail">${inlineMarkdown(item.detail)}</span>` : ""}
+    </div>`).join("")}</div>`;
+}
+
+function cardVisualRows(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value && typeof value === "object" && Array.isArray(value.rows)) {
+    return value.rows;
+  }
+  return [];
+}
+
+function renderCardBars(bars) {
+  const rows = cardVisualRows(bars).filter((row) => row && (row.label || row.value));
+  if (rows.length === 0) {
+    return "";
+  }
+  const title = bars && !Array.isArray(bars) && bars.title ? bars.title : "分布";
+  const chart = {
+    encoding: {
+      label: "label",
+      value: "value",
+      status: "status"
+    }
+  };
+  return `<div class="card-visual card-bars" data-card-bars>
+    <div class="card-visual-title">${escapeHtml(title)}</div>
+    ${renderBarLikeChart(chart, rows)}
+  </div>`;
+}
+
+function renderCardTable(table) {
+  const rows = cardVisualRows(table);
+  if (!table || typeof table !== "object" || rows.length === 0) {
+    return "";
+  }
+  const columns = normalizeTableColumns({ columns: table.columns, headers: table.headers, rows });
+  if (columns.length === 0) {
+    return "";
+  }
+  const colgroup = columns
+    .map((column) => column.width ? `<col style="width:${escapeAttr(column.width)}">` : "<col>")
+    .join("");
+  const head = columns.map((column, columnIndex) => (
+    `<th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="${columnIndex}" data-align="${escapeAttr(column.align)}">${escapeHtml(column.label)}</th>`
+  )).join("");
+  const body = rows.map((row, rowIndex) => {
+    const tableRow = rowIndex + 1;
+    return `<tr>${columns.map((column, columnIndex) => (
+      `<td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="${columnIndex}" data-align="${escapeAttr(column.align)}">${renderTableValue(tableCellValue(row, column, columnIndex))}</td>`
+    )).join("")}</tr>`;
+  }).join("\n");
+  const title = table.title ? `<div class="card-visual-title">${escapeHtml(table.title)}</div>` : "";
+  const caption = table.caption ? `<p class="table-caption">${escapeHtml(table.caption)}</p>` : "";
+  return `<div class="card-visual card-table" data-card-table>
+    ${title}
+    ${caption}
+    <div class="table-scroll card-table-scroll" data-table-wrap>
+      <table class="report-data-table card-data-table" data-report-data-table data-card-data-table>
+        <colgroup>${colgroup}</colgroup>
+        <thead><tr>${head}</tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderCardVisuals(item) {
+  return [
+    renderCardStats(item.stats || item.summaryStats || item.summary_stats),
+    renderCardBars(item.bars || item.barChart || item.bar_chart),
+    renderCardTable(item.table || item.dataTable || item.data_table)
+  ].join("");
+}
+
 function renderCardMedia(media) {
   const items = Array.isArray(media)
     ? media.filter((item) => item && item.src).slice(0, 2)
@@ -1247,12 +1333,14 @@ function renderFilterableCard(item, target, cardClass) {
   const group = item.group || "item";
   const className = ["interactive-card", "evidence-card", "evidence-spotlight", cardClass].filter(Boolean).join(" ");
   const groupMeta = item.showGroup === false ? "" : `<div class="meta">${escapeHtml(group)}</div>`;
+  const body = item.body ? `<p>${inlineMarkdown(item.body)}</p>` : "";
   return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}">
     ${groupMeta}
     ${renderCardTitle(item)}
     ${renderCardTags(item.tags)}
     ${renderCardMedia(item.media)}
-    <p>${inlineMarkdown(item.body || "")}</p>
+    ${renderCardVisuals(item)}
+    ${body}
     ${renderCardDetails(item.points)}
   </article>`;
 }

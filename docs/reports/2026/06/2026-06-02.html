@@ -882,6 +882,99 @@ p.hero-summary-text {
   text-align: center;
 }
 
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
 body.lightbox-open {
   overflow: hidden;
 }
@@ -1035,6 +1128,53 @@ body.lightbox-open {
 .project-card .card-detail-list {
   grid-area: project-details;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
 }
 
 .blog-card .card-detail-list {
@@ -1278,6 +1418,17 @@ body.lightbox-open {
       "builder-details";
   }
 
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
   .project-card {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -1400,6 +1551,7 @@ body.lightbox-open {
 }
 
 .interactive-card {
+  scroll-margin-top: 96px;
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1769,6 +1921,12 @@ summary:focus-visible {
 .report-nav a[aria-current="true"] {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
 }
 
 .code-panel,
@@ -2518,6 +2676,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://blog.cloudflare.com/optimizing-core-unit-boot-time/" rel="noopener noreferrer">How we reduced core unit boot time from hours to minutes</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">bare-metal reliability</span></div>
 
+
     <p>Cloudflare 复盘 Gen12 core servers 固件更新后 UEFI boot timeout，把数小时启动降回分钟级。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>它不是泛泛的事故复盘，而是把 firmware rollout、裸金属启动链路、容量恢复和自动化回滚拆开讲，适合基础设施团队学习如何把硬件/固件问题纳入发布门禁和可观测性。</span></dd></div></dl>
   </article>
@@ -2526,6 +2685,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.latent.space/p/video-agents" rel="noopener noreferrer">Why Video Agent models are next</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AIGC</span><span class="chip chip-topic">video agents</span><span class="chip chip-topic">多模态产品</span></div>
 
+
     <p>Ethan He 从 xAI Grok Imagine 和 NVIDIA Cosmos 经验谈 video generation、world models、API 成本与速度。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>它适合放在 AIGC/多模态产品雷达里看：视频工具的竞争点正在从“生成一段素材”转向连续编辑、场景理解、状态记忆和工具调用。</span></dd></div></dl>
   </article>
@@ -2533,6 +2693,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://www.interconnects.ai/p/open-and-closed-models-are-on-different" rel="noopener noreferrer">Open and closed models are on different exponentials</a></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">open vs closed model economics</span></div>
+
 
     <p>Nathan Lambert 把开放模型和闭源模型放在不同增长曲线上比较，并把 coding agents 视为用户愿意为边际智能付费的早期市场。</p>
     <dl class="card-detail-list"><div><dt>要点 2</dt><dd><span>文章对工程团队的价值在于，它提醒平台选择不能只看当下 leaderboard，还要看开放权重的迭代速度、API 利润空间和长期锁定风险。</span></dd></div></dl>
@@ -2574,6 +2735,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-02-levie.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/levie/status/2061247380897579500" rel="noopener noreferrer">Aaron Levie</a><span class="card-subtitle">@levie</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Box CEO</span><span class="chip chip-date">2026-06-01</span></div>
 
+
     <p>企业里的整个 AI agent 问题是一个非常复杂、充满未知的领域。它实际上是在尝试把身份、权限、控制和工作流管理带到任意组合的已连接 AI agents 中。而这还没有算上数据访问和信息架构这类问题。</p>
 
   </article>
@@ -2582,6 +2744,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-02-rauchg.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/rauchg/status/2061135404942974982" rel="noopener noreferrer">Guillermo Rauch</a><span class="card-subtitle">@rauchg</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">Vercel CEO</span><span class="chip chip-date">2026-05-31</span></div>
 
+
     <p>CEO 和 CTO 重新回到写代码（并分享他们对此的兴奋感）这一现象不应被低估。</p>
 
   </article>
@@ -2589,6 +2752,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-02-steipete.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://x.com/steipete/status/2061208638027395490" rel="noopener noreferrer">Peter Steinberger</a><span class="card-subtitle">@steipete</span></span></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">OpenClaw / PSPDFKit founder</span><span class="chip chip-date">2026-05-31</span></div>
+
 
     <p>想象一下，如果你能教 Codex 充当 QA assistant，并在每次 commit 之后生成类似用户测试的报告。看到 @nikitonsky 的帖子并（尝试）重复测试，正是这么一回事。（有意思的是，他的 AI 出故障了，所以这就是他的报告结尾。）</p>
 
@@ -2610,6 +2774,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAACHFBMVEVMaXH////////////////////+/v7////////////////////////////////////+/v7////////////+/v7+/v7////////////////////////////////////////////+/v7////////////+/v79/f38/Pz7+/sAAAD4+Pj6+vq/v7/U1NQFBQVmZmb09PTx8fHr6+v5+fnW1tZcXFwWFhYPDw8wMDAaGhqGhoZXV1fFxcU9PT2mpqYtLS3h4eFra2szMzNGRkbs7OwGBgYZGRn29va2trYpKSkuLi5dXV0YGBheXl42NjaHh4ciIiJsbGwlJSWdnZ1oaGjv7+/Hx8c/Pz9PT08yMjKXl5csLCxYWFiNjY2Dg4McHBxDQ0O+vr7V1dWAgIADAwPf3986OjpZWVnk5ORvb28VFRV1dXUeHh5ISEhkZGSLi4uBgYGFhYWxsbGnp6cODg53d3cqKirl5eVfX19QUFDGxsbDw8OCgoISEhJ/f3/e3t719fUQEBAvLy9AQEARERGqqqqIiIgbGxu0tLQnJye1tbXn5+fm5uakpKQ8PDwmJiZtbW1iYmLS0tIICAgJCQkkJCQgICAEBAQ+Pj68vLwoKCibm5sUFBQNDQ0xMTHg4OCcnJxHR0ezs7OgoKDu7u4dHR3ExMTd3d3CwsJMTEzt7e0HBwfJycmioqJNTU1jY2PKysrIyMgXFxcTExM406YOAAAAJHRSTlMAASzMAwL8/f77DYyem9DoKef5MPbtX+wYzl7wG+s3jQw4nZzRy0erAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwElEQVR4nH1TZVcjQRAcYpsQ3IJrze7GBUgCBHd3d3d3PXd3d3f7g/dmFw74cv1l39uprumpriJEKj8VIdFRATGRHBcZExAVTYjKjxwptZooAuKghVRaxKUq2L9/pSL+SWEAp+MopA8Qpk8mqsPzkCBwGi0VBF7kJQ4Nh6CQA4SKJAZDpwVl7QAviCIPrQ7BKTJCTRSh0AAU5ryeYrtFRlFoEKogakL8iL+SnfMo6Kypnpydahzs7cpgdBoo/YkfURM9dKzfkZ8pgseqcaausrTDBQod9IwiPAJa0HQMXweFz5vVXA5+qCjfCapFRDghJJAR8LDee4P1DVuLC6ZWwNxdCAE6BBISnwAthdn+wObDZlMGsP38zoIDeTXljCIhnsSCoxSZ97febSM3Gy9ant5cbrhwceKUFTw4xLIbBFR4Poju92jfe/LMWAuY6j1F7hPSmGlECU7AeA7e1nzEJ+PjJcvapQrgauaIRWJQEgNb0dgiWrN8eJjD3j9nfGUF6vtL2BAGwjENBqbh3G1mM5hMmPf++LIDVPVBBDgGENFXBezYbnnnGSA7F99WWjE9AMoABvbKkv7zwO1i4xy7IqcdP39/xuIYc4aBDQkelpHqK8DlG5WPXq8Zv6PtTwlyxiGwIdOgA8Wou2ql3gTUGj0v99rxazd91FMBgUkZKzFYz04sZTUsN7oLC9gMbWVtDZmglAklS32y7BwcC3frtoCMpk18LbXZzftSS8sSUHhaBJzpcLXYNtZxrYkJLS9LWjeFM79oiEd5c5bXB4ozw0inkNctG4bC1VFaWTdjXAUPobbbwTSQDbNvOUqR0dU72Dg1O1ld1lnALti33IFpqeR3WOzFPXlm1n9gWmb7FMn2vCgKMopSyfaJh8GQgyP5XeQFgR4PDkMk6+XosXY5ekn+h+dyeFOPhjfgeHj/F/+/Zvqm8OFp/WAAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://status.openai.com//incidents/01KT204M76EYZYJX7WYG1B2QPH" rel="noopener noreferrer">status.openai.com</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">官方来源</span></div>
 
+
     <p>OpenAI Status 记录 Free users ChatGPT availability 下降；这类状态页事件只作轻量运营线索，不进入主体信息。
 
 待确认：来源是 OpenAI 官方状态页 incident，可确认事件存在和服务影响范围；边界：状态页事件通常是短周期运营信号，不能推导长期产品质量或模型能力变化。</p>
@@ -2619,6 +2784,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     <h3><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><a class="card-title-link" href="https://techcrunch.com/2026/06/01/nvidia-chases-200b-cpu-market-with-ai-agent-pcs-from-microsoft-dell-and-hp/" rel="noopener noreferrer">techcrunch.com</a></span></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span></div>
+
 
     <p>TechCrunch 报道 NVIDIA、Microsoft、Dell、HP 的 AI agent PC 方向；这条先作为产业雷达保留，说明端侧 agent 和 AI PC 正在从芯片叙事走向 OEM 产品线。
 
