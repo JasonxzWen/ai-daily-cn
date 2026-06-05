@@ -3842,6 +3842,117 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
 });
 
+test("report:draft promotes reader-relevant company actions from primary sources", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-reader-selection-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const companyCandidates = [
+    {
+      id: "tencent-product-conference",
+      source_id: "content-tencent-media-center",
+      category: "community_lead",
+      title: "Tencent schedules product conference and cloud business updates",
+      url: "https://www.tencent.com/en-us/articles/product-conference.html",
+      source: "Tencent Media Center",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Tencent Media Center says the company will hold a product conference and update cloud, games, and enterprise service plans.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: "https://www.tencent.com/en-us/articles/product-conference.html",
+      verification_sources: ["https://www.tencent.com/en-us/articles/product-conference.html"]
+    },
+    {
+      id: "alibaba-quarterly-results",
+      source_id: "content-alibaba-group-press-releases",
+      category: "community_lead",
+      title: "Alibaba Group posts quarterly results and business priorities",
+      url: "https://www.alibabagroup.com/en-US/document-quarterly-results",
+      source: "Alibaba Group Press Releases",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Alibaba Group release covers quarterly results, management commentary, and priority businesses for the next period.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: "https://www.alibabagroup.com/en-US/document-quarterly-results",
+      verification_sources: ["https://www.alibabagroup.com/en-US/document-quarterly-results"]
+    },
+    {
+      id: "meituan-organization-update",
+      source_id: "content-meituan-investor-relations",
+      category: "community_lead",
+      title: "Meituan updates organization and quarterly operating outlook",
+      url: "https://www.meituan.com/en-US/investor-relations/organization-update",
+      source: "Meituan Investor Relations",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official investor relations material explains organization changes, operating outlook, and service priorities.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: "https://www.meituan.com/en-US/investor-relations/organization-update",
+      verification_sources: ["https://www.meituan.com/en-US/investor-relations/organization-update"]
+    }
+  ];
+  const paperCandidates = Array.from({ length: 4 }, (_, index) => ({
+    id: `hardcore-paper-${index + 1}`,
+    source_id: "content-arxiv-cs-ai",
+    category: "community_lead",
+    title: `New transformer inference benchmark paper ${index + 1}`,
+    url: `https://arxiv.org/abs/2605.${index + 1}`,
+    source: "arXiv cs.AI",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "A technical paper about transformer inference benchmarks, eval design, and reasoning traces.",
+    verification_status: "primary_confirmed",
+    source_level: "paper",
+    primary_url: `https://arxiv.org/abs/2605.${index + 1}`,
+    verification_sources: [`https://arxiv.org/abs/2605.${index + 1}`]
+  }));
+  discovery.candidates.push(
+    ...companyCandidates,
+    ...paperCandidates,
+    {
+      id: "google-news-company-rumor",
+      source_id: "general-news-google-china-big-tech-company-watch",
+      category: "community_lead",
+      title: "Google News reports a Tencent reorganization rumor",
+      url: "https://news.google.com/rss/articles/example",
+      source: "Google News China Big Tech Company Watch RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Aggregator lead about a possible company reorganization without primary confirmation.",
+      verification_status: "intermediary_only",
+      source_level: "intermediary",
+      intermediary_url: "https://news.google.com/rss/articles/example"
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainIds = new Set(drafted.report.main_items.map((item) => item.candidate_id));
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of companyCandidates) {
+    assert(mainUrls.has(candidate.url), `reader-relevant company action should enter main_items: ${candidate.id}`);
+  }
+  assert(!mainIds.has("google-news-company-rumor"));
+  assert(!mainUrls.has("https://news.google.com/rss/articles/example"));
+  assert(drafted.report.main_items.some((item) => item.editorial_category === "company_business"));
+  assert(
+    drafted.report.main_items
+      .filter((item) => item.source_level === "paper")
+      .length < paperCandidates.length,
+    "hardcore papers should not crowd out all reader-relevant company actions"
+  );
+});
+
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-dedupe-"));
   const reportDate = "2026-05-26";

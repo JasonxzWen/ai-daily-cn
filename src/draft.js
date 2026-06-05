@@ -24,9 +24,27 @@ const REPORT_AUDIT_GROUP_FIELDS = new Set([
 ]);
 const AIGC_RE = /\bAIGC\b|generative\s+(?:ai|video|image|media|game|art|audio)|(?:ai|image|video|music|audio|speech|game|3d)\s+generation|AI\s+(?:video|image|music|game|short|film|asset|avatar|media|creator)|text-to-(?:image|video|speech|3d)|creator\s+tool|content\s+generation|game\s+(?:asset|world|level|character)\s+generation|runway|pika|sora|veo|luma|kling|hailuo|midjourney|stable diffusion|图像生成|图片生成|视频生成|影像生成|音乐生成|音频生成|语音生成|配音|短剧|漫剧|游戏资产|游戏生成|动画生成|三维生成|数字人|创作者工具|内容产业|文生图|文生视频|生图|生视频/i;
 const INTERMEDIARY_SOURCE_RE = /techcrunch|the verge|verge ai|ars technica|venturebeat|fast company|planet ai|google news|product hunt|producthunt|crunchbase|36kr|qbitai|jiqizhixin|leiphone|infoq|wechat|rsshub|reddit|hacker news|hnrss|smol ai|ben's bites|buttondown|ai news archive|the magnifier/i;
-const AI_RELEVANCE_RE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|large language model|model|models|agent|agents|agentic|chatgpt|codex|claude|gemini|gpt|openai|anthropic|deepmind|mistral|qwen|nemotron|reasoning|inference|eval|benchmark|rag|embedding|vector|transformer|diffusion|copilot|cursor|mcp)\b|人工智能|机器学习|深度学习|神经网络|大模型|模型|智能体|推理|评测|向量|多模态|代码助手/i;
+const AI_RELEVANCE_RE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|large language model|model|models|agent|agents|agentic|chatgpt|codex|claude|gemini|gpt|grok|openai|anthropic|deepmind|xai|x\.ai|mistral|qwen|nemotron|reasoning|inference|eval|benchmark|rag|embedding|vector|transformer|diffusion|copilot|cursor|mcp)\b|人工智能|机器学习|深度学习|神经网络|大模型|模型|智能体|推理|评测|向量|多模态|代码助手/i;
 const BUILDER_RELEVANCE_RE = /\b(ai|agi|llm|model|agent|agents|openai|anthropic|claude|gemini|deepmind|google labs|gpt|codex|cursor|copilot|mcp|eval|benchmark|rag|inference|training|fine[-\s]?tuning|prompt|token|transformer|diffusion|sora|veo|runway)\b|人工智能|大模型|模型|智能体|代理|评测|推理|训练|微调|提示词|多模态|生成式|文生图|文生视频|代码助手/i;
 const BUILDER_IRRELEVANT_RE = /\bnot anything ai related\b|nothing to do with ai|unrelated to ai|off[-\s]?topic/i;
+const COMPANY_ACTION_RE = /\b(earnings|quarterly results?|financial results?|revenue|profit|guidance|layoffs?|job cuts?|hiring|reorganization|reorganisation|restructuring|organization changes?|leadership|management|board|conference|summit|keynote|product conference|launch event|partnership|investment|pricing|availability|policy|regulation|open[-\s]?source|github|hugging face|model weights?)\b|财报|业绩|营收|利润|指引|裁员|招聘|组织架构|组织调整|重组|管理层|董事会|大会|峰会|发布会|合作|投资|价格|定价|可用性|政策|监管|开源|模型权重/i;
+const PRODUCT_PLATFORM_RE = /\b(product|platform|app|service|cloud|enterprise|developer|api|sdk|release|launch|availability|pricing|quota|github|hugging face|open[-\s]?source|repo|repository)\b|产品|平台|应用|服务|云|企业|开发者|接口|发布|上线|可用|价格|配额|开源|仓库/i;
+const TRUSTED_PRIMARY_SOURCE_LEVELS = new Set([
+  "primary",
+  "official",
+  "paper",
+  "github",
+  "multi_source",
+  "official_company_news",
+  "official_open_source_account",
+  "official_model_host_account"
+]);
+const READER_RELEVANT_SOURCE_LEVELS = new Set([
+  "official_company_news",
+  "official_open_source_account",
+  "official_model_host_account",
+  "github"
+]);
 const MAIN_TARGET = 10;
 const MAX_PUBLIC_UNITS = 45;
 
@@ -814,7 +832,7 @@ function normalizeCandidate(rawCandidate, context) {
   if (!candidate.source_level) {
     candidate.source_level = sourceLevelForCandidate(candidate);
   }
-  if (!candidate.verification_status && candidate.source_level && ["primary", "official", "paper", "github", "multi_source"].includes(candidate.source_level)) {
+  if (!candidate.verification_status && candidate.source_level && TRUSTED_PRIMARY_SOURCE_LEVELS.has(candidate.source_level)) {
     candidate.verification_status = candidate.source_level === "multi_source" ? "multi_source_confirmed" : "primary_confirmed";
   }
   return candidate;
@@ -849,13 +867,13 @@ function canPromoteToMain(candidate) {
   if (isSearchShadowCandidate(candidate)) return false;
   if (isKnownIntermediaryCandidate(candidate)) return false;
   if (isGitHubTrendingCandidate(candidate, {})) return false;
-  if (!isAiRelevantCandidate(candidate)) return false;
+  if (!isReaderRelevantCandidate(candidate)) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
   const sourceLevel = sourceLevelForCandidate(candidate);
   if (candidate.category === "hot_blog" && !["official", "paper", "github", "multi_source"].includes(sourceLevel)) {
     return false;
   }
-  const trustedSourceLevel = ["primary", "official", "paper", "github", "multi_source"].includes(sourceLevel);
+  const trustedSourceLevel = TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel);
   return trustedSourceLevel && (!candidate.verification_status || PRIMARY_STATUSES.has(candidate.verification_status));
 }
 
@@ -863,10 +881,15 @@ function candidateScore(candidate) {
   let score = 0;
   if (PRIMARY_STATUSES.has(candidate.verification_status)) score += 30;
   if (candidate.source_level === "official" || candidate.source_level === "primary") score += 20;
-  if (candidate.source_level === "paper" || candidate.source_level === "paper_api") score += 12;
+  if (candidate.source_level === "official_company_news") score += 22;
+  if (candidate.source_level === "official_open_source_account" || candidate.source_level === "official_model_host_account") score += 18;
+  if (candidate.source_level === "paper" || candidate.source_level === "paper_api") score += 4;
   if (candidate.source_level === "github") score += 10;
   if (candidate.category === "main_item") score += 10;
   if (candidate.category === "hot_blog") score += 6;
+  if (candidate.editorial_category === "company_business") score += 10;
+  if (candidate.editorial_category === "product_radar" || candidate.editorial_category === "open_source") score += 8;
+  if (isReaderRelevantCandidate(candidate)) score += 6;
   if (isAigcCandidate(candidate)) score += 8;
   if (candidate.image_url) score += 4;
   if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
@@ -923,6 +946,19 @@ function isAiRelevantCandidate(candidate) {
   return AIGC_RE.test(text) || AI_RELEVANCE_RE.test(text);
 }
 
+function isReaderRelevantCandidate(candidate) {
+  if (isAiRelevantCandidate(candidate)) return true;
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const text = candidateText(candidate);
+  if (sourceLevel === "official_company_news") {
+    return COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text);
+  }
+  if (READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel)) {
+    return COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text);
+  }
+  return TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel) && (COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text));
+}
+
 function canPromoteToBuilderObservation(candidate) {
   const text = candidateText(candidate);
   if (!text || BUILDER_IRRELEVANT_RE.test(text)) return false;
@@ -948,6 +984,11 @@ function isSearchShadowCandidate(candidate) {
 function inferredEditorialCategory(candidate) {
   const text = candidateText(candidate);
   if (AIGC_RE.test(text)) return "content_aigc";
+  if (sourceLevelForCandidate(candidate) === "official_company_news" && COMPANY_ACTION_RE.test(text)) return "company_business";
+  if (sourceLevelForCandidate(candidate) === "official_model_host_account") return "model_release";
+  if (sourceLevelForCandidate(candidate) === "official_open_source_account") return "open_source";
+  if (PRODUCT_PLATFORM_RE.test(text) && /github|open[-\s]?source|repo|repository|hugging face|开源|仓库/i.test(text)) return "open_source";
+  if (COMPANY_ACTION_RE.test(text) && /earnings|quarterly|financial|revenue|profit|layoffs?|job cuts?|reorganization|restructuring|organization|leadership|conference|summit|keynote|财报|业绩|营收|利润|裁员|组织|重组|管理层|大会|峰会|发布会/i.test(text)) return "company_business";
   if (/model|gpt|claude|gemini|qwen|llm|benchmark|eval|reasoning|推理|模型/i.test(text)) return "ai_industry";
   if (/policy|governance|regulation|safety|安全|监管|治理|政策/i.test(text)) return "policy_infra";
   if (/funding|acquisition|ipo|融资|收购|估值/i.test(text)) return "funding";
@@ -973,7 +1014,8 @@ function sourceLevelForCandidate(candidate) {
 }
 
 function tierForCandidate(candidate) {
-  if (candidate.source_level === "official" || candidate.source_level === "primary") return "T0";
+  if (candidate.source_level === "official" || candidate.source_level === "primary" || candidate.source_level === "official_company_news") return "T0";
+  if (candidate.source_level === "official_open_source_account" || candidate.source_level === "official_model_host_account") return "T1";
   if (candidate.source_level === "paper" || candidate.source_level === "github") return "T2";
   if (candidate.source_level === "multi_source") return "T1";
   return "T3";
@@ -1078,6 +1120,15 @@ function sourceGroundedFact(candidate, original) {
 
 function readerImpactForCandidate(candidate, category) {
   const text = candidateText(candidate);
+  if (category === "company_business") {
+    return "它能帮助读者判断大厂的资源投入、组织重心和商业优先级是否正在改变";
+  }
+  if (category === "product_radar") {
+    return "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估";
+  }
+  if (category === "open_source") {
+    return "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态";
+  }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
     return "它可能改变内容生产、素材生成或创作者工具链的成本与交付方式";
   }
@@ -1095,6 +1146,15 @@ function readerImpactForCandidate(candidate, category) {
 
 function readerWatchForCandidate(candidate, category) {
   const text = candidateText(candidate);
+  if (category === "company_business") {
+    return "看它是否涉及裁员、组织调整、财报指引、发布会、合作伙伴和重点业务投入";
+  }
+  if (category === "product_radar") {
+    return "看是否有明确入口、价格、地区、权限、目标用户和后续发布时间";
+  }
+  if (category === "open_source") {
+    return "看仓库活跃度、README、许可证、模型卡、下载限制和是否有真实案例";
+  }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
     return "看它是否给出可试用入口、生成质量样例、版权/商用边界和价格变化";
   }
@@ -1112,6 +1172,15 @@ function readerWatchForCandidate(candidate, category) {
 
 function audienceRelevanceForCandidate(candidate, category) {
   const text = candidateText(candidate);
+  if (category === "company_business") {
+    return "不直接做 AI 的读者也可用它判断行业风向、就业与供应商策略、合作和采购风险";
+  }
+  if (category === "product_radar") {
+    return "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图";
+  }
+  if (category === "open_source") {
+    return "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具";
+  }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
     return "内容、设计和产品团队可用它判断生成式工具是否值得进入试用或采购清单";
   }
@@ -1130,6 +1199,8 @@ function audienceRelevanceForCandidate(candidate, category) {
 function themeLabelForCandidate(candidate) {
   const text = candidateText(candidate);
   if (AIGC_RE.test(text)) return "内容生成";
+  if (sourceLevelForCandidate(candidate) === "official_company_news" || /earnings|layoffs?|reorganization|leadership|conference|财报|裁员|组织|发布会/i.test(text)) return "大厂与业务动向";
+  if (sourceLevelForCandidate(candidate) === "official_open_source_account" || sourceLevelForCandidate(candidate) === "official_model_host_account") return "官方开源与模型账号";
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) return "agent 与开发工具";
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) return "模型研究与评测";
   if (/policy|safety|governance|regulation|security/i.test(text)) return "安全治理";
