@@ -1988,6 +1988,8 @@ test("registered source registry covers official company news lanes", async () =
     ["content-apple-newsroom", "https://www.apple.com/newsroom/rss-feed.rss"],
     ["content-meta-newsroom", "https://about.fb.com/news/feed/"],
     ["content-amazon-news", "https://www.aboutamazon.com/news/rss"],
+    ["content-nvidia-newsroom-rss", "https://nvidianews.nvidia.com/rss.xml"],
+    ["content-github-blog-feed", "https://github.blog/feed/"],
     ["content-tencent-media-center", "https://www.tencent.com/en-us/media.html"],
     ["content-alibaba-group-press-releases", "https://www.alibabagroup.com/en-US/news-press-releases"],
     ["content-meituan-investor-relations", "https://www.meituan.com/en-US/investor-relations"]
@@ -2020,11 +2022,21 @@ test("registered source registry covers official open-source account lanes", asy
     ["content-github-moonshotai-org", "https://github.com/moonshotai.atom", "official_open_source_account"],
     ["content-github-minimax-ai-org", "https://github.com/MiniMax-AI.atom", "official_open_source_account"],
     ["content-github-tencent-hunyuan-org", "https://github.com/Tencent-Hunyuan.atom", "official_open_source_account"],
+    ["content-github-microsoft-org", "https://github.com/microsoft.atom", "official_open_source_account"],
+    ["content-github-nvidia-org", "https://github.com/NVIDIA.atom", "official_open_source_account"],
+    ["content-github-paddlepaddle-org", "https://github.com/PaddlePaddle.atom", "official_open_source_account"],
     ["content-huggingface-openai", "https://huggingface.co/openai", "official_model_host_account"],
+    ["content-huggingface-anthropic", "https://huggingface.co/Anthropic", "official_model_host_account"],
     ["content-huggingface-deepseek-ai", "https://huggingface.co/deepseek-ai", "official_model_host_account"],
+    ["content-huggingface-minimaxai", "https://huggingface.co/MiniMaxAI", "official_model_host_account"],
     ["content-huggingface-qwen", "https://huggingface.co/Qwen", "official_model_host_account"],
+    ["content-huggingface-zai-org", "https://huggingface.co/zai-org", "official_model_host_account"],
+    ["content-huggingface-bytedance-seed", "https://huggingface.co/ByteDance-Seed", "official_model_host_account"],
     ["content-huggingface-moonshotai", "https://huggingface.co/moonshotai", "official_model_host_account"],
-    ["content-huggingface-meta-llama", "https://huggingface.co/meta-llama", "official_model_host_account"]
+    ["content-huggingface-meta-llama", "https://huggingface.co/meta-llama", "official_model_host_account"],
+    ["content-huggingface-paddlepaddle", "https://huggingface.co/PaddlePaddle", "official_model_host_account"],
+    ["content-huggingface-microsoft", "https://huggingface.co/microsoft", "official_model_host_account"],
+    ["content-huggingface-nvidia", "https://huggingface.co/nvidia", "official_model_host_account"]
   ];
 
   for (const [id, url, sourceLevel] of expected) {
