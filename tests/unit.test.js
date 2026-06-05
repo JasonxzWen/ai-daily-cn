@@ -2027,6 +2027,8 @@ test("registered source registry covers official open-source account lanes", asy
     ["content-github-moonshotai-org", "https://github.com/moonshotai.atom", "official_open_source_account"],
     ["content-github-minimax-ai-org", "https://github.com/MiniMax-AI.atom", "official_open_source_account"],
     ["content-github-tencent-hunyuan-org", "https://github.com/Tencent-Hunyuan.atom", "official_open_source_account"],
+    ["content-github-bytedance-org", "https://github.com/bytedance.atom", "official_open_source_account"],
+    ["content-github-baidu-org", "https://github.com/baidu.atom", "official_open_source_account"],
     ["content-github-microsoft-org", "https://github.com/microsoft.atom", "official_open_source_account"],
     ["content-github-nvidia-org", "https://github.com/NVIDIA.atom", "official_open_source_account"],
     ["content-github-paddlepaddle-org", "https://github.com/PaddlePaddle.atom", "official_open_source_account"],
