@@ -82,6 +82,38 @@
       "notes": "Official Amazon company/product news lane for AWS, devices, logistics, policy, and business context."
     },
     {
+      "id": "content-nvidia-newsroom-rss",
+      "name": "NVIDIA Newsroom RSS",
+      "url": "https://nvidianews.nvidia.com/rss.xml",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T0",
+      "authority": "primary",
+      "enablement": "core",
+      "verification_policy": "primary_allowed",
+      "requires_original_url": false,
+      "max_items_per_run": 4,
+      "timeout_ms": 15000,
+      "source_level": "official_company_news",
+      "notes": "Official NVIDIA newsroom feed for company, platform, partner, and AI infrastructure signals."
+    },
+    {
+      "id": "content-github-blog-feed",
+      "name": "GitHub Blog Feed",
+      "url": "https://github.blog/feed/",
+      "source_kind": "rss",
+      "candidate_category": "community_lead",
+      "tier": "T1",
+      "authority": "primary",
+      "enablement": "optional",
+      "verification_policy": "primary_allowed",
+      "requires_original_url": false,
+      "max_items_per_run": 4,
+      "timeout_ms": 15000,
+      "source_level": "official_company_news",
+      "notes": "Official GitHub company/product blog for platform, developer ecosystem, security, and open-source operations signals."
+    },
+    {
       "id": "content-tencent-media-center",
       "name": "Tencent Media Center",
       "url": "https://www.tencent.com/en-us/media.html",
