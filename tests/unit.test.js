@@ -3687,6 +3687,28 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
 });
 
+test("quality review flags untranslated main item source excerpts", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    summary: "Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
+    bullets: [
+      "**Baidu Press Releases**: Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Hold Annual General Meeting on June 5, 2026 Apr 23, 2026 Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
+      "==影响==：它能帮助读者判断大厂的资源投入、组织重心和商业优先级是否正在改变。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("main_item_untranslated"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[0]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [
@@ -4399,10 +4421,12 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   const draftReviewCodes = draftReview.issues.map((issue) => issue.code);
   assert(!draftReviewCodes.includes("autodraft_template_phrase"));
   assert(!draftReviewCodes.includes("candidate_pool_reference_invalid"));
+  assert(!draftReviewCodes.includes("main_item_untranslated"));
   assert(!draftReviewCodes.includes("hot_blog_summary_untranslated"));
   assert(!draftReviewCodes.includes("hot_blog_summary_too_thin"));
   assert(!draftReviewCodes.includes("hot_blog_points_invalid"));
   assert.equal(draftReview.checklist.find((item) => item.id === "candidate_backrefs").status, "passed");
+  assert.equal(draftReview.checklist.find((item) => item.id === "main_item_editorial_quality").status, "passed");
   assert.equal(draftReview.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "passed");
 
   const written = await writeReportDraft({

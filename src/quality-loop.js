@@ -33,6 +33,8 @@ const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
 const HOT_BLOG_SUMMARY_MAX_LENGTH = 260;
 const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
+const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
+const MAIN_ITEM_MAX_LATIN_CHARS = 90;
 const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
 const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
@@ -126,7 +128,7 @@ export function reviewReportQuality(report, options = {}) {
     collectHighlightIssues(entry, issues, limits);
   }
 
-  collectMainItemDensityIssues(report, issues);
+  collectMainItemDensityIssues(report, issues, aiReviewTasks);
   collectHotBlogSummaryIssues(report, issues, aiReviewTasks);
   collectBuilderTranslationIssues(report, issues, aiReviewTasks);
   collectCandidatePoolIssues(report, candidatePool, issues, { autoDraft });
@@ -353,7 +355,7 @@ function collectHighlightIssues(entry, issues, limits) {
   }
 }
 
-function collectMainItemDensityIssues(report, issues) {
+function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
   const items = Array.isArray(report?.main_items) ? report.main_items : [];
   items.forEach((item, index) => {
     const bullets = Array.isArray(item?.bullets) ? item.bullets : [];
@@ -376,7 +378,51 @@ function collectMainItemDensityIssues(report, issues) {
         repairable: false
       });
     }
+    collectMainItemLanguageIssues(item, index, issues, aiReviewTasks);
   });
+}
+
+function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
+  const entries = [
+    { path: `main_items[${index}].summary`, value: item?.summary },
+    ...(Array.isArray(item?.bullets) ? item.bullets.map((value, bulletIndex) => ({
+      path: `main_items[${index}].bullets[${bulletIndex}]`,
+      value
+    })) : [])
+  ];
+
+  for (const entry of entries) {
+    const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+    if (!plain) {
+      continue;
+    }
+    const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+    const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+    const ratioBase = chineseChars + latinChars;
+    const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
+    if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS && !looksLikeUntranslatedEnglish(plain)) {
+      continue;
+    }
+    if (chineseRatio >= MAIN_ITEM_MIN_CHINESE_RATIO && !looksLikeUntranslatedEnglish(plain)) {
+      continue;
+    }
+    issues.push({
+      code: "main_item_untranslated",
+      severity: "error",
+      path: entry.path,
+      message: "Main item public text must be reader-facing Chinese, not an untranslated English title or source excerpt.",
+      repairable: true,
+      details: {
+        chinese_ratio: Number(chineseRatio.toFixed(3)),
+        latin_chars: latinChars
+      }
+    });
+    aiReviewTasks.push({
+      kind: "main_item_editorial_rewrite",
+      path: entry.path,
+      instruction: "Rewrite this main item text in Chinese for readers. Keep the same fact and source link, but do not paste an untranslated English excerpt into the public body."
+    });
+  }
 }
 
 function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
@@ -606,6 +652,11 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
       id: "content_density",
       ok: !warningCodes.has("content_too_thin"),
       status: warningCodes.has("content_too_thin") ? "warning" : "passed"
+    },
+    {
+      id: "main_item_editorial_quality",
+      ok: !failedCodes.has("main_item_untranslated"),
+      status: failedCodes.has("main_item_untranslated") ? "failed" : "passed"
     },
     {
       id: "hot_blog_editorial_quality",

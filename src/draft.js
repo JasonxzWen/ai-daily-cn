@@ -1201,13 +1201,12 @@ function tierForCandidate(candidate) {
 
 function chineseSummary(candidate, category) {
   const source = candidate.source || "来源";
-  const title = trimText(candidate.title, 90);
-  const evidence = trimText(candidate.evidence || candidate.title, 150);
   const lead = chineseLeadForCandidate(candidate);
+  const fact = lead || genericChineseFact(candidate, null);
   if (category === "content_aigc") {
-    return `${source}：${lead || title}。这条内容生成线索的关键信息是：${evidence}`;
+    return `${source}：${fact}。这条内容生成线索的关键信息是：看它是否给出可试用入口、生成质量样例、授权边界和价格变化`;
   }
-  return `${source}：${lead || title}。读者应先看原文给出的变化、适用对象和落地边界；${evidence}`;
+  return `${source}：${fact}。读者应先看原文给出的变化、适用对象和落地边界`;
 }
 
 function chineseGithubDescription(description, repo) {
@@ -1236,6 +1235,9 @@ function chineseLeadForCandidate(candidate) {
   const title = String(candidate.title || "");
   const evidence = String(candidate.evidence || "");
   const text = `${title} ${evidence}`.toLowerCase();
+  if (/baidu.*annual general meeting|annual general meeting.*baidu/.test(text)) {
+    return "Baidu 披露将召开年度股东大会，重点是公司治理、投资者关系和后续管理层议程是否出现变化";
+  }
   if (/dreaming.*memory|better memory.*chatgpt|chatgpt.*memory/.test(text)) {
     return "OpenAI 介绍 ChatGPT 的新记忆系统，重点是让产品更稳定地记住用户偏好，并在多轮对话中保留更有用的上下文";
   }
@@ -1286,14 +1288,63 @@ function displayTitleForCandidate(candidate) {
 }
 
 function sourceGroundedFact(candidate, original) {
-  const title = trimText(candidate.title, 110);
-  const evidence = trimText(candidate.evidence || original?.evidence || "", 170);
   const lead = chineseLeadForCandidate(candidate);
   if (lead) {
-    return `${lead}${title ? `（原文标题：${title}）` : ""}`;
+    return lead;
   }
-  if (!evidence || evidence === title) return title;
-  return `${title}；${evidence}`;
+  return genericChineseFact(candidate, original);
+}
+
+function genericChineseFact(candidate, original) {
+  void original;
+  const entity = mainEntity(candidate) || candidate.source || "相关来源";
+  const category = inferredEditorialCategory(candidate);
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const text = candidateText(candidate);
+  const theme = genericFactTheme({ category, sourceLevel, text });
+  const scope = genericFactScope({ category, text });
+  return `${entity} 发布${theme}；读者应重点核对${scope}`;
+}
+
+function genericFactTheme({ category, sourceLevel, text }) {
+  if (category === "company_business" || sourceLevel === "official_company_news") {
+    return "公司治理、财报、组织或业务优先级相关更新";
+  }
+  if (category === "open_source" || sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account") {
+    return "开源仓库、模型账号或开发者资源更新";
+  }
+  if (category === "product_radar") {
+    return "产品、平台或服务可用性更新";
+  }
+  if (category === "content_aigc" || AIGC_RE.test(text)) {
+    return "内容生成工具或创作工作流更新";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "agent、开发工具或自动化工作流更新";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "研究、评测或能力边界更新";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "安全、治理或合规相关更新";
+  }
+  return "AI 产品、模型或平台动态";
+}
+
+function genericFactScope({ category, text }) {
+  if (category === "company_business") {
+    return "发布时间、管理层口径、业务投入和对合作或采购的影响";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "适用版本、权限边界、接入方式、失败恢复和团队落地成本";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "实验设置、数据范围、可复现材料和与现有方案的差异";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "生效范围、执行主体、例外条款和上线流程影响";
+  }
+  return "官方入口、适用范围、可验证证据和后续变化";
 }
 
 function readerImpactForCandidate(candidate, category) {
