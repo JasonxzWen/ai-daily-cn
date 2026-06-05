@@ -3965,6 +3965,95 @@ test("report:draft promotes reader-relevant company actions from primary sources
   );
 });
 
+test("report:draft favors plain-reader utility over hardcore research details", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-grounded-selection-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const plainReaderCandidates = [
+    {
+      id: "github-platform-pricing",
+      source_id: "content-github-blog-feed",
+      category: "community_lead",
+      title: "GitHub changes Copilot pricing and enterprise availability",
+      url: "https://github.blog/example-copilot-pricing",
+      source: "GitHub Blog Feed",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official GitHub Blog explains Copilot pricing, enterprise availability, and rollout timing for business users.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: "https://github.blog/example-copilot-pricing",
+      verification_sources: ["https://github.blog/example-copilot-pricing"]
+    },
+    {
+      id: "bytedance-seed-model-card",
+      source_id: "content-huggingface-bytedance-seed",
+      category: "community_lead",
+      title: "ByteDance Seed publishes model weights and a usage guide on Hugging Face",
+      url: "https://huggingface.co/ByteDance-Seed/example-model",
+      source: "ByteDance Seed Hugging Face Organization",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Hugging Face organization page lists model weights, usage limits, and examples for developers.",
+      verification_status: "primary_confirmed",
+      source_level: "official_model_host_account",
+      primary_url: "https://huggingface.co/ByteDance-Seed/example-model",
+      verification_sources: ["https://huggingface.co/ByteDance-Seed/example-model"]
+    },
+    {
+      id: "nvidia-ai-platform-launch",
+      source_id: "content-nvidia-newsroom-rss",
+      category: "community_lead",
+      title: "NVIDIA launches an enterprise AI platform with Microsoft partner support",
+      url: "https://nvidianews.nvidia.com/news/example-enterprise-ai-platform",
+      source: "NVIDIA Newsroom RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official NVIDIA Newsroom says the company launched an enterprise AI platform, named partners, and described availability.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: "https://nvidianews.nvidia.com/news/example-enterprise-ai-platform",
+      verification_sources: ["https://nvidianews.nvidia.com/news/example-enterprise-ai-platform"]
+    }
+  ];
+  const hardcoreResearchCandidates = Array.from({ length: 12 }, (_, index) => ({
+    id: `hardcore-transformer-paper-${index + 1}`,
+    source_id: "content-arxiv-cs-ai",
+    category: "community_lead",
+    title: `Transformer inference benchmark and reasoning trace paper ${index + 1}`,
+    url: `https://arxiv.org/abs/2605.90${index}`,
+    source: "arXiv cs.AI",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "A technical paper about transformer inference benchmarks, ablation settings, reasoning traces, and eval methodology.",
+    verification_status: "primary_confirmed",
+    source_level: "paper",
+    primary_url: `https://arxiv.org/abs/2605.90${index}`,
+    verification_sources: [`https://arxiv.org/abs/2605.90${index}`]
+  }));
+  discovery.candidates.push(...plainReaderCandidates, ...hardcoreResearchCandidates);
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of plainReaderCandidates) {
+    assert(mainUrls.has(candidate.url), `plain-reader utility candidate should enter main_items: ${candidate.id}`);
+  }
+  assert.equal(
+    drafted.report.main_items.filter((item) => item.source_level === "paper").length,
+    0,
+    "pure benchmark papers should stay out of main_items when enough reader-utility candidates exist"
+  );
+});
+
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-dedupe-"));
   const reportDate = "2026-05-26";
