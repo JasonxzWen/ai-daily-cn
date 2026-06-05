@@ -29,6 +29,8 @@ const BUILDER_RELEVANCE_RE = /\b(ai|agi|llm|model|agent|agents|openai|anthropic|
 const BUILDER_IRRELEVANT_RE = /\bnot anything ai related\b|nothing to do with ai|unrelated to ai|off[-\s]?topic/i;
 const COMPANY_ACTION_RE = /\b(earnings|quarterly results?|financial results?|revenue|profit|guidance|layoffs?|job cuts?|hiring|reorganization|reorganisation|restructuring|organization changes?|leadership|management|board|conference|summit|keynote|product conference|launch event|partnership|investment|pricing|availability|policy|regulation|open[-\s]?source|github|hugging face|model weights?)\b|财报|业绩|营收|利润|指引|裁员|招聘|组织架构|组织调整|重组|管理层|董事会|大会|峰会|发布会|合作|投资|价格|定价|可用性|政策|监管|开源|模型权重/i;
 const PRODUCT_PLATFORM_RE = /\b(product|platform|app|service|cloud|enterprise|developer|api|sdk|release|launch|availability|pricing|quota|github|hugging face|open[-\s]?source|repo|repository)\b|产品|平台|应用|服务|云|企业|开发者|接口|发布|上线|可用|价格|配额|开源|仓库/i;
+const HARDCORE_RESEARCH_RE = /\b(arxiv|paper|benchmark|evaluation|eval|reasoning traces?|transformer inference|inference benchmark|ablation|dataset|pre[-\s]?train|post[-\s]?training|fine[-\s]?tuning|rlvr|loss|gradient|tokenizer|architecture|throughput|latency|context window)\b|论文|基准|评测|推理轨迹|消融|数据集|训练|微调|架构|吞吐|延迟/i;
+const PLAIN_READER_SIGNAL_RE = /\b(pricing|availability|rollout|launch|product|platform|app|service|enterprise|developer|api|sdk|conference|summit|partnership|customer|use case|workflow|open[-\s]?source|github|hugging face|model weights?|layoffs?|job cuts?|reorganization|restructuring|earnings|revenue|guidance)\b|价格|定价|可用|发布|上线|产品|平台|应用|服务|企业|开发者|接口|大会|峰会|合作|客户|用例|工作流|开源|模型权重|裁员|组织调整|重组|财报|营收|指引/i;
 const TRUSTED_PRIMARY_SOURCE_LEVELS = new Set([
   "primary",
   "official",
@@ -299,7 +301,10 @@ function formatReportDate(date) {
 function pickMainCandidates(candidates, target) {
   const picked = [];
   const seenUrls = new Set();
-  const aigc = candidates.find((candidate) => isAigcCandidate(candidate));
+  const plainReaderCandidates = candidates.filter((candidate) => hasPlainReaderSignal(candidate));
+  const hardcoreLimit = plainReaderCandidates.length >= target - 2 ? 2 : target;
+  let hardcorePicked = 0;
+  const aigc = candidates.find((candidate) => isAigcCandidate(candidate) && !isHardcoreResearchOnly(candidate));
   if (aigc) {
     picked.push(aigc);
     seenUrls.add(normalizeUrl(aigc.url));
@@ -308,6 +313,10 @@ function pickMainCandidates(candidates, target) {
     if (picked.length >= target) break;
     const key = normalizeUrl(candidate.url);
     if (!key || seenUrls.has(key)) continue;
+    if (isHardcoreResearchOnly(candidate)) {
+      if (hardcorePicked >= hardcoreLimit) continue;
+      hardcorePicked += 1;
+    }
     picked.push(candidate);
     seenUrls.add(key);
   }
@@ -867,6 +876,7 @@ function canPromoteToMain(candidate) {
   if (isSearchShadowCandidate(candidate)) return false;
   if (isKnownIntermediaryCandidate(candidate)) return false;
   if (isGitHubTrendingCandidate(candidate, {})) return false;
+  if (isHardcoreResearchOnly(candidate)) return false;
   if (!isReaderRelevantCandidate(candidate)) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
   const sourceLevel = sourceLevelForCandidate(candidate);
@@ -890,6 +900,7 @@ function candidateScore(candidate) {
   if (candidate.editorial_category === "company_business") score += 10;
   if (candidate.editorial_category === "product_radar" || candidate.editorial_category === "open_source") score += 8;
   if (isReaderRelevantCandidate(candidate)) score += 6;
+  score += readerUtilityScore(candidate);
   if (isAigcCandidate(candidate)) score += 8;
   if (candidate.image_url) score += 4;
   if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
@@ -900,7 +911,7 @@ function isGitHubTrendingCandidate(candidate, meta = {}) {
   return Boolean(
     meta.repo ||
     /github trending/i.test(`${candidate.source || ""} ${candidate.evidence || ""} ${candidate.notes || ""}`) ||
-    /github-trending|github-/i.test(candidate.source_id || "")
+    /github[-_]trending|github-github-trending/i.test(candidate.source_id || "")
   );
 }
 
@@ -947,6 +958,8 @@ function isAiRelevantCandidate(candidate) {
 }
 
 function isReaderRelevantCandidate(candidate) {
+  if (hasPlainReaderSignal(candidate)) return true;
+  if (isHardcoreResearchOnly(candidate)) return false;
   if (isAiRelevantCandidate(candidate)) return true;
   const sourceLevel = sourceLevelForCandidate(candidate);
   const text = candidateText(candidate);
@@ -957,6 +970,42 @@ function isReaderRelevantCandidate(candidate) {
     return COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text);
   }
   return TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel) && (COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text));
+}
+
+function hasPlainReaderSignal(candidate) {
+  const category = candidate.editorial_category || inferredEditorialCategory(candidate);
+  if (["company_business", "product_radar", "open_source", "content_aigc"].includes(category)) return true;
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const text = candidateText(candidate);
+  if (AIGC_RE.test(text)) return true;
+  if (sourceLevel === "official_company_news") {
+    return COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text) || PLAIN_READER_SIGNAL_RE.test(text);
+  }
+  if (sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account" || sourceLevel === "github") {
+    return PRODUCT_PLATFORM_RE.test(text) || PLAIN_READER_SIGNAL_RE.test(text);
+  }
+  return PLAIN_READER_SIGNAL_RE.test(text);
+}
+
+function isHardcoreResearchOnly(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const text = candidateText(candidate);
+  const researchSource = sourceLevel === "paper" || sourceLevel === "paper_api" || /\barxiv\b|openalex|semantic scholar|research paper/i.test(`${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""}`);
+  return researchSource && HARDCORE_RESEARCH_RE.test(text) && !hasPlainReaderSignal(candidate);
+}
+
+function readerUtilityScore(candidate) {
+  let score = 0;
+  const category = candidate.editorial_category || inferredEditorialCategory(candidate);
+  if (category === "company_business") score += 18;
+  if (category === "product_radar") score += 16;
+  if (category === "open_source") score += 14;
+  if (category === "content_aigc") score += 14;
+  if (hasPlainReaderSignal(candidate)) score += 12;
+  if (COMPANY_ACTION_RE.test(candidateText(candidate))) score += 8;
+  if (PRODUCT_PLATFORM_RE.test(candidateText(candidate))) score += 8;
+  if (isHardcoreResearchOnly(candidate)) score -= 30;
+  return score;
 }
 
 function canPromoteToBuilderObservation(candidate) {
