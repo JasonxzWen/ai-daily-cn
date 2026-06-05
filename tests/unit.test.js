@@ -62,6 +62,25 @@ const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 const siteUrl = "https://jasonxzwen.github.io/ai-daily-cn/";
 const execFileAsync = promisify(execFile);
 
+test("schema allows OpenRouter snapshot on a source audit source", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.sources.push({
+    name: "OpenRouter Rankings",
+    url: "https://openrouter.ai/rankings",
+    status: "checked",
+    notes: "public_page_snapshot; 10 top models parsed",
+    snapshot: openRouterSnapshotFixture()
+  });
+
+  const validation = validateReport(report);
+
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const source = validation.value.source_audit.content_sources.sources.find((item) => item.name === "OpenRouter Rankings");
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.top_entries.length, 10);
+});
+
 function mainMarkdownSections(input) {
   return input.sections.filter((section) => section.group === "main" && section.type === "markdown");
 }
