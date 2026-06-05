@@ -98,6 +98,34 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Daily tracking cards should be visual/table-first and must not render leaderboard rows as text detail logs.",
       { weak_cards: weakTrackingCards }
     );
+    const weakBuilderCards = Array.from(document.querySelectorAll(".builder-card"))
+      .map((card, index) => {
+        const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const textWithoutUrls = bodyText.replace(/https?:\/\/\S+/gi, "").trim();
+        const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
+        const latinChars = (bodyText.match(/[A-Za-z]/g) || []).length;
+        const ratioBase = chineseChars + latinChars;
+        const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+        const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
+        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              body: bodyText.slice(0, 180),
+              chinese_chars: chineseChars,
+              chinese_ratio: Number(chineseRatio.toFixed(3)),
+              long_english_run: longEnglishRun
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "builder_cards_translated",
+      weakBuilderCards.length === 0,
+      "X/Twitter builder cards should render Chinese translations or summaries, not raw English original posts.",
+      { weak_cards: weakBuilderCards }
+    );
     const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
