@@ -1039,6 +1039,73 @@
         "watch_next": {
           "type": "string",
           "minLength": 1
+        },
+        "snapshot": {
+          "$ref": "#/$defs/daily_tracking_snapshot"
+        }
+      }
+    },
+    "daily_tracking_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "collection_method", "snapshot_status", "snapshot_as_of", "source_url", "top_entries"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "collection_method": {
+          "enum": ["public_page_playwright", "official_api", "public_page_static", "manual"]
+        },
+        "snapshot_status": {
+          "enum": ["complete", "partial", "blocked"]
+        },
+        "snapshot_as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "top_entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/daily_tracking_snapshot_entry"
+          },
+          "default": []
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "daily_tracking_snapshot_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "model", "provider", "tokens", "change"],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tokens": {
+          "type": "string",
+          "minLength": 1
+        },
+        "change": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
         }
       }
     },
@@ -1379,6 +1446,9 @@
         },
         "notes": {
           "type": "string"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/daily_tracking_snapshot"
         }
       }
     },

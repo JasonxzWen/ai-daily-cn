@@ -49,7 +49,7 @@
           "$ref": "#/$defs/absolute_url"
         },
         "source_kind": {
-          "enum": ["rss", "html_index", "rsshub", "rss_bridge", "aggregator", "search_api", "manual"]
+          "enum": ["rss", "html_index", "rsshub", "rss_bridge", "aggregator", "search_api", "manual", "openrouter_rankings_public_playwright", "github_report_markdown"]
         },
         "candidate_category": {
           "enum": [
@@ -80,6 +80,10 @@
         "max_items_per_run": {
           "type": "integer",
           "minimum": 1
+        },
+        "lookback_days": {
+          "type": "integer",
+          "minimum": 0
         },
         "timeout_ms": {
           "type": "integer",

@@ -15,7 +15,9 @@ import {
   DEFAULT_GITHUB_TRENDING_SOURCES,
   collectGitHubTrending,
   collectStatuspageIncidents,
-  parseGitHubTrendingHtml
+  parseGitHubTrendingHtml,
+  parseGitHubReportMarkdownEntries,
+  parseOpenRouterRankingsText
 } from "../src/discovery.js";
 import { collectSearchNews } from "../src/search-news.js";
 import { checkSourcesHealth } from "../src/source-health.js";
@@ -68,6 +70,51 @@ function mainMarkdownContent(input) {
   return mainMarkdownSections(input)
     .map((section) => section.content)
     .join("\n\n");
+}
+
+function openRouterRankingsSampleText(rows = 10) {
+  const entries = [
+    ["DeepSeek V4 Flash", "deepseek", "2.9T tokens", "18%"],
+    ["Hy3 preview", "tencent", "2.7T tokens", "13%"],
+    ["MiMo-V2.5", "xiaomi", "2.31T tokens", "450%"],
+    ["Owl Alpha", "openrouter", "1.99T tokens", "44%"],
+    ["Claude Sonnet 4.6", "anthropic", "1.77T tokens", "14%"],
+    ["Claude Opus 4.7", "anthropic", "1.41T tokens", "47%"],
+    ["DeepSeek V4 Pro", "deepseek", "1.34T tokens", "11%"],
+    ["MiniMax M3", "minimax", "1.22T tokens", "new"],
+    ["MiMo-V2.5-Pro", "xiaomi", "1.12T tokens", "37%"],
+    ["DeepSeek V3.2", "deepseek", "1.11T tokens", "15%"]
+  ].slice(0, rows);
+  return [
+    "AI Model Rankings",
+    "Top Models",
+    "This Week",
+    ...entries.flatMap(([model, provider, tokens, change], index) => [
+      `${index + 1}.`,
+      model,
+      "by",
+      provider,
+      tokens,
+      change
+    ]),
+    "Show more",
+    "Market Share"
+  ].join("\n");
+}
+
+function openRouterSnapshotFixture(rows = 10) {
+  return {
+    type: "openrouter_rankings_public_page",
+    collection_method: "public_page_playwright",
+    snapshot_status: rows === 10 ? "complete" : "partial",
+    snapshot_as_of: fixedGeneratedAt,
+    source_url: "https://openrouter.ai/rankings",
+    top_entries: parseOpenRouterRankingsText(openRouterRankingsSampleText(rows)).map((entry) => ({
+      ...entry,
+      url: `https://openrouter.ai/${entry.provider}/${entry.model.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`
+    })),
+    notes: "Public OpenRouter rankings page snapshot."
+  };
 }
 
 test("HTML renders main item bold and highlight markers", async () => {
@@ -1837,6 +1884,72 @@ test("content source discovery parses hot blog and interview feeds", async () =>
   assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
 });
 
+test("GitHub report markdown parser extracts report links as discovery leads", () => {
+  const entries = parseGitHubReportMarkdownEntries(`
+## Top AI Papers of the Week (May 24 - May 31) - 2026
+| **Paper** | **Links** |
+| --- | --- |
+| 1) **SkillOpt** - Optimizes agent skill documents through validation-gated rollouts. | [Paper](https://arxiv.org/abs/2605.23904), [Tweet](https://x.com/omarsar0/status/2058936160291004483) |
+
+1、[codex-provider-sync](https://hellogithub.com/periodical/statistics/click?target=https://github.com/Dailin521/codex-provider-sync)：Codex 切换 Provider 找回历史对话的工具。
+`, {
+    name: "GitHub report fixture",
+    url: "https://raw.githubusercontent.com/example/repo/main/report.md",
+    fallback_event_date: "2026-05-31"
+  });
+
+  assert.equal(entries.length, 2);
+  assert.equal(entries[0].title, "SkillOpt");
+  assert.equal(entries[0].url, "https://arxiv.org/abs/2605.23904");
+  assert.equal(entries[0].event_date, "2026-05-31");
+  assert.equal(entries[1].title, "codex-provider-sync");
+  assert.equal(entries[1].url, "https://github.com/Dailin521/codex-provider-sync");
+});
+
+test("content source discovery reads latest GitHub markdown report instead of commit feed", async () => {
+  const fetchedUrls = [];
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    limit: 10,
+    sources: [
+      {
+        id: "content-ruanyf-weekly",
+        name: "RuanYF Weekly",
+        url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
+        source_kind: "github_report_markdown",
+        candidate_category: "community_lead",
+        authority: "aggregator",
+        verification_policy: "primary_required",
+        latest_report_link_pattern: "docs/issue-\\d+\\.md",
+        lookback_days: 14,
+        maxItemsPerRun: 2
+      }
+    ],
+    fetchImpl: async (url) => {
+      fetchedUrls.push(url);
+      if (url.endsWith("/README.md")) {
+        return textResponse("- Issue 399: [China AI labs visit](docs/issue-399.md)");
+      }
+      return textResponse(`
+# Weekly issue 399: China AI labs visit
+Analysts wrote trip notes: [Kevin Xu](https://interconnect.substack.com/p/chinai-mood-april-26-may-4-2026), [Nathan Lambert](https://www.interconnects.ai/p/notes-from-inside-chinas-ai-labs).
+`);
+    }
+  });
+
+  assert.deepEqual(fetchedUrls, [
+    "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
+    "https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-399.md"
+  ]);
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.candidates.length, 2);
+  assert.equal(collected.candidates[0].source_id, "content-ruanyf-weekly");
+  assert.equal(collected.candidates[0].category, "community_lead");
+  assert.equal(collected.candidates[0].verification_status, "intermediary_only");
+  assert.match(collected.candidates[0].notes, /source_report_url=https:\/\/raw\.githubusercontent\.com\/ruanyf\/weekly\/master\/docs\/issue-399\.md/);
+});
+
 test("default content sources cover broader tech, big-tech, and Product Hunt trending", () => {
   const names = DEFAULT_CONTENT_SOURCES.map((source) => source.name);
 
@@ -1887,9 +2000,9 @@ test("registered discovery sources cover the user requested AI source list", asy
 
   const expected = [
     ["follow-builders", ["https://github.com/zarazhangrui/follow-builders"]],
-    ["ML-Papers-of-the-Week", ["https://github.com/dair-ai/ML-Papers-of-the-Week/commits/main.atom"]],
-    ["HelloGitHub", ["https://github.com/521xueweihan/HelloGitHub/commits/master.atom"]],
-    ["RuanYF Weekly", ["https://github.com/ruanyf/weekly/commits/master.atom"]],
+    ["ML-Papers-of-the-Week", ["https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md"]],
+    ["HelloGitHub", ["https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md"]],
+    ["RuanYF Weekly", ["https://raw.githubusercontent.com/ruanyf/weekly/master/README.md"]],
     ["OpenAI Blog RSS", ["https://openai.com/blog/rss.xml", "https://openai.com/news/rss.xml"]],
     ["Google DeepMind", ["https://deepmind.google/blog/rss.xml", "https://deepmind.google/discover/blog/"]],
     ["Google Research", ["https://research.google/blog/rss/"]],
@@ -1971,12 +2084,126 @@ test("registered content sources include fixed daily tracking leaderboards", asy
     const source = sourcesById.get(id);
     assert(source, `missing source ${id}`);
     assert.equal(normalizedSourceUrl(source.url), normalizedSourceUrl(url));
-    assert.equal(source.source_kind, "html_index");
+    assert.equal(source.source_kind, id === "content-openrouter-rankings" ? "openrouter_rankings_public_playwright" : "html_index");
     assert.equal(source.candidate_category, "community_lead");
     assert.equal(source.authority, "primary");
     assert.equal(source.enablement, "core");
     assert.equal(source.verification_policy, "primary_allowed");
   }
+});
+
+test("parseOpenRouterRankingsText extracts public Top 10 rows", () => {
+  const rows = parseOpenRouterRankingsText(openRouterRankingsSampleText());
+
+  assert.equal(rows.length, 10);
+  assert.deepEqual(rows[0], {
+    rank: 1,
+    model: "DeepSeek V4 Flash",
+    provider: "deepseek",
+    tokens: "2.9T tokens",
+    change: "18%"
+  });
+  assert.equal(rows[7].change, "new");
+  assert.deepEqual(rows.map((row) => row.rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+});
+
+test("collectContentSources stores OpenRouter public page snapshot without candidate pollution", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-openrouter-rankings",
+        name: "OpenRouter Rankings",
+        url: "https://openrouter.ai/rankings",
+        source_kind: "openrouter_rankings_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    openrouterRankingsText: openRouterRankingsSampleText()
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.match(source.notes, /public_page_snapshot/);
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.collection_method, "public_page_playwright");
+  assert.equal(source.snapshot.top_entries.length, 10);
+  assert.equal(source.snapshot.top_entries[0].model, "DeepSeek V4 Flash");
+  assert.equal(collected.candidates.length, 0);
+});
+
+test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomplete", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-openrouter-rankings",
+        name: "OpenRouter Rankings",
+        url: "https://openrouter.ai/rankings",
+        source_kind: "openrouter_rankings_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    openrouterRankingsText: openRouterRankingsSampleText(8)
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "no_signal");
+  assert.match(source.notes, /top10_incomplete/);
+  assert.equal(source.snapshot.snapshot_status, "partial");
+  assert.equal(source.snapshot.top_entries.length, 8);
+});
+
+test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-openrouter-snapshot-"));
+  const reportDate = "2026-06-05";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.content_sources.sources.push({
+    name: "OpenRouter Rankings",
+    url: "https://openrouter.ai/rankings",
+    status: "checked",
+    notes: "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
+    snapshot: openRouterSnapshotFixture()
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const tracking = drafted.report.daily_tracking.find((item) => item.id === "openrouter-rankings");
+  assert.equal(tracking.publish_to_public, true);
+  assert.equal(tracking.change_status, "changed");
+  assert.equal(tracking.verification_status, "primary_confirmed");
+  assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert(tracking.summary.includes("DeepSeek V4 Flash"));
+  assert(tracking.metrics.some((metric) => metric.label === "#10" && metric.value.includes("DeepSeek V3.2")));
+  assert(tracking.watch_points.some((point) => point.includes("MiniMax M3") || point.includes("MiMo-V2.5")));
+
+  const input = reportToInteractionInput(drafted.report);
+  const trackingSection = input.sections.find((section) => section.title === "每日追踪" || section.title.includes("追踪"));
+  assert(trackingSection);
+  assert.equal(trackingSection.items.length, 1);
+  assert.equal(trackingSection.items[0].title, "OpenRouter");
+  assert(trackingSection.items[0].points.some((point) => point.label === "#1" && point.value.includes("2.9T tokens")));
+  assert(trackingSection.items[0].points.some((point) => point.label === "#10" && point.value.includes("1.11T tokens")));
+  assert(!JSON.stringify(trackingSection).includes("Playwright"));
+  assert(!JSON.stringify(trackingSection).includes("DOM"));
 });
 
 test("registered source registry covers official company news lanes", async () => {
