@@ -26,6 +26,17 @@ await fs.copyFile(
 const structuredReport = JSON.parse(
   await fs.readFile(path.join(rootDir, "tests/fixtures/reports/good/structured-report.json"), "utf8")
 );
+const weakHotBlogReport = structuredClone(structuredReport);
+weakHotBlogReport.report_date = "2026-05-16";
+weakHotBlogReport.title = "AI 日报 2026-05-16";
+weakHotBlogReport.html_path = "reports/2026/05/2026-05-16.html";
+weakHotBlogReport.canonical_url = "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-16.html";
+weakHotBlogReport.hot_blogs = [
+  {
+    ...weakHotBlogReport.hot_blogs[0],
+    summary: "这篇文章的看点不是单个技术名词，而是它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界。读者可以重点看是否有代码、接口、README、案例或失败模式，而不只看作者结论。对非 AI 直接从业者，价值在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+  }
+];
 structuredReport.main_items[0].bullets = [
   "**OpenAI** added ==keyword-notable|source-linked evidence== for page checklist validation.",
   "The fixture keeps enough public text to exercise inline highlight rendering and card layout."
@@ -147,6 +158,7 @@ structuredReport.evidence_assets = [
   }
 ];
 await fs.writeFile(path.join(dataInputDir, "structured-report.json"), JSON.stringify(structuredReport, null, 2), "utf8");
+await fs.writeFile(path.join(dataInputDir, "weak-hot-blog-report.json"), JSON.stringify(weakHotBlogReport, null, 2), "utf8");
 
 await buildSite({
   rootDir: tmp,
@@ -224,6 +236,12 @@ try {
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   assert.equal(await builderCardsCollapseOnMobile(page), true);
   assert.equal(await hasHorizontalOverflow(page), false);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`${server.url}/reports/2026/05/2026-05-16.html`);
+  const weakHotBlogChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-16" });
+  assert.equal(weakHotBlogChecklist.ok, false);
+  assert(weakHotBlogChecklist.issues.some((issue) => issue.id === "hot_blog_cards_reader_facing"));
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

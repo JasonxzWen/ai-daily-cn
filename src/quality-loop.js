@@ -33,6 +33,12 @@ const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
 const HOT_BLOG_SUMMARY_MAX_LENGTH = 260;
 const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
+const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
+const HOT_BLOG_COVERAGE_PATTERNS = [
+  /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
+  /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
+  /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
+];
 
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
@@ -398,6 +404,9 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
     if (chineseChars < HOT_BLOG_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
       problems.push("not_chinese_editorial_summary");
     }
+    if (looksLikeTemplatedHotBlogSummary(plain) || lacksHotBlogEditorialCoverage(plain)) {
+      problems.push("template_or_low_information");
+    }
 
     if (problems.length === 0) {
       return;
@@ -405,9 +414,11 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
 
     const code = problems.includes("not_chinese_editorial_summary")
       ? "hot_blog_summary_untranslated"
-      : problems.includes("points_not_2_to_4")
-        ? "hot_blog_points_invalid"
-        : "hot_blog_summary_too_thin";
+      : problems.includes("template_or_low_information")
+        ? "hot_blog_summary_template"
+        : problems.includes("points_not_2_to_4")
+          ? "hot_blog_points_invalid"
+          : "hot_blog_summary_too_thin";
     issues.push({
       code,
       severity: "error",
@@ -436,10 +447,20 @@ function hotBlogPublicPoints(summary) {
     return [];
   }
   const parts = text
-    .split(/(?<=[。！？!?；;])\s*/u)
+    .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
     .map((part) => part.trim())
     .filter(Boolean);
   return parts.length > 0 ? parts : [text];
+}
+
+function looksLikeTemplatedHotBlogSummary(value) {
+  return HOT_BLOG_TEMPLATE_RE.test(String(value || ""));
+}
+
+function lacksHotBlogEditorialCoverage(value) {
+  const text = String(value || "");
+  const hits = HOT_BLOG_COVERAGE_PATTERNS.filter((pattern) => pattern.test(text)).length;
+  return hits < 2;
 }
 
 function looksLikeUntranslatedEnglish(value) {
@@ -588,8 +609,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "hot_blog_editorial_quality",
-      ok: !failedCodes.has("hot_blog_summary_untranslated") && !failedCodes.has("hot_blog_points_invalid") && !failedCodes.has("hot_blog_summary_too_thin"),
-      status: failedCodes.has("hot_blog_summary_untranslated") || failedCodes.has("hot_blog_points_invalid") || failedCodes.has("hot_blog_summary_too_thin") ? "failed" : "passed"
+      ok: !failedCodes.has("hot_blog_summary_untranslated") && !failedCodes.has("hot_blog_points_invalid") && !failedCodes.has("hot_blog_summary_too_thin") && !failedCodes.has("hot_blog_summary_template"),
+      status: failedCodes.has("hot_blog_summary_untranslated") || failedCodes.has("hot_blog_points_invalid") || failedCodes.has("hot_blog_summary_too_thin") || failedCodes.has("hot_blog_summary_template") ? "failed" : "passed"
     },
     {
       id: "autodraft_editorial_rewrite",

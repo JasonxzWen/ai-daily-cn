@@ -979,7 +979,7 @@ function hotBlogPointTexts(summary) {
     return [];
   }
   const parts = text
-    .split(/(?<=[。！？!?；;])\s*/u)
+    .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
     .map((part) => part.trim())
     .filter(Boolean);
   return parts.length >= 2 ? parts.slice(0, 4) : [text];

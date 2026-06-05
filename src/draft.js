@@ -1259,15 +1259,58 @@ function themeLabelForCandidate(candidate) {
 }
 
 function hotBlogSummary(candidate) {
-  const title = trimText(displayTitleForCandidate(candidate), 90);
-  const source = trimText(candidate.source || candidate.author || "原文", 36);
-  const focus = hotBlogFocusForCandidate(candidate);
-  const readingAngle = hotBlogReadingAngle(candidate);
-  const readerValue = hotBlogReaderValue(candidate);
-  return trimText(
-    `${title}。${source} 这篇文章的看点不是单个技术名词，而是${focus}。读者可以重点看${readingAngle}；对非 AI 直接从业者，价值在于${readerValue}。`,
-    240
-  );
+  const claim = hotBlogClaimForCandidate(candidate);
+  const evidence = hotBlogEvidenceForCandidate(candidate);
+  const action = hotBlogActionForCandidate(candidate);
+  return trimText(`${claim}。${evidence}。${action}。`, 220);
+}
+
+function hotBlogClaimForCandidate(candidate) {
+  const text = candidateText(candidate);
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "文章梳理模型评测或研究结论怎样改变能力边界、成本预期和可靠性判断";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "文章说明安全、治理或平台规则会怎样变成团队需要执行的产品和上线约束";
+  }
+  if (AIGC_RE.test(text)) {
+    return "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界";
+  }
+  return "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点";
+}
+
+function hotBlogEvidenceForCandidate(candidate) {
+  const text = candidateText(candidate);
+  if (/code|repo|github|open source|readme|sdk|api|mcp/i.test(text)) {
+    return "需要核对代码、接口、README、案例或失败模式，判断作者结论是否能复用";
+  }
+  if (/paper|arxiv|benchmark|eval|dataset|leaderboard/i.test(text)) {
+    return "需要核对实验设置、数据来源、对比基线、可复现代码和作者承认的限制";
+  }
+  if (/product|launch|platform|enterprise|workflow|agent/i.test(text)) {
+    return "需要核对真实场景、接入门槛、价格、可用地区、案例证据和工作流限制";
+  }
+  return "需要核对作者列出的证据、适用前提、反例和没有覆盖的边界";
+}
+
+function hotBlogActionForCandidate(candidate) {
+  const text = candidateText(candidate);
+  if (/agent|workflow|tool|coding|developer|mcp/i.test(text)) {
+    return "适合判断这类工具是否值得试点、采购或进入内部自动化路线图";
+  }
+  if (/model|llm|benchmark|eval|reasoning|context/i.test(text)) {
+    return "适合更新对模型能力的预期，避免只记住排行榜或单个指标";
+  }
+  if (/policy|security|safety|governance|regulation/i.test(text)) {
+    return "适合进入合规、安全或平台治理的风险清单";
+  }
+  if (AIGC_RE.test(text)) {
+    return "适合判断这类工具是否值得试用、采购或进入内容生产流程";
+  }
+  return "适合判断它是否会影响产品路线、工具选型或内部风险预案";
 }
 
 function hotBlogFocusForCandidate(candidate) {
