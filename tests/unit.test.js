@@ -39,7 +39,7 @@ import {
 } from "../src/feedback-contract.js";
 import { findPlainLanguageIssues } from "../src/plain-language.js";
 import { findFreshnessIssues } from "../src/quality-gates.js";
-import { classifyPublishQuality, findPublishQualityIssues } from "../src/quality-status.js";
+import { classifyPublishQuality, deriveQualityStatus, findPublishQualityIssues } from "../src/quality-status.js";
 import {
   applyQualityRepairContract,
   repairReportQuality,
@@ -548,6 +548,29 @@ test("日报可以转换为 effective-interact 输入", async () => {
       evidence: "GitHub Trending weekly rank #1; not present yesterday."
     }
   ];
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: "2026-05-15",
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      change_summary: "OpenRouter Top 10 出现新模型。",
+      publish_to_public: true,
+      summary: "关注模型在 OpenRouter 上的实际调用热度、周使用排名和应用生态迁移；它回答开发者正在用什么。",
+      watch_points: ["榜首模型和供应商份额是否改变。"],
+      metrics: [{ label: "核心指标", value: "Top Models / weekly usage", trend: "unknown" }],
+      evidence: "OpenRouter 官方榜单。",
+      verification_note: "本轮已检查官方入口。",
+      risk_note: "不能直接代表全市场份额。",
+      watch_next: "显著变化时回到模型发布和价格页核验。"
+    }
+  ];
   const input = reportToInteractionInput(report);
 
   assert.equal(input.template, "research-explainer");
@@ -562,6 +585,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
     [
       ["主体", "2", "重点条目"],
       ["AIGC", "1", "产品/内容"],
+      ["追踪", "1", "榜单变化"],
       ["技术博客", "1", "深读"],
       ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
@@ -586,6 +610,15 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!mainContent.includes("来源："));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
   assert(!mainContent.includes("Generic follow-up metadata should not render"));
+  const trackingSection = input.sections.find((section) => section.title === "每日追踪");
+  assert.equal(trackingSection.type, "filterable-cards");
+  assert.equal(trackingSection.cardClass, "tracking-card");
+  assert.equal(trackingSection.items.length, 1);
+  assert.equal(trackingSection.items[0].title, "OpenRouter");
+  assert.equal(trackingSection.items[0].href, "https://openrouter.ai/rankings");
+  assert(trackingSection.items[0].body.includes("开发者正在用什么"));
+  assert(trackingSection.items[0].tags.includes("topic|模型使用"));
+  assert(trackingSection.items[0].points.some((point) => point.label === "核心指标"));
   const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
@@ -636,6 +669,37 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.deepEqual(input.nextActions, []);
   assert.equal(input.nextActionsCollapsed, undefined);
   assert.equal(input.evidence, undefined);
+});
+
+test("每日追踪没有可核验变化时不渲染公开正文板块", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: "2026-05-15",
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "no_change",
+      change_summary: "本轮检查了官方入口，未解析到当日可入选变化。",
+      publish_to_public: false,
+      summary: "关注模型在 OpenRouter 上的实际调用热度。",
+      watch_points: ["榜首模型和供应商份额是否改变。"],
+      metrics: [{ label: "核心指标", value: "Top Models / weekly usage", trend: "unknown" }],
+      evidence: "OpenRouter 官方榜单。",
+      verification_note: "本轮已检查官方入口。",
+      risk_note: "不能直接代表全市场份额。"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+
+  assert(!input.sections.some((section) => section.title === "每日追踪"));
+  assert(!input.heroStats.some((item) => item.label === "追踪"));
 });
 
 test("project interaction content is only shown as GitHub Trending item tags", async () => {
@@ -1887,6 +1951,27 @@ test("registered content sources cover frontier AI company official sources", as
     assert(source, `missing source ${id}`);
     assert.equal(new URL(source.url).hostname, hostname);
     assert.equal(source.authority, "primary");
+    assert.equal(source.verification_policy, "primary_allowed");
+  }
+});
+
+test("registered content sources include fixed daily tracking leaderboards", async () => {
+  const registry = JSON.parse(await fs.readFile(path.join(rootDir, "config/sources/default-content-sources.json"), "utf8"));
+  const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const expected = [
+    ["content-openrouter-rankings", "https://openrouter.ai/rankings"],
+    ["content-artificial-analysis-intelligence-index", "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"],
+    ["content-swe-bench-pro-public", "https://scale.com/leaderboard/swe_bench_pro_public"]
+  ];
+
+  for (const [id, url] of expected) {
+    const source = sourcesById.get(id);
+    assert(source, `missing source ${id}`);
+    assert.equal(normalizedSourceUrl(source.url), normalizedSourceUrl(url));
+    assert.equal(source.source_kind, "html_index");
+    assert.equal(source.candidate_category, "community_lead");
+    assert.equal(source.authority, "primary");
+    assert.equal(source.enablement, "core");
     assert.equal(source.verification_policy, "primary_allowed");
   }
 });
@@ -3475,6 +3560,58 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   const reportDate = "2026-05-26";
   const discoveryPath = path.join(tmp, "discovery.json");
   const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push({
+    id: "github-weekly-rank-one",
+    source_id: "github-github-trending-weekly",
+    category: "project",
+    title: "example/weekly-project",
+    repo: "example/weekly-project",
+    url: "https://github.com/example/weekly-project",
+    source: "GitHub Trending weekly",
+    event_date: reportDate,
+    status: "excluded",
+    rank: 1,
+    trend: "new",
+    language: "TypeScript",
+    window: "weekly",
+    description: "Weekly-only project that must not replace the daily Top 10.",
+    evidence: "GitHub Trending weekly rank #1 with recent stars this week.",
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: "https://github.com/example/weekly-project",
+    verification_sources: ["https://github.com/example/weekly-project"]
+  });
+  discovery.candidates.push({
+    id: "official-looking-intermediary",
+    source_id: "content-google-research-blog",
+    category: "community_lead",
+    title: "Aggregator says Google released a model",
+    url: "https://example.com/intermediary-google-model",
+    source: "Google Research Blog",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "A non-primary wrapper claims a model update but has not returned to the original post.",
+    verification_status: "intermediary_only",
+    source_level: "official",
+    intermediary_url: "https://example.com/wrapper"
+  });
+  discovery.candidates.push({
+    id: "builder-non-ai",
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: "@builder: off topic",
+    url: "https://x.com/builder/status/1794993600000000999",
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    status: "excluded",
+    author: "Example Builder",
+    handle: "builder",
+    original_text: "not anything ai related, just a personal update",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: "https://x.com/builder/status/1794993600000000999"
+  });
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
   const drafted = await generateReportDraft({
@@ -3487,11 +3624,41 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
 
   assert.equal(drafted.counts.main_items, 8);
   assert.equal(drafted.counts.github_trending, 10);
+  assert.equal(drafted.counts.daily_tracking, 3);
+  assert.deepEqual(drafted.report.daily_tracking.map((item) => item.id), [
+    "openrouter-rankings",
+    "artificial-analysis-intelligence-index",
+    "swe-bench-pro-public"
+  ]);
+  assert(drafted.report.daily_tracking.every((item) => item.watch_points.length > 0 && item.metrics.length > 0));
+  assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert(drafted.report.github_trending.every((item) => item.source === "GitHub Trending daily"));
+  assert(!drafted.report.github_trending.some((item) => item.repo === "example/weekly-project"));
   assert(drafted.report.main_items.some((item) => item.editorial_category === "content_aigc"));
+  assert(!drafted.report.main_items.some((item) => item.verification_status === "intermediary_only"));
+  assert(!drafted.report.main_items.some((item) => item.url === "https://example.com/intermediary-google-model"));
   assert(!drafted.report.main_items.some((item) => item.source === "OpenAI Status"));
   assert(!drafted.report.main_items.some((item) => item.source === "Product Hunt Trending Feed"));
   assert(!drafted.report.main_items.some((item) => item.source === "TechCrunch AI"));
   assert(!drafted.report.main_items.some((item) => item.source === "OpenAlex"));
+  assert(!drafted.report.builder_observations.some((item) => item.original_text?.includes("not anything ai related")));
+  const publicAutodraftText = JSON.stringify({
+    summary: drafted.report.summary,
+    main_items: drafted.report.main_items,
+    hot_blogs: drafted.report.hot_blogs,
+    builder_observations: drafted.report.builder_observations
+  });
+  for (const phrase of [
+    "来源链路清晰",
+    "核验状态为",
+    "事实栏目只采用",
+    "可信信号",
+    "发布或更新了这条信号",
+    "自动草稿译述",
+    "工程雷达线索"
+  ]) {
+    assert(!publicAutodraftText.includes(phrase), `public autodraft text should not include ${phrase}`);
+  }
   assert(drafted.candidatePool.candidates.some((candidate) =>
     candidate.status === "included" &&
     candidate.included_in === "main_items" &&
@@ -3523,7 +3690,10 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert.equal(written.report.report_date, reportDate);
   assert.equal(written.report.main_items.length, 8);
   assert.equal(written.report.github_trending.length, 10);
+  assert.equal(written.report.daily_tracking.length, 3);
   assert.equal(written.report.quality_status.status, "degraded");
+  assert(written.report.quality_status.reasons.includes("daily_tracking_source_blocked"));
+  assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
 });
 
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
@@ -3547,6 +3717,22 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
     primary_url: "https://example.com/official/1",
     verification_sources: ["https://example.com/official/1"]
   });
+  discovery.candidates.push({
+    id: "hot-blog-duplicate-blog-url",
+    source_id: "content-latent-space-copy",
+    category: "hot_blog",
+    title: "Scaling Past Informal AI mirror",
+    url: "https://www.latent.space/p/axiom",
+    source: "Latent.Space Mirror",
+    author: "Latent.Space",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Same URL as another hot blog candidate; should not be included twice.",
+    verification_status: "primary_confirmed",
+    source_level: "primary",
+    primary_url: "https://www.latent.space/p/axiom",
+    verification_sources: ["https://www.latent.space/p/axiom"]
+  });
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
   const historyDir = path.join(tmp, "reports-data", "2026", "05");
@@ -3568,6 +3754,11 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
   assert.equal(mainUrls.has("https://example.com/official/2"), false);
   assert(!drafted.report.hot_blogs.some((item) => mainUrls.has(item.url)));
+  assert.equal(new Set(drafted.report.hot_blogs.map((item) => item.url)).size, drafted.report.hot_blogs.length);
+  assert.equal(
+    drafted.candidatePool.candidates.find((candidate) => candidate.id === "hot-blog-duplicate-blog-url")?.status,
+    "excluded"
+  );
 });
 
 test("evidence cache downloads image_url candidates into local evidence assets", async () => {
@@ -4364,6 +4555,43 @@ test("report:write derives degraded quality status for blocked content discovery
   assert(report.quality_status.affected_sections.includes("hot_blogs"));
   assert(report.quality_status.degraded_sections.some((issue) => issue.section === "hot_blogs"));
   assert.match(report.quality_status.public_note, /Content source/);
+});
+
+test("quality status degrades when a fixed daily tracking source is unverified", () => {
+  const report = {
+    report_date: "2026-05-01",
+    main_items: [],
+    github_trending: [],
+    hot_blogs: [],
+    projects: [],
+    builder_observations: [],
+    daily_tracking: [
+      {
+        id: "swe-bench-pro",
+        name: "SWE-bench Pro",
+        verification_status: "unverified",
+        verification_note: "本轮固定入口抓取受阻：HTTP 403。"
+      }
+    ],
+    source_audit: {
+      content_sources: {
+        sources: [
+          {
+            name: "Scale Labs SWE-Bench Pro",
+            status: "blocked",
+            notes: "HTTP 403"
+          }
+        ]
+      }
+    }
+  };
+
+  const status = deriveQualityStatus(report);
+
+  assert.equal(status.status, "degraded");
+  assert(status.reasons.includes("daily_tracking_source_blocked"));
+  assert(status.affected_sections.includes("daily_tracking"));
+  assert(status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
 });
 
 test("report:write includes public network guidance for discovery outages", async () => {

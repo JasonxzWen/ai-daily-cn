@@ -162,6 +162,13 @@
       },
       "default": []
     },
+    "daily_tracking": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/daily_tracking_item"
+      },
+      "default": []
+    },
     "projects": {
       "type": "array",
       "items": {
@@ -928,6 +935,105 @@
           "minLength": 1
         },
         "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "daily_tracking_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "url", "event_date", "source", "category", "summary", "watch_points", "evidence", "verification_status", "source_level"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": ["model_usage", "model_benchmark", "coding_benchmark"]
+        },
+        "importance": {
+          "$ref": "#/$defs/importance"
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verification_status"
+        },
+        "change_status": {
+          "enum": ["changed", "no_change", "blocked", "missing", "unknown"]
+        },
+        "change_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publish_to_public": {
+          "type": "boolean",
+          "default": false
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "watch_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "trend": {
+                "enum": ["new", "up", "down", "same", "unknown"]
+              }
+            }
+          },
+          "default": []
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "watch_next": {
           "type": "string",
           "minLength": 1
         }

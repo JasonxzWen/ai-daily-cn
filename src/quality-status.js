@@ -152,6 +152,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
     reasons,
     affectedSections
   });
+  addDailyTrackingDegradation({ report, reasons, affectedSections });
 
   addSelectionDegradation({ report, candidatePool, reasons, affectedSections });
 
@@ -322,6 +323,15 @@ function degradedSectionsFromReasons(reasons, affectedSections) {
       };
     }
     const reason = degradedReasonForSection(reasons, section);
+    if (section === "daily_tracking" && reason === "daily_tracking_source_blocked") {
+      return {
+        error_code: "quality_degraded",
+        code: reason,
+        section,
+        message: "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。",
+        remediation: "修复对应榜单的抓取或解析路径后，再把可核验变化标记为 publish_to_public。"
+      };
+    }
     return {
       error_code: "quality_degraded",
       code: reason,
@@ -336,7 +346,8 @@ function degradedReasonForSection(reasons, section) {
   const mapped = {
     github_trending: "github_trending_blocked",
     hot_blogs: "content_sources_blocked",
-    builder_observations: "builder_sources_blocked"
+    builder_observations: "builder_sources_blocked",
+    daily_tracking: "daily_tracking_source_blocked"
   }[section];
   if (mapped && reasons.includes(mapped)) {
     return mapped;
@@ -778,6 +789,38 @@ function addSourceDegradation({ group, reason, section, currentCount, reasons, a
   affectedSections.push(section);
 }
 
+function addDailyTrackingDegradation({ report, reasons, affectedSections }) {
+  const items = Array.isArray(report?.daily_tracking) ? report.daily_tracking : [];
+  const hasUnverifiedTracking = items.some((item) => {
+    if (String(item?.verification_status || "") === "unverified") {
+      return true;
+    }
+    const note = [
+      item?.verification_note,
+      item?.risk_note,
+      item?.evidence
+    ].filter(Boolean).join(" ");
+    return /blocked|HTTP\s+\d{3}|403|抓取受阻|不可用/i.test(note);
+  });
+  const trackingSourceBlocked = sourceAuditHasBlockedDailyTracker(report?.source_audit);
+  if (!hasUnverifiedTracking && !trackingSourceBlocked) {
+    return;
+  }
+  reasons.push("daily_tracking_source_blocked");
+  affectedSections.push("daily_tracking");
+}
+
+function sourceAuditHasBlockedDailyTracker(sourceAudit) {
+  const sources = Array.isArray(sourceAudit?.content_sources?.sources) ? sourceAudit.content_sources.sources : [];
+  return sources.some((source) => {
+    const name = String(source?.name || source?.label || "").trim();
+    if (!/OpenRouter Rankings|Artificial Analysis Intelligence Index|Scale Labs SWE-Bench Pro/i.test(name)) {
+      return false;
+    }
+    return BLOCKED_SOURCE_STATUSES.has(source?.status);
+  });
+}
+
 function addSelectionDegradation({ report, candidatePool, reasons, affectedSections }) {
   const candidates = Array.isArray(candidatePool?.candidates) ? candidatePool.candidates : [];
   if (candidates.length === 0) {
@@ -896,6 +939,9 @@ function publicQualityNote(status, reasons, explicitNote) {
     }
     if (reasons.includes("builder_sources_blocked")) {
       return explicitNote || "Builder source coverage is degraded; Builder observations may be incomplete.";
+    }
+    if (reasons.includes("daily_tracking_source_blocked")) {
+      return explicitNote || "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。";
     }
     return explicitNote || "Some discovery coverage is degraded; this report may be incomplete.";
   }
