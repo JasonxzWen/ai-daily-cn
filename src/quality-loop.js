@@ -33,12 +33,15 @@ const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
 const HOT_BLOG_SUMMARY_MAX_LENGTH = 260;
 const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
+const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
+const MAIN_ITEM_MAX_LATIN_CHARS = 90;
 const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
 const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
   /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
+const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u;
 
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
@@ -123,10 +126,12 @@ export function reviewReportQuality(report, options = {}) {
   for (const entry of textEntries) {
     collectEnglishToneIssues(entry, issues);
     collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks);
+    collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks);
+    collectPublicUntranslatedIssues(entry, issues, aiReviewTasks);
     collectHighlightIssues(entry, issues, limits);
   }
 
-  collectMainItemDensityIssues(report, issues);
+  collectMainItemDensityIssues(report, issues, aiReviewTasks);
   collectHotBlogSummaryIssues(report, issues, aiReviewTasks);
   collectBuilderTranslationIssues(report, issues, aiReviewTasks);
   collectCandidatePoolIssues(report, candidatePool, issues, { autoDraft });
@@ -315,6 +320,60 @@ function collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks) {
   });
 }
 
+function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
+  if (!/^(main_items\[\d+\]\.bullets\[\d+\]|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.summary|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+    return;
+  }
+  if (!PUBLIC_TEMPLATE_BODY_RE.test(String(entry.value || ""))) {
+    return;
+  }
+  issues.push({
+    code: "public_template_body",
+    severity: "error",
+    path: entry.path,
+    message: "Public report body must not include templated impact/watch labels or generic workflow-log prose.",
+    repairable: true
+  });
+  aiReviewTasks.push({
+    kind: "public_editorial_rewrite",
+    path: entry.path,
+    instruction: "Rewrite this public body text as concrete reader-facing facts. Remove impact/watch labels and generic advice such as checking README, permissions, pricing, or whether a team should follow up unless those details are specific to this source."
+  });
+}
+
+function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
+  if (!/^(hero_highlights|builder_observations|community_leads)\[\d+\]\.(?:title|reason|content|translation)$/.test(entry.path)) {
+    return;
+  }
+  const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+  if (!plain || !looksLikeUntranslatedEnglish(plain)) {
+    return;
+  }
+  const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+  if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS) {
+    return;
+  }
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
+  issues.push({
+    code: "public_text_untranslated",
+    severity: "error",
+    path: entry.path,
+    message: "Public report text must be reader-facing Chinese, not an untranslated English source excerpt.",
+    repairable: true,
+    details: {
+      chinese_ratio: Number(chineseRatio.toFixed(3)),
+      latin_chars: latinChars
+    }
+  });
+  aiReviewTasks.push({
+    kind: "public_editorial_rewrite",
+    path: entry.path,
+    instruction: "Rewrite this public report text in Chinese for readers. Keep the same source meaning, but do not paste an untranslated English excerpt into the public page."
+  });
+}
+
 function collectHighlightIssues(entry, issues, limits) {
   const highlights = [...entry.value.matchAll(/==([^=\n]+)==/g)].map((match) => ({
     raw: match[0],
@@ -353,7 +412,7 @@ function collectHighlightIssues(entry, issues, limits) {
   }
 }
 
-function collectMainItemDensityIssues(report, issues) {
+function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
   const items = Array.isArray(report?.main_items) ? report.main_items : [];
   items.forEach((item, index) => {
     const bullets = Array.isArray(item?.bullets) ? item.bullets : [];
@@ -376,7 +435,51 @@ function collectMainItemDensityIssues(report, issues) {
         repairable: false
       });
     }
+    collectMainItemLanguageIssues(item, index, issues, aiReviewTasks);
   });
+}
+
+function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
+  const entries = [
+    { path: `main_items[${index}].summary`, value: item?.summary },
+    ...(Array.isArray(item?.bullets) ? item.bullets.map((value, bulletIndex) => ({
+      path: `main_items[${index}].bullets[${bulletIndex}]`,
+      value
+    })) : [])
+  ];
+
+  for (const entry of entries) {
+    const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+    if (!plain) {
+      continue;
+    }
+    const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+    const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+    const ratioBase = chineseChars + latinChars;
+    const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
+    if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS && !looksLikeUntranslatedEnglish(plain)) {
+      continue;
+    }
+    if (chineseRatio >= MAIN_ITEM_MIN_CHINESE_RATIO && !looksLikeUntranslatedEnglish(plain)) {
+      continue;
+    }
+    issues.push({
+      code: "main_item_untranslated",
+      severity: "error",
+      path: entry.path,
+      message: "Main item public text must be reader-facing Chinese, not an untranslated English title or source excerpt.",
+      repairable: true,
+      details: {
+        chinese_ratio: Number(chineseRatio.toFixed(3)),
+        latin_chars: latinChars
+      }
+    });
+    aiReviewTasks.push({
+      kind: "main_item_editorial_rewrite",
+      path: entry.path,
+      instruction: "Rewrite this main item text in Chinese for readers. Keep the same fact and source link, but do not paste an untranslated English excerpt into the public body."
+    });
+  }
 }
 
 function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
@@ -466,7 +569,9 @@ function lacksHotBlogEditorialCoverage(value) {
 function looksLikeUntranslatedEnglish(value) {
   const text = String(value || "").trim();
   const englishSentences = text.match(/\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/g) || [];
-  return englishSentences.length >= 1;
+  const englishRunWithoutSentenceStop = text.match(/\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/+.-]{55,}(?=；|。|，|$)/g) || [];
+  const sourceColonExcerpt = /\b[A-Z][A-Za-z0-9 +.-]{2,}\s*(?:Blog|Changelog|Press Releases|News|Research|RSS|Feed)?[:：]\s*[A-Z][A-Za-z0-9 ,;:'"()[\]\/+.-]{35,}/.test(text);
+  return englishSentences.length >= 1 || englishRunWithoutSentenceStop.length >= 1 || sourceColonExcerpt;
 }
 
 function collectCandidatePoolIssues(report, candidatePool, issues, context = {}) {
@@ -606,6 +711,16 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
       id: "content_density",
       ok: !warningCodes.has("content_too_thin"),
       status: warningCodes.has("content_too_thin") ? "warning" : "passed"
+    },
+    {
+      id: "main_item_editorial_quality",
+      ok: !failedCodes.has("main_item_untranslated"),
+      status: failedCodes.has("main_item_untranslated") ? "failed" : "passed"
+    },
+    {
+      id: "public_editorial_quality",
+      ok: !failedCodes.has("public_text_untranslated") && !failedCodes.has("public_template_body"),
+      status: failedCodes.has("public_text_untranslated") || failedCodes.has("public_template_body") ? "failed" : "passed"
     },
     {
       id: "hot_blog_editorial_quality",

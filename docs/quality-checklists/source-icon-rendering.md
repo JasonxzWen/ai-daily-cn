@@ -8,4 +8,5 @@ Use this checklist when a daily report item should render a source icon but fall
 - [ ] The affected title renders an `img.inline-site-icon` before the link text.
 - [ ] The icon `src` is a concrete image data URI or trusted favicon URL, not a generated initials SVG.
 - [ ] The icon image is loaded and has non-zero rendered dimensions on desktop and mobile viewports.
+- [ ] Source summary bullets are reader-facing Chinese, not untranslated English source excerpts.
 - [ ] The public page quality checklist still passes after regeneration.

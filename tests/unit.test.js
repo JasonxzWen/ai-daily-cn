@@ -535,6 +535,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   report.main_items[0].url = "https://status.openai.com/incidents/example-agent-platform";
   report.main_items[0].editorial_category = "ai_industry";
   report.main_items[0].why_it_matters = "Why metadata should stay in JSON but not render as an extra main bullet.";
+  report.main_items[0].reader_relevance = "Reader relevance metadata should stay in JSON and not render as an extra main bullet.";
   report.main_items[0].watch_next = "Generic follow-up metadata should not render in main bullets.";
   report.main_items.push({
     title: "Cisco and OpenAI redefine enterprise engineering with Codex",
@@ -678,7 +679,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**![OpenAI Status]"));
   assert(!mainContent.includes("来源："));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
+  assert(!mainContent.includes("Reader relevance metadata should stay in JSON"));
   assert(!mainContent.includes("Generic follow-up metadata should not render"));
+  assert(!mainContent.includes("==影响=="));
+  assert(!mainContent.includes("==留意=="));
   const trackingSection = input.sections.find((section) => section.title === "每日追踪");
   assert.equal(trackingSection.type, "filterable-cards");
   assert.equal(trackingSection.cardClass, "tracking-card");
@@ -3687,6 +3691,105 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
 });
 
+test("quality review flags untranslated main item source excerpts", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    summary: "Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
+    bullets: [
+      "**Baidu Press Releases**: Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Hold Annual General Meeting on June 5, 2026 Apr 23, 2026 Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
+      "==影响==：它能帮助读者判断大厂的资源投入、组织重心和商业优先级是否正在改变。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("main_item_untranslated"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[0]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
+test("quality review flags mixed English changelog excerpts in main item body", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    summary: "GitHub Changelog：Fix with Copilot for failing Actions now in Pro, Pro+, and Max。读者应先看原文给出的变化、适用对象和落地边界；When a GitHub Actions job fails, Copilot Pro, Pro+, and Max subscribers can now ask Copilot cloud agent to fix it in one click.",
+    bullets: [
+      "**GitHub Changelog**：Fix with Copilot for failing Actions now in Pro, Pro+, and Max；When a GitHub Actions job fails, Copilot Pro, Pro+, and Max subscribers can now ask Copilot cloud agent to fix it in one click。",
+      "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("main_item_untranslated"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[0]"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
+test("quality review flags untranslated English excerpts in public observation sections", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hero_highlights = [
+    {
+      title: "Industry leaders share new perspectives on generative media for startups",
+      url: "https://example.com",
+      reason: "Google Keyword Blog：Industry leaders share new perspectives on generative media for startups。这条内容生成线索的关键信息是：Future of AI hero. Treat this as a community lead unless it is backed by a primary source."
+    }
+  ];
+  report.builder_observations = [
+    {
+      ...report.builder_observations[0],
+      content: "这条原帖讨论 AI 工具或 agent 实践：Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours.",
+      translation: "这条原帖讨论 AI 工具或 agent 实践：Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours."
+    }
+  ];
+  report.community_leads = [
+    {
+      ...report.community_leads[0],
+      content: "Apple Newsroom：Apple and Major League Baseball have announced the July schedule for Friday Night Baseball on Apple TV, featuring several marquee matchups. Treat this as a community lead unless it is backed by a primary source."
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_text_untranslated").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("hero_highlights[0].reason"));
+  assert(issuePaths.includes("builder_observations[0].content"));
+  assert(issuePaths.includes("builder_observations[0].translation"));
+  assert(issuePaths.includes("community_leads[0].content"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
+test("quality review rejects templated impact and watch prose in public body", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    bullets: [
+      "**要点**：GitHub Copilot 增加更大上下文窗口和可配置推理级别。",
+      "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。",
+      "==留意==：看仓库活跃度、README、许可证、模型卡、下载限制和是否有真实案例。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_template_body").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("main_items[0].bullets[1]"));
+  assert(issuePaths.includes("main_items[0].bullets[2]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [
@@ -4399,10 +4502,12 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   const draftReviewCodes = draftReview.issues.map((issue) => issue.code);
   assert(!draftReviewCodes.includes("autodraft_template_phrase"));
   assert(!draftReviewCodes.includes("candidate_pool_reference_invalid"));
+  assert(!draftReviewCodes.includes("main_item_untranslated"));
   assert(!draftReviewCodes.includes("hot_blog_summary_untranslated"));
   assert(!draftReviewCodes.includes("hot_blog_summary_too_thin"));
   assert(!draftReviewCodes.includes("hot_blog_points_invalid"));
   assert.equal(draftReview.checklist.find((item) => item.id === "candidate_backrefs").status, "passed");
+  assert.equal(draftReview.checklist.find((item) => item.id === "main_item_editorial_quality").status, "passed");
   assert.equal(draftReview.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "passed");
 
   const written = await writeReportDraft({
@@ -5745,7 +5850,7 @@ test("report:write rejects GitHub Trending descriptions copied in English", asyn
   assert.equal(report.github_trending[0].description, draft.github_trending[0].description);
 });
 
-test("report:write rejects expanded main items without highlight markers or enough detail", async () => {
+test("report:write rejects expanded main items with templated prose or thin detail", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseItem = draft.main_items[0];
@@ -5761,7 +5866,7 @@ test("report:write rejects expanded main items without highlight markers or enou
       url,
       bullets: [
         `**Fixture ${index + 1}** describes an important AI industry update.`,
-        "It keeps a second factual point but deliberately omits highlight markers."
+        "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。"
       ]
     };
   });
