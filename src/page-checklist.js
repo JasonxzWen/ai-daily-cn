@@ -126,6 +126,53 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "X/Twitter builder cards should render Chinese translations or summaries, not raw English original posts.",
       { weak_cards: weakBuilderCards }
     );
+    const internalReviewLanguageRe = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
+    const internalReviewTextHits = Array.from(document.querySelectorAll(".interactive-card > p, .interactive-card .card-detail-list dd"))
+      .map((node, index) => ({
+        index,
+        text: node.textContent?.replace(/\s+/g, " ").trim() || "",
+        title: node.closest(".interactive-card")?.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || ""
+      }))
+      .filter((item) => internalReviewLanguageRe.test(item.text))
+      .map((item) => ({
+        index: item.index,
+        title: item.title,
+        text: item.text.slice(0, 180)
+      }));
+    addCheck(
+      "public_internal_review_language_absent",
+      internalReviewTextHits.length === 0,
+      "Public card bodies should not expose internal review labels such as pending confirmation or community-lead caveats.",
+      { hits: internalReviewTextHits }
+    );
+    const weakCommunityCards = Array.from(document.querySelectorAll(".community-card"))
+      .map((card, index) => {
+        const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const textWithoutUrls = bodyText.replace(/https?:\/\/\S+/gi, "").trim();
+        const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
+        const latinChars = (bodyText.match(/[A-Za-z]/g) || []).length;
+        const ratioBase = chineseChars + latinChars;
+        const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+        const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
+        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              body: bodyText.slice(0, 180),
+              chinese_chars: chineseChars,
+              chinese_ratio: Number(chineseRatio.toFixed(3)),
+              long_english_run: longEnglishRun
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "community_cards_reader_facing",
+      weakCommunityCards.length === 0,
+      "Community cards should render Chinese reader-facing summaries, not raw English excerpts.",
+      { weak_cards: weakCommunityCards }
+    );
     const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";

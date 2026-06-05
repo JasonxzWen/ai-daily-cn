@@ -143,7 +143,35 @@ export function normalizeReportDraft(draft, options = {}) {
     currentAutomationRevision: options.automationRevision
   });
 
-  return validation.value;
+  return stripPrivateDisclosureFields(validation.value);
+}
+
+function stripPrivateDisclosureFields(report) {
+  const publicReport = structuredClone(report);
+  for (const sectionName of [
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "daily_tracking",
+    "projects",
+    "github_trending",
+    "builder_observations",
+    "community_leads"
+  ]) {
+    if (!Array.isArray(publicReport[sectionName])) {
+      continue;
+    }
+    publicReport[sectionName] = publicReport[sectionName].map((item) => {
+      if (!item || typeof item !== "object") {
+        return item;
+      }
+      const next = { ...item };
+      delete next.verification_note;
+      delete next.risk_note;
+      return next;
+    });
+  }
+  return publicReport;
 }
 
 function requireModelReleasesInMainItems(report) {

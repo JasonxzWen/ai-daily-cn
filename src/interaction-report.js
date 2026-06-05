@@ -1227,10 +1227,10 @@ function editorialCardPoints(item, options = {}) {
       points.push({ label: "来源", value: sourceLevelLabel(item.source_level) });
     }
     if (item?.verification_note) {
-      points.push({ label: "待确认", value: item.verification_note });
+      points.push({ label: "说明", value: item.verification_note });
     }
     if (item?.risk_note) {
-      points.push({ label: "边界", value: item.risk_note });
+      points.push({ label: "上下文", value: item.risk_note });
     }
   }
   return points;
@@ -1330,6 +1330,11 @@ function stripPublicBodySourcePrefix(value, item = {}) {
   }
   return text
     .replace(/\s*。?\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
+    .replace(/\s*(?:待确认|边界)\s*[：:][^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/\s*(?:该来源|中介来源|事实性结论|事实来自|官方文档)[^。；;\n]*(?:仅作为?线索|仅作(?:发现|社区)?线索|需要一手|多源确认|原始链接|不得仅凭该线索写入主体)[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/[；;]?\s*当前作为[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:确认|。|$)/g, "")
+    .replace(/[；;]?\s*这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/\s*(?:不进入|未进入)\s*AI\s*主体事实[。；;]?/g, "")
     .trim();
 }
 
@@ -1453,29 +1458,44 @@ function formatTwitterDiscussion(items, auditGroup, options = {}) {
 
 function formatCommunityLeadCards(items) {
   const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
-  return leads.map((item) => ({
-    group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
-    title: communityLeadTitle(item),
-    href: item.url,
-    titleIcon: mainItemIconFor(item),
-    body: formatDailyInlineText(communityLeadBody(item), item),
-    showGroup: false,
-    tags: [
-      cardTag(importanceTagFor("community_leads", item)),
-      item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
-      item.event_date ? cardTag(item.event_date, "date") : ""
-    ].filter(Boolean),
-    points: []
-  }));
+  return leads.map((item) => {
+    const body = communityLeadBody(item);
+    if (!isReaderFacingChineseBody(body)) {
+      return null;
+    }
+    return {
+      group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
+      title: communityLeadTitle(item),
+      href: item.url,
+      titleIcon: mainItemIconFor(item),
+      body: formatDailyInlineText(body, item),
+      showGroup: false,
+      tags: [
+        cardTag(importanceTagFor("community_leads", item)),
+        item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
+        item.event_date ? cardTag(item.event_date, "date") : ""
+      ].filter(Boolean),
+      points: []
+    };
+  }).filter(Boolean);
 }
 
 function communityLeadBody(item) {
-  const body = String(item?.content || "").trim();
-  const disclosure = [
-    item?.verification_note ? `待确认：${stripTrailingSentencePunctuation(item.verification_note)}` : "",
-    item?.risk_note ? `边界：${stripTrailingSentencePunctuation(item.risk_note)}` : ""
-  ].filter(Boolean).join("；");
-  return disclosure ? `${body}\n\n${disclosure}。` : body;
+  return stripPublicBodySourcePrefix(item?.content || "", item);
+}
+
+function isReaderFacingChineseBody(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text) {
+    return false;
+  }
+  const textWithoutUrls = text.replace(/https?:\/\/\S+/gi, "").trim();
+  const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (text.match(/[A-Za-z]/g) || []).length;
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+  const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
+  return chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
 }
 
 function formatNestedEditorialDetails(item) {
