@@ -132,6 +132,24 @@
       "notes": "Official Tencent media center covering corporate news and financial releases."
     },
     {
+      "id": "content-bytedance-news",
+      "name": "ByteDance News",
+      "url": "https://www.bytedance.com/en/news",
+      "source_kind": "html_index",
+      "candidate_category": "community_lead",
+      "tier": "T0",
+      "authority": "primary",
+      "enablement": "core",
+      "verification_policy": "primary_allowed",
+      "format": "html_index",
+      "linkPattern": "/en/news/",
+      "requires_original_url": false,
+      "max_items_per_run": 4,
+      "timeout_ms": 15000,
+      "source_level": "official_company_news",
+      "notes": "Official ByteDance company news lane for product, business, organization, trust and safety, TikTok, CapCut, Lark, Feishu, Douyin and platform-policy signals."
+    },
+    {
       "id": "content-alibaba-group-press-releases",
       "name": "Alibaba Group Press Releases",
       "url": "https://www.alibabagroup.com/en-US/news-press-releases",
@@ -148,6 +166,27 @@
       "timeout_ms": 15000,
       "source_level": "official_company_news",
       "notes": "Official Alibaba Group press-release lane for company, business, and financial signals."
+    },
+    {
+      "id": "content-baidu-press-releases",
+      "name": "Baidu Press Releases",
+      "url": "https://ir.baidu.com/index.php/press-releases",
+      "source_kind": "html_index",
+      "candidate_category": "community_lead",
+      "tier": "T0",
+      "authority": "primary",
+      "enablement": "core",
+      "verification_policy": "primary_allowed",
+      "format": "html_index",
+      "linkPattern": [
+        "news-releases/news-release-details/",
+        "/press-releases/"
+      ],
+      "requires_original_url": false,
+      "max_items_per_run": 4,
+      "timeout_ms": 15000,
+      "source_level": "official_company_news",
+      "notes": "Official Baidu investor-relations press-release lane for earnings, buybacks, spin-offs, leadership, business and AI platform signals."
     },
     {
       "id": "content-meituan-investor-relations",
