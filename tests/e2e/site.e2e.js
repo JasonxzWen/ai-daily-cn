@@ -131,6 +131,17 @@ structuredReport.builder_observations = [
   }
 ];
 structuredReport.self_check.builder_observations = structuredReport.builder_observations.length;
+structuredReport.community_leads = [
+  {
+    content: "Apple Newsroom：Apple 公布 Apple TV 上 Friday Night Baseball 的 7 月赛程，包括多场重点棒球比赛和 Apple TV 平台排期变化；这是娱乐内容和平台排期线索，不进入 AI 主体事实。待确认：事实来自可回看的原始链接。",
+    url: "https://www.apple.com/newsroom/example-friday-night-baseball/",
+    source: "Apple Newsroom",
+    event_date: "2026-05-15",
+    source_level: "official",
+    verification_status: "primary_confirmed",
+    verification_note: "事实来自可回看的原始链接。"
+  }
+];
 structuredReport.evidence_assets = [
   {
     type: "figure",
@@ -241,6 +252,10 @@ try {
   assert.doesNotMatch(builderCardsText, /Coding agents need eval loops before unattended work/);
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
   assert.equal(await builderCardsUseHorizontalRows(page), true);
+  const communityCardsText = await page.locator(".community-card-grid").textContent();
+  assert.match(communityCardsText, /Apple TV/);
+  assert.doesNotMatch(communityCardsText, /Apple Newsroom[：:]/);
+  assert.doesNotMatch(communityCardsText, /待确认|Treat this as a community lead|事实性结论|不进入\s*AI\s*主体事实/);
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await page.locator(".project-card-grid").count(), 0);
@@ -255,6 +270,14 @@ try {
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  await page.locator(".community-card > p").first().evaluate((node) => {
+    node.textContent = "Apple Newsroom：Apple and Major League Baseball have announced the July schedule for Friday Night Baseball on Apple TV. Treat this as a community lead unless it is backed by a primary source. 待确认：事实来自可回看的原始链接。";
+  });
+  const pollutedCommunityChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(pollutedCommunityChecklist.ok, false);
+  assert(pollutedCommunityChecklist.issues.some((issue) => issue.id === "public_internal_review_language_absent"));
+  assert(pollutedCommunityChecklist.issues.some((issue) => issue.id === "community_cards_reader_facing"));
+
   await page.goto(`${server.url}/reports/2026/05/2026-05-16.html`);
   const weakHotBlogChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-16" });
   assert.equal(weakHotBlogChecklist.ok, false);

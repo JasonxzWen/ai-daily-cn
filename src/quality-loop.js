@@ -43,6 +43,7 @@ const HOT_BLOG_COVERAGE_PATTERNS = [
 ];
 const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u;
 const PUBLIC_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
+const PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
 
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
@@ -128,6 +129,7 @@ export function reviewReportQuality(report, options = {}) {
     collectEnglishToneIssues(entry, issues);
     collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks);
     collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks);
+    collectPublicInternalReviewLanguageIssues(entry, issues, aiReviewTasks);
     collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report);
     collectPublicUntranslatedIssues(entry, issues, aiReviewTasks);
     collectHighlightIssues(entry, issues, limits);
@@ -364,6 +366,32 @@ function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
     kind: "public_editorial_rewrite",
     path: entry.path,
     instruction: "Remove the source-name prefix from this public text. Keep the source represented by the existing icon/link and rewrite any remaining excerpt as reader-facing Chinese."
+  });
+}
+
+function collectPublicInternalReviewLanguageIssues(entry, issues, aiReviewTasks) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary)|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+    return;
+  }
+  const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
+  const match = plain.match(PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE);
+  if (!match) {
+    return;
+  }
+  issues.push({
+    code: "public_internal_review_language",
+    severity: "error",
+    path: entry.path,
+    message: "Public report body must not expose internal review labels such as pending confirmation or community-lead caveats.",
+    repairable: true,
+    details: {
+      phrase: match[0].slice(0, 80)
+    }
+  });
+  aiReviewTasks.push({
+    kind: "public_editorial_rewrite",
+    path: entry.path,
+    instruction: "Rewrite this public body text for readers. Remove internal review labels such as pending confirmation, community-lead caveats, source verification workflow notes, and boundary reminders while keeping the same factual meaning."
   });
 }
 
@@ -763,8 +791,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "public_editorial_quality",
-      ok: !failedCodes.has("public_text_untranslated") && !failedCodes.has("public_template_body") && !failedCodes.has("public_source_prefix"),
-      status: failedCodes.has("public_text_untranslated") || failedCodes.has("public_template_body") || failedCodes.has("public_source_prefix") ? "failed" : "passed"
+      ok: !failedCodes.has("public_text_untranslated") && !failedCodes.has("public_template_body") && !failedCodes.has("public_source_prefix") && !failedCodes.has("public_internal_review_language"),
+      status: failedCodes.has("public_text_untranslated") || failedCodes.has("public_template_body") || failedCodes.has("public_source_prefix") || failedCodes.has("public_internal_review_language") ? "failed" : "passed"
     },
     {
       id: "hot_blog_editorial_quality",

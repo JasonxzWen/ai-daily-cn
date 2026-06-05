@@ -1065,10 +1065,12 @@ test("domestic community leads stay inside the shared community section", async 
   const techcrunch = communitySection.items.find((item) => item.title === "TechCrunch AI");
   assert(leiphone);
   assert(leiphone.body.includes("千问 APP"));
-  assert(leiphone.body.includes("待确认：中介来源仅作发现线索"));
+  assert(!leiphone.body.includes("待确认"));
+  assert(!leiphone.body.includes("中介来源仅作发现线索"));
   assert.equal(leiphone.points.length, 0);
   assert(techcrunch);
   assert(techcrunch.body.includes("TechCrunch"));
+  assert(!techcrunch.body.includes("待确认"));
   assert.equal(techcrunch.points.length, 0);
 });
 
@@ -3867,6 +3869,26 @@ test("quality review rejects source-name prefixes in public body text", async ()
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
 
+test("quality review rejects internal review language in public body text", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.community_leads = [
+    {
+      ...report.community_leads[0],
+      source: "Apple Newsroom",
+      content: "Apple 公布 Apple TV 上 Friday Night Baseball 的 7 月赛程。待确认：事实来自可回看的原始链接；边界：不得仅凭该线索写入主体。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const internalIssue = review.issues.find((issue) => issue.code === "public_internal_review_language");
+
+  assert.equal(review.ok, false);
+  assert(internalIssue);
+  assert.equal(internalIssue.path, "community_leads[0].content");
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite" && task.path === "community_leads[0].content"));
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [
@@ -6139,6 +6161,8 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
 
   assert.equal(report.hot_blogs[0].candidate_id, "hot-blog-intermediary");
   assert.equal(report.hot_blogs[0].source_level, "intermediary");
+  assert(!("verification_note" in report.hot_blogs[0]));
+  assert(!("risk_note" in report.hot_blogs[0]));
 });
 
 test("report:write rejects undisclosed intermediary leads in viewpoint sections", async () => {
