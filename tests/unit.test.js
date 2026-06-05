@@ -23,6 +23,11 @@ import {
 import { collectSearchNews } from "../src/search-news.js";
 import { checkSourcesHealth } from "../src/source-health.js";
 import { auditSourceRunHistory } from "../src/source-phase5.js";
+import {
+  extractSourceStatusRecords,
+  findSourcesWithoutEffectiveSignal,
+  mergeSourceStatusRecords
+} from "../src/source-status-history.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
@@ -4613,6 +4618,130 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(await exists(result.candidatePoolPath), true);
 });
 
+test("source status history dedupes same-day records and flags 10-day stale sources", () => {
+  const staleUrl = "https://example.com/stale-feed.xml";
+  const currentRecords = extractSourceStatusRecords({
+    content_sources: {
+      checked: true,
+      sources: [
+        {
+          name: "Stale Feed",
+          url: staleUrl,
+          status: "blocked",
+          notes: "latest run blocked"
+        },
+        {
+          name: "Healthy Feed",
+          url: "https://example.com/healthy-feed.xml",
+          status: "checked",
+          notes: "latest run parsed items"
+        }
+      ],
+      candidates_found: 0,
+      included: 0
+    }
+  }, {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+  const staleHistory = datesThrough("2026-05-07", 9).map((date) => ({
+    date,
+    group: "content_sources",
+    source_key: staleUrl,
+    name: "Stale Feed",
+    url: staleUrl,
+    status: "no_signal",
+    notes: "no dated items"
+  }));
+  const healthyHistory = datesThrough("2026-05-07", 9).map((date, index) => ({
+    date,
+    group: "content_sources",
+    source_key: "https://example.com/healthy-feed.xml",
+    name: "Healthy Feed",
+    url: "https://example.com/healthy-feed.xml",
+    status: index === 4 ? "checked" : "no_signal",
+    notes: "mixed status"
+  }));
+  const firstMerge = mergeSourceStatusRecords({
+    schema_version: 1,
+    records: [...staleHistory, ...healthyHistory]
+  }, currentRecords, {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+  const secondMerge = mergeSourceStatusRecords(firstMerge, currentRecords.map((record) =>
+    record.url === staleUrl ? { ...record, notes: "second same-day run" } : record
+  ), {
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt
+  });
+
+  const staleRecords = secondMerge.records.filter((record) => record.url === staleUrl);
+  assert.equal(staleRecords.length, 10);
+  assert.equal(staleRecords.filter((record) => record.date === "2026-05-16").length, 1);
+  assert.equal(staleRecords.find((record) => record.date === "2026-05-16").notes, "second same-day run");
+
+  const staleSources = findSourcesWithoutEffectiveSignal(secondMerge, {
+    reportDate: "2026-05-16",
+    days: 10
+  });
+
+  assert.equal(staleSources.length, 1);
+  assert.equal(staleSources[0].name, "Stale Feed");
+  assert.equal(staleSources[0].blocked_count, 1);
+  assert.equal(staleSources[0].no_signal_count, 9);
+});
+
+test("report:write tracks source status history and appends stale source optimization suggestion", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-status-"));
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const staleUrl = "https://example.com/stale-feed.xml";
+  draft.source_audit.content_sources.sources.push({
+    name: "Stale Feed",
+    url: staleUrl,
+    status: "no_signal",
+    notes: "no dated items returned"
+  });
+  const draftPath = path.join(tmp, "daily-report.json");
+  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
+
+  const historyPath = path.join(tmp, "reports-data", "source-status-history.json");
+  await fs.mkdir(path.dirname(historyPath), { recursive: true });
+  await fs.writeFile(historyPath, `${JSON.stringify({
+    schema_version: 1,
+    records: datesThrough("2026-05-07", 9).map((date) => ({
+      date,
+      group: "content_sources",
+      source_key: staleUrl,
+      name: "Stale Feed",
+      url: staleUrl,
+      status: date === "2026-05-12" ? "blocked" : "no_signal",
+      notes: "historical no signal"
+    }))
+  }, null, 2)}\n`, "utf8");
+
+  const result = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: draftPath,
+    outputDir: "reports-data",
+    candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+
+  assert.equal(result.sourceStatusHistoryPath, historyPath);
+  assert.equal(await exists(result.sourceStatusHistoryPath), true);
+  const history = JSON.parse(await fs.readFile(historyPath, "utf8"));
+  const staleRecords = history.records.filter((record) => record.url === staleUrl);
+  assert.equal(staleRecords.length, 10);
+  assert.equal(staleRecords.filter((record) => record.date === "2026-05-16").length, 1);
+  assert.equal(result.report.self_check.source_status_history.stale_sources, 1);
+  assert(result.report.self_check.optimization_suggestions.some((item) =>
+    item.issue.includes("过去 10 天存在持续无有效信号的固定信源") &&
+    item.evidence.includes("Stale Feed")
+  ));
+});
+
 test("report:draft 从发现候选池自动选取并写出可 report:write 的草稿", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-"));
   const reportDate = "2026-05-26";
@@ -7236,6 +7365,15 @@ async function exists(filePath) {
   } catch {
     return false;
   }
+}
+
+function datesThrough(startDate, count) {
+  const start = new Date(`${startDate}T00:00:00Z`);
+  return Array.from({ length: count }, (_unused, index) => {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
 }
 
 function sourceAuditFixture() {

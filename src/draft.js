@@ -2,6 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
+import {
+  appendSourceStatusSuggestionsToDraft,
+  prepareSourceStatusHistoryUpdate,
+  writeSourceStatusHistory
+} from "./source-status-history.js";
 import { normalizeUrlIdentity } from "./url.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
@@ -85,31 +90,42 @@ export async function generateReportDraft(options = {}) {
     sourceAudit,
     evidenceAssets: evidence.assets
   });
+  const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
+    rootDir,
+    outputDir: options.sourceStatusOutputDir || "reports-data",
+    reportDate,
+    generatedAt,
+    sourceAudit,
+    days: options.sourceStatusWindowDays || 10
+  });
+  const reportWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(report, sourceStatusUpdate);
+  const sourceStatusHistoryPath = await writeSourceStatusHistory(sourceStatusUpdate);
 
   const outputPath = path.resolve(rootDir, options.outputPath || path.join(".tmp", "daily-report.json"));
   const candidateOutputPath = path.resolve(rootDir, options.candidateOutputPath || path.join(".tmp", `source-candidates-${reportDate}.json`));
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.mkdir(path.dirname(candidateOutputPath), { recursive: true });
-  await fs.writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(outputPath, `${JSON.stringify(reportWithSourceSuggestions, null, 2)}\n`, "utf8");
   await fs.writeFile(candidateOutputPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
 
   return {
-    report,
+    report: reportWithSourceSuggestions,
     candidatePool,
     path: outputPath,
     candidatePoolPath: candidateOutputPath,
+    sourceStatusHistoryPath,
     evidence_assets: evidence.assets,
     evidence_skipped: evidence.skipped,
     counts: {
       candidates: candidatePool.candidates.length,
-      main_items: report.main_items.length,
-      github_trending: report.github_trending.length,
-      hot_blogs: report.hot_blogs.length,
-      daily_tracking: report.daily_tracking.length,
-      projects: report.projects.length,
-      builder_observations: report.builder_observations.length,
-      community_leads: report.community_leads.length,
-      evidence_assets: report.evidence_assets.length
+      main_items: reportWithSourceSuggestions.main_items.length,
+      github_trending: reportWithSourceSuggestions.github_trending.length,
+      hot_blogs: reportWithSourceSuggestions.hot_blogs.length,
+      daily_tracking: reportWithSourceSuggestions.daily_tracking.length,
+      projects: reportWithSourceSuggestions.projects.length,
+      builder_observations: reportWithSourceSuggestions.builder_observations.length,
+      community_leads: reportWithSourceSuggestions.community_leads.length,
+      evidence_assets: reportWithSourceSuggestions.evidence_assets.length
     }
   };
 }
