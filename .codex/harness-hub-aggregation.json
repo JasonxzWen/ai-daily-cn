@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-02T08:43:54.802Z",
+  "generatedAt": "2026-06-05T04:06:34.564Z",
   "source": {
     "path": "D:/harness-hub",
-    "branch": "main",
-    "commit": "586950abb086828bca7361ec3f17c5397bdd05c3",
-    "status": "## main...origin/main"
+    "branch": "codex/chinese-summary-routing",
+    "commit": "eebf29ad5c67d23eef898528282c1e861ea09dd5",
+    "status": "## codex/chinese-summary-routing...origin/codex/chinese-summary-routing (dirty)"
   },
   "target": {
-    "path": "C:/Users/Admin/.codex/worktrees/94c6/ai-daily-cn",
+    "path": "C:/Users/Admin/.codex/worktrees/7fb3/ai-daily-cn",
     "skillsRoot": ".codex/skills"
   },
   "policy": {
@@ -21,12 +21,12 @@
     "baseline": "Original local skills are computed from tracked .codex/skills/*/SKILL.md files before this aggregation."
   },
   "counts": {
-    "hubSkills": 44,
+    "hubSkills": 45,
     "localSkillsBefore": 12,
-    "importedSkills": 33,
+    "importedSkills": 34,
     "overlappingSkills": 11,
     "localOnlySkills": 1,
-    "copiedFiles": 114,
+    "copiedFiles": 115,
     "preservedConflicts": 22,
     "identicalFiles": 33,
     "localOnlyFilesKept": 10
@@ -53,6 +53,7 @@
     "openspec-archive-change",
     "openspec-explore",
     "openspec-propose",
+    "package-release-sniffer",
     "product-capability",
     "review-workflow",
     "sdd-workflow",
@@ -325,6 +326,11 @@
     },
     {
       "skill": "openspec-propose",
+      "path": "SKILL.md",
+      "strategy": "new-skill"
+    },
+    {
+      "skill": "package-release-sniffer",
       "path": "SKILL.md",
       "strategy": "new-skill"
     },
