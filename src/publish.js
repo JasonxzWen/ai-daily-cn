@@ -342,13 +342,15 @@ export async function createPublishPlan(options = {}) {
   }
 
   const dates = reports.map((report) => report.report_date).sort();
+  const generatedRepoFiles = toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files);
   const repoFiles = filterDocsForReportDate(
-    toRepoRelativeFiles(repoRoot, options.outDir || "docs", generated.files),
+    generatedRepoFiles,
     options.outDir || "docs",
     options.reportDate,
     generated.reports
   );
-  const stageFiles = uniqueSorted([...repoFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
+  const dirtyGeneratedFiles = generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles);
+  const stageFiles = uniqueSorted([...repoFiles, ...dirtyGeneratedFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
   assertDirtyPublisherFilesCovered(statusEntries, stageFiles);
   const commitMessage =
     dates.length === 1
@@ -1081,6 +1083,14 @@ function assertDirtyPublisherFilesCovered(statusEntries, stageFiles) {
       }
     );
   }
+}
+
+function generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles) {
+  const generated = new Set(generatedRepoFiles);
+  return statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => isPublisherOwnedPath(file))
+    .filter((file) => generated.has(file));
 }
 
 function uniqueSorted(values) {
