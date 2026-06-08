@@ -220,6 +220,29 @@
         "test_name": "quality review flags AI tone highlight and translation issues",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-feedback-memory-self-check",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Require feedback memory review and regression self-check",
+      "problem": "User-reported issues could be fixed once but future task specs did not force Codex to review the feedback ledger or record an explicit regression self-check.",
+      "expected_behavior": "Every repository modification records a meaningful `Feedback Ledger Review` and `Regression Self-Check`; harness validation fails when either section is missing or empty, and the quick reference summarizes prior issues and fixes.",
+      "scope": [
+        "AGENTS.md",
+        "clean-state-checklist.md",
+        "config/feedback-ledger.json",
+        "definition-of-done.md",
+        "docs/feedback-buglist-quick-reference.md",
+        "scripts/harness-validate.mjs",
+        "tasks/templates/sdd-tdd-task.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "feedback memory self-check rejects quick reference missing ledger item",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

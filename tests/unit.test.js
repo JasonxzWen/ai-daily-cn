@@ -3735,6 +3735,14 @@ test("harness SDD TDD accepts trivial current task only with justification", asy
       "",
       "- Typo is fixed.",
       "",
+      "## Feedback Ledger Review",
+      "",
+      "- Reviewed `config/feedback-ledger.json`; no feedback-ledger item applies to this typo-only fixture.",
+      "",
+      "## Regression Self-Check",
+      "",
+      "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
+      "",
       "## Allowed Paths",
       "",
       "- `docs/example.md`",
@@ -3782,6 +3790,14 @@ test("harness SDD TDD accepts trivial current task only with justification", asy
       "",
       "- Typo is fixed.",
       "",
+      "## Feedback Ledger Review",
+      "",
+      "- Reviewed `config/feedback-ledger.json`; no feedback-ledger item applies to this typo-only fixture.",
+      "",
+      "## Regression Self-Check",
+      "",
+      "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
+      "",
       "## Allowed Paths",
       "",
       "- `docs/example.md`",
@@ -3828,6 +3844,14 @@ test("harness SDD TDD accepts task class followed by template guidance", async (
       "",
       "- Harness accepts task templates with guidance text.",
       "",
+      "## Feedback Ledger Review",
+      "",
+      "- Reviewed `config/feedback-ledger.json` and confirmed this fixture exercises the feedback-ledger review contract.",
+      "",
+      "## Regression Self-Check",
+      "",
+      "- Self-check confirms the fixture still contains the required regression review before handoff validation.",
+      "",
       "## Red Test",
       "",
       "Run before implementation:",
@@ -3866,6 +3890,195 @@ test("harness SDD TDD accepts task class followed by template guidance", async (
   const result = await runHarnessValidate(tmp);
 
   assert.equal(result.code, 0, result.stderr);
+});
+
+test("feedback memory self-check rejects non-trivial current task without feedback ledger review", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness enforces feedback-memory review.",
+      "",
+      "## Regression Self-Check",
+      "",
+      "- Compare the implementation against prior feedback items before handoff.",
+      "",
+      "## Red Test",
+      "",
+      "Run before implementation:",
+      "",
+      "```powershell",
+      "node scripts/harness-validate.mjs",
+      "```",
+      "",
+      "Expected initial failure:",
+      "",
+      "- The pre-change harness rejects this fixture.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /Feedback Ledger Review/);
+});
+
+test("feedback memory self-check rejects non-trivial current task without regression self-check", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness enforces regression self-checks.",
+      "",
+      "## Feedback Ledger Review",
+      "",
+      "- Reviewed `config/feedback-ledger.json` and the quick reference for applicable regressions.",
+      "",
+      "## Red Test",
+      "",
+      "Run before implementation:",
+      "",
+      "```powershell",
+      "node scripts/harness-validate.mjs",
+      "```",
+      "",
+      "Expected initial failure:",
+      "",
+      "- The pre-change harness rejects this fixture.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /Regression Self-Check/);
+});
+
+test("feedback memory self-check ledger item is bound to harness validation", async () => {
+  const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
+  const item = ledger.items.find((entry) => entry.id === "feedback/p1-feedback-memory-self-check");
+
+  assert(item, "feedback/p1-feedback-memory-self-check must be recorded in the feedback ledger");
+  assert.equal(item.severity, "P1");
+  assert.equal(item.status, "implemented");
+  assert(item.scope.includes("scripts/harness-validate.mjs"));
+  assert(item.scope.includes("tasks/templates/sdd-tdd-task.md"));
+  assert.equal(item.validation.command, "node --test tests/unit.test.js");
+  assert.equal(item.validation.test_name, "feedback memory self-check rejects quick reference missing ledger item");
+
+  const result = await validateFeedbackContract({ rootDir });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("feedback memory self-check rejects quick reference missing ledger item", async () => {
+  const tmp = await createHarnessFixture({
+    feedbackLedger: {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/covered-item",
+          severity: "P1",
+          status: "implemented",
+          title: "Covered feedback",
+          problem: "Covered feedback can regress.",
+          expected_behavior: "Covered feedback is documented.",
+          scope: ["scripts/harness-validate.mjs"],
+          validation: {
+            command: "node --test tests/unit.test.js",
+            test_name: "fixture",
+            gate: "npm run validate"
+          }
+        },
+        {
+          id: "feedback/missing-from-quick-reference",
+          severity: "P1",
+          status: "implemented",
+          title: "Missing feedback",
+          problem: "A quick reference can drift from the ledger.",
+          expected_behavior: "Harness validation catches missing quick-reference IDs.",
+          scope: ["scripts/harness-validate.mjs"],
+          validation: {
+            command: "node --test tests/unit.test.js",
+            test_name: "fixture",
+            gate: "npm run validate"
+          }
+        }
+      ]
+    },
+    quickReference: [
+      "# Feedback Buglist Quick Reference",
+      "",
+      "- feedback/covered-item: documented.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /feedback\/missing-from-quick-reference/);
 });
 
 test("OpenSpec removed from active package workflow", async () => {
@@ -7812,6 +8025,8 @@ async function runHarnessValidate(cwd) {
 
 async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
+  await fs.mkdir(path.join(tmp, "config"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
   await fs.mkdir(path.join(tmp, "scripts"), { recursive: true });
   await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
 
@@ -7822,6 +8037,7 @@ async function createHarnessFixture(options = {}) {
       "",
       "Codex worktree session-handoff tasks/daily-publish-runbook.md publish:dry-run",
       "SDD/TDD Red Test",
+      "Feedback Ledger Review Regression Self-Check",
       ""
     ].join("\n"),
     "utf8"
@@ -7830,6 +8046,34 @@ async function createHarnessFixture(options = {}) {
   await fs.writeFile(path.join(tmp, "session-handoff.md"), "# Session Handoff\n\n## Current Status\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "clean-state-checklist.md"), "# Clean State Checklist\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "definition-of-done.md"), "# Definition Of Done\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(
+    path.join(tmp, "config", "feedback-ledger.json"),
+    JSON.stringify(options.feedbackLedger || {
+      schema_version: 1,
+      items: [
+        {
+          id: "feedback/fixture",
+          severity: "P1",
+          status: "implemented",
+          title: "Fixture feedback",
+          problem: "Fixture feedback can drift.",
+          expected_behavior: "Fixture feedback is reviewed.",
+          scope: ["scripts/harness-validate.mjs"],
+          validation: {
+            command: "node --test tests/unit.test.js",
+            test_name: "fixture",
+            gate: "npm run validate"
+          }
+        }
+      ]
+    }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "docs", "feedback-buglist-quick-reference.md"),
+    options.quickReference || "# Feedback Buglist Quick Reference\n\n- feedback/fixture: review config/feedback-ledger.json before implementation.\n",
+    "utf8"
+  );
   await fs.writeFile(path.join(tmp, "tasks", "current-task.md"), options.currentTask || validNonTrivialCurrentTask(), "utf8");
   await fs.writeFile(
     path.join(tmp, "tasks", "daily-publish-runbook.md"),
@@ -7876,6 +8120,8 @@ async function createHarnessFixture(options = {}) {
       "## Acceptance Criteria",
       "## Red Test",
       "## Deterministic Substitute",
+      "## Feedback Ledger Review",
+      "## Regression Self-Check",
       "## Allowed Paths",
       "## Forbidden Paths",
       "## Validation Commands",
@@ -7955,6 +8201,14 @@ function validNonTrivialCurrentTask() {
     "## Acceptance Criteria",
     "",
     "- Harness enforces the SDD/TDD contract.",
+    "",
+    "## Feedback Ledger Review",
+    "",
+    "- Reviewed `config/feedback-ledger.json`; this fixture confirms feedback-ledger memory is present before implementation.",
+    "",
+    "## Regression Self-Check",
+    "",
+    "- Self-check verifies the fixture includes the required regression review before validation handoff.",
     "",
     "## Red Test",
     "",

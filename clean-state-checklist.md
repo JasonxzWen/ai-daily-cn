@@ -4,6 +4,8 @@ Use this checklist before handoff.
 
 - `git status --short` has been reviewed.
 - `tasks/current-task.md` is current, not a stale handoff from a previous task.
+- `Feedback Ledger Review` records the applicable items from `config/feedback-ledger.json` and `docs/feedback-buglist-quick-reference.md`.
+- `Regression Self-Check` records the concrete anti-regression checks performed before handoff.
 - Non-trivial work has recorded Red Test failure evidence or a justified deterministic substitute before implementation.
 - Changed files match the current task's allowed paths.
 - Forbidden paths were not modified.

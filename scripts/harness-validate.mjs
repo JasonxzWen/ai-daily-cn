@@ -6,6 +6,8 @@ const root = process.cwd();
 const requiredFiles = [
   'AGENTS.md',
   'feature_list.json',
+  'config/feedback-ledger.json',
+  'docs/feedback-buglist-quick-reference.md',
   'progress.md',
   'session-handoff.md',
   'clean-state-checklist.md',
@@ -37,6 +39,8 @@ const requiredMarkers = {
     'publish:dry-run',
     'SDD/TDD',
     'Red Test',
+    'Feedback Ledger Review',
+    'Regression Self-Check',
   ],
   'tasks/current-task.md': [
     'Task Class',
@@ -75,6 +79,8 @@ const requiredMarkers = {
     'Acceptance Criteria',
     'Red Test',
     'Deterministic Substitute',
+    'Feedback Ledger Review',
+    'Regression Self-Check',
     'Allowed Paths',
     'Forbidden Paths',
     'Validation Commands',
@@ -170,6 +176,7 @@ if (fs.existsSync(featureStatePath)) {
 }
 
 validatePackageScripts(failures);
+validateFeedbackQuickReference(failures);
 validateCurrentTask(failures);
 
 if (failures.length > 0) {
@@ -264,6 +271,33 @@ function validatePackageScripts(failures) {
   }
 }
 
+function validateFeedbackQuickReference(failures) {
+  const ledgerPath = path.join(root, 'config', 'feedback-ledger.json');
+  const quickReferencePath = path.join(root, 'docs', 'feedback-buglist-quick-reference.md');
+  if (!fs.existsSync(ledgerPath) || !fs.existsSync(quickReferencePath)) {
+    return;
+  }
+
+  let ledger;
+  try {
+    ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
+  } catch {
+    failures.push('config/feedback-ledger.json: must be valid JSON');
+    return;
+  }
+
+  const items = Array.isArray(ledger.items) ? ledger.items : [];
+  const quickReference = fs.readFileSync(quickReferencePath, 'utf8');
+  const missingIds = items
+    .map((item) => String(item?.id || '').trim())
+    .filter(Boolean)
+    .filter((id) => !quickReference.includes(id));
+
+  if (missingIds.length > 0) {
+    failures.push(`docs/feedback-buglist-quick-reference.md: missing feedback ledger IDs ${missingIds.join(', ')}`);
+  }
+}
+
 function validateCurrentTask(failures) {
   const taskPath = path.join(root, 'tasks/current-task.md');
   if (!fs.existsSync(taskPath)) return;
@@ -274,6 +308,8 @@ function validateCurrentTask(failures) {
     failures.push('tasks/current-task.md: first non-empty Task Class line must be "non-trivial" or "trivial"');
     return;
   }
+
+  validateFeedbackMemorySections(content, failures);
 
   if (taskClass === 'trivial') {
     const justification = sectionText(content, 'Trivial Justification').trim();
@@ -297,6 +333,37 @@ function validateCurrentTask(failures) {
   if (redTest.length === 0 && substitute.length > 0 && !/reason|\u7406\u7531|\u4e0d\u53ef|\u65e0\u6cd5|\u56e0\u4e3a|not practical|not feasible/i.test(substitute)) {
     failures.push('tasks/current-task.md: Deterministic Substitute must explain why a direct red test is not practical');
   }
+}
+
+function validateFeedbackMemorySections(content, failures) {
+  const feedbackReview = sectionText(content, 'Feedback Ledger Review').trim();
+  const regressionSelfCheck = sectionText(content, 'Regression Self-Check').trim();
+
+  if (!hasMeaningfulFeedbackReview(feedbackReview)) {
+    failures.push('tasks/current-task.md: Feedback Ledger Review must record reviewed feedback-ledger items or explain why none apply');
+  }
+  if (!hasMeaningfulRegressionSelfCheck(regressionSelfCheck)) {
+    failures.push('tasks/current-task.md: Regression Self-Check must record the task-specific checks that prevent known feedback regressions');
+  }
+}
+
+function hasMeaningfulFeedbackReview(value) {
+  const text = normalizedSectionText(value);
+  return text.length >= 40 && /(config\/feedback-ledger\.json|feedback-ledger|反馈|ledger)/i.test(text);
+}
+
+function hasMeaningfulRegressionSelfCheck(value) {
+  const text = normalizedSectionText(value);
+  return text.length >= 40 && /(自检|self-check|regression|回归|检查|validate|harness|验证)/i.test(text);
+}
+
+function normalizedSectionText(value) {
+  return String(value)
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function hasFailureEvidence(value) {
