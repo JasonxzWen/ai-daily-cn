@@ -30,6 +30,7 @@
         "Gemini API Managed Agents 用单次 API 调用创建可运行工具和代码的隔离 Linux 环境，并能通过 AGENTS.md 与 SKILL.md 定义可版本化 agent。",
         "AI Studio 增加 Workspace 集成、导出到 Antigravity、原生 Android prompt-to-app 和 Google Play 内测发布路径，目标是把原型、代码、测试和部署压到同一工作面。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -51,6 +52,7 @@
         "Fix with Copilot 会在 handoff 前弹出对话框，让用户选择是直接改当前 PR、开新 PR、选择模型还是补充指令。",
         "批量修复入口意味着 Copilot code review 不再只是评论生成器，而是把 review comments 变成 cloud agent 的可执行任务队列。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -73,6 +75,7 @@
         "Google 的检测 API 放在 Gemini Enterprise Agent Platform 上，面向企业后台审核、事实核验、内容排序和合成媒体标注场景。",
         "对生成式媒体产品而言，溯源从“附加说明”变成平台互操作能力；上传、截图、转码和再分发后的信号保真会成为工程约束。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -95,6 +98,7 @@
         "auto-connect 允许把当前已登录浏览器上下文交给 agent，适合调试需要认证的后台或内部系统，减少重复登录和环境搭建。",
         "第三方 developer tools 能把应用内部状态和组件细节暴露给 agent，降低 agent 只能从 DOM 或截图猜测状态的风险。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -116,6 +120,7 @@
         "这类部署要求模型输出可审计、可追责，并能适配受监管行业的安全、权限和数据治理要求。",
         "对企业 AI 平台团队而言，关键不只是采购模型，而是把模型能力嵌入已有业务系统、客户交付流程和行业合规边界。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -138,6 +143,7 @@
         "MCP OAuth 让 Claude、ChatGPT、Glean 等 OAuth-enabled AI tools 能用现有 dbt 登录连接，不必手工分发 token。",
         "Remote MCP Server 新增 Admin API 和产品文档工具，AI assistant 能排查 job error 并回到实时官方文档，而不是只生成查询。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -151,6 +157,7 @@
       "source": "Google Blog",
       "summary": "Google 发布 Gemini 3.5 系列并先推出 3.5 Flash，面向 Gemini app、AI Mode、Antigravity、Gemini API、AI Studio、Android Studio 和企业平台开放。",
       "notes": "重点定位为 agentic workflows 与 coding；Google 同时披露 3.5 Pro 已在内部使用，计划下月推出。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -162,6 +169,7 @@
       "source": "Google Blog",
       "summary": "Google Flow 和 Gemini app 发布 Gemini Omni Flash，强调从文本、图像、视频输入生成或编辑视频，并支持 conversational editing。",
       "notes": "Google 表示 Omni Flash 今日在 Gemini app、Google Flow 和 YouTube Shorts 可用，API/企业入口会在后续数周推出。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -173,6 +181,7 @@
       "source": "Hugging Face Blog",
       "summary": "Tom Aarsen 发布 6 个基于 Ettin ModernBERT encoder 的 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数。",
       "notes": "文章给出模型链接、蒸馏数据和训练 recipe，适合 RAG 检索后重排链路直接试用或复训。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -184,6 +193,7 @@
       "source": "Hugging Face Blog / Ai2",
       "summary": "Ai2 发布 OlmoEarth v1.1，更高效的地球观测模型家族，并提供模型 collection、tech report 和 code。",
       "notes": "面向环境监测、作物类型映射、森林损失驱动识别等地理空间 AI 任务；属于垂直领域模型发布。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -197,6 +207,7 @@
       "topic": "Agent debugging / browser runtime verification",
       "summary": "Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。",
       "why_it_matters": "这篇文章提供了 agent 端到端验证的具体接口清单，可直接影响前端 coding agent 的验收和调试方式。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -208,6 +219,7 @@
       "topic": "RAG reranking / Sentence Transformers",
       "summary": "文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。",
       "why_it_matters": "RAG 工程里重排常是质量与成本的折中点；该文给了可复现训练路径和不同尺寸模型选择。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -219,6 +231,7 @@
       "topic": "Analytics engineering agents / MCP / BYOK",
       "summary": "dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。",
       "why_it_matters": "它展示了数据平台厂商如何把 AI assistant 接入身份、lineage、文档和作业排错，而不是只做 SQL 自动补全。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -271,16 +284,19 @@
     {
       "content": "Mistral 3 官方页披露 Mistral Large 3、Ministral 3 系列、Apache 2.0、vLLM/Hugging Face/AWS Bedrock 等可用路径，但本轮页面未暴露稳定 published date；按规则暂不写入主体或 model_releases。",
       "url": "https://mistral.ai/news/mistral-3",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Anthropic 在 2026-05-18 宣布收购 Stainless，强化 SDK、CLI 和 MCP server tooling；该事件高信号但超出本轮 24 小时主体窗口，未扩窗补入。",
       "url": "https://www.anthropic.com/news/anthropic-acquires-stainless?s=09",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "WordPress 7.0 release schedule 显示 2026-05-20 发布，Beta 1 文档曾说明 Web Client AI API 会进入 Core；待最终 release post 出现后可复核是否进入主体。",
       "url": "https://make.wordpress.org/core/7-0/",
+      "image_urls": [],
       "importance": "general"
     }
   ],

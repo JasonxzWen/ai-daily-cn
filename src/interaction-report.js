@@ -144,7 +144,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "热门技术博客",
+      title: "热门博客",
       group: "main",
       cardClass: "blog-card",
       filterLabel: "博客主题筛选",
@@ -181,7 +181,7 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
-  const communityCards = formatCommunityLeadCards(communityLeads);
+  const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl });
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -877,7 +877,7 @@ function formatDailyTrackingCards(items, context = {}) {
     const stats = dailyTrackingStats(item, entries);
     const bars = dailyTrackingProviderBars(entries);
     const table = dailyTrackingTable(item, entries);
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 5 });
     return {
       group: dailyTrackingCategoryLabel(item.category),
       title: item.name,
@@ -1136,7 +1136,7 @@ function dailyTrackingCategoryLabel(category) {
 
 function formatHotBlogCards(items, context = {}) {
   return items.map((item) => {
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url));
     const points = hotBlogPointTexts(item.summary);
     const body = points.shift() || String(item.summary || "").trim();
     return {
@@ -1328,19 +1328,50 @@ function sourceLevelLabel(value) {
   return labels[value] || String(value || "").trim();
 }
 
-function formatCardMedia(report, assets) {
+function formatCardMedia(report, assets, options = {}) {
   if (!report || !Array.isArray(assets) || assets.length === 0) {
     return [];
   }
 
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
+
   return assets
     .filter((asset) => asset?.local_path)
-    .slice(0, 2)
+    .slice(0, limit)
     .map((asset) => ({
       src: relativeAssetHref(report.html_path, asset.local_path),
       alt: asset.title || "",
       caption: evidenceCaption(asset)
     }));
+}
+
+function formatCardMediaForItem(report, item, assets, options = {}) {
+  const localMedia = formatCardMedia(report, assets, options);
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
+  if (localMedia.length >= limit) {
+    return localMedia;
+  }
+
+  const media = [...localMedia];
+  if (item?.image_url) {
+    media.push({
+      src: item.image_url,
+      alt: item.image_alt || item.title || "",
+      caption: item.image_alt || item.title || "原文图片"
+    });
+  }
+  for (const imageUrl of Array.isArray(item?.image_urls) ? item.image_urls : []) {
+    media.push({
+      src: imageUrl,
+      alt: item.image_alt || item.title || "",
+      caption: item.image_alt || item.title || "原文图片"
+    });
+  }
+
+  const seen = new Set();
+  return media
+    .filter((entry) => entry?.src && !seen.has(entry.src) && seen.add(entry.src))
+    .slice(0, limit);
 }
 
 function hotBlogTags(item) {
@@ -1513,13 +1544,14 @@ function formatTwitterDiscussion(items, auditGroup, options = {}) {
   return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
 }
 
-function formatCommunityLeadCards(items) {
+function formatCommunityLeadCards(items, context = {}) {
   const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
   return leads.map((item) => {
     const body = communityLeadBody(item);
     if (!isReaderFacingChineseBody(body)) {
       return null;
     }
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 2 });
     return {
       group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
       title: communityLeadTitle(item),
@@ -1532,13 +1564,16 @@ function formatCommunityLeadCards(items) {
         item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points: []
+      points: [],
+      ...(media.length > 0 ? { media } : {})
     };
   }).filter(Boolean);
 }
 
 function communityLeadBody(item) {
-  return stripPublicBodySourcePrefix(item?.content || "", item);
+  const body = stripPublicBodySourcePrefix(item?.content || "", item);
+  const firstSentence = body.split(/(?<=[。！？!?；;])\s*/u).find(Boolean) || body;
+  return trimText(firstSentence, 120);
 }
 
 function isReaderFacingChineseBody(value) {
@@ -1562,6 +1597,10 @@ function formatNestedEditorialDetails(item) {
 }
 
 function communityLeadTitle(item) {
+  const title = String(item?.title || "").trim();
+  if (title) {
+    return title;
+  }
   const source = String(item?.source || item?.publisher || "").trim();
   if (source) {
     return source;

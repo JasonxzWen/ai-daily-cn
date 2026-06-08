@@ -681,7 +681,7 @@ function renderHotBlogsSection(items) {
   }
 
   return `<section class="section" id="hot-blogs">
-      <h2>热门技术博客</h2>
+      <h2>热门博客</h2>
       ${items.map(renderHotBlog).join("\n")}
     </section>`;
 }

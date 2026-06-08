@@ -33,10 +33,16 @@ const INTERMEDIARY_SOURCE_RE = /techcrunch|the verge|verge ai|ars technica|ventu
 const AI_RELEVANCE_RE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|large language model|model|models|agent|agents|agentic|chatgpt|codex|claude|gemini|gpt|grok|openai|anthropic|deepmind|xai|x\.ai|mistral|qwen|nemotron|reasoning|inference|eval|benchmark|rag|embedding|vector|transformer|diffusion|copilot|cursor|mcp)\b|人工智能|机器学习|深度学习|神经网络|大模型|模型|智能体|推理|评测|向量|多模态|代码助手/i;
 const BUILDER_RELEVANCE_RE = /\b(ai|agi|llm|model|agent|agents|openai|anthropic|claude|gemini|deepmind|google labs|gpt|codex|cursor|copilot|mcp|eval|benchmark|rag|inference|training|fine[-\s]?tuning|prompt|token|transformer|diffusion|sora|veo|runway)\b|人工智能|大模型|模型|智能体|代理|评测|推理|训练|微调|提示词|多模态|生成式|文生图|文生视频|代码助手/i;
 const BUILDER_IRRELEVANT_RE = /\bnot anything ai related\b|nothing to do with ai|unrelated to ai|off[-\s]?topic/i;
+const BUILDER_LOW_SIGNAL_RE = /\bgood night\b|touch sand|favorite of plato|favorite.*dialogues?|vibecon\b|my absolute favorite/i;
 const COMPANY_ACTION_RE = /\b(earnings|quarterly results?|financial results?|revenue|profit|guidance|layoffs?|job cuts?|hiring|reorganization|reorganisation|restructuring|organization changes?|leadership|management|board|conference|summit|keynote|product conference|launch event|partnership|investment|pricing|availability|policy|regulation|open[-\s]?source|github|hugging face|model weights?)\b|财报|业绩|营收|利润|指引|裁员|招聘|组织架构|组织调整|重组|管理层|董事会|大会|峰会|发布会|合作|投资|价格|定价|可用性|政策|监管|开源|模型权重/i;
 const PRODUCT_PLATFORM_RE = /\b(product|platform|app|service|cloud|enterprise|developer|api|sdk|release|launch|availability|pricing|quota|github|hugging face|open[-\s]?source|repo|repository)\b|产品|平台|应用|服务|云|企业|开发者|接口|发布|上线|可用|价格|配额|开源|仓库/i;
 const HARDCORE_RESEARCH_RE = /\b(arxiv|paper|benchmark|evaluation|eval|reasoning traces?|transformer inference|inference benchmark|ablation|dataset|pre[-\s]?train|post[-\s]?training|fine[-\s]?tuning|rlvr|loss|gradient|tokenizer|architecture|throughput|latency|context window)\b|论文|基准|评测|推理轨迹|消融|数据集|训练|微调|架构|吞吐|延迟/i;
 const PLAIN_READER_SIGNAL_RE = /\b(pricing|availability|rollout|launch|product|platform|app|service|enterprise|developer|api|sdk|conference|summit|partnership|customer|use case|workflow|open[-\s]?source|github|hugging face|model weights?|layoffs?|job cuts?|reorganization|restructuring|earnings|revenue|guidance)\b|价格|定价|可用|发布|上线|产品|平台|应用|服务|企业|开发者|接口|大会|峰会|合作|客户|用例|工作流|开源|模型权重|裁员|组织调整|重组|财报|营收|指引/i;
+const LOW_SIGNAL_VENDOR_PARTNERSHIP_RE = /\b(partnership|collaborat(?:e|ion)|build(?:ing)? an ai factory|ai factory|build ai infrastructure|gigawatt-scale ai cloud|memory for ai factor(?:y|ies))\b|合作|联合打造|共建/i;
+const LOW_VALUE_EVENT_GUIDE_RE = /\bhow to watch\b|\bwhat to expect\b|\bwatch live\b|\blivestream\b|\bschedule\b|\blineup\b|\btickets?\b|直播|观看指南|日程|赛程/i;
+const MINOR_CONSUMER_AI_FEATURE_RE = /\bdesign merch\b|\balexa for shopping\b|\bpet portraits?\b|\btumblers?\b|\bgroup shirts?\b|\bcreator assistant\b|\bai translations?\b|\bfacebook translations?\b/i;
+const GENERIC_HOT_BLOG_EVIDENCE_RE = /published this blog\/interview entry\.?$/i;
+const TITLE_MOJIBAKE_RE = /�|锟|喔|鈥|峄|岷|箞|鑳|€/u;
 const TRUSTED_PRIMARY_SOURCE_LEVELS = new Set([
   "primary",
   "official",
@@ -88,7 +94,7 @@ export async function generateReportDraft(options = {}) {
     generatedAt,
     selection,
     sourceAudit,
-    evidenceAssets: evidence.assets
+    evidenceAssets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets)
   });
   const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
     rootDir,
@@ -114,7 +120,7 @@ export async function generateReportDraft(options = {}) {
     path: outputPath,
     candidatePoolPath: candidateOutputPath,
     sourceStatusHistoryPath,
-    evidence_assets: evidence.assets,
+    evidence_assets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets),
     evidence_skipped: evidence.skipped,
     counts: {
       candidates: candidatePool.candidates.length,
@@ -137,9 +143,13 @@ export function mergeDiscoveryPayloads(payloads, options = {}) {
   const sourceMap = new Map();
   const candidates = [];
   const metaById = new Map();
+  const evidenceAssets = [];
 
   for (const payload of payloads) {
     mergeSourceAudit(sourceAudit, payload?.source_audit);
+    for (const asset of Array.isArray(payload?.evidence_assets) ? payload.evidence_assets : []) {
+      evidenceAssets.push(asset);
+    }
     for (const source of Array.isArray(payload?.sources) ? payload.sources : []) {
       addCandidateSource(sourceMap, source, generatedAt);
     }
@@ -175,11 +185,13 @@ export function mergeDiscoveryPayloads(payloads, options = {}) {
     sourceAudit,
     sources: [...sourceMap.values()].sort((left, right) => left.id.localeCompare(right.id)),
     candidates,
-    metaById
+    metaById,
+    evidence_assets: mergeEvidenceAssets(evidenceAssets)
   };
 }
 
 function selectReportItems(merged, options = {}) {
+  const reportDate = requireReportDate(options.reportDate);
   const candidates = cloneCandidates(merged.candidates);
   const metaById = merged.metaById || new Map();
   const selectedIds = new Set();
@@ -206,7 +218,7 @@ function selectReportItems(merged, options = {}) {
   const mainPool = candidates
     .filter((candidate) => !selectedIds.has(candidate.id))
     .filter((candidate) => !recentMainUrls.has(normalizeUrl(candidate.url)))
-    .filter((candidate) => canPromoteToMain(candidate))
+    .filter((candidate) => canPromoteToMain(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
   const mainSeeds = pickMainCandidates(mainPool, MAIN_TARGET);
   const mainItems = mainSeeds.map((candidate) => {
@@ -232,11 +244,12 @@ function selectReportItems(merged, options = {}) {
   });
 
   const hotBlogSeenUrls = new Set(mainItems.map((item) => normalizeUrl(item.url)).filter(Boolean));
+  const hotBlogPool = candidates
+    .filter((candidate) => !selectedIds.has(candidate.id))
+    .filter((candidate) => canPromoteToHotBlog(candidate, reportDate))
+    .sort((left, right) => candidateScore(right) - candidateScore(left));
   const hotBlogSeeds = [];
-  for (const candidate of candidates
-    .filter((item) => item.category === "hot_blog" && !selectedIds.has(item.id))
-    .filter((item) => isAiRelevantCandidate(item))
-    .sort((left, right) => candidateScore(right) - candidateScore(left))) {
+  for (const candidate of hotBlogPool) {
     if (hotBlogSeeds.length >= 3) break;
     const key = normalizeUrl(candidate.url);
     if (!key || hotBlogSeenUrls.has(key)) continue;
@@ -260,11 +273,28 @@ function selectReportItems(merged, options = {}) {
     return builderObservationItem(builderCandidate);
   });
 
-  const communitySeeds = candidates
+  const communityPool = candidates
     .filter((candidate) => candidate.category === "community_lead" && !selectedIds.has(candidate.id))
+    .filter((candidate) => canPromoteToCommunityLead(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left))
     .slice(0, Math.max(0, MAX_PUBLIC_UNITS - mainItems.length - githubTrending.length - projects.length - hotBlogs.length - builderObservations.length));
-  const communityLeads = communitySeeds.slice(0, 8).map((candidate) => {
+  const communitySeeds = [];
+  let communityLowSignalPartnerships = 0;
+  const communityTopicKeys = new Set();
+  for (const candidate of communityPool) {
+    if (communitySeeds.length >= 8) break;
+    if (isLowSignalVendorPartnership(candidate)) {
+      if (communityLowSignalPartnerships >= 1) continue;
+      communityLowSignalPartnerships += 1;
+    }
+    const topicKey = communityLeadTopicKey(candidate);
+    if (topicKey && communityTopicKeys.has(topicKey)) continue;
+    communitySeeds.push(candidate);
+    if (topicKey) {
+      communityTopicKeys.add(topicKey);
+    }
+  }
+  const communityLeads = communitySeeds.map((candidate) => {
     markIncludedCandidate(candidate, "community_lead", "community_leads");
     selectedIds.add(candidate.id);
     return communityLeadItem(candidate);
@@ -277,7 +307,14 @@ function selectReportItems(merged, options = {}) {
     hot_blogs: hotBlogs,
     projects,
     builder_observations: builderObservations,
-    community_leads: communityLeads
+    community_leads: communityLeads,
+    eligible_counts: {
+      main_items: mainPool.length,
+      github_trending: publicGithubCandidates.length,
+      hot_blogs: hotBlogPool.length,
+      projects: projectSeeds.length,
+      builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length
+    }
   };
 }
 
@@ -305,6 +342,25 @@ async function loadRecentMainUrls(rootDir, reportDate, lookbackDays = 7) {
   return urls;
 }
 
+function mergeEvidenceAssets(...groups) {
+  const merged = [];
+  const seen = new Set();
+  for (const group of groups) {
+    for (const asset of Array.isArray(group) ? group : []) {
+      if (!asset || typeof asset !== "object") {
+        continue;
+      }
+      const key = `${asset.source_url || ""}::${asset.local_path || ""}::${asset.title || ""}`;
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      merged.push(asset);
+    }
+  }
+  return merged;
+}
+
 function parseReportDate(reportDate) {
   const validDate = requireReportDate(reportDate);
   const [year, month, day] = validDate.split("-").map((part) => Number.parseInt(part, 10));
@@ -318,10 +374,15 @@ function formatReportDate(date) {
 function pickMainCandidates(candidates, target) {
   const picked = [];
   const seenUrls = new Set();
+  let lowSignalPartnershipCount = 0;
   const plainReaderCandidates = candidates.filter((candidate) => hasPlainReaderSignal(candidate));
   const hardcoreLimit = plainReaderCandidates.length >= target - 2 ? 2 : target;
   let hardcorePicked = 0;
-  const aigc = candidates.find((candidate) => isAigcCandidate(candidate) && !isHardcoreResearchOnly(candidate));
+  const aigc = candidates.find((candidate) => (
+    isAigcCandidate(candidate) &&
+    !isHardcoreResearchOnly(candidate) &&
+    !isMinorConsumerAiFeatureCandidate(candidate)
+  ));
   if (aigc) {
     picked.push(aigc);
     seenUrls.add(normalizeUrl(aigc.url));
@@ -330,6 +391,10 @@ function pickMainCandidates(candidates, target) {
     if (picked.length >= target) break;
     const key = normalizeUrl(candidate.url);
     if (!key || seenUrls.has(key)) continue;
+    if (isLowSignalVendorPartnership(candidate)) {
+      if (lowSignalPartnershipCount >= 1) continue;
+      lowSignalPartnershipCount += 1;
+    }
     if (isHardcoreResearchOnly(candidate)) {
       if (hardcorePicked >= hardcoreLimit) continue;
       hardcorePicked += 1;
@@ -374,6 +439,28 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
       main_items: selection.main_items.length,
       builder_observations: selection.builder_observations.length,
       builder_skill_used: ["candidate-pool-autodraft"],
+      selection_snapshot: {
+        main_items: {
+          eligible_candidates: selection.eligible_counts?.main_items || 0,
+          selected: selection.main_items.length
+        },
+        github_trending: {
+          eligible_candidates: selection.eligible_counts?.github_trending || 0,
+          selected: selection.github_trending.length
+        },
+        hot_blogs: {
+          eligible_candidates: selection.eligible_counts?.hot_blogs || 0,
+          selected: selection.hot_blogs.length
+        },
+        projects: {
+          eligible_candidates: selection.eligible_counts?.projects || 0,
+          selected: selection.projects.length
+        },
+        builder_observations: {
+          eligible_candidates: selection.eligible_counts?.builder_observations || 0,
+          selected: selection.builder_observations.length
+        }
+      },
       fallback_sources: [],
       primary_links: selection.main_items.every((item) => PRIMARY_STATUSES.has(item.verification_status)),
       no_banned_words: true,
@@ -410,6 +497,9 @@ function stripDraftPublicBodyNoise(value, item = {}) {
     .replace(/\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
     .replace(/\s*Community lead unless backed by a primary source\.?/gi, "")
     .replace(/\s*This is a community lead unless it is backed by a primary source\.?/gi, "")
+    .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,60}\s+latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion\.?/gi, "")
+    .replace(/\s*This is an intermediary\/self-media lead; trace it to a primary source before[^。.;\n]*(?:[。.;]|$)/gi, "")
+    .replace(/^[（(]英文[)）][。.]?\s*/u, "")
     .replace(/\s*待确认\s*[:：]\s*[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*边界\s*[:：]\s*[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*事实性结论[^。；;\n]*(?:一手来源|多源确认|原始链接|主体)[^。；;\n]*(?:[。；;]|$)/g, "")
@@ -438,7 +528,7 @@ function stripDraftSourcePrefixes(value, item = {}) {
       .replace(new RegExp(`^(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*[\\u2013\\u2014]\\s*`, "i"), "")
       .trim();
   }
-  return text.replace(/^[A-Za-z][A-Za-z0-9 &./+_'()-]{2,80}\s*[:：]\s*/, "").trim();
+  return text.replace(/^[A-Za-z][A-Za-z0-9 &./+_'()-]{2,80}\s*(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)\s*[:：-]\s*/i, "").trim();
 }
 
 function escapeRegex(value) {
@@ -480,9 +570,6 @@ function mainItem(candidate, original) {
   const entity = mainEntity(candidate);
   const summary = chineseSummary(candidate, category);
   const impact = readerImpactForCandidate(candidate, category);
-  const watch = readerWatchForCandidate(candidate, category);
-  const fact = stripDraftPublicBodyNoise(sourceGroundedFact(candidate, original), candidate);
-  const judgement = readerJudgementForCandidate(candidate, category);
   return {
     title: displayTitleForCandidate(candidate),
     candidate_id: candidate.id,
@@ -495,15 +582,240 @@ function mainItem(candidate, original) {
     tier: tierForCandidate(candidate),
     entities: [entity].filter(Boolean),
     summary,
-    bullets: [
-      `==变化==：${ensureChineseSentence(fact)}`,
-      `==判断点==：${ensureChineseSentence(judgement)}`
-    ],
+    bullets: mainItemBullets(candidate, original, category),
     why_it_matters: impact,
     reader_relevance: audienceRelevanceForCandidate(candidate, category),
     verification_note: candidate.verification_note || "事实来自可回看的原始链接。",
     risk_note: candidate.risk_note || "如涉及价格、融资、benchmark 或监管事实，仍需在正式编辑时补充更强核验。"
   };
+}
+
+function mainItemBullets(candidate, original, category) {
+  return uniqueEditorialSentences([
+    mainItemFactBullet(candidate, original),
+    ...mainItemSpecificBullets(candidate),
+    mainItemScopeBullet(candidate, category),
+    mainItemDecisionBullet(candidate, category)
+  ]).slice(0, 5);
+}
+
+function mainItemFactBullet(candidate, original) {
+  const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
+  const fact = highlightMainItemFact(
+    candidate,
+    stripSentenceEnding(stripDraftPublicBodyNoise(sourceGroundedFact(candidate, original), candidate))
+  );
+  return `**${label}**：${fact}。`;
+}
+
+function mainItemScopeBullet(candidate, category) {
+  const scope = mainItemScopeFactText(candidate, category);
+  return scope ? `**已公开**：${scope}。` : "";
+}
+
+function mainItemDecisionBullet(candidate, category) {
+  const impact = mainItemDecisionSentence(candidate, category);
+  return impact ? `**影响**：${impact}。` : "";
+}
+
+function compactMainItemLabel(candidate) {
+  const raw = stripDraftPublicBodyNoise(displayTitleForCandidate(candidate), candidate)
+    .replace(/[：:｜|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const text = trimText(raw || mainEntity(candidate) || candidate.source || "今日主线", 28);
+  return text.replace(/\.\.\.$/, "");
+}
+
+function readerLabelForCandidate(candidate) {
+  const text = `${candidate.title || ""} ${candidate.evidence || ""} ${candidate.url || ""}`.toLowerCase();
+  if (/rocketmq.*litetopic/.test(text)) return "RocketMQ LiteTopic";
+  if (/agentscope java 2\.0/.test(text)) return "AgentScope Java 2.0";
+  if (/tokenmaxxing|ontology-based dependency/.test(text)) return "Token 成本优化";
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) return "WhatsApp 反间谍";
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) return "英国主权 AI";
+  if (/sk telecom.*ai cloud|gigawatt-scale ai cloud/.test(text)) return "SKT AI Cloud";
+  if (/lg group.*ai factory/.test(text)) return "LG AI Factory";
+  if (/doosan.*ai factory/.test(text)) return "Doosan AI Factory";
+  return "";
+}
+
+function mainItemScopeBulletText(candidate, category) {
+  const text = candidateText(candidate);
+  if (category === "company_business") {
+    return "==keyword-notable|投入方向==、合作节奏和组织动作";
+  }
+  if (category === "product_radar") {
+    return "==keyword-notable|入口/范围==、价格、地区和上线节奏";
+  }
+  if (category === "open_source") {
+    return "==keyword-notable|代码/接口==、许可证和维护节奏";
+  }
+  if (category === "content_aigc" || AIGC_RE.test(text)) {
+    return "==keyword-notable|试用入口==、样例质量、版权边界和价格";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "==keyword-notable|部署方式==、权限、上下文和失败恢复";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "==keyword-notable|实验边界==、数据范围和复现材料";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "==keyword-notable|生效范围==、执行主体和例外条款";
+  }
+  return "==keyword-notable|官方入口==、适用范围和后续变化";
+}
+
+function mainItemScopeFactText(candidate, category) {
+  const text = candidateText(candidate);
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/i.test(text)) {
+    return "当前公开的是攻击归因、拦截动作和受影响对象描述，完整受害面仍未披露";
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/i.test(text)) {
+    return "当前公开的是基础设施路线、合作方口径和英国本地落地节奏";
+  }
+  if (category === "company_business") {
+    return "当前公开信息主要落在投入方向、合作节奏、组织动作和执行安排";
+  }
+  if (category === "product_radar") {
+    return "当前公开的是入口、适用范围、价格、地区和上线节奏";
+  }
+  if (category === "open_source") {
+    return "当前公开的是代码、接口、许可证、维护节奏和可复用边界";
+  }
+  if (category === "content_aigc" || AIGC_RE.test(text)) {
+    return "当前公开的是试用入口、样例质量、版权边界和价格变化";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "当前公开的是部署方式、权限、上下文管理和失败恢复边界";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "当前公开的是实验设置、数据范围、对比基线和复现材料";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "当前公开的是生效范围、执行主体、例外条款和落地安排";
+  }
+  return "当前公开信息主要集中在适用对象、证据来源和后续执行安排";
+}
+
+function mainItemScopePhrase(candidate, category) {
+  const text = candidateText(candidate);
+  if (category === "company_business") {
+    return "管理层口径、业务投入、合作节奏和组织变化";
+  }
+  if (category === "product_radar") {
+    return "入口、权限、价格、地区和上线范围";
+  }
+  if (category === "open_source") {
+    return "代码示例、许可证、模型卡和维护节奏";
+  }
+  if (category === "content_aigc" || AIGC_RE.test(text)) {
+    return "试用入口、样例质量、版权边界和价格变化";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "API、权限、上下文管理、失败恢复和落地成本";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "实验设置、数据范围、可复现材料和对比基线";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "生效范围、执行主体、例外条款和上线流程";
+  }
+  return "官方入口、适用范围、可验证证据和后续变化";
+}
+
+function mainItemDecisionSentence(candidate, category) {
+  const text = candidateText(candidate);
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/i.test(text)) {
+    return "这会提醒企业和高风险人群重新审视聊天入口、设备链路和定向钓鱼防护";
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/i.test(text)) {
+    return "这会影响欧洲本地算力建设、政府合作项目和供应商站位判断";
+  }
+  if (category === "company_business") {
+    return "这会影响市场对供应商投入方向、合作优先级和组织重心的判断";
+  }
+  if (category === "product_radar") {
+    return "这会改变团队安排试用、采购和替换工具的优先级";
+  }
+  if (category === "open_source") {
+    return "这会影响团队是否把它放进 PoC、评估清单或现有工作流";
+  }
+  if (category === "content_aigc" || AIGC_RE.test(text)) {
+    return "这会影响创作工具能否进入正式生产流程和预算清单";
+  }
+  if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
+    return "这会影响 agent 工具接入顺序、权限设计和团队落地成本";
+  }
+  if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
+    return "这会改变团队对能力边界、成本和可靠性的预期";
+  }
+  if (/policy|safety|governance|regulation|security/i.test(text)) {
+    return "这类更新会直接牵动上线流程、风控口径和合规检查";
+  }
+  return "这会影响产品路线、接入时机和风险判断";
+}
+
+function highlightMainItemFact(candidate, fact) {
+  const text = String(fact || "").trim();
+  const candidateTextLower = candidateText(candidate).toLowerCase();
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(candidateTextLower)) {
+    return text.replace("NSO", "==keyword-notable|NSO==");
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(candidateTextLower)) {
+    return text.replace("英国主权 AI", "==keyword-notable|英国主权 AI==");
+  }
+  if (/fix with copilot.*failing actions|failing actions.*copilot/.test(candidateTextLower)) {
+    return text.replace("Copilot", "==keyword-notable|Copilot==");
+  }
+  return text;
+}
+
+function mainItemSpecificBullets(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
+    return [
+      "**攻击归因**：WhatsApp 把这轮定向钓鱼攻击与 NSO 关联起来，说明它把这次事件按高风险间谍软件处理。",
+      "**背景**：NSO 是一家长期处在监管和执法争议中的间谍软件公司，也被美国政府列入黑名单。",
+      "**披露重点**：这次公开信息集中在拦截动作和攻击归因，暂时还没有更完整的受影响范围说明。"
+    ];
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) {
+    return [
+      "**时间点**：NVIDIA 继续借伦敦科技周推进英国“主权 AI”议题，和去年的口号形成前后呼应。",
+      "**今年**：公开叙事已经从“做 AI maker”转向展示基础设施、伙伴协作和执行层进展。",
+      "**信号**：这条消息更像英国把 AI 产业政策往算力建设和本地落地推进的延续动作。"
+    ];
+  }
+  if (/fix with copilot.*failing actions|failing actions.*copilot/.test(text)) {
+    return [
+      "**入口变化**：GitHub 把 Actions 失败后的 Copilot 修复能力开放给 Pro、Pro+ 和 Max 用户。",
+      "**使用方式**：失败任务现在可以直接交给 Copilot cloud agent 处理，而不是只停在错误日志。",
+      "**范围**：这次变化首先影响 GitHub Actions 的故障处理链路和团队内的自动修复习惯。"
+    ];
+  }
+  if (/agent tasks rest api.*copilot|copilot.*agent tasks rest api/.test(text)) {
+    return [
+      "**接口变化**：GitHub 为 Copilot 云端 agent 任务开放了 REST API。",
+      "**团队价值**：外部系统现在可以启动、跟踪和串联 Copilot agent 任务，不必只靠界面操作。",
+      "**落地边界**：真正要看的不是口号，而是接口权限、任务状态和可集成范围。"
+    ];
+  }
+  return [];
+}
+
+function uniqueEditorialSentences(items) {
+  const result = [];
+  const seen = new Set();
+  for (const value of items.map((item) => String(item || "").trim()).filter(Boolean)) {
+    const key = value.replace(/\s+/g, " ").trim();
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push(value);
+  }
+  return result;
 }
 
 function githubTrendingItem(candidate, meta, index) {
@@ -548,10 +860,11 @@ function projectItem(candidate, meta) {
 function hotBlogItem(candidate) {
   const fields = nonPrimaryDisclosureFields(candidate);
   return {
-    title: displayTitleForCandidate(candidate),
+    title: hotBlogTitleForCandidate(candidate),
     candidate_id: candidate.id,
     editorial_category: inferredEditorialCategory(candidate) === "content_aigc" ? "content_aigc" : "viewpoint_analysis",
     ...fields,
+    ...builderMediaFields(candidate),
     url: candidate.url,
     publisher: candidate.source || "Unknown",
     author: candidate.author || candidate.source || "Unknown",
@@ -563,7 +876,7 @@ function hotBlogItem(candidate) {
 }
 
 function builderObservationItem(candidate) {
-  const originalText = candidate.original_text || candidate.evidence || candidate.title;
+  const originalText = sanitizeBuilderOriginalText(candidate);
   const translation = hasChineseText(originalText)
     ? originalText
     : builderReadableSummary(originalText);
@@ -592,7 +905,9 @@ function communityLeadItem(candidate) {
   const fields = nonPrimaryDisclosureFields(candidate);
   return {
     candidate_id: candidate.id,
+    title: communityLeadTitleForCandidate(candidate),
     content: communityLeadPublicSummary(candidate),
+    ...builderMediaFields(candidate),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source,
@@ -603,21 +918,66 @@ function communityLeadItem(candidate) {
 }
 
 function communityLeadPublicSummary(candidate) {
+  const digest = candidateReaderDigest(candidate);
+  if (digest) {
+    return trimText(stripDraftPublicBodyNoise(digest, candidate), 140);
+  }
   const lead = chineseLeadForCandidate(candidate);
   if (lead) {
-    return stripDraftPublicBodyNoise(lead, candidate);
+    return trimText(stripDraftPublicBodyNoise(lead, candidate), 140);
   }
-  const raw = stripDraftPublicBodyNoise(candidate.evidence || candidate.title, candidate);
-  if (hasChineseText(raw) && raw.length >= 20) {
-    return trimText(raw, 220);
+  for (const field of [candidate.summary, candidate.evidence, candidate.title]) {
+    const raw = stripDraftPublicBodyNoise(field, candidate);
+    if (hasChineseText(raw) && raw.length >= 18) {
+      return trimText(raw, 140);
+    }
   }
   const category = inferredEditorialCategory(candidate);
-  const sourceLevel = sourceLevelForCandidate(candidate);
-  const text = candidateText(candidate);
-  const theme = genericFactTheme({ category, sourceLevel, text });
-  const scope = genericFactScope({ category, text });
   const source = candidate.source || "公开来源";
-  return `${source} 的社区动态指向${theme}；先核对${scope}，再判断是否值得进入主体跟进。`;
+  return `${source} 提到一条${themeLabelForCandidate(candidate)}相关线索，当前公开信息主要落在${mainItemScopePhrase(candidate, category)}。`;
+}
+
+function communityLeadTitleForCandidate(candidate) {
+  const rawTitle = stripDraftPublicBodyNoise(candidate.title || "", candidate);
+  const lead = chineseLeadForCandidate(candidate);
+  if (lead && /^(the download|newsletter|daily brief|daily digest)\s*:/i.test(rawTitle)) {
+    return trimText(lead, 80);
+  }
+  if (rawTitle) {
+    return trimText(rawTitle, 80);
+  }
+  const source = String(candidate.source || "").trim();
+  if (source) {
+    return source;
+  }
+  try {
+    return new URL(String(candidate.url || "")).hostname.replace(/^www\./, "");
+  } catch {
+    return "社区线索";
+  }
+}
+
+function communityLeadTopicKey(candidate) {
+  const basis = stripDraftPublicBodyNoise(
+    chineseLeadForCandidate(candidate) ||
+    candidate.title ||
+    candidate.content ||
+    candidate.evidence ||
+    "",
+    candidate
+  ).toLowerCase();
+  return basis
+    .replace(/[“”"'‘’`]/g, "")
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, " ")
+    .trim();
+}
+
+function hotBlogTitleForCandidate(candidate) {
+  const rawTitle = stripDraftPublicBodyNoise(candidate.title || "", candidate);
+  if (rawTitle && hasReaderVisibleTitle(candidate)) {
+    return trimText(rawTitle, 120);
+  }
+  return displayTitleForCandidate(candidate);
 }
 
 function builderMediaFields(candidate) {
@@ -1212,7 +1572,7 @@ function cloneCandidates(candidates) {
   return candidates.map((candidate) => ({ ...candidate }));
 }
 
-function canPromoteToMain(candidate) {
+function canPromoteToMain(candidate, reportDate = "") {
   if (candidate.category === "builder_observation") return false;
   if (candidate.category === "project") return false;
   if (isStatuspageCandidate(candidate)) return false;
@@ -1220,9 +1580,14 @@ function canPromoteToMain(candidate) {
   if (isKnownIntermediaryCandidate(candidate)) return false;
   if (isGitHubTrendingCandidate(candidate, {})) return false;
   if (isHardcoreResearchOnly(candidate)) return false;
+  if (isMinorConsumerAiFeatureCandidate(candidate)) return false;
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (!hasReaderVisibleTitle(candidate)) return false;
+  if (isFutureDatedCandidate(candidate, reportDate)) return false;
   if (!isReaderRelevantCandidate(candidate)) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
-  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (isLowSignalVendorPartnership(candidate)) return false;
+  if (isBlogLikeCandidate(candidate) && !isMajorMainNewsCandidate(candidate) && !READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel)) return false;
   if (candidate.category === "hot_blog" && !["official", "paper", "github", "multi_source"].includes(sourceLevel)) {
     return false;
   }
@@ -1240,12 +1605,23 @@ function candidateScore(candidate) {
   if (candidate.source_level === "github") score += 10;
   if (candidate.category === "main_item") score += 10;
   if (candidate.category === "hot_blog") score += 6;
+  if (isBlogLikeCandidate(candidate) && /weekly|newsletter|substack|hugging face|huggingface|latent\.space/i.test(`${candidate.source || ""} ${candidate.url || ""}`.toLowerCase())) score += 8;
+  if (candidate.category === "hot_blog" && hasConcreteHotBlogMaterial(candidate)) score += 18;
   if (candidate.editorial_category === "company_business") score += 10;
   if (candidate.editorial_category === "product_radar" || candidate.editorial_category === "open_source") score += 8;
   if (isReaderRelevantCandidate(candidate)) score += 6;
   score += readerUtilityScore(candidate);
   if (isAigcCandidate(candidate)) score += 8;
   if (candidate.image_url) score += 4;
+  if (hasReaderVisibleTitle(candidate)) score += 3;
+  if (isRepositoryLikeUrl(candidate.url)) score -= 20;
+  if (isLowSignalVendorPartnership(candidate)) score -= 22;
+  if (isResolvedStatusCandidate(candidate)) score -= 25;
+  if (isLowValueEventGuideCandidate(candidate)) score -= 20;
+  if (isLowValueProfileCandidate(candidate)) score -= 30;
+  if (candidate.category === "hot_blog" && !hasConcreteHotBlogMaterial(candidate)) score -= 20;
+  if (isMinorConsumerAiFeatureCandidate(candidate)) score -= 35;
+  if (isFutureDatedCandidate(candidate)) score -= 30;
   if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
   return score;
 }
@@ -1354,13 +1730,85 @@ function readerUtilityScore(candidate) {
 function canPromoteToBuilderObservation(candidate) {
   const text = candidateText(candidate);
   if (!text || BUILDER_IRRELEVANT_RE.test(text)) return false;
+  if (BUILDER_LOW_SIGNAL_RE.test(text)) return false;
   if (!candidate.url && !candidate.original_url) return false;
   return BUILDER_RELEVANCE_RE.test(text);
+}
+
+function canPromoteToHotBlog(candidate, reportDate = "") {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (!["official", "primary", "paper", "multi_source"].includes(sourceLevel)) return false;
+  if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
+  if (!isAiRelevantCandidate(candidate)) return false;
+  if (!isBlogLikeCandidate(candidate)) return false;
+  if (!hasConcreteHotBlogMaterial(candidate)) return false;
+  if (!hasReaderVisibleTitle(candidate)) return false;
+  if (isFutureDatedCandidate(candidate, reportDate)) return false;
+  if (isStatuspageCandidate(candidate)) return false;
+  if (isSearchShadowCandidate(candidate)) return false;
+  return true;
+}
+
+function canPromoteToCommunityLead(candidate, reportDate = "") {
+  if (candidate.category === "builder_observation") return false;
+  if (candidate.category === "project") return false;
+  if (!isAiRelevantCandidate(candidate)) return false;
+  if (!hasReaderVisibleTitle(candidate)) return false;
+  if (isFutureDatedCandidate(candidate, reportDate)) return false;
+  if (isSearchShadowCandidate(candidate)) return false;
+  if (isResolvedStatusCandidate(candidate)) return false;
+  if (isLowValueResearchLead(candidate, reportDate)) return false;
+  if (isLowValueEventGuideCandidate(candidate)) return false;
+  if (isLowValueProfileCandidate(candidate)) return false;
+  return true;
 }
 
 function isStatuspageCandidate(candidate) {
   const text = `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""} ${candidate.title || ""}`.toLowerCase();
   return text.includes("statuspage") || text.includes("status page") || text.includes("status.openai.com") || text.includes("status.claude.com") || /\bincident\b/.test(text);
+}
+
+function isResolvedStatusCandidate(candidate) {
+  if (!isStatuspageCandidate(candidate)) {
+    return false;
+  }
+  return /resolved|operational|fully recovered|monitoring|elevated errors|degraded performance|incident/i.test(candidateText(candidate));
+}
+
+function isLowValueEventGuideCandidate(candidate) {
+  const text = `${candidate.title || ""} ${candidate.evidence || ""} ${candidate.summary || ""}`.toLowerCase();
+  return LOW_VALUE_EVENT_GUIDE_RE.test(text) && !/launch|release|pricing|availability|api|sdk|model|ai feature|siri|agent|copilot|codex|claude|gemini|gpt|模型|功能|价格|接口|开发者/.test(text);
+}
+
+function isLowValueProfileCandidate(candidate) {
+  const url = String(candidate.url || "");
+  const text = `${candidate.source || ""} ${candidate.title || ""}`.toLowerCase();
+  if (/crunchbase\.com\/person\//i.test(url)) {
+    return true;
+  }
+  return /crunchbase news ai/.test(text) && /\belon musk\b/.test(text);
+}
+
+function isMinorConsumerAiFeatureCandidate(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (!MINOR_CONSUMER_AI_FEATURE_RE.test(text)) {
+    return false;
+  }
+  return !/\b(api|sdk|model|pricing|enterprise|developer|platform|open source|weights|research|regulation|policy|security|privacy|government|benchmark)\b/.test(text);
+}
+
+function hasConcreteHotBlogMaterial(candidate) {
+  if (hotBlogSpecificSummary(candidate)) {
+    return true;
+  }
+  const evidence = String(candidate.evidence || "").trim();
+  if (!evidence || GENERIC_HOT_BLOG_EVIDENCE_RE.test(evidence)) {
+    return false;
+  }
+  if (evidence.length >= 90) {
+    return true;
+  }
+  return /\b(introduces|explains|shows|details|describes|breaks down|designed|workflow|session|distributed|enterprise|ontology|dependency)\b/i.test(evidence);
 }
 
 function isKnownIntermediaryCandidate(candidate) {
@@ -1405,6 +1853,105 @@ function sourceLevelForCandidate(candidate) {
   return "primary";
 }
 
+function hasReaderVisibleTitle(candidate) {
+  const title = stripDraftPublicBodyNoise(candidate?.title || "", candidate);
+  if (!title || TITLE_MOJIBAKE_RE.test(title)) {
+    return false;
+  }
+  if (/\p{Script=Han}/u.test(title)) {
+    return true;
+  }
+  if (/\p{Script=Thai}/u.test(title)) {
+    return false;
+  }
+
+  const asciiLetters = (title.match(/[A-Za-z]/g) || []).length;
+  const nonAsciiLetters = [...title].filter((char) => char.charCodeAt(0) > 127 && /\p{Letter}/u.test(char)).length;
+  return (asciiLetters >= 8 && nonAsciiLetters <= 2) || (asciiLetters >= 14 && nonAsciiLetters <= 4);
+}
+
+function isRepositoryLikeUrl(url) {
+  try {
+    const parsed = new URL(String(url || ""));
+    const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+    if (host !== "github.com") return false;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    return parts.length >= 2 && !parts[0].endsWith(".atom");
+  } catch {
+    return false;
+  }
+}
+
+function isBlogLikeCandidate(candidate) {
+  const source = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`.toLowerCase();
+  if (isRepositoryLikeUrl(candidate.url)) {
+    return false;
+  }
+  if (source.includes("hellogithub")) {
+    return false;
+  }
+  if (candidate.category === "hot_blog") {
+    return true;
+  }
+  return /blog|weblog|newsletter|weekly|latent\.space|huggingface|hugging face|substack|changelog|anthropic news|openai blog|research/i.test(source);
+}
+
+function isLowSignalVendorPartnership(candidate) {
+  const text = candidateText(candidate);
+  if (!LOW_SIGNAL_VENDOR_PARTNERSHIP_RE.test(text)) {
+    return false;
+  }
+  return /nvidia|sk telecom|sk hynix|lg group|doosan|ai factory|infrastructure/i.test(text);
+}
+
+function isMajorMainNewsCandidate(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  const sourceText = `${candidate.source || ""} ${candidate.source_id || ""}`.toLowerCase();
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (isLowSignalVendorPartnership(candidate)) {
+    return false;
+  }
+  if (candidate.source_level === "official_company_news") {
+    return true;
+  }
+  if (sourceLevel === "official" && /changelog|release notes?|updates?/.test(sourceText) && (hasPlainReaderSignal(candidate) || isAigcCandidate(candidate))) {
+    return true;
+  }
+  if (/newsroom|news rss|anthropic news|media center|press/.test(sourceText) && (COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text))) {
+    return true;
+  }
+  return /spyware|phishing|security|attack|vulnerability|lawsuit|ban|policy|regulation|government|prime minister|minister|sovereign ai|annual general meeting|earnings|revenue|profit|layoffs?|reorganization|funding|acquisition|ipo|pricing|availability|rollout|launch|restores? access|service disruption|conference|summit|keynote|wwdc/i.test(text);
+}
+
+function isLowValueResearchLead(candidate, reportDate = "") {
+  const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`;
+  if (!/openalex|doi\.org|zenodo|scholarworks|hal\.science|eprint|dataset|replication package/i.test(sourceText.toLowerCase())) {
+    return false;
+  }
+  if (isFutureDatedCandidate(candidate, reportDate)) {
+    return true;
+  }
+  return !hasPlainReaderSignal(candidate);
+}
+
+function isFutureDatedCandidate(candidate, reportDate = "", toleranceDays = 0) {
+  const candidateDate = dateOnly(candidate?.event_date);
+  const baseline = dateOnly(reportDate);
+  if (!candidateDate || !baseline) {
+    return false;
+  }
+  return candidateDate > shiftDateOnly(baseline, toleranceDays);
+}
+
+function shiftDateOnly(value, offsetDays) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  date.setUTCDate(date.getUTCDate() + offsetDays);
+  return date.toISOString().slice(0, 10);
+}
+
 function tierForCandidate(candidate) {
   if (candidate.source_level === "official" || candidate.source_level === "primary" || candidate.source_level === "official_company_news") return "T0";
   if (candidate.source_level === "official_open_source_account" || candidate.source_level === "official_model_host_account") return "T1";
@@ -1414,12 +1961,27 @@ function tierForCandidate(candidate) {
 }
 
 function chineseSummary(candidate, category) {
+  const specific = mainItemSpecificSummary(candidate);
+  if (specific) {
+    return specific;
+  }
   const lead = chineseLeadForCandidate(candidate);
   const fact = stripDraftPublicBodyNoise(lead || genericChineseFact(candidate, null), candidate);
   if (category === "content_aigc") {
-    return `${fact}。关键信息是看它是否给出可试用入口、生成质量样例、授权边界和价格变化。`;
+    return `${fact}。当前公开信息主要落在试用入口、样例质量、版权边界和价格变化。`;
   }
-  return `${fact}。读者应先看原文给出的变化、适用对象和落地边界。`;
+  return `${fact}。当前公开信息主要落在${mainItemScopePhrase(candidate, category)}。`;
+}
+
+function mainItemSpecificSummary(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
+    return "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击，公开信息主要集中在攻击归因、拦截动作和受影响范围说明。";
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) {
+    return "NVIDIA 借伦敦科技周继续推进英国主权 AI，公开信息主要落在基础设施展示、伙伴协作和执行层进展。";
+  }
+  return "";
 }
 
 function chineseGithubDescription(description, repo) {
@@ -1522,6 +2084,69 @@ function chineseLeadForCandidate(candidate) {
   if (/business analytics.*claude|automated.*analytics/.test(text)) {
     return "Anthropic 数据团队案例显示，Claude 被用于自动化大量业务分析查询，并配套 eval、消融和线上验证";
   }
+  if (/rocketmq.*litetopic/.test(text)) {
+    return "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话";
+  }
+  if (/agentscope java 2\.0/.test(text)) {
+    return "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走";
+  }
+  if (/tokenmaxxing|ontology-based dependency/.test(text)) {
+    return "这篇文章讨论企业 agent 怎么降 token 成本，重点是先建依赖关系再减无效上下文";
+  }
+  if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
+    return "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击";
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) {
+    return "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行";
+  }
+  if (/sk telecom.*ai cloud|gigawatt-scale ai cloud/.test(text)) {
+    return "SK Telecom 计划用 NVIDIA DSX 搭建吉瓦级 AI Cloud，首个 AI factory 瞄准 2027 年";
+  }
+  if (/lg group.*ai factory/.test(text)) {
+    return "NVIDIA 与 LG Group 共建 AI factory，覆盖机器人、自动驾驶和 GPU 云";
+  }
+  if (/doosan.*ai factory/.test(text)) {
+    return "NVIDIA 与 Doosan 扩大合作，继续押注 physical AI、机器人和 AI factory 基础设施";
+  }
+  if (/building pakistan notice helper|small ai tool for a very local safety problem/.test(text)) {
+    return "作者用一个很小的 AI 工具去解决巴基斯坦本地安全公告的检索问题";
+  }
+  if (/finding-miscompiles-for-fun-not-profit|我用 ai 寻找 bug|miscompile/.test(text)) {
+    return "这篇文章讲的是如何借助 AI 去定位 miscompile 这类难复现 bug";
+  }
+  if (/codex-provider-sync/.test(text)) {
+    return "这个工具专门解决 Codex 切换 Provider 后历史会话丢失的问题";
+  }
+  if (/wwdc 2026|how to watch and what to expect/.test(text)) {
+    return "苹果 WWDC 2026 临近，外界在看系统改版和 Siri / AI 是否补课";
+  }
+  if (/notion restores access to anthropic|service disruption/.test(text)) {
+    return "Notion 已恢复 Anthropic 接入，暴露出企业 AI 工作流对模型供应商的依赖";
+  }
+  if (/super app/.test(text)) {
+    return "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用";
+  }
+  if (/skillopt/.test(text)) {
+    return "SkillOpt 把自然语言 skill 文档当成 agent 的可训练状态";
+  }
+  if (/weather and climate science ai revolution|climate science ai revolution|machine learning has its limits/.test(text)) {
+    return "Ars Technica 讨论气象和气候科学里的 AI 使用边界，核心问题不是“能不能用”，而是哪些环节真的比传统方法更可靠";
+  }
+  if (/autoscientists/.test(text)) {
+    return "AutoScientists 试图让多智能体在没有中央 planner 的情况下自组织做科研";
+  }
+  if (/compiling agentic workflows into weights/.test(text)) {
+    return "这篇论文想把完整 agent workflow 蒸馏进小模型权重里，换更低的推理成本";
+  }
+  if (/language models need sleep/.test(text)) {
+    return "这篇论文讨论长上下文 agent 的“睡眠”机制，想降低记忆越跑越贵的问题";
+  }
+  if (/adapting the interface, not the model|life-harness/.test(text)) {
+    return "Life-Harness 的观点是，很多 agent 失败先该改接口和反馈，不必急着重训模型";
+  }
+  if (/the efficiency frontier/.test(text)) {
+    return "这篇论文把上下文成本当成部署问题，讨论什么时候该缓存、检索或压缩";
+  }
   return "";
 }
 
@@ -1529,10 +2154,24 @@ function displayTitleForCandidate(candidate) {
   return trimText(chineseLeadForCandidate(candidate) || candidate.title, 120);
 }
 
-function sourceGroundedFact(candidate, original) {
+function candidateReaderDigest(candidate) {
   const lead = chineseLeadForCandidate(candidate);
   if (lead) {
     return lead;
+  }
+  for (const field of [candidate.summary, candidate.evidence, candidate.title]) {
+    const raw = stripDraftPublicBodyNoise(field, candidate);
+    if (hasChineseText(raw) && raw.length >= 18) {
+      return trimText(raw, 180);
+    }
+  }
+  return "";
+}
+
+function sourceGroundedFact(candidate, original) {
+  const digest = candidateReaderDigest(candidate);
+  if (digest) {
+    return digest;
   }
   return genericChineseFact(candidate, original);
 }
@@ -1545,7 +2184,7 @@ function genericChineseFact(candidate, original) {
   const text = candidateText(candidate);
   const theme = genericFactTheme({ category, sourceLevel, text });
   const scope = genericFactScope({ category, text });
-  return `${entity} 发布${theme}；读者应重点核对${scope}`;
+  return `${entity} 放出一条${theme}，当前能确认的信息主要集中在${scope}`;
 }
 
 function genericFactTheme({ category, sourceLevel, text }) {
@@ -1586,7 +2225,7 @@ function genericFactScope({ category, text }) {
   if (/policy|safety|governance|regulation|security/i.test(text)) {
     return "生效范围、执行主体、例外条款和上线流程影响";
   }
-  return "官方入口、适用范围、可验证证据和后续变化";
+  return "入口、适用对象、证据和后续动作";
 }
 
 function readerImpactForCandidate(candidate, category) {
@@ -1711,10 +2350,45 @@ function themeLabelForCandidate(candidate) {
 }
 
 function hotBlogSummary(candidate) {
-  const claim = hotBlogClaimForCandidate(candidate);
-  const evidence = hotBlogEvidenceForCandidate(candidate);
-  const action = hotBlogActionForCandidate(candidate);
-  return trimText(`${claim}。${evidence}。${action}。`, 220);
+  const specific = hotBlogSpecificSummary(candidate);
+  if (specific) {
+    return trimText(specific, 220);
+  }
+  const digest = candidateReaderDigest(candidate) || hotBlogClaimForCandidate(candidate);
+  const angle = hotBlogSpecificAngle(candidate) || hotBlogAngleSentence(candidate);
+  const action = hotBlogReaderValueSentence(candidate);
+  return trimText(`${digest}。${angle}。${action}。`, 220);
+}
+
+function hotBlogSpecificAngle(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/building pakistan notice helper|small ai tool for a very local safety problem/.test(text)) {
+    return "文章最有价值的地方，是它先把问题压得很窄，再决定该用多重的 AI 流程，而不是先炫模型能力";
+  }
+  if (/rocketmq.*litetopic|agentscope java 2\.0|tokenmaxxing/.test(text)) {
+    return "阅读时重点看作者把哪些工程约束讲清楚了，哪些是真正能落进生产环境的能力，哪些还只是 demo 叙事";
+  }
+  if (/skillopt|autoscientists|language models need sleep|the efficiency frontier|life-harness/.test(text)) {
+    return "阅读时重点看方法边界：哪些结论来自实验设置，哪些部分真的能迁移到团队自己的 agent 工作流";
+  }
+  return "";
+}
+
+function hotBlogSpecificSummary(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/building pakistan notice helper|small ai tool for a very local safety problem/.test(text)) {
+    return "作者做了一个面向巴基斯坦本地安全公告的检索助手，问题边界压得很窄。文章把数据入口、检索路径和真实使用场景讲得很具体，不是先堆复杂 agent 再找问题。对产品和内容团队的参考价值，在于它给了一个“先做小而准的 AI 工具，再谈扩展”的案例。";
+  }
+  if (/rocketmq.*litetopic/.test(text)) {
+    return "文章介绍 RocketMQ 5.5.0 的 LiteTopic，目标是承接百万级轻量 AI agent 会话。作者把事件分发、会话隔离和持久化这些消息层约束讲得比模型故事更具体，也给出了对应场景。对工程团队的价值，在于判断多 agent 或高并发系统里，消息层是不是要单独设计。";
+  }
+  if (/agentscope java 2\.0/.test(text)) {
+    return "文章讲 AgentScope Java 2.0 如何补齐分布式调度、企业级部署和生产可用能力。它关心的是 Java 团队真正会卡住的稳定性、集成和治理问题，不只是 demo 体验。适合用来判断企业内部 agent 平台是否需要 JVM 路线。";
+  }
+  if (/tokenmaxxing|ontology-based dependency/.test(text)) {
+    return "文章讨论企业 agent 为什么会被无效上下文拖高 token 成本，并给出用依赖关系建模来收敛上下文的做法。它不是单纯劝你压缩 prompt，而是先拆清楚任务之间哪些信息真的必须保留。适合拿来判断企业级 agent 优化应该先做检索、记忆还是上下文裁剪。";
+  }
+  return "";
 }
 
 function hotBlogClaimForCandidate(candidate) {
@@ -1810,6 +2484,25 @@ function hotBlogReaderValue(candidate) {
   return "快速判断这条技术观点是否会影响产品路线、工具选型或风险预案";
 }
 
+function hotBlogAngleSentence(candidate) {
+  const focus = hotBlogFocusForCandidate(candidate);
+  const angle = hotBlogReadingAngle(candidate);
+  if (focus && angle) {
+    return `文章真正有用的部分，在于它讲清了${focus}，同时没有回避${angle}`;
+  }
+  if (focus) {
+    return `文章把重点落在${focus}`;
+  }
+  if (angle) {
+    return `文中把${angle}交代得更具体`;
+  }
+  return "文章没有停留在抽象观点，而是给了更具体的做法和边界";
+}
+
+function hotBlogReaderValueSentence(candidate) {
+  return `对读者的价值，在于${hotBlogReaderValue(candidate)}`;
+}
+
 function builderReadableSummary(originalText) {
   const text = String(originalText || "").replace(/\s+/g, " ").trim();
   const lower = text.toLowerCase();
@@ -1843,6 +2536,24 @@ function builderReadableSummary(originalText) {
   if (/claude code.*pm|agentic eval|model performance/.test(lower)) {
     return "Cat Wu 发布 Claude Code 相关产品岗位信息，重点指向模型表现和 agentic eval；读者可关注团队是否继续把评测能力和产品性能改进绑定。";
   }
+  if (/vercel ai gateway.*1t tokens|zero markup over the labs|zero-data retention/.test(lower)) {
+    return "Guillermo Rauch 说，Vercel AI Gateway 每月能替用户“救回”超过 1T token 请求，做法类似支付里的智能重试：底层模型失败或额度出问题时，用网关做冗余切换。重点不是再赚一层差价，而是在不加价的前提下补上容灾、零数据留存、可观测性、用量 API 和配额控制。";
+  }
+  if (/opus is the best model for long-running work|five tips for running opus autonomously/.test(lower)) {
+    return "Boris Cherny 总结了让 Opus 长时间自主跑任务的五个要点：权限尽量自动放行、把复杂任务拆进动态工作流、用 /goal 或 /loop 强化“做完再停”、尽量放到云端跑，以及确保 Claude 能持续拿到它需要的工具和文件。";
+  }
+  if (/market got wrong about ai eating enterprise software|gtm|enterprise software/.test(lower)) {
+    return "Aaron Levie 认为市场误判了“AI 会吞掉企业软件”的速度。写软件本身确实更便宜了，但企业软件真正昂贵的部分一直是分发、销售、实施和长期服务，所以 AI 不会自动抹平这些护城河。";
+  }
+  if (/box now has a markdown editor|full cli support|box drive/.test(lower)) {
+    return "Aaron Levie 宣布 Box Web 端补上了 Markdown 编辑、CLI、评论和版本历史，同时 Box Drive 可以把文件直接挂给 Claude、Codex、Obsidian、Cursor 这类桌面工具。重点是 Box 想把自己变成 AI 工具能直接读写的文件层，而不只是云盘。";
+  }
+  if (/new kind of big button.*codex|10x usage limits for a month|100 days/.test(lower)) {
+    return "Thibault Sottiaux 说 Codex 接下来 100 天每天会挑一位做出高质量成果的用户，给一个月 10 倍额度。这个动作本质上是在用更高上限换真实案例，看看高频用户会把 Codex 推到什么强度。";
+  }
+  if (/training data is low skill|high-economic-value tasks|knowledge work agents/.test(lower)) {
+    return "Madhu Guru 反驳了“训练数据只是低技能脏活”的看法。他的核心观点是，前沿模型真正缺的是高经济价值任务的数据，而这类知识往往分散在旧工具、专家经验和难标准化的工作流里，所以知识工作 agent 迟迟没有像 SWE agent 那样成熟。";
+  }
   if (/routing to models|model routing|router/.test(lower)) {
     return "把请求路由到合适模型确实很难：成本、延迟、质量和可用性都会变化，不能只按单一排行榜或默认模型做决定。";
   }
@@ -1858,17 +2569,36 @@ function builderReadableSummary(originalText) {
   if (/datasette-agent-edit|release:.*agent|agent-edit/.test(lower)) {
     return "发布 datasette-agent-edit：它把 agent 辅助编辑接到 Datasette 工作流里，重点看是否能稳定处理数据、权限和可回滚修改。";
   }
-  return `直译待补：${trimText(text, 260)}`;
+  return `这条帖子在谈${builderTopicName(lower)}，重点落在${builderFocusPoints(lower)}。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。`;
 }
 
-function builderTopicLabel(text) {
+function builderTopicName(text) {
   if (/agent|eval|production|workflow|tool|coding|codex|cursor|copilot/.test(text)) {
-    return "这是一条关于 AI 工具和 agent 实践的 Builder 讨论";
+    return "AI 工具和 agent 实践";
   }
   if (/model|llm|openai|anthropic|claude|gemini|gpt/.test(text)) {
-    return "这是一条关于模型产品和能力变化的 Builder 讨论";
+    return "模型产品和能力变化";
   }
-  return "这是一条关于 AI 生态变化的 Builder 讨论";
+  return "AI 生态变化";
+}
+
+function builderFocusPoints(text) {
+  if (/pricing|token|cost|gateway|retry|retention|quota|usage api/.test(text)) {
+    return "成本、容灾、可观测性和网关这一层到底能替团队省多少事";
+  }
+  if (/permissions?|dynamic workflows?|goal|loop|cloud/.test(text)) {
+    return "权限放行、工作流编排和长任务稳定性";
+  }
+  if (/gtm|enterprise software|market/.test(text)) {
+    return "企业分发、销售和服务这些真正难被 AI 立刻抹平的成本";
+  }
+  if (/markdown|cli|version history|drive|codex|cursor|obsidian/.test(text)) {
+    return "文件入口、版本历史，以及它怎样接进现有 AI 工具链";
+  }
+  if (/training data|knowledge work|domain-specific/.test(text)) {
+    return "高价值训练数据为什么难拿，以及这会卡住哪些知识工作 agent";
+  }
+  return "真实场景、落地边界和哪些做法可以直接复用";
 }
 
 function topicForCandidate(candidate) {
@@ -1916,6 +2646,39 @@ function candidateText(candidate) {
     candidate.reader_relevance,
     candidate.image_alt
   ].filter(Boolean).join(" ");
+}
+
+function sanitizeBuilderOriginalText(candidate) {
+  const fallback = candidate.original_text || candidate.evidence || candidate.title || "";
+  let text = String(fallback).replace(/\s+/g, " ").trim();
+  if (!text) {
+    return text;
+  }
+
+  const author = String(candidate.author || "").trim();
+  const handle = String(candidate.handle || "").trim().replace(/^@/, "");
+  if (author && handle) {
+    text = text.replace(new RegExp(`^${escapeRegex(author)}\\s+@?${escapeRegex(handle)}\\s+\\d+\\s*(?:s|m|h|d|w)\\b\\s*`, "i"), "");
+  }
+  if (author) {
+    text = text.replace(new RegExp(`^${escapeRegex(author)}\\s+`, "i"), "");
+  }
+  if (handle) {
+    text = text.replace(new RegExp(`^@?${escapeRegex(handle)}\\s+`, "i"), "");
+  }
+
+  text = text
+    .replace(/^\d+\s*(?:s|m|h|d|w)\b\s*/i, "")
+    .replace(/\b\d[\d,.]*\s+(?:likes?|replies|reply|reposts?|retweets?|views?|bookmarks?)\b/gi, "")
+    .replace(/\b(?:view post image|show more|translate post|read more|view analytics|copy link)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  return text || String(candidate.title || "").trim();
+}
+
+function stripSentenceEnding(value) {
+  return String(value || "").trim().replace(/[。！？!?；;]+$/u, "");
 }
 
 function normalizedCandidateCategory(category) {

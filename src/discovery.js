@@ -778,6 +778,7 @@ export async function collectBuilderFallbacks(options = {}) {
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
+  const evidenceAssets = [];
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
   const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
   const followBuildersFeeds = options.followBuildersFeeds === false
@@ -1185,6 +1186,7 @@ export async function collectContentSources(options = {}) {
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
+  const evidenceAssets = [];
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
   const perSourceLimit = Number.isInteger(options.perSourceLimit) && options.perSourceLimit > 0 ? options.perSourceLimit : 3;
   const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
@@ -1233,6 +1235,7 @@ export async function collectContentSources(options = {}) {
         generatedAt,
         reportDate
       });
+      evidenceAssets.push(...(Array.isArray(result.evidence_assets) ? result.evidence_assets : []));
       markSource(candidateSources.at(-1), result.status, result.notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
         snapshot: result.snapshot
@@ -1245,6 +1248,7 @@ export async function collectContentSources(options = {}) {
         generatedAt,
         reportDate
       });
+      evidenceAssets.push(...(Array.isArray(result.evidence_assets) ? result.evidence_assets : []));
       markSource(candidateSources.at(-1), result.status, result.notes);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
         snapshot: result.snapshot
@@ -1472,7 +1476,8 @@ export async function collectContentSources(options = {}) {
       }
     },
     sources: candidateSources,
-    candidates: candidates.slice(0, limit)
+    candidates: candidates.slice(0, limit),
+    evidence_assets: evidenceAssets
   };
 }
 
@@ -2886,9 +2891,18 @@ async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
     ) {
       throw new Error("browser_snapshot_disabled_for_mock_fetch");
     }
-    const text = typeof options.openrouterRankingsText === "string"
-      ? options.openrouterRankingsText
-      : await readOpenRouterRankingsText(sourceInfo, options);
+    const pageSnapshot = typeof options.openrouterRankingsText === "string"
+      ? {
+          text: options.openrouterRankingsText,
+          evidence_assets: Array.isArray(options.openrouterRankingsEvidenceAssets) ? options.openrouterRankingsEvidenceAssets : []
+        }
+      : typeof options.openrouterRankingsTextFetcher === "function"
+        ? {
+            text: await options.openrouterRankingsTextFetcher(sourceInfo),
+            evidence_assets: Array.isArray(options.openrouterRankingsEvidenceAssets) ? options.openrouterRankingsEvidenceAssets : []
+          }
+        : await readOpenRouterRankingsPageSnapshot(sourceInfo, options);
+    const text = pageSnapshot.text;
     const entries = parseOpenRouterRankingsText(text);
     const snapshot = openRouterRankingsSnapshot(entries, sourceInfo, options.generatedAt);
     const complete = snapshot.snapshot_status === "complete";
@@ -2897,7 +2911,8 @@ async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
       notes: complete
         ? `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; collection_method=playwright_dom`
         : `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; top10_incomplete`,
-      snapshot
+      snapshot,
+      evidence_assets: pageSnapshot.evidence_assets || []
     };
   } catch (error) {
     return {
@@ -2911,15 +2926,13 @@ async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
         source_url: sourceInfo.url,
         top_entries: [],
         notes: sanitizeNoteValue(error?.message || error)
-      }
+      },
+      evidence_assets: []
     };
   }
 }
 
-async function readOpenRouterRankingsText(sourceInfo, options = {}) {
-  if (typeof options.openrouterRankingsTextFetcher === "function") {
-    return options.openrouterRankingsTextFetcher(sourceInfo);
-  }
+async function readOpenRouterRankingsPageSnapshot(sourceInfo, options = {}) {
   const { chromium } = await import("@playwright/test");
   const timeoutMs = Number.isInteger(sourceInfo.timeoutMs) && sourceInfo.timeoutMs > 0
     ? sourceInfo.timeoutMs
@@ -2931,7 +2944,16 @@ async function readOpenRouterRankingsText(sourceInfo, options = {}) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
     await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
-    return await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const evidence_assets = await captureDailyTrackingPageEvidence({
+      page,
+      sourceInfo,
+      rootDir: options.rootDir || process.cwd(),
+      outDir: options.evidenceOutDir || options.outDir || "docs",
+      reportDate: options.reportDate,
+      maxScreenshots: 5
+    });
+    return { text, evidence_assets };
   } finally {
     await browser.close();
   }
@@ -3016,9 +3038,18 @@ async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
     ) {
       throw new Error("browser_snapshot_disabled_for_mock_fetch");
     }
-    const text = typeof options.artificialAnalysisIndexText === "string"
-      ? options.artificialAnalysisIndexText
-      : await readArtificialAnalysisIndexText(sourceInfo, options);
+    const pageSnapshot = typeof options.artificialAnalysisIndexText === "string"
+      ? {
+          text: options.artificialAnalysisIndexText,
+          evidence_assets: Array.isArray(options.artificialAnalysisIndexEvidenceAssets) ? options.artificialAnalysisIndexEvidenceAssets : []
+        }
+      : typeof options.artificialAnalysisIndexTextFetcher === "function"
+        ? {
+            text: await options.artificialAnalysisIndexTextFetcher(sourceInfo),
+            evidence_assets: Array.isArray(options.artificialAnalysisIndexEvidenceAssets) ? options.artificialAnalysisIndexEvidenceAssets : []
+          }
+        : await readArtificialAnalysisIndexPageSnapshot(sourceInfo, options);
+    const text = pageSnapshot.text;
     const entries = parseArtificialAnalysisIndexText(text);
     const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt);
     const complete = snapshot.snapshot_status === "complete";
@@ -3027,7 +3058,8 @@ async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
       notes: complete
         ? `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; collection_method=playwright_dom`
         : `public_page_snapshot; ${snapshot.top_entries.length} top models parsed; top10_incomplete`,
-      snapshot
+      snapshot,
+      evidence_assets: pageSnapshot.evidence_assets || []
     };
   } catch (error) {
     return {
@@ -3041,15 +3073,13 @@ async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
         source_url: sourceInfo.url,
         top_entries: [],
         notes: sanitizeNoteValue(error?.message || error)
-      }
+      },
+      evidence_assets: []
     };
   }
 }
 
-async function readArtificialAnalysisIndexText(sourceInfo, options = {}) {
-  if (typeof options.artificialAnalysisIndexTextFetcher === "function") {
-    return options.artificialAnalysisIndexTextFetcher(sourceInfo);
-  }
+async function readArtificialAnalysisIndexPageSnapshot(sourceInfo, options = {}) {
   const { chromium } = await import("@playwright/test");
   const timeoutMs = Number.isInteger(sourceInfo.timeoutMs) && sourceInfo.timeoutMs > 0
     ? sourceInfo.timeoutMs
@@ -3061,7 +3091,16 @@ async function readArtificialAnalysisIndexText(sourceInfo, options = {}) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
     await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
-    return await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const evidence_assets = await captureDailyTrackingPageEvidence({
+      page,
+      sourceInfo,
+      rootDir: options.rootDir || process.cwd(),
+      outDir: options.evidenceOutDir || options.outDir || "docs",
+      reportDate: options.reportDate,
+      maxScreenshots: 5
+    });
+    return { text, evidence_assets };
   } finally {
     await browser.close();
   }
@@ -3173,6 +3212,75 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt) {
     top_entries: topEntries,
     notes: "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof."
   };
+}
+
+async function captureDailyTrackingPageEvidence(options = {}) {
+  const page = options.page;
+  const sourceInfo = options.sourceInfo || {};
+  const rootDir = options.rootDir || process.cwd();
+  const outDir = path.resolve(rootDir, options.outDir || "docs");
+  const reportDate = requireReportDate(options.reportDate || new Date().toISOString().slice(0, 10));
+  const maxScreenshots = Number.isInteger(options.maxScreenshots) && options.maxScreenshots > 0 ? options.maxScreenshots : 5;
+  if (!page || maxScreenshots <= 0) {
+    return [];
+  }
+
+  const publicPrefix = path.posix.join("assets", "evidence");
+  const targetDir = path.join(outDir, "assets", "evidence");
+  await fs.mkdir(targetDir, { recursive: true });
+
+  const viewportSize = page.viewportSize() || { width: 1280, height: 900 };
+  const scrollMetrics = await page.evaluate(() => ({
+    scrollHeight: Math.max(document.documentElement.scrollHeight || 0, document.body?.scrollHeight || 0, window.innerHeight || 0),
+    viewportHeight: window.innerHeight || 0
+  }));
+  const positions = screenshotScrollPositions(scrollMetrics.scrollHeight, scrollMetrics.viewportHeight || viewportSize.height, maxScreenshots);
+  const base = slugId(`${sourceInfo.id || sourceInfo.name || "tracking"}-${reportDate}`) || `tracking-${reportDate}`;
+  const assets = [];
+
+  for (const [index, top] of positions.entries()) {
+    await page.evaluate((value) => window.scrollTo(0, value), top);
+    await page.waitForTimeout(350);
+    const fileName = `${base}-${index + 1}.png`;
+    const filePath = path.join(targetDir, fileName);
+    await page.screenshot({
+      path: filePath,
+      animations: "disabled",
+      clip: {
+        x: 0,
+        y: 0,
+        width: viewportSize.width,
+        height: viewportSize.height
+      }
+    });
+    assets.push({
+      type: "figure",
+      title: trimText(`${sourceInfo.name || "每日追踪"} 图表 ${index + 1}`, 80),
+      source_url: sourceInfo.url,
+      local_path: path.posix.join(publicPrefix, fileName),
+      caption: `${sourceInfo.name || "每日追踪"} 页面截图 ${index + 1}，用于展示当日公开榜单或图表。`,
+      extraction_status: "source_image"
+    });
+  }
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return assets;
+}
+
+function screenshotScrollPositions(scrollHeight, viewportHeight, maxScreenshots) {
+  const totalHeight = Number(scrollHeight) > 0 ? Number(scrollHeight) : viewportHeight;
+  const frameHeight = Number(viewportHeight) > 0 ? Number(viewportHeight) : 900;
+  const maxScroll = Math.max(0, totalHeight - frameHeight);
+  const ratios = maxScreenshots >= 4 ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.35, 0.7, 1];
+  const positions = [...new Set(
+    ratios
+      .map((ratio) => Math.round(maxScroll * ratio))
+      .filter((value) => value >= 0)
+  )];
+  if (positions.length === 0) {
+    return [0];
+  }
+  return positions.slice(0, maxScreenshots);
 }
 
 export function contentSourceSkipReason(sourceInfo, env = process.env) {
@@ -3691,6 +3799,14 @@ function slugId(value) {
     .replace(/https?:\/\//g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function trimText(value, maxLength) {
+  const text = cleanText(value);
+  if (!maxLength || text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, Math.max(0, maxLength - 3)).trim()}...`;
 }
 
 function requireReportDate(reportDate) {

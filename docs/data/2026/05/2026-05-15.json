@@ -28,6 +28,7 @@
         "OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。",
         "Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -49,6 +50,7 @@
         "Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。",
         "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -69,6 +71,7 @@
         "健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。",
         "教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -90,6 +93,7 @@
         "首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。",
         "这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -111,6 +115,7 @@
         "Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。",
         "可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -132,6 +137,7 @@
         "核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。",
         "对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。"
       ],
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -177,16 +183,19 @@
     {
       "content": "OpenAI 在 2026-05-14 发布 ChatGPT sensitive conversations 安全更新，说明系统会利用跨时间上下文识别逐步出现的风险；该条更偏安全策略说明，本轮不计入主体产品/工程条目。",
       "url": "https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Google Developers Blog 同日发布 Arm 与 Google AI Edge 优化文章，涉及 SME2、LiteRT、XNNPACK 和 KleidiAI；因为本轮 Google 主体已采用 Genkit middleware，该条作为边缘推理线索保留。",
       "url": "https://developers.googleblog.com/accelerating-on-device-ai-a-look-at-arm-and-google-ai-edge-optimization/",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是 dated changelog；按已确认规则，只作为“官方文档状态存在但发布日期待交叉确认”的社区线索。",
       "url": "https://docs.x.ai/developers/models?cluster=us-east-1",
+      "image_urls": [],
       "importance": "general"
     }
   ],

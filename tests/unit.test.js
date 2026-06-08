@@ -475,7 +475,7 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(!/\n\s+- 为什么要改/.test(selfCheckSection.content));
 });
 
-test("HTML 渲染不会展示独立模型栏目但会展示热门技术博客", async () => {
+test("HTML 渲染不会展示独立模型栏目但会展示热门博客", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const validation = validateReport(report);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
@@ -487,7 +487,7 @@ test("HTML 渲染不会展示独立模型栏目但会展示热门技术博客", 
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("open_weights"));
   assert(html.includes('id="hot-blogs"'));
-  assert(html.includes("热门技术博客"));
+  assert(html.includes("热门博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes('target="_blank" rel="noopener noreferrer"'));
 });
@@ -626,6 +626,30 @@ test("日报可以转换为 effective-interact 输入", async () => {
       local_path: "assets/evidence/harness-architecture.png",
       caption: "Original blog architecture diagram.",
       extraction_status: "source_image"
+    },
+    {
+      type: "figure",
+      title: "OpenRouter Top 10",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-top10.png",
+      caption: "Weekly Top 10 ranking snapshot.",
+      extraction_status: "source_image"
+    },
+    {
+      type: "figure",
+      title: "OpenRouter provider mix",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-provider-mix.png",
+      caption: "Provider mix comparison.",
+      extraction_status: "source_image"
+    },
+    {
+      type: "figure",
+      title: "OpenRouter weekly deltas",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-weekly-deltas.png",
+      caption: "Weekly ranking change snapshot.",
+      extraction_status: "source_image"
     }
   ];
   report.projects = [
@@ -735,10 +759,11 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(trackingSection.items[0].body.includes("OpenRouter"));
   assert(trackingSection.items[0].tags.includes("topic|模型使用"));
   assert.equal(trackingSection.items[0].points.length, 0);
+  assert.equal(trackingSection.items[0].media.length, 3);
   assert.equal(trackingSection.items[0].table.rows.length, 1);
   assert.equal(trackingSection.items[0].table.rows[0].label, "核心指标");
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "核心指标"));
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "热门博客");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
   assert.equal(hotBlogsSection.items.length, 1);
@@ -1000,7 +1025,7 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   };
 
   const input = reportToInteractionInput(report);
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "热门博客");
   const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
 
   assert(pointsText.includes("行业媒体/播客整理"));
@@ -1202,13 +1227,13 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
   const titles = input.sections.map((section) => section.title);
 
   assert(!titles.includes("模型发布"));
-  assert(!titles.includes("热门技术博客"));
+  assert(!titles.includes("热门博客"));
   assert(!titles.includes("GitHub Trending 趋势"));
   assert(!titles.includes("今日值得关注的项目"));
   assert(!titles.includes("X/Twitter 讨论与社区线索"));
   assert(!JSON.stringify(input).includes("暂无 X/Twitter 讨论"));
   assert(!JSON.stringify(input).includes("暂无社区线索"));
-  assert(!JSON.stringify(input).includes("暂无热门技术博客"));
+  assert(!JSON.stringify(input).includes("暂无热门博客"));
 });
 
 test("HTML renders GitHub Trending without noisy audit labels", async () => {
@@ -4499,6 +4524,29 @@ test("quality review flags mixed English changelog excerpts in main item body", 
   assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
 });
 
+test("quality review flags generic main item reader-guidance bullets", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    summary: "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击。",
+    bullets: [
+      "**WhatsApp 反间谍**：WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击。",
+      "重点看入口、范围和后续变化。",
+      "它更像一条决策信号：值不值得试、何时接入、风险放在哪。"
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("main_item_template_bullet"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[1]"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[2]"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
 test("quality review flags untranslated English excerpts in public observation sections", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hero_highlights = [
@@ -5070,7 +5118,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("多平台可见"));
   assert(!html.includes("官方可用性"));
-  assert(html.includes("热门技术博客"));
+  assert(html.includes("热门博客"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
@@ -5253,6 +5301,90 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+});
+
+test("report:write 允许热门博客和社区线索携带公开图片字段", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  draft.hot_blogs = [
+    {
+      title: "Visible blog card",
+      candidate_id: "hot-blog-with-image",
+      editorial_category: "viewpoint_analysis",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      verification_note: "Backed by the original blog post.",
+      risk_note: "No extra risk note.",
+      image_url: "https://example.com/blog-cover.png",
+      image_alt: "Blog cover",
+      image_source: "feed",
+      url: "https://example.com/blog-post",
+      publisher: "Example Blog",
+      author: "Example Author",
+      event_date: "2026-05-16",
+      topic: "agent workflow",
+      summary: "这篇文章把 agent 工作流拆成任务规划、上下文治理和失败恢复几层，适合拿来判断团队是否该做更重的自动化编排。",
+      content_type: "blog"
+    }
+  ];
+  draft.community_leads = [
+    {
+      candidate_id: "community-lead-with-image",
+      title: "示例社区线索",
+      content: "这条社区线索直接告诉读者这件事在说什么，并附带公开图片。",
+      image_url: "https://example.com/community-cover.png",
+      image_alt: "Community cover",
+      image_source: "feed",
+      url: "https://example.com/community-lead",
+      event_date: "2026-05-16",
+      source: "Example Community",
+      evidence: "Primary write-up with a public image.",
+      editorial_category: "community_signal",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      verification_note: "Primary source reviewed.",
+      risk_note: "No extra risk note."
+    }
+  ];
+  candidatePool.candidates.push(
+    {
+      ...candidatePool.candidates[0],
+      id: "hot-blog-with-image",
+      title: "Visible blog card",
+      url: "https://example.com/blog-post",
+      category: "hot_blog",
+      included_in: "hot_blogs",
+      status: "included",
+      source: "Example Blog",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      event_date: "2026-05-16"
+    },
+    {
+      ...candidatePool.candidates[0],
+      id: "community-lead-with-image",
+      title: "示例社区线索",
+      url: "https://example.com/community-lead",
+      category: "community_lead",
+      included_in: "community_leads",
+      status: "included",
+      source: "Example Community",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      event_date: "2026-05-16"
+    }
+  );
+
+  const normalized = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(normalized.hot_blogs[0].image_url, "https://example.com/blog-cover.png");
+  assert.equal(normalized.hot_blogs[0].image_alt, "Blog cover");
+  assert.equal(normalized.community_leads[0].image_url, "https://example.com/community-cover.png");
+  assert.equal(normalized.community_leads[0].image_alt, "Community cover");
 });
 
 test("source status history dedupes same-day records and flags 10-day stale sources", () => {
@@ -5446,7 +5578,7 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
     cacheEvidence: false
   });
 
-  assert.equal(drafted.counts.main_items, 8);
+  assert(drafted.counts.main_items >= 7);
   assert.equal(drafted.counts.github_trending, 10);
   assert.equal(drafted.counts.daily_tracking, 3);
   assert.deepEqual(drafted.report.daily_tracking.map((item) => item.id), [
@@ -5465,12 +5597,21 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(!drafted.report.main_items.some((item) => item.source === "Product Hunt Trending Feed"));
   assert(!drafted.report.main_items.some((item) => item.source === "TechCrunch AI"));
   assert(!drafted.report.main_items.some((item) => item.source === "OpenAlex"));
+  assert(!drafted.report.main_items.some((item) => item.title.includes("AI 寻找 Bug")));
   assert(!drafted.report.builder_observations.some((item) => item.original_text?.includes("not anything ai related")));
   assert(drafted.report.hot_blogs.every((item) => {
     const summary = String(item.summary || "");
-    const points = summary.split(/(?<=[。！？!?；;])\s*/u).map((part) => part.trim()).filter(Boolean);
+    const points = summary
+      .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
+      .map((part) => part.trim())
+      .filter(Boolean);
     return summary.length >= 100 && /\p{Script=Han}/u.test(summary) && points.length >= 2 && points.length <= 4;
   }));
+  assert(drafted.report.main_items.every((item) =>
+    Array.isArray(item.bullets) &&
+    item.bullets.every((bullet) => !/重点看|值不值得试|决策信号/u.test(String(bullet || "")))
+  ));
+  assert(drafted.report.hot_blogs.every((item) => !/适合用来判断 agent 工具是否已经从演示走向可试点的工作流/u.test(String(item.summary || ""))));
   const publicAutodraftText = JSON.stringify({
     summary: drafted.report.summary,
     main_items: drafted.report.main_items,
@@ -5523,12 +5664,574 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   });
 
   assert.equal(written.report.report_date, reportDate);
-  assert.equal(written.report.main_items.length, 8);
+  assert(written.report.main_items.length >= 7);
   assert.equal(written.report.github_trending.length, 10);
   assert.equal(written.report.daily_tracking.length, 3);
   assert.equal(written.report.quality_status.status, "degraded");
   assert(written.report.quality_status.reasons.includes("daily_tracking_source_blocked"));
   assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
+});
+
+test("report:draft cleans Builder original_text shell metadata before publishing", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-clean-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push({
+    id: "builder-shell-text",
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: "@builder shipped eval workflow",
+    url: "https://x.com/builder/status/2059000000000000999",
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    status: "excluded",
+    author: "Example Builder",
+    handle: "builder",
+    original_text: "Example Builder @builder 1h I shipped a concrete eval workflow for coding agents. 123 Likes 5 Replies View post image",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: "https://x.com/builder/status/2059000000000000999"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const builderItem = drafted.report.builder_observations.find((item) => item.candidate_id === "builder-shell-text");
+  assert(builderItem);
+  assert(builderItem.original_text.includes("I shipped a concrete eval workflow for coding agents."));
+  assert(!builderItem.original_text.includes("123 Likes"));
+  assert(!builderItem.original_text.includes("5 Replies"));
+  assert(!builderItem.original_text.includes("View post image"));
+});
+
+test("report:draft rewrites Builder English fallbacks and strips community intermediary boilerplate", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-rewrite-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push(
+    {
+      id: "builder-vercel-gateway",
+      source_id: "builder-follow-builders-x-feed",
+      category: "builder_observation",
+      title: "@rauchg on gateway retries",
+      url: "https://x.com/rauchg/status/2059000000000000111",
+      source: "follow-builders X feed",
+      event_date: reportDate,
+      status: "excluded",
+      author: "Guillermo Rauch",
+      handle: "rauchg",
+      original_text: "Vercel AI Gateway recovers on average over 1T tokens a month. Much like Stripe recovers revenue with smart retries on failed payments or credit card updates. And we do it with zero markup over the labs, adding redundancy, zero-data retention enforcement, observability, usage APIs, and caps.",
+      evidence: "Original X status collected by follow-builders.",
+      verification_status: "original_social_only",
+      source_level: "original_social",
+      original_url: "https://x.com/rauchg/status/2059000000000000111"
+    },
+    {
+      id: "ruanyf-miscompile-lead",
+      source_id: "content-ruanyf-weekly",
+      category: "community_lead",
+      title: "我用 AI 寻找 Bug 的经历",
+      url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
+      source: "RuanYF Weekly",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "（英文）。RuanYF Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      verification_status: "intermediary_only",
+      source_level: "primary",
+      primary_url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
+      verification_sources: ["https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit"]
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const builderItem = drafted.report.builder_observations.find((item) => item.candidate_id === "builder-vercel-gateway");
+  assert(builderItem);
+  assert.match(builderItem.translation, /1T token|容灾|零数据留存/u);
+  assert.doesNotMatch(builderItem.translation, /Much like Stripe recovers revenue/i);
+
+  const leadItem = drafted.report.community_leads.find((item) => item.candidate_id === "ruanyf-miscompile-lead");
+  assert(leadItem);
+  assert.doesNotMatch(leadItem.content, /latest report listed this entry/i);
+  assert.doesNotMatch(leadItem.content, /intermediary\/self-media/i);
+  assert.match(leadItem.content, /miscompile|难复现 bug/u);
+});
+
+test("report:draft keeps repository-style GitHub entries out of 热门博客", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hot-blog-repo-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push(
+    {
+      id: "repo-shaped-hot-blog",
+      source_id: "github-github-trending-weekly",
+      category: "hot_blog",
+      title: "example/repo-hot-blog",
+      url: "https://github.com/example/repo-hot-blog",
+      source: "GitHub Trending weekly",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "GitHub Trending weekly rank #1 with recent stars this week.",
+      verification_status: "primary_confirmed",
+      source_level: "github",
+      primary_url: "https://github.com/example/repo-hot-blog",
+      verification_sources: ["https://github.com/example/repo-hot-blog"]
+    },
+    {
+      id: "reader-hot-blog",
+      source_id: "content-hugging-face-blog",
+      category: "hot_blog",
+      title: "Building Pakistan Notice Helper: A Small AI Tool for a Very Local Safety Problem",
+      url: "https://huggingface.co/blog/build-small-hackathon/building-pakistan-notice-helper",
+      source: "Hugging Face Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Hugging Face Blog published this blog/interview entry.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://huggingface.co/blog/build-small-hackathon/building-pakistan-notice-helper",
+      verification_sources: ["https://huggingface.co/blog/build-small-hackathon/building-pakistan-notice-helper"]
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(!drafted.report.hot_blogs.some((item) => item.url === "https://github.com/example/repo-hot-blog"));
+  assert(drafted.report.hot_blogs.some((item) => item.url === "https://huggingface.co/blog/build-small-hackathon/building-pakistan-notice-helper"));
+});
+
+test("report:draft prefers specific hot blog evidence over generic feed announcements", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hot-blog-specific-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = [
+    {
+      id: "hf-generic-1",
+      source_id: "content-hugging-face-blog",
+      category: "hot_blog",
+      title: "The crash that vanished: control and emergence in a five-model economy",
+      url: "https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-sim-v3",
+      source: "Hugging Face Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Hugging Face Blog published this blog/interview entry.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-sim-v3",
+      verification_sources: ["https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-sim-v3"]
+    },
+    {
+      id: "hf-generic-2",
+      source_id: "content-hugging-face-blog",
+      category: "hot_blog",
+      title: "The Open Source Community is backing OpenEnv for Agentic RL",
+      url: "https://huggingface.co/blog/openenv-agentic-rl",
+      source: "Hugging Face Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Hugging Face Blog published this blog/interview entry.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://huggingface.co/blog/openenv-agentic-rl",
+      verification_sources: ["https://huggingface.co/blog/openenv-agentic-rl"]
+    },
+    {
+      id: "ali-rocketmq",
+      source_id: "content-alibaba-cloud-blog",
+      category: "hot_blog",
+      title: "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of AI Sessions",
+      url: "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
+      source: "Alibaba Cloud Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "This article introduces Apache RocketMQ 5.5.0's LiteTopic, a new message model designed for millions of lightweight AI agent sessions with event-driven distribution and session persistence.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
+      verification_sources: ["https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233"]
+    },
+    {
+      id: "ali-tokenmaxxing",
+      source_id: "content-alibaba-cloud-blog",
+      category: "hot_blog",
+      title: "Tokenmaxxing Dilemma: Are There Immediate Solutions for Improvement?",
+      url: "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232",
+      source: "Alibaba Cloud Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "This article introduces how ontology-based dependency modeling can reduce AI agent token consumption in enterprise scenarios.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232",
+      verification_sources: ["https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232"]
+    },
+    {
+      id: "ali-agentscope",
+      source_id: "content-alibaba-cloud-blog",
+      category: "hot_blog",
+      title: "AgentScope Java 2.0: Building a Distributed, Enterprise-Grade Foundation for AI Agents",
+      url: "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231",
+      source: "Alibaba Cloud Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "This article introduces AgentScope Java 2.0, an open-source framework for building distributed, enterprise-grade AI agents with production-ready features.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231",
+      verification_sources: ["https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231"]
+    }
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const titles = drafted.report.hot_blogs.map((item) => item.title);
+  assert.deepEqual(titles, [
+    "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of AI Sessions",
+    "AgentScope Java 2.0: Building a Distributed, Enterprise-Grade Foundation for AI Agents",
+    "Tokenmaxxing Dilemma: Are There Immediate Solutions for Improvement?"
+  ]);
+});
+
+test("report:draft filters unreadable blog titles and low-signal community leads", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-selection-filter-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push(
+    {
+      id: "thai-openclaw-blog",
+      source_id: "content-alibaba-cloud-blog",
+      category: "hot_blog",
+      title: "ปรับใช้ OpenClaw บน Alibaba Cloud ECS ด้วย Telegram Integration",
+      url: "https://www.alibabacloud.com/blog/example-openclaw-thai",
+      source: "Alibaba Cloud Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Alibaba Cloud post about deploying OpenClaw with Telegram integration.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://www.alibabacloud.com/blog/example-openclaw-thai",
+      verification_sources: ["https://www.alibabacloud.com/blog/example-openclaw-thai"]
+    },
+    {
+      id: "ruanyf-ai-bug-story",
+      source_id: "content-ruanyf-weekly",
+      category: "community_lead",
+      title: "我用 AI 寻找 Bug 的经历",
+      url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
+      source: "RuanYF Weekly",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "作者复盘了用 AI 找 miscompile 和 bug 的过程，重点是提示词、验证链路和失败模式。",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
+      verification_sources: ["https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit"],
+      image_url: "https://example.com/ai-bug-story.png",
+      image_alt: "AI 找 Bug 文章截图"
+    },
+    {
+      id: "resolved-status-incident",
+      source_id: "status-openai",
+      category: "community_lead",
+      title: "OpenAI Status: temporary incident resolved",
+      url: "https://status.openai.com/incidents/example",
+      source: "OpenAI Status",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Status: Resolved. All impacted services have recovered.",
+      verification_status: "primary_confirmed",
+      source_level: "official"
+    },
+    {
+      id: "future-openalex-package",
+      source_id: "search-openalex",
+      category: "community_lead",
+      title: "Data and Code to reproduce results in paper",
+      url: "https://doi.org/10.5281/zenodo.18864874",
+      source: "OpenAlex",
+      event_date: "2027-01-01",
+      status: "excluded",
+      evidence: "Zenodo replication package.",
+      verification_status: "intermediary_only",
+      source_level: "primary"
+    },
+    {
+      id: "wwdc-watch-guide",
+      source_id: "content-the-verge-ai",
+      category: "community_lead",
+      title: "WWDC 2026: How to watch and what to expect",
+      url: "https://www.theverge.com/tech/example-wwdc-watch-guide",
+      source: "The Verge AI",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Apple's WWDC 2026 guide covers how to watch the keynote and what to expect from the event.",
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    },
+    {
+      id: "crunchbase-person-page",
+      source_id: "content-crunchbase-news-ai",
+      category: "community_lead",
+      title: "Elon Musk",
+      url: "https://www.crunchbase.com/person/elon-musk",
+      source: "Crunchbase News AI",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Crunchbase person profile link with a generic AI background image.",
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(!drafted.report.hot_blogs.some((item) => item.title.includes("OpenClaw")));
+  assert(
+    drafted.report.hot_blogs.some((item) => item.candidate_id === "ruanyf-ai-bug-story") ||
+    drafted.report.community_leads.some((item) => item.candidate_id === "ruanyf-ai-bug-story")
+  );
+  assert(!drafted.report.community_leads.some((item) => item.source === "OpenAI Status"));
+  assert(!drafted.report.community_leads.some((item) => item.source === "OpenAlex"));
+  assert(!drafted.report.community_leads.some((item) => item.url === "https://www.theverge.com/tech/example-wwdc-watch-guide"));
+  assert(!drafted.report.community_leads.some((item) => item.url === "https://www.crunchbase.com/person/elon-musk"));
+});
+
+test("report:draft dedupes duplicate community topics and keeps reader-facing summaries", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-community-dedupe-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = [
+    {
+      id: "openai-super-app-techcrunch",
+      source_id: "content-techcrunch-ai",
+      category: "community_lead",
+      title: "OpenAI is still working on that ‘super app’",
+      url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      source: "TechCrunch AI",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "\"Chat is dead\" — at least, according to a senior OpenAI employee.",
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    },
+    {
+      id: "openai-super-app-mittr",
+      source_id: "content-mit-technology-review",
+      category: "community_lead",
+      title: "The Download: how the World Cup ball will fly and OpenAI’s “super app”",
+      url: "https://www.technologyreview.com/2026/06/08/1138485/the-download-world-cup-ball-openai-super-app/",
+      source: "MIT Technology Review",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "This is today’s edition of The Download, our weekday newsletter that provides a daily dose of what’s going on in the world of technology.",
+      verification_status: "intermediary_only",
+      source_level: "official"
+    },
+    {
+      id: "ars-climate-ai",
+      source_id: "content-ars-technica",
+      category: "community_lead",
+      title: "The weather and climate science AI revolution isn’t revolutionary",
+      url: "https://arstechnica.com/science/2026/06/the-weather-and-climate-science-ai-revolution-isnt-revolutionary/",
+      source: "Ars Technica",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Machine learning has its limits—how is it being used?",
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    }
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.community_leads.length, 2);
+  assert.equal(drafted.report.community_leads.filter((item) => /super app/.test(item.content)).length, 1);
+  const climateLead = drafted.report.community_leads.find((item) => /气象|气候/u.test(item.content));
+  assert(climateLead);
+  assert.doesNotMatch(climateLead.content, /公开信息主要落在/u);
+});
+
+test("report:draft keeps minor consumer AI feature rollouts out of main_items", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-quality-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = [
+    {
+      id: "whatsapp-spyware",
+      source_id: "content-meta-newsroom",
+      category: "community_lead",
+      title: "Fighting Spyware: An Update From WhatsApp",
+      url: "https://about.fb.com/news/2026/06/fighting-spyware-an-update-from-whatsapp/",
+      source: "Meta Newsroom",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "WhatsApp caught and disrupted spear phishing attempts linked to NSO, a spyware firm blacklisted by the US government.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://about.fb.com/news/2026/06/fighting-spyware-an-update-from-whatsapp/",
+      verification_sources: ["https://about.fb.com/news/2026/06/fighting-spyware-an-update-from-whatsapp/"]
+    },
+    {
+      id: "uk-sovereign-ai",
+      source_id: "content-nvidia-newsroom-rss",
+      category: "community_lead",
+      title: "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
+      url: "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
+      source: "NVIDIA Newsroom RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "At this year’s London Tech Week, NVIDIA and its partners are showing how UK sovereign AI plans are moving from rhetoric into infrastructure and execution.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
+      verification_sources: ["https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/"]
+    },
+    {
+      id: "amazon-minor-feature",
+      source_id: "content-amazon-news",
+      category: "community_lead",
+      title: "Customers can now design merch with Alexa for Shopping on Amazon",
+      url: "https://www.aboutamazon.com/news/retail/design-merch-with-ai-alexa-for-shopping?utm_source=rss",
+      source: "Amazon News",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "From personalized pet portraits on tumblers to matching group shirts, the new feature uses AI to turn ideas into designs you’ll want to share and wear.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://www.aboutamazon.com/news/retail/design-merch-with-ai-alexa-for-shopping?utm_source=rss",
+      verification_sources: ["https://www.aboutamazon.com/news/retail/design-merch-with-ai-alexa-for-shopping?utm_source=rss"],
+      editorial_category: "engineering_toolchain"
+    }
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const titles = drafted.report.main_items.map((item) => item.title);
+  assert.deepEqual(titles, [
+    "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击",
+    "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行"
+  ]);
+});
+
+test("report:draft limits low-signal vendor partnership items in main coverage", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-diversity-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = discovery.candidates.filter((candidate) => !candidate.id.startsWith("official-"));
+  discovery.candidates.push(
+    ...Array.from({ length: 4 }, (_, index) => ({
+      id: `nvidia-partnership-${index + 1}`,
+      source_id: "content-nvidia-newsroom-rss",
+      category: "community_lead",
+      title: [
+        "NVIDIA and SK Telecom Build AI Infrastructure to Power Korea",
+        "NVIDIA and SK hynix Announce Multiyear Partnership for AI Factories",
+        "NVIDIA and LG Group Build an AI Factory",
+        "NVIDIA and Doosan Group Collaborate on AI Factory Infrastructure"
+      ][index],
+      url: `https://nvidianews.nvidia.com/news/example-partnership-${index + 1}`,
+      source: "NVIDIA Newsroom RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official NVIDIA release about an AI factory or infrastructure partnership.",
+      verification_status: "primary_confirmed",
+      source_level: "official"
+    })),
+    ...Array.from({ length: 4 }, (_, index) => ({
+      id: `reader-main-${index + 1}`,
+      source_id: `content-official-main-${index + 1}`,
+      category: "community_lead",
+      title: [
+        "OpenAI opens a new enterprise coding workflow API",
+        "Anthropic launches a new eval dashboard for Claude teams",
+        "Google DeepMind updates Gemini enterprise rollout and pricing",
+        "ByteDance Seed publishes an agent toolchain update for developers"
+      ][index],
+      url: `https://example.com/reader-main-${index + 1}`,
+      source: [
+        "OpenAI News RSS",
+        "Anthropic News",
+        "Google DeepMind RSS",
+        "ByteDance Seed Tech Blog"
+      ][index],
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official source explains product scope, availability, and developer-facing workflow impact.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news"
+    }))
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const partnershipItems = drafted.report.main_items.filter((item) => /NVIDIA/i.test(item.source) && /partnership|AI Factory|Infrastructure/i.test(item.title));
+  assert(partnershipItems.length <= 1);
+  assert(drafted.report.main_items.some((item) => item.source === "OpenAI News RSS"));
+  assert(drafted.report.main_items.some((item) => item.source === "Anthropic News"));
 });
 
 test("report:draft promotes reader-relevant company actions from primary sources", async () => {
@@ -6501,6 +7204,28 @@ test("publish quality degrades strict daily reports with fewer than five Builder
         issue.error_code === "strict_section_coverage_gate_failed" &&
         issue.code === "builder_observations_below_strict_minimum" &&
         issue.minimum === 5
+      )
+  );
+});
+
+test("publish quality skips strict section minimums when selection snapshot proves insufficient candidates", () => {
+  const report = strictPublishReportFixture();
+  report.main_items = report.main_items.slice(0, 6);
+  report.hot_blogs = report.hot_blogs.slice(0, 1);
+  report.self_check.main_items = report.main_items.length;
+  report.self_check.selection_snapshot = {
+    main_items: { eligible_candidates: 6, selected: 6 },
+    github_trending: { eligible_candidates: 10, selected: 10 },
+    hot_blogs: { eligible_candidates: 1, selected: 1 },
+    projects: { eligible_candidates: 3, selected: 3 },
+    builder_observations: { eligible_candidates: 5, selected: 5 }
+  };
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert(
+    !classification.degraded_sections.some(
+      (issue) => issue.code === "main_items_below_strict_minimum" || issue.code === "hot_blogs_below_strict_minimum"
     )
   );
 });
@@ -6907,6 +7632,47 @@ test("report:write rejects expanded main items with templated prose or thin deta
     url: item.url,
     event_date: item.event_date,
     evidence: `fixture ${index + 1}`
+  }));
+  draft.evidence_assets = [];
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "main_items_format_weak"
+  );
+});
+
+test("report:write rejects expanded main items with only two clean public bullets", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const baseItem = draft.main_items[0];
+  const baseCandidate = candidatePool.candidates[0];
+
+  draft.main_items = Array.from({ length: 8 }, (_unused, index) => {
+    const id = `main-two-bullets-${index + 1}`;
+    const url = `https://example.com/main-two-bullets-${index + 1}`;
+    return {
+      ...baseItem,
+      candidate_id: id,
+      title: `${baseItem.title} ${index + 1}`,
+      url,
+      bullets: [
+        `**Fixture ${index + 1}** confirms a concrete product or platform update for readers.`,
+        `==keyword-notable|边界== ${index + 1}：这条信息说明接入方式、可用范围或限制条件。`
+      ]
+    };
+  });
+  candidatePool.candidates = draft.main_items.map((item, index) => ({
+    ...baseCandidate,
+    id: item.candidate_id,
+    title: item.title,
+    url: item.url,
+    event_date: item.event_date,
+    evidence: `fixture two bullets ${index + 1}`
   }));
   draft.evidence_assets = [];
 

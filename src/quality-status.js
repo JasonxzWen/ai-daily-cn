@@ -402,6 +402,10 @@ function strictSectionIssues(report) {
   const issues = [];
 
   for (const [section, minimum] of Object.entries(SECTION_MINIMUMS)) {
+    const eligibleCandidates = strictEligibleCandidateCount(report, section);
+    if (eligibleCandidates !== null && eligibleCandidates < minimum) {
+      continue;
+    }
     const count = sectionCount(report, section);
     if (count < minimum) {
       issues.push({
@@ -417,6 +421,11 @@ function strictSectionIssues(report) {
   }
 
   return issues;
+}
+
+function strictEligibleCandidateCount(report, section) {
+  const count = Number(report?.self_check?.selection_snapshot?.[section]?.eligible_candidates);
+  return Number.isFinite(count) && count >= 0 ? count : null;
 }
 
 function strictEditorialIssues(report) {

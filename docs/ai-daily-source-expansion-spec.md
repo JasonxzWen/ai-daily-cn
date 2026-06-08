@@ -26,10 +26,10 @@
 | 信源 | 类型 | 用途 | 处理规则 |
 |---|---|---|---|
 | `follow-builders` central feed | X/Twitter、播客、官方博客聚合 | Builder 观察、访谈精选、X 讨论线索 | 优先读取 central JSON；保留每条原始 URL；不可用时记录 `blocked_reason` |
-| OpenAI News / RSS | 官方发布、工程、安全、产品 | 主体信息、模型索引、热门技术博客 | 优先一手引用；公开模型新闻仍进入主体信息 |
-| Anthropic Engineering / News | 工程文章、Claude Code、agent、harness、eval | 热门技术博客、主体信息、访谈背景 | 页面可抓取；若无 RSS，使用页面解析或 `follow-builders` blogs |
+| OpenAI News / RSS | 官方发布、工程、安全、产品 | 主体信息、模型索引、热门博客 | 优先一手引用；公开模型新闻仍进入主体信息 |
+| Anthropic Engineering / News | 工程文章、Claude Code、agent、harness、eval | 热门博客、主体信息、访谈背景 | 页面可抓取；若无 RSS，使用页面解析或 `follow-builders` blogs |
 | Google DeepMind / Google Research Blog | 模型、研究、系统、开源 | 主体信息、模型索引、研究/工程博客 | Google Research RSS 可用；DeepMind 页面解析；公开页不单列模型发布 |
-| Hugging Face Blog / RSS | 开源模型、agent、推理、训练、社区文章 | 热门技术博客、项目线索 | 原文可作为最终来源 |
+| Hugging Face Blog / RSS | 开源模型、agent、推理、训练、社区文章 | 热门博客、项目线索 | 原文可作为最终来源 |
 | GitHub Trending / Release / README | 开源项目 | GitHub Trending / 项目 highlight | 必须补领域、作用、信号证据 |
 
 ### P1：高优先发现源
@@ -39,8 +39,8 @@
 | Follow AI Builders | builder 名录与活跃度 | 扩展 builder 白名单、角色标签 | 只作名录和发现，不替代原始帖子 |
 | Latent.Space | AI Engineer Newsletter / podcast / X recap | 热门博客、访谈、X 线索 | 优先回溯到原始帖子/项目/官方源；无法回溯时标为观点/综述 |
 | Interconnects | frontier labs、开源模型、技术观点 | 热门博客、观点与分析 | 作为高质量个人/研究博客原文 |
-| Microsoft Research Blog | 研究与系统文章 | 热门技术博客、研究线索 | 原文可入选 |
-| BAIR Blog | 学术/agent/robotics/eval | 热门技术博客 | 原文可入选 |
+| Microsoft Research Blog | 研究与系统文章 | 热门博客、研究线索 | 原文可入选 |
+| BAIR Blog | 学术/agent/robotics/eval | 热门博客 | 原文可入选 |
 | Product Hunt | 新产品发现 | 新产品/项目线索 | 需要产品页或官网交叉确认，不直接写成事实 |
 | Product Hunt Trending | 新产品趋势 | 项目候选、产品趋势 | 必须和 developer-tools feed 一起看；上榜只说明热度，项目事实仍需官网/GitHub/文档确认 |
 | TechCrunch AI / Enterprise | 科技媒体、创业与企业软件 | 行业趋势、大厂动态、融资线索 | 作为发现源；事实尽量回到公司公告、监管文件、产品页或一手访谈 |
@@ -95,7 +95,7 @@
 - Header 条目数不超过 3。
 - Header 每条都能在正文或来源审计中找到对应来源。
 
-### 热门技术博客
+### 热门博客
 
 栏目目标：让读者不点开原文也能理解文章核心内容。
 
@@ -166,7 +166,7 @@
 
 ### 访谈与播客
 
-栏目定位：优质访谈可以进入热门技术博客、Builder 观察或社区线索，不一定新增固定大栏目。
+栏目定位：优质访谈可以进入热门博客、Builder 观察或社区线索，不一定新增固定大栏目。
 
 入选标准：
 
@@ -201,7 +201,7 @@
 
 验收：
 
-- HTML 正文和导航中不出现“暂无 Builder 观察”“暂无社区线索”“暂无热门技术博客”等空态内容。
+- HTML 正文和导航中不出现“暂无 Builder 观察”“暂无社区线索”“暂无热门博客”等空态内容。
 - `source_audit` 仍说明检查状态和原因。
 
 ## 数据结构建议
@@ -299,6 +299,6 @@
 ## 默认决策
 
 1. `follow-builders` central feed 中带原始 X URL 的内容，默认视为可审计 Builder 一手候选。
-2. 热门技术博客摘要对新日报执行约 100-160 个中文字符门禁；旧日报不 retroactive 修复。
+2. 热门博客摘要对新日报执行约 100-160 个中文字符门禁；旧日报不 retroactive 修复。
 3. 不新增固定“Product Hunt”“精选播客”“Twitter 热点讨论”大栏目；它们先作为候选源，按内容质量进入 GitHub Trending 项目 highlight、博客、Builder 或社区线索。
 4. 微信公众号等中文媒体源可以作为发现源，但无法回源时不作为事实最终来源。

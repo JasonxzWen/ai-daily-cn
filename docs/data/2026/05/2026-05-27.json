@@ -163,6 +163,7 @@
         "新的 workflows 体验把 agent node、审批、业务逻辑和 AI-powered actions 放到统一画布，并提供 node-level testing，适合把不确定的 agent 动作放回可审计流程。",
         "Work IQ、remote MCP servers 和 A2A GA 说明 Microsoft 正在把企业上下文、工具接入和多 agent 协作放进同一套 Copilot Studio 低代码平台。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -184,6 +185,7 @@
         "状态页同屏列出 APIs、ChatGPT、Codex 和 FedRAMP 的可用性，适合作为 incident runbook 中的供应商状态检查入口。",
         "如果内部监控只记录应用侧登录失败而没有关联供应商状态页，排障人员容易把外部身份链路问题误判成本地配置或权限变更。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -205,6 +207,7 @@
         "文中提到 BLAST 会按部署条件、可达攻击面、认证要求和现实攻击能力过滤发现项，这比只看扫描器告警数量更接近补丁优先级排序。",
         "内部平台团队需要把 AI 发现项接入复现、确认、修复、补偿控制和发布说明，而不是把模型输出直接当成漏洞清单。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -220,6 +223,7 @@
       "source": "Hugging Face Model Card",
       "summary": "Borealis-5B-IT 是 Apache-2.0 的 audio-language model：Whisper Large V3 作为冻结音频编码器，Qwen3-4B 作为语言模型，中间用 adapter 对齐音频嵌入，并提供 transformers 与 vLLM 插件路径。",
       "notes": "Hugging Face 社区文章在 2026-05-25 公开训练配方、数据和实现细节；本轮放在模型区，不放进主体信息。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -234,6 +238,7 @@
       "topic": "Agent terminology and harness design",
       "content_type": "blog",
       "summary": "这篇文章把 agent 相关术语拆成几个工程层次：model 是完成预测或生成的底层能力，scaffold 是围绕模型组织提示、状态和工具调用的脚手架，harness 则是让整个系统可运行、可观测、可评估的外层执行环境。作者进一步把 context engineering、tool use、skills、sub-agents 与 training 分开，指出很多争论来自把模型能力、产品体验和执行环境混在一起。对研发团队来说，这篇文章适合用来统一 coding agent 或研究 agent 的设计语言：先明确哪些问题属于模型，哪些属于上下文组织、工具权限、失败恢复和评估回放，再决定是换模型、改 harness，还是补技能和测试。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],

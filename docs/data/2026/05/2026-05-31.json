@@ -452,6 +452,7 @@
         "OpenAI 提出评测报告应记录模型、工具、harness、预算和 validity checks，避免把一次运行结果包装成过宽的能力结论。",
         "对工程团队的直接影响是：以后做模型横评或供应商准入时，报告模板需要暴露执行环境和 elicitation 方式，不能只存最终分数。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -473,6 +474,7 @@
         "cohorts 可以帮助企业识别哪些团队停留在代码补全，哪些团队已经进入 agent-first 或 multi-agent 使用模式。",
         "对采购和治理团队来说，这类指标能把 AI 工具 ROI 讨论从总使用量转向具体工作流迁移，但仍需要结合代码质量、review 和安全事件数据。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -488,6 +490,7 @@
       "source": "GitHub Changelog",
       "summary": "GitHub 宣布 Claude Opus 4.8 在 GitHub Copilot 中 generally available，覆盖 Copilot Pro+、Business 和 Enterprise 等用户，管理员需要在策略中允许该模型。",
       "notes": "这不是 Anthropic 的首次模型发布，而是 GitHub Copilot 产品入口的可用性更新；适合已有 Copilot 治理流程的团队检查 policy、IDE 覆盖范围和 rollout 状态。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -503,6 +506,7 @@
       "summary": "OpenAI 更新 Frontier Governance Framework，把 cyber offense、CBRN、harmful manipulation、loss of control、model reporting、security risk management、incident response 和外部专家输入放进同一治理框架。它还明确把 California Transparency in Frontier AI Act 与 EU AI Act GPAI Code of Practice 作为对齐背景。对企业来说，这类框架的价值在于提供了供应商尽调问题清单：不仅问模型能力，也要问风险分类、事件响应、外部评审和安全管理链路。",
       "content_type": "blog",
       "why_it_matters": "前沿模型治理正在从原则叙述转向可审计控制项，采购、法务和安全团队需要把这些维度写进供应商评估。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -516,6 +520,7 @@
       "summary": "OpenAI 与 Thrive、Crete 合作描述了 Tax AI 的构建方式：把税务专家反馈、生产使用信号和 Codex 驱动的实现循环结合起来，让 agent 可以围绕垂直领域任务持续改进。文章值得看的是流程形态，而不是税务场景本身：专家知识、真实任务、结构化反馈、代码修改和回归验证被放进同一个产品迭代闭环。",
       "content_type": "engineering_note",
       "why_it_matters": "垂直 agent 的差异点越来越像数据与反馈工程，Codex 类工具的价值在于把生产问题转成可验证的实现变更。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -529,6 +534,7 @@
       "summary": "Hugging Face 的 PyTorch profiler 教程从矩阵运算、trace 读取、token/s、inference loop 和 training loop 入手，强调先知道什么可以被 profile，再看 trace 中的 CPU/GPU 时间和调度开销。对于部署 LLM 的团队，这比抽象性能建议更直接：它把 profile 对象限定到具体循环和具体指标，便于定位是数据加载、kernel、compile 还是模型调用链路造成瓶颈。",
       "content_type": "engineering_note",
       "why_it_matters": "当推理成本和延迟成为上线门槛时，团队需要能复现的 profiler 方法，而不是只看端到端耗时。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -542,6 +548,7 @@
       "summary": "这篇 Hugging Face 社区文章记录 Dell Enterprise Hub 在 Dell Tech World 2026 的展示，重点是让开放模型在 Dell 基础设施上以企业可部署方式交付，并提到 goodput 场景与 dell-ai SDK。它不是模型能力发布，更像企业 AI 基础设施信号：开放模型正在被包装进更标准化的硬件、SDK 和本地运行路径中。",
       "content_type": "blog",
       "why_it_matters": "关注私有化和本地部署的团队，可以把它作为开放模型商业交付路径的观察样本。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],

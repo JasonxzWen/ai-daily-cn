@@ -137,13 +137,14 @@ structuredReport.builder_observations = [
 structuredReport.self_check.builder_observations = structuredReport.builder_observations.length;
 structuredReport.community_leads = [
   {
-    content: "Apple Newsroom：Apple 公布 Apple TV 上 Friday Night Baseball 的 7 月赛程，包括多场重点棒球比赛和 Apple TV 平台排期变化；这是娱乐内容和平台排期线索，不进入 AI 主体事实。待确认：事实来自可回看的原始链接。",
-    url: "https://www.apple.com/newsroom/example-friday-night-baseball/",
-    source: "Apple Newsroom",
+    title: "企业开始把 token 成本当成模型路由约束",
+    content: "TechCrunch 报道企业在多模型工作流里更关注 token 成本、路由策略和失败率，企业选型开始从单模型能力比较转向系统成本控制。",
+    url: "https://techcrunch.com/example-token-routing-costs/",
+    source: "TechCrunch AI",
     event_date: "2026-05-15",
-    source_level: "official",
-    verification_status: "primary_confirmed",
-    verification_note: "事实来自可回看的原始链接。"
+    source_level: "intermediary",
+    verification_status: "intermediary_only",
+    verification_note: "中介来源，仅作社区观察。"
   }
 ];
 structuredReport.daily_tracking = [
@@ -258,8 +259,8 @@ weakBuilderReport.builder_observations = [
     author: "Untranslated Builder",
     handle: "rawbuilder",
     url: "https://x.com/rawbuilder/status/2059000000000000002",
-    translation: "这条原帖讨论模型或产品变化：This great conversation with @danintheory of @OpenAI is also available on Spotify, Apple Podcasts and here on YouTube.",
-    content: "这条原帖讨论模型或产品变化：This great conversation with @danintheory of @OpenAI is also available on Spotify, Apple Podcasts and here on YouTube."
+    translation: "Matt Turck 提到一场与 OpenAI 相关负责人的访谈已同步到播客和 YouTube；这类帖子适合当访谈入口，但不能替代正式发布或产品说明。",
+    content: "Matt Turck 提到一场与 OpenAI 相关负责人的访谈已同步到播客和 YouTube；这类帖子适合当访谈入口，但不能替代正式发布或产品说明。"
   }
 ];
 weakBuilderReport.self_check.builder_observations = weakBuilderReport.builder_observations.length;
@@ -315,7 +316,7 @@ try {
   assert.doesNotMatch(reportBody, /模型发布/);
   assert.doesNotMatch(reportBody, /ExampleModel 2/);
   assert.equal(await page.locator("#model-releases").count(), 0);
-  assert.match(await page.locator("body").textContent(), /热门技术博客/);
+  assert.match(await page.locator("body").textContent(), /热门博客/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.match(await page.locator("body").textContent(), /GitHub Trending/);
   assert.match(await page.locator("body").textContent(), /项目 highlight/);
@@ -335,9 +336,9 @@ try {
   assert.equal(await page.locator(".builder-card .card-media-grid img").count(), 1);
   assert.equal(await builderCardsUseHorizontalRows(page), true);
   const communityCardsText = await page.locator(".community-card-grid").textContent();
-  assert.match(communityCardsText, /Apple TV/);
+  assert.match(communityCardsText, /token 成本/);
   assert.doesNotMatch(communityCardsText, /Apple Newsroom[：:]/);
-  assert.doesNotMatch(communityCardsText, /待确认|Treat this as a community lead|事实性结论|不进入\s*AI\s*主体事实/);
+  assert.doesNotMatch(communityCardsText, /待确认|Treat this as a community lead|事实性结论|不进入\s*AI\s*主体事实|社区观察/);
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   await imageLightboxOpensAndCloses(page, ".builder-card .card-media-grid img");
@@ -362,12 +363,21 @@ try {
   assert(pollutedCommunityChecklist.issues.some((issue) => issue.id === "public_internal_review_language_absent"));
   assert(pollutedCommunityChecklist.issues.some((issue) => issue.id === "community_cards_reader_facing"));
 
-  await page.goto(`${server.url}/reports/2026/05/2026-05-16.html`);
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.locator(".blog-card > p").first().evaluate((node) => {
+    node.textContent = "这篇文章的看点不是单个技术名词，而是它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界。读者可以重点看是否有代码、接口、README、案例或失败模式，而不只看作者结论。";
+  });
   const weakHotBlogChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-16" });
   assert.equal(weakHotBlogChecklist.ok, false);
   assert(weakHotBlogChecklist.issues.some((issue) => issue.id === "hot_blog_cards_reader_facing"));
 
-  await page.goto(`${server.url}/reports/2026/05/2026-05-17.html`);
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.locator(".builder-card > p").first().evaluate((node) => {
+    node.textContent = "Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours.";
+  });
+  await page.locator(".builder-card .card-detail-list dd").first().evaluate((node) => {
+    node.textContent = "";
+  });
   const weakBuilderChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-17" });
   assert.equal(weakBuilderChecklist.ok, false);
   assert(weakBuilderChecklist.issues.some((issue) => issue.id === "builder_cards_translated"));
