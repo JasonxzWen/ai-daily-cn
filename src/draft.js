@@ -446,19 +446,33 @@ function escapeRegex(value) {
 }
 
 function summaryForSelection(selection, aigcCount) {
-  const themes = selection.main_items
-    .map((item) => themeLabelForCandidate(item))
-    .filter(Boolean);
-  const uniqueThemes = [...new Set(themes)].slice(0, 4);
-  if (uniqueThemes.length === 0 && selection.github_trending.length === 0) {
+  const mainTitles = selection.main_items
+    .map((item) => stripDraftPublicBodyNoise(item.title || item.summary || "", item))
+    .filter(Boolean)
+    .slice(0, 3);
+  if (mainTitles.length === 0 && selection.github_trending.length === 0) {
     return "今日固定信源没有足够清晰的主体事实，日报保留信源状态和少量观察，不强行扩写。";
   }
-  const trendText = selection.github_trending.length > 0 ? `GitHub Trending 展示当日 Top ${selection.github_trending.length}` : "";
-  const builderText = selection.builder_observations.length > 0 ? "Builder 观察只保留与 AI 工具、模型或 agent 实践直接相关的原帖" : "";
-  const aigcText = aigcCount > 0 ? `内容生成相关 ${aigcCount} 条` : "";
-  return [uniqueThemes.length > 0 ? `今日重点集中在${uniqueThemes.join("、")}` : "", aigcText, trendText, builderText]
-    .filter(Boolean)
-    .join("；") + "。";
+  const parts = [];
+  if (mainTitles.length > 0) {
+    parts.push(`今日主线是 ${mainTitles.join("；")}`);
+  }
+  if (aigcCount > 0) {
+    parts.push(`其中 ${aigcCount} 条直接涉及内容生成或创作者工具`);
+  }
+  if (selection.github_trending.length > 0) {
+    const topRepo = selection.github_trending[0]?.repo || selection.github_trending[0]?.name || "";
+    parts.push(topRepo ? `GitHub Trending 从 ${topRepo} 开始补充 ${selection.github_trending.length} 个开源信号` : `GitHub Trending 补充 ${selection.github_trending.length} 个开源信号`);
+  }
+  if (selection.builder_observations.length > 0) {
+    const authors = selection.builder_observations
+      .map((item) => item.author)
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("、");
+    parts.push(authors ? `X/Twitter 保留 ${authors} 等原帖的中文直译与原文` : "X/Twitter 保留原帖中文直译与原文");
+  }
+  return `${parts.join("；")}。`;
 }
 
 function mainItem(candidate, original) {
@@ -565,6 +579,7 @@ function builderObservationItem(candidate) {
     translation,
     ...(candidate.avatar_url ? { avatar_url: candidate.avatar_url } : {}),
     ...(candidate.avatar_local_path ? { avatar_local_path: candidate.avatar_local_path } : {}),
+    ...builderMediaFields(candidate),
     url: candidate.url,
     role: "builder",
     event_date: candidate.event_date,
@@ -601,7 +616,28 @@ function communityLeadPublicSummary(candidate) {
   const text = candidateText(candidate);
   const theme = genericFactTheme({ category, sourceLevel, text });
   const scope = genericFactScope({ category, text });
-  return `这条内容涉及${theme}；读者可重点核对${scope}。`;
+  const source = candidate.source || "公开来源";
+  return `${source} 的社区动态指向${theme}；先核对${scope}，再判断是否值得进入主体跟进。`;
+}
+
+function builderMediaFields(candidate) {
+  const fields = {};
+  if (candidate.image_url && isHttpUrl(candidate.image_url)) {
+    fields.image_url = candidate.image_url;
+  }
+  if (Array.isArray(candidate.image_urls)) {
+    const imageUrls = candidate.image_urls.filter(isHttpUrl).slice(0, 4);
+    if (imageUrls.length > 0) {
+      fields.image_urls = imageUrls;
+    }
+  }
+  if (candidate.image_alt) {
+    fields.image_alt = trimText(candidate.image_alt, 180);
+  }
+  if (candidate.image_source) {
+    fields.image_source = trimText(candidate.image_source, 80);
+  }
+  return fields;
 }
 
 function dailyTrackingItems(reportDate, sourceAudit) {
@@ -1127,6 +1163,7 @@ function normalizeCandidate(rawCandidate, context) {
     ...(rawCandidate.avatar_url ? { avatar_url: rawCandidate.avatar_url } : {}),
     ...(rawCandidate.avatar_local_path ? { avatar_local_path: rawCandidate.avatar_local_path } : {}),
     ...(rawCandidate.image_url ? { image_url: rawCandidate.image_url } : {}),
+    ...(Array.isArray(rawCandidate.image_urls) ? { image_urls: rawCandidate.image_urls.filter(isHttpUrl).slice(0, 4) } : {}),
     ...(rawCandidate.image_alt ? { image_alt: rawCandidate.image_alt } : {}),
     ...(rawCandidate.image_source ? { image_source: rawCandidate.image_source } : {}),
     ...(rawCandidate.notes ? { notes: trimText(rawCandidate.notes, 400) } : {}),
@@ -1806,7 +1843,22 @@ function builderReadableSummary(originalText) {
   if (/claude code.*pm|agentic eval|model performance/.test(lower)) {
     return "Cat Wu 发布 Claude Code 相关产品岗位信息，重点指向模型表现和 agentic eval；读者可关注团队是否继续把评测能力和产品性能改进绑定。";
   }
-  return `${builderTopicLabel(lower)}。读者可关注官方说明、可试用入口、演示截图和真实案例，判断它是否会影响模型使用、agent 工作流或开发者工具选型。`;
+  if (/routing to models|model routing|router/.test(lower)) {
+    return "把请求路由到合适模型确实很难：成本、延迟、质量和可用性都会变化，不能只按单一排行榜或默认模型做决定。";
+  }
+  if (/token costs?|tokens? cost|pricing|costs? are becoming/.test(lower)) {
+    return "Token 成本正在成为模型选择里的真实约束：同一个工作流要同时看价格、上下文长度、延迟和失败率，而不是只看能力榜。";
+  }
+  if (/filter or sort.*codex threads|codex threads.*filter or sort/.test(lower)) {
+    return "应该有办法筛选或排序所有 Codex 线程；线程一多，找回正在进行、已阻塞或需要收尾的任务会变得很困难。";
+  }
+  if (/plato.*dialogues?|favorite.*dialogues?/.test(lower)) {
+    return "原帖提到自己最喜欢的柏拉图对话；这更像个人阅读分享，除非上下文连接到 AI 工具或 agent 实践，否则不应扩写成产品信号。";
+  }
+  if (/datasette-agent-edit|release:.*agent|agent-edit/.test(lower)) {
+    return "发布 datasette-agent-edit：它把 agent 辅助编辑接到 Datasette 工作流里，重点看是否能稳定处理数据、权限和可回滚修改。";
+  }
+  return `直译待补：${trimText(text, 260)}`;
 }
 
 function builderTopicLabel(text) {
@@ -1858,6 +1910,9 @@ function candidateText(candidate) {
     candidate.source,
     candidate.evidence,
     candidate.notes,
+    candidate.summary,
+    candidate.content,
+    candidate.original_text,
     candidate.reader_relevance,
     candidate.image_alt
   ].filter(Boolean).join(" ");

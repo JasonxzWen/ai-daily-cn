@@ -778,8 +778,15 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
+  assert(sourceAuditSection.content.includes("==tag-status-checked|checked=="));
+  assert(sourceAuditSection.content.includes("==tag-status-no-signal|no_signal=="));
   assert.equal(sourceAuditSection.appendix, true);
   assert.equal(sourceAuditSection.collapsed, true);
+  const sourceAuditOverview = input.sections.find((section) => section.title === "信源状态概览");
+  assert(sourceAuditOverview);
+  assert.equal(sourceAuditOverview.type, "chart");
+  assert.equal(sourceAuditOverview.chart.type, "bar");
+  assert(sourceAuditOverview.chart.data.some((row) => row.group === "GitHub Trending"));
   const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
   assert(selfCheckSection);
   assert.equal(selfCheckSection.appendix, true);
@@ -1017,6 +1024,8 @@ test("builder interaction section renders translated Twitter-style cards and omi
       url: "https://example.com/builder-post",
       event_date: "2026-05-15",
       source: "follow-builders X feed",
+      image_url: "https://example.com/builder-post.png",
+      image_alt: "Builder thread screenshot",
       evidence: "Original X URL was collected from follow-builders central feed on 2026-05-15."
     }
   ];
@@ -1031,7 +1040,8 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert.equal(section.items[0].title, "Example Builder");
   assert.equal(section.items[0].subtitle, "@examplebuilder");
   assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
-  assert(!JSON.stringify(section.items[0].points).includes("unattended work"));
+  assert(section.items[0].points.some((point) => point.label === "原文" && point.value.includes("unattended work")));
+  assert.equal(section.items[0].media[0].src, "https://example.com/builder-post.png");
   assert(!section.items[0].points.some((point) => point.label === "账号"));
   assert(!JSON.stringify(section).includes("Original X URL was collected"));
   assert(!JSON.stringify(section).includes("证据："));
@@ -1408,7 +1418,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
   };
 
   const input = reportToInteractionInput(report);
-  const auditSection = input.sections.find((section) => section.group === "verification" && section.content.includes("HNRSS Frontpage"));
+  const auditSection = input.sections.find((section) => section.group === "verification" && typeof section.content === "string" && section.content.includes("HNRSS Frontpage"));
   assert(auditSection, "source audit section should be present");
   const mainContent = mainMarkdownContent(input);
 
@@ -4011,6 +4021,29 @@ test("quality review flags untranslated English excerpts in public observation s
   assert(issuePaths.includes("community_leads[0].content"));
   assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
+test("quality review rejects templated builder translations", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      original_text: "There should be a way to filter or sort all my Codex threads.",
+      translation: "这是一条关于 AI 工具和 agent 实践的 Builder 讨论。读者可关注官方说明、可试用入口、演示截图和真实案例。",
+      content: "这是一条关于 AI 工具和 agent 实践的 Builder 讨论。读者可关注官方说明、可试用入口、演示截图和真实案例。",
+      url: "https://x.com/example/status/2059000000000000000"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const templateIssues = review.issues.filter((issue) => issue.code === "builder_translation_template");
+
+  assert.equal(review.ok, false);
+  assert.equal(templateIssues.length, 2);
+  assert(templateIssues.some((issue) => issue.path === "builder_observations[0].translation"));
+  assert(templateIssues.some((issue) => issue.path === "builder_observations[0].content"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
 });
 
 test("quality review rejects templated impact and watch prose in public body", async () => {

@@ -192,6 +192,10 @@ export function reportToInteractionInput(report, options = {}) {
       items: communityCards
     });
   }
+  const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
+  if (sourceAuditOverview) {
+    sections.push(sourceAuditOverview);
+  }
   const qualityStatus = formatQualityStatus(report.quality_status);
   if (qualityStatus) {
     sections.push({
@@ -1156,6 +1160,8 @@ function formatBuilderObservationCards(items, report) {
   return items.map((item) => {
     const translation = builderTranslationText(item);
     const handle = builderHandle(item);
+    const originalText = builderOriginalText(item);
+    const media = formatBuilderMedia(report, item);
 
     return {
       group: "X/Twitter",
@@ -1170,13 +1176,54 @@ function formatBuilderObservationCards(items, report) {
         item.role ? cardTag(item.role, "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points: []
+      points: originalText ? [{ label: "原文", value: originalText }] : [],
+      ...(media.length > 0 ? { media } : {})
     };
   });
 }
 
 function builderTranslationText(item) {
   return String(item?.translation || item?.translated_text || item?.content || "").trim();
+}
+
+function builderOriginalText(item) {
+  return String(item?.original_text || "").trim();
+}
+
+function formatBuilderMedia(report, item) {
+  const media = [];
+  if (item?.image_url) {
+    media.push({
+      src: item.image_url,
+      alt: item.image_alt || `${item.author || "Builder"} 原帖图片`,
+      caption: item.image_alt || "原帖图片"
+    });
+  }
+  for (const imageUrl of Array.isArray(item?.image_urls) ? item.image_urls : []) {
+    media.push({
+      src: imageUrl,
+      alt: item.image_alt || `${item.author || "Builder"} 原帖图片`,
+      caption: item.image_alt || "原帖图片"
+    });
+  }
+  for (const asset of Array.isArray(report?.evidence_assets) ? report.evidence_assets : []) {
+    if (asset?.source_url !== item?.url || !asset?.local_path) {
+      continue;
+    }
+    const src = relativeAssetHref(report.html_path, asset.local_path);
+    if (!src) {
+      continue;
+    }
+    media.push({
+      src,
+      alt: asset.caption || asset.title || `${item.author || "Builder"} 原帖图片`,
+      caption: evidenceCaption(asset)
+    });
+  }
+  const seen = new Set();
+  return media
+    .filter((entry) => entry.src && !seen.has(entry.src) && seen.add(entry.src))
+    .slice(0, 2);
 }
 
 function builderHandle(item) {
@@ -1675,10 +1722,10 @@ function formatAuditGroup(title, group) {
 
   const counts = sourceStatusCounts(group.sources);
   const sources = Array.isArray(group.sources) && group.sources.length > 0
-    ? group.sources.map((source) => `- ${markdownLink(source.url, source.name)}：${source.status}${source.notes ? `，${source.notes}` : ""}`).join("\n")
+    ? group.sources.map((source) => `- ${markdownLink(source.url, source.name)}：${sourceStatusTag(source.status)}${source.notes ? `，${source.notes}` : ""}`).join("\n")
     : "- 未记录具体来源。";
   const details = [
-    `- Source status: checked=${counts.checked}; no_signal=${counts.no_signal}; blocked=${counts.blocked}; skipped=${counts.skipped}`,
+    `- Source status: ${sourceStatusTag("checked")} ${counts.checked}；${sourceStatusTag("no_signal")} ${counts.no_signal}；${sourceStatusTag("blocked")} ${counts.blocked}；${sourceStatusTag("skipped")} ${counts.skipped}`,
     "- 审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。",
     `- 检查状态：${group.checked ? "已检查" : "未检查"}`,
     `- 候选 / 入选：${group.candidates_found} / ${group.included}`,
@@ -1687,6 +1734,91 @@ function formatAuditGroup(title, group) {
     `- 说明：${group.notes || "无"}`
   ].filter(Boolean);
   return `### ${title}\n\n${details.join("\n")}\n\n${sources}`;
+}
+
+function formatSourceAuditOverviewChart(audit, dataHref) {
+  if (!audit) {
+    return null;
+  }
+  const rows = sourceAuditGroups(audit)
+    .map(({ title, group }) => {
+      const counts = sourceStatusCounts(group?.sources);
+      const total = counts.checked + counts.no_signal + counts.blocked + counts.skipped;
+      if (total === 0) {
+        return null;
+      }
+      return {
+        group: title,
+        checked: counts.checked,
+        status: `checked ${counts.checked} / no_signal ${counts.no_signal} / blocked ${counts.blocked} / skipped ${counts.skipped}`,
+        blocked: counts.blocked,
+        no_signal: counts.no_signal,
+        skipped: counts.skipped
+      };
+    })
+    .filter(Boolean);
+  if (rows.length === 0) {
+    return null;
+  }
+  const checked = rows.reduce((sum, row) => sum + row.checked, 0);
+  const blocked = rows.reduce((sum, row) => sum + row.blocked, 0);
+  const noSignal = rows.reduce((sum, row) => sum + row.no_signal, 0);
+  const takeaway = blocked > 0
+    ? `本轮有 ${blocked} 个来源阻塞；已检查 ${checked} 个来源，no_signal ${noSignal} 个。`
+    : `本轮已检查 ${checked} 个来源，no_signal ${noSignal} 个。`;
+  return {
+    type: "chart",
+    title: "信源状态概览",
+    group: "verification",
+    status: blocked > 0 ? "warning" : "complete",
+    chart: {
+      type: "bar",
+      title: "各信源组 checked 数量",
+      takeaway,
+      encoding: {
+        label: "group",
+        value: "checked",
+        status: "status"
+      },
+      source: {
+        label: "source_audit",
+        url: dataHref
+      },
+      altText: "按信源组展示 checked 数量，并在状态列列出 blocked、no_signal 和 skipped。",
+      data: rows
+    }
+  };
+}
+
+function sourceAuditGroups(audit) {
+  return [
+    { title: "GitHub Trending", group: audit.github_trending },
+    { title: "Builder 原始源", group: audit.builder_sources },
+    { title: "热门博客与访谈源", group: audit.content_sources },
+    { title: "搜索 / 新闻影子源", group: audit.search_sources },
+    { title: "信源健康检查", group: audit.sources_health }
+  ].filter((item) => item.group);
+}
+
+function sourceStatusTag(status) {
+  const normalized = sourceStatusClass(status);
+  const labels = {
+    checked: "checked",
+    "no-signal": "no_signal",
+    blocked: "blocked",
+    skipped: "skipped",
+    unknown: "unknown"
+  };
+  return `==tag-status-${normalized}|${labels[normalized]}==`;
+}
+
+function sourceStatusClass(status) {
+  const value = String(status || "").trim();
+  if (value === "checked") return "checked";
+  if (value === "no_signal") return "no-signal";
+  if (value === "blocked") return "blocked";
+  if (value.startsWith("skipped")) return "skipped";
+  return "unknown";
 }
 
 function sourceStatusCounts(sources) {

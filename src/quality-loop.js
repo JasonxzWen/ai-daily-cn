@@ -41,7 +41,8 @@ const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
-const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u;
+const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对)/u;
+const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补)/u;
 const PUBLIC_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
 const PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
 
@@ -751,6 +752,25 @@ function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
         repairable: true
       });
     }
+    for (const [fieldName, value] of [["translation", translation], ["content", content]]) {
+      if (!value || !BUILDER_TEMPLATE_TRANSLATION_RE.test(value)) {
+        continue;
+      }
+      const path = `builder_observations[${index}].${fieldName}`;
+      issues.push({
+        code: "builder_translation_template",
+        severity: "error",
+        path,
+        message: "Builder observation must use a concrete Chinese translation, not a generic template or repair placeholder.",
+        repairable: true
+      });
+      aiReviewTasks.push({
+        kind: "builder_translation_rewrite",
+        path,
+        source_path: `builder_observations[${index}].original_text`,
+        instruction: "Translate original_text directly into Chinese. Preserve meaning, names, numbers, links and tone; do not summarize into a generic Builder observation."
+      });
+    }
   });
 }
 
@@ -776,8 +796,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "builder_translation",
-      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch"),
-      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
+      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch") && !failedCodes.has("builder_translation_template"),
+      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") || failedCodes.has("builder_translation_template") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
     },
     {
       id: "content_density",
