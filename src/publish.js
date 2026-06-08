@@ -12,6 +12,7 @@ import { buildAutomationRevision } from "./automation-revision.js";
 import { mergeCommandEnv, npmCommandText, npmInvocationForArgs } from "./process-runner.js";
 
 const execFileAsync = promisify(execFile);
+const SOURCE_STATUS_HISTORY_REPO_PATH = "reports-data/source-status-history.json";
 
 export async function checkPublishPreflight(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
@@ -920,6 +921,9 @@ async function resolveCurrentAutomationRevision(options, repoRoot) {
 
 async function plannedReportsDataFiles(repoRoot, dates) {
   const files = [];
+  if (await exists(path.join(repoRoot, ...SOURCE_STATUS_HISTORY_REPO_PATH.split("/")))) {
+    files.push(SOURCE_STATUS_HISTORY_REPO_PATH);
+  }
   for (const date of dates) {
     const [year, month] = date.split("-");
     const base = `reports-data/${year}/${month}/${date}`;
