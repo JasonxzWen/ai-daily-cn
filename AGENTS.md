@@ -7,6 +7,16 @@
 - Run `node scripts/harness-validate.mjs` before handoff when harness files change.
 - For daily publish runs, follow `tasks/daily-publish-runbook.md`; capture `publish:dry-run` before any real publish.
 
+## SDD/TDD 工作流
+
+- `tasks/current-task.md` 是每次迭代的唯一当前规格源；`progress.md` 只记录过程状态，`session-handoff.md` 只记录交接结果。
+- 非平凡改动必须先完成 `tasks/current-task.md` 中的 `Task Class`、`Spec`、`Acceptance Criteria`、`Red Test` 或 `Deterministic Substitute`、`Allowed Paths`、`Forbidden Paths`、`Validation Commands`、`Parallel Writes` 和 `Handoff Requirements`。
+- 规格就绪前只允许只读探索；不得写测试、改实现、删除文件或生成持久产物。
+- 非平凡改动必须在实现前运行 `Red Test` 并记录失败证据；如果直接红灯测试不可行，必须写明 `Deterministic Substitute` 和理由。
+- `Task Class: trivial` 只允许用于 typo、纯文案、一行无行为配置或只读诊断等低风险任务，并且必须包含 `Trivial Justification`。
+- `node scripts/harness-validate.mjs` 是仓库级 SDD/TDD 验证门；不要绕过或弱化它来完成交付。
+- OpenSpec 不再作为本仓库的主动规格或验证流程；长期契约也写入 `tasks/current-task.md` 并绑定测试或验证门。
+
 ## 语言
 
 始终使用中文回复用户。技术标识符、命令、路径、schema 字段名和 URL 保持原文。

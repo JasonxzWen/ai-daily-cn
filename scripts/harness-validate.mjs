@@ -13,9 +13,15 @@ const requiredFiles = [
   'tasks/current-task.md',
   'tasks/daily-publish-runbook.md',
   'tasks/templates/daily-publish-task.md',
+  'tasks/templates/sdd-tdd-task.md',
   'scripts/harness-validate.mjs',
 ];
-const forbiddenFiles = ['CLAUDE.md'];
+const forbiddenPaths = [
+  { path: 'CLAUDE.md', reason: 'non-Codex platform instruction file is present' },
+  { path: 'openspec', reason: 'OpenSpec workflow artifacts must be removed from the active repository' },
+  { path: 'scripts/validate-openspec.mjs', reason: 'OpenSpec validator must be removed from the active workflow' },
+  { path: 'tests/openspec.test.js', reason: 'OpenSpec tests must be removed from the active workflow' },
+];
 const sizeLimits = {
   'AGENTS.md': 32 * 1024,
   'progress.md': 16 * 1024,
@@ -23,14 +29,24 @@ const sizeLimits = {
   'tasks/current-task.md': 16 * 1024,
 };
 const requiredMarkers = {
-  'AGENTS.md': ['Codex', 'worktree', 'session-handoff', 'tasks/daily-publish-runbook.md', 'publish:dry-run'],
+  'AGENTS.md': [
+    'Codex',
+    'worktree',
+    'session-handoff',
+    'tasks/daily-publish-runbook.md',
+    'publish:dry-run',
+    'SDD/TDD',
+    'Red Test',
+  ],
   'tasks/current-task.md': [
-    'Goal',
-    'Allowed paths',
-    'Forbidden paths',
-    'Validation commands',
-    'Parallel writes',
-    'Handoff requirements',
+    'Task Class',
+    'Spec',
+    'Acceptance Criteria',
+    'Allowed Paths',
+    'Forbidden Paths',
+    'Validation Commands',
+    'Parallel Writes',
+    'Handoff Requirements',
   ],
   'tasks/daily-publish-runbook.md': [
     'Preflight',
@@ -52,6 +68,18 @@ const requiredMarkers = {
     'npm run validate',
     'npm run publish:dry-run',
   ],
+  'tasks/templates/sdd-tdd-task.md': [
+    'Task Class',
+    'Trivial Justification',
+    'Spec',
+    'Acceptance Criteria',
+    'Red Test',
+    'Deterministic Substitute',
+    'Allowed Paths',
+    'Forbidden Paths',
+    'Validation Commands',
+    'Handoff Requirements',
+  ],
 };
 const requiredPackageScripts = {
   'prompt:build': ['src/cli.js', 'prompt:build'],
@@ -59,8 +87,8 @@ const requiredPackageScripts = {
   build: ['src/cli.js', 'build', '--out docs'],
   test: ['node --test'],
   'test:e2e': ['scripts/run-e2e.mjs'],
-  'validate:openspec': ['scripts/validate-openspec.mjs'],
-  validate: ['npm run test', 'npm run build', 'npm run test:e2e', 'npm run validate:openspec', 'git diff --check'],
+  'harness:validate': ['scripts/harness-validate.mjs'],
+  validate: ['npm run harness:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
   'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],
@@ -91,9 +119,9 @@ for (const file of requiredFiles) {
   }
 }
 
-for (const file of forbiddenFiles) {
-  if (fs.existsSync(path.join(root, file))) {
-    failures.push(`${file}: non-Codex platform instruction file is present`);
+for (const entry of forbiddenPaths) {
+  if (fs.existsSync(path.join(root, entry.path))) {
+    failures.push(`${entry.path}: ${entry.reason}`);
   }
 }
 
@@ -142,6 +170,7 @@ if (fs.existsSync(featureStatePath)) {
 }
 
 validatePackageScripts(failures);
+validateCurrentTask(failures);
 
 if (failures.length > 0) {
   console.error('Harness validation failed:');
@@ -214,6 +243,14 @@ function validatePackageScripts(failures) {
   }
 
   const scripts = isRecord(manifest.scripts) ? manifest.scripts : {};
+  for (const [scriptName, command] of Object.entries(scripts)) {
+    if (scriptName.toLowerCase().includes('openspec')) {
+      failures.push(`package.json#scripts.${scriptName}: OpenSpec scripts are not part of the active workflow`);
+    }
+    if (typeof command === 'string' && /openspec/i.test(command)) {
+      failures.push(`package.json#scripts.${scriptName}: OpenSpec command references are not part of the active workflow`);
+    }
+  }
   for (const [scriptName, markers] of Object.entries(requiredPackageScripts)) {
     const command = scripts[scriptName];
     if (typeof command !== 'string' || command.trim().length === 0) {
@@ -225,4 +262,69 @@ function validatePackageScripts(failures) {
       failures.push(`package.json#scripts.${scriptName}: missing markers ${missing.join(', ')}`);
     }
   }
+}
+
+function validateCurrentTask(failures) {
+  const taskPath = path.join(root, 'tasks/current-task.md');
+  if (!fs.existsSync(taskPath)) return;
+
+  const content = fs.readFileSync(taskPath, 'utf8');
+  const taskClass = firstNonEmptyLine(sectionText(content, 'Task Class')).toLowerCase();
+  if (!['non-trivial', 'trivial'].includes(taskClass)) {
+    failures.push('tasks/current-task.md: first non-empty Task Class line must be "non-trivial" or "trivial"');
+    return;
+  }
+
+  if (taskClass === 'trivial') {
+    const justification = sectionText(content, 'Trivial Justification').trim();
+    if (justification.length < 20) {
+      failures.push('tasks/current-task.md: trivial tasks require a meaningful Trivial Justification');
+    }
+    return;
+  }
+
+  const redTest = sectionText(content, 'Red Test').trim();
+  const substitute = sectionText(content, 'Deterministic Substitute').trim();
+  if (redTest.length === 0 && substitute.length === 0) {
+    failures.push('tasks/current-task.md: non-trivial tasks require Red Test or Deterministic Substitute');
+  }
+  if (redTest.length > 0 && !/(node|npm|git|pwsh|powershell|curl|Invoke-)/i.test(redTest)) {
+    failures.push('tasks/current-task.md: Red Test must include an executable command or deterministic check');
+  }
+  if (redTest.length > 0 && !hasFailureEvidence(redTest)) {
+    failures.push('tasks/current-task.md: Red Test must record the expected or actual failing result');
+  }
+  if (redTest.length === 0 && substitute.length > 0 && !/reason|\u7406\u7531|\u4e0d\u53ef|\u65e0\u6cd5|\u56e0\u4e3a|not practical|not feasible/i.test(substitute)) {
+    failures.push('tasks/current-task.md: Deterministic Substitute must explain why a direct red test is not practical');
+  }
+}
+
+function hasFailureEvidence(value) {
+  return /fail|failed|failing|red evidence|expected initial|not ok|AssertionError|ERR_|exit code|non-zero|\u5931\u8d25|\u672a\u901a\u8fc7/i.test(value);
+}
+
+function firstNonEmptyLine(value) {
+  return String(value)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => line.length > 0) || '';
+}
+
+function sectionText(content, heading) {
+  const lines = content.split(/\r?\n/);
+  const headingPattern = new RegExp(`^##\\s+${escapeRegExp(heading)}\\s*$`, 'i');
+  const nextHeadingPattern = /^##\s+\S/;
+  const start = lines.findIndex((line) => headingPattern.test(line));
+  if (start === -1) return '';
+
+  const collected = [];
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (nextHeadingPattern.test(lines[index])) break;
+    collected.push(lines[index]);
+  }
+  return collected.join('\n');
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

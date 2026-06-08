@@ -19,7 +19,7 @@
 
 - [Skill Hub 前端与 HTML 汇报能力评估](skill-hub-frontend-html-capability-evaluation.md)
 - [AI 日报分发、测试与提示词构建规范](ai-daily-distribution-testing-prompt-spec.md)
-- [OpenSpec 风格规格](../openspec/changes/add-ai-daily-static-publishing/proposal.md)
+- 当前迭代规格以 `tasks/current-task.md` 为准；新任务使用 `tasks/templates/sdd-tdd-task.md`。
 
 ## 当前仓库观察
 

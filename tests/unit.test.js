@@ -3620,6 +3620,268 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
+test("harness SDD TDD rejects non-trivial current task without red test", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness enforces the SDD/TDD contract.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /Red Test|Deterministic Substitute/);
+});
+
+test("harness SDD TDD rejects red test without failing result evidence", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness enforces red-test evidence.",
+      "",
+      "## Red Test",
+      "",
+      "```powershell",
+      "node scripts/harness-validate.mjs",
+      "```",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /failing result/);
+});
+
+test("harness SDD TDD accepts trivial current task only with justification", async () => {
+  const missingJustificationRoot = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "trivial",
+      "",
+      "## Spec",
+      "",
+      "Fix a typo.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Typo is fixed.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `docs/example.md`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not change code.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `git diff --check`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report the edit.",
+      ""
+    ].join("\n")
+  });
+  const missingJustification = await runHarnessValidate(missingJustificationRoot);
+
+  assert.notEqual(missingJustification.code, 0);
+  assert.match(missingJustification.stderr, /Trivial Justification/);
+
+  const justifiedRoot = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "trivial",
+      "",
+      "## Trivial Justification",
+      "",
+      "Documentation-only typo fix with no behavior, contract, validation, publication, or automation impact.",
+      "",
+      "## Spec",
+      "",
+      "Fix a typo.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Typo is fixed.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `docs/example.md`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not change code.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `git diff --check`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report the edit.",
+      ""
+    ].join("\n")
+  });
+  const justified = await runHarnessValidate(justifiedRoot);
+
+  assert.equal(justified.code, 0, justified.stderr);
+});
+
+test("harness SDD TDD accepts task class followed by template guidance", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "Use `trivial` only for typo, pure copy, one-line no-behavior config, or read-only diagnostic tasks.",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness accepts task templates with guidance text.",
+      "",
+      "## Red Test",
+      "",
+      "Run before implementation:",
+      "",
+      "```powershell",
+      "node scripts/harness-validate.mjs",
+      "```",
+      "",
+      "Expected initial failure:",
+      "",
+      "- The pre-change harness rejects the task fixture.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.equal(result.code, 0, result.stderr);
+});
+
+test("OpenSpec removed from active package workflow", async () => {
+  const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
+  const scripts = manifest.scripts || {};
+
+  assert.equal("validate:openspec" in scripts, false);
+  assert.equal(scripts["harness:validate"], "node scripts/harness-validate.mjs");
+  assert.match(scripts.validate || "", /npm run harness:validate/);
+  assert.doesNotMatch(scripts.test || "", /openspec/i);
+  assert.doesNotMatch(scripts.validate || "", /openspec/i);
+  assert.equal(await exists(path.join(rootDir, "scripts", "validate-openspec.mjs")), false);
+  assert.equal(await exists(path.join(rootDir, "tests", "openspec.test.js")), false);
+  assert.equal(await exists(path.join(rootDir, "openspec")), false);
+});
+
 test("daily runner writes launcher summary and stops before real publish by default", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-launcher-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -7491,6 +7753,198 @@ async function exists(filePath) {
   } catch {
     return false;
   }
+}
+
+async function runHarnessValidate(cwd) {
+  try {
+    const result = await execFileAsync(process.execPath, [path.join(rootDir, "scripts/harness-validate.mjs")], {
+      cwd
+    });
+    return {
+      code: 0,
+      stdout: result.stdout,
+      stderr: result.stderr
+    };
+  } catch (error) {
+    return {
+      code: error.code ?? 1,
+      stdout: error.stdout || "",
+      stderr: error.stderr || error.message || ""
+    };
+  }
+}
+
+async function createHarnessFixture(options = {}) {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
+  await fs.mkdir(path.join(tmp, "scripts"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
+
+  await fs.writeFile(
+    path.join(tmp, "AGENTS.md"),
+    [
+      "# AGENTS.md",
+      "",
+      "Codex worktree session-handoff tasks/daily-publish-runbook.md publish:dry-run",
+      "SDD/TDD Red Test",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(path.join(tmp, "progress.md"), "# Progress\n\n## Current State\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "session-handoff.md"), "# Session Handoff\n\n## Current Status\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "clean-state-checklist.md"), "# Clean State Checklist\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "definition-of-done.md"), "# Definition Of Done\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "tasks", "current-task.md"), options.currentTask || validNonTrivialCurrentTask(), "utf8");
+  await fs.writeFile(
+    path.join(tmp, "tasks", "daily-publish-runbook.md"),
+    [
+      "# Daily Publish Runbook",
+      "",
+      "## Preflight",
+      "## Source Discovery",
+      "## Report Write",
+      "## Build And Validate",
+      "## Dry Run",
+      "## Real Publish",
+      "## GitHub API Fallback",
+      "## Handoff",
+      "",
+      "npm run publish:dry-run",
+      "npm run publish -- confirm-push YYYY-MM-DD",
+      "npm run publish:github-api -- confirm-push YYYY-MM-DD",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "tasks", "templates", "daily-publish-task.md"),
+    [
+      "# Daily Publish Task",
+      "",
+      "YYYY-MM-DD",
+      "Asia/Shanghai",
+      "Real publish requires explicit confirmation",
+      "npm run validate",
+      "npm run publish:dry-run",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "tasks", "templates", "sdd-tdd-task.md"),
+    [
+      "# Current Task",
+      "## Task Class",
+      "## Trivial Justification",
+      "## Spec",
+      "## Acceptance Criteria",
+      "## Red Test",
+      "## Deterministic Substitute",
+      "## Allowed Paths",
+      "## Forbidden Paths",
+      "## Validation Commands",
+      "## Handoff Requirements",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.copyFile(path.join(rootDir, "scripts", "harness-validate.mjs"), path.join(tmp, "scripts", "harness-validate.mjs"));
+  await fs.writeFile(
+    path.join(tmp, "package.json"),
+    JSON.stringify({
+      scripts: {
+        "prompt:build": "node src/cli.js prompt:build",
+        "report:write": "node src/cli.js report:write",
+        build: "node src/cli.js build --data-input reports-data --input reports-source --out docs",
+        test: "node --test tests/unit.test.js",
+        "test:e2e": "node scripts/run-e2e.mjs",
+        "harness:validate": "node scripts/harness-validate.mjs",
+        validate: "npm run harness:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
+        "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
+        "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
+        "publish:preflight": "node src/cli.js publish:preflight",
+        "publish:dry-run": "node src/cli.js publish:dry-run --data-input reports-data --input reports-source --out docs",
+        "publish:github-api": "node src/cli.js publish:github-api",
+        publish: "node src/cli.js publish",
+        "discover:github-trending": "node src/cli.js discover:github-trending",
+        "discover:builders": "node src/cli.js discover:builders",
+        "discover:content-sources": "node src/cli.js discover:content-sources",
+        "discover:statuspage-incidents": "node src/cli.js discover:statuspage-incidents"
+      }
+    }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "feature_list.json"),
+    JSON.stringify({
+      features: [
+        "daily-source-discovery",
+        "structured-report-write",
+        "static-html-build",
+        "publish-preflight",
+        "publish-dry-run",
+        "publish-execute",
+        "daily-publish-harness"
+      ].map((id) => ({
+        id,
+        status: "active",
+        summary: `${id} fixture`,
+        commands: ["npm run validate"],
+        artifacts: ["fixture"],
+        acceptance: ["fixture acceptance 1", "fixture acceptance 2"],
+        stop_conditions: ["fixture stop"]
+      })),
+      parallel_write_policy: {
+        default: "blocked"
+      }
+    }, null, 2),
+    "utf8"
+  );
+
+  return tmp;
+}
+
+function validNonTrivialCurrentTask() {
+  return [
+    "# Current Task",
+    "",
+    "## Task Class",
+    "",
+    "non-trivial",
+    "",
+    "## Spec",
+    "",
+    "A fixture implementation task.",
+    "",
+    "## Acceptance Criteria",
+    "",
+    "- Harness enforces the SDD/TDD contract.",
+    "",
+    "## Red Test",
+    "",
+    "`node --test tests/unit.test.js --test-name-pattern \"fixture\"` fails before implementation.",
+    "",
+    "## Allowed Paths",
+    "",
+    "- `scripts/harness-validate.mjs`",
+    "",
+    "## Forbidden Paths",
+    "",
+    "- Do not modify generated reports.",
+    "",
+    "## Validation Commands",
+    "",
+    "- `node scripts/harness-validate.mjs`",
+    "",
+    "## Parallel Writes",
+    "",
+    "- No parallel writes.",
+    "",
+    "## Handoff Requirements",
+    "",
+    "- Report validation evidence.",
+    ""
+  ].join("\n");
 }
 
 function datesThrough(startDate, count) {
