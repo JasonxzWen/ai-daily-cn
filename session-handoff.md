@@ -2,46 +2,52 @@
 
 ## Current Status
 
-- Feedback-memory and regression self-check mechanism is implemented.
-- Current task spec has been reset to this active task in `tasks/current-task.md`.
-- Worktree is detached `HEAD`, not a named branch.
-- No commit, push, remote setting, or automation configuration change was made.
+- Local Harness Hub aggregation is updated to source `D:/harness-hub` at `main@b8a5d87ed9c5ad07b594feeea52de1a0b05759d3`.
+- A repeatable updater now exists at `scripts/update-harness-hub.mjs`.
+- Version/package release sniff prompts still route to `package-release-sniffer`.
+- Full repository validation passed with the updated Harness Hub content.
+- No commit, push, or PR was created for this task.
 
 ## Changed Files
 
-- `AGENTS.md`
-- `clean-state-checklist.md`
-- `config/feedback-ledger.json`
-- `definition-of-done.md`
-- `docs/feedback-buglist-quick-reference.md`
+- `.codex/harness-hub-aggregation.json`
+- `.codex/skills/effective-interact/_harness-hub/SKILL.md`
+- `.codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.js`
+- `.codex/skills/effective-interact/_harness-hub/assets/components/rich-render-runtime.js`
+- `.codex/skills/effective-interact/_harness-hub/references/interaction-patterns.md`
+- `.codex/skills/effective-interact/_harness-hub/scripts/validate-interaction.mjs`
+- `.codex/skills/sdd-workflow/SKILL.md`
+- `.codex/skills/workflow-router/references/orchestration-policy.md`
+- `.codex/skills/workflow-router/scripts/advisory-check.mjs`
+- `.codex/skills/workflow-router/scripts/route-intent.mjs`
+- `.codex/skills/workflow-router/scripts/skill-activation-check.mjs`
+- `.codex/skills/workflow-router/scripts/workflow-check.mjs`
 - `progress.md`
-- `scripts/harness-validate.mjs`
+- `scripts/update-harness-hub.mjs`
 - `session-handoff.md`
 - `tasks/current-task.md`
-- `tasks/templates/sdd-tdd-task.md`
-- `tests/unit.test.js`
+- `tests/skills.test.js`
 
 ## What Changed
 
-- Added a human-readable quick reference for all current P1 feedback items.
-- Added `feedback/p1-feedback-memory-self-check` to the durable feedback ledger.
-- Made `Feedback Ledger Review` and `Regression Self-Check` mandatory task sections.
-- Updated harness validation to reject missing or empty feedback-memory/self-check content.
-- Added focused unit tests proving the new validation behavior and ledger binding.
-- Generated ignored effective-interact handoff report at `.codex/skills/effective-interact/artifacts/feedback-memory-handoff.html`.
-- Strict self-check found and fixed a coverage gap: missing ledger IDs in the quick reference now fail `scripts/harness-validate.mjs`.
+- Replaced the stale previous task spec with a Harness Hub maintenance spec that explicitly targets source freshness and version-sniff validation.
+- Added a local sync script that reads the existing aggregation policy, refreshes imported skills, preserves overlapping local skills, updates `_harness-hub` upstream snapshots, and rewrites `.codex/harness-hub-aggregation.json` with current source metadata.
+- Synced the local aggregation from the old recorded source commit `eebf29ad5c67d23eef898528282c1e861ea09dd5` to current source HEAD `b8a5d87ed9c5ad07b594feeea52de1a0b05759d3`.
+- Pulled in the upstream `workflow-router` changes that keep Harness Hub maintenance advisories and helper routing current.
+- Refreshed the overlapping `effective-interact` `_harness-hub` snapshot files instead of replacing the active local `effective-interact` implementation.
+- Added focused tests for: source freshness against the local Harness Hub checkout, version-sniff routing to `package-release-sniffer`, and updater overlay-preservation behavior.
+- Trimmed one trailing whitespace line introduced by the upstream `webapp-testing` skill during sync.
 
 ## Validation Evidence
 
-- Red test before implementation: `node --test tests/unit.test.js --test-name-pattern "feedback memory self-check"` failed after dependencies were restored, with 196 subtests, 193 pass, 3 fail.
-- Focused green test after implementation: same command passed with 196 subtests.
+- Pre-implementation deterministic failure: manifest commit `eebf29ad5c67d23eef898528282c1e861ea09dd5` did not match `D:/harness-hub` HEAD `b8a5d87ed9c5ad07b594feeea52de1a0b05759d3`.
+- Focused red test before sync: `node --test tests/skills.test.js --test-name-pattern "Harness Hub source commit matches local source HEAD|Harness Hub version sniff prompt routes to package-release-sniffer|Harness Hub updater preserves local overlays while refreshing upstream copies"` failed only on source freshness.
+- Sync command passed: `node scripts/update-harness-hub.mjs --source-root D:/harness-hub`.
+- Focused green test after sync: the same command passed with source freshness, version-sniff routing, and updater preservation all green.
+- `npm test` passed with 261 tests.
 - `node scripts/harness-validate.mjs` passed.
-- `node scripts/validate-feedback-contract.mjs` passed with `{ "ok": true, "failures": [] }`.
-- `npm run validate` passed, including `harness:validate`, `feedback:validate`, workflow validation, sources validation, 258 tests, build, privacy scan, e2e, and `git diff --check`.
-- `npm run build` during validate reported `written_files: []`.
-- Deterministic quick-reference coverage check found 12 ledger items and `missing: []`.
-- Effective-interact report validation passed; browser checks covered 390, 768, and 1440 px viewports with no overlaps or clipped text.
-- Strict follow-up red/green: `node --test tests/unit.test.js --test-name-pattern "quick reference missing ledger item"` failed before harness coverage enforcement and passed after the fix.
+- `git diff --check` passed.
+- `npm run validate` passed end to end; build reported `written_files: []`.
 
 ## Pending Validation
 
@@ -49,8 +55,8 @@
 
 ## Residual Risk
 
-- No known validation gap remains for the feedback-memory mechanism. The quick reference is still manually edited, but `node scripts/harness-validate.mjs` now fails when any ledger ID is missing from it.
+- The updater relies on a local source checkout path (`D:/harness-hub`) for real syncs. The default repository test only enforces source freshness when that local checkout exists, so another environment without the source repo will skip that one freshness assertion rather than fail.
 
 ## Next Action
 
-- User review or explicitly request branch/commit if desired.
+- Review the synced Harness Hub skill diffs and decide whether to stage/commit them in one maintenance PR.

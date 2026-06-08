@@ -3,9 +3,10 @@ import fs from "node:fs";
 import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { syncHarnessHub } from "../scripts/update-harness-hub.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -71,6 +72,137 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
     fs.existsSync(path.join(rootDir, ".codex", "skills", "effective-interact", "_harness-hub", "scripts", "create-interaction.mjs")),
     true
   );
+});
+
+test("Harness Hub source commit matches local source HEAD", async (t) => {
+  const manifestPath = path.join(rootDir, ".codex", "harness-hub-aggregation.json");
+  const manifest = JSON.parse(await fsp.readFile(manifestPath, "utf8"));
+  const sourceRoot = manifest.source?.path;
+
+  if (!sourceRoot || !fs.existsSync(path.join(sourceRoot, ".git"))) {
+    t.skip(`Local Harness Hub source is unavailable: ${sourceRoot ?? "missing"}`);
+    return;
+  }
+
+  const head = execFileSync("git", ["-C", sourceRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  assert.equal(manifest.source.commit, head);
+});
+
+test("Harness Hub version sniff prompt routes to package-release-sniffer", () => {
+  const scriptPath = path.join(rootDir, ".codex", "skills", "workflow-router", "scripts", "skill-activation-check.mjs");
+  const result = spawnSync(
+    process.execPath,
+    [
+      scriptPath,
+      "--prompt",
+      "Sniff newly published npm and PyPI AI agent packages from primary registry and release feeds for today's developer-tool monitoring.",
+      "--json"
+    ],
+    {
+      cwd: rootDir,
+      encoding: "utf8"
+    }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.selectedSkill, "package-release-sniffer");
+});
+
+test("Harness Hub updater preserves local overlays while refreshing upstream copies", async () => {
+  const sourceRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-hub-source-"));
+  const targetRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-hub-target-"));
+  const sourceSkillsRoot = path.join(sourceRoot, "skills");
+  const targetSkillsRoot = path.join(targetRoot, ".codex", "skills");
+  const manifestPath = path.join(targetRoot, ".codex", "harness-hub-aggregation.json");
+
+  async function write(filePath, content) {
+    await fsp.mkdir(path.dirname(filePath), { recursive: true });
+    await fsp.writeFile(filePath, content, "utf8");
+  }
+
+  await write(path.join(sourceSkillsRoot, "imported-skill", "SKILL.md"), "source imported skill\n");
+  await write(path.join(sourceSkillsRoot, "imported-skill", "notes.md"), "source imported notes\n");
+  await write(path.join(sourceSkillsRoot, "overlap-skill", "SKILL.md"), "source overlap skill\n");
+  await write(path.join(sourceSkillsRoot, "overlap-skill", "references", "upstream.md"), "source upstream reference\n");
+  await write(path.join(sourceSkillsRoot, "overlap-skill", "scripts", "new-helper.mjs"), "export const helper = true;\n");
+
+  await write(path.join(targetSkillsRoot, "imported-skill", "SKILL.md"), "old imported skill\n");
+  await write(path.join(targetSkillsRoot, "imported-skill", "local.txt"), "remove me\n");
+  await write(path.join(targetSkillsRoot, "overlap-skill", "SKILL.md"), "local active overlap skill\n");
+  await write(path.join(targetSkillsRoot, "overlap-skill", "local-only.md"), "keep me\n");
+  await write(path.join(targetSkillsRoot, "overlap-skill", "_harness-hub", "stale.md"), "stale upstream copy\n");
+  await write(path.join(targetSkillsRoot, "local-only-skill", "SKILL.md"), "local only skill\n");
+
+  await write(
+    manifestPath,
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        generatedAt: "2026-06-08T00:00:00.000Z",
+        source: {
+          path: sourceRoot.replaceAll(path.sep, "/"),
+          branch: "old-branch",
+          commit: "0".repeat(40),
+          status: "## old-branch"
+        },
+        target: {
+          path: targetRoot.replaceAll(path.sep, "/"),
+          skillsRoot: ".codex/skills"
+        },
+        policy: {
+          importedSkills: "Hub-only skills are copied into .codex/skills.",
+          overlappingSkills:
+            "Existing local skill files remain active. Hub-only files are added. Same-path Hub conflicts are preserved under _harness-hub/ inside the same skill.",
+          localOnlySkills: "Local-only skills are left untouched.",
+          skippedTopLevelSourceDirs: ["artifacts"],
+          baseline: "Original local skills are computed from tracked .codex/skills/*/SKILL.md files before this aggregation."
+        },
+        importedSkills: ["imported-skill"],
+        overlappingSkills: ["overlap-skill"],
+        localOnlySkills: ["local-only-skill"]
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  const result = syncHarnessHub({
+    root: targetRoot,
+    sourceRoot,
+    sourceMetadata: {
+      branch: "main",
+      commit: "1".repeat(40),
+      status: "## main"
+    }
+  });
+
+  assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "imported-skill", "SKILL.md"), "utf8"), "source imported skill\n");
+  assert.equal(fs.existsSync(path.join(targetSkillsRoot, "imported-skill", "local.txt")), false);
+  assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "SKILL.md"), "utf8"), "local active overlap skill\n");
+  assert.equal(
+    await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "_harness-hub", "SKILL.md"), "utf8"),
+    "source overlap skill\n"
+  );
+  assert.equal(
+    await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "references", "upstream.md"), "utf8"),
+    "source upstream reference\n"
+  );
+  assert.equal(
+    await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "scripts", "new-helper.mjs"), "utf8"),
+    "export const helper = true;\n"
+  );
+  assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "local-only.md"), "utf8"), "keep me\n");
+  assert.equal(fs.existsSync(path.join(targetSkillsRoot, "overlap-skill", "_harness-hub", "stale.md")), false);
+  assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "local-only-skill", "SKILL.md"), "utf8"), "local only skill\n");
+
+  assert.equal(result.manifest.source.commit, "1".repeat(40));
+  assert.deepEqual(result.manifest.importedSkills, ["imported-skill"]);
+  assert.deepEqual(result.manifest.overlappingSkills, ["overlap-skill"]);
+  assert.deepEqual(result.manifest.localOnlySkills, ["local-only-skill"]);
+  assert.equal(result.manifest.counts.preservedConflicts, 1);
+  assert.equal(result.manifest.counts.copiedFiles, 4);
+  assert.equal(result.manifest.counts.localOnlyFilesKept, 1);
 });
 
 test("effective-interact generator creates a validated self-contained interaction report", async () => {

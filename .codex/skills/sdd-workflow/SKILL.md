@@ -12,7 +12,7 @@ Use this owner for change work. SDD is the spine; TDD is embedded inside the acc
 Do not start implementation until the user-visible gates are aligned.
 
 1. **Align user need**: outcome, actor, pain, constraints, non-goals, and success target.
-2. **Gather required material**: repo docs, code paths, existing source decisions, and referenced repos/blogs needed for the change.
+2. **Gather required material and explore directions**: repo docs, code paths, existing source decisions, referenced repos/blogs, and 2-3 viable directions from evidence. Recommend one and record rejected alternatives. Use `grill-me` for pressure questions, `prototype` for disposable proof, and `product-capability` for implementation constraints when useful. Do not require a standalone brainstorming skill.
 3. **Write spec and acceptance**: target behavior, boundaries, acceptance criteria, verification strategy, and open questions.
 4. **Write executable plan and align**: file targets, task order, tests, cleanup list, subagent use, hook checks, and validation commands.
 5. **Clean unneeded files**: delete, demote, archive, or retain only after ownership and safety are clear.
@@ -21,6 +21,17 @@ Do not start implementation until the user-visible gates are aligned.
 8. **Deliver report**: use `effective-interact` for material work, with changes, evidence, validation, risks, and next actions.
 
 During implementation, update the active task's `Spec updates` only for decision-level changes that alter assumptions, acceptance criteria, allowed paths, validation commands, user-visible behavior, or risk. Do not turn it into a progress log; progress belongs in the harness progress file when a repo harness is active.
+
+## Repo Harness State
+
+When `.harness-hub/state/` exists, persist the plan before implementation instead of relying on chat memory:
+
+- `current-task.md`: goal, assumptions, non-goals, allowed paths, forbidden paths, discovery/brainstorming, target spec, P0/P1/P2 test matrix, validation commands, open questions, alignment status, and checkpoint policy.
+- `decisions.md`: accepted direction, rationale, rejected alternatives, and any decision-level changes.
+- `progress.md`: current phase, completed work, validation records, runtime signals, blockers, PR status, and checkpoint commit state.
+- `session-handoff.md`: restart status, changed files, validation evidence, residual risk, and next action before ending the session.
+
+Ask only blocking open questions before implementation. A blocking question is one whose answer changes user-visible behavior, safety, data ownership, compatibility, cost, release/rollback behavior, external side effects, allowed paths, or acceptance criteria.
 
 ## TDD
 

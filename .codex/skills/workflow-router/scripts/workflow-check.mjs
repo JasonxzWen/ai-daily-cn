@@ -24,8 +24,11 @@ function parseArgs(argv) {
     hasEvidence: false,
     hasReproduction: false,
     hasValidation: false,
+    hasHtmlHandoff: false,
     materialChanges: false,
     willMutate: false,
+    expectedOutputMode: null,
+    currentTaskPath: null,
     json: false,
     help: false,
   };
@@ -55,10 +58,17 @@ function parseArgs(argv) {
       options.hasReproduction = true;
     } else if (arg === '--has-validation') {
       options.hasValidation = true;
+    } else if (arg === '--has-html-handoff') {
+      options.hasHtmlHandoff = true;
+      options.hasHandoff = true;
     } else if (arg === '--material-changes') {
       options.materialChanges = true;
     } else if (arg === '--will-mutate') {
       options.willMutate = true;
+    } else if (arg === '--expected-output-mode') {
+      options.expectedOutputMode = readValue(argv, ++index, arg);
+    } else if (arg === '--current-task') {
+      options.currentTaskPath = readValue(argv, ++index, arg);
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg === '--help' || arg === '-h') {
@@ -109,8 +119,11 @@ export function checkWorkflow(options) {
     hasEvidence: Boolean(options.hasEvidence),
     hasReproduction: Boolean(options.hasReproduction),
     hasValidation: Boolean(options.hasValidation),
+    hasHtmlHandoff: Boolean(options.hasHtmlHandoff),
     materialChanges: Boolean(options.materialChanges),
     willMutate: Boolean(options.willMutate),
+    expectedOutputMode: options.expectedOutputMode || route.expectedOutputMode,
+    currentTaskPath: options.currentTaskPath,
   });
   const ownerContract = checkOwnerContract({ state: route.state });
 
@@ -142,8 +155,11 @@ Flags mirror advisory-check.mjs:
   --has-evidence
   --has-reproduction
   --has-validation
+  --has-html-handoff
   --material-changes
   --will-mutate
+  --expected-output-mode <mode>
+  --current-task <path>
 
 This command composes intent routing, advisory gates, and owner contract checks. It is side-effect free:
 it never edits files, dispatches subagents, calls remote services, or starts implementation.`);
@@ -166,6 +182,8 @@ function printText(result) {
       console.log(`- ${warning.id}: ${warning.message}`);
     }
   }
+  console.log(`EXPECTED_OUTPUT_MODE: ${result.advisory.expectedOutputMode || result.route.expectedOutputMode || 'none'}`);
+  console.log(`HTML_REQUIRED: ${result.advisory.htmlRequired ? 'yes' : 'no'}`);
   console.log(`NEXT_ACTION: ${result.nextAction}`);
 }
 
