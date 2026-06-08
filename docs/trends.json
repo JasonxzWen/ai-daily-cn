@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-05T14:44:22.219Z",
+  "generated_at": "2026-06-08T02:37:33.654Z",
   "window_days": 7,
   "source": {
-    "report_count": 23,
-    "date_from": "2026-05-30",
-    "date_to": "2026-06-05"
+    "report_count": 24,
+    "date_from": "2026-06-02",
+    "date_to": "2026-06-08"
   },
   "thresholds": {
     "watching": {
@@ -32,8 +32,8 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 30,
-      "active_days": 7,
+      "occurrences": 18,
+      "active_days": 5,
       "sections": [
         "builder_observations",
         "github_trending",
@@ -42,42 +42,35 @@
         "projects"
       ],
       "entities": [
-        "Anthropic",
         "AWS",
         "Claude Code",
         "Codex",
         "GitHub",
-        "Google",
         "OpenAI"
       ],
       "dates": [
-        "2026-05-30",
-        "2026-05-31",
-        "2026-06-01",
         "2026-06-02",
         "2026-06-03",
         "2026-06-04",
-        "2026-06-05"
+        "2026-06-05",
+        "2026-06-08"
       ],
       "related_reports": [
-        "2026-05-30",
-        "2026-05-31",
-        "2026-06-01",
         "2026-06-02",
         "2026-06-03",
         "2026-06-04",
-        "2026-06-05"
+        "2026-06-05",
+        "2026-06-08"
       ]
     },
     {
       "id": "mcp",
       "label": "MCP",
-      "status": "active",
-      "occurrences": 4,
-      "active_days": 3,
+      "status": "watching",
+      "occurrences": 3,
+      "active_days": 2,
       "sections": [
         "github_trending",
-        "hot_blogs",
         "main_items",
         "projects"
       ],
@@ -86,12 +79,10 @@
         "GitHub"
       ],
       "dates": [
-        "2026-06-01",
         "2026-06-02",
         "2026-06-03"
       ],
       "related_reports": [
-        "2026-06-01",
         "2026-06-02",
         "2026-06-03"
       ]
@@ -99,50 +90,24 @@
     {
       "id": "enterprise-agent-governance",
       "label": "enterprise agent governance",
-      "status": "active",
-      "occurrences": 3,
-      "active_days": 3,
+      "status": "watching",
+      "occurrences": 2,
+      "active_days": 2,
       "sections": [
         "github_trending",
-        "hot_blogs",
-        "main_items"
+        "hot_blogs"
       ],
       "entities": [
         "Claude Code",
         "Codex",
-        "GitHub",
-        "Google"
-      ],
-      "dates": [
-        "2026-05-30",
-        "2026-06-02",
-        "2026-06-03"
-      ],
-      "related_reports": [
-        "2026-05-30",
-        "2026-06-02",
-        "2026-06-03"
-      ]
-    },
-    {
-      "id": "agent-memory",
-      "label": "agent memory",
-      "status": "watching",
-      "occurrences": 3,
-      "active_days": 2,
-      "sections": [
-        "github_trending",
-        "projects"
-      ],
-      "entities": [
         "GitHub"
       ],
       "dates": [
-        "2026-06-01",
+        "2026-06-02",
         "2026-06-03"
       ],
       "related_reports": [
-        "2026-06-01",
+        "2026-06-02",
         "2026-06-03"
       ]
     }
@@ -150,121 +115,121 @@
   "candidate_topics": [
     {
       "term": "github",
-      "occurrences": 114,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "trending",
-      "occurrences": 95,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "github trending",
-      "occurrences": 94,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "daily",
-      "occurrences": 90,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "agent",
-      "occurrences": 81,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "stars",
-      "occurrences": 77,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "today",
-      "occurrences": 75,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "trending daily",
-      "occurrences": 74,
-      "active_days": 6,
-      "display": false
-    },
-    {
-      "term": "stars today",
-      "occurrences": 73,
-      "active_days": 7,
+      "occurrences": 82,
+      "active_days": 5,
       "display": false
     },
     {
       "term": "with",
-      "occurrences": 73,
-      "active_days": 6,
+      "occurrences": 76,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "agent",
+      "occurrences": 67,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "trending",
+      "occurrences": 66,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "github trending",
+      "occurrences": 65,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "stars",
+      "occurrences": 64,
+      "active_days": 5,
       "display": false
     },
     {
       "term": "appeared",
-      "occurrences": 59,
+      "occurrences": 62,
       "active_days": 5,
       "display": false
     },
     {
       "term": "appeared github",
-      "occurrences": 59,
+      "occurrences": 62,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "today",
+      "occurrences": 62,
       "active_days": 5,
       "display": false
     },
     {
       "term": "with stars",
+      "occurrences": 62,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "daily",
+      "occurrences": 61,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "stars today",
+      "occurrences": 60,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "trending daily",
       "occurrences": 59,
       "active_days": 5,
       "display": false
     },
     {
       "term": "daily with",
-      "occurrences": 55,
+      "occurrences": 58,
       "active_days": 5,
       "display": false
     },
     {
       "term": "all",
-      "occurrences": 50,
+      "occurrences": 51,
       "active_days": 5,
       "display": false
     },
     {
       "term": "release",
-      "occurrences": 39,
-      "active_days": 6,
+      "occurrences": 42,
+      "active_days": 5,
       "display": false
     },
     {
       "term": "commit",
-      "occurrences": 39,
+      "occurrences": 41,
       "active_days": 5,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 38,
+      "occurrences": 40,
       "active_days": 5,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 38,
+      "occurrences": 40,
       "active_days": 5,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 38,
+      "occurrences": 40,
       "active_days": 5,
       "display": false
     }
@@ -1532,6 +1497,10 @@
       "github_trending": []
     },
     "2026-06-05": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-06-08": {
       "main_items": [],
       "github_trending": []
     }
