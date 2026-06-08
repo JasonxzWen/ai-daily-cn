@@ -978,6 +978,43 @@ test("verifyPublishedUrl 在页面持续不可用时返回错误", async () => {
   assert.match(result.error, /HTTP 404/);
 });
 
+test("github api publish falls back to git credential helper when gh auth is unavailable", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await fs.mkdir(path.join(repoRoot, "docs"), { recursive: true });
+  await fs.writeFile(path.join(repoRoot, "docs/index.html"), "<!doctype html><title>AI 日报 2026-05-13</title>");
+
+  const commandCalls = [];
+  const fetchCalls = [];
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    confirmPush: true,
+    repository: "owner/repo",
+    verifyPages: false,
+    commandRunner: async (file, args, options = {}) => {
+      commandCalls.push({ file, args, input: options.input, env: options.env || {} });
+      if (file === "gh") {
+        throw new Error("Access is denied");
+      }
+      if (file === "git" && args.join(" ") === "credential fill") {
+        return "protocol=https\nhost=github.com\nusername=x-access-token\npassword=credential-token\n";
+      }
+      return "";
+    },
+    git: fakeGit({
+      status: " M docs/index.html",
+      remoteUrl: "https://github.com/owner/repo.git"
+    }),
+    fetchImpl: fakeGitHubFetch({ calls: fetchCalls })
+  });
+
+  assert.equal(result.committed, true);
+  assert.equal(result.pushed, true);
+  assert(commandCalls.some((call) => call.file === "gh"));
+  const credentialCall = commandCalls.find((call) => call.file === "git" && call.args.join(" ") === "credential fill");
+  assert.equal(credentialCall.input, "protocol=https\nhost=github.com\n\n");
+  assert.equal(fetchCalls[0].headers.Authorization, "Bearer credential-token");
+});
+
 function fakeGit(overrides = {}) {
   const calls = overrides.calls || [];
   return {
@@ -1059,7 +1096,7 @@ function fakeGitHubFetch(options = {}) {
   return async (url, init = {}) => {
     const method = init.method || "GET";
     const body = init.body ? JSON.parse(init.body) : undefined;
-    calls.push({ url, method, body });
+    calls.push({ url, method, body, headers: init.headers || {} });
 
     if (url.endsWith("/git/ref/heads/main")) {
       return jsonResponse({ object: { sha: "commit-base" } });
