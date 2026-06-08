@@ -11,8 +11,8 @@ const FORBIDDEN_SECTION_SELECTORS = [
 ];
 
 export async function evaluateDailyPageChecklist(page, options = {}) {
-  await eagerLoadPageImages(page, options.imageTimeoutMs || 5000);
-  const result = await page.evaluate(({ reportDate, forbiddenSectionText, forbiddenSectionSelectors }) => {
+  const imageLoad = await eagerLoadPageImages(page, options.imageTimeoutMs || 5000);
+  const result = await page.evaluate(({ reportDate, forbiddenSectionText, forbiddenSectionSelectors, imageLoadTimedOut }) => {
     const checks = [];
     const issues = [];
     const addCheck = (id, ok, message, details = {}) => {
@@ -163,6 +163,27 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       trackingCards.length > 0 && weakTrackingCards.length === 0,
       "Daily tracking should render at least one visual/table-first public card and must not render leaderboard rows as text detail logs.",
       { count: trackingCards.length, weak_cards: weakTrackingCards }
+    );
+    const trackingImageCountIssues = trackingCards
+      .map((card) => {
+        const title = card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        if (!["OpenRouter", "Artificial Analysis"].includes(title)) {
+          return null;
+        }
+        const imageCount = card.querySelectorAll(".card-media-grid img").length;
+        return imageCount >= 3 && imageCount <= 5
+          ? null
+          : {
+              title,
+              image_count: imageCount
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_expected_image_count",
+      trackingImageCountIssues.length === 0,
+      "OpenRouter and Artificial Analysis cards should render 3-5 evidence images when those cards are present.",
+      { issues: trackingImageCountIssues }
     );
     const trackingOverlapIssues = trackingCards
       .map((card, index) => {
@@ -393,10 +414,24 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const contentImages = Array.from(document.images).filter((image) =>
       image.getAttribute("src") && !image.closest(".image-lightbox[hidden]")
     );
+    const remoteContentImages = contentImages
+      .filter((image) => /^(https?:)?\/\//i.test(image.getAttribute("src") || ""))
+      .map((image) => ({
+        src: image.getAttribute("src") || "",
+        alt: image.getAttribute("alt") || "",
+        title: image.closest("figure")?.querySelector("figcaption")?.textContent?.replace(/\s+/g, " ").trim() || ""
+      }));
+    addCheck(
+      "public_media_local_only",
+      remoteContentImages.length === 0,
+      "Public page should only render local build assets or data URI images, not remote http(s) media.",
+      { remote_images: remoteContentImages }
+    );
     addCheck(
       "images_loaded",
-      contentImages.every((image) => image.complete && image.naturalWidth > 0),
-      "All page images should load."
+      !imageLoadTimedOut && contentImages.every((image) => image.complete && image.naturalWidth > 0),
+      "All page images should load.",
+      { timed_out: imageLoadTimedOut, count: contentImages.length }
     );
     addCheck(
       "external_links_rel",
@@ -424,7 +459,8 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
   }, {
     reportDate: options.reportDate || "",
     forbiddenSectionText: options.forbiddenSectionText || options.forbiddenText || FORBIDDEN_SECTION_TEXT,
-    forbiddenSectionSelectors: options.forbiddenSectionSelectors || FORBIDDEN_SECTION_SELECTORS
+    forbiddenSectionSelectors: options.forbiddenSectionSelectors || FORBIDDEN_SECTION_SELECTORS,
+    imageLoadTimedOut: imageLoad.timedOut
   });
 
   return {
@@ -447,9 +483,17 @@ async function eagerLoadPageImages(page, timeoutMs) {
     window.scrollTo(0, 0);
     await nextFrame();
   });
-  await page.waitForFunction(
-    () => Array.from(document.images).every((image) => image.complete),
-    null,
-    { timeout: timeoutMs }
-  );
+  try {
+    await page.waitForFunction(
+      () => Array.from(document.images).every((image) => image.complete),
+      null,
+      { timeout: timeoutMs }
+    );
+    return { timedOut: false };
+  } catch (error) {
+    if (String(error?.message || error).includes("Timeout")) {
+      return { timedOut: true };
+    }
+    throw error;
+  }
 }

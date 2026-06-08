@@ -217,6 +217,30 @@ structuredReport.source_audit = {
 structuredReport.evidence_assets = [
   {
     type: "figure",
+    title: "OpenRouter chart 1",
+    source_url: "https://openrouter.ai/rankings",
+    local_path: "assets/evidence/e2e-openrouter-1.png",
+    caption: "OpenRouter chart 1.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
+    title: "OpenRouter chart 2",
+    source_url: "https://openrouter.ai/rankings",
+    local_path: "assets/evidence/e2e-openrouter-2.png",
+    caption: "OpenRouter chart 2.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
+    title: "OpenRouter chart 3",
+    source_url: "https://openrouter.ai/rankings",
+    local_path: "assets/evidence/e2e-openrouter-3.png",
+    caption: "OpenRouter chart 3.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
     title: "ExampleModel benchmark",
     source_url: firstModel.url,
     local_path: "assets/evidence/e2e-model-benchmark.png",
@@ -289,6 +313,9 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-1.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-2.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-3.png"));
 
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();
@@ -336,6 +363,7 @@ try {
   assert.equal(await page.locator(".blog-card").count(), 2);
   assert.equal(await page.locator(".builder-card").count(), 2);
   assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
+  assert.equal(await page.locator(".card-media-grid img[src^='http']").count(), 0);
   const builderCardsText = await page.locator(".builder-card-grid").textContent();
   assert.match(builderCardsText, /@examplebuilder/);
   assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);

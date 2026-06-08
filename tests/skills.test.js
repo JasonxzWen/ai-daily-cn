@@ -893,6 +893,57 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(card, /<figcaption>Original blog architecture diagram\.<\/figcaption>/);
 });
 
+test("effective-interact renders up to five card media items for daily tracking cards", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-card-media-limit-"));
+  const inputPath = path.join(tmp, "tracking-media.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI 日报 2026-05-28",
+      summary: "测试 tracking 卡片多图渲染。",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "每日追踪",
+          group: "main",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "TRACKING",
+              title: "OpenRouter",
+              href: "https://openrouter.ai/rankings",
+              body: "公开榜单跟踪。",
+              media: Array.from({ length: 5 }, (_unused, index) => ({
+                src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=",
+                alt: `Chart ${index + 1}`,
+                caption: `Chart ${index + 1}`
+              }))
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "tracking-media", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const mediaBlock = html.match(/<div class="card-media-grid" data-count="5">[\s\S]*?<\/div>/)?.[0] || "";
+  assert(mediaBlock);
+  assert.equal((mediaBlock.match(/<figure>/g) || []).length, 5);
+});
+
 test("GitHub Pages deployment workflow publishes the generated docs artifact", async () => {
   const workflow = await fsp.readFile(path.join(rootDir, ".github", "workflows", "deploy-pages.yml"), "utf8");
 
