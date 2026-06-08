@@ -3777,6 +3777,44 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   assert(reportWriteStage.command.args.includes(".tmp/daily-report.optimized.json"));
 });
 
+test("daily runner falls back to GitHub API when real publish fails", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-publish-fallback-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      if (stage.id === "publish_real") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            publish_status: {
+              publish_error: "git_push_failed"
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published");
+  assert.equal(result.summary.next_action.kind, "none");
+  assert.deepEqual(calls.slice(-2).map((stage) => stage.id), ["publish_real", "publish_github_api_fallback"]);
+  const fallbackStage = calls.find((stage) => stage.id === "publish_github_api_fallback");
+  assert.deepEqual(fallbackStage.command.args, ["run", "publish:github-api", "--", "confirm-push", "2026-06-04"]);
+});
+
 test("daily runner restart discards pending AI repair state and prepares again", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-restart-"));
   const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json");
@@ -4492,6 +4530,40 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
 
   const feed = JSON.parse(await fs.readFile(path.join(outDir, "feed.json"), "utf8"));
   assert.equal(feed.reports[0].markdown_url, undefined);
+});
+
+test("buildSite ignores source status history metadata in reports-data", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-history-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const structuredReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = structuredReport.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+  await fs.writeFile(
+    path.join(reportDir, `${structuredReport.report_date}.json`),
+    `${JSON.stringify(structuredReport, null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(dataInputDir, "source-status-history.json"),
+    `${JSON.stringify({ schema_version: 1, records: [] }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert.equal(result.reports.length, 1);
+  assert(result.writtenFiles.includes(`reports/${year}/${month}/${structuredReport.report_date}.html`));
+  assert(result.writtenFiles.includes(`data/${year}/${month}/${structuredReport.report_date}.json`));
 });
 
 test("buildSite writes trend index and injects scoped trend tags without mutating report data", async () => {

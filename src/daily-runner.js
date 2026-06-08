@@ -311,6 +311,33 @@ async function runPostQualityStages({
 }) {
   for (const stage of buildPostQualityWorkflowStages({ reportDate, publish, reportPath })) {
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
+      const fallbackStage = buildPublishFallbackStage(reportDate);
+      const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
+      if (fallbackOutcome.blocked) {
+        summary.final_status = "blocked";
+        summary.next_action = {
+          ...blockedNextAction(fallbackOutcome.error),
+          failed_stage_id: fallbackStage.id,
+          previous_stage_id: stage.id
+        };
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      if (!fallbackOutcome.normalized.ok) {
+        summary.final_status = "blocked";
+        summary.next_action = {
+          kind: "inspect_stage_failure",
+          stage_id: fallbackStage.id,
+          previous_stage_id: stage.id,
+          summary_path: summaryPath
+        };
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      await writeSummary(summaryPath, summary);
+      continue;
+    }
     if (outcome.blocked) {
       summary.final_status = "blocked";
       summary.next_action = blockedNextAction(outcome.error);
@@ -509,6 +536,10 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
     stages.push(npmStage("publish_real", ["run", "publish", "--", "confirm-push", reportDate]));
   }
   return stages;
+}
+
+function buildPublishFallbackStage(reportDate) {
+  return npmStage("publish_github_api_fallback", ["run", "publish:github-api", "--", "confirm-push", reportDate]);
 }
 
 async function defaultPrepareCleanWorktree({ launcherRoot, allowedBranch, worktreeDir }) {

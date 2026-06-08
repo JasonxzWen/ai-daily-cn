@@ -16,6 +16,7 @@ import { withDefaultImportance } from "./importance.js";
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
+const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -119,6 +120,7 @@ export async function collectJsonFiles(inputDir) {
   return files
     .filter((file) => file.toLowerCase().endsWith(".json"))
     .filter((file) => !file.toLowerCase().endsWith(".candidates.json"))
+    .filter((file) => !REPORT_DATA_AUXILIARY_JSON.has(path.basename(file).toLowerCase()))
     .sort();
 }
 
