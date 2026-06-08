@@ -3846,6 +3846,42 @@ test("daily runner falls back to GitHub API when real publish fails", async () =
   assert.deepEqual(fallbackStage.command.args, ["run", "publish:github-api", "--", "confirm-push", "2026-06-04"]);
 });
 
+test("daily runner records stdout and stderr from failed publish stages", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-publish-error-output-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "publish_real" || stage.id === "publish_github_api_fallback") {
+        const error = new Error(`${stage.id} failed`);
+        error.code = stage.id === "publish_real" ? "ETIMEDOUT" : 1;
+        error.stdout = `${stage.id} stdout`;
+        error.stderr = `${stage.id} stderr`;
+        throw error;
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  const publishStage = result.summary.stages.find((stage) => stage.id === "publish_real");
+  const fallbackStage = result.summary.stages.find((stage) => stage.id === "publish_github_api_fallback");
+  assert.equal(publishStage.error_code, "ETIMEDOUT");
+  assert.equal(publishStage.output.stdout, "publish_real stdout");
+  assert.equal(publishStage.output.stderr, "publish_real stderr");
+  assert.equal(fallbackStage.error_code, 1);
+  assert.equal(fallbackStage.output.stdout, "publish_github_api_fallback stdout");
+  assert.equal(fallbackStage.output.stderr, "publish_github_api_fallback stderr");
+});
+
 test("daily runner restart discards pending AI repair state and prepares again", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-restart-"));
   const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json");

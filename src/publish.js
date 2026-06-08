@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import { promisify } from "node:util";
@@ -13,6 +13,12 @@ import { mergeCommandEnv, npmCommandText, npmInvocationForArgs } from "./process
 
 const execFileAsync = promisify(execFile);
 const SOURCE_STATUS_HISTORY_REPO_PATH = "reports-data/source-status-history.json";
+const DEFAULT_GIT_COMMAND_TIMEOUT_MS = 2 * 60 * 1000;
+const GIT_AUTH_COMMAND_TIMEOUT_MS = 10 * 1000;
+const NON_INTERACTIVE_GIT_ENV = {
+  GIT_TERMINAL_PROMPT: "0",
+  GCM_INTERACTIVE: "Never"
+};
 
 export async function checkPublishPreflight(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
@@ -544,9 +550,12 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     };
   }
 
-  const token = await resolveGitHubToken(options, repoRoot);
+  const token = await resolveGitHubToken(options, repoRoot, git);
   if (!token) {
-    throw new PublisherError("github_token_missing", "GitHub API 发布需要 GH_TOKEN、GITHUB_TOKEN 或可用的 gh auth token。");
+    throw new PublisherError(
+      "github_token_missing",
+      "GitHub API 发布需要 GH_TOKEN、GITHUB_TOKEN、可用的 gh auth token 或 Git credential helper 中的 GitHub token。"
+    );
   }
 
   const repository = options.repository || process.env.GITHUB_REPOSITORY || parseGitHubRepository(await git.remoteUrl());
@@ -1226,21 +1235,113 @@ function parseJsonPayload(text) {
 async function runGit(cwd, args, options = {}) {
   const { stdout } = await execFileAsync("git", args, {
     cwd,
+    env: mergeCommandEnv(NON_INTERACTIVE_GIT_ENV, { baseEnv: options.env || process.env }),
     encoding: "utf8",
-    maxBuffer: 1024 * 1024
+    maxBuffer: 1024 * 1024,
+    timeout: options.timeoutMs || DEFAULT_GIT_COMMAND_TIMEOUT_MS,
+    windowsHide: true
   });
   return options.trim === false ? stdout : stdout.trim();
 }
 
 async function runExternalCommand(file, args, options = {}) {
+  if (Object.prototype.hasOwnProperty.call(options, "input")) {
+    return runExternalCommandWithInput(file, args, options);
+  }
+
   const { stdout } = await execFileAsync(file, args, {
     cwd: options.cwd,
     env: mergeCommandEnv(options.env),
     encoding: "utf8",
     maxBuffer: options.maxBuffer || 10 * 1024 * 1024,
-    timeout: options.timeoutMs
+    timeout: options.timeoutMs,
+    windowsHide: true
   });
   return options.trim === false ? stdout : stdout.trim();
+}
+
+async function runExternalCommandWithInput(file, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(file, args, {
+      cwd: options.cwd,
+      env: mergeCommandEnv(options.env),
+      windowsHide: true,
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    const maxBuffer = options.maxBuffer || 10 * 1024 * 1024;
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+    const finish = (error, value) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      if (error) {
+        reject(error);
+      } else {
+        resolve(options.trim === false ? value : value.trim());
+      }
+    };
+    const timer = options.timeoutMs
+      ? setTimeout(() => {
+          child.kill();
+          const error = new Error(`Command timed out after ${options.timeoutMs}ms: ${file} ${args.join(" ")}`);
+          error.code = "ETIMEDOUT";
+          error.stdout = stdout;
+          error.stderr = stderr;
+          finish(error);
+        }, options.timeoutMs)
+      : null;
+
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      if (stdout.length + stderr.length > maxBuffer) {
+        const error = new Error(`Command output exceeded maxBuffer: ${file} ${args.join(" ")}`);
+        error.code = "ERR_CHILD_PROCESS_STDIO_MAXBUFFER";
+        error.stdout = stdout;
+        error.stderr = stderr;
+        child.kill();
+        finish(error);
+      }
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+      if (stdout.length + stderr.length > maxBuffer) {
+        const error = new Error(`Command output exceeded maxBuffer: ${file} ${args.join(" ")}`);
+        error.code = "ERR_CHILD_PROCESS_STDIO_MAXBUFFER";
+        error.stdout = stdout;
+        error.stderr = stderr;
+        child.kill();
+        finish(error);
+      }
+    });
+    child.on("error", (error) => {
+      error.stdout = stdout;
+      error.stderr = stderr;
+      finish(error);
+    });
+    child.on("close", (code) => {
+      if (settled) {
+        return;
+      }
+      if (code !== 0) {
+        const error = new Error(`Command failed with exit code ${code}: ${file} ${args.join(" ")}`);
+        error.code = code;
+        error.stdout = stdout;
+        error.stderr = stderr;
+        finish(error);
+        return;
+      }
+      finish(null, stdout);
+    });
+    child.stdin.end(options.input);
+  });
 }
 
 async function runGitCommand(cwd, args, options = {}) {
@@ -1508,7 +1609,7 @@ function toPrepareBlocker(error) {
   };
 }
 
-async function resolveGitHubToken(options, repoRoot) {
+async function resolveGitHubToken(options, repoRoot, git) {
   if (options.token) {
     return options.token;
   }
@@ -1522,16 +1623,60 @@ async function resolveGitHubToken(options, repoRoot) {
     return String((await options.tokenResolver()) || "").trim();
   }
 
+  const run = options.commandRunner || runExternalCommand;
   try {
-    const { stdout } = await execFileAsync("gh", ["auth", "token"], {
+    const stdout = await run("gh", ["auth", "token"], {
       cwd: repoRoot,
-      windowsHide: true,
-      timeout: 10000
+      env: NON_INTERACTIVE_GIT_ENV,
+      timeoutMs: GIT_AUTH_COMMAND_TIMEOUT_MS
     });
-    return stdout.trim();
+    const token = String(stdout || "").trim();
+    if (token) {
+      return token;
+    }
+  } catch {
+    // Fall through to Git's credential helper. This keeps scheduled publishes
+    // recoverable when the GitHub CLI config file is unreadable.
+  }
+
+  const remoteUrl =
+    options.remoteUrl ||
+    (typeof git?.remoteUrl === "function" ? await git.remoteUrl().catch(() => "") : "");
+  return resolveGitCredentialToken({ repoRoot, remoteUrl, run });
+}
+
+async function resolveGitCredentialToken({ repoRoot, remoteUrl, run }) {
+  if (!isGitHubRemoteUrl(remoteUrl)) {
+    return "";
+  }
+
+  try {
+    const stdout = await run("git", ["credential", "fill"], {
+      cwd: repoRoot,
+      env: NON_INTERACTIVE_GIT_ENV,
+      input: "protocol=https\nhost=github.com\n\n",
+      timeoutMs: GIT_AUTH_COMMAND_TIMEOUT_MS,
+      trim: false
+    });
+    return parseGitCredentialToken(stdout);
   } catch {
     return "";
   }
+}
+
+function isGitHubRemoteUrl(remoteUrl) {
+  return /(^|[@/:])github\.com[:/]/i.test(String(remoteUrl || ""));
+}
+
+function parseGitCredentialToken(output) {
+  const fields = new Map();
+  for (const line of String(output || "").split(/\r?\n/)) {
+    const match = /^([^=]+)=(.*)$/.exec(line);
+    if (match) {
+      fields.set(match[1], match[2]);
+    }
+  }
+  return String(fields.get("password") || fields.get("oauth_token") || "").trim();
 }
 
 function delay(ms) {

@@ -654,15 +654,28 @@ function normalizeStageResult(stageResult) {
 }
 
 function recordStage(summary, { id, status, command, output, error, now }) {
+  const errorOutput = error ? extractErrorOutput(error) : null;
   summary.stages.push({
     id,
     status,
     ...(command ? { command } : {}),
     ...(output ? { output: sanitizeStageOutput(output) } : {}),
+    ...(errorOutput ? { output: sanitizeStageOutput(errorOutput) } : {}),
     ...(error ? { error: error.message, error_code: error.code || "" } : {}),
     updated_at: now()
   });
   summary.updated_at = now();
+}
+
+function extractErrorOutput(error) {
+  const output = {};
+  if (error && Object.prototype.hasOwnProperty.call(error, "stdout")) {
+    output.stdout = trimOutput(error.stdout);
+  }
+  if (error && Object.prototype.hasOwnProperty.call(error, "stderr")) {
+    output.stderr = trimOutput(error.stderr);
+  }
+  return Object.keys(output).length > 0 ? output : null;
 }
 
 async function writeSummary(summaryPath, summary) {
