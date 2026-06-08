@@ -2,47 +2,47 @@
 
 ## Current Status
 
-- The 21:30 status self-check implementation is in place.
-- Real Codex automation inventory has been updated: app-visible `ai-2` is the active 02:30 daily generation automation, `ai` is the active 21:30 self-check automation, and legacy `ai-daily` / `ai-push-github-pages` are paused.
-- Focused unit tests, `npm run workflow:validate`, and full `npm run validate` pass.
-- Validation/build generated `docs/data/**` empty `daily_tracking` default changes; those generated artifacts were restored and are not part of the handoff diff.
+- SDD/TDD hardening implementation is complete on branch `codex/sdd-tdd-harness-hardening`.
+- Current task spec has been reset in `tasks/current-task.md`.
+- Focused red tests were added, failed before implementation, and now pass after implementation.
+- `node scripts/harness-validate.mjs` passes with the new SDD/TDD current-task contract.
+- `npm run validate` passes with `harness:validate` first in the validation chain.
+- OpenSpec active workflow files have been removed from package scripts, tests, validator script, and tracked `openspec/**` files.
 
 ## Changed Files
 
-- `config/daily-workflow-contract.json`
-- `docs/codex-automation-setup.md`
+- `AGENTS.md`
+- `clean-state-checklist.md`
+- `definition-of-done.md`
+- `docs/ai-daily-report-github-pages-plan.md`
+- `docs/skill-hub-frontend-html-capability-evaluation.md`
 - `package.json`
-- `prompts/ai-daily/modules/publish-workflow.md`
-- `scripts/validate-daily-workflow-contract.mjs`
-- `src/automation-inventory.js`
-- `src/cli.js`
-- `src/daily-runner.js`
-- `src/draft.js`
-- `src/evidence-cache.js`
-- `src/process-runner.js`
-- `src/publish.js`
-- `src/quality-gates.js`
-- `src/quality-status.js`
-- `src/render.js`
-- `src/report.js`
-- `src/status-self-check.js`
-- `src/url.js`
-- `src/workflow-contract.js`
-- `tasks/current-task.md`
-- `tasks/daily-publish-runbook.md`
-- `tasks/templates/daily-publish-task.md`
 - `progress.md`
+- `scripts/harness-validate.mjs`
 - `session-handoff.md`
+- `tasks/current-task.md`
+- `tasks/templates/sdd-tdd-task.md`
 - `tests/unit.test.js`
+- `scripts/validate-openspec.mjs` deleted
+- `tests/openspec.test.js` deleted
+- `openspec/**` deleted
 
 ## Validation Evidence
 
-- Focused unit run passed: 155 tests, 0 failures.
-- `npm run workflow:validate` passed against real automation inventory.
-- `npm run validate` passed: feedback, workflow, sources, 213 tests, build, privacy, e2e, OpenSpec, and diff-check all passed.
-- `git diff --check` passed.
+- Red test before implementation: `node --test tests/unit.test.js --test-name-pattern "harness SDD TDD|OpenSpec removed"` failed.
+- Focused green test after implementation: same command passed with 192 tests.
 - `node scripts/harness-validate.mjs` passed.
+- `npm run validate` passed, including `harness:validate`, feedback, workflow, sources, 252 tests, build, privacy scan, e2e, and `git diff --check`.
+- OpenSpec audit passed for active workflow cleanup; remaining references are cleanup notes, negative assertions, and current task context.
+
+## Pending Validation
+
+- None.
+
+## Residual Risk
+
+- Historical `reports/*.html` files may still mention OpenSpec as past work-report content; those are not active workflow instructions and should not be hand-edited as part of this cleanup.
 
 ## Next Action
 
-- Report final results.
+- User review or commit when explicitly requested.

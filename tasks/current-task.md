@@ -1,73 +1,117 @@
 # Current Task
 
-## Goal
+## Task Class
 
-Add a daily 21:30 status self-check for AI daily publishing and harden the recent daily automation flow so duplicate/legacy publish automations are detected before they can conflict.
+non-trivial
 
-## Scope
+## Spec
 
-- Add `status:self-check` CLI/script support.
-- Reuse shared helpers for npm command construction and URL identity normalization.
-- Validate the Codex-native daily runner contract against repository markers and external Codex automation inventory.
-- Pause the old legacy publish automation and create one active 21:30 status self-check automation.
+### Goal
 
-## Non-goals
+Harden this repository for strict SDD-first and TDD-first Codex iteration while keeping interactive "vibe coding" usable.
 
-- Do not commit, push, or change GitHub Pages settings.
-- Do not generate or publish a new daily report as part of this implementation.
-- Do not hand-edit generated public report HTML.
+### User-Visible Behavior
 
-## Allowed paths
+- `tasks/current-task.md` is the single authoritative specification for every active non-trivial iteration.
+- Before a non-trivial task spec is ready, Codex may only perform read-only exploration.
+- Non-trivial implementation must record a `Red Test` with a real failing command before code changes, or a `Deterministic Substitute` with a reason when a direct red test is not practical.
+- Trivial work is exempt only when `Task Class` is `trivial` and `Trivial Justification` is present.
+- `node scripts/harness-validate.mjs` enforces the current-task SDD/TDD contract.
+- OpenSpec is removed from the active workflow and validation chain.
 
-- `config/daily-workflow-contract.json`
-- `docs/codex-automation-setup.md`
-- `package.json`
-- `prompts/ai-daily/modules/publish-workflow.md`
-- `scripts/validate-daily-workflow-contract.mjs`
-- `src/**`
-- `tasks/current-task.md`
-- `tasks/daily-publish-runbook.md`
-- `tasks/templates/daily-publish-task.md`
-- `progress.md`
-- `session-handoff.md`
-- `tests/unit.test.js`
+### Boundaries
 
-## Forbidden paths
+- Keep daily publish safety rules and automation contracts intact.
+- Keep `npm run validate` as the broad repository verification gate.
+- Do not commit, push, create a PR, change remote Pages settings, or modify Codex automation configuration.
+- Do not edit generated public daily report HTML by hand.
 
-- Do not change remote Pages settings.
-- Do not commit, push, or create a PR unless explicitly requested.
-- Do not keep generated `docs/data/**` changes produced only by validation.
-- Do not modify generated public report HTML by hand.
-- Do not reset hard or overwrite unrelated user changes.
+### Non-Goals
+
+- Do not redesign daily report rendering.
+- Do not change publishing behavior except removing OpenSpec validation from the local validation chain.
+- Do not introduce a new external spec system.
 
 ## Acceptance Criteria
 
-- `npm run workflow:validate` passes with exactly one active daily publish automation and one active status self-check automation.
-- `status:self-check` reports artifact, Pages, quality, source health, dry-run, and automation inventory status.
-- Multiple active daily publish automations produce `multiple_active_daily_publish_automations`.
-- Unit coverage exists for shared URL identity, Windows npm invocation, and status self-check behavior.
-- `npm run validate` passes before handoff.
+- `tasks/current-task.md` contains explicit task class, spec, acceptance criteria, Red Test or deterministic substitute, allowed paths, forbidden paths, validation commands, and handoff requirements.
+- `scripts/harness-validate.mjs` rejects non-trivial current tasks missing `Red Test` or `Deterministic Substitute`.
+- `scripts/harness-validate.mjs` accepts `trivial` tasks only when a `Trivial Justification` is present.
+- `npm run validate` runs `npm run harness:validate` before the broader validation chain.
+- `package.json#scripts.validate` no longer runs `validate:openspec`, and `package.json#scripts.test` no longer references `tests/openspec.test.js`.
+- The OpenSpec validator, OpenSpec tests, and `openspec/` tree are removed from the repository.
+- Project guidance no longer tells Codex to use OpenSpec as an active workflow.
+- A reusable SDD/TDD task template exists under `tasks/templates/`.
+- Focused red tests fail before implementation and pass after implementation.
+- `node scripts/harness-validate.mjs`, `npm run test`, `npm run build`, `npm run test:e2e`, and `npm run validate` pass.
 
-## Validation commands
+## Red Test
 
-- `node --test tests/unit.test.js --test-name-pattern "status:self-check|shared URL identity|shared npm invocation|daily workflow contract|report:draft skips recent"`
-- `npm run workflow:validate`
-- `npm run validate`
+Run before implementation after adding tests:
+
+```powershell
+node --test tests/unit.test.js --test-name-pattern "harness SDD TDD|OpenSpec removed"
+```
+
+Actual initial failure recorded before implementation:
+
+- Fails because `scripts/harness-validate.mjs` does not enforce SDD/TDD task fields.
+- Fails because OpenSpec remains in package scripts, tests, validator script, and repository files.
+
+## Deterministic Substitute
+
+Not used. This change is directly testable with unit tests around harness validation and package workflow assertions.
+
+## Allowed Paths
+
+- `AGENTS.md`
+- `clean-state-checklist.md`
+- `definition-of-done.md`
+- `docs/ai-daily-report-github-pages-plan.md`
+- `docs/skill-hub-frontend-html-capability-evaluation.md`
+- `feature_list.json`
+- `package.json`
+- `package-lock.json`
+- `progress.md`
+- `scripts/harness-validate.mjs`
+- `session-handoff.md`
+- `tasks/current-task.md`
+- `tasks/templates/**`
+- `tests/unit.test.js`
+- `tests/openspec.test.js`
+- `scripts/validate-openspec.mjs`
+- `openspec/**`
+
+## Forbidden Paths
+
+- Do not modify generated public daily report HTML by hand.
+- Do not change remote Pages settings.
+- Do not modify Codex automation configuration.
+- Do not commit, push, or create a PR unless explicitly requested.
+- Do not reset hard or overwrite unrelated user changes.
+
+## Validation Commands
+
+- `node --test tests/unit.test.js --test-name-pattern "harness SDD TDD|OpenSpec removed"`
+- `npm run harness:validate`
 - `node scripts/harness-validate.mjs`
+- `npm run test`
+- `npm run build`
+- `npm run test:e2e`
+- `npm run validate`
 - `git diff --check`
 
-## Parallel writes
+## Parallel Writes
 
-- No parallel writes. Manual edits use `apply_patch`; generated validation output is reverted unless it is part of the requested change.
+- No parallel writes. Manual edits use `apply_patch`; generated output is inspected and reverted unless it is part of this task.
 
-## Handoff requirements
+## Handoff Requirements
 
-- Report code, documentation, and automation changes.
-- Report validation command results.
-- Clearly state that no daily report was generated/published and no GitHub Pages setting was changed.
+- Report removed OpenSpec files and remaining historical references, if any.
+- Report SDD/TDD validator behavior and red/green test evidence.
+- Report full validation command results.
+- Report residual risks and follow-up cleanup, if any.
 
-## Current Status
+## Spec Updates
 
-- Implementation and automation updates are complete.
-- Focused unit tests, `npm run workflow:validate`, and `npm run validate` pass.
-- Harness validation is being rerun after restoring the required task-state sections.
+- None yet.

@@ -1,0 +1,78 @@
+# Current Task
+
+## Task Class
+
+non-trivial
+
+Use `trivial` only for typo, pure copy, one-line no-behavior config, or read-only diagnostic tasks. Trivial tasks must include `## Trivial Justification`.
+
+## Trivial Justification
+
+Remove this section for non-trivial work.
+
+## Spec
+
+### Goal
+
+State the concrete outcome.
+
+### User-Visible Behavior
+
+- Describe observable behavior or artifact changes.
+
+### Boundaries
+
+- State constraints, ownership, and integration boundaries.
+
+### Non-Goals
+
+- State what this task will not do.
+
+## Acceptance Criteria
+
+- Each criterion must be directly verifiable.
+
+## Red Test
+
+Run before implementation:
+
+```powershell
+<command expected to fail before implementation>
+```
+
+Expected initial failure:
+
+- Explain the exact failure signal.
+
+## Deterministic Substitute
+
+Use only when a direct red test is not practical. Explain the reason and the deterministic check that replaces it.
+
+## Allowed Paths
+
+- `<path>`
+
+## Forbidden Paths
+
+- Do not modify unrelated user work.
+- Do not reset hard or overwrite unrelated changes.
+
+## Validation Commands
+
+- `node scripts/harness-validate.mjs`
+- `npm run validate`
+- `git diff --check`
+
+## Parallel Writes
+
+- No parallel writes unless the task explicitly defines independent worktrees, non-overlapping paths, and an integration point.
+
+## Handoff Requirements
+
+- Report red/green evidence.
+- Report validation command results.
+- Report changed files, risks, and follow-up work.
+
+## Spec Updates
+
+- Record only decision-level changes that alter assumptions, acceptance criteria, allowed paths, validation commands, user-visible behavior, or risk.

@@ -38,9 +38,9 @@ node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agen
 
 - `web` profile 推荐了 HTML 报告、前端模式、浏览器测试、E2E、UI/a11y 审计等能力。
 - 当时仓库缺少 agent 指令面，现已补充根级 `AGENTS.md`。
-- 当时仓库缺少明确成功标准、OpenSpec tasks 或 Definition of Done，现已有 OpenSpec change 与 `npm run validate` 门。
+- 当时仓库缺少明确成功标准、任务规格或 Definition of Done；当前主动流程以 `tasks/current-task.md`、`definition-of-done.md` 和 `npm run validate` 门为准。
 - 当时仓库缺少可重复验证命令，现已有 `build`、`test`、`test:e2e`、`validate`，并新增技能 smoke 测试。
-- 当时仓库缺少 skill routing、agent roles 或 OpenSpec change 等路由资产，现已补充 `html-work-reports` repo-local 技能路由。
+- 当时仓库缺少 skill routing、agent roles 或任务路由资产，现已补充 `html-work-reports` repo-local 技能路由。
 - 自动化候选应保持手动，直到存在可检查的 `build/test/validate` gate。
 
 ## 可复用能力矩阵
@@ -136,7 +136,7 @@ npx skill-hub install D:\ai-daily-cn --profile web --agent codex --dry-run --jso
 当前已具备：
 
 - `docs/` 方案文档。
-- OpenSpec 风格 proposal/design/spec/tasks。
+- 基于 `tasks/current-task.md` 的当前任务规格、SDD/TDD 模板和仓库验证门。
 - Prompt 构建规范。
 - JSON/HTML/feed 数据契约。
 - Good case / bad case / forbidden case fixtures。
