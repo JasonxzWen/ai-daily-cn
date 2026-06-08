@@ -16,6 +16,7 @@ const requiredFiles = [
   'tasks/daily-publish-runbook.md',
   'tasks/templates/daily-publish-task.md',
   'tasks/templates/sdd-tdd-task.md',
+  'prompts/ai-daily/modules/editorial-authority.md',
   'scripts/harness-validate.mjs',
 ];
 const forbiddenPaths = [
@@ -64,6 +65,7 @@ const requiredMarkers = {
     'npm run publish:dry-run',
     'npm run publish -- confirm-push YYYY-MM-DD',
     'npm run publish:github-api -- confirm-push YYYY-MM-DD',
+    'editorial-authority.md',
   ],
   'tasks/templates/daily-publish-task.md': [
     'YYYY-MM-DD',
@@ -71,6 +73,7 @@ const requiredMarkers = {
     'Real publish requires explicit confirmation',
     'npm run validate',
     'npm run publish:dry-run',
+    'editorial-authority.md',
   ],
   'tasks/templates/sdd-tdd-task.md': [
     'Task Class',
@@ -85,6 +88,13 @@ const requiredMarkers = {
     'Forbidden Paths',
     'Validation Commands',
     'Handoff Requirements',
+  ],
+  'prompts/ai-daily/modules/editorial-authority.md': [
+    '迭代维护机制',
+    '本轮修改清单',
+    'Good Case',
+    'Bad Case',
+    '迭代历史',
   ],
 };
 const requiredPackageScripts = {

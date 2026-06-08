@@ -3,7 +3,7 @@
   "modules": [
     {
       "name": "base",
-      "purpose": "定义日报主编角色、中文输出、目标读者与事实优先边界。"
+      "purpose": "定义日报主编角色、目标读者、输出语言与事实优先边界。"
     },
     {
       "name": "date-scope",
@@ -15,7 +15,7 @@
     },
     {
       "name": "candidate-pool",
-      "purpose": "定义候选池 sidecar 和 candidate_id 回指硬门禁，确保正文条目可复查。"
+      "purpose": "定义候选池 sidecar 与 candidate_id 回指硬门禁，确保正文条目可复查。"
     },
     {
       "name": "source-policy",
@@ -35,15 +35,15 @@
     },
     {
       "name": "output-html",
-      "purpose": "定义公开 HTML 输出章节、来源链接、项目表、自检和迭代建议展示要求。"
+      "purpose": "定义公开 HTML 输出板块、来源链接、图片、自检和迭代建议展示要求。"
     },
     {
       "name": "effective-interact-output",
-      "purpose": "定义公开日报必须通过 .codex/skills/effective-interact 的 pre-rendered 模式生成。"
+      "purpose": "定义公开日报必须通过 effective-interact 的 pre-rendered 模式生成。"
     },
     {
       "name": "structured-report-json",
-      "purpose": "定义结构化日报 JSON、内容元数据、source_audit、quality_status 和候选回指字段。"
+      "purpose": "定义结构化日报 JSON、元数据、source_audit、quality_status 和候选回指字段。"
     },
     {
       "name": "publish-workflow",
@@ -52,6 +52,10 @@
     {
       "name": "reflection-loop",
       "purpose": "定义反思与自动化迭代建议的字段、展示和用户确认边界。"
+    },
+    {
+      "name": "editorial-authority",
+      "purpose": "聚合当前日报内容合同、板块定位、负面清单与本轮迭代，作为唯一权威资产并覆盖旧口径。"
     }
   ]
 }

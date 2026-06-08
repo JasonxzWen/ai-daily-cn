@@ -315,7 +315,7 @@ try {
   assert.doesNotMatch(reportBody, /模型发布/);
   assert.doesNotMatch(reportBody, /ExampleModel 2/);
   assert.equal(await page.locator("#model-releases").count(), 0);
-  assert.match(await page.locator("body").textContent(), /热门技术博客/);
+  assert.match(await page.locator("body").textContent(), /技不止术/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.match(await page.locator("body").textContent(), /GitHub Trending/);
   assert.match(await page.locator("body").textContent(), /项目 highlight/);

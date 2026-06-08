@@ -2,6 +2,9 @@
 
 Use this runbook for daily AI report generation and GitHub Pages publishing.
 
+- 唯一权威资产：`prompts/ai-daily/modules/editorial-authority.md`。如果与旧规范文档、旧 ROI 清单、旧 prompt 模块或历史说明冲突，以这份资产为准。
+- 同一板块如果出现新旧两版要求，只执行唯一权威资产里的较新版本；旧文档只作归档参考。
+
 ## Codex-Native Runner Contract
 
 - Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:run -- --date YYYY-MM-DD`.
@@ -16,6 +19,8 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 ## Preflight
 
 - Confirm the target date in `Asia/Shanghai` as `YYYY-MM-DD`.
+- 先按 `prompts/ai-daily/modules/editorial-authority.md` 校对当天内容合同，不要并行参考多份旧文档裁决冲突。
+- 如果当天为了修正文风、板块、选题阈值或坏例复发而改 prompt / 规则，必须把 `editorial-authority.md` 里的 `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史` 一并更新，不要只改实现不留维护面。
 - Review `git status --short --branch` before mutating files.
 - For automation and publish runs, treat the latest `origin/main` as the only authoritative baseline. Unmerged PR branches, detached HEAD work, and local experiment branches must not affect the daily report.
 - User-confirmed feedback that must persist is P1 by default. It must be recorded in `config/feedback-ledger.json` with existing scope files, a validation command covered by `npm run validate`, and an existing test assertion or runtime gate; otherwise it is only a session-local suggestion.
@@ -184,4 +189,5 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 ## Handoff
 
 - Final response must include the daily HTML path, structured JSON path, validate result, dry-run result, expected Pages URL, real publish verification, and at most three prompt or rule iteration suggestions.
+- If the run changed any content contract, also report which `editorial-authority.md` sections were updated so the next iteration does not rely on chat history.
 - Human-assisted publish runs update `progress.md` and `session-handoff.md` when the run changes repo state or publish status. Scheduled automation runs do not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`.

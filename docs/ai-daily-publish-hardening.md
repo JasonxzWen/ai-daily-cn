@@ -1,5 +1,7 @@
 # AI 日报发布链路加固
 
+> 状态：活跃配套文档。本文只记录发布链路的稳健性与恢复顺序；内容合同、板块口径和迭代覆盖关系以 `prompts/ai-daily/modules/editorial-authority.md` 为准，如与本文冲突，以该文件为准。
+
 本文记录定时任务发布链路的稳健性约束，配合 `docs/codex-automation-setup.md` 使用。
 
 ## 失败模式
@@ -31,9 +33,11 @@
 ```powershell
 npm run test
 npm run validate
-npm run publish:dry-run -- --date YYYY-MM-DD
+npm run publish:dry-run:daily -- --date YYYY-MM-DD
 npm run publish:preflight
 ```
+
+旧命令 `npm run publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断，不再作为调度或日常 dry-run 入口。
 
 如果本地存在已提交但未推送的日报提交，还要运行：
 
