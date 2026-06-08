@@ -36,6 +36,8 @@ export const AI_STOCK_PHRASES = [
   "想象空间",
   "读者应重点核对",
   "判断点",
+  "技不止术",
+  "热门技术博客",
   "把它当作 AI 产品或平台策略信号",
   "读者应先看原文给出的变化",
   "Generated after syncing current main",

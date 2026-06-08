@@ -447,6 +447,24 @@
           "type": "string",
           "minLength": 1
         },
+        "image_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
+        "image_alt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_source": {
+          "type": "string",
+          "minLength": 1
+        },
         "watch_next": {
           "type": "string",
           "minLength": 1
@@ -480,6 +498,7 @@
         "bullets": {
           "type": "array",
           "minItems": 1,
+          "maxItems": 5,
           "items": {
             "type": "string",
             "minLength": 1
@@ -552,6 +571,24 @@
           "minLength": 1
         },
         "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
+        "image_alt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_source": {
           "type": "string",
           "minLength": 1
         },
@@ -630,6 +667,24 @@
           "minLength": 1
         },
         "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
+        "image_alt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_source": {
           "type": "string",
           "minLength": 1
         },
@@ -1135,6 +1190,10 @@
         "candidate_id": {
           "$ref": "#/$defs/candidate_id"
         },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
         "content": {
           "type": "string",
           "minLength": 1
@@ -1164,6 +1223,24 @@
           "minLength": 1
         },
         "risk_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
+        "image_alt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_source": {
           "type": "string",
           "minLength": 1
         },

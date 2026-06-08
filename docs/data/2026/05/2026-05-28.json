@@ -1017,6 +1017,7 @@
         "**运行分类**：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。",
         "**自动化处理**：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -1038,6 +1039,7 @@
         "**团队门槛**：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。",
         "**可跟进项**：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -1059,6 +1061,7 @@
         "**模型准入**：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。",
         "**合并门禁**：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -1074,6 +1077,7 @@
       "topic": "Agentic enterprise IT benchmark",
       "content_type": "blog",
       "summary": "这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -1086,6 +1090,7 @@
       "topic": "Local speech-to-speech agent stack",
       "content_type": "blog",
       "summary": "文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -1197,6 +1202,7 @@
     {
       "content": "Claude Status 记录 2026-05-28 一次 Claude Opus 4.7 elevated errors 已解决；如果日报自动化或 coding agent 流程同时依赖多个模型供应商，这类状态页应和 OpenAI Status 一样进入运行前检查。",
       "url": "https://status.claude.com/incidents/0w1bqsc12lt8",
+      "image_urls": [],
       "importance": "general"
     }
   ],

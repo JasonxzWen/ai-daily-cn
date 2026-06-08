@@ -1852,7 +1852,8 @@
       "editorial_category": "ai_industry",
       "why_it_matters": "真正的变化不是“又能调用一个模型”，而是 OpenAI 开始嵌进云厂商的采购和治理系统，企业团队评估 AI 平台时会少一条单独供应商通道。",
       "reader_relevance": "已经在 AWS 上跑 Bedrock、IAM、CloudTrail 或 GovCloud 的团队，可以把这条当作代码 agent 落地路径的采购/权限参考。",
-      "watch_next": "后面要看 Bedrock 上的能力边界、Codex 权限模型、区域可用性和企业价格是否跟官方叙事一致。"
+      "watch_next": "后面要看 Bedrock 上的能力边界、Codex 权限模型、区域可用性和企业价格是否跟官方叙事一致。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-openai-stargate-michigan",
@@ -1879,7 +1880,8 @@
       "editorial_category": "policy_infra",
       "why_it_matters": "这类新闻表面是建数据中心，本质是 AI 供给被电力、水、地方审批和人才计划共同约束，模型能力之外的硬资源开始变成产品节奏的一部分。",
       "reader_relevance": "评估大模型服务稳定性、区域部署或长期成本时，工程团队不能只看 API benchmark，也要看供应商背后的算力扩张是否跟得上。",
-      "watch_next": "值得继续盯电网接入、投产时间、GovCloud/企业负载是否受益，以及本地社区对能源和水资源的反馈。"
+      "watch_next": "值得继续盯电网接入、投产时间、GovCloud/企业负载是否受益，以及本地社区对能源和水资源的反馈。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-openai-policy-advocacy",
@@ -1904,7 +1906,8 @@
       "editorial_category": "policy_infra",
       "why_it_matters": "AI 公司现在不只卖产品，也在进入政策、监管和公共叙事场；官方边界说清楚后，后续新闻更容易区分公司承诺和外围组织叙事。",
       "reader_relevance": "做企业 AI 合规、采购或安全评估时，这类政策口径会影响供应商风险判断，尤其是面向政府和受监管行业的项目。",
-      "watch_next": "继续看这些原则会不会落成更具体的安全测试、透明度报告或监管合作机制。"
+      "watch_next": "继续看这些原则会不会落成更具体的安全测试、透明度报告或监管合作机制。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-anthropic-confidential-s1",
@@ -1930,7 +1933,8 @@
       "editorial_category": "company_business",
       "why_it_matters": "这是一条资本市场大新闻：Claude 供应商若进入公开市场，模型训练、企业收入和安全责任都会受到更强披露压力。",
       "reader_relevance": "Claude/Codex 类工具已经嵌入工程工作流，供应商融资和上市节奏会影响价格、稳定性、企业采购和长期平台风险。",
-      "watch_next": "公开 S-1 出来后，重点看收入结构、云供应商依赖、研发成本、安全责任和企业客户集中度。"
+      "watch_next": "公开 S-1 出来后，重点看收入结构、云供应商依赖、研发成本、安全责任和企业客户集中度。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-github-copilot-june1-billing-auto",
@@ -1956,7 +1960,8 @@
       "editorial_category": "engineering_toolchain",
       "why_it_matters": "AI 编程工具正在从 seat 订阅变成可计量资源，代码 review、agent 调用和模型选择都会进入预算和治理讨论。",
       "reader_relevance": "普通工程师会直接感受到 review、自动模型选择和 agent 调用的额度限制；团队也需要把 IDE 体验和成本策略放在一起看。",
-      "watch_next": "留意组织级 budget 默认值、超额通知、auto model selection 的实际模型分配，以及 code review 对 Actions minutes 的消耗。"
+      "watch_next": "留意组织级 budget 默认值、超额通知、auto model selection 的实际模型分配，以及 code review 对 Actions minutes 的消耗。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-jetbrains-mellum2",
@@ -1982,7 +1987,8 @@
       "editorial_category": "model_release",
       "why_it_matters": "这条不需要被单独放成模型栏目；它更像一个工具链信号：IDE 厂商在探索小模型常驻、低延迟、低成本地服务开发工作流。",
       "reader_relevance": "做 IDE 插件、内部代码助手、RAG 路由或私有化 coding agent 的团队，可以用它判断哪些任务不必一直调用大模型 API。",
-      "watch_next": "后续看真实代码补全延迟、tool routing 准确率、私有仓库微调体验，以及与 Qwen/DeepSeek-Coder 的成本对比。"
+      "watch_next": "后续看真实代码补全延迟、tool routing 准确率、私有仓库微调体验，以及与 Qwen/DeepSeek-Coder 的成本对比。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-aws-agentcore-auth-code-flow",
@@ -2009,7 +2015,8 @@
       "editorial_category": "engineering_toolchain",
       "why_it_matters": "agent 基础设施正在从 demo 进入权限、身份和审计设计；MCP 真要进企业，OAuth、token 交换和最小权限比 prompt 更关键。",
       "reader_relevance": "如果团队要让 agent 访问 Jira、GitHub、数据库或内部工具，这篇可以作为设计授权链路和审计日志的参考。",
-      "watch_next": "继续看 Gateway 对多租户、token 生命周期、工具权限分级和审计日志的支持。"
+      "watch_next": "继续看 Gateway 对多租户、token 生命周期、工具权限分级和审计日志的支持。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-nvidia-jetpack-72-agentic-edge",
@@ -2035,7 +2042,8 @@
       "editorial_category": "engineering_toolchain",
       "why_it_matters": "这属于硬件和部署层面的行业动态：agent 不只在云端和 IDE 里跑，机器人、工业视觉和端侧推理也开始有更完整的工具链。",
       "reader_relevance": "做机器人、工业视觉、端侧推理或本地工具调用的工程师，可以从这里判断 Jetson 侧是否能同时撑住模型、技能、调度和内存优化。",
-      "watch_next": "继续看 Jetson skills 的可复用度、NemoClaw 安装体验、Super Mode 对功耗和稳定性的影响。"
+      "watch_next": "继续看 Jetson skills 的可复用度、NemoClaw 安装体验、Super Mode 对功耗和稳定性的影响。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-nvidia-dgx-spark-local-agents",
@@ -2062,7 +2070,8 @@
       "editorial_category": "engineering_toolchain",
       "why_it_matters": "本地 agent lab 的叙事正在变具体：长上下文、多 agent、隐私和 per-token 成本不再只是云端 API 问题。",
       "reader_relevance": "需要处理私有数据、长任务或高频工具调用的团队，可以用这条判断什么时候从纯 API 调用转向本地/混合部署。",
-      "watch_next": "继续看多节点设置复杂度、Qwen3.6 实测吞吐，以及它和云端 API 的总成本边界。"
+      "watch_next": "继续看多节点设置复杂度、Qwen3.6 实测吞吐，以及它和云端 API 的总成本边界。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-alibaba-qwen-code-model-studio",
@@ -2088,7 +2097,8 @@
       "editorial_category": "content_aigc",
       "why_it_matters": "AIGC 内容工具正在从单次聊天生成，走向可配置、可审查、可接入 CMS 或运营后台的生产流水线。",
       "reader_relevance": "做运营工具、内容平台、设计自动化或增长系统的工程师，可以从这个例子拆出 prompt 模板、权限、成本和审核的工程问题。",
-      "watch_next": "继续看 Model Studio CLI 是否支持批量生成、权限隔离、成本控制，以及与现有 CMS/设计系统的集成。"
+      "watch_next": "继续看 Model Studio CLI 是否支持批量生成、权限隔离、成本控制，以及与现有 CMS/设计系统的集成。",
+      "image_urls": []
     }
   ],
   "model_releases": [],
@@ -2108,7 +2118,8 @@
       "source_level": "primary",
       "verification_status": "primary_confirmed",
       "reader_relevance": "对维护裸金属、固件 rollout 或大规模服务器 fleet 的工程师，文章提供了从 timeout、日志到容量恢复的完整排障路径。",
-      "watch_next": "可对照自己团队的 firmware 升级、reboot SLO、自动回滚和现场恢复流程。"
+      "watch_next": "可对照自己团队的 firmware 升级、reboot SLO、自动回滚和现场恢复流程。",
+      "image_urls": []
     },
     {
       "candidate_id": "hot-latent-video-agents",
@@ -2125,7 +2136,8 @@
       "source_level": "primary",
       "verification_status": "primary_confirmed",
       "reader_relevance": "做内容工具、广告素材、互动视频、多模态 agent 的工程师，可以把这篇当成视频 agent 产品化路线图来读。",
-      "watch_next": "继续看视频 agent 是否能稳定处理可控编辑、连续镜头、成本预算和 API 延迟。"
+      "watch_next": "继续看视频 agent 是否能稳定处理可控编辑、连续镜头、成本预算和 API 延迟。",
+      "image_urls": []
     },
     {
       "candidate_id": "hot-interconnects-open-closed-exponentials",
@@ -2142,7 +2154,8 @@
       "source_level": "primary",
       "verification_status": "primary_confirmed",
       "reader_relevance": "适合评估开源模型、闭源 API、coding agent 付费意愿和模型商业化路径的工程/平台负责人。",
-      "watch_next": "关注开放模型在 coding、tool use 和推理成本上的追赶速度。"
+      "watch_next": "关注开放模型在 coding、tool use 和推理成本上的追赶速度。",
+      "image_urls": []
     }
   ],
   "projects": [
@@ -2294,7 +2307,8 @@
       "verification_status": "primary_confirmed",
       "reader_relevance": "适合工程团队跟踪 ChatGPT 免费用户可用性波动，但这类运营事件只影响服务状态判断，不应被包装成模型或产品发布。",
       "verification_note": "来源是 OpenAI 官方状态页 incident，可确认事件存在和服务影响范围。",
-      "risk_note": "状态页事件通常是短周期运营信号，不能推导长期产品质量或模型能力变化。"
+      "risk_note": "状态页事件通常是短周期运营信号，不能推导长期产品质量或模型能力变化。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2304,7 +2318,8 @@
       "verification_status": "primary_confirmed",
       "reader_relevance": "适合依赖 Claude Sonnet 的工程团队做可用性复盘、供应商 SLA 观察和降级预案检查。",
       "verification_note": "来源是 Anthropic/Claude 官方状态页 incident，可确认 degraded performance 事件本身。",
-      "risk_note": "状态页只说明服务可用性事件，不代表模型能力、价格或长期稳定性结论。"
+      "risk_note": "状态页只说明服务可用性事件，不代表模型能力、价格或长期稳定性结论。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2314,7 +2329,8 @@
       "verification_status": "intermediary_only",
       "reader_relevance": "关注端侧 agent、Windows PC OEM、企业桌面环境和本地推理的工程师，可以先用它建立观察项。",
       "verification_note": "当前保留 TechCrunch 原文作为中介线索，尚未逐项回源到 NVIDIA、Microsoft、Dell 或 HP 官方页面。",
-      "risk_note": "不能作为主体事实使用；需要厂商发布页或多源确认后才能升格。"
+      "risk_note": "不能作为主体事实使用；需要厂商发布页或多源确认后才能升格。",
+      "image_urls": []
     }
   ],
   "evidence_assets": [

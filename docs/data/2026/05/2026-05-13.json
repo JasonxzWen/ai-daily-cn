@@ -28,6 +28,7 @@
         "GPT-Realtime-Translate 面向跨语言实时对话，GPT-Realtime-Whisper 面向低延迟流式转写；两者适合客服、会议、教育和现场活动等语音工作流。",
         "价格和可用性已在原文列出，团队可以直接评估语音输入/输出 token、按分钟翻译和转写成本。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -48,6 +49,7 @@
         "增强个性化会引用历史聊天、文件和已连接 Gmail 等上下文，同时引入 memory sources 让用户查看部分使用过的上下文来源。",
         "对产品团队而言，默认模型变化会影响用户对回答长度、个性化和检索触发时机的预期，灰度评估应覆盖已有提示词和客服/知识库场景。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -68,6 +70,7 @@
         "Claude Opus API rate limits 提高，适合此前受吞吐限制的批量代码审查、长任务 Agent 和企业内部工具。",
         "算力合作被明确用于提高 Claude Pro、Claude Max 和 API 容量，工程团队可以重新评估并发、队列和降级策略。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -89,6 +92,7 @@
         "模板结构包含 skills、connectors 和 subagents，强调可按企业建模规范、风控政策和审批流程改造。",
         "这类行业模板把 Agent 交付从单点提示词推进到权限、凭据、审计和工具调用组合，值得内部平台团队拆解复用。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -109,6 +113,7 @@
         "GitHub 与 Linear 接入说明编码和项目管理场景正在进入通用助手入口，不再只停留在 IDE 或单独 bot。",
         "Bring Your Own MCP 让企业可接入内部知识库、私有 API 或内部 MCP 网关，需要同步评估权限隔离和审计。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -128,6 +133,7 @@
         "文档建议大多数文本、推理和代码工作负载迁移到 grok-4.3，并按 reasoning effort 调整延迟与成本。",
         "使用 xAI API 的服务应在 2026-05-15 12:00 PT 前完成模型名替换、回归测试和错误监控。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -147,6 +153,7 @@
         "同时包含 app 更新流程 hardening，适合依赖桌面/本地运行时分发的团队跟进验证。",
         "该条属于 GitHub Release 信号，不等同于新模型发布，但对本地模型运行链路有直接操作价值。"
       ],
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -167,6 +174,7 @@
         "gpt-oss MXFP4 在 torch.compile 下的 fake op 参数被补齐，Qwen3-VL 在高负载下的边界检查问题被移除。",
         "线上推理平台若运行这些模型族，应优先在灰度环境验证该补丁版本。"
       ],
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -187,6 +195,7 @@
         "插件详情展示 hooks，分享暴露 link metadata 和 discoverability controls，说明 Codex 插件分发能力继续成形。",
         "Windows sandbox 权限修复和 apply_patch 差异跟踪修复对桌面端、审查和自动化任务稳定性更重要。"
       ],
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -206,6 +215,7 @@
         "同页还能看到 1.x 与 classic 包的相关 hardening，说明影响面不只在主包。",
         "仍依赖旧 LangChain 组件加载外部 manifest、序列化对象或 hub 资源的系统，应把该类升级列入安全补丁队列。"
       ],
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -244,6 +254,7 @@
     {
       "content": "Mistral 3 官方页面已可访问，但页面正文未给出明确发布日期；本轮不计入主体条目，建议后续用模型卡或 Hugging Face 发布时间交叉确认。",
       "url": "https://mistral.ai/news/mistral-3",
+      "image_urls": [],
       "importance": "general"
     }
   ],

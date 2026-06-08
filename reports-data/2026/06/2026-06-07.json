@@ -24,13 +24,13 @@
           "name": "GitHub Trending daily",
           "url": "https://github.com/trending?since=daily",
           "status": "checked",
-          "notes": "16 repositories parsed"
+          "notes": "15 repositories parsed"
         },
         {
           "name": "GitHub Trending weekly",
           "url": "https://github.com/trending?since=weekly",
           "status": "checked",
-          "notes": "18 repositories parsed"
+          "notes": "19 repositories parsed"
         },
         {
           "name": "GitHub Trending Python daily",
@@ -42,7 +42,7 @@
           "name": "GitHub Trending Python weekly",
           "url": "https://github.com/trending/python?since=weekly",
           "status": "checked",
-          "notes": "14 repositories parsed"
+          "notes": "15 repositories parsed"
         },
         {
           "name": "GitHub Trending TypeScript daily",
@@ -60,13 +60,13 @@
           "name": "GitHub Trending Rust daily",
           "url": "https://github.com/trending/rust?since=daily",
           "status": "checked",
-          "notes": "20 repositories parsed"
+          "notes": "12 repositories parsed"
         },
         {
           "name": "GitHub Trending Rust weekly",
           "url": "https://github.com/trending/rust?since=weekly",
           "status": "checked",
-          "notes": "20 repositories parsed"
+          "notes": "19 repositories parsed"
         },
         {
           "name": "GitHub Trending Go daily",
@@ -78,12 +78,12 @@
           "name": "GitHub Trending Go weekly",
           "url": "https://github.com/trending/go?since=weekly",
           "status": "checked",
-          "notes": "19 repositories parsed"
+          "notes": "18 repositories parsed"
         }
       ],
-      "candidates_found": 134,
+      "candidates_found": 126,
       "included": 13,
-      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 7 个日期、136 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
+      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 6 个日期、109 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
     },
     "builder_sources": {
       "checked": true,
@@ -128,7 +128,7 @@
       "candidates_found": 15,
       "included": 6,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-08T10:55:35.043Z",
+      "last_successful_feed_at": "2026-06-08T08:51:56.180Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "content_sources": {
@@ -227,8 +227,8 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "checked",
-          "notes": "1 recent intermediary lead entries parsed"
+          "status": "blocked",
+          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -546,7 +546,7 @@
           "name": "Product Hunt Developer Tools Feed",
           "url": "https://www.producthunt.com/feed?category=developer-tools",
           "status": "checked",
-          "notes": "1 recent product/project entries parsed; 0 product cross-checks confirmed"
+          "notes": "4 recent product/project entries parsed; 0 product cross-checks confirmed"
         },
         {
           "name": "Latent.Space",
@@ -564,7 +564,7 @@
           "name": "Hacker News Topstories API",
           "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
           "status": "checked",
-          "notes": "3 recent intermediary lead entries parsed"
+          "notes": "5 recent intermediary lead entries parsed"
         },
         {
           "name": "Hugging Face Daily Papers",
@@ -630,7 +630,7 @@
           "name": "Planet AI",
           "url": "https://www.planet-ai.net/rss.xml",
           "status": "checked",
-          "notes": "43 recent intermediary lead entries parsed"
+          "notes": "46 recent intermediary lead entries parsed"
         },
         {
           "name": "OpenRouter Rankings",
@@ -641,7 +641,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-08T10:55:38.164Z",
+            "snapshot_as_of": "2026-06-08T08:51:56.179Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -727,7 +727,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-08T10:55:38.164Z",
+            "snapshot_as_of": "2026-06-08T08:51:56.179Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -814,31 +814,31 @@
           "name": "HNRSS Frontpage",
           "url": "https://hnrss.org/frontpage",
           "status": "checked",
-          "notes": "5 recent intermediary lead entries parsed"
+          "notes": "8 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AI RSS",
           "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20OR%20generative%20AI%20when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "25 recent intermediary lead entries parsed"
+          "notes": "39 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AI Policy RSS",
           "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "41 recent intermediary lead entries parsed"
+          "notes": "42 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
           "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "26 recent intermediary lead entries parsed"
+          "notes": "27 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
           "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "35 recent intermediary lead entries parsed"
+          "notes": "37 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -849,26 +849,26 @@
         {
           "name": "Google News China Big Tech Company Watch RSS",
           "url": "https://news.google.com/rss/search?q=(Tencent%20OR%20ByteDance%20OR%20Alibaba%20OR%20Meituan%20OR%20Baidu%20OR%20DeepSeek%20OR%20MiniMax%20OR%20Moonshot%20OR%20Kimi%20OR%20Zhipu%20OR%20Qwen)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20GitHub%20OR%20%22open%20source%22%20OR%20%22Hugging%20Face%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
-          "status": "checked",
-          "notes": "1 recent intermediary lead entries parsed"
+          "status": "no_signal",
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Official Open Source Watch RSS",
           "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "11 recent intermediary lead entries parsed"
+          "notes": "13 recent intermediary lead entries parsed"
         },
         {
           "name": "36Kr",
           "url": "https://36kr.com/feed",
           "status": "checked",
-          "notes": "5 recent intermediary lead entries parsed"
+          "notes": "6 recent intermediary lead entries parsed"
         },
         {
           "name": "QbitAI",
           "url": "https://www.qbitai.com/feed",
           "status": "checked",
-          "notes": "3 recent intermediary lead entries parsed"
+          "notes": "5 recent intermediary lead entries parsed"
         },
         {
           "name": "Jiqizhixin",
@@ -880,13 +880,13 @@
           "name": "Leiphone",
           "url": "https://www.leiphone.com/feed",
           "status": "checked",
-          "notes": "3 recent intermediary lead entries parsed"
+          "notes": "8 recent intermediary lead entries parsed"
         },
         {
           "name": "InfoQ CN",
           "url": "https://www.infoq.cn/feed",
           "status": "checked",
-          "notes": "1 recent intermediary lead entries parsed"
+          "notes": "3 recent intermediary lead entries parsed"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -898,7 +898,7 @@
           "name": "Anthropic GitHub Organization",
           "url": "https://github.com/anthropics.atom",
           "status": "no_signal",
-          "notes": "0 recent intermediary lead entries parsed; retry_succeeded_after_1"
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Google DeepMind GitHub Organization",
@@ -1064,7 +1064,7 @@
         }
       ],
       "candidates_found": 60,
-      "included": 8,
+      "included": 7,
       "sources_checked": 128,
       "enablement_counts": {
         "core": 54,
@@ -1085,7 +1085,7 @@
         "artificial_analysis_index_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-08T10:55:38.164Z",
+      "last_successful_feed_at": "2026-06-08T08:51:56.179Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -1095,31 +1095,31 @@
         {
           "name": "GDELT",
           "url": "https://api.gdeltproject.org/",
-          "status": "blocked",
-          "notes": "provider_timeout_exceeded_45000ms"
+          "status": "checked",
+          "notes": "6 shadow candidates; provider_timeout_exceeded_45000ms"
         },
         {
           "name": "OpenAlex",
           "url": "https://api.openalex.org/",
           "status": "checked",
-          "notes": "36 shadow candidates"
+          "notes": "34 shadow candidates"
         },
         {
           "name": "arXiv",
           "url": "https://export.arxiv.org/",
-          "status": "checked",
-          "notes": "4 shadow candidates"
+          "status": "no_signal",
+          "notes": "0 shadow candidates"
         }
       ],
       "candidates_found": 40,
-      "included": 4,
+      "included": 5,
       "provider_runtime_ms": {
-        "gdelt": 49847,
-        "openalex": 17003,
-        "arxiv": 924
+        "gdelt": 50006,
+        "openalex": 18981,
+        "arxiv": 9758
       },
       "provider_cost_units": {
-        "gdelt": 6,
+        "gdelt": 4,
         "openalex": 14,
         "arxiv": 14
       },
@@ -1179,8 +1179,8 @@
         {
           "name": "Anthropic Company News",
           "url": "https://www.anthropic.com/news",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "status": "checked",
+          "notes": "html_index source is reachable; feed_like=false"
         },
         {
           "name": "xAI Company News",
@@ -1534,7 +1534,7 @@
           "name": "Product Hunt Developer Tools Feed",
           "url": "https://www.producthunt.com/feed?category=developer-tools",
           "status": "checked",
-          "notes": "50 feed entries parsed; 1 within 48h"
+          "notes": "50 feed entries parsed; 4 within 48h"
         },
         {
           "name": "Latent.Space",
@@ -1641,32 +1641,32 @@
         {
           "name": "HNRSS Frontpage",
           "url": "https://hnrss.org/frontpage",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "status": "checked",
+          "notes": "20 feed entries parsed; 8 within 48h"
         },
         {
           "name": "Google News AI RSS",
           "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20OR%20generative%20AI%20when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "100 feed entries parsed; 24 within 48h"
+          "notes": "100 feed entries parsed; 39 within 48h"
         },
         {
           "name": "Google News AI Policy RSS",
           "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "55 feed entries parsed; 40 within 48h"
+          "notes": "54 feed entries parsed; 42 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
           "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "35 feed entries parsed; 26 within 48h"
+          "notes": "35 feed entries parsed; 27 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
           "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "55 feed entries parsed; 34 within 48h"
+          "notes": "48 feed entries parsed; 37 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -1677,14 +1677,14 @@
         {
           "name": "Google News China Big Tech Company Watch RSS",
           "url": "https://news.google.com/rss/search?q=(Tencent%20OR%20ByteDance%20OR%20Alibaba%20OR%20Meituan%20OR%20Baidu%20OR%20DeepSeek%20OR%20MiniMax%20OR%20Moonshot%20OR%20Kimi%20OR%20Zhipu%20OR%20Qwen)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20GitHub%20OR%20%22open%20source%22%20OR%20%22Hugging%20Face%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
-          "status": "checked",
-          "notes": "100 feed entries parsed; 1 within 48h"
+          "status": "no_signal",
+          "notes": "100 feed entries parsed; 0 within 48h"
         },
         {
           "name": "Google News Official Open Source Watch RSS",
           "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "notes": "18 feed entries parsed; 11 within 48h"
+          "notes": "19 feed entries parsed; 13 within 48h"
         },
         {
           "name": "36Kr",
@@ -1696,7 +1696,7 @@
           "name": "QbitAI",
           "url": "https://www.qbitai.com/feed",
           "status": "checked",
-          "notes": "10 feed entries parsed; 3 within 48h"
+          "notes": "10 feed entries parsed; 5 within 48h"
         },
         {
           "name": "Jiqizhixin",
@@ -1713,8 +1713,8 @@
         {
           "name": "InfoQ CN",
           "url": "https://www.infoq.cn/feed",
-          "status": "no_signal",
-          "notes": "20 feed entries parsed; 0 within 48h"
+          "status": "checked",
+          "notes": "20 feed entries parsed; 2 within 48h"
         },
         {
           "name": "SSPAI",
@@ -1962,10 +1962,146 @@
       "language": "all",
       "window": "daily",
       "rank": 1,
-      "previous_rank": 1,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "mvanhorn/last30days-skill appeared on GitHub Trending daily with 1,111 stars today. 近 7 天本地记录曾在 2026-06-05、2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "mvanhorn/last30days-skill appeared on GitHub Trending daily with 1,111 stars today. 近 7 天本地记录曾在 2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "opencv/opencv",
+      "repo": "opencv/opencv",
+      "candidate_id": "trend-project-opencv-opencv",
+      "description": "opencv/opencv 今天进了 GitHub Trending Top 10，仓库描述显示它主打计算机视觉和图像处理，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/opencv/opencv",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "opencv/opencv appeared on GitHub Trending daily with 65 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "notable"
+    },
+    {
+      "name": "Leonxlnx/taste-skill",
+      "repo": "Leonxlnx/taste-skill",
+      "candidate_id": "trend-project-leonxlnx-taste-skill",
+      "description": "Leonxlnx/taste-skill 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 工程工具，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "Leonxlnx/taste-skill appeared on GitHub Trending daily with 1,103 stars today. 近 7 天本地记录曾在 2026-06-01、2026-06-03、2026-06-04、2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "notable"
+    },
+    {
+      "name": "NousResearch/hermes-agent",
+      "repo": "NousResearch/hermes-agent",
+      "candidate_id": "trend-project-nousresearch-hermes-agent",
+      "description": "NousResearch/hermes-agent 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/NousResearch/hermes-agent",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": 2,
+      "rank_delta": -2,
+      "trend": "down",
+      "evidence": "NousResearch/hermes-agent appeared on GitHub Trending daily with 1,112 stars today. 近 7 天本地记录曾在 2026-06-04、2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    },
+    {
+      "name": "lfnovo/open-notebook",
+      "repo": "lfnovo/open-notebook",
+      "candidate_id": "trend-project-lfnovo-open-notebook",
+      "description": "lfnovo/open-notebook 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 工程工具，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/lfnovo/open-notebook",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": 7,
+      "rank_delta": 2,
+      "trend": "up",
+      "evidence": "lfnovo/open-notebook appeared on GitHub Trending daily with 554 stars today. 近 7 天本地记录曾在 2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    },
+    {
+      "name": "yikart/AiToEarn",
+      "repo": "yikart/AiToEarn",
+      "candidate_id": "trend-project-yikart-aitoearn",
+      "description": "yikart/AiToEarn 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 工程工具，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/yikart/AiToEarn",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "yikart/AiToEarn appeared on GitHub Trending daily with 183 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "general"
+    },
+    {
+      "name": "aaif-goose/goose",
+      "repo": "aaif-goose/goose",
+      "candidate_id": "trend-project-aaif-goose-goose",
+      "description": "aaif-goose/goose 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 编码和 agent 工作流，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/aaif-goose/goose",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "aaif-goose/goose appeared on GitHub Trending daily with 322 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "importance": "general"
+    },
+    {
+      "name": "Crosstalk-Solutions/project-nomad",
+      "repo": "Crosstalk-Solutions/project-nomad",
+      "candidate_id": "trend-project-crosstalk-solutions-project-nomad",
+      "description": "Crosstalk-Solutions/project-nomad 今天进了 GitHub Trending Top 10，仓库描述显示它主打工具调用和接口接入，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/Crosstalk-Solutions/project-nomad",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "Crosstalk-Solutions/project-nomad appeared on GitHub Trending daily with 309 stars today. 近 7 天本地记录曾在 2026-06-01、2026-06-03 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
+    },
+    {
+      "name": "ggml-org/llama.cpp",
+      "repo": "ggml-org/llama.cpp",
+      "candidate_id": "trend-project-ggml-org-llama-cpp",
+      "description": "ggml-org/llama.cpp 今天进了 GitHub Trending Top 10，仓库描述显示它主打模型调用和推理工程，可以当作这类工具最近的一份实现样本来看。",
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "event_date": "2026-06-07",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "ggml-org/llama.cpp appeared on GitHub Trending daily with 158 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "general"
     },
     {
@@ -1978,147 +2114,11 @@
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
-      "rank": 2,
-      "previous_rank": 2,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "RyanCodrai/turbovec appeared on GitHub Trending daily with 1,554 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "google/skills",
-      "repo": "google/skills",
-      "candidate_id": "trend-project-google-skills",
-      "description": "google/skills 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/google/skills",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 3,
-      "previous_rank": 3,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "google/skills appeared on GitHub Trending daily with 481 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "refactoringhq/tolaria",
-      "repo": "refactoringhq/tolaria",
-      "candidate_id": "trend-project-refactoringhq-tolaria",
-      "description": "refactoringhq/tolaria 今天进了 GitHub Trending Top 10，仓库描述显示它主打检索增强和知识库管线，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/refactoringhq/tolaria",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 4,
-      "previous_rank": 4,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "refactoringhq/tolaria appeared on GitHub Trending daily with 245 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "Panniantong/Agent-Reach",
-      "repo": "Panniantong/Agent-Reach",
-      "candidate_id": "trend-project-panniantong-agent-reach",
-      "description": "Panniantong/Agent-Reach 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/Panniantong/Agent-Reach",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 5,
-      "previous_rank": 5,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "Panniantong/Agent-Reach appeared on GitHub Trending daily with 961 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "danielmiessler/Personal_AI_Infrastructure",
-      "repo": "danielmiessler/Personal_AI_Infrastructure",
-      "candidate_id": "trend-project-danielmiessler-personal-ai-infrastructure",
-      "description": "danielmiessler/Personal_AI_Infrastructure 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/danielmiessler/Personal_AI_Infrastructure",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 6,
-      "previous_rank": 6,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "danielmiessler/Personal_AI_Infrastructure appeared on GitHub Trending daily with 337 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "santifer/career-ops",
-      "repo": "santifer/career-ops",
-      "candidate_id": "trend-project-santifer-career-ops",
-      "description": "santifer/career-ops 今天进了 GitHub Trending Top 10，仓库描述显示它主打前端界面和组件工程，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/santifer/career-ops",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 7,
-      "previous_rank": 7,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "santifer/career-ops appeared on GitHub Trending daily with 665 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "phuryn/pm-skills",
-      "repo": "phuryn/pm-skills",
-      "candidate_id": "trend-project-phuryn-pm-skills",
-      "description": "phuryn/pm-skills 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/phuryn/pm-skills",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 8,
-      "previous_rank": 8,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "phuryn/pm-skills appeared on GitHub Trending daily with 112 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "openai/plugins",
-      "repo": "openai/plugins",
-      "candidate_id": "trend-project-openai-plugins",
-      "description": "openai/plugins 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 工程工具，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/openai/plugins",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
-      "rank": 9,
-      "previous_rank": 9,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "openai/plugins appeared on GitHub Trending daily with 262 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "importance": "general"
-    },
-    {
-      "name": "Andyyyy64/whichllm",
-      "repo": "Andyyyy64/whichllm",
-      "candidate_id": "trend-project-andyyyy64-whichllm",
-      "description": "Andyyyy64/whichllm 今天进了 GitHub Trending Top 10，仓库描述显示它主打模型评测和质量验证，可以当作这类工具最近的一份实现样本来看。",
-      "url": "https://github.com/Andyyyy64/whichllm",
-      "event_date": "2026-06-07",
-      "source": "GitHub Trending daily",
-      "language": "all",
-      "window": "daily",
       "rank": 10,
-      "previous_rank": 10,
-      "rank_delta": 0,
-      "trend": "same",
-      "evidence": "Andyyyy64/whichllm appeared on GitHub Trending daily with 103 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "evidence": "RyanCodrai/turbovec appeared on GitHub Trending daily with 1,554 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "general"
     }
   ],
@@ -2258,7 +2258,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-08T10:55:38.164Z",
+        "snapshot_as_of": "2026-06-08T08:51:56.179Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -2422,7 +2422,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-08T10:55:38.164Z",
+        "snapshot_as_of": "2026-06-08T08:51:56.179Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -2550,43 +2550,43 @@
       "event_date": "2026-06-07",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "mvanhorn/last30days-skill appeared on GitHub Trending daily with 1,111 stars today. 近 7 天本地记录曾在 2026-06-05、2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "mvanhorn/last30days-skill appeared on GitHub Trending daily with 1,111 stars today. 近 7 天本地记录曾在 2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
-      "name": "RyanCodrai/turbovec",
-      "candidate_id": "project-ryancodrai-turbovec",
+      "name": "opencv/opencv",
+      "candidate_id": "project-opencv-opencv",
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "RyanCodrai/turbovec 今天进了 GitHub Trending Top 10，仓库描述显示它主打前端界面和组件工程，可以当作这类工具最近的一份实现样本来看。",
+      "description": "opencv/opencv 今天进了 GitHub Trending Top 10，仓库描述显示它主打计算机视觉和图像处理，可以当作这类工具最近的一份实现样本来看。",
       "domains": [
         "AI tooling"
       ],
       "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
-      "url": "https://github.com/RyanCodrai/turbovec",
+      "url": "https://github.com/opencv/opencv",
       "event_date": "2026-06-07",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "RyanCodrai/turbovec appeared on GitHub Trending daily with 1,554 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "opencv/opencv appeared on GitHub Trending daily with 65 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "notable"
     },
     {
-      "name": "google/skills",
-      "candidate_id": "project-google-skills",
+      "name": "Leonxlnx/taste-skill",
+      "candidate_id": "project-leonxlnx-taste-skill",
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "google/skills 今天进了 GitHub Trending Top 10，仓库描述显示它主打agent 工作流和任务编排，可以当作这类工具最近的一份实现样本来看。",
+      "description": "Leonxlnx/taste-skill 今天进了 GitHub Trending Top 10，仓库描述显示它主打AI 工程工具，可以当作这类工具最近的一份实现样本来看。",
       "domains": [
-        "agent"
+        "AI tooling"
       ],
       "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
-      "url": "https://github.com/google/skills",
+      "url": "https://github.com/Leonxlnx/taste-skill",
       "event_date": "2026-06-07",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "google/skills appeared on GitHub Trending daily with 481 stars today. 近 7 天本地记录曾在 2026-06-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "Leonxlnx/taste-skill appeared on GitHub Trending daily with 1,103 stars today. 近 7 天本地记录曾在 2026-06-01、2026-06-03、2026-06-04、2026-06-05 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     }
   ],
@@ -2704,30 +2704,6 @@
   ],
   "community_leads": [
     {
-      "candidate_id": "status-openai-some-users-may-experience-issues-accessing-openai-accounts",
-      "content": "OpenAI Status 这条线索指向产品、平台或服务可用性，当天公开细节主要还是官方入口、适用范围、可验证证据和后续变化，暂时先放在观察区。",
-      "url": "https://status.openai.com//incidents/01KTBZDS20E3PZ53DH2SCKXN49",
-      "event_date": "2026-06-06",
-      "source": "OpenAI Status",
-      "evidence": "Status: Resolved Incorrectly suspended users have been restored access and received an email about their account and subscription information, if relevant. Impacted services have recovered. Affected components App (Operational) VS Code exte",
-      "editorial_category": "community_signal",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "importance": "general"
-    },
-    {
-      "candidate_id": "content-baidu-press-releases-baidu-to-hold-annual-general-meeting-on-june-5-2026",
-      "content": "Baidu 披露将召开年度股东大会，重点是公司治理、投资者关系和后续管理层议程是否出现变化",
-      "url": "https://ir.baidu.com/news-releases/news-release-details/baidu-hold-annual-general-meeting-june-5-2026",
-      "event_date": "2026-06-05",
-      "source": "Baidu Press Releases",
-      "evidence": "Baidu to Hold Annual General Meeting on June 5, 2026 Apr 23, 2026 Baidu to Report First Quarter 2026 Financial Results on May 18, 2026 Mar 17, 2026 Baidu, Inc. Files Its Annual Report on Form 20-F Feb 26, 2026 Baidu Announces Fourth Quarter。Treat this as a community lead unless it is backed by a primary source.",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
-      "verification_status": "primary_confirmed",
-      "importance": "general"
-    },
-    {
       "candidate_id": "status-openai-voice-mode-availability-impacted",
       "content": "OpenAI Status 这条线索指向AI 产品、模型或平台动态，当天公开细节主要还是官方入口、适用范围、可验证证据和后续变化，暂时先放在观察区。",
       "url": "https://status.openai.com//incidents/01KTCF0M9HQ04JB48EXMMJVX5J",
@@ -2764,22 +2740,10 @@
       "importance": "general"
     },
     {
-      "candidate_id": "search-openalex-ai-devtools-pricing-quota-cost-kevinkawchak-single-prompt-bill-v",
+      "candidate_id": "search-openalex-model-availability-ops-exotic-weil-self-intersection-across-all",
       "content": "OpenAlex 这条线索指向公司治理、财报、组织或业务优先级，当天公开细节主要还是发布时间、管理层口径、业务投入和对合作或采购的影响，暂时先放在观察区。",
-      "url": "https://doi.org/10.5281/zenodo.20576649",
-      "event_date": "2026-06-07",
-      "source": "OpenAlex",
-      "evidence": "Zenodo (CERN European Organization for Nuclear Research)",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
-      "verification_status": "intermediary_only",
-      "importance": "general"
-    },
-    {
-      "candidate_id": "search-openalex-model-availability-ops-gemini-pro-benchmark-performance-across-r",
-      "content": "OpenAlex 这条线索指向公司治理、财报、组织或业务优先级，当天公开细节主要还是发布时间、管理层口径、业务投入和对合作或采购的影响，暂时先放在观察区。",
-      "url": "https://doi.org/10.5281/zenodo.20577279",
-      "event_date": "2026-06-07",
+      "url": "https://doi.org/10.5281/zenodo.18734869",
+      "event_date": "2026-12-22",
       "source": "OpenAlex",
       "evidence": "Zenodo (CERN European Organization for Nuclear Research)",
       "editorial_category": "community_signal",
@@ -2797,6 +2761,42 @@
       "editorial_category": "community_signal",
       "source_level": "official",
       "verification_status": "primary_confirmed",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "status-claude-opus-4-8-degraded-service",
+      "content": "Claude Status 这条线索指向AI 产品、模型或平台动态，当天公开细节主要还是官方入口、适用范围、可验证证据和后续变化，暂时先放在观察区。",
+      "url": "https://status.claude.com/incidents/b1gzqlnpxxxk",
+      "event_date": "2026-06-06",
+      "source": "Claude Status",
+      "evidence": "Jun 6 , 10:14 UTC Resolved - This incident has been resolved. Jun 6 , 09:59 UTC Monitoring - A fix has been implemented and we are monitoring the results. Jun 6 , 09:43 UTC Identified - The issue has been identified and a fix is being imple",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "search-openalex-official-open-source-account-watch-automated-solid-violation-det",
+      "content": "OpenAlex 这条线索指向开源仓库、模型账号或开发者资源，当天公开细节主要还是实验设置、数据范围、可复现材料和与现有方案的差异，暂时先放在观察区。",
+      "url": "https://doi.org/10.5281/zenodo.20111113",
+      "event_date": "2026-10-05",
+      "source": "OpenAlex",
+      "evidence": "Zenodo (CERN European Organization for Nuclear Research)",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general"
+    },
+    {
+      "candidate_id": "search-openalex-official-open-source-account-watch-does-context-size-matter-cont",
+      "content": "OpenAlex 这条线索指向开源仓库、模型账号或开发者资源，当天公开细节主要还是适用版本、权限边界、接入方式、失败恢复和团队落地成本，暂时先放在观察区。",
+      "url": "https://doi.org/10.5281/zenodo.18102024",
+      "event_date": "2026-12-30",
+      "source": "OpenAlex",
+      "evidence": "Zenodo (CERN European Organization for Nuclear Research)",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
       "importance": "general"
     }
   ],
@@ -2832,11 +2832,11 @@
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "56cb71e5dd3f308e66864e841e15b004a1897cb9",
-      "git_commit_short": "56cb71e5dd3f",
-      "git_branch": "main",
-      "origin_main_sha": "56cb71e5dd3f308e66864e841e15b004a1897cb9",
-      "origin_main_short": "56cb71e5dd3f",
+      "git_commit": "257e600be4eccbd0093e1d1b123d2c15596c9660",
+      "git_commit_short": "257e600be4ec",
+      "git_branch": "detached",
+      "origin_main_sha": "257e600be4eccbd0093e1d1b123d2c15596c9660",
+      "origin_main_short": "257e600be4ec",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -2869,7 +2869,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-08T11:01:24.213Z",
+  "generated_at": "2026-06-08T10:08:24.558Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-07.html",
   "html_path": "reports/2026/06/2026-06-07.html",

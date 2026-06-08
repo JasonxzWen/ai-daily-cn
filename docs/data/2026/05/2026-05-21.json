@@ -130,6 +130,7 @@
         "Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。",
         "对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -148,6 +149,7 @@
         "这降低了开发者手动选择模型的负担，也把 Copilot 的产品差异化从模型列表推进到任务路由策略。",
         "组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -167,6 +169,7 @@
         "这个发布直接瞄准现有 OpenAI SDK 生态，把迁移成本从重写客户端降到改 endpoint URL 的层面。",
         "对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -188,6 +191,7 @@
         "官方博客写明 self-hosted sandboxes 为 public beta，MCP tunnels 为 research preview。",
         "这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -207,6 +211,7 @@
         "Vercel 把 Google 的最新模型快速接入 AI Gateway，强化了统一模型入口对多提供商应用的价值。",
         "对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -226,6 +231,7 @@
         "Ettin Reranker 发布多个 cross-encoder reranker artifact，并公开训练数据来源，适合 RAG 检索链路中的 lightweight rerank 评估。",
         "Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -239,6 +245,7 @@
       "source": "Google Blog",
       "summary": "Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。",
       "notes": "同时已出现在 Vercel AI Gateway，开发者可通过 Vercel AI SDK 使用 `google/gemini-3.5-flash`。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -250,6 +257,7 @@
       "source": "Google Blog",
       "summary": "Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。",
       "notes": "本轮仅按官方 I/O 汇总记录，不引入第三方推断。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -261,6 +269,7 @@
       "source": "Hugging Face Blog",
       "summary": "Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。",
       "notes": "适合作为 RAG pipeline 中低参数 reranker 的候选，需要在自有语料上做离线评估。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -272,6 +281,7 @@
       "source": "Ai2 Blog",
       "summary": "Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。",
       "notes": "官方页提供模型、技术报告和代码入口，后续可跟踪实际下游应用复现。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -285,6 +295,7 @@
       "topic": "model serving / OpenAI-compatible API",
       "summary": "SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。",
       "why_it_matters": "这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -296,6 +307,7 @@
       "topic": "managed agents / MCP / sandboxing",
       "summary": "Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。",
       "why_it_matters": "生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -307,6 +319,7 @@
       "topic": "reranker / RAG",
       "summary": "Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。",
       "why_it_matters": "RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -428,21 +441,25 @@
     {
       "content": "karpathy/autoresearch 出现在 Trending 候选中，但本轮未找到足够新的官方 release 证据，保留为研究自动化方向的复核线索。",
       "url": "https://github.com/karpathy/autoresearch",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "anthropics/claude-plugins-official 出现在 Trending 候选中，因其更像官方插件目录信号，本轮未放入主条目。",
       "url": "https://github.com/anthropics/claude-plugins-official",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "HKUDS/CLI-Anything 出现在 Trending 候选中，agent-native CLI 方向值得后续检查 release、文档和真实案例。",
       "url": "https://github.com/HKUDS/CLI-Anything",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Google Labs 的 Project Genie / Gemini Spark 相关 X 信号与 I/O 2026 agentic Gemini 主线相关，但需要等待更完整官方文档再提升为主条目。",
       "url": "https://x.com/GoogleLabs/status/2056872996988756228",
+      "image_urls": [],
       "importance": "general"
     }
   ],

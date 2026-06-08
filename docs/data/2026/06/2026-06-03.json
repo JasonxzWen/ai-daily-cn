@@ -1774,7 +1774,8 @@
       ],
       "why_it_matters": "安全团队可以把这篇当成 agentic threat modeling 的词表：哪些能力进入攻击流程、哪些环节能观测、哪些只是单点案例，优先转成检测和演练条目。",
       "verification_note": "一手来源：Anthropic News，URL 与候选池一致。",
-      "watch_next": "跟踪 MITRE ATT&CK 映射是否被安全平台、红队演练和检测规则采用。"
+      "watch_next": "跟踪 MITRE ATT&CK 映射是否被安全平台、红队演练和检测规则采用。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-alibaba-qwen-vla",
@@ -1797,7 +1798,8 @@
       ],
       "why_it_matters": "这类模型对机器人、浏览器控制和桌面自动化的价值在于把 perception 与 action 合并评估；工程团队要重点看数据闭环、动作约束和失败恢复。",
       "verification_note": "一手来源：Alibaba Cloud Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。"
+      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-alibaba-qwen3-7-plus",
@@ -1820,7 +1822,8 @@
       ],
       "why_it_matters": "对企业应用来说，关键不是多模态宣传，而是能否稳定处理含图表、界面、文档和工具调用的真实工单；后续要看 API、成本和上下文限制。",
       "verification_note": "一手来源：Alibaba Cloud Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。"
+      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-openai-codex-workflow",
@@ -1843,7 +1846,8 @@
       ],
       "why_it_matters": "Codex 正从 IDE 助手变成可嵌入业务工具的 agent runtime；团队需要重新设计权限、审计、制品托管和跨文档反馈流程。",
       "verification_note": "一手来源：OpenAI News RSS，URL 与候选池一致。",
-      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。"
+      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-openai-travelers-claims",
@@ -1867,7 +1871,8 @@
       ],
       "why_it_matters": "这是保险理赔的生产落地案例，说明企业 AI 项目开始围绕高频流程、峰值容量和客户自助体验优化，而不是只做内部知识问答。",
       "verification_note": "一手来源：OpenAI News RSS，URL 与候选池一致。",
-      "watch_next": "跟踪 Travelers 是否披露理赔周期、客服峰值和客户自助率等后续运营指标。"
+      "watch_next": "跟踪 Travelers 是否披露理赔周期、客服峰值和客户自助率等后续运营指标。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-openai-youth-safety",
@@ -1890,7 +1895,8 @@
       ],
       "why_it_matters": "政策团队和教育产品要把未成年人保护、默认安全设置、年龄分层和机会公平纳入产品路线；这会影响学校和消费者 AI 工具采购。",
       "verification_note": "一手来源：OpenAI News RSS，URL 与候选池一致。",
-      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。"
+      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-anthropic-glasswing",
@@ -1913,7 +1919,8 @@
       ],
       "why_it_matters": "这类项目会影响政府、学校和公共机构采用 AI 的信任框架；工程团队要关注安全评估、事件响应和外部伙伴协作要求。",
       "verification_note": "一手来源：Anthropic News，URL 与候选池一致。",
-      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。"
+      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-github-copilot-sdk-ga",
@@ -1937,7 +1944,8 @@
       ],
       "why_it_matters": "这把 Copilot 从成品工具推进到可集成平台；做内部 DevTool 的团队可以评估 SDK 边界、身份权限、日志留存和成本归因。",
       "verification_note": "一手来源：GitHub Changelog，URL 与候选池一致。",
-      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。"
+      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-github-copilot-app-preview",
@@ -1961,7 +1969,8 @@
       ],
       "why_it_matters": "桌面端 Copilot app 会把 agent 从编辑器扩到本地工作台；团队需要验证它与现有 IDE、CLI、仓库权限和企业策略的冲突点。",
       "verification_note": "一手来源：GitHub Changelog，URL 与候选池一致。",
-      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。"
+      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-github-gpt-4-1-deprecated",
@@ -1985,7 +1994,8 @@
       ],
       "why_it_matters": "这会影响团队的模型回归基线：如果近期提示词、评测或代码生成质量变化，需把 Copilot 后端模型切换作为变量纳入排查。",
       "verification_note": "一手来源：GitHub Changelog，URL 与候选池一致。",
-      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。"
+      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-nvidia-windows-personal-agents",
@@ -2009,7 +2019,8 @@
       ],
       "why_it_matters": "端侧 agent 的约束与云端不同：模型体积、GPU/内存、隐私边界和离线可用性会决定体验上限，值得桌面应用团队提前验证。",
       "verification_note": "一手来源：NVIDIA Developer Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。"
+      "watch_next": "继续跟踪监管文件、合作方名单、默认安全设置和采购合规要求。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-aws-nova-forge-hpo",
@@ -2033,7 +2044,8 @@
       ],
       "why_it_matters": "对企业模型定制来说，重点是把无标注领域数据、标注示例和 reward signals 分开治理；否则局部提升可能带来通用能力退化。",
       "verification_note": "一手来源：AWS Machine Learning Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。"
+      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-aws-nova-2-lite-object-detection",
@@ -2056,7 +2068,8 @@
       ],
       "why_it_matters": "这说明多模态小模型开始承担更具体的视觉任务；做质检、工单图片和运营审核的团队可把它纳入低成本视觉推理候选。",
       "verification_note": "一手来源：AWS Machine Learning Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。"
+      "watch_next": "继续跟踪 API 可用性、上下文/多模态限制、评测复现和实际成本。",
+      "image_urls": []
     },
     {
       "candidate_id": "main-aws-baz-agentcore-code-review",
@@ -2079,7 +2092,8 @@
       ],
       "why_it_matters": "AI code review 的价值正在从给建议转向围绕 spec 做可追踪审查；团队应关注输入规范、误报控制和与现有 PR 流程的集成。",
       "verification_note": "一手来源：AWS Machine Learning Blog，URL 与候选池一致。",
-      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。"
+      "watch_next": "继续跟踪权限模型、审计日志、企业策略和与现有开发流程的集成。",
+      "image_urls": []
     }
   ],
   "model_releases": [],
@@ -2099,7 +2113,8 @@
       "summary": "1. 聚焦本地、快速的 computer-use agent，适合观察桌面自动化从云端演示走向本地执行；2. 价值在于延迟、隐私和可控性，但仍要验证真实 UI 失败恢复；3. 可作为 RPA、浏览器 agent 和终端自动化的评测样本。",
       "content_type": "blog",
       "reader_relevance": "适合做 agent 平台、企业工作流和多模态工具链的工程团队作为设计参考。",
-      "verification_note": "一手博客来源：Hugging Face Blog。"
+      "verification_note": "一手博客来源：Hugging Face Blog。",
+      "image_urls": []
     },
     {
       "candidate_id": "content-hugging-face-blog-beyond-llms-why-scalable-enterprise-ai-adoption-depend",
@@ -2116,7 +2131,8 @@
       "summary": "1. IBM Research 把企业 AI 采用问题落到 agent logic，而不是单纯模型能力；2. 重点是流程状态、工具调用、权限和治理如何组合；3. 适合做企业 agent 平台的人检查 orchestration、observability 与审计设计。",
       "content_type": "blog",
       "reader_relevance": "适合做 agent 平台、企业工作流和多模态工具链的工程团队作为设计参考。",
-      "verification_note": "一手博客来源：Hugging Face Blog。"
+      "verification_note": "一手博客来源：Hugging Face Blog。",
+      "image_urls": []
     },
     {
       "candidate_id": "content-alibaba-cloud-blog-ontology-is-trending-again-can-it-improve-my-ai-agent",
@@ -2133,7 +2149,8 @@
       "summary": "1. 文章把 ontology 作为结构化领域知识层，服务企业运维 agent 的准确性和可解释性；2. 核心启发是把隐性知识显式建模，再交给 agent 调用；3. 适合知识密集型客服、运维、合规和内部工具场景。",
       "content_type": "blog",
       "reader_relevance": "适合做 agent 平台、企业工作流和多模态工具链的工程团队作为设计参考。",
-      "verification_note": "一手博客来源：Alibaba Cloud Blog。"
+      "verification_note": "一手博客来源：Alibaba Cloud Blog。",
+      "image_urls": []
     }
   ],
   "github_trending": [
@@ -2559,7 +2576,8 @@
       "evidence": "Status: Monitoring We have applied the mitigation and are monitoring the recovery. Affected components Login (Operational) Conversations (Operational) Responses (Operational) Codex Web (Operational) App (Operational)",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "官方状态页或一手来源确认事件存在。",
-      "risk_note": "状态页事件通常是短周期运营信号，不代表长期能力变化。"
+      "risk_note": "状态页事件通常是短周期运营信号，不代表长期能力变化。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2573,7 +2591,8 @@
       "evidence": "Jun 3 , 07:36 UTC Resolved - This incident has been resolved. Jun 3 , 04:17 UTC Investigating - We have identified an issue which is resulting in some Claude Code services being degraded. As a result of this issue, users will see issues wit",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "官方状态页或一手来源确认事件存在。",
-      "risk_note": "状态页事件通常是短周期运营信号，不代表长期能力变化。"
+      "risk_note": "状态页事件通常是短周期运营信号，不代表长期能力变化。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2587,7 +2606,8 @@
       "evidence": "Uber's cutback has occurred after the company had reportedly encouraged staff to use AI as much as possible. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "中介来源仅作发现线索，事实性结论需要一手或多源确认。",
-      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。"
+      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2601,7 +2621,8 @@
       "evidence": "Online publishers are getting more control over whether their websites appear in Google's AI Search features, thanks to a UK regulatory ruling. The new conduct rule imposed by the Competition and Markets Authority (CMA) requires Google to l。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "中介来源仅作发现线索，事实性结论需要一手或多源确认。",
-      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。"
+      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2615,7 +2636,8 @@
       "evidence": "文｜邓咏仪 编辑｜张雨忻 杨轩 36 氪独家获悉，字节跳动火山引擎在今年 4 月已将 MaaS 业务营收目标上调至 150 亿元，且这个营收目标几乎每月都在上调。而在 2025 年底，这一目标还是 100 亿元。 36 氪了解到，在 2025 年，火山全年的 MaaS 收入约 15 亿元左右，等于截止目前 2026 年的营收目标是去年实际营收的 10 倍。可以说，火山这一波 MaaS 营收增长几乎都归功于 Seedance 2.0 的爆发——视频模型 Seedance 2.0。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "中介来源仅作发现线索，事实性结论需要一手或多源确认。",
-      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。"
+      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2629,7 +2651,8 @@
       "evidence": "6月3日，千问APP宣布将向第三方Agent、Skill全面开放，所有企业均可在千问运营自己的品牌Agent。目前，瑞幸、肯德基、蜜雪冰城、东方航空等首批企业正在千问进行Agent服务测试，并将陆续上线。 未来，企业可以在千问APP中运营自己的Agent，自定义Agent人设与服务边界，以对话的形式为用户提供各种形式的产品服务。同时，Agent具备记忆与主动规划能力，可在特定场景下主动提供服务，如行程提醒、权益到期、复购推荐等。 与之对应，全面接入第三方Agent的千问将成为。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "reader_relevance": "作为轻量信号保留，帮助团队决定是否需要进一步回源或调整监控。",
       "verification_note": "中介来源仅作发现线索，事实性结论需要一手或多源确认。",
-      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。"
+      "risk_note": "涉及监管、营收、商业化或平台政策时，不得在未回源前写入事实主线。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2643,7 +2666,8 @@
       "evidence": "36Kr intermediary lead about Astribot financing and commercialization signals; high-risk financing and valuation claims require primary or multi-source verification.",
       "reader_relevance": "国内具身智能融资和产业订单会影响机器人/多模态团队的合作、采购和生态观察，但不能在未回源前当作确定事实。",
       "verification_note": "中介来源仅作发现线索，融资额、估值和订单需公司公告、投资方公告或至少两个独立可信来源确认。",
-      "risk_note": "融资、估值和订单属于高风险商业事实，不进入主体事实主线。"
+      "risk_note": "融资、估值和订单属于高风险商业事实，不进入主体事实主线。",
+      "image_urls": []
     },
     {
       "importance": "general",
@@ -2657,7 +2681,8 @@
       "evidence": "QbitAI intermediary lead about WorldArena ranking change; benchmark claims require original leaderboard or primary research artifact verification.",
       "reader_relevance": "如果榜单回源成立，可能影响多模态/世界模型评测关注点；当前只能提示团队跟踪原始榜单和评测方法。",
       "verification_note": "中介来源仅作发现线索，benchmark/榜单结论需原始 leaderboard、论文或项目页确认。",
-      "risk_note": "benchmark 和模型能力属于高风险事实，不进入主体事实主线。"
+      "risk_note": "benchmark 和模型能力属于高风险事实，不进入主体事实主线。",
+      "image_urls": []
     }
   ],
   "evidence_assets": [

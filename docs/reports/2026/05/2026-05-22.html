@@ -1398,23 +1398,38 @@ body.lightbox-open {
 }
 
 .community-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   align-items: stretch;
 }
 
 .community-card {
   grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-areas:
+    "community-title"
+    "community-tags"
+    "community-body";
+  gap: 8px 18px;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
+.community-card:has(.card-media-grid) {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-areas:
+    "community-title community-media"
+    "community-tags community-media"
+    "community-body community-media";
+  align-items: start;
+}
+
 .community-card h3 {
+  grid-area: community-title;
   display: flex;
   gap: 8px;
   align-items: center;
   margin: 0;
+  min-width: 0;
 }
 
 .community-card .card-title-icon {
@@ -1434,25 +1449,30 @@ body.lightbox-open {
 }
 
 .community-card .card-tags {
+  grid-area: community-tags;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
 .community-card > p {
+  grid-area: community-body;
+  margin: 0;
   color: #25231f;
-  line-height: 1.62;
+  font-size: 15px;
+  line-height: 1.68;
 }
 
-.community-card .card-detail-list {
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+.community-card .card-media-grid {
+  grid-area: community-media;
+  min-width: 0;
+  align-self: start;
 }
 
-.community-card .card-detail-list div {
-  padding-top: 0;
-  border-top: 0;
+.community-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
 }
 
 @media (max-width: 760px) {
@@ -1486,6 +1506,27 @@ body.lightbox-open {
       "builder-media"
       "builder-body"
       "builder-details";
+  }
+
+  .community-card,
+  .community-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-media"
+      "community-body";
+  }
+
+  .community-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-body";
+  }
+
+  .community-card .card-media-grid img {
+    object-fit: contain;
   }
 
   .tracking-card {
@@ -2586,7 +2627,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <ul class="hero-summary-text hero-summary-list"><li>本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路</li><li>Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1</li><li>GitHub Copilot 加强任务路由与语义 issue 检索</li><li>AWS SageMaker 用 OpenAI-compatible API 降低迁移成本</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>7</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>技不止术</span><strong>4</strong><small>深读</small></div>
+<div class="hero-stat"><span>热门博客</span><strong>4</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>0</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>0</strong><small>观察</small></div>
 <div class="hero-stat"><span>覆盖</span><strong>05-19..05-22</strong><small>扩展时间范围</small></div>
@@ -2601,7 +2642,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-html-work-report-1" title="其他信号" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>其他信号</span></a>
-<a href="#section-html-work-report-2" title="技不止术" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>技不止术</span></a>
+<a href="#section-html-work-report-2" title="热门博客" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>热门博客</span></a>
 <a href="#section-x-twitter-3" title="X/Twitter 讨论" data-nav-link data-nav-index="3" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
 <a href="#section-html-work-report-4" title="社区线索" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
 <a href="#section-html-work-report-5" title="信源状态概览" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="warning"><span>信源状态概览</span></a>
@@ -2671,7 +2712,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
-      <h2>技不止术</h2>
+      <h2>热门博客</h2>
 
     </div>
 
@@ -2740,20 +2781,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://github.com/multica-ai/andrej-karpathy-skills" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>github.com</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://github.com/multica-ai/andrej-karpathy-skills" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更…</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
 
-    <p>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布；后续可检查是否有真实可运行 skill packaging。</p>
+    <p>multica-ai/andrej-karpathy-skills 在全站 daily trending 中出现，但更像 CLAUDE.md 方法沉淀，不是可验证产品发布； 后续可检查是否有真实可运行 skill packaging。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Qkc8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>blog.google</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://blog.google/innovation-and-ai/technology/ai/google-io-2026-all-our-announcements/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Qkc8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generat…</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
 
-    <p>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目；后续应单独跟踪开发者 API、价格和地区可用性。</p>
+    <p>Google I/O 的 Gemini Omni、Flow Agent、Search agents 和 Generative UI 信息较多，已分流到模型发布和主条目； 后续应单独跟踪开发者 API、价格和地区可用性。</p>
 
   </article>
     </div>

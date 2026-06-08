@@ -39,7 +39,7 @@ export function renderReportHtml(report) {
   const metaItems = [
     `<span><strong>${mainItems.length}</strong> 主体信息</span>`,
     githubTrending.length > 0 ? `<span><strong>${githubTrending.length}</strong> GitHub Trending</span>` : "",
-    hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 技不止术</span>` : "",
+    hotBlogs.length > 0 ? `<span><strong>${hotBlogs.length}</strong> 热门博客</span>` : "",
     builderObservations.length > 0 ? `<span><strong>${builderObservations.length}</strong> Builder 观察</span>` : "",
     communityLeads.length > 0 ? `<span><strong>${communityLeads.length}</strong> 社区线索</span>` : ""
   ]
@@ -681,7 +681,7 @@ function renderHotBlogsSection(items) {
   }
 
   return `<section class="section" id="hot-blogs">
-      <h2>技不止术</h2>
+      <h2>热门博客</h2>
       ${items.map(renderHotBlog).join("\n")}
     </section>`;
 }

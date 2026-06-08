@@ -104,6 +104,7 @@
         "OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。",
         "工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -125,6 +126,7 @@
         "Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。",
         "这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -146,6 +148,7 @@
         "官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。",
         "对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -169,6 +172,7 @@
         "Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。",
         "这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -190,6 +194,7 @@
         "文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。",
         "这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -210,6 +215,7 @@
         "OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。",
         "工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -224,6 +230,7 @@
       "source": "Microsoft Research",
       "summary": "面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
       "notes": "官方称 4B 和 27B 将很快在 Microsoft Foundry 提供；当前按 research preview 记录，不写成开放权重。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -237,6 +244,7 @@
       "topic": "agent output / HTML reports / coding workflow",
       "summary": "Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。",
       "why_it_matters": "这与本仓库日报从 Markdown 转向 self-contained HTML 的方向一致，也说明 agent 输出形态正在成为人机协作质量的一部分。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -248,6 +256,7 @@
       "topic": "computer use agents / browser agents / evaluation",
       "summary": "文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。",
       "why_it_matters": "CUA 模型的可用性不仅取决于浏览器操作成功率，也取决于歧义、授权、不可逆动作和 sandbox 的组合设计。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -259,6 +268,7 @@
       "topic": "AI security operations / Opus / vulnerability remediation",
       "summary": "Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。",
       "why_it_matters": "安全团队正在把 frontier model 当成持续操作系统的一部分，评估重点会落到误报、验证、补救责任和审计链。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -270,6 +280,7 @@
       "topic": "AI infrastructure / agent runtime / sandboxes",
       "summary": "Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。",
       "why_it_matters": "agent 产品能否生产化，越来越依赖隔离执行、并行 sandbox、冷启动、观测和权限模型这些基础设施能力。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
@@ -335,11 +346,13 @@
     {
       "content": "GitHub Trending 官方页面在当前自动化 shell 下抓取失败，Web 文本视图也未稳定返回仓库列表；今天的项目表已用 GitTrend、Trendshift 和仓库 README 交叉验证，但后续仍应修复官方榜单采集链路。",
       "url": "https://github.com/trending",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Reddit AI agent 讨论继续围绕 irreversible action 的信任边界展开，例如 git push、数据库写入和生产部署需要声明式检查与人工确认；本轮仅作为社区线索，不写入主体信息。",
       "url": "https://www.reddit.com/r/AI_Agents/comments/1tk6j3r/devs_using_ai_coding_agents_where_does_trust/",
+      "image_urls": [],
       "importance": "general"
     }
   ],

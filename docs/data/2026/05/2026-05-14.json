@@ -28,6 +28,7 @@
         "首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。",
         "权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -49,6 +50,7 @@
         "GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。",
         "对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -70,6 +72,7 @@
         "Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。",
         "SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -91,6 +94,7 @@
         "OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。",
         "对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -112,6 +116,7 @@
         "系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。",
         "官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -150,11 +155,13 @@
     {
       "content": "OpenAI Daybreak 官方页面已上线，页面正文强调把 GPT-5.5、Trusted Access for Cyber、GPT-5.5-Cyber 与 Codex Security 组合用于安全代码审查、威胁建模、补丁验证和依赖风险分析；但页面未给出明确发布日期，本轮不写入主体条目。",
       "url": "https://openai.com/daybreak",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Claude Opus 4.7 fast mode 主要来自 X/聚合站线索；当前 Claude Code docs 中 fast mode 页面仍显示 Opus 4.6 且写明不支持 Opus 4.7，因此本轮降级为待验证线索。",
       "url": "https://code.claude.com/docs/en/fast-mode",
+      "image_urls": [],
       "importance": "general"
     }
   ],

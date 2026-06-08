@@ -144,7 +144,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "技不止术",
+      title: "热门博客",
       group: "main",
       cardClass: "blog-card",
       filterLabel: "博客主题筛选",
@@ -181,7 +181,7 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
-  const communityCards = formatCommunityLeadCards(communityLeads);
+  const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl });
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -253,9 +253,9 @@ export function reportToInteractionInput(report, options = {}) {
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
     intent: {
-      audience: "关注 AI 内容、产品、平台、策略与工程的一线从业者",
-      primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 内容、产品、平台、策略、工程和开源动态？`,
-      decision: "只保留有可回源证据、能改变内容判断、产品路线、平台分发、组织动作或真实工作流的条目。",
+      audience: "3-10 年经验的研发工程师与技术管理者",
+      primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？`,
+      decision: "只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。",
       timeBudget: "8 分钟",
       artifactKind: "research",
       successCriteria: [
@@ -307,12 +307,12 @@ function isProcessStatusSummary(summary) {
 
 function dailyIntent(report) {
   return {
-    audience: "内容、产品、平台、策略与工程的一线从业者，关注 AI 行业内模型、公司、工具、产品、内容生态、开源项目、观点和社区讨论。",
+    audience: "内容、产品、平台、策略与工程的一线从业者，关注 AI 行业内模型、公司、工具、产品、开源项目、观点和社区讨论。",
     primaryQuestion: `${report.report_date} 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
     decision: "事实主线只保留可回溯的一手、官方、论文、GitHub 或多源确认条目；观点和社区线索必须披露来源层级与风险。",
     successCriteria: [
       "主体信息解释它与内容、产品、平台、策略或工程判断的关系",
-      "技不止术、播客、社区讨论和产品雷达承载高密度洞察但标明来源风险",
+      "观点、播客、社区讨论和产品雷达承载高密度但标明来源风险",
       "HTML 保留结构化导航、卡片、证据图片和 source_audit 附录",
       "结构化 JSON 可回溯到候选池与核验状态"
     ]
@@ -325,7 +325,7 @@ function dailyHeroStats(report, collections) {
   const aigcCount = countAigcSignals(collections);
   const stats = [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "技不止术", value: String(collections.hotBlogs.length), detail: "深读" },
+    { label: "热门博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
     {
@@ -596,8 +596,8 @@ function mainItemPublicBullets(item) {
 
 function isMainItemTemplateBullet(value) {
   const text = String(value || "");
-  return /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|判断点)==)|(?:==(?:影响|留意|判断点)==)|(?:影响|留意|判断点))[:：]/u.test(text) ||
-    /(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|读者应重点核对|把它当作 AI 产品或平台策略信号|读者应先看原文给出的变化)/u.test(text);
+  return /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]/u.test(text) ||
+    /(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u.test(text);
 }
 
 function mainItemContractGroups(items) {
@@ -877,7 +877,7 @@ function formatDailyTrackingCards(items, context = {}) {
     const stats = dailyTrackingStats(item, entries);
     const bars = dailyTrackingProviderBars(entries);
     const table = dailyTrackingTable(item, entries);
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 5 });
     return {
       group: dailyTrackingCategoryLabel(item.category),
       title: item.name,
@@ -1136,7 +1136,7 @@ function dailyTrackingCategoryLabel(category) {
 
 function formatHotBlogCards(items, context = {}) {
   return items.map((item) => {
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url));
     const points = hotBlogPointTexts(item.summary);
     const body = points.shift() || String(item.summary || "").trim();
     return {
@@ -1328,19 +1328,50 @@ function sourceLevelLabel(value) {
   return labels[value] || String(value || "").trim();
 }
 
-function formatCardMedia(report, assets) {
+function formatCardMedia(report, assets, options = {}) {
   if (!report || !Array.isArray(assets) || assets.length === 0) {
     return [];
   }
 
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
+
   return assets
     .filter((asset) => asset?.local_path)
-    .slice(0, 2)
+    .slice(0, limit)
     .map((asset) => ({
       src: relativeAssetHref(report.html_path, asset.local_path),
       alt: asset.title || "",
       caption: evidenceCaption(asset)
     }));
+}
+
+function formatCardMediaForItem(report, item, assets, options = {}) {
+  const localMedia = formatCardMedia(report, assets, options);
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
+  if (localMedia.length >= limit) {
+    return localMedia;
+  }
+
+  const media = [...localMedia];
+  if (item?.image_url) {
+    media.push({
+      src: item.image_url,
+      alt: item.image_alt || item.title || "",
+      caption: item.image_alt || item.title || "原文图片"
+    });
+  }
+  for (const imageUrl of Array.isArray(item?.image_urls) ? item.image_urls : []) {
+    media.push({
+      src: imageUrl,
+      alt: item.image_alt || item.title || "",
+      caption: item.image_alt || item.title || "原文图片"
+    });
+  }
+
+  const seen = new Set();
+  return media
+    .filter((entry) => entry?.src && !seen.has(entry.src) && seen.add(entry.src))
+    .slice(0, limit);
 }
 
 function hotBlogTags(item) {
@@ -1395,6 +1426,28 @@ function stripPublicBodySourcePrefix(value, item = {}) {
     .trim();
 }
 
+function stripCommunityLeadFallbackBoilerplate(value, item = {}) {
+  let text = String(value || "").trim();
+  if (!text) {
+    return "";
+  }
+  for (const source of publicBodySourceLabels(item)) {
+    text = stripPublicBodyExactSourcePrefix(text, source);
+  }
+  const verificationNote = String(item?.verification_note || "").trim();
+  if (verificationNote) {
+    text = text.replace(verificationNote, "").trim();
+  }
+  return text
+    .replace(/\s*。?\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
+    .replace(/\s*(?:待确认|边界)\s*[：:][^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/[；;]?\s*当前作为[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/[；;]?\s*等待官方[^。；;\n]*(?:确认|核实|产品页确认)?[。；;]?/g, "")
+    .replace(/\s*中介来源[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/\s*事实性结论需要一手或多源确认[。；;]?/g, "")
+    .trim();
+}
+
 function stripPublicBodyExactSourcePrefix(value, source) {
   const text = String(value || "").trim();
   const sourceText = String(source || "").trim();
@@ -1405,6 +1458,12 @@ function stripPublicBodyExactSourcePrefix(value, source) {
   return text
     .replace(new RegExp(`^(?:\\*\\*)?${escapedSource}(?:\\*\\*)?\\s*[：:]\\s*`, "i"), "")
     .trim() || text;
+}
+
+function stripSentenceEnding(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[。！？!?；;:：]+$/u, "");
 }
 
 function publicBodySourceLabels(item = {}) {
@@ -1513,13 +1572,14 @@ function formatTwitterDiscussion(items, auditGroup, options = {}) {
   return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
 }
 
-function formatCommunityLeadCards(items) {
+function formatCommunityLeadCards(items, context = {}) {
   const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
   return leads.map((item) => {
     const body = communityLeadBody(item);
     if (!isReaderFacingChineseBody(body)) {
       return null;
     }
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 2 });
     return {
       group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
       title: communityLeadTitle(item),
@@ -1532,13 +1592,57 @@ function formatCommunityLeadCards(items) {
         item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points: []
+      points: [],
+      ...(media.length > 0 ? { media } : {})
     };
   }).filter(Boolean);
 }
 
+function summarizeCommunityLeadBody(text, title) {
+  const originalBody = String(text || "").trim();
+  if (!originalBody) {
+    return "";
+  }
+  let body = originalBody;
+  if (title && body.startsWith(title)) {
+    body = body.slice(title.length).replace(/^[，,；;：:\s]+/u, "").trim();
+  }
+  const sentences = body
+    .split(/(?<=[。！？!?；;])\s*/u)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (sentences.length === 0) {
+    return trimText(originalBody, 160);
+  }
+  const picked = [];
+  let visibleLength = 0;
+  for (const sentence of sentences) {
+    picked.push(sentence);
+    visibleLength += sentence.length;
+    if (picked.length >= 2 || visibleLength >= 140) {
+      break;
+    }
+  }
+  return trimText(picked.join(" "), 160);
+}
+
 function communityLeadBody(item) {
-  return stripPublicBodySourcePrefix(item?.content || "", item);
+  const primaryBody = stripPublicBodySourcePrefix(item?.content || "", item);
+  const rawBody = String(item?.content || "").trim();
+  if (!primaryBody && !rawBody) {
+    return "";
+  }
+  const title = stripSentenceEnding(stripPublicBodySourcePrefix(communityLeadTitle(item), item));
+  const summarizedPrimaryBody = summarizeCommunityLeadBody(primaryBody, title);
+  if (isReaderFacingChineseBody(summarizedPrimaryBody)) {
+    return summarizedPrimaryBody;
+  }
+  const fallbackBody = stripCommunityLeadFallbackBoilerplate(rawBody, item);
+  const summarizedFallbackBody = summarizeCommunityLeadBody(fallbackBody, title);
+  if (summarizedFallbackBody) {
+    return summarizedFallbackBody;
+  }
+  return summarizedPrimaryBody || trimText(primaryBody || rawBody, 160);
 }
 
 function isReaderFacingChineseBody(value) {
@@ -1555,6 +1659,32 @@ function isReaderFacingChineseBody(value) {
   return chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
 }
 
+function shouldPreferCommunityLeadBodyTitle(title, fallbackTitle) {
+  if (!fallbackTitle) {
+    return false;
+  }
+  const text = String(title || "").replace(/https?:\/\/\S+/gi, "").trim();
+  if (!text) {
+    return true;
+  }
+  const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (text.match(/[A-Za-z]/g) || []).length;
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+  const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{40,}/.test(text);
+  return chineseChars < 8 && (longEnglishRun || chineseRatio < 0.2);
+}
+
+function communityLeadBodyTitle(item) {
+  const body = stripPublicBodySourcePrefix(item?.content || "", item);
+  if (!isReaderFacingChineseBody(body)) {
+    return "";
+  }
+  const firstSentence = body.split(/(?<=[。！？!?；;])\s*/u).find(Boolean) || body;
+  const firstClause = firstSentence.split(/[；;。！？!?]/u).find(Boolean) || firstSentence;
+  return stripSentenceEnding(trimText(firstClause, 60));
+}
+
 function formatNestedEditorialDetails(item) {
   return editorialBullets(item)
     .map((bullet) => `  - ${bullet}`)
@@ -1562,9 +1692,20 @@ function formatNestedEditorialDetails(item) {
 }
 
 function communityLeadTitle(item) {
+  const title = stripPublicBodySourcePrefix(item?.title || "", item);
+  const bodyTitle = communityLeadBodyTitle(item);
+  if (shouldPreferCommunityLeadBodyTitle(title, bodyTitle)) {
+    return bodyTitle;
+  }
+  if (title) {
+    return title;
+  }
   const source = String(item?.source || item?.publisher || "").trim();
   if (source) {
     return source;
+  }
+  if (bodyTitle) {
+    return bodyTitle;
   }
   try {
     return new URL(String(item?.url || "")).hostname.replace(/^www\./, "");

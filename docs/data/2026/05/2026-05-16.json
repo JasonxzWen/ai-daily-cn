@@ -28,6 +28,7 @@
         "OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。",
         "对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -49,6 +50,7 @@
         "reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。",
         "文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -70,6 +72,7 @@
         "Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。",
         "使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -91,6 +94,7 @@
         "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。",
         "对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -112,6 +116,7 @@
         "首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。",
         "这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -157,21 +162,25 @@
     {
       "content": "OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。",
       "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。",
       "url": "https://huggingface.co/blog/continuous_async",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "Anthropic 2026-05-14 公布与 Gates Foundation 的 2 亿美元合作；上一期已覆盖，本轮仅作为 AI 公益部署和领域 benchmark 线索保留。",
       "url": "https://www.anthropic.com/news/gates-foundation-partnership",
+      "image_urls": [],
       "importance": "general"
     },
     {
       "content": "AWS 2026-05-14 宣布 SageMaker AI 支持 Qwen3.6 serverless customization；上一期已覆盖，本轮不重复放入主体。",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/",
+      "image_urls": [],
       "importance": "general"
     }
   ],

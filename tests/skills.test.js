@@ -842,7 +842,7 @@ test("effective-interact filterable cards can hide visual group labels", async (
       sections: [
         {
           type: "filterable-cards",
-          title: "技不止术",
+          title: "热门博客",
           group: "main",
           cardClass: "blog-card",
           showFilters: false,

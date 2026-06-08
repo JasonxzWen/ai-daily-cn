@@ -462,6 +462,7 @@
         "文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。",
         "对部署团队来说，关键约束是访问对象、任务范围和支持机制，而不是模型名称本身；后续应跟踪伙伴案例是否披露评测方法和边界。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -484,6 +485,7 @@
         "Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。",
         "Gemini API 路径为开发者提供更直接的试用入口，但官方明确它不由企业 SLA 覆盖，不能与企业平台承诺混为一谈。"
       ],
+      "image_urls": [],
       "importance": "major"
     },
     {
@@ -511,6 +513,7 @@
         "Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。",
         "对企业采购来说，Claude 同时覆盖 AWS、Google Cloud 和 Azure 的叙述，降低了只押单一云入口的必要性，但真实可用区域、价格和配额仍要按各云文档核验。"
       ],
+      "image_urls": [],
       "importance": "major"
     }
   ],
@@ -527,6 +530,7 @@
       "summary": "OpenAI Help Center 的更新记录把 GPT-5.5 Instant 的写作与代码输出调整、canvas 调用变化、以及 ChatGPT 内 OpenAI o3 与 GPT-4.5 的退场日期放在同一条 release note 中。这里最值得产品团队核对的是界面行为：复杂写作和代码将更多以聊天内代码块完成，而不是自动进入 canvas。其次是模型生命周期：ChatGPT 产品里的 o3 和 GPT-4.5 有明确退场日，但说明同时写明这些退场不影响 API。做内部模型选择器或用户文档时，应把 ChatGPT UI 的变化与 API 可用性分开记录。",
       "content_type": "engineering_note",
       "why_it_matters": "产品和支持团队需要同步 UI 行为与模型退场日期，避免把 ChatGPT 产品变化误读成 API 变更。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -540,6 +544,7 @@
       "summary": "AWS 这篇文章不是再宣布一次模型发布，而是把 Claude Opus 4.8 在 Bedrock 与 Claude Platform on AWS 两条路径中的接入方式写成可执行说明。它列出 Bedrock 控制台试用、Anthropic Messages API 通过 bedrock-runtime 调用、Converse API 调用、模型 ID、权限前提和区域可用性。对已经在 Bedrock 做多模型网关的团队，文章的价值在于把模型能力描述和接入细节放在同一处：可以直接核对 IAM、SDK、区域、调用 API 和是否需要 Claude Platform 原生体验。",
       "content_type": "engineering_note",
       "why_it_matters": "已经使用 Bedrock 的团队可以据此拆分试用、权限、区域和 API 调用检查项。",
+      "image_urls": [],
       "importance": "notable"
     },
     {
@@ -553,6 +558,7 @@
       "summary": "Google Research 的 I/O 回顾把 Gemini for Science、ERA、Co-Scientist、Computational Discovery、Hypothesis Generation、Literature Insights 和 Science Skills 放在一条研究产品线里。文章值得单独读，是因为它没有只讲单个模型，而是展示 Google 如何把代码搜索、论文综合、多 agent 假设生成和科研工作流串成工具集合。对于做内部研究助理、实验自动化或文献分析的团队，这篇文章提供了拆分模块的线索：代码优化、假设生成、可点击引用、结构化文献结果和领域技能应该分别验证。",
       "content_type": "blog",
       "why_it_matters": "科研助理和文献工具不应只验证回答质量，还要分别验证代码、引用、假设生成和领域技能。",
+      "image_urls": [],
       "importance": "notable"
     }
   ],
