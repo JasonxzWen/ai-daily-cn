@@ -32,6 +32,18 @@ State the concrete outcome.
 
 - Each criterion must be directly verifiable.
 
+## Feedback Ledger Review
+
+- Review `config/feedback-ledger.json` and `docs/feedback-buglist-quick-reference.md`.
+- Record applicable prior feedback items and how this task avoids repeating them.
+- If no item applies, explain why.
+
+## Regression Self-Check
+
+- List the concrete self-checks to run before handoff against applicable prior feedback.
+- Include relevant commands, files, UI pages, or generated artifacts.
+- If the user reported a new durable issue, add/update the ledger and quick reference before handoff.
+
 ## Red Test
 
 Run before implementation:

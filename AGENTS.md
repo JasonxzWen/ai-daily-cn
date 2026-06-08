@@ -11,11 +11,20 @@
 
 - `tasks/current-task.md` 是每次迭代的唯一当前规格源；`progress.md` 只记录过程状态，`session-handoff.md` 只记录交接结果。
 - 非平凡改动必须先完成 `tasks/current-task.md` 中的 `Task Class`、`Spec`、`Acceptance Criteria`、`Red Test` 或 `Deterministic Substitute`、`Allowed Paths`、`Forbidden Paths`、`Validation Commands`、`Parallel Writes` 和 `Handoff Requirements`。
+- 每次仓库修改都必须先审阅 `config/feedback-ledger.json` 和 `docs/feedback-buglist-quick-reference.md`；在 `tasks/current-task.md` 写入 `Feedback Ledger Review`，说明适用的既有问题、修复规则和本轮如何避免复发。
+- 每次交付前都必须在 `tasks/current-task.md` 写入 `Regression Self-Check`，列出已执行的回归自检。不能只写“已检查”，必须对应到具体 ledger 项、文件、命令或页面验收。
 - 规格就绪前只允许只读探索；不得写测试、改实现、删除文件或生成持久产物。
 - 非平凡改动必须在实现前运行 `Red Test` 并记录失败证据；如果直接红灯测试不可行，必须写明 `Deterministic Substitute` 和理由。
 - `Task Class: trivial` 只允许用于 typo、纯文案、一行无行为配置或只读诊断等低风险任务，并且必须包含 `Trivial Justification`。
 - `node scripts/harness-validate.mjs` 是仓库级 SDD/TDD 验证门；不要绕过或弱化它来完成交付。
 - OpenSpec 不再作为本仓库的主动规格或验证流程；长期契约也写入 `tasks/current-task.md` 并绑定测试或验证门。
+
+## 反馈记忆与回归自检
+
+- 不依赖模型隐式记忆来保存用户指出的问题；长期记忆只以仓库文件和验证门为准。
+- `config/feedback-ledger.json` 是机器可验证 buglist；`docs/feedback-buglist-quick-reference.md` 是开始工作前的人读速查表。
+- 用户确认需要长期生效的问题默认按 P1 处理，必须写入 ledger，并绑定真实存在的 scope 文件、`npm run validate` 覆盖的验证命令和真实测试断言或运行时质量门；否则只能作为本会话建议，不能声称已固化。
+- 后续每次生成、修改、发布或交付，都要把用户曾指出的问题作为自检清单回放；发现新复发风险时，先更新 `Feedback Ledger Review` / `Regression Self-Check`，再交付。
 
 ## 语言
 
