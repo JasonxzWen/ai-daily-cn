@@ -41,6 +41,10 @@ export async function runStatusSelfCheck(options = {}) {
   };
 
   const report = await readReport(paths.report_json, blockingIssues);
+  const reportAutomationRevision =
+    report?.self_check?.automation_revision && typeof report.self_check.automation_revision === "object"
+      ? report.self_check.automation_revision
+      : undefined;
   await checkRequiredFiles({ rootDir: checkRoot, reportDate, paths, blockingIssues, checks });
   collectQualityIssues(report, blockingIssues, degradedSections);
 
@@ -135,7 +139,8 @@ export async function runStatusSelfCheck(options = {}) {
       outDir: options.outDir || "docs",
       siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
       generatedAt,
-      reportDate
+      reportDate,
+      currentAutomationRevision: reportAutomationRevision
     })
   );
   if (dryRun.failed) {

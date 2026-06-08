@@ -3488,7 +3488,25 @@ test("status:self-check reports degraded published state without blocking", asyn
 test("status:self-check runs publish checks from the prepared clean worktree", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-launcher-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
-  await writeSelfCheckReportFixture(cleanRoot, "2026-06-04");
+  const reportAutomationRevision = {
+    schema_version: 1,
+    git_commit: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    git_commit_short: "aaaaaaaaaaaa",
+    git_branch: "main",
+    origin_main_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    origin_main_short: "aaaaaaaaaaaa",
+    prompt_manifest: "prompts/ai-daily/manifest.json",
+    prompt_modules: ["fixed-source-checklist.md"],
+    source_registry_count: 132,
+    source_registry_enablement_counts: { core: 54, optional: 73, manual: 5 },
+    rules: ["fixed_source_checklist"]
+  };
+  await writeSelfCheckReportFixture(cleanRoot, "2026-06-04", {
+    self_check: {
+      report_date: "2026-06-04",
+      automation_revision: reportAutomationRevision
+    }
+  });
   const automationsDir = path.join(launcherRoot, "automations");
   await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
   await fs.writeFile(
@@ -3502,6 +3520,7 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
     "utf8"
   );
   const seenRoots = [];
+  let dryRunAutomationRevision = null;
 
   const result = await runStatusSelfCheck({
     rootDir: launcherRoot,
@@ -3520,8 +3539,9 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
       seenRoots.push(["build", checkRoot]);
       return { reports: [{ report_date: "2026-06-04" }], writtenFiles: [] };
     },
-    createDailyPublishPlanImpl: async ({ repoRoot: checkRoot }) => {
+    createDailyPublishPlanImpl: async ({ repoRoot: checkRoot, currentAutomationRevision }) => {
       seenRoots.push(["dry-run", checkRoot]);
+      dryRunAutomationRevision = currentAutomationRevision;
       return { mode: "daily-dry-run", reports: [{ report_date: "2026-06-04" }] };
     },
     checkSourcesHealthImpl: async ({ rootDir: checkRoot }) => {
@@ -3545,6 +3565,7 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
   assert.equal(result.launcher_root, launcherRoot.replace(/\\/g, "/"));
   assert.equal(result.checked_repo_root, cleanRoot.replace(/\\/g, "/"));
   assert(seenRoots.every(([, checkRoot]) => checkRoot === cleanRoot));
+  assert.deepEqual(dryRunAutomationRevision, reportAutomationRevision);
   const saved = JSON.parse(await fs.readFile(path.join(launcherRoot, ".tmp", "status-self-check-2026-06-04.json"), "utf8"));
   assert.equal(saved.checked_repo_root, cleanRoot.replace(/\\/g, "/"));
 });
