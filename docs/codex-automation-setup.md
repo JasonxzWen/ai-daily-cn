@@ -28,11 +28,11 @@
 
 目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报。主产物是由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成的自包含静态 HTML 和结构化 JSON；验证通过后只发布 `docs/` 与 `reports-data/`，由 GitHub Actions Pages workflow 部署到 GitHub Pages。
 
-执行准则：先阅读并遵守 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md`。始终从 launcher worktree 调用 `npm run daily:run -- --date YYYY-MM-DD --publish`；runner 负责 clean checkout、阶段顺序、contract、状态、校验、`sources:phase5-audit`、`publish:dry-run:daily`、真实 publish 或 GitHub API 兜底。定时任务不要展开旧手工流水线，不要使用 `publish:prepare-worktree`，不要提交、stash、切换或清理 launcher worktree。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
+执行准则：先阅读并遵守唯一权威资产 `prompts/ai-daily/modules/editorial-authority.md`，再按 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md` 执行。始终从 launcher worktree 调用 `npm run daily:run -- --date YYYY-MM-DD --publish`；runner 负责 clean checkout、阶段顺序、contract、状态、校验、`sources:phase5-audit`、`publish:dry-run:daily`、真实 publish 或 GitHub API 兜底。定时任务不要展开旧手工流水线，不要使用 `publish:prepare-worktree`，不要提交、stash、切换或清理 launcher worktree。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
 
 必须运行并记录：`npm run daily:run -- --date YYYY-MM-DD --publish` 和 `.tmp/run-summary-YYYY-MM-DD.json`。读取 summary 中的 `final_status`、`stages` 和 `next_action`；当 `next_action.kind` 为 `codex_ai_repair_contract` 时，由 Codex 根据 `ai_review_tasks`、候选池、`source_audit`、`original_text` 和原始链接写入 `.tmp/quality-ai-repair-YYYY-MM-DD.json`，只修改 public text 字段，然后用同一 runner 命令继续。publish 模式最多 5 次 `review -> AI repair contract -> repair -> review`；如果同日状态需要丢弃，显式使用 `--restart`。涉及页面元素时必须确认 runner 的 page-check/validate 结果；如果浏览器环境阻塞，必须报告阻塞原因。
 
-日报公开页面必须遵守固定展示合同：顶部日期区显示本期覆盖时间范围；主体信息只用 icon/link 表示来源，不显示来源名称；主体标题不加下划线；正文 `==...==` 关键词渲染为加粗变色文字而不是 tag；tag 只用于重要级别、趋势、star 变化、主题和项目 highlight，并且必须按类型区分颜色且去重；`model_releases` 只保留结构化 JSON 索引，不渲染公开“模型发布”板块，相关新闻合入 `main_items`；`projects` 只作为 GitHub Trending 的 `项目 highlight` 元数据，不渲染公开“今日值得关注的项目”板块、“项目 highlights”子标题或额外项目列表；国内/中文动态并入现有主体分组、热门博客、GitHub Trending 或共享“社区线索”，不渲染独立“国内动态”导航项；热门技术博客摘要为约 100-160 个中文字符的 2-4 个分点，原文有信息密度高的证据图时通过 `evidence_assets` 贴图；正文证据图和热门技术博客/卡片图片必须可点开放大，来源 icon 不参与放大；GitHub Trending 默认展示 Top 10，star 变化必须做成 tag，项目 highlight 只能作为匹配 Top 10 条目的 tag，并把领域和作用压进行内说明。
+日报公开页面必须遵守固定展示合同：顶部日期区显示本期覆盖时间范围；主体信息只用 icon/link 表示来源，不显示来源名称；主体标题不加下划线；正文 `==...==` 关键词渲染为加粗变色文字而不是 tag；tag 只用于重要级别、趋势、star 变化、主题和项目 highlight，并且必须按类型区分颜色且去重；`model_releases` 只保留结构化 JSON 索引，不渲染公开“模型发布”板块，相关新闻合入 `main_items`；`projects` 只作为 GitHub Trending 的 `项目 highlight` 元数据，不渲染公开“今日值得关注的项目”板块、“项目 highlights”子标题或额外项目列表；国内/中文动态并入现有主体分组、技不止术、GitHub Trending 或共享“社区线索”，不渲染独立“国内动态”导航项；技不止术摘要为约 100-160 个中文字符的 2-4 个分点，原文有信息密度高的证据图时通过 `evidence_assets` 贴图；正文证据图和技不止术卡片图片必须可点开放大，来源 icon 不参与放大；GitHub Trending 默认展示 Top 10，star 变化必须做成 tag，项目 highlight 只能作为匹配 Top 10 条目的 tag，并把领域和作用压进行内说明。
 
 固定信源面的目标是证明“已检查并写入最终 `source_audit`”。公开源在当前环境返回 403/5xx 或抓取失败时，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可作为 source-surface proof，但不得把 blocked 来源的未核验事实写入正文。
 
@@ -47,7 +47,7 @@
 
 ## 当前发布边界
 
-当前仓库已具备本地生成、effective-interact HTML 渲染、验证、`publish:dry-run`、显式确认后的安全本机 Git `publish`、不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力，以及 push 后由 GitHub Actions 发布 `docs/` artifact 到 GitHub Pages 的 workflow。远端 Pages 设置必须使用 `GitHub Actions` source；如果仍是 `main /docs` legacy source，先不要切换到“只依赖 workflow”的发布假设。
+当前仓库已具备本地生成、effective-interact HTML 渲染、验证、调度 dry-run `publish:dry-run:daily`、显式确认后的安全本机 Git `publish`、不依赖本机 `.git` 写入权限的 GitHub API 兜底发布能力，以及 push 后由 GitHub Actions 发布 `docs/` artifact 到 GitHub Pages 的 workflow。旧命令 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。远端 Pages 设置必须使用 `GitHub Actions` source；如果仍是 `main /docs` legacy source，先不要切换到“只依赖 workflow”的发布假设。
 
 ## 定时任务网络设置提醒
 

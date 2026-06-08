@@ -17,6 +17,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 ## Assumptions
 
 - Date is interpreted in `Asia/Shanghai`.
+- 唯一权威资产是 `prompts/ai-daily/modules/editorial-authority.md`；若与旧规范、旧 ROI 清单或旧 prompt 口径冲突，以该文件为准。
 - Existing project instructions in `AGENTS.md` remain authoritative.
 - Real publish requires explicit confirmation.
 
@@ -56,6 +57,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - Candidate pool and structured draft pass report-write gates.
 - All collected information is compared against recent `reports-data` reports/candidate pools and deduped before selection.
 - Runner records `sources:phase5-audit` before dry-run/publish completion.
+- If prompt / rule changes are explicitly approved during the run, update `prompts/ai-daily/modules/editorial-authority.md` together with its `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史`.
 - `npm run validate` passes.
 - `npm run publish:dry-run:daily -- --date YYYY-MM-DD` reports the date-scoped publish plan and expected Pages URL.
 - Real publish, when approved, verifies the final Pages URL.

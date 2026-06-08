@@ -1,5 +1,7 @@
 # AI 日报分发、测试与提示词构建规范
 
+> 状态：归档/参考。当前唯一权威资产为 `prompts/ai-daily/modules/editorial-authority.md`；如与本文冲突，以该文件为准。
+
 ## 目标
 
 本文定义“每日 AI 日报自动发布为 GitHub Pages 静态站点”的实现前规格，覆盖：

@@ -144,7 +144,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "热门技术博客",
+      title: "技不止术",
       group: "main",
       cardClass: "blog-card",
       filterLabel: "博客主题筛选",
@@ -253,9 +253,9 @@ export function reportToInteractionInput(report, options = {}) {
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
     intent: {
-      audience: "3-10 年经验的研发工程师与技术管理者",
-      primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？`,
-      decision: "只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。",
+      audience: "关注 AI 内容、产品、平台、策略与工程的一线从业者",
+      primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 内容、产品、平台、策略、工程和开源动态？`,
+      decision: "只保留有可回源证据、能改变内容判断、产品路线、平台分发、组织动作或真实工作流的条目。",
       timeBudget: "8 分钟",
       artifactKind: "research",
       successCriteria: [
@@ -307,12 +307,12 @@ function isProcessStatusSummary(summary) {
 
 function dailyIntent(report) {
   return {
-    audience: "普通工程师：有技术能力，关注 AI 行业内模型、公司、工具、产品、开源项目、观点和社区讨论。",
-    primaryQuestion: `${report.report_date} 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
+    audience: "内容、产品、平台、策略与工程的一线从业者，关注 AI 行业内模型、公司、工具、产品、内容生态、开源项目、观点和社区讨论。",
+    primaryQuestion: `${report.report_date} 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
     decision: "事实主线只保留可回溯的一手、官方、论文、GitHub 或多源确认条目；观点和社区线索必须披露来源层级与风险。",
     successCriteria: [
-      "主体信息解释为什么重要或与工程师的关系",
-      "观点、播客、社区讨论和产品雷达承载高密度但标明来源风险",
+      "主体信息解释它与内容、产品、平台、策略或工程判断的关系",
+      "技不止术、播客、社区讨论和产品雷达承载高密度洞察但标明来源风险",
       "HTML 保留结构化导航、卡片、证据图片和 source_audit 附录",
       "结构化 JSON 可回溯到候选池与核验状态"
     ]
@@ -325,7 +325,7 @@ function dailyHeroStats(report, collections) {
   const aigcCount = countAigcSignals(collections);
   const stats = [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "技术博客", value: String(collections.hotBlogs.length), detail: "深读" },
+    { label: "技不止术", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
     {
@@ -596,8 +596,8 @@ function mainItemPublicBullets(item) {
 
 function isMainItemTemplateBullet(value) {
   const text = String(value || "");
-  return /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意)==)|(?:==(?:影响|留意)==)|(?:影响|留意))[:：]/u.test(text) ||
-    /(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u.test(text);
+  return /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|判断点)==)|(?:==(?:影响|留意|判断点)==)|(?:影响|留意|判断点))[:：]/u.test(text) ||
+    /(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|读者应重点核对|把它当作 AI 产品或平台策略信号|读者应先看原文给出的变化)/u.test(text);
 }
 
 function mainItemContractGroups(items) {

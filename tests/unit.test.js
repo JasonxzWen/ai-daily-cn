@@ -32,7 +32,7 @@ import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
-import { generateReportDraft } from "../src/draft.js";
+import { generateReportDraft, hotBlogSummary } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { mergeFeed, buildSite } from "../src/site.js";
@@ -475,7 +475,7 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(!/\n\s+- 为什么要改/.test(selfCheckSection.content));
 });
 
-test("HTML 渲染不会展示独立模型栏目但会展示热门技术博客", async () => {
+test("HTML 渲染不会展示独立模型栏目但会展示技不止术", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const validation = validateReport(report);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
@@ -487,7 +487,7 @@ test("HTML 渲染不会展示独立模型栏目但会展示热门技术博客", 
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("open_weights"));
   assert(html.includes('id="hot-blogs"'));
-  assert(html.includes("热门技术博客"));
+  assert(html.includes("技不止术"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes('target="_blank" rel="noopener noreferrer"'));
 });
@@ -697,7 +697,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
       ["主体", "2", "重点条目"],
       ["AIGC", "1", "产品/内容"],
       ["追踪", "1", "榜单变化"],
-      ["技术博客", "1", "深读"],
+      ["技不止术", "1", "深读"],
       ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
       ["覆盖", "05-15", "标准时间范围"]
@@ -738,7 +738,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(trackingSection.items[0].table.rows.length, 1);
   assert.equal(trackingSection.items[0].table.rows[0].label, "核心指标");
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "核心指标"));
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "技不止术");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
   assert.equal(hotBlogsSection.items.length, 1);
@@ -772,8 +772,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("\n  - "));
   assert(!trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
-  assert(input.intent.audience.includes("普通工程师"));
-  assert(input.intent.primaryQuestion.includes("模型、产品、开源、观点和社区动态"));
+  assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
+  assert(input.intent.primaryQuestion.includes("产品、开源、观点和社区动态"));
   assert(input.sections.some((section) => section.title === "AI 资讯"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
@@ -996,16 +996,16 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
     verification_status: "intermediary_only",
     verification_note: "原文是行业媒体/播客整理，未作为事实主线使用。",
     risk_note: "观点和产品信号仅供跟进，具体发布事实需要回到官方公告。",
-    reader_relevance: "适合普通工程师判断 agent 平台和工具链的采用顺序。"
+    reader_relevance: "适合产品和工程团队判断 agent 平台和工具链的采用顺序。"
   };
 
   const input = reportToInteractionInput(report);
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门技术博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "技不止术");
   const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
 
   assert(pointsText.includes("行业媒体/播客整理"));
   assert(pointsText.includes("仅供跟进"));
-  assert(!pointsText.includes("普通工程师"));
+  assert(!pointsText.includes("产品和工程团队"));
   assert(!pointsText.includes("看点"));
   assert(!pointsText.includes("风险"));
   assert(!mainMarkdownContent(input).includes("行业媒体/播客整理"));
@@ -1202,13 +1202,13 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
   const titles = input.sections.map((section) => section.title);
 
   assert(!titles.includes("模型发布"));
-  assert(!titles.includes("热门技术博客"));
+  assert(!titles.includes("技不止术"));
   assert(!titles.includes("GitHub Trending 趋势"));
   assert(!titles.includes("今日值得关注的项目"));
   assert(!titles.includes("X/Twitter 讨论与社区线索"));
   assert(!JSON.stringify(input).includes("暂无 X/Twitter 讨论"));
   assert(!JSON.stringify(input).includes("暂无社区线索"));
-  assert(!JSON.stringify(input).includes("暂无热门技术博客"));
+  assert(!JSON.stringify(input).includes("暂无技不止术"));
 });
 
 test("HTML renders GitHub Trending without noisy audit labels", async () => {
@@ -4460,6 +4460,7 @@ test("quality review flags untranslated main item source excerpts", async () => 
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
     ...report.main_items[0],
+    title: "GPT-5.2 and GPT-5.2-Codex deprecated",
     summary: "Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
     bullets: [
       "**Baidu Press Releases**: Baidu to Hold Annual General Meeting on June 5, 2026; Baidu to Hold Annual General Meeting on June 5, 2026 Apr 23, 2026 Baidu to Report First Quarter 2026 Financial Results on May 18, 2026.",
@@ -4472,10 +4473,30 @@ test("quality review flags untranslated main item source excerpts", async () => 
 
   assert.equal(review.ok, false);
   assert(codes.includes("main_item_untranslated"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].title"));
   assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
   assert(review.issues.some((issue) => issue.path === "main_items[0].bullets[0]"));
   assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
+test("quality review flags untranslated report summary and hero titles", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.summary = "Today the main threads are GPT-5.2 and GPT-5.2-Codex deprecated; CodeQL 2.25.6 adds Swift 6.3.2 support and improves C# coverage.";
+  report.hero_highlights = [
+    {
+      title: "Enterprise-managed plugins in VS Code in public preview",
+      url: "https://example.com",
+      reason: "VS Code 开始公测企业统一管理插件能力。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_text_untranslated").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("summary"));
+  assert(issuePaths.includes("hero_highlights[0].title"));
 });
 
 test("quality review flags mixed English changelog excerpts in main item body", async () => {
@@ -4561,21 +4582,58 @@ test("quality review rejects templated impact and watch prose in public body", a
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
     ...report.main_items[0],
+    summary: "GitHub Changelog 发布开源仓库、模型账号或开发者资源更新；目前最需要补看的信息是适用版本、权限边界、接入方式、失败恢复和团队落地成本。可先关注适用对象、落地边界和后续变化。",
     bullets: [
       "**要点**：GitHub Copilot 增加更大上下文窗口和可配置推理级别。",
       "==影响==：它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态。",
       "==留意==：看仓库活跃度、README、许可证、模型卡、下载限制和是否有真实案例。"
     ]
   };
+  report.hero_highlights = [
+    {
+      title: "GitHub Copilot 扩大上下文窗口",
+      url: "https://example.com",
+      reason: "GitHub Changelog 发布开源仓库、模型账号或开发者资源更新；目前最需要补看的信息是适用版本、权限边界、接入方式、失败恢复和团队落地成本。可先关注适用对象、落地边界和后续变化。"
+    }
+  ];
 
   const review = reviewReportQuality(report);
   const issuePaths = review.issues.filter((issue) => issue.code === "public_template_body").map((issue) => issue.path);
 
   assert.equal(review.ok, false);
+  assert(issuePaths.includes("main_items[0].summary"));
   assert(issuePaths.includes("main_items[0].bullets[1]"));
   assert(issuePaths.includes("main_items[0].bullets[2]"));
+  assert(issuePaths.includes("hero_highlights[0].reason"));
   assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
+test("quality review rejects templated GitHub trending and community lead prose", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      name: "example/agent-project",
+      repo: "example/agent-project",
+      url: "https://github.com/example/agent-project",
+      source: "GitHub Trending daily",
+      description: "进入 GitHub Trending Top 10，可作为 agent 方向的 agent 工具或工作流实现 线索；读者可用它快速判断该方向近期有哪些可复用实现、维护节奏和落地门槛。"
+    }
+  ];
+  report.community_leads = [
+    {
+      source: "OpenAI Status",
+      url: "https://status.openai.com/incidents/example",
+      content: "OpenAI Status 的社区动态指向 AI 产品、模型或平台动态；先核对官方入口、适用范围、可验证证据和后续变化，再判断是否值得进入主体跟进。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issuePaths = review.issues.filter((issue) => issue.code === "public_template_body").map((issue) => issue.path);
+
+  assert.equal(review.ok, false);
+  assert(issuePaths.includes("github_trending[0].description"));
+  assert(issuePaths.includes("community_leads[0].content"));
 });
 
 test("quality review rejects source-name prefixes in public body text", async () => {
@@ -5070,7 +5128,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("多平台可见"));
   assert(!html.includes("官方可用性"));
-  assert(html.includes("热门技术博客"));
+  assert(html.includes("技不止术"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
@@ -5531,6 +5589,183 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
 });
 
+test("report:draft 会把常见 Builder 和技不止术候选改写成具体中文，而不是占位或万能话术", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-editorial-rewrite-"));
+  const reportDate = "2026-05-27";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push(
+    {
+      id: "builder-vercel-ai-gateway",
+      source_id: "builder-follow-builders-x-feed",
+      category: "builder_observation",
+      title: "Guillermo Rauch: Vercel AI Gateway recovers on average over 1T tokens a month",
+      url: "https://x.com/rauchg/status/2063714700618334260",
+      source: "follow-builders X feed",
+      event_date: reportDate,
+      status: "excluded",
+      author: "Guillermo Rauch",
+      handle: "rauchg",
+      original_text: "Vercel AI Gateway recovers on average over 1T tokens a month Much like Stripe recovers revenue with smart retries on failed payments or credit card updates. And we do it with zero markup over the labs; adding redundancy, zero-data retention enforcement, observability, usage APIs, caps.",
+      evidence: "Original X status collected by follow-builders.",
+      verification_status: "original_social_only",
+      source_level: "original_social",
+      original_url: "https://x.com/rauchg/status/2063714700618334260"
+    },
+    {
+      id: "builder-openai-lockdown-mode",
+      source_id: "builder-simon-willison",
+      category: "builder_observation",
+      title: "Simon Willison: OpenAI Help: Lockdown Mode",
+      url: "https://simonwillison.net/2026/Jun/5/openai-help-lockdown-mode/#atom-everything",
+      source: "Simon Willison Weblog",
+      event_date: reportDate,
+      status: "excluded",
+      author: "Simon Willison Weblog",
+      original_text: "OpenAI first teased this in February, but now it's live and rolling out to eligible personal accounts, including Free, Go, Plus, and Pro, and self-serve ChatGPT Business accounts. Lockdown Mode is designed to help protect sensitive conversations and data.",
+      evidence: "Original blog post collected by discovery.",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://simonwillison.net/2026/Jun/5/openai-help-lockdown-mode/#atom-everything",
+      verification_sources: ["https://simonwillison.net/2026/Jun/5/openai-help-lockdown-mode/#atom-everything"]
+    },
+    {
+      id: "builder-box-markdown",
+      source_id: "builder-follow-builders-x-feed",
+      category: "builder_observation",
+      title: "Aaron Levie: Box now has a markdown editor on the web",
+      url: "https://x.com/levie/status/2063649508681224367",
+      source: "follow-builders X feed",
+      event_date: reportDate,
+      status: "excluded",
+      author: "Aaron Levie",
+      handle: "levie",
+      original_text: "Box now has a markdown editor on the web. Full CLI support. Commenting. Full version history. Box Drive also lets you connect to any desktop client as a mounted drive, so you instantly work with all your files in Claude Cowork, Codex, Obsidian, Cursor, or any other app.",
+      evidence: "Original X status collected by follow-builders.",
+      verification_status: "original_social_only",
+      source_level: "original_social",
+      original_url: "https://x.com/levie/status/2063649508681224367"
+    },
+    {
+      id: "hot-blog-dragonwell",
+      source_id: "content-alibaba-cloud-blog-dragonwell",
+      category: "hot_blog",
+      title: "AI-Powered Dragonwell Native Acceleration: Automatic Discovery of 10x Performance Improvement Opportunities",
+      url: "https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222",
+      source: "Alibaba Cloud Blog",
+      author: "Alibaba Cloud",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "This article introduces an AI-powered performance analytics system that automatically identifies optimization opportunities in Java/Scala applications",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222",
+      verification_sources: ["https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222"]
+    },
+    {
+      id: "hot-blog-openclaw",
+      source_id: "content-alibaba-cloud-blog-openclaw",
+      category: "hot_blog",
+      title: "Deploy OpenClaw di Alibaba Cloud ECS dengan Integrasi Telegram",
+      url: "https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221",
+      source: "Alibaba Cloud Blog",
+      author: "Alibaba Cloud",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Panduan langkah demi langkah menjalankan AI coding agent Anda sendiri di cloud",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      primary_url: "https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221",
+      verification_sources: ["https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221"]
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const byUrl = new Map(drafted.report.builder_observations.map((item) => [item.url, item]));
+  const vercel = byUrl.get("https://x.com/rauchg/status/2063714700618334260");
+  assert(vercel);
+  assert.match(vercel.translation, /1T tokens|冗余路由|零数据留存/u);
+  assert.doesNotMatch(vercel.translation, /直译待补/);
+
+  const lockdown = byUrl.get("https://simonwillison.net/2026/Jun/5/openai-help-lockdown-mode/#atom-everything");
+  assert(lockdown);
+  assert.match(lockdown.translation, /Lockdown Mode|高风险场景|ChatGPT Business/u);
+  assert.doesNotMatch(lockdown.translation, /直译待补/);
+
+  const box = byUrl.get("https://x.com/levie/status/2063649508681224367");
+  assert(box);
+  assert.match(box.translation, /Markdown|CLI|版本历史|Codex/u);
+  assert.doesNotMatch(box.translation, /直译待补/);
+
+  const dragonwell = drafted.report.hot_blogs.find((item) => item.url === "https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222");
+  assert(dragonwell);
+  assert(dragonwell.summary.length >= 100);
+  assert.match(dragonwell.summary, /Java \/ Scala|性能分析|调优/u);
+  assert.doesNotMatch(dragonwell.summary, /文章梳理一个 AI 产品/);
+
+  const openclaw = drafted.report.hot_blogs.find((item) => item.url === "https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221");
+  assert(openclaw);
+  assert.match(openclaw.title, /OpenClaw|coding agent|阿里云 ECS/u);
+  assert.doesNotMatch(openclaw.title, /Data Security Center/);
+});
+
+test("hotBlogSummary 会把 Hugging Face 和 OpenAI 的高频条目写成具体中文摘要", () => {
+  const nemotron = hotBlogSummary({
+    title: "Nemotron 3.5 Content Safety: Customizable Multimodal Safety for Global Enterprise AI",
+    evidence: "Hugging Face Blog published this blog/interview entry.",
+    source: "Hugging Face Blog"
+  });
+  assert(nemotron.length >= 100);
+  assert.match(nemotron, /多模态|治理|误判|漏判/u);
+  assert.doesNotMatch(nemotron, /文章说明安全、治理或平台规则/);
+
+  const hfCli = hotBlogSummary({
+    title: "Designing the hf CLI as an agent-optimized way to work with the Hub",
+    evidence: "Hugging Face Blog published this blog/interview entry.",
+    source: "Hugging Face Blog"
+  });
+  assert(hfCli.length >= 100);
+  assert.match(hfCli, /命令行|Hub|agent/u);
+  assert.doesNotMatch(hfCli, /文章拆解 agent、开发工具或自动化流程/);
+
+  const endava = hotBlogSummary({
+    title: "How Endava is redesigning software delivery around AI agents",
+    evidence: "Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to accelerate software delivery, automate workflows, and build an AI-native culture across the enterprise.",
+    source: "OpenAI News RSS"
+  });
+  assert(endava.length >= 100);
+  assert.match(endava, /ChatGPT Enterprise|Codex|软件交付/u);
+  assert.doesNotMatch(endava, /文章拆解 agent、开发工具或自动化流程/);
+});
+
+test("hotBlogSummary 生成的 Nemotron 摘要可以通过技不止术质量门", () => {
+  const report = {
+    report_date: "2026-06-06",
+    hot_blogs: [
+      {
+        title: "Nemotron 3.5 多模态内容安全分类与治理能力",
+        summary: hotBlogSummary({
+          title: "Nemotron 3.5 Content Safety: Customizable Multimodal Safety for Global Enterprise AI",
+          evidence: "Hugging Face Blog published this blog/interview entry.",
+          source: "Hugging Face Blog"
+        })
+      }
+    ]
+  };
+
+  const review = reviewReportQuality(report);
+  assert.equal(review.ok, true);
+  assert.equal(review.issues.find((issue) => issue.path === "hot_blogs[0].summary"), undefined);
+});
+
 test("report:draft promotes reader-relevant company actions from primary sources", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-reader-selection-"));
   const reportDate = "2026-05-26";
@@ -5731,7 +5966,7 @@ test("report:draft favors plain-reader utility over hardcore research details", 
   );
   assert(drafted.report.github_trending.length > 0);
   for (const item of drafted.report.github_trending) {
-    assert.match(item.description, /进入 GitHub Trending Top 10/);
+    assert.match(item.description, /GitHub Trending Top 10/);
     assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
   }
 });
@@ -5799,6 +6034,37 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
     drafted.candidatePool.candidates.find((candidate) => candidate.id === "hot-blog-duplicate-blog-url")?.status,
     "excluded"
   );
+});
+
+test("report:draft 在主体被近 7 天去重清空时，会用已核验的 primary hot_blog 补 1 条主线", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-main-fallback-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const historyDir = path.join(tmp, "reports-data", "2026", "05");
+  await fs.mkdir(historyDir, { recursive: true });
+  await fs.writeFile(
+    path.join(historyDir, "2026-05-25.json"),
+    `${JSON.stringify({
+      report_date: "2026-05-25",
+      main_items: Array.from({ length: 8 }, (_unused, index) => ({ url: `https://example.com/official/${index + 1}` }))
+    }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.main_items.length, 1);
+  assert.equal(drafted.report.main_items[0].url, "https://www.latent.space/p/axiom");
+  assert.equal(drafted.report.main_items[0].candidate_id, "main-hot-blog-axiom");
 });
 
 test("evidence cache downloads image_url candidates into local evidence assets", async () => {
@@ -6990,6 +7256,27 @@ test("report:write 拒绝结构化草稿中的泛化套话", async () => {
   );
 });
 
+test("report:write 拒绝机器日志和模板判断句", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  draft.self_check.notes = "Generated after syncing current main with strict coverage gates.";
+  draft.main_items[0].bullets = [
+    "判断点：把它当作 AI 产品或平台策略信号，重点对照发布时间、入口、适用对象和可验证证据。"
+  ];
+
+  const issuePhrases = findPlainLanguageIssues(draft).map((item) => item.phrase);
+  assert(issuePhrases.includes("Generated after syncing current main"));
+  assert(issuePhrases.includes("判断点"));
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    "plain_language_failed"
+  );
+});
+
 test("report:write 要求入选条目回指候选池", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -7052,7 +7339,7 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
       verification_status: "intermediary_only",
       verification_note: "行业媒体整理，作为观点线索收录，不写入事实主线。",
       risk_note: "产品发布事实仍需回到官方公告或仓库确认。",
-      reader_relevance: "帮助普通工程师判断 agent 平台能力和迁移成本。"
+      reader_relevance: "帮助产品和工程团队判断 agent 平台能力和迁移成本。"
     }
   ];
   draft.source_audit.content_sources.candidates_found = 1;
@@ -7081,7 +7368,7 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
     source_level: "intermediary",
     verification_note: "行业媒体整理，作为观点线索收录，不写入事实主线。",
     risk_note: "产品发布事实仍需回到官方公告或仓库确认。",
-    reader_relevance: "帮助普通工程师判断 agent 平台能力和迁移成本。"
+    reader_relevance: "帮助产品和工程团队判断 agent 平台能力和迁移成本。"
   });
 
   const report = normalizeReportDraft(draft, {
@@ -7478,7 +7765,12 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD"));
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD --publish"));
   assert(prompt.includes(".tmp/run-summary-YYYY-MM-DD.json"));
+  assert(prompt.includes("唯一权威资产"));
+  assert(prompt.includes("editorial-authority.md"));
   assert(prompt.includes("publish:dry-run:daily"));
+  assert(prompt.includes("npm run publish:dry-run:daily -- --date 2026-05-15"));
+  assert(!prompt.includes("npm run publish:dry-run -- --date 2026-05-15"));
+  assert(!prompt.includes("热门技术博客"));
   assert(prompt.includes("--restart"));
   assert(prompt.includes("反思与迭代建议"));
   assert(prompt.includes("去套话检查"));
@@ -7528,6 +7820,14 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("follow-builders central feed"));
   assert(prompt.includes("Product Hunt"));
   assert(prompt.includes("Product Hunt Trending"));
+  assert(prompt.includes("preview access"));
+  assert(prompt.includes("技不止术"));
+  assert(prompt.includes("Top 10"));
+  assert(prompt.includes("迭代维护机制"));
+  assert(prompt.includes("本轮修改清单"));
+  assert(prompt.includes("Good Case"));
+  assert(prompt.includes("Bad Case"));
+  assert(prompt.includes("后写覆盖前写"));
   assert(prompt.includes("TechCrunch AI"));
   assert(prompt.includes("TechCrunch AI/Enterprise"));
   assert(prompt.includes("ML Papers of the Week"));
@@ -8027,6 +8327,7 @@ async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
   await fs.mkdir(path.join(tmp, "config"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "prompts", "ai-daily", "modules"), { recursive: true });
   await fs.mkdir(path.join(tmp, "scripts"), { recursive: true });
   await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
 
@@ -8080,6 +8381,7 @@ async function createHarnessFixture(options = {}) {
     [
       "# Daily Publish Runbook",
       "",
+      "唯一权威资产：prompts/ai-daily/modules/editorial-authority.md",
       "## Preflight",
       "## Source Discovery",
       "## Report Write",
@@ -8103,9 +8405,38 @@ async function createHarnessFixture(options = {}) {
       "",
       "YYYY-MM-DD",
       "Asia/Shanghai",
+      "唯一权威资产：prompts/ai-daily/modules/editorial-authority.md",
       "Real publish requires explicit confirmation",
       "npm run validate",
       "npm run publish:dry-run",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "prompts", "ai-daily", "modules", "editorial-authority.md"),
+    [
+      "# 唯一权威资产",
+      "",
+      "## 迭代维护机制",
+      "",
+      "- Fixture canonical authority.",
+      "",
+      "## 本轮修改清单",
+      "",
+      "1. Fixture update.",
+      "",
+      "## Good Case",
+      "",
+      "- Fixture good case.",
+      "",
+      "## Bad Case",
+      "",
+      "- Fixture bad case.",
+      "",
+      "## 迭代历史",
+      "",
+      "- 2026-06-08: fixture history.",
       ""
     ].join("\n"),
     "utf8"

@@ -1,5 +1,7 @@
 # AI 日报静态发布决策记录
 
+> 状态：归档/参考。当前唯一权威资产为 `prompts/ai-daily/modules/editorial-authority.md`；如与本文冲突，以该文件为准。
+
 ## 已确认
 
 - 目标仓库：当前仓库 `JasonxzWen/ai-daily-cn`。
