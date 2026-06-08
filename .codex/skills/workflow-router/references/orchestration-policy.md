@@ -48,12 +48,13 @@ Use `scripts/advisory-check.mjs` as the shared side-effect-free core for manual 
 
 ```powershell
 node skills/workflow-router/scripts/advisory-check.mjs --state sdd-change --phase pre-implementation --json
+node skills/workflow-router/scripts/advisory-check.mjs --state sdd-change --phase pre-implementation --current-task .harness-hub/state/current-task.md --json
 node skills/workflow-router/scripts/advisory-check.mjs --state diagnosis --phase pre-implementation --has-reproduction --has-evidence --json
 node skills/workflow-router/scripts/advisory-check.mjs --state review --phase pre-implementation --will-mutate --json
 node skills/workflow-router/scripts/advisory-check.mjs --state delivery --phase pre-delivery --material-changes --json
 ```
 
-The script emits JSON warnings for missing SDD/maintenance scope/spec/acceptance/plan gates, explicit read-only owner mutation attempts, diagnosis without reproduction/evidence, state/phase mismatches, and delivery without validation or handoff. It always reports `blocking: false`, and never writes local or remote state.
+The script emits JSON warnings for missing SDD/maintenance scope/spec/acceptance/plan gates, explicit read-only owner mutation attempts, diagnosis without reproduction/evidence, state/phase mismatches, and delivery without validation or handoff. When `--current-task <path>` is provided, that file is inspected first. Without an explicit path, the script only auto-discovers `.harness-hub/state/current-task.md` in the current working directory; it does not recurse upward into parent directories. It always reports `blocking: false`, and never writes local or remote state.
 
 ## Planning Contract
 

@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Interaction Workflow](#interaction-workflow)
+- [Visual Language First](#visual-language-first)
 - [Output Mode Gate](#output-mode-gate)
 - [Plain-Text And Markdown Patterns](#plain-text-and-markdown-patterns)
 - [Pattern Selection](#pattern-selection)
@@ -22,12 +23,26 @@
 
 Use this workflow every time the skill loads:
 
-1. Treat loading as permission to run a communication-worthiness check, not as an obligation to emit HTML.
-2. Identify the reader need, decision frame, and smallest output mode that lowers decision cost.
+1. Treat loading as permission to run a communication-worthiness check, not as an obligation to emit HTML, except when the selected workflow expects an HTML handoff for material repo or skill changes.
+2. Identify the reader need, decision frame, and visual language that could reduce interaction time and information loss.
 3. Choose one primary pattern from [Plain-Text And Markdown Patterns](#plain-text-and-markdown-patterns) or [Pattern Selection](#pattern-selection). If no pattern fits, answer in ordinary chat or Markdown.
 4. Use the generator only for `html-artifact` mode. Start from the closest template when HTML is justified.
 5. Add rich sections only when the chosen pattern requires them. Do not add charts, Mermaid, code, diff, tabs, filters, claims, or controls just to make the response look richer or silence an advisory warning.
 6. Validate HTML artifacts and hand off the artifact link with validation status and any kept advisory warnings.
+
+## Visual Language First
+
+HTML handoff is a visual communication artifact, not Markdown wrapped in a browser. When the skill loads for a material report, organize the thinking around the visual shape before drafting the prose:
+
+- comparisons become matrices or side-by-side option cards;
+- process, routing, lifecycle, and failure paths become flows or timelines;
+- validation and risk become status tables or dashboards;
+- code and source evidence become source-linked tours, diffs, or evidence maps;
+- long continuation state becomes grouped navigation with stable anchors.
+
+This is not a license to decorate. A visual structure is justified only when it reduces reader interaction time, information loss, or rework. If a visual idea does not change how quickly the user can understand, compare, verify, decide, or continue, use `plain-brief`, `structured-markdown`, or `visual-markdown` instead.
+
+Do not draft a linear handoff first and ask at the end whether it deserves visualization. Start by asking which relationship the reader needs to see: priority, sequence, ownership, dependency, contrast, evidence, state, risk, or next action. The output mode follows that information architecture.
 
 ## Default Session Routing
 
@@ -39,7 +54,7 @@ The skill loads only when clear complex communication would reduce the user's de
 | During work | The next useful user input depends on seeing options, blockers, file evidence, validation state, or a process map together. | The user only needs a concise status sentence before work continues. |
 | Final handoff | Material repo or skill behavior changed, validation evidence matters, or the final answer would become a long linear file list. | The work is tiny, self-evident, and has no durable evidence beyond one command result. |
 
-For material repo or skill changes, default to a structured handoff. Use plain text or Markdown when it can preserve the decision trail. Escalate to an `implementation-handoff` or `conclusion-dashboard` HTML artifact only when browser navigation, visualization, filtering, copy/export, or source browsing changes how quickly the user can understand, compare, verify, decide, or act.
+For material repo or skill changes, default to a validated `implementation-handoff` or `conclusion-dashboard` HTML artifact unless the user explicitly waives HTML or the work is tiny and has no durable evidence trail. Plain text or Markdown can still be used for interim status, but final material handoff should keep evidence, validation, risks, and next actions inspectable in the ignored local artifact.
 
 ## Output Mode Gate
 
@@ -63,20 +78,21 @@ Output modes:
 | `plain-brief` | A 200-500 Chinese-character answer needs BLUF, Top 3 support, and next action but no separate artifact. | Do not add tables or diagrams if a direct paragraph is faster. |
 | `structured-markdown` | Complex communication needs headings, bullets, compact tables, or evidence labels inside chat. | Do not create HTML when Markdown keeps the decision trail obvious. |
 | `visual-markdown` | The answer needs Mermaid, a decision matrix, command blocks, or source anchors but not browser controls. | Keep it readable in the chat transcript. |
-| `html-artifact` | Browser navigation, visualization, filtering, copy/export, option approval, structure browsing, or local interaction lowers decision cost. | Keep the page single-file, static, and disposable. |
+| `html-artifact` | Browser navigation, visualization, filtering, copy/export, option approval, structure browsing, local interaction, or material repo/skill handoff evidence lowers decision cost. | Keep the page single-file, static, and disposable. |
 
 Use the lower mode when in doubt.
 
 Hard HTML conditions:
 
 - More than 5 source anchors, files, findings, or citations need local navigation.
+- Material repo or skill behavior changed and the final handoff needs changed areas, evidence, validation, risks, and next actions.
 - The user must filter, sort, compare, copy, export, or return structured input.
 - Side-by-side options have enough dimensions that one compact Markdown table becomes hard to scan.
 - Architecture, workflow, timeline, dependency graph, milestone plan, module map, repo tree, or skill structure is too wide for one compact Mermaid diagram.
 - Multi-option approval or visual style approval needs a browsable gallery rather than a production UI.
 - A durable browser handoff is explicitly useful for review, acceptance, or continuation.
 
-HTML escalation is forbidden when one compact Markdown table, one Mermaid diagram, or one short file list is enough.
+HTML escalation is forbidden when one compact Markdown table, one Mermaid diagram, or one short file list is enough, except for material repo/skill handoffs where the workflow/advisory layer expects `html-artifact`.
 
 ## Plain-Text And Markdown Patterns
 

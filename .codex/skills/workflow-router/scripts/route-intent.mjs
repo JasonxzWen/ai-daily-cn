@@ -22,6 +22,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Gather required material and answer from evidence.',
     helpers: ['documentation-lookup'],
     effectiveInteract: 'default-consider',
+    expectedOutputMode: null,
   },
   'sdd-change': {
     owner: 'sdd-workflow',
@@ -30,6 +31,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Align user need before spec, plan, cleanup, implementation, and tests.',
     helpers: ['product-capability', 'tdd-workflow', 'verification-loop'],
     effectiveInteract: 'required',
+    expectedOutputMode: null,
   },
   diagnosis: {
     owner: 'diagnosis-workflow',
@@ -45,6 +47,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Reproduce or bound the symptom before fixing.',
     helpers: ['diagnose', 'agent-introspection-debugging', 'webapp-testing'],
     effectiveInteract: 'default-consider',
+    expectedOutputMode: null,
   },
   review: {
     owner: 'review-workflow',
@@ -53,6 +56,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Gather review evidence and report findings first.',
     helpers: ['compound-code-review', 'security-review', 'web-design-guidelines'],
     effectiveInteract: 'default-consider',
+    expectedOutputMode: null,
   },
   delivery: {
     owner: 'delivery-workflow',
@@ -61,6 +65,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Verify acceptance, PR status when relevant, and residual risks before declaring done.',
     helpers: ['verification-loop', 'effective-interact', 'handoff'],
     effectiveInteract: 'required',
+    expectedOutputMode: null,
   },
   'harness-hub-maintenance': {
     owner: 'hub-maintenance-workflow',
@@ -69,6 +74,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Gather source, capability, and lifecycle evidence before changing Harness Hub.',
     helpers: ['skill-creator', 'documentation-lookup', 'verification-loop'],
     effectiveInteract: 'required',
+    expectedOutputMode: 'html-artifact',
   },
   clarify: {
     owner: null,
@@ -77,6 +83,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'Ask one concise question.',
     helpers: [],
     effectiveInteract: 'not-needed',
+    expectedOutputMode: null,
   },
   none: {
     owner: null,
@@ -85,6 +92,7 @@ const STATE_CONFIG = Object.freeze({
     nextGate: 'No workflow owner needed.',
     helpers: [],
     effectiveInteract: 'not-needed',
+    expectedOutputMode: null,
   },
 });
 
@@ -150,6 +158,7 @@ const SIGNALS = Object.freeze({
     '\u8bc1\u636e',
     '\u8bf4\u660e',
     '\u56de\u7b54',
+    '\u603b\u7ed3',
   ],
   sddChange: [
     'add',
@@ -273,7 +282,6 @@ const SIGNALS = Object.freeze({
     '\u6e05\u7406',
     '\u4ea4\u4ed8',
     '\u53d1\u5e03\u8bf4\u660e',
-    '\u603b\u7ed3',
     '\u63d0pr',
     '\u63d0 pr',
     '\u521b\u5efapr',
@@ -334,6 +342,9 @@ const SIGNALS = Object.freeze({
     'router',
     'source projects',
     'upstream skill',
+    'effective-interact',
+    'effective report',
+    'effective-report',
     'install/update/remove',
     'npm',
     'profile',
@@ -418,6 +429,11 @@ const SIGNALS = Object.freeze({
     '\u5e76\u884c',
     '\u8c03\u5ea6',
   ],
+  hubMaintenanceChangeTarget: [
+    'effective-interact',
+    'effective report',
+    'effective-report',
+  ],
 });
 
 function normalize(value) {
@@ -464,6 +480,7 @@ function makeResult(state, confidence, reason, extras = {}) {
     nextGate: config.nextGate,
     allowedHelperSkills: [...config.helpers],
     effectiveInteract: config.effectiveInteract,
+    expectedOutputMode: config.expectedOutputMode,
     mutates: false,
     ...extras,
   };
@@ -490,6 +507,7 @@ export function classifyIntent(prompt) {
   const prCloseoutSignal = includesAny(text, SIGNALS.prCloseout);
   const hubSignal = includesAny(text, SIGNALS.hubMaintenance);
   const hubActionSignal = includesAny(text, SIGNALS.hubMaintenanceAction);
+  const hubChangeTargetSignal = includesAny(text, SIGNALS.hubMaintenanceChangeTarget);
   const explicitOwner = hasExplicitOwner(text);
 
   if (includesAny(text, SIGNALS.vagueNext) && !changeSignal && !explicitOwner) {
@@ -504,6 +522,10 @@ export function classifyIntent(prompt) {
 
   if (hubSignal && hubActionSignal) {
     return makeResult('harness-hub-maintenance', 'high', 'The request targets Harness Hub capability, routing, source, packaging, or lifecycle maintenance.');
+  }
+
+  if (hubSignal && changeSignal && hubChangeTargetSignal) {
+    return makeResult('harness-hub-maintenance', 'high', 'The request changes a repo-owned skill, report, routing, or capability behavior.');
   }
 
   if (reviewSignal && changeSignal && !noMutation) {
@@ -606,6 +628,7 @@ function printText(result) {
   console.log(`NEXT GATE: ${result.nextGate}`);
   console.log(`HELPERS: ${result.allowedHelperSkills.join(', ') || 'none'}`);
   console.log(`EFFECTIVE_INTERACT: ${result.effectiveInteract}`);
+  console.log(`EXPECTED_OUTPUT_MODE: ${result.expectedOutputMode || 'none'}`);
   if (result.clarification) {
     console.log(`CLARIFICATION: ${result.clarification}`);
   }
