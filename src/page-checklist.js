@@ -83,6 +83,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         card_icons: unlinkedCardTitleIcons.map((image) => image.closest(".interactive-card")?.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim().slice(0, 140) || "")
       }
     );
+    const cardTitleLinks = Array.from(document.querySelectorAll(".interactive-card h3 a.card-title-link"));
+    const missingCardTitleIcons = cardTitleLinks
+      .filter((link) => !link.querySelector("img.card-title-icon"))
+      .map((link) => link.textContent?.replace(/\s+/g, " ").trim().slice(0, 140) || "");
+    addCheck(
+      "source_icons_present",
+      cardTitleLinks.length === 0 || missingCardTitleIcons.length === 0,
+      "Public card title links should include source or avatar icons.",
+      { count: cardTitleLinks.length, missing_titles: missingCardTitleIcons }
+    );
     const githubTrendingSection = document.querySelector("section[id*='github-trending']");
     const githubTrendRows = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll("ol > li")) : [];
     const weakGithubTrendRows = githubTrendRows
@@ -138,16 +148,63 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Daily tracking should render at least one visual/table-first public card and must not render leaderboard rows as text detail logs.",
       { count: trackingCards.length, weak_cards: weakTrackingCards }
     );
+    const trackingOverlapIssues = trackingCards
+      .map((card, index) => {
+        const selectors = [":scope > h3", ":scope > .card-tags", ":scope > .card-stat-grid", ":scope > .card-bars", ":scope > .card-table", ":scope > .card-media-grid", ":scope > p"];
+        const rects = selectors
+          .flatMap((selector) => Array.from(card.querySelectorAll(selector)))
+          .map((node) => {
+            const rect = node.getBoundingClientRect();
+            return {
+              label: node.matches("h3") ? "title" : node.className || node.tagName.toLowerCase(),
+              left: rect.left,
+              right: rect.right,
+              top: rect.top,
+              bottom: rect.bottom,
+              width: rect.width,
+              height: rect.height
+            };
+          })
+          .filter((rect) => rect.width > 1 && rect.height > 1);
+        for (let leftIndex = 0; leftIndex < rects.length; leftIndex += 1) {
+          for (let rightIndex = leftIndex + 1; rightIndex < rects.length; rightIndex += 1) {
+            const a = rects[leftIndex];
+            const b = rects[rightIndex];
+            const separated = a.right <= b.left + 1 || b.right <= a.left + 1 || a.bottom <= b.top + 1 || b.bottom <= a.top + 1;
+            if (!separated) {
+              return {
+                index,
+                title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+                overlap: [a.label, b.label]
+              };
+            }
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_no_overlap",
+      trackingOverlapIssues.length === 0,
+      "Daily tracking card title, tags, stats, bars, table, media and body should not visually overlap.",
+      { overlaps: trackingOverlapIssues }
+    );
     const weakBuilderCards = Array.from(document.querySelectorAll(".builder-card"))
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const originalRows = Array.from(card.querySelectorAll(".card-detail-list div"))
+          .filter((row) => (row.querySelector("dt")?.textContent || "").trim() === "原文");
+        const originalText = originalRows
+          .map((row) => row.querySelector("dd")?.textContent?.replace(/\s+/g, " ").trim() || "")
+          .join(" ");
         const textWithoutUrls = bodyText.replace(/https?:\/\/\S+/gi, "").trim();
         const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
         const latinChars = (bodyText.match(/[A-Za-z]/g) || []).length;
         const ratioBase = chineseChars + latinChars;
         const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
         const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
-        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
+        const originalAttached = originalText.length >= 10;
+        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun && originalAttached;
         return ok
           ? null
           : {
@@ -156,14 +213,15 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
               body: bodyText.slice(0, 180),
               chinese_chars: chineseChars,
               chinese_ratio: Number(chineseRatio.toFixed(3)),
-              long_english_run: longEnglishRun
+              long_english_run: longEnglishRun,
+              original_attached: originalAttached
             };
       })
       .filter(Boolean);
     addCheck(
       "builder_cards_translated",
       weakBuilderCards.length === 0,
-      "X/Twitter builder cards should render Chinese translations or summaries, not raw English original posts.",
+      "X/Twitter builder cards should render Chinese translations in the body and attach the original post below.",
       { weak_cards: weakBuilderCards }
     );
     const internalReviewLanguageRe = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
@@ -263,6 +321,21 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       weakBlogCards.length === 0,
       "Hot blog cards should render as reader-facing Chinese analysis with 2-4 readable points, not untranslated excerpts or thin summaries.",
       { weak_cards: weakBlogCards }
+    );
+    const sourceAuditSection = Array.from(document.querySelectorAll("section, details"))
+      .find((section) => /信源审计/.test(section.querySelector("h1, h2, h3, summary")?.textContent || ""));
+    const sourceAuditOverviewChart = Array.from(document.querySelectorAll("[data-chart-section]"))
+      .find((section) => /信源状态概览/.test(section.textContent || ""));
+    const sourceStatusTags = Array.from(document.querySelectorAll("mark.daily-tag-status-checked, mark.daily-tag-status-no-signal, mark.daily-tag-status-blocked, mark.daily-tag-status-skipped, mark.daily-tag-status-unknown"));
+    addCheck(
+      "source_audit_status_visualized",
+      Boolean(sourceAuditOverviewChart) && Boolean(sourceAuditSection) && sourceStatusTags.length >= 2,
+      "Source audit should include a visible status chart and colored status tags for each source state.",
+      {
+        has_chart: Boolean(sourceAuditOverviewChart),
+        has_audit_section: Boolean(sourceAuditSection),
+        status_tag_count: sourceStatusTags.length
+      }
     );
     const contentImages = Array.from(document.images).filter((image) =>
       image.getAttribute("src") && !image.closest(".image-lightbox[hidden]")

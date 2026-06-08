@@ -183,6 +183,36 @@ structuredReport.daily_tracking = [
     }
   }
 ];
+structuredReport.source_audit = {
+  github_trending: {
+    checked: true,
+    candidates_found: 10,
+    included: 10,
+    notes: "Fixture GitHub Trending audit.",
+    sources: [
+      { name: "GitHub Trending daily", url: "https://github.com/trending?since=daily", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending weekly", url: "https://github.com/trending?since=weekly", status: "no_signal", notes: "Not used for this public day." }
+    ]
+  },
+  builder_sources: {
+    checked: true,
+    candidates_found: 2,
+    included: 2,
+    notes: "Fixture Builder audit.",
+    sources: [
+      { name: "follow-builders X feed", url: "https://x.com/examplebuilder", status: "checked", notes: "Original X URLs preserved." }
+    ]
+  },
+  content_sources: {
+    checked: true,
+    candidates_found: 2,
+    included: 2,
+    notes: "Fixture content audit.",
+    sources: [
+      { name: "Example Blog", url: "https://example.com/blog", status: "checked", notes: "Fixture blog parsed." }
+    ]
+  }
+};
 structuredReport.evidence_assets = [
   {
     type: "figure",
@@ -206,6 +236,14 @@ structuredReport.evidence_assets = [
     source_url: structuredReport.hot_blogs[0].url,
     local_path: "assets/evidence/e2e-blog-architecture.png",
     caption: "Original blog architecture figure.",
+    extraction_status: "source_image"
+  },
+  {
+    type: "figure",
+    title: "Builder post screenshot",
+    source_url: structuredReport.builder_observations[0].url,
+    local_path: "assets/evidence/e2e-builder-post.png",
+    caption: "Original X post image.",
     extraction_status: "source_image"
   }
 ];
@@ -240,6 +278,7 @@ await buildSite({
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-benchmark.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
+await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();
@@ -290,8 +329,10 @@ try {
   const builderCardsText = await page.locator(".builder-card-grid").textContent();
   assert.match(builderCardsText, /@examplebuilder/);
   assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
-  assert.doesNotMatch(builderCardsText, /Coding agents need eval loops before unattended work/);
+  assert.match(builderCardsText, /原文/);
+  assert.match(builderCardsText, /Coding agents need eval loops before unattended work/);
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
+  assert.equal(await page.locator(".builder-card .card-media-grid img").count(), 1);
   assert.equal(await builderCardsUseHorizontalRows(page), true);
   const communityCardsText = await page.locator(".community-card-grid").textContent();
   assert.match(communityCardsText, /Apple TV/);
@@ -299,6 +340,7 @@ try {
   assert.doesNotMatch(communityCardsText, /待确认|Treat this as a community lead|事实性结论|不进入\s*AI\s*主体事实/);
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
+  await imageLightboxOpensAndCloses(page, ".builder-card .card-media-grid img");
   assert.equal(await page.locator(".project-card-grid").count(), 0);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
@@ -306,6 +348,7 @@ try {
   const mobileChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
+  await imageLightboxOpensAndCloses(page, ".builder-card .card-media-grid img");
   assert.equal(await noMediaBlogCardsUseReadableSingleColumn(page), true);
   assert.equal(await builderCardsCollapseOnMobile(page), true);
   assert.equal(await hasHorizontalOverflow(page), false);

@@ -246,6 +246,41 @@ h3 {
   color: #334155;
 }
 
+.rendered-markdown mark.daily-tag-status-checked,
+.report-data-table mark.daily-tag-status-checked,
+.report-hero mark.daily-tag-status-checked {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.rendered-markdown mark.daily-tag-status-no-signal,
+.report-data-table mark.daily-tag-status-no-signal,
+.report-hero mark.daily-tag-status-no-signal {
+  background: #fef9c3;
+  border-color: #fde047;
+  color: #854d0e;
+}
+
+.rendered-markdown mark.daily-tag-status-blocked,
+.report-data-table mark.daily-tag-status-blocked,
+.report-hero mark.daily-tag-status-blocked {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.daily-tag-status-skipped,
+.report-data-table mark.daily-tag-status-skipped,
+.report-hero mark.daily-tag-status-skipped,
+.rendered-markdown mark.daily-tag-status-unknown,
+.report-data-table mark.daily-tag-status-unknown,
+.report-hero mark.daily-tag-status-unknown {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
 .rendered-markdown mark.trend-status-new,
 .report-data-table mark.trend-status-new,
 .report-hero mark.trend-status-new {
@@ -1150,6 +1185,14 @@ body.lightbox-open {
   grid-area: tracking-tags;
 }
 
+.tracking-card > *,
+.tracking-card .card-stat-grid,
+.tracking-card .card-bars,
+.tracking-card .card-table,
+.tracking-card .card-table-scroll {
+  min-width: 0;
+}
+
 .tracking-card .card-stat-grid {
   grid-area: tracking-stats;
 }
@@ -1160,6 +1203,7 @@ body.lightbox-open {
 
 .tracking-card .card-table {
   grid-area: tracking-table;
+  max-width: 100%;
 }
 
 .tracking-card > p {
@@ -1170,6 +1214,15 @@ body.lightbox-open {
 
 .tracking-card .card-media-grid {
   grid-column: 1 / -1;
+}
+
+.tracking-card .card-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tracking-card .card-data-table {
+  min-width: min(560px, 100%);
 }
 
 .blog-card .card-detail-list {
@@ -1251,6 +1304,7 @@ body.lightbox-open {
   grid-template-areas:
     "builder-title builder-body"
     "builder-tags builder-body"
+    ". builder-media"
     ". builder-details";
   gap: 10px 18px;
   align-items: start;
@@ -1302,6 +1356,17 @@ body.lightbox-open {
   font-size: 15px;
   line-height: 1.7;
   min-width: 0;
+}
+
+.builder-card .card-media-grid {
+  grid-area: builder-media;
+  min-width: 0;
+}
+
+.builder-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #f8fafc;
 }
 
 .builder-card .card-detail-list {
@@ -1409,6 +1474,7 @@ body.lightbox-open {
     grid-template-areas:
       "builder-title"
       "builder-tags"
+      "builder-media"
       "builder-body"
       "builder-details";
   }

@@ -251,6 +251,13 @@
         "image_url": {
           "$ref": "#/$defs/absolute_url"
         },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          },
+          "default": []
+        },
         "image_alt": {
           "type": "string",
           "minLength": 1
