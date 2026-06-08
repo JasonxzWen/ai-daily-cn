@@ -1398,23 +1398,38 @@ body.lightbox-open {
 }
 
 .community-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   align-items: stretch;
 }
 
 .community-card {
   grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-areas:
+    "community-title"
+    "community-tags"
+    "community-body";
+  gap: 8px 18px;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
+.community-card:has(.card-media-grid) {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-areas:
+    "community-title community-media"
+    "community-tags community-media"
+    "community-body community-media";
+  align-items: start;
+}
+
 .community-card h3 {
+  grid-area: community-title;
   display: flex;
   gap: 8px;
   align-items: center;
   margin: 0;
+  min-width: 0;
 }
 
 .community-card .card-title-icon {
@@ -1434,25 +1449,30 @@ body.lightbox-open {
 }
 
 .community-card .card-tags {
+  grid-area: community-tags;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
 .community-card > p {
+  grid-area: community-body;
+  margin: 0;
   color: #25231f;
-  line-height: 1.62;
+  font-size: 15px;
+  line-height: 1.68;
 }
 
-.community-card .card-detail-list {
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+.community-card .card-media-grid {
+  grid-area: community-media;
+  min-width: 0;
+  align-self: start;
 }
 
-.community-card .card-detail-list div {
-  padding-top: 0;
-  border-top: 0;
+.community-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
 }
 
 @media (max-width: 760px) {
@@ -1486,6 +1506,27 @@ body.lightbox-open {
       "builder-media"
       "builder-body"
       "builder-details";
+  }
+
+  .community-card,
+  .community-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-media"
+      "community-body";
+  }
+
+  .community-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-body";
+  }
+
+  .community-card .card-media-grid img {
+    object-fit: contain;
   }
 
   .tracking-card {
@@ -2573,7 +2614,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-03 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-03 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-06-02 至 2026-06-03</div>
@@ -2587,7 +2628,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>14</strong><small>重点条目</small></div>
 <div class="hero-stat"><span>AIGC</span><strong>6</strong><small>产品/内容</small></div>
-<div class="hero-stat"><span>技术博客</span><strong>3</strong><small>深读</small></div>
+<div class="hero-stat"><span>热门博客</span><strong>3</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>6</strong><small>观察</small></div>
 <div class="hero-stat"><span>覆盖</span><strong>06-02..06-03</strong><small>扩展时间范围</small></div>
@@ -2898,25 +2939,34 @@ PS: welcome https://t.co/WTKvpexJtD to Vercel!</span></dd></div></dl>
     <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="TechCrunch AI" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>TechCrunch AI</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>TechCrunch 报道 Uber 在四个月内超出 AI 使用预算后限制员工 AI 支出</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-02</span></div>
 
 
-    <p>TechCrunch 报道 Uber 在四个月内超出 AI 使用预算后限制员工 AI 支出；</p>
+    <p>这是 AI 成本治理线索，进入社区观察而非事实主线。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="The Verge AI" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://www.theverge.com/tech/942302/google-search-ai-overviews-uk-cma-publisher-opt-out" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAJ1BMVEVHcExSAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP9SAP+IbbjWAAAADHRSTlMAX0GgcRDMJrb04oZMw6usAAABqUlEQVRYhdWWyYKDMAxDWQIUmP//3mlgWvwSL0DnUh3jxMiy7LZpvh9thK58MSHc9D8BHmWChdFuDhL0JQFEn/weFxOA8jg8RbiWYEAFKR8FNRQJEoLb0XopwVjHpsV6qySAhPNfi30ZmQB0s4R1Y9wEZNuq1igBI7Fl+vGYNrydDCtDwlUntjQ2Bvl+FqkhTWsnwD1Z22QFCgKoALXJTs7VAL8ArRY7tBrvaRjeIjnjPQpdJgYhj1ED5qic8iaWkYM8lWHIWEUzHAkzsNoqfhmQqTYLZJy1CjwJK4aKGyGz2mlfRjZaFUl+onYjJ1Z7TxkrjnChMW/Y+GUFIDDoCTrnI3ChOSzSapSREhoEPBlBzl4YWG1wIyQ094Uj4xkJNwryYjrOIaGzMzkwR6mn1s0O+O1dKyRUJ/X4lipjr6bVgZl7ZZVndg+Vy61Slythhuz43rBw1RBSsN2N8bK7wElftwGuSKgBLgx6qGFABTcIwIUpvl9BuvBjCe/0UJ+u84ALvb9fFuDCTyXUflBD/KuEdwhgtm+8h4ThJlEACZ1fAxNJ4IaJvgW/0z1C3l9aXhAAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>The Verge 报道英国 CMA 要求 Google 允许出版商选择退出 AI Search features</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
+
+
+    <p>这是平台政策线索，需回到监管文件或 Google 官方说明再升格。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="36Kr" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://36kr.com/p/3836973710423429?f=rss" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>36Kr</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://36kr.com/p/3836973710423429?f=rss" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>36Kr 提到火山引擎 MaaS 与 Seedance 2.0 商业化进展</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
 
-    <p>36Kr 提到火山引擎 MaaS 与 Seedance 2.0 商业化进展；</p>
+    <p>因涉及营收数字，当前仅作中文产业线索，需公司或多源验证。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/wsfm6yIgeRQ9ij1X.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Leiphone</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/wsfm6yIgeRQ9ij1X.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>雷峰网报道千问 APP 将向第三方 Agent、Skill 开放并引入品牌服务测试</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
 
@@ -2925,20 +2975,20 @@ PS: welcome https://t.co/WTKvpexJtD to Vercel!</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="36Kr" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://36kr.com/p/3836068296209537?f=rss" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>36Kr</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://36kr.com/p/3836068296209537?f=rss" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>36Kr 报道深圳具身智能公司星尘智能完成新一轮融资并出现产业订单线索</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
 
-    <p>36Kr 报道深圳具身智能公司星尘智能完成新一轮融资并出现产业订单线索；</p>
+    <p>因涉及融资额、估值和订单，当前仅作国内具身智能融资热度线索，需公司、投资方或多源验证。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/428435.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>QbitAI</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/428435.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>QbitAI 线索称国内团队跨维智能在 WorldArena 相关榜单出现排名变化</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">中介/媒体线索</span><span class="chip chip-date">2026-06-03</span></div>
 
 
-    <p>QbitAI 线索称国内团队跨维智能在 WorldArena 相关榜单出现排名变化；</p>
+    <p>因涉及 benchmark/榜单，当前只作为国内模型评测线索，需回到 WorldArena 原始榜单或论文/项目页确认。</p>
 
   </article>
     </div>

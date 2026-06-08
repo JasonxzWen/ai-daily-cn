@@ -33,7 +33,19 @@ export const AI_STOCK_PHRASES = [
   "范式转变",
   "生态闭环",
   "价值闭环",
-  "想象空间"
+  "想象空间",
+  "读者应重点核对",
+  "判断点",
+  "技不止术",
+  "热门技术博客",
+  "把它当作 AI 产品或平台策略信号",
+  "读者应先看原文给出的变化",
+  "Generated after syncing current main",
+  "strict coverage gates",
+  "Fixed source surface checked",
+  "timed out twice in the current shell",
+  "shadow audit",
+  "included 标记已写回"
 ];
 
 export const SOURCE_TIERS = ["T0", "T1", "T2", "T3"];

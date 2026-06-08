@@ -721,7 +721,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
       ["主体", "2", "重点条目"],
       ["AIGC", "1", "产品/内容"],
       ["追踪", "1", "榜单变化"],
-      ["技术博客", "1", "深读"],
+      ["热门博客", "1", "深读"],
       ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
       ["覆盖", "05-15", "标准时间范围"]
@@ -732,6 +732,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(input.heroLinks.find((item) => item.label === "日报导航")?.icon.startsWith("data:image/svg+xml;base64,"));
   assert(!input.summary.includes("Agent harness 成为今日主线"));
   assert(!input.summary.includes("其余条目见后文"));
+  assert(!input.summary.includes("技不止术"));
   assert(!input.sections.some((section) => section.title === "日报概览"));
   assert(!input.sections.some((section) => section.title === "主线摘要"));
   const mainContent = mainMarkdownContent(input);
@@ -767,6 +768,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
   assert.equal(hotBlogsSection.items.length, 1);
+  assert(!JSON.stringify(hotBlogsSection).includes("技不止术"));
   assert.equal(hotBlogsSection.items[0].title, "Harness Engineering for Long Running Agents");
   assert.equal(hotBlogsSection.items[0].href, "https://example.com/blog/harness-engineering");
   assert.match(hotBlogsSection.items[0].titleIcon, /^data:image\/svg\+xml;base64,/);
@@ -797,8 +799,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("\n  - "));
   assert(!trendingSection.content.includes(" | "));
   assert(!trendingSection.content.includes("新上榜"));
-  assert(input.intent.audience.includes("普通工程师"));
-  assert(input.intent.primaryQuestion.includes("模型、产品、开源、观点和社区动态"));
+  assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
+  assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
   assert(input.sections.some((section) => section.title === "AI 资讯"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
@@ -1137,17 +1139,50 @@ test("domestic community leads stay inside the shared community section", async 
   assert.equal(communitySection.type, "filterable-cards");
   assert.equal(communitySection.cardClass, "community-card");
   assert.equal(communitySection.items.length, 2);
-  const leiphone = communitySection.items.find((item) => item.title === "Leiphone");
-  const techcrunch = communitySection.items.find((item) => item.title === "TechCrunch AI");
+  const leiphone = communitySection.items.find((item) => item.group === "Leiphone");
+  const techcrunch = communitySection.items.find((item) => item.group === "TechCrunch AI");
   assert(leiphone);
+  assert.match(leiphone.title, /千问 APP/);
   assert(leiphone.body.includes("千问 APP"));
   assert(!leiphone.body.includes("待确认"));
   assert(!leiphone.body.includes("中介来源仅作发现线索"));
   assert.equal(leiphone.points.length, 0);
   assert(techcrunch);
+  assert.match(techcrunch.title, /TechCrunch/);
   assert(techcrunch.body.includes("TechCrunch"));
   assert(!techcrunch.body.includes("待确认"));
   assert.equal(techcrunch.points.length, 0);
+});
+
+test("community lead cards keep fuller news summaries and preserve images", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [];
+  report.self_check.builder_observations = 0;
+  report.community_leads = [
+    {
+      title: "OpenAI is still working on that ‘super app’",
+      content: "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用；讨论焦点在于这些入口会不会继续往同一个应用里收。",
+      url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      source: "TechCrunch AI",
+      event_date: "2026-06-08",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "中介来源，仅作社区观察。",
+      image_url: "https://example.com/super-app.png",
+      image_alt: "OpenAI super app illustration"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.title === "社区线索");
+
+  assert(section);
+  assert.equal(section.type, "filterable-cards");
+  assert.equal(section.cardClass, "community-card");
+  assert.equal(section.items.length, 1);
+  assert.equal(section.items[0].title, "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用");
+  assert.match(section.items[0].body, /这些入口会不会继续往同一个应用里收/);
+  assert.equal(section.items[0].media[0].src, "https://example.com/super-app.png");
 });
 
 test("AIGC hero stat counts Chinese signals and omits zero-value cards", async () => {
@@ -4663,6 +4698,18 @@ test("quality review rejects source-name prefixes in public body text", async ()
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
 
+test("quality review rejects legacy hot blog public labels", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.summary = "今天的技不止术集中在 agent 平台和成本治理。";
+
+  const review = reviewReportQuality(report);
+  const legacyIssue = review.issues.find((issue) => issue.path === "summary" && issue.code === "plain_language_stock_phrase");
+
+  assert.equal(review.ok, false);
+  assert(legacyIssue);
+  assert.equal(legacyIssue.message, "Text contains stock phrase: 技不止术");
+});
+
 test("quality review rejects internal review language in public body text", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.community_leads = [
@@ -5918,9 +5965,9 @@ test("report:draft prefers specific hot blog evidence over generic feed announce
 
   const titles = drafted.report.hot_blogs.map((item) => item.title);
   assert.deepEqual(titles, [
-    "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of AI Sessions",
-    "AgentScope Java 2.0: Building a Distributed, Enterprise-Grade Foundation for AI Agents",
-    "Tokenmaxxing Dilemma: Are There Immediate Solutions for Improvement?"
+    "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话",
+    "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走",
+    "这篇文章讨论企业 agent 怎么降 token 成本，重点是先建依赖关系再减无效上下文"
   ]);
 });
 
@@ -6097,6 +6144,111 @@ test("report:draft dedupes duplicate community topics and keeps reader-facing su
   const climateLead = drafted.report.community_leads.find((item) => /气象|气候/u.test(item.content));
   assert(climateLead);
   assert.doesNotMatch(climateLead.content, /公开信息主要落在/u);
+});
+
+test("report:draft limits paper and GitHub overflow in community leads while keeping reader-facing news leads", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-community-mix-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = [
+    {
+      id: "super-app-visual",
+      source_id: "content-techcrunch-ai",
+      category: "community_lead",
+      title: "OpenAI is still working on that ‘super app’",
+      url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      source: "TechCrunch AI",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "\"Chat is dead\" — at least, according to a senior OpenAI employee.",
+      verification_status: "intermediary_only",
+      source_level: "intermediary",
+      image_url: "https://example.com/super-app.png",
+      image_alt: "OpenAI super app illustration"
+    },
+    {
+      id: "climate-visual",
+      source_id: "content-ars-technica",
+      category: "community_lead",
+      title: "The weather and climate science AI revolution isn’t revolutionary",
+      url: "https://arstechnica.com/science/2026/06/the-weather-and-climate-science-ai-revolution-isnt-revolutionary/",
+      source: "Ars Technica",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Machine learning has its limits—how is it being used?",
+      verification_status: "intermediary_only",
+      source_level: "intermediary",
+      image_url: "https://example.com/climate-ai.png",
+      image_alt: "Climate AI illustration"
+    },
+    {
+      id: "skillopt-paper",
+      source_id: "content-ml-papers",
+      category: "community_lead",
+      title: "SkillOpt",
+      url: "https://example.com/papers/skillopt",
+      source: "ML Papers of the Week",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Skill optimization for agent workflows.",
+      verification_status: "intermediary_only",
+      source_level: "paper"
+    },
+    {
+      id: "autoscientists-paper",
+      source_id: "content-ml-papers",
+      category: "community_lead",
+      title: "AutoScientists",
+      url: "https://example.com/papers/autoscientists",
+      source: "ML Papers of the Week",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Multi-agent science workflows without a central planner.",
+      verification_status: "intermediary_only",
+      source_level: "paper"
+    },
+    {
+      id: "codex-provider-sync",
+      source_id: "content-hellogithub",
+      category: "community_lead",
+      title: "codex-provider-sync",
+      url: "https://hellogithub.com/repository/codex-provider-sync",
+      source: "HelloGitHub",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "A tool that keeps Codex sessions when switching providers.",
+      verification_status: "primary_confirmed",
+      source_level: "github"
+    },
+    {
+      id: "agent-memory-sync",
+      source_id: "content-hellogithub",
+      category: "community_lead",
+      title: "agent-memory-sync",
+      url: "https://hellogithub.com/repository/agent-memory-sync",
+      source: "HelloGitHub",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "An AI agent memory sync utility for multi-provider workflows.",
+      verification_status: "primary_confirmed",
+      source_level: "github"
+    }
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(drafted.report.community_leads.some((item) => item.candidate_id === "super-app-visual"));
+  assert(drafted.report.community_leads.some((item) => item.candidate_id === "climate-visual"));
+  assert(drafted.report.community_leads.filter((item) => item.source_level === "paper").length <= 1);
+  assert(drafted.report.community_leads.filter((item) => item.source_level === "github").length <= 1);
 });
 
 test("report:draft keeps minor consumer AI feature rollouts out of main_items", async () => {
@@ -6434,7 +6586,7 @@ test("report:draft favors plain-reader utility over hardcore research details", 
   );
   assert(drafted.report.github_trending.length > 0);
   for (const item of drafted.report.github_trending) {
-    assert.match(item.description, /进入 GitHub Trending Top 10/);
+    assert.match(item.description, /(?:进入|进了) GitHub Trending Top 10/);
     assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
   }
 });
@@ -8793,6 +8945,7 @@ async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
   await fs.mkdir(path.join(tmp, "config"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "prompts", "ai-daily", "modules"), { recursive: true });
   await fs.mkdir(path.join(tmp, "scripts"), { recursive: true });
   await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
 
@@ -8846,6 +8999,8 @@ async function createHarnessFixture(options = {}) {
     [
       "# Daily Publish Runbook",
       "",
+      "唯一权威资产：`prompts/ai-daily/modules/editorial-authority.md`",
+      "",
       "## Preflight",
       "## Source Discovery",
       "## Report Write",
@@ -8867,6 +9022,7 @@ async function createHarnessFixture(options = {}) {
     [
       "# Daily Publish Task",
       "",
+      "`prompts/ai-daily/modules/editorial-authority.md`",
       "YYYY-MM-DD",
       "Asia/Shanghai",
       "Real publish requires explicit confirmation",
@@ -8895,6 +9051,10 @@ async function createHarnessFixture(options = {}) {
       ""
     ].join("\n"),
     "utf8"
+  );
+  await fs.copyFile(
+    path.join(rootDir, "prompts", "ai-daily", "modules", "editorial-authority.md"),
+    path.join(tmp, "prompts", "ai-daily", "modules", "editorial-authority.md")
   );
   await fs.copyFile(path.join(rootDir, "scripts", "harness-validate.mjs"), path.join(tmp, "scripts", "harness-validate.mjs"));
   await fs.writeFile(

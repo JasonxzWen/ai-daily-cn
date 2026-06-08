@@ -1398,23 +1398,38 @@ body.lightbox-open {
 }
 
 .community-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   align-items: stretch;
 }
 
 .community-card {
   grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-areas:
+    "community-title"
+    "community-tags"
+    "community-body";
+  gap: 8px 18px;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
+.community-card:has(.card-media-grid) {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-areas:
+    "community-title community-media"
+    "community-tags community-media"
+    "community-body community-media";
+  align-items: start;
+}
+
 .community-card h3 {
+  grid-area: community-title;
   display: flex;
   gap: 8px;
   align-items: center;
   margin: 0;
+  min-width: 0;
 }
 
 .community-card .card-title-icon {
@@ -1434,25 +1449,30 @@ body.lightbox-open {
 }
 
 .community-card .card-tags {
+  grid-area: community-tags;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
 .community-card > p {
+  grid-area: community-body;
+  margin: 0;
   color: #25231f;
-  line-height: 1.62;
+  font-size: 15px;
+  line-height: 1.68;
 }
 
-.community-card .card-detail-list {
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+.community-card .card-media-grid {
+  grid-area: community-media;
+  min-width: 0;
+  align-self: start;
 }
 
-.community-card .card-detail-list div {
-  padding-top: 0;
-  border-top: 0;
+.community-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
 }
 
 @media (max-width: 760px) {
@@ -1486,6 +1506,27 @@ body.lightbox-open {
       "builder-media"
       "builder-body"
       "builder-details";
+  }
+
+  .community-card,
+  .community-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-media"
+      "community-body";
+  }
+
+  .community-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-body";
+  }
+
+  .community-card .card-media-grid img {
+    object-fit: contain;
   }
 
   .tracking-card {
@@ -2573,7 +2614,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 </head>
 <body>
   <main class="report-shell">
-    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-01 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-01 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
       <div class="title-row">
         <div>
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-30 至 2026-06-01</div>
@@ -2587,7 +2628,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>10</strong><small>重点条目</small></div>
 <div class="hero-stat"><span>AIGC</span><strong>7</strong><small>产品/内容</small></div>
-<div class="hero-stat"><span>技术博客</span><strong>3</strong><small>深读</small></div>
+<div class="hero-stat"><span>热门博客</span><strong>3</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>3</strong><small>观察</small></div>
 <div class="hero-stat"><span>覆盖</span><strong>05-30..06-01</strong><small>扩展时间范围</small></div>
@@ -2825,7 +2866,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>github.blog</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>模型可用性：Claude Opus 4.8 在 GitHub Copilot 中 GA 属于产品入口可用性更新，本轮从…</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
 

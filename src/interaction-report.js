@@ -307,11 +307,11 @@ function isProcessStatusSummary(summary) {
 
 function dailyIntent(report) {
   return {
-    audience: "普通工程师：有技术能力，关注 AI 行业内模型、公司、工具、产品、开源项目、观点和社区讨论。",
-    primaryQuestion: `${report.report_date} 有哪些值得普通工程师跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
+    audience: "内容、产品、平台、策略与工程的一线从业者，关注 AI 行业内模型、公司、工具、产品、开源项目、观点和社区讨论。",
+    primaryQuestion: `${report.report_date} 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？`,
     decision: "事实主线只保留可回溯的一手、官方、论文、GitHub 或多源确认条目；观点和社区线索必须披露来源层级与风险。",
     successCriteria: [
-      "主体信息解释为什么重要或与工程师的关系",
+      "主体信息解释它与内容、产品、平台、策略或工程判断的关系",
       "观点、播客、社区讨论和产品雷达承载高密度但标明来源风险",
       "HTML 保留结构化导航、卡片、证据图片和 source_audit 附录",
       "结构化 JSON 可回溯到候选池与核验状态"
@@ -325,7 +325,7 @@ function dailyHeroStats(report, collections) {
   const aigcCount = countAigcSignals(collections);
   const stats = [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "技术博客", value: String(collections.hotBlogs.length), detail: "深读" },
+    { label: "热门博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
     {
@@ -1426,6 +1426,28 @@ function stripPublicBodySourcePrefix(value, item = {}) {
     .trim();
 }
 
+function stripCommunityLeadFallbackBoilerplate(value, item = {}) {
+  let text = String(value || "").trim();
+  if (!text) {
+    return "";
+  }
+  for (const source of publicBodySourceLabels(item)) {
+    text = stripPublicBodyExactSourcePrefix(text, source);
+  }
+  const verificationNote = String(item?.verification_note || "").trim();
+  if (verificationNote) {
+    text = text.replace(verificationNote, "").trim();
+  }
+  return text
+    .replace(/\s*。?\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
+    .replace(/\s*(?:待确认|边界)\s*[：:][^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/[；;]?\s*当前作为[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/[；;]?\s*等待官方[^。；;\n]*(?:确认|核实|产品页确认)?[。；;]?/g, "")
+    .replace(/\s*中介来源[^。；;\n]*(?:[。；;]|$)/g, "")
+    .replace(/\s*事实性结论需要一手或多源确认[。；;]?/g, "")
+    .trim();
+}
+
 function stripPublicBodyExactSourcePrefix(value, source) {
   const text = String(value || "").trim();
   const sourceText = String(source || "").trim();
@@ -1436,6 +1458,12 @@ function stripPublicBodyExactSourcePrefix(value, source) {
   return text
     .replace(new RegExp(`^(?:\\*\\*)?${escapedSource}(?:\\*\\*)?\\s*[：:]\\s*`, "i"), "")
     .trim() || text;
+}
+
+function stripSentenceEnding(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[。！？!?；;:：]+$/u, "");
 }
 
 function publicBodySourceLabels(item = {}) {
@@ -1570,10 +1598,51 @@ function formatCommunityLeadCards(items, context = {}) {
   }).filter(Boolean);
 }
 
+function summarizeCommunityLeadBody(text, title) {
+  const originalBody = String(text || "").trim();
+  if (!originalBody) {
+    return "";
+  }
+  let body = originalBody;
+  if (title && body.startsWith(title)) {
+    body = body.slice(title.length).replace(/^[，,；;：:\s]+/u, "").trim();
+  }
+  const sentences = body
+    .split(/(?<=[。！？!?；;])\s*/u)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (sentences.length === 0) {
+    return trimText(originalBody, 160);
+  }
+  const picked = [];
+  let visibleLength = 0;
+  for (const sentence of sentences) {
+    picked.push(sentence);
+    visibleLength += sentence.length;
+    if (picked.length >= 2 || visibleLength >= 140) {
+      break;
+    }
+  }
+  return trimText(picked.join(" "), 160);
+}
+
 function communityLeadBody(item) {
-  const body = stripPublicBodySourcePrefix(item?.content || "", item);
-  const firstSentence = body.split(/(?<=[。！？!?；;])\s*/u).find(Boolean) || body;
-  return trimText(firstSentence, 120);
+  const primaryBody = stripPublicBodySourcePrefix(item?.content || "", item);
+  const rawBody = String(item?.content || "").trim();
+  if (!primaryBody && !rawBody) {
+    return "";
+  }
+  const title = stripSentenceEnding(stripPublicBodySourcePrefix(communityLeadTitle(item), item));
+  const summarizedPrimaryBody = summarizeCommunityLeadBody(primaryBody, title);
+  if (isReaderFacingChineseBody(summarizedPrimaryBody)) {
+    return summarizedPrimaryBody;
+  }
+  const fallbackBody = stripCommunityLeadFallbackBoilerplate(rawBody, item);
+  const summarizedFallbackBody = summarizeCommunityLeadBody(fallbackBody, title);
+  if (summarizedFallbackBody) {
+    return summarizedFallbackBody;
+  }
+  return summarizedPrimaryBody || trimText(primaryBody || rawBody, 160);
 }
 
 function isReaderFacingChineseBody(value) {
@@ -1590,6 +1659,32 @@ function isReaderFacingChineseBody(value) {
   return chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
 }
 
+function shouldPreferCommunityLeadBodyTitle(title, fallbackTitle) {
+  if (!fallbackTitle) {
+    return false;
+  }
+  const text = String(title || "").replace(/https?:\/\/\S+/gi, "").trim();
+  if (!text) {
+    return true;
+  }
+  const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (text.match(/[A-Za-z]/g) || []).length;
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+  const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{40,}/.test(text);
+  return chineseChars < 8 && (longEnglishRun || chineseRatio < 0.2);
+}
+
+function communityLeadBodyTitle(item) {
+  const body = stripPublicBodySourcePrefix(item?.content || "", item);
+  if (!isReaderFacingChineseBody(body)) {
+    return "";
+  }
+  const firstSentence = body.split(/(?<=[。！？!?；;])\s*/u).find(Boolean) || body;
+  const firstClause = firstSentence.split(/[；;。！？!?]/u).find(Boolean) || firstSentence;
+  return stripSentenceEnding(trimText(firstClause, 60));
+}
+
 function formatNestedEditorialDetails(item) {
   return editorialBullets(item)
     .map((bullet) => `  - ${bullet}`)
@@ -1597,13 +1692,20 @@ function formatNestedEditorialDetails(item) {
 }
 
 function communityLeadTitle(item) {
-  const title = String(item?.title || "").trim();
+  const title = stripPublicBodySourcePrefix(item?.title || "", item);
+  const bodyTitle = communityLeadBodyTitle(item);
+  if (shouldPreferCommunityLeadBodyTitle(title, bodyTitle)) {
+    return bodyTitle;
+  }
   if (title) {
     return title;
   }
   const source = String(item?.source || item?.publisher || "").trim();
   if (source) {
     return source;
+  }
+  if (bodyTitle) {
+    return bodyTitle;
   }
   try {
     return new URL(String(item?.url || "")).hostname.replace(/^www\./, "");

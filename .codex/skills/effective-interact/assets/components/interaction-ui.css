@@ -1389,23 +1389,38 @@ body.lightbox-open {
 }
 
 .community-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   align-items: stretch;
 }
 
 .community-card {
   grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-areas:
+    "community-title"
+    "community-tags"
+    "community-body";
+  gap: 8px 18px;
   border-color: #d7dce5;
   background: #ffffff;
 }
 
+.community-card:has(.card-media-grid) {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-areas:
+    "community-title community-media"
+    "community-tags community-media"
+    "community-body community-media";
+  align-items: start;
+}
+
 .community-card h3 {
+  grid-area: community-title;
   display: flex;
   gap: 8px;
   align-items: center;
   margin: 0;
+  min-width: 0;
 }
 
 .community-card .card-title-icon {
@@ -1425,25 +1440,30 @@ body.lightbox-open {
 }
 
 .community-card .card-tags {
+  grid-area: community-tags;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
 .community-card > p {
+  grid-area: community-body;
+  margin: 0;
   color: #25231f;
-  line-height: 1.62;
+  font-size: 15px;
+  line-height: 1.68;
 }
 
-.community-card .card-detail-list {
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+.community-card .card-media-grid {
+  grid-area: community-media;
+  min-width: 0;
+  align-self: start;
 }
 
-.community-card .card-detail-list div {
-  padding-top: 0;
-  border-top: 0;
+.community-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
 }
 
 @media (max-width: 760px) {
@@ -1477,6 +1497,27 @@ body.lightbox-open {
       "builder-media"
       "builder-body"
       "builder-details";
+  }
+
+  .community-card,
+  .community-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-media"
+      "community-body";
+  }
+
+  .community-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-body";
+  }
+
+  .community-card .card-media-grid img {
+    object-fit: contain;
   }
 
   .tracking-card {

@@ -59,6 +59,22 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Public report should not render deprecated model/project sections.",
       { forbidden_hits: forbiddenHits }
     );
+    const bodyText = document.body.textContent?.replace(/\s+/g, " ").trim() || "";
+    const legacyPublicHits = [
+      "技不止术",
+      "热门技术博客",
+      "变化：",
+      "落点：",
+      "为什么重要：",
+      "判断点：",
+      "watch_next"
+    ].filter((item) => bodyText.includes(item));
+    addCheck(
+      "legacy_public_copy_absent",
+      legacyPublicHits.length === 0,
+      "Public page should not expose legacy section labels or template copy such as 技不止术 / 热门技术博客 / 变化： / 落点：.",
+      { hits: legacyPublicHits }
+    );
     addCheck(
       "inline_highlights_rendered",
       document.querySelectorAll(".text-keyword, .text-highlight, .keyword-major, .keyword-notable, .keyword-general, .daily-tag, .tag-highlight, .tag-stars, .tag-topic, .tag-major, .tag-notable, .tag-general").length > 0,
@@ -270,6 +286,43 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       weakCommunityCards.length === 0,
       "Community cards should render Chinese reader-facing summaries, not raw English excerpts.",
       { weak_cards: weakCommunityCards }
+    );
+    const communityGrid = document.querySelector(".community-card-grid");
+    const communityCards = Array.from(document.querySelectorAll(".community-card"));
+    const communityGridColumns = communityGrid ? getComputedStyle(communityGrid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean) : [];
+    const narrowViewport = window.innerWidth <= 760;
+    const weakCommunityLayoutCards = communityCards
+      .map((card, index) => {
+        const media = card.querySelector(".card-media-grid");
+        if (!media) {
+          return null;
+        }
+        const styles = getComputedStyle(card);
+        const columns = styles.gridTemplateColumns.trim().split(/\s+/).filter(Boolean);
+        const titleRect = card.querySelector("h3")?.getBoundingClientRect();
+        const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
+        const mediaRect = media.getBoundingClientRect();
+        const ok = narrowViewport
+          ? columns.length === 1 && Boolean(titleRect && bodyRect && Math.abs(bodyRect.left - titleRect.left) < 8 && Math.abs(mediaRect.left - titleRect.left) < 8)
+          : columns.length === 2 && Boolean(titleRect && bodyRect && mediaRect.left > bodyRect.left + 120);
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              columns,
+              viewport: window.innerWidth
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "community_cards_news_stream",
+      communityCards.length === 0 || (communityGridColumns.length === 1 && weakCommunityLayoutCards.length === 0),
+      "Community leads should render as a single-column news stream, and cards with images should use a text-left / image-right row layout on desktop then collapse on mobile.",
+      {
+        grid_columns: communityGridColumns,
+        weak_cards: weakCommunityLayoutCards
+      }
     );
     const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
       .map((card, index) => {

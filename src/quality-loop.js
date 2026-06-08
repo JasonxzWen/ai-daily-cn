@@ -36,14 +36,15 @@ const HOT_BLOG_MIN_CHINESE_CHARS = 60;
 const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_MAX_LATIN_CHARS = 90;
 const MAIN_ITEM_GENERIC_TEMPLATE_RE = /(?:重点看|如果你在评估新工具|值不值得试|何时接入|风险放在哪|决策信号)/u;
+const PUBLIC_TITLE_MAX_LATIN_CHARS = 24;
 const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
 const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
   /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
-const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对)/u;
-const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:读者可关注官方说明|直译待补)/u;
+const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对|目前最需要补看的信息是|可先关注适用对象、落地边界和后续变化|进入 GitHub Trending Top 10，可作为|读者可用它快速判断|先核对[^。；;\n]*再判断是否值得进入主体跟进|要核对|适合[^。；;\n]{0,24}(?:判断|试水))/u;
+const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补)/u;
 const PUBLIC_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
 const PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
 
@@ -327,7 +328,7 @@ function collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks) {
 }
 
 function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
-  if (!/^(main_items\[\d+\]\.bullets\[\d+\]|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.summary|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:summary|bullets\[\d+\])|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.summary|github_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   if (!PUBLIC_TEMPLATE_BODY_RE.test(String(entry.value || ""))) {
@@ -416,20 +417,27 @@ function publicSourceLabelsForPath(report, pathName) {
 }
 
 function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
-  if (!/^(hero_highlights|builder_observations|community_leads)\[\d+\]\.(?:title|reason|content|translation)$/.test(entry.path)) {
+  if (!/^(summary|hero_highlights\[\d+\]\.(?:title|reason)|main_items\[\d+\]\.title|hot_blogs\[\d+\]\.title|builder_observations\[\d+\]\.(?:title|content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
-  if (!plain || !looksLikeUntranslatedEnglish(plain)) {
+  if (!plain) {
     return;
   }
+  const looksEnglish = looksLikeUntranslatedEnglish(plain);
   const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
   const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
-  if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS) {
-    return;
-  }
+  const titleLikePath = /\.(?:title)$/.test(entry.path);
+  const maxLatinChars = titleLikePath ? PUBLIC_TITLE_MAX_LATIN_CHARS : entry.path === "summary" ? 48 : MAIN_ITEM_MAX_LATIN_CHARS;
   const ratioBase = chineseChars + latinChars;
   const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
+  const englishTitleOnly = titleLikePath && chineseChars === 0 && latinChars >= 10;
+  if (!englishTitleOnly && latinChars <= maxLatinChars && !looksEnglish) {
+    return;
+  }
+  if (!englishTitleOnly && chineseRatio >= MAIN_ITEM_MIN_CHINESE_RATIO && !looksEnglish) {
+    return;
+  }
   issues.push({
     code: "public_text_untranslated",
     severity: "error",
@@ -515,6 +523,7 @@ function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
 
 function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
   const entries = [
+    { path: `main_items[${index}].title`, value: item?.title, maxLatinChars: PUBLIC_TITLE_MAX_LATIN_CHARS },
     { path: `main_items[${index}].summary`, value: item?.summary },
     ...(Array.isArray(item?.bullets) ? item.bullets.map((value, bulletIndex) => ({
       path: `main_items[${index}].bullets[${bulletIndex}]`,
@@ -529,40 +538,29 @@ function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
     }
     const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
     const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+    const titleLikePath = entry.path.endsWith(".title");
+    const maxLatinChars = entry.maxLatinChars || MAIN_ITEM_MAX_LATIN_CHARS;
     const ratioBase = chineseChars + latinChars;
     const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
-    if (latinChars <= MAIN_ITEM_MAX_LATIN_CHARS && !looksLikeUntranslatedEnglish(plain)) {
-      if (MAIN_ITEM_GENERIC_TEMPLATE_RE.test(plain)) {
-        issues.push({
-          code: "main_item_template_bullet",
-          severity: "error",
-          path: entry.path,
-          message: "Main item public bullets must summarize disclosed facts, not generic reader-guidance phrases such as 重点看 or 值不值得试.",
-          repairable: false
-        });
-        aiReviewTasks.push({
-          kind: "main_item_editorial_rewrite",
-          path: entry.path,
-          instruction: "Rewrite this main item text in Chinese using concrete disclosed facts. Remove generic reader-guidance phrases such as 重点看, 值不值得试, or 决策信号."
-        });
-      }
+    if (MAIN_ITEM_GENERIC_TEMPLATE_RE.test(plain)) {
+      issues.push({
+        code: "main_item_template_bullet",
+        severity: "error",
+        path: entry.path,
+        message: "Main item public bullets must summarize disclosed facts, not generic reader-guidance phrases such as 重点看 or 值不值得试.",
+        repairable: false
+      });
+      aiReviewTasks.push({
+        kind: "main_item_editorial_rewrite",
+        path: entry.path,
+        instruction: "Rewrite this main item text in Chinese using concrete disclosed facts. Remove generic reader-guidance phrases such as 重点看, 值不值得试, or 决策信号."
+      });
+    }
+    const englishTitleOnly = titleLikePath && chineseChars === 0 && latinChars >= 10;
+    if (!englishTitleOnly && latinChars <= maxLatinChars && !looksLikeUntranslatedEnglish(plain)) {
       continue;
     }
-    if (chineseRatio >= MAIN_ITEM_MIN_CHINESE_RATIO && !looksLikeUntranslatedEnglish(plain)) {
-      if (MAIN_ITEM_GENERIC_TEMPLATE_RE.test(plain)) {
-        issues.push({
-          code: "main_item_template_bullet",
-          severity: "error",
-          path: entry.path,
-          message: "Main item public bullets must summarize disclosed facts, not generic reader-guidance phrases such as 重点看 or 值不值得试.",
-          repairable: false
-        });
-        aiReviewTasks.push({
-          kind: "main_item_editorial_rewrite",
-          path: entry.path,
-          instruction: "Rewrite this main item text in Chinese using concrete disclosed facts. Remove generic reader-guidance phrases such as 重点看, 值不值得试, or 决策信号."
-        });
-      }
+    if (!englishTitleOnly && chineseRatio >= MAIN_ITEM_MIN_CHINESE_RATIO && !looksLikeUntranslatedEnglish(plain)) {
       continue;
     }
     issues.push({
