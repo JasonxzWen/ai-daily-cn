@@ -1191,6 +1191,16 @@ function builderOriginalText(item) {
 }
 
 function formatBuilderMedia(report, item) {
+  const matchingAssets = Array.isArray(report?.evidence_assets)
+    ? report.evidence_assets.filter((asset) =>
+      normalizeEvidenceUrl(asset?.source_url) === normalizeEvidenceUrl(item?.url)
+    )
+    : [];
+  const localMedia = formatCardMedia(report, matchingAssets, { limit: 2 });
+  if (localMedia.length > 0) {
+    return localMedia;
+  }
+
   const media = [];
   if (item?.image_url) {
     media.push({
@@ -1206,24 +1216,7 @@ function formatBuilderMedia(report, item) {
       caption: item.image_alt || "原帖图片"
     });
   }
-  for (const asset of Array.isArray(report?.evidence_assets) ? report.evidence_assets : []) {
-    if (asset?.source_url !== item?.url || !asset?.local_path) {
-      continue;
-    }
-    const src = relativeAssetHref(report.html_path, asset.local_path);
-    if (!src) {
-      continue;
-    }
-    media.push({
-      src,
-      alt: asset.caption || asset.title || `${item.author || "Builder"} 原帖图片`,
-      caption: evidenceCaption(asset)
-    });
-  }
-  const seen = new Set();
-  return media
-    .filter((entry) => entry.src && !seen.has(entry.src) && seen.add(entry.src))
-    .slice(0, 2);
+  return normalizePublicMedia(media, 2);
 }
 
 function builderHandle(item) {
@@ -1335,24 +1328,23 @@ function formatCardMedia(report, assets, options = {}) {
 
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
 
-  return assets
+  return normalizePublicMedia(assets
     .filter((asset) => asset?.local_path)
-    .slice(0, limit)
     .map((asset) => ({
       src: relativeAssetHref(report.html_path, asset.local_path),
       alt: asset.title || "",
       caption: evidenceCaption(asset)
-    }));
+    })), limit);
 }
 
 function formatCardMediaForItem(report, item, assets, options = {}) {
   const localMedia = formatCardMedia(report, assets, options);
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
-  if (localMedia.length >= limit) {
+  if (localMedia.length > 0) {
     return localMedia;
   }
 
-  const media = [...localMedia];
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
+  const media = [];
   if (item?.image_url) {
     media.push({
       src: item.image_url,
@@ -1368,10 +1360,35 @@ function formatCardMediaForItem(report, item, assets, options = {}) {
     });
   }
 
+  return normalizePublicMedia(media, limit);
+}
+
+function normalizePublicMedia(entries, limit) {
   const seen = new Set();
-  return media
-    .filter((entry) => entry?.src && !seen.has(entry.src) && seen.add(entry.src))
+  return entries
+    .filter((entry) => {
+      const src = String(entry?.src || "").trim();
+      if (!isPublicRenderableMediaSrc(src) || seen.has(src)) {
+        return false;
+      }
+      seen.add(src);
+      return true;
+    })
     .slice(0, limit);
+}
+
+function isPublicRenderableMediaSrc(src) {
+  const value = String(src || "").trim();
+  if (!value) {
+    return false;
+  }
+  if (/^data:/i.test(value)) {
+    return true;
+  }
+  if (/^(?:https?:)?\/\//i.test(value)) {
+    return false;
+  }
+  return true;
 }
 
 function hotBlogTags(item) {

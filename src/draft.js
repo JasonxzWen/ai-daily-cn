@@ -86,8 +86,9 @@ export async function generateReportDraft(options = {}) {
       rootDir,
       reportDate,
       outDir: options.evidenceOutDir || options.outDir || "docs",
-      maxAssets: options.maxEvidenceAssets || 3,
+      maxAssets: options.maxEvidenceAssets,
       candidates: candidatePool.candidates.filter((candidate) => candidate.status === "included"),
+      existingEvidenceAssets: merged.evidence_assets,
       fetchImpl: options.fetchImpl
     });
   const sourceAudit = updateAuditIncludedCounts(merged.sourceAudit, selection.candidates);

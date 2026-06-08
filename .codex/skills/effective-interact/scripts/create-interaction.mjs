@@ -1304,7 +1304,7 @@ function renderCardVisuals(item) {
 
 function renderCardMedia(media) {
   const items = Array.isArray(media)
-    ? media.filter((item) => item && item.src).slice(0, 2)
+    ? media.filter((item) => item && item.src).slice(0, 5)
     : [];
   if (items.length === 0) {
     return "";

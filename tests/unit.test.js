@@ -1056,6 +1056,16 @@ test("builder interaction section renders translated Twitter-style cards and omi
       evidence: "Original X URL was collected from follow-builders central feed on 2026-05-15."
     }
   ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Builder thread screenshot",
+      source_url: "https://example.com/builder-post",
+      local_path: "assets/evidence/builder-post.png",
+      caption: "Cached Builder post image.",
+      extraction_status: "source_image"
+    }
+  ];
   report.self_check.builder_observations = 1;
 
   const input = reportToInteractionInput(report);
@@ -1068,7 +1078,8 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert.equal(section.items[0].subtitle, "@examplebuilder");
   assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
   assert(section.items[0].points.some((point) => point.label === "原文" && point.value.includes("unattended work")));
-  assert.equal(section.items[0].media[0].src, "https://example.com/builder-post.png");
+  assert.equal(section.items[0].media.length, 1);
+  assert(section.items[0].media[0].src.endsWith("assets/evidence/builder-post.png"));
   assert(!section.items[0].points.some((point) => point.label === "账号"));
   assert(!JSON.stringify(section).includes("Original X URL was collected"));
   assert(!JSON.stringify(section).includes("证据："));
@@ -1172,6 +1183,16 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
       image_alt: "OpenAI super app illustration"
     }
   ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "OpenAI super app illustration",
+      source_url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      local_path: "assets/evidence/openai-super-app.png",
+      caption: "Cached community illustration.",
+      extraction_status: "source_image"
+    }
+  ];
 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.title === "社区线索");
@@ -1182,7 +1203,69 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   assert.equal(section.items.length, 1);
   assert.equal(section.items[0].title, "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用");
   assert.match(section.items[0].body, /这些入口会不会继续往同一个应用里收/);
-  assert.equal(section.items[0].media[0].src, "https://example.com/super-app.png");
+  assert.equal(section.items[0].media.length, 1);
+  assert(section.items[0].media[0].src.endsWith("assets/evidence/openai-super-app.png"));
+});
+
+test("public card media prefers local evidence assets and drops remote fallbacks", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hot_blogs = [
+    {
+      ...report.hot_blogs[0],
+      image_url: "https://example.com/blog-cover.png",
+      image_alt: "Blog cover"
+    }
+  ];
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      handle: "examplebuilder",
+      role: "maintainer",
+      original_text: "Coding agents need eval loops before unattended work.",
+      translation: "Coding agent 在无人值守工作之前需要 eval loops。",
+      content: "Coding agent 在无人值守工作之前需要 eval loops。",
+      url: "https://example.com/builder-post",
+      event_date: "2026-05-15",
+      source: "follow-builders X feed",
+      image_url: "https://example.com/builder-post.png",
+      image_alt: "Builder thread screenshot"
+    }
+  ];
+  report.community_leads = [
+    {
+      title: "OpenAI is still working on that ‘super app’",
+      content: "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用；讨论焦点在于这些入口会不会继续往同一个应用里收。",
+      url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      source: "TechCrunch AI",
+      event_date: "2026-06-08",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "中介来源，仅作社区观察。",
+      image_url: "https://example.com/community-cover.png",
+      image_alt: "Community cover"
+    }
+  ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Harness architecture",
+      source_url: report.hot_blogs[0].url,
+      local_path: "assets/evidence/harness-architecture.png",
+      caption: "Original blog architecture diagram.",
+      extraction_status: "source_image"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const hotBlogsSection = input.sections.find((section) => section.cardClass === "blog-card");
+  const builderSection = input.sections.find((section) => section.cardClass === "builder-card");
+  const communitySection = input.sections.find((section) => section.cardClass === "community-card");
+
+  assert.equal(hotBlogsSection.items[0].media.length, 1);
+  assert(hotBlogsSection.items[0].media[0].src.endsWith("assets/evidence/harness-architecture.png"));
+  assert(!JSON.stringify(hotBlogsSection.items[0].media).includes("https://example.com/blog-cover.png"));
+  assert.equal(builderSection.items[0].media?.length || 0, 0);
+  assert.equal(communitySection.items[0].media?.length || 0, 0);
 });
 
 test("AIGC hero stat counts Chinese signals and omits zero-value cards", async () => {
@@ -6689,6 +6772,136 @@ test("evidence cache downloads image_url candidates into local evidence assets",
   assert.equal(result.assets[0].source_url, "https://runwayml.com/en/changelog/example");
   assert.match(result.assets[0].local_path, /^assets\/evidence\/runway-video-model-update-2026-05-26\.png$/);
   assert.equal(await exists(path.join(tmp, "docs", result.assets[0].local_path)), true);
+});
+
+test("evidence cache skips sources that already have local evidence and backfills remaining public images", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-cache-existing-"));
+  const result = await cacheEvidenceImages({
+    rootDir: tmp,
+    reportDate: "2026-05-26",
+    outDir: "docs",
+    existingEvidenceAssets: [
+      {
+        source_url: "https://example.com/blog-already-covered",
+        local_path: "assets/evidence/already-covered.png"
+      }
+    ],
+    candidates: [
+      {
+        id: "already-covered",
+        title: "Blog already covered",
+        url: "https://example.com/blog-already-covered",
+        source: "Covered source",
+        status: "included",
+        included_in: "hot_blogs",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/already-covered.png",
+        image_alt: "Already covered"
+      },
+      {
+        id: "community-image",
+        title: "Community image worth caching",
+        url: "https://example.com/community-image",
+        source: "Community source",
+        status: "included",
+        included_in: "community_leads",
+        verification_status: "intermediary_only",
+        image_url: "https://example.com/community-image.png",
+        image_alt: "Community image"
+      }
+    ],
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([["content-type", "image/png"]]),
+      arrayBuffer: async () => Buffer.alloc(256, 7)
+    })
+  });
+
+  assert.equal(result.assets.length, 1);
+  assert.equal(result.assets[0].source_url, "https://example.com/community-image");
+  assert.match(result.assets[0].local_path, /^assets\/evidence\/community-image-worth-caching-2026-05-26\.png$/);
+});
+
+test("evidence cache preserves a community image slot when hot blogs would otherwise take every new asset", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-cache-community-quota-"));
+  const result = await cacheEvidenceImages({
+    rootDir: tmp,
+    reportDate: "2026-05-26",
+    outDir: "docs",
+    maxAssets: 4,
+    candidates: [
+      {
+        id: "main-image",
+        title: "Main image",
+        url: "https://example.com/main-image",
+        source: "Primary main source",
+        status: "included",
+        included_in: "main_items",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/main-image.png",
+        image_alt: "Main image"
+      },
+      {
+        id: "hot-blog-1",
+        title: "Hot blog one",
+        url: "https://example.com/hot-blog-1",
+        source: "Hot blog one",
+        status: "included",
+        included_in: "hot_blogs",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/hot-blog-1.png",
+        image_alt: "Hot blog one"
+      },
+      {
+        id: "hot-blog-2",
+        title: "Hot blog two",
+        url: "https://example.com/hot-blog-2",
+        source: "Hot blog two",
+        status: "included",
+        included_in: "hot_blogs",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/hot-blog-2.png",
+        image_alt: "Hot blog two"
+      },
+      {
+        id: "hot-blog-3",
+        title: "Hot blog three",
+        url: "https://example.com/hot-blog-3",
+        source: "Hot blog three",
+        status: "included",
+        included_in: "hot_blogs",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/hot-blog-3.png",
+        image_alt: "Hot blog three"
+      },
+      {
+        id: "community-priority",
+        title: "Community image should stay visible",
+        url: "https://example.com/community-priority",
+        source: "Community source",
+        status: "included",
+        included_in: "community_leads",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/community-priority.png",
+        image_alt: "Community priority"
+      }
+    ],
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([["content-type", "image/png"]]),
+      arrayBuffer: async () => Buffer.alloc(256, 7)
+    })
+  });
+
+  assert.equal(result.assets.length, 4);
+  assert(result.assets.some((asset) => asset.source_url === "https://example.com/main-image"));
+  assert(result.assets.some((asset) => asset.source_url === "https://example.com/community-priority"));
+  assert.equal(
+    result.assets.filter((asset) => asset.source_url.startsWith("https://example.com/hot-blog-")).length,
+    2
+  );
 });
 
 test("content source discovery uses cache fallback for blocked arXiv or Reddit sources", async () => {

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { normalizeUrlIdentity } from "./url.js";
 
-const DEFAULT_MAX_ASSETS = 3;
+const DEFAULT_MAX_ASSETS = 4;
 const DEFAULT_PUBLIC_PREFIX = "assets/evidence";
 const IMAGE_EXTENSIONS = new Map([
   ["image/jpeg", ".jpg"],
@@ -19,10 +19,15 @@ export async function cacheEvidenceImages(options = {}) {
   const maxAssets = positiveInt(options.maxAssets, DEFAULT_MAX_ASSETS);
   const outDir = path.resolve(rootDir, options.outDir || "docs");
   const publicPrefix = options.publicPrefix || DEFAULT_PUBLIC_PREFIX;
+  const existingSourceUrls = new Set(
+    (Array.isArray(options.existingEvidenceAssets) ? options.existingEvidenceAssets : [])
+      .map((asset) => normalizeUrl(asset?.source_url))
+      .filter(Boolean)
+  );
   const candidates = Array.isArray(options.candidates)
     ? options.candidates
     : await readCandidatePoolCandidates(rootDir, options.candidatePoolPath, reportDate);
-  const selected = selectImageCandidates(candidates, maxAssets);
+  const selected = selectImageCandidates(candidates, maxAssets, existingSourceUrls);
   const assets = [];
   const skipped = [];
 
@@ -77,10 +82,11 @@ export async function cacheEvidenceImages(options = {}) {
   return { assets, skipped };
 }
 
-function selectImageCandidates(candidates, maxAssets) {
+function selectImageCandidates(candidates, maxAssets, existingSourceUrls = new Set()) {
   const seenUrls = new Set();
-  return candidates
+  const ranked = candidates
     .filter((candidate) => candidate?.image_url && candidate?.url)
+    .filter((candidate) => !existingSourceUrls.has(normalizeUrl(candidate.url)))
     .filter((candidate) => {
       const key = normalizeUrl(candidate.url);
       if (!key || seenUrls.has(key)) {
@@ -89,8 +95,39 @@ function selectImageCandidates(candidates, maxAssets) {
       seenUrls.add(key);
       return true;
     })
-    .sort((left, right) => candidateImageScore(right) - candidateImageScore(left))
-    .slice(0, maxAssets);
+    .sort((left, right) => candidateImageScore(right) - candidateImageScore(left));
+
+  const selected = [];
+  const selectedUrls = new Set();
+
+  // Keep at least one image slot for each major public section when candidates exist.
+  for (const section of ["main_items", "hot_blogs", "community_leads"]) {
+    if (selected.length >= maxAssets) {
+      break;
+    }
+    const candidate = ranked.find((item) =>
+      item.included_in === section && !selectedUrls.has(normalizeUrl(item.url))
+    );
+    if (!candidate) {
+      continue;
+    }
+    selected.push(candidate);
+    selectedUrls.add(normalizeUrl(candidate.url));
+  }
+
+  for (const candidate of ranked) {
+    if (selected.length >= maxAssets) {
+      break;
+    }
+    const key = normalizeUrl(candidate.url);
+    if (!key || selectedUrls.has(key)) {
+      continue;
+    }
+    selected.push(candidate);
+    selectedUrls.add(key);
+  }
+
+  return selected;
 }
 
 function candidateImageScore(candidate) {
@@ -98,6 +135,7 @@ function candidateImageScore(candidate) {
   if (candidate.status === "included") score += 20;
   if (candidate.included_in === "main_items") score += 16;
   if (candidate.included_in === "hot_blogs") score += 8;
+  if (candidate.included_in === "community_leads") score += 7;
   if (candidate.included_in === "projects") score += 6;
   if (candidate.verification_status === "primary_confirmed") score += 10;
   if (candidate.verification_status === "multi_source_confirmed") score += 8;

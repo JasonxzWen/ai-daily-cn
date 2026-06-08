@@ -251,7 +251,7 @@ try {
       outputPath,
       candidateOutputPath,
       evidenceOutDir: args["evidence-out"] || "docs",
-      maxEvidenceAssets: Number.parseInt(args["max-evidence-assets"] || "3", 10),
+      maxEvidenceAssets: args["max-evidence-assets"] ? Number.parseInt(args["max-evidence-assets"], 10) : undefined,
       cacheEvidence: args["no-evidence-cache"] !== true
     });
     printJson({

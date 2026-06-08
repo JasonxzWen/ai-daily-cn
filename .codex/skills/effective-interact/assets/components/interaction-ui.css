@@ -884,8 +884,14 @@ p.hero-summary-text {
   gap: 10px;
 }
 
-.card-media-grid[data-count="2"] {
+.card-media-grid[data-count="2"],
+.card-media-grid[data-count="3"],
+.card-media-grid[data-count="4"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-media-grid[data-count="5"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .card-media-grid figure {
@@ -1541,7 +1547,10 @@ body.lightbox-open {
   }
 
   .project-card .card-detail-list,
-  .card-media-grid[data-count="2"] {
+  .card-media-grid[data-count="2"],
+  .card-media-grid[data-count="3"],
+  .card-media-grid[data-count="4"],
+  .card-media-grid[data-count="5"] {
     grid-template-columns: 1fr;
   }
 }
