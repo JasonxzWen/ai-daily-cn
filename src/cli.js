@@ -395,6 +395,28 @@ try {
       ok: true,
       ...result
     });
+  } else if (isPlatformDiscoverCommand(command)) {
+    const platform = platformDiscoverCommandPlatform(command);
+    const args = parseArgs(argv);
+    const positionalNumbers = positiveIntegers(argv);
+    const result = await collectContentSources({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      platformExempt: platform,
+      sourcesPath: args.sources || path.join("config", "sources", `${platform}-platform-sources.json`),
+      enablement: args.enablement || firstEnablement(argv) || "manual,core,optional",
+      includeWeChatInput: false,
+      limit: Number.parseInt(args.limit || positionalNumbers[0] || "20", 10),
+      perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
+      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
   } else if (command === "discover:search-news") {
     const args = parseArgs(argv);
     const positionalNumbers = positiveIntegers(argv);
@@ -630,6 +652,14 @@ function positiveIntegers(args) {
 
 function firstEnablement(args) {
   return args.find((token) => /^(core|optional|manual)(,(core|optional|manual))*$/.test(token));
+}
+
+function isPlatformDiscoverCommand(value) {
+  return /^discover:(wechat|zhihu|reddit)-platform$/.test(String(value || ""));
+}
+
+function platformDiscoverCommandPlatform(value) {
+  return String(value || "").match(/^discover:(wechat|zhihu|reddit)-platform$/)?.[1] || "";
 }
 
 function firstJsonPath(args) {

@@ -8,8 +8,19 @@ import {
   writeSourceStatusHistory
 } from "./source-status-history.js";
 import { normalizeUrlIdentity } from "./url.js";
+import {
+  auditGroupForPlatform,
+  isPlatformExemptCategory,
+  PLATFORM_AUDIT_GROUPS,
+  PLATFORM_CATEGORY_TO_SECTION,
+  PLATFORM_SECTIONS,
+  PLATFORM_TO_AUDIT_GROUP,
+  platformFromCandidateCategory,
+  requirePlatformExemptItemContract,
+  sectionForPlatformCategory
+} from "./platform-exempt.js";
 
-const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
+const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS];
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
 const PRIMARY_STATUSES = new Set(["primary_confirmed", "multi_source_confirmed"]);
 const REPORT_AUDIT_GROUP_FIELDS = new Set([
@@ -322,6 +333,8 @@ function selectReportItems(merged, options = {}) {
     return communityLeadItem(candidate);
   });
 
+  const platformSelections = selectPlatformExemptItems(candidates, selectedIds);
+
   return {
     candidates: [...includedCandidates, ...derived],
     main_items: mainItems,
@@ -330,14 +343,55 @@ function selectReportItems(merged, options = {}) {
     projects,
     builder_observations: builderObservations,
     community_leads: communityLeads,
+    ...platformSelections.sections,
     eligible_counts: {
       main_items: mainPool.length,
       github_trending: publicGithubCandidates.length,
       hot_blogs: hotBlogPool.length,
       projects: projectSeeds.length,
-      builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length
+      builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
+      ...platformSelections.eligibleCounts
     }
   };
+}
+
+function selectPlatformExemptItems(candidates, selectedIds) {
+  const sections = Object.fromEntries(PLATFORM_SECTIONS.map((sectionName) => [sectionName, []]));
+  const eligibleCounts = Object.fromEntries(PLATFORM_SECTIONS.map((sectionName) => [sectionName, 0]));
+  for (const [category, sectionName] of Object.entries(PLATFORM_CATEGORY_TO_SECTION)) {
+    const eligible = candidates
+      .filter((candidate) => candidate.category === category && !selectedIds.has(candidate.id))
+      .filter(canPromoteToPlatformExemptSection)
+      .sort((left, right) => candidateScore(right) - candidateScore(left));
+    eligibleCounts[sectionName] = eligible.length;
+    const seenUrls = new Set();
+    for (const candidate of eligible) {
+      if (sections[sectionName].length >= 6) break;
+      const urlKey = normalizeUrl(candidate.url);
+      if (!urlKey || seenUrls.has(urlKey)) continue;
+      seenUrls.add(urlKey);
+      markIncludedCandidate(candidate, category, sectionName);
+      selectedIds.add(candidate.id);
+      sections[sectionName].push(platformExemptItem(candidate));
+    }
+  }
+  return { sections, eligibleCounts };
+}
+
+function canPromoteToPlatformExemptSection(candidate) {
+  if (!isPlatformExemptCategory(candidate.category)) {
+    return false;
+  }
+  const sectionName = sectionForPlatformCategory(candidate.category);
+  if (!sectionName) {
+    return false;
+  }
+  try {
+    requirePlatformExemptItemContract(platformExemptItem(candidate), { sectionName });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function loadRecentMainUrls(rootDir, reportDate, lookbackDays = 7) {
@@ -455,6 +509,9 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     projects: selection.projects,
     builder_observations: selection.builder_observations,
     community_leads: selection.community_leads,
+    wechat_items: selection.wechat_items || [],
+    zhihu_items: selection.zhihu_items || [],
+    reddit_items: selection.reddit_items || [],
     evidence_assets: evidenceAssets,
     self_check: {
       report_date: reportDate,
@@ -481,6 +538,18 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
         builder_observations: {
           eligible_candidates: selection.eligible_counts?.builder_observations || 0,
           selected: selection.builder_observations.length
+        },
+        wechat_items: {
+          eligible_candidates: selection.eligible_counts?.wechat_items || 0,
+          selected: (selection.wechat_items || []).length
+        },
+        zhihu_items: {
+          eligible_candidates: selection.eligible_counts?.zhihu_items || 0,
+          selected: (selection.zhihu_items || []).length
+        },
+        reddit_items: {
+          eligible_candidates: selection.eligible_counts?.reddit_items || 0,
+          selected: (selection.reddit_items || []).length
         }
       },
       fallback_sources: [],
@@ -1439,6 +1508,35 @@ function nonPrimaryDisclosureFields(candidate) {
   };
 }
 
+function platformExemptItem(candidate) {
+  const item = {
+    candidate_id: candidate.id,
+    platform: candidate.platform || platformFromCandidateCategory(candidate.category),
+    source_id: candidate.source_id,
+    rule_id: candidate.rule_id || candidate.source_id,
+    title: displayTitleForCandidate(candidate),
+    url: candidate.url,
+    event_date: candidate.event_date,
+    source: candidate.source,
+    source_level: candidate.source_level,
+    verification_status: candidate.verification_status,
+    claim_text: candidate.claim_text,
+    why_watch: candidate.why_watch,
+    disclosure: candidate.disclosure,
+    matched_terms: Array.isArray(candidate.matched_terms) ? candidate.matched_terms : [],
+    exemption_policy: candidate.exemption_policy,
+    published_by_gate: candidate.published_by_gate,
+    ...(candidate.author ? { author: candidate.author } : {}),
+    ...(candidate.handle ? { handle: candidate.handle } : {}),
+    ...(candidate.evidence ? { summary: trimText(candidate.evidence, 260) } : {}),
+    ...(candidate.original_text ? { original_text: trimText(candidate.original_text, 500) } : {}),
+    ...(candidate.reader_relevance ? { why_watch: candidate.reader_relevance } : {}),
+    ...(candidate.notes ? { risk_label: trimText(candidate.notes, 180) } : {})
+  };
+  requirePlatformExemptItemContract(item, { sectionName: sectionForPlatformCategory(candidate.category) });
+  return item;
+}
+
 function mergeSourceAudit(target, audit) {
   if (!audit || typeof audit !== "object") return;
   for (const [groupName, group] of Object.entries(audit)) {
@@ -1498,6 +1596,19 @@ function sanitizeReportAuditSource(source) {
     name: source?.name || "Unknown source",
     url: isHttpUrl(source?.url) ? source.url : "https://example.com/",
     status: source?.status || "no_signal",
+    ...(source?.id ? { id: String(source.id) } : {}),
+    ...(source?.source_kind ? { source_kind: String(source.source_kind) } : {}),
+    ...(source?.tier ? { tier: String(source.tier) } : {}),
+    ...(source?.authority ? { authority: String(source.authority) } : {}),
+    ...(source?.enablement ? { enablement: String(source.enablement) } : {}),
+    ...(source?.verification_policy ? { verification_policy: String(source.verification_policy) } : {}),
+    ...(source?.platform ? { platform: String(source.platform) } : {}),
+    ...(typeof source?.requires_original_url === "boolean" ? { requires_original_url: source.requires_original_url } : {}),
+    ...(Number.isInteger(source?.http_status) || source?.http_status === null ? { http_status: source.http_status } : {}),
+    ...(typeof source?.feed_like === "boolean" ? { feed_like: source.feed_like } : {}),
+    ...(Number.isInteger(source?.recent_48h_entries) ? { recent_48h_entries: source.recent_48h_entries } : {}),
+    ...(Number.isInteger(source?.original_url_count) || source?.original_url_count === null ? { original_url_count: source.original_url_count } : {}),
+    ...(Number.isInteger(source?.parsed_count) ? { parsed_count: source.parsed_count } : {}),
     ...(source?.notes ? { notes: String(source.notes) } : {}),
     ...(snapshot ? { snapshot } : {})
   };
@@ -1531,6 +1642,9 @@ function sanitizeDailyTrackingSnapshot(snapshot) {
 }
 
 function auditGroupForCandidate(candidate) {
+  if (isPlatformExemptCategory(candidate.category)) {
+    return auditGroupForPlatform(candidate.platform || platformFromCandidateCategory(candidate.category));
+  }
   const source = `${candidate.source_id || ""} ${candidate.source || ""}`.toLowerCase();
   if (source.includes("github") && source.includes("trending")) return "github_trending";
   if (source.includes("builder") || source.includes("follow-builders") || candidate.category === "builder_observation") return "builder_sources";
@@ -1560,15 +1674,23 @@ function addSourcesFromAudit(sourceMap, audit, generatedAt) {
         category,
         status: source.status,
         checked_at: generatedAt,
-        notes: source.notes || ""
+        notes: source.notes || "",
+        platform: source.platform || platformForAuditGroup(groupName),
+        source_level: source.source_level,
+        verification_status: source.verification_status
       }, generatedAt);
     }
   }
 }
 
 function sourceIdFromAuditSource(groupName, source) {
-  const prefix = groupName === "github_trending" ? "github" : groupName === "builder_sources" ? "builder" : groupName === "search_sources" ? "search" : "content";
+  const platform = platformForAuditGroup(groupName);
+  const prefix = platform || (groupName === "github_trending" ? "github" : groupName === "builder_sources" ? "builder" : groupName === "search_sources" ? "search" : "content");
   return `${prefix}-${slugId(source?.name || source?.url || groupName) || "source"}`;
+}
+
+function platformForAuditGroup(groupName) {
+  return Object.entries(PLATFORM_TO_AUDIT_GROUP).find(([, auditGroup]) => auditGroup === groupName)?.[0] || "";
 }
 
 function addCandidateSource(sourceMap, source, generatedAt) {
@@ -1582,7 +1704,10 @@ function addCandidateSource(sourceMap, source, generatedAt) {
     category: candidateSourceCategory(source.category),
     status,
     checked_at: source.checked_at || generatedAt,
-    notes: source.notes || ""
+    notes: source.notes || "",
+    ...(source.platform ? { platform: source.platform } : {}),
+    ...(source.source_level ? { source_level: source.source_level } : {}),
+    ...(source.verification_status ? { verification_status: source.verification_status } : {})
   };
   if (!sourceMap.has(id)) {
     sourceMap.set(id, normalized);
@@ -1633,7 +1758,15 @@ function normalizeCandidate(rawCandidate, context) {
     ...(rawCandidate.verification_note ? { verification_note: rawCandidate.verification_note } : {}),
     ...(rawCandidate.risk_note ? { risk_note: rawCandidate.risk_note } : {}),
     ...(rawCandidate.reader_relevance ? { reader_relevance: rawCandidate.reader_relevance } : {}),
-    ...(Array.isArray(rawCandidate.verification_sources) ? { verification_sources: rawCandidate.verification_sources.filter(isHttpUrl) } : {})
+    ...(Array.isArray(rawCandidate.verification_sources) ? { verification_sources: rawCandidate.verification_sources.filter(isHttpUrl) } : {}),
+    ...(rawCandidate.platform ? { platform: rawCandidate.platform } : {}),
+    ...(rawCandidate.rule_id ? { rule_id: rawCandidate.rule_id } : {}),
+    ...(rawCandidate.claim_text ? { claim_text: trimText(rawCandidate.claim_text, 500) } : {}),
+    ...(rawCandidate.why_watch ? { why_watch: trimText(rawCandidate.why_watch, 300) } : {}),
+    ...(rawCandidate.disclosure ? { disclosure: trimText(rawCandidate.disclosure, 300) } : {}),
+    ...(Array.isArray(rawCandidate.matched_terms) ? { matched_terms: rawCandidate.matched_terms.map((term) => String(term || "").trim()).filter(Boolean).slice(0, 12) } : {}),
+    ...(rawCandidate.exemption_policy ? { exemption_policy: rawCandidate.exemption_policy } : {}),
+    ...(rawCandidate.published_by_gate ? { published_by_gate: rawCandidate.published_by_gate } : {})
   };
   const editorialCategory = rawCandidate.editorial_category || inferredEditorialCategory(candidate);
   if (editorialCategory) {
@@ -3095,7 +3228,7 @@ function stripSentenceEnding(value) {
 }
 
 function normalizedCandidateCategory(category) {
-  return ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead"].includes(category)
+  return ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", ...Object.keys(PLATFORM_CATEGORY_TO_SECTION)].includes(category)
     ? category
     : category === "blog"
       ? "hot_blog"
@@ -3111,6 +3244,7 @@ function candidateSourceCategory(category) {
 }
 
 function sourceCategoryForCandidate(candidate) {
+  if (isPlatformExemptCategory(candidate.category)) return "community";
   if (candidate.category === "builder_observation") return "builder";
   if (candidate.category === "project" || isGitHubTrendingCandidate(candidate, candidate)) return "project";
   if (candidate.category === "hot_blog") return "blog";

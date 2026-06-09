@@ -3,13 +3,15 @@ import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { validateReport } from "./schema.js";
 import { isValidDateString } from "./time.js";
+import { PLATFORM_AUDIT_GROUPS } from "./platform-exempt.js";
 
 export const MERGEABLE_SOURCE_AUDIT_GROUPS = [
   "github_trending",
   "builder_sources",
   "content_sources",
   "search_sources",
-  "sources_health"
+  "sources_health",
+  ...PLATFORM_AUDIT_GROUPS
 ];
 
 export async function mergeSourceAuditIntoReport(options = {}) {

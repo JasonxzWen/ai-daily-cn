@@ -8328,6 +8328,212 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
   assert(!("risk_note" in report.hot_blogs[0]));
 });
 
+test("platform exempt report sections require public audit disclosure and render independently", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const platformUrl = "https://www.zhihu.com/question/123/answer/456";
+  draft.zhihu_items = [
+    {
+      candidate_id: "zhihu-platform-signal",
+      platform: "zhihu",
+      source_id: "zhihu-ai-agent-feed",
+      rule_id: "zhihu-ai-agent-feed",
+      title: "知乎讨论提到企业 agent 部署门槛",
+      url: platformUrl,
+      event_date: "2026-05-16",
+      source: "Zhihu AI Agent Feed",
+      source_level: "platform_exempt_signal",
+      verification_status: "platform_exempt_unverified",
+      claim_text: "平台线索显示，原帖称企业 agent 部署仍主要卡在权限、评测和回滚流程。",
+      why_watch: "适合作为产品和工程团队观察国内用户讨论的弱信号。",
+      disclosure: "平台扩散发现，未做一手回源核验。",
+      matched_terms: ["agent", "评测"],
+      exemption_policy: "platform_signal_exempt",
+      published_by_gate: "deterministic_platform_gate"
+    }
+  ];
+  draft.source_audit.zhihu_sources = platformAuditGroupFixture("Zhihu AI Agent Feed", "https://www.zhihu.com/rss", 1, 1);
+  candidatePool.sources.push(platformCandidateSourceFixture("zhihu-ai-agent-feed", "Zhihu AI Agent Feed", "https://www.zhihu.com/rss", "zhihu"));
+  candidatePool.candidates.push(platformCandidateFixture({
+    id: "zhihu-platform-signal",
+    sourceId: "zhihu-ai-agent-feed",
+    category: "zhihu_item",
+    includedIn: "zhihu_items",
+    platform: "zhihu",
+    title: "知乎讨论提到企业 agent 部署门槛",
+    url: platformUrl
+  }));
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+  const input = reportToInteractionInput(report);
+  const renderedText = JSON.stringify(input);
+
+  assert.equal(report.zhihu_items[0].source_id, "zhihu-ai-agent-feed");
+  assert.equal(report.zhihu_items[0].rule_id, "zhihu-ai-agent-feed");
+  assert.equal(report.quality_status.status, "ok");
+  assert(renderedText.includes("知乎线索"));
+  assert(renderedText.includes("zhihu-ai-agent-feed"));
+  assert(renderedText.includes("未做一手回源核验"));
+});
+
+test("platform exempt report rejects fact-style claims and wrong section placement", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const platformUrl = "https://www.reddit.com/r/MachineLearning/comments/example/agent_eval/";
+  const item = {
+    candidate_id: "reddit-platform-signal",
+    platform: "reddit",
+    source_id: "reddit-ml-feed",
+    rule_id: "reddit-ml-feed",
+    title: "Reddit thread on agent evaluation",
+    url: platformUrl,
+    event_date: "2026-05-16",
+    source: "Reddit r/MachineLearning",
+    source_level: "platform_exempt_signal",
+    verification_status: "platform_exempt_unverified",
+    claim_text: "OpenAI 发布了新的 agent evaluation product.",
+    why_watch: "A discussion signal for evaluation workflows.",
+    disclosure: "Platform discovery signal; no primary-source verification.",
+    matched_terms: ["agent", "evaluation"],
+    exemption_policy: "platform_signal_exempt",
+    published_by_gate: "deterministic_platform_gate"
+  };
+  draft.reddit_items = [item];
+  draft.source_audit.reddit_sources = platformAuditGroupFixture("Reddit r/MachineLearning", "https://www.reddit.com/r/MachineLearning/.rss", 1, 1);
+  candidatePool.sources.push(platformCandidateSourceFixture("reddit-ml-feed", "Reddit r/MachineLearning", "https://www.reddit.com/r/MachineLearning/.rss", "reddit"));
+  candidatePool.candidates.push(platformCandidateFixture({
+    id: "reddit-platform-signal",
+    sourceId: "reddit-ml-feed",
+    category: "reddit_item",
+    includedIn: "reddit_items",
+    platform: "reddit",
+    title: item.title,
+    url: platformUrl
+  }));
+
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "platform_exempt_claim_too_strong"
+  );
+
+  draft.reddit_items[0].claim_text = "Reddit 讨论称，开发者仍在寻找更可靠的 agent evaluation workflow.";
+  draft.reddit_items[0].url = "https://example.com/not-reddit";
+  candidatePool.candidates.at(-1).url = "https://example.com/not-reddit";
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "platform_exempt_url_mismatch"
+  );
+
+  draft.reddit_items[0].url = platformUrl;
+  candidatePool.candidates.at(-1).url = platformUrl;
+  candidatePool.candidates.at(-1).included_in = "main_items";
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "candidate_pool_reference_invalid"
+  );
+});
+
+test("platform exempt discovery applies deterministic source rules", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-05-16",
+    generatedAt: fixedGeneratedAt,
+    includeWeChatInput: false,
+    platformExempt: "wechat",
+    sources: [
+      {
+        id: "wechat-ai-feed",
+        name: "WeChat AI Feed",
+        url: "https://example.com/wechat.xml",
+        source_kind: "rss",
+        candidate_category: "wechat_item",
+        tier: "T3",
+        authority: "community",
+        enablement: "optional",
+        verification_policy: "platform_signal_exempt",
+        platform: "wechat",
+        allowed_hosts: ["mp.weixin.qq.com"],
+        allowed_url_patterns: ["^https://mp\\.weixin\\.qq\\.com/"],
+        include_keywords: ["agent", "AI"],
+        exclude_keywords: ["广告"],
+        public_disclosure_label: "平台扩散发现，未做一手回源核验。",
+        max_items_per_run: 3
+      }
+    ],
+    fetchImpl: async () => textResponse([
+      "<?xml version=\"1.0\"?><rss><channel>",
+      "<item><title>AI agent 工程复盘</title><link>https://mp.weixin.qq.com/s/demo</link><pubDate>Sat, 16 May 2026 02:00:00 GMT</pubDate><description>原帖称 AI agent 工程复盘关注评测和回滚。</description></item>",
+      "<item><title>广告：AI agent 课程</title><link>https://mp.weixin.qq.com/s/ad</link><pubDate>Sat, 16 May 2026 02:00:00 GMT</pubDate><description>广告内容。</description></item>",
+      "</channel></rss>"
+    ].join(""))
+  });
+
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].category, "wechat_item");
+  assert.equal(collected.candidates[0].included_in, "wechat_items");
+  assert.equal(collected.candidates[0].platform, "wechat");
+  assert.equal(collected.candidates[0].rule_id, "wechat-ai-feed");
+  assert.equal(collected.source_audit.wechat_sources.candidates_found, 1);
+  assert.equal(collected.source_audit.wechat_sources.included, 0);
+});
+
+test("report:draft publishes platform exempt candidates into independent sections", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-platform-draft-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const platformUrl = "https://www.zhihu.com/question/123/answer/456";
+  discovery.source_audit.zhihu_sources = platformAuditGroupFixture("Zhihu AI Agent Feed", "https://www.zhihu.com/rss", 1, 0);
+  discovery.sources.push(platformCandidateSourceFixture("zhihu-ai-agent-feed", "Zhihu AI Agent Feed", "https://www.zhihu.com/rss", "zhihu"));
+  discovery.candidates.push(platformCandidateFixture({
+    id: "zhihu-platform-draft-signal",
+    sourceId: "zhihu-ai-agent-feed",
+    category: "zhihu_item",
+    includedIn: "zhihu_items",
+    platform: "zhihu",
+    title: "知乎讨论提到企业 agent 部署门槛",
+    url: platformUrl
+  }));
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.zhihu_items.length, 1);
+  assert.equal(drafted.report.zhihu_items[0].candidate_id, "zhihu-platform-draft-signal");
+  assert.equal(drafted.report.zhihu_items[0].verification_status, "platform_exempt_unverified");
+  assert.equal(drafted.report.source_audit.zhihu_sources.included, 1);
+  assert(!drafted.report.main_items.some((item) => item.candidate_id === "zhihu-platform-draft-signal"));
+  assert(drafted.candidatePool.candidates.some((candidate) =>
+    candidate.id === "zhihu-platform-draft-signal" &&
+    candidate.status === "included" &&
+    candidate.included_in === "zhihu_items"
+  ));
+});
+
 test("report:write rejects undisclosed intermediary leads in viewpoint sections", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
@@ -8813,6 +9019,86 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
 
 async function readFixture(relativePath) {
   return fs.readFile(path.join(rootDir, "tests/fixtures", relativePath), "utf8");
+}
+
+function platformAuditGroupFixture(name, url, candidatesFound, included) {
+  return {
+    checked: true,
+    sources: [
+      {
+        id: slugFixtureId(name),
+        name,
+        url,
+        status: "checked",
+        source_kind: "rss",
+        tier: "T3",
+        authority: "community",
+        enablement: "optional",
+        verification_policy: "platform_signal_exempt",
+        platform: platformFromUrl(url),
+        parsed_count: candidatesFound,
+        recent_48h_entries: candidatesFound,
+        notes: `${candidatesFound} platform entries parsed`
+      }
+    ],
+    candidates_found: candidatesFound,
+    included,
+    sources_checked: 1,
+    notes: "Platform exempt discovery checked."
+  };
+}
+
+function platformCandidateSourceFixture(id, name, url, platform) {
+  return {
+    id,
+    name,
+    url,
+    category: "community",
+    status: "checked",
+    checked_at: fixedGeneratedAt,
+    source_level: "platform_exempt_signal",
+    verification_status: "platform_exempt_unverified",
+    platform
+  };
+}
+
+function platformCandidateFixture({ id, sourceId, category, includedIn, platform, title, url }) {
+  return {
+    id,
+    source_id: sourceId,
+    category,
+    title,
+    url,
+    source: sourceId,
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: includedIn,
+    platform,
+    rule_id: sourceId,
+    source_level: "platform_exempt_signal",
+    verification_status: "platform_exempt_unverified",
+    claim_text: `${platform} 平台线索显示，原帖称这是一条值得观察的工程讨论。`,
+    why_watch: "用于观察平台讨论趋势，不作为事实确认。",
+    disclosure: "平台扩散发现，未做一手回源核验。",
+    matched_terms: ["agent"],
+    exemption_policy: "platform_signal_exempt",
+    published_by_gate: "deterministic_platform_gate",
+    evidence: "Platform exempt fixture."
+  };
+}
+
+function slugFixtureId(value) {
+  return String(value || "fixture")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "fixture";
+}
+
+function platformFromUrl(value) {
+  if (/zhihu/i.test(value)) return "zhihu";
+  if (/reddit/i.test(value)) return "reddit";
+  if (/wechat|weixin/i.test(value)) return "wechat";
+  return "wechat";
 }
 
 function strictPublishReportFixture() {

@@ -13,6 +13,7 @@ import {
 } from "./presentation.js";
 import { defaultImportanceForSection, importanceLabel, importanceTag, normalizeImportance } from "./importance.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "./source-icon-cache.js";
+import { platformForSection, platformItemLabel, PLATFORM_SECTIONS } from "./platform-exempt.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -121,6 +122,9 @@ export function reportToInteractionInput(report, options = {}) {
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const platformItems = Object.fromEntries(
+    PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
+  );
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const paths = reportRelativePaths(report.report_date);
@@ -190,6 +194,20 @@ export function reportToInteractionInput(report, options = {}) {
       cardClass: "community-card",
       showFilters: false,
       items: communityCards
+    });
+  }
+  for (const sectionName of PLATFORM_SECTIONS) {
+    const cards = formatPlatformExemptCards(platformItems[sectionName], sectionName, { report, evidenceByUrl });
+    if (cards.length === 0) {
+      continue;
+    }
+    sections.push({
+      type: "filterable-cards",
+      title: platformItemLabel(platformForSection(sectionName)),
+      group: "signals",
+      cardClass: "platform-card",
+      showFilters: false,
+      items: cards
     });
   }
   const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
@@ -1290,13 +1308,14 @@ function hasNonPrimarySourceSignal(item = {}) {
   const sourceLevel = String(item?.source_level || "").trim();
   const status = String(item?.verification_status || "").trim();
   return Boolean(
-    ["intermediary_only", "original_social_only", "unverified"].includes(status) ||
+    ["intermediary_only", "original_social_only", "unverified", "platform_exempt_unverified"].includes(status) ||
     (sourceLevel && !["primary", "official", "paper", "github", "multi_source"].includes(sourceLevel))
   );
 }
 
 function sourceLevelLabel(value) {
   const labels = {
+    platform_exempt_signal: "平台豁免线索",
     primary: "一手来源",
     official: "官方来源",
     paper: "论文/研究来源",
@@ -1615,6 +1634,41 @@ function formatCommunityLeadCards(items, context = {}) {
   }).filter(Boolean);
 }
 
+function formatPlatformExemptCards(items, sectionName, context = {}) {
+  const platform = platformForSection(sectionName);
+  return (Array.isArray(items) ? items : []).map((item) => {
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 1 });
+    const body = String(item.claim_text || item.summary || item.title || "").trim();
+    return {
+      group: item.source || platformItemLabel(platform),
+      title: item.title || platformItemLabel(platform),
+      href: item.url,
+      titleIcon: siteIconForUrl(item.url, item.source || platformItemLabel(platform)),
+      body: formatDailyInlineText(body, item),
+      showGroup: false,
+      tags: [
+        cardTag(importanceTagFor(sectionName, item)),
+        cardTag(platformItemLabel(platform), "topic"),
+        cardTag("未做一手回源核验", "risk"),
+        item.event_date ? cardTag(item.event_date, "date") : ""
+      ].filter(Boolean),
+      points: [
+        item.platform ? { label: "platform", value: item.platform } : null,
+        item.source_id ? { label: "source_id", value: item.source_id } : null,
+        item.rule_id ? { label: "rule_id", value: item.rule_id } : null,
+        item.source_level ? { label: "source_level", value: item.source_level } : null,
+        item.verification_status ? { label: "verification_status", value: item.verification_status } : null,
+        item.disclosure ? { label: "公开披露", value: item.disclosure } : null,
+        item.why_watch ? { label: "观察理由", value: trimText(item.why_watch, 180) } : null,
+        Array.isArray(item.matched_terms) && item.matched_terms.length > 0
+          ? { label: "matched_terms", value: item.matched_terms.join(", ") }
+          : null
+      ].filter(Boolean),
+      ...(media.length > 0 ? { media } : {})
+    };
+  });
+}
+
 function summarizeCommunityLeadBody(text, title) {
   const originalBody = String(text || "").trim();
   if (!originalBody) {
@@ -1869,7 +1923,10 @@ function formatSourceAudit(audit) {
     formatAuditGroup("Builder 原始源", audit.builder_sources),
     audit.content_sources ? formatAuditGroup("热门博客与访谈源", audit.content_sources) : "",
     audit.search_sources ? formatAuditGroup("搜索 / 新闻影子源", audit.search_sources) : "",
-    audit.sources_health ? formatAuditGroup("信源健康检查", audit.sources_health) : ""
+    audit.sources_health ? formatAuditGroup("信源健康检查", audit.sources_health) : "",
+    audit.wechat_sources ? formatAuditGroup(platformItemLabel("wechat"), audit.wechat_sources) : "",
+    audit.zhihu_sources ? formatAuditGroup(platformItemLabel("zhihu"), audit.zhihu_sources) : "",
+    audit.reddit_sources ? formatAuditGroup(platformItemLabel("reddit"), audit.reddit_sources) : ""
   ].filter(Boolean).join("\n\n");
 }
 
@@ -1954,7 +2011,10 @@ function sourceAuditGroups(audit) {
     { title: "Builder 原始源", group: audit.builder_sources },
     { title: "热门博客与访谈源", group: audit.content_sources },
     { title: "搜索 / 新闻影子源", group: audit.search_sources },
-    { title: "信源健康检查", group: audit.sources_health }
+    { title: "信源健康检查", group: audit.sources_health },
+    { title: platformItemLabel("wechat"), group: audit.wechat_sources },
+    { title: platformItemLabel("zhihu"), group: audit.zhihu_sources },
+    { title: platformItemLabel("reddit"), group: audit.reddit_sources }
   ].filter((item) => item.group);
 }
 
