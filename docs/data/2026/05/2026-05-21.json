@@ -2,114 +2,6 @@
   "report_date": "2026-05-21",
   "title": "AI 日报 2026-05-21",
   "summary": "今日重点集中在 Google I/O 2026 的 Gemini 3.5 / Gemini Omni / Antigravity 发布、GitHub Copilot 自动模型路由、SageMaker OpenAI-compatible API、Claude Managed Agents 企业级执行边界，以及 GitHub Trending 中持续升温的 coding-agent 基础设施项目。本轮显式记录 GitHub Trending 与 Builder 原始源审计，避免板块空转。",
-  "source_window": {
-    "date_from": "2026-05-19",
-    "date_to": "2026-05-21",
-    "fallback_window_used": true,
-    "notes": "24 小时内的 T0 官方源不足以覆盖模型、开发工具、开源项目与 Builder 动向，因此补充 2026-05-19 至 2026-05-20 的官方发布、GitHub Trending 当日抓取和 follow-builders feed。GitHub Trending 检查时间为 2026-05-21，Builder feed 生成时间为 2026-05-20T07:32:12.985Z。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending daily all",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "解析候选 17 个。"
-        },
-        {
-          "name": "GitHub Trending weekly all",
-          "url": "https://github.com/trending?since=weekly",
-          "status": "checked",
-          "notes": "解析候选 14 个。"
-        },
-        {
-          "name": "GitHub Trending daily Python",
-          "url": "https://github.com/trending/python?since=daily",
-          "status": "checked",
-          "notes": "解析候选 17 个。"
-        },
-        {
-          "name": "GitHub Trending weekly Python",
-          "url": "https://github.com/trending/python?since=weekly",
-          "status": "checked",
-          "notes": "解析候选 13 个。"
-        },
-        {
-          "name": "GitHub Trending daily TypeScript",
-          "url": "https://github.com/trending/typescript?since=daily",
-          "status": "checked",
-          "notes": "解析候选 15 个。"
-        },
-        {
-          "name": "GitHub Trending weekly TypeScript",
-          "url": "https://github.com/trending/typescript?since=weekly",
-          "status": "checked",
-          "notes": "解析候选 17 个。"
-        },
-        {
-          "name": "GitHub Trending daily Rust",
-          "url": "https://github.com/trending/rust?since=daily",
-          "status": "checked",
-          "notes": "解析候选 18 个。"
-        },
-        {
-          "name": "GitHub Trending weekly Rust",
-          "url": "https://github.com/trending/rust?since=weekly",
-          "status": "checked",
-          "notes": "解析候选 17 个。"
-        },
-        {
-          "name": "GitHub Trending daily Go",
-          "url": "https://github.com/trending/go?since=daily",
-          "status": "checked",
-          "notes": "解析候选 17 个。"
-        },
-        {
-          "name": "GitHub Trending weekly Go",
-          "url": "https://github.com/trending/go?since=weekly",
-          "status": "checked",
-          "notes": "解析候选 15 个。"
-        }
-      ],
-      "candidates_found": 121,
-      "included": 6,
-      "notes": "本轮纳入 agent runtime、code knowledge graph、context database、agentic backend 等与 AI 日报相关的项目；其余候选保留为待复核线索。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders prepare-digest",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "checked",
-          "notes": "stats: 17 X builders, 40 tweets, 2 blog posts, 1 podcast; feedGeneratedAt 2026-05-20T07:32:12.985Z。"
-        },
-        {
-          "name": "follow-builders X feed",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "checked",
-          "notes": "通过 prepare-digest 读取 Builder 原始 X 链接，筛出 4 条与模型、agent、coding workflow 相关信号。"
-        },
-        {
-          "name": "Training Data podcast",
-          "url": "https://www.youtube.com/watch?v=j7ypvRUFY7M",
-          "status": "checked",
-          "notes": "2026-05-19 episode；作为 Builder/创业访谈候选源检查，未放入主条目。"
-        },
-        {
-          "name": "Claude Managed Agents blog from builder feed",
-          "url": "https://claude.com/blog/claude-managed-agents-updates",
-          "status": "checked",
-          "notes": "Builder feed 命中后回溯到 Claude 官方博客。"
-        }
-      ],
-      "candidates_found": 43,
-      "included": 4,
-      "notes": "只采用原始链接或官方页；X feed 可用，未使用二手转述。"
-    }
-  },
   "main_items": [
     {
       "title": "Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上",
@@ -244,7 +136,6 @@
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/",
       "source": "Google Blog",
       "summary": "Google I/O 2026 汇总页称 Gemini 3.5 Flash 是 Gemini 3.5 系列首个模型，定位为 combining frontier intelligence with action。",
-      "notes": "同时已出现在 Vercel AI Gateway，开发者可通过 Vercel AI SDK 使用 `google/gemini-3.5-flash`。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -256,7 +147,6 @@
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/",
       "source": "Google Blog",
       "summary": "Google 官方 I/O 汇总页将 Gemini Omni 描述为可从任意输入开始创建内容，先从视频开始，强调 world understanding、multimodality 和 editing。",
-      "notes": "本轮仅按官方 I/O 汇总记录，不引入第三方推断。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -268,7 +158,6 @@
       "url": "https://huggingface.co/blog/ettin-reranker",
       "source": "Hugging Face Blog",
       "summary": "Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。",
-      "notes": "适合作为 RAG pipeline 中低参数 reranker 的候选，需要在自有语料上做离线评估。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -280,7 +169,6 @@
       "url": "https://allenai.org/blog/olmoearth-v1-1",
       "source": "Ai2 Blog",
       "summary": "Ai2 发布 OlmoEarth v1.1，面向卫星影像、森林变化、作物类型地图等地球观测任务。",
-      "notes": "官方页提供模型、技术报告和代码入口，后续可跟踪实际下游应用复现。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -294,7 +182,6 @@
       "event_date": "2026-05-20",
       "topic": "model serving / OpenAI-compatible API",
       "summary": "SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。",
-      "why_it_matters": "这是企业把已有 OpenAI 生态应用迁到自管模型服务链路的关键适配层。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -306,7 +193,6 @@
       "event_date": "2026-05-19",
       "topic": "managed agents / MCP / sandboxing",
       "summary": "Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。",
-      "why_it_matters": "生产级 agent 的核心不只是模型能力，还包括执行环境、凭证、网络边界和审计。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -318,7 +204,6 @@
       "event_date": "2026-05-19",
       "topic": "reranker / RAG",
       "summary": "Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。",
-      "why_it_matters": "RAG 质量越来越依赖 rerank 层，较小模型的速度、部署成本和可复现实验会影响检索栈选型。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -331,7 +216,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending daily / weekly",
       "signal": "trending",
-      "evidence": "npm run discover:github-trending -- 50 抓取到该项目，并按 code knowledge graph / coding agent 关键词命中。",
       "domains": [],
       "importance": "notable"
     },
@@ -342,7 +226,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending",
       "signal": "trending",
-      "evidence": "discover:github-trending 把该项目列为 AI agent context database 候选。",
       "domains": [],
       "importance": "notable"
     },
@@ -353,7 +236,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending",
       "signal": "trending",
-      "evidence": "discover:github-trending 候选列表命中，且与 production LLM software / agents 主题相关。",
       "domains": [],
       "importance": "notable"
     },
@@ -364,7 +246,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending TypeScript",
       "signal": "trending",
-      "evidence": "Trending TypeScript 候选命中，描述直接指向 agentic coding 后端平台。",
       "domains": [],
       "importance": "notable"
     },
@@ -375,7 +256,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending",
       "signal": "trending",
-      "evidence": "discover:github-trending 候选命中，适合作为后续项目发现入口而非单一产品发布。",
       "domains": [],
       "importance": "notable"
     },
@@ -386,7 +266,6 @@
       "event_date": "2026-05-21",
       "source": "GitHub Trending",
       "signal": "trending",
-      "evidence": "discover:github-trending 候选命中，描述同时覆盖多个主流 coding agent / IDE agent。",
       "domains": [],
       "importance": "notable"
     }
@@ -399,7 +278,6 @@
       "url": "https://x.com/karpathy/status/2056753169888334312",
       "event_date": "2026-05-21",
       "source": "follow-builders X feed",
-      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 Personal update: I've joined Anthropic...",
       "image_urls": [],
       "importance": "notable"
     },
@@ -410,7 +288,6 @@
       "url": "https://x.com/joshwoodward/status/2056873495116845485",
       "event_date": "2026-05-21",
       "source": "follow-builders X feed",
-      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 Introducing Gemini Spark! Our 24/7 personal AI agent...",
       "image_urls": [],
       "importance": "notable"
     },
@@ -421,7 +298,6 @@
       "url": "https://x.com/rauchg/status/2056735989830471977",
       "event_date": "2026-05-21",
       "source": "follow-builders X feed",
-      "evidence": "prepare-digest.js 抓取原始 X 链接，文本提到 Claude Managed Agents 与 Vercel Sandbox。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -432,7 +308,6 @@
       "url": "https://x.com/swyx/status/2056877529991205072",
       "event_date": "2026-05-21",
       "source": "follow-builders X feed",
-      "evidence": "prepare-digest.js 抓取原始 X 链接，文本开头为 there's 4 parts to this AI SDLC...",
       "image_urls": [],
       "importance": "notable"
     }
@@ -463,67 +338,20 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-21",
-    "main_items": 6,
-    "builder_observations": 4,
-    "builder_skill_used": [
-      "official-ai-releases: checked official blogs, changelogs and model pages for 2026-05-19..2026-05-21",
-      "github-ai-trending: ran npm run discover:github-trending -- 50; 10 GitHub Trending sources checked; 121 unique candidates found",
-      "follow-builders: ran prepare-digest.js; 17 X builders, 40 tweets, 2 blog posts and 1 podcast checked"
-    ],
-    "fallback_sources": [
-      "Google Developers Blog",
-      "Google Blog I/O 2026 collection",
-      "GitHub Changelog",
-      "AWS Machine Learning Blog",
-      "Claude Blog",
-      "Vercel Changelog",
-      "Hugging Face Blog",
-      "Ai2 Blog",
-      "GitHub Trending",
-      "follow-builders X feed"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "主条目为 6 条，未强行填满 10 条。Builder 观察与 GitHub Trending 均记录 source_audit；GitHub Trending 项目只作为项目观察，不把未验证 release 写成官方发布。未执行 commit、push 或 GitHub Pages 发布。",
-    "optimization_suggestions": [
-      {
-        "area": "source_audit",
-        "suggestion": "把 discover:github-trending 的完整候选 JSON 持久化到 .tmp 或 reports-data sidecar，便于下次 diff。"
-      },
-      {
-        "area": "schema",
-        "suggestion": "为 source_audit 增加 checked_at 字段，避免只靠 notes 表达抓取时间。"
-      },
-      {
-        "area": "builder_observations",
-        "suggestion": "为 Builder feed 增加 per-author last_seen，降低重复引用同一作者旧帖的概率。"
-      }
-    ]
-  },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-21.html",
   "html_path": "reports/2026/05/2026-05-21.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-21.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-21T04:19:58.638Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

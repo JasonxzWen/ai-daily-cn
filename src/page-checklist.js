@@ -9,10 +9,21 @@ const FORBIDDEN_SECTION_SELECTORS = [
   ".project-card-grid",
   ".project-card"
 ];
+const PUBLIC_CONTENT_IMAGE_MIN_WIDTH = 240;
+const PUBLIC_CONTENT_IMAGE_MIN_HEIGHT = 160;
+const PUBLIC_CONTENT_IMAGE_MIN_AREA = 80000;
 
 export async function evaluateDailyPageChecklist(page, options = {}) {
   const imageLoad = await eagerLoadPageImages(page, options.imageTimeoutMs || 5000);
-  const result = await page.evaluate(({ reportDate, forbiddenSectionText, forbiddenSectionSelectors, imageLoadTimedOut }) => {
+  const result = await page.evaluate(({
+    reportDate,
+    forbiddenSectionText,
+    forbiddenSectionSelectors,
+    imageLoadTimedOut,
+    publicImageMinWidth,
+    publicImageMinHeight,
+    publicImageMinArea
+  }) => {
     const checks = [];
     const issues = [];
     const addCheck = (id, ok, message, details = {}) => {
@@ -67,7 +78,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "落点：",
       "为什么重要：",
       "判断点：",
-      "watch_next"
+      "watch_next",
+      "候选 / 入选",
+      "入选原因",
+      "source_audit"
     ].filter((item) => bodyText.includes(item));
     addCheck(
       "legacy_public_copy_absent",
@@ -164,26 +178,57 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Daily tracking should render at least one visual/table-first public card and must not render leaderboard rows as text detail logs.",
       { count: trackingCards.length, weak_cards: weakTrackingCards }
     );
-    const trackingImageCountIssues = trackingCards
+    const trackingScreenshotIssues = trackingCards
       .map((card) => {
         const title = card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "";
         if (!["OpenRouter", "Artificial Analysis"].includes(title)) {
           return null;
         }
+        const tableRows = card.querySelectorAll("[data-card-data-table] tbody tr").length;
         const imageCount = card.querySelectorAll(".card-media-grid img").length;
-        return imageCount >= 3 && imageCount <= 5
+        return tableRows >= 3 && imageCount === 0
           ? null
           : {
               title,
+              table_rows: tableRows,
               image_count: imageCount
             };
       })
       .filter(Boolean);
     addCheck(
-      "daily_tracking_expected_image_count",
-      trackingImageCountIssues.length === 0,
-      "OpenRouter and Artificial Analysis cards should render 3-5 evidence images when those cards are present.",
-      { issues: trackingImageCountIssues }
+      "daily_tracking_structured_not_screenshot",
+      trackingScreenshotIssues.length === 0,
+      "OpenRouter and Artificial Analysis should render structured table rows and no public screenshot media.",
+      { issues: trackingScreenshotIssues }
+    );
+    const trackingTableLayoutIssues = trackingCards
+      .map((card, index) => {
+        const table = card.querySelector("[data-card-data-table]");
+        const rows = Array.from(table?.querySelectorAll("tbody tr") || []);
+        if (!table || rows.length === 0) {
+          return null;
+        }
+        const rowHeights = rows.map((row) => row.getBoundingClientRect().height).filter((height) => height > 0);
+        const maxRowHeight = Math.max(...rowHeights, 0);
+        const rowHeightLimit = document.documentElement.clientWidth <= 760 ? 140 : 120;
+        return maxRowHeight <= rowHeightLimit
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              max_row_height: Math.round(maxRowHeight),
+              row_height_limit: rowHeightLimit,
+              rows: rows.length,
+              table_width: Math.round(table.getBoundingClientRect().width),
+              viewport_width: document.documentElement.clientWidth
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_table_compact",
+      trackingTableLayoutIssues.length === 0,
+      "Daily tracking tables should stay compact on mobile and must not stretch rows into large blank blocks.",
+      { issues: trackingTableLayoutIssues }
     );
     const trackingOverlapIssues = trackingCards
       .map((card, index) => {
@@ -396,23 +441,52 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Hot blog cards should render as reader-facing Chinese analysis with 2-4 readable points, not untranslated excerpts or thin summaries.",
       { weak_cards: weakBlogCards }
     );
-    const sourceAuditSection = Array.from(document.querySelectorAll("section, details"))
-      .find((section) => /信源审计/.test(section.querySelector("h1, h2, h3, summary")?.textContent || ""));
-    const sourceAuditOverviewChart = Array.from(document.querySelectorAll("[data-chart-section]"))
-      .find((section) => /信源状态概览/.test(section.textContent || ""));
-    const sourceStatusTags = Array.from(document.querySelectorAll("mark.daily-tag-status-checked, mark.daily-tag-status-no-signal, mark.daily-tag-status-blocked, mark.daily-tag-status-skipped, mark.daily-tag-status-unknown"));
+    const publicDebugSections = Array.from(document.querySelectorAll("section, details, nav a"))
+      .map((node) => node.textContent?.replace(/\s+/g, " ").trim() || "")
+      .filter((text) => /信源审计|自检与产物|发布质量说明|Source status|候选\s*\/\s*入选|source_audit|ledger|降级项/.test(text));
     addCheck(
-      "source_audit_status_visualized",
-      Boolean(sourceAuditOverviewChart) && Boolean(sourceAuditSection) && sourceStatusTags.length >= 2,
-      "Source audit should include a visible status chart and colored status tags for each source state.",
-      {
-        has_chart: Boolean(sourceAuditOverviewChart),
-        has_audit_section: Boolean(sourceAuditSection),
-        status_tag_count: sourceStatusTags.length
-      }
+      "public_debug_sections_absent",
+      publicDebugSections.length === 0,
+      "Public report should not expose source audit, self-check, ledger, candidate counts, or degradation logs as reader content.",
+      { hits: publicDebugSections.slice(0, 12) }
     );
     const contentImages = Array.from(document.images).filter((image) =>
       image.getAttribute("src") && !image.closest(".image-lightbox[hidden]")
+    );
+    const publicContentImages = contentImages.filter((image) =>
+      image.closest(".card-media-grid") ||
+      (image.closest(".rendered-markdown") && !image.classList.contains("inline-site-icon"))
+    );
+    const invalidPublicImages = publicContentImages
+      .map((image, index) => {
+        const src = image.getAttribute("src") || "";
+        const caption = image.closest("figure")?.querySelector("figcaption")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const alt = image.getAttribute("alt") || "";
+        const width = image.naturalWidth || 0;
+        const height = image.naturalHeight || 0;
+        const tooSmall = width < publicImageMinWidth || height < publicImageMinHeight || width * height < publicImageMinArea;
+        const screenshotLike = /full[- ]?page|browser|viewport|page screenshot|页面截图|整页截图|浏览器截图/i.test(`${src} ${alt} ${caption}`);
+        const nonContent = /\b(?:favicon|logo|avatar|icon)\b|图标|头像|徽标/i.test(`${src} ${alt} ${caption}`);
+        return tooSmall || screenshotLike || nonContent
+          ? {
+              index,
+              src,
+              alt,
+              caption,
+              width,
+              height,
+              too_small: tooSmall,
+              screenshot_like: screenshotLike,
+              non_content: nonContent
+            }
+          : null;
+      })
+      .filter(Boolean);
+    addCheck(
+      "public_content_media_valid",
+      invalidPublicImages.length === 0,
+      "Public content images must be readable content assets, not tiny icons/logos/avatars or full-page screenshots.",
+      { invalid_images: invalidPublicImages }
     );
     const remoteContentImages = contentImages
       .filter((image) => /^(https?:)?\/\//i.test(image.getAttribute("src") || ""))
@@ -460,7 +534,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     reportDate: options.reportDate || "",
     forbiddenSectionText: options.forbiddenSectionText || options.forbiddenText || FORBIDDEN_SECTION_TEXT,
     forbiddenSectionSelectors: options.forbiddenSectionSelectors || FORBIDDEN_SECTION_SELECTORS,
-    imageLoadTimedOut: imageLoad.timedOut
+    imageLoadTimedOut: imageLoad.timedOut,
+    publicImageMinWidth: PUBLIC_CONTENT_IMAGE_MIN_WIDTH,
+    publicImageMinHeight: PUBLIC_CONTENT_IMAGE_MIN_HEIGHT,
+    publicImageMinArea: PUBLIC_CONTENT_IMAGE_MIN_AREA
   });
 
   return {

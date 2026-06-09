@@ -4,6 +4,9 @@ import { normalizeUrlIdentity } from "./url.js";
 
 const DEFAULT_MAX_ASSETS = 4;
 const DEFAULT_PUBLIC_PREFIX = "assets/evidence";
+const PUBLIC_EVIDENCE_MIN_WIDTH = 240;
+const PUBLIC_EVIDENCE_MIN_HEIGHT = 160;
+const PUBLIC_EVIDENCE_MIN_AREA = 80000;
 const IMAGE_EXTENSIONS = new Map([
   ["image/jpeg", ".jpg"],
   ["image/jpg", ".jpg"],
@@ -62,6 +65,15 @@ export async function cacheEvidenceImages(options = {}) {
         skipped.push({ id: candidate.id, image_url: imageUrl, reason: "image_too_small" });
         continue;
       }
+      const dimensions = readImageDimensions(bytes);
+      if (dimensions && isTooSmallPublicEvidence(dimensions)) {
+        skipped.push({
+          id: candidate.id,
+          image_url: imageUrl,
+          reason: `image_dimensions_too_small:${dimensions.width}x${dimensions.height}`
+        });
+        continue;
+      }
       const extension = extensionForImage(contentType, imageUrl);
       const fileName = uniqueEvidenceFileName(assets, candidate, reportDate, extension);
       const localPath = path.posix.join(publicPrefix, fileName);
@@ -72,7 +84,11 @@ export async function cacheEvidenceImages(options = {}) {
         source_url: candidate.url,
         local_path: localPath,
         caption: evidenceCaption(candidate),
-        extraction_status: "source_image"
+        extraction_status: "source_image",
+        ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
+        byte_size: bytes.length,
+        asset_role: "content",
+        capture_kind: "source_asset"
       });
     } catch (error) {
       skipped.push({ id: candidate.id, image_url: imageUrl, reason: String(error?.message || error || "fetch_failed") });
@@ -80,6 +96,62 @@ export async function cacheEvidenceImages(options = {}) {
   }
 
   return { assets, skipped };
+}
+
+function isTooSmallPublicEvidence({ width, height }) {
+  return width < PUBLIC_EVIDENCE_MIN_WIDTH ||
+    height < PUBLIC_EVIDENCE_MIN_HEIGHT ||
+    width * height < PUBLIC_EVIDENCE_MIN_AREA;
+}
+
+function readImageDimensions(buffer) {
+  if (buffer.length >= 24 && buffer.toString("ascii", 1, 4) === "PNG") {
+    return {
+      width: buffer.readUInt32BE(16),
+      height: buffer.readUInt32BE(20)
+    };
+  }
+  if (buffer.length >= 10 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP") {
+    return readWebpDimensions(buffer);
+  }
+  if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+    return readJpegDimensions(buffer);
+  }
+  return null;
+}
+
+function readWebpDimensions(buffer) {
+  const chunk = buffer.toString("ascii", 12, 16);
+  if (chunk === "VP8X" && buffer.length >= 30) {
+    return {
+      width: 1 + buffer.readUIntLE(24, 3),
+      height: 1 + buffer.readUIntLE(27, 3)
+    };
+  }
+  return null;
+}
+
+function readJpegDimensions(buffer) {
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = buffer[offset + 1];
+    const length = buffer.readUInt16BE(offset + 2);
+    if (length < 2) {
+      return null;
+    }
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: buffer.readUInt16BE(offset + 5),
+        width: buffer.readUInt16BE(offset + 7)
+      };
+    }
+    offset += 2 + length;
+  }
+  return null;
 }
 
 function selectImageCandidates(candidates, maxAssets, existingSourceUrls = new Set()) {

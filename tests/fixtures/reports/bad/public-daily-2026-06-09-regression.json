@@ -1,0 +1,59 @@
+{
+  "report_date": "2026-06-09",
+  "observed_problem": "Public daily page had only three main items, exposed full-page leaderboard screenshots, rendered tiny source icons as content images, and mixed internal audit/debug sections into the reader-facing report.",
+  "main_item_count": 3,
+  "daily_tracking": [
+    {
+      "id": "openrouter-rankings",
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai/rankings",
+      "event_date": "2026-06-09",
+      "source": "OpenRouter Rankings",
+      "category": "model_usage",
+      "importance": "notable",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "change_status": "changed",
+      "publish_to_public": true,
+      "summary": "OpenRouter public rankings fixture parsed into table rows.",
+      "metrics": [],
+      "snapshot_fixture": "openrouter_top_10"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "OpenRouter full-page browser screenshot",
+      "source_url": "https://openrouter.ai/rankings",
+      "local_path": "assets/evidence/2026-06-09-openrouter-full-page.png",
+      "caption": "Full browser page screenshot used as main content.",
+      "extraction_status": "source_image",
+      "width": 1280,
+      "height": 900,
+      "capture_kind": "full_page_screenshot"
+    },
+    {
+      "type": "figure",
+      "title": "Artificial Analysis full-page browser screenshot",
+      "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      "local_path": "assets/evidence/2026-06-09-artificial-analysis-full-page.png",
+      "caption": "Full browser page screenshot used as main content.",
+      "extraction_status": "source_image",
+      "width": 1280,
+      "height": 900,
+      "capture_kind": "full_page_screenshot"
+    },
+    {
+      "type": "figure",
+      "title": "Tiny source icon",
+      "source_url": "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232",
+      "local_path": "assets/evidence/2026-06-09-tokenmaxxing-icon.png",
+      "caption": "28x28 source icon rendered as a public image.",
+      "extraction_status": "source_image",
+      "width": 28,
+      "height": 28,
+      "byte_size": 398,
+      "asset_role": "icon"
+    }
+  ]
+}

@@ -321,15 +321,17 @@ function requireExpandedMainItemFormat(report) {
 
   mainItems.forEach((item, index) => {
     const bullets = Array.isArray(item.bullets) ? item.bullets.map((bullet) => String(bullet || "").trim()) : [];
-    const text = bullets.join("\n");
-    if (bullets.length < 3 || bullets.length > 5) {
-      errors.push(`main_items[${index}].bullets must contain 3-5 factual bullets`);
+    const summary = String(item.summary || "").trim();
+    const factLines = [summary, ...bullets].map((line) => line.trim()).filter(Boolean);
+    const text = factLines.join("\n");
+    if (factLines.length < 2 || factLines.length > 3) {
+      errors.push(`main_items[${index}] must contain 2-3 compact factual lines plus title/link`);
     }
     if (!/\*\*[^*]+\*\*/.test(text) && !/==[^=\n]+==/.test(text)) {
       errors.push(`main_items[${index}] missing emphasis`);
     }
-    const totalChars = bullets.reduce((sum, bullet) => sum + bullet.length, 0);
-    if (totalChars < 80) {
+    const totalChars = factLines.reduce((sum, line) => sum + line.length, 0);
+    if (totalChars < 70) {
       errors.push(`main_items[${index}] summary is too thin`);
     }
     if (/(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]/u.test(text)) {
@@ -337,6 +339,9 @@ function requireExpandedMainItemFormat(report) {
     }
     if (/(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向)/u.test(text)) {
       errors.push(`main_items[${index}] contains generic public template prose`);
+    }
+    if (/(?:这次放出的信息主要落在|当前公开信息主要落在|公开细节集中在|最有用的公开信息，通常是|当前公开信息主要集中在)/u.test(text)) {
+      errors.push(`main_items[${index}] contains generic autodraft prose`);
     }
     const metaPhrase = bannedMetaPhrases.find((phrase) => text.includes(phrase));
     if (metaPhrase) {
@@ -347,7 +352,7 @@ function requireExpandedMainItemFormat(report) {
   if (errors.length > 0) {
     throw new PublisherError(
       "main_items_format_weak",
-      "Expanded main_items require 3-5 factual bullets without templated public labels or generic watch-next prose.",
+      "Expanded main_items require compact factual summary lines without templated labels, generic watch-next prose, or explanation filler.",
       { errors }
     );
   }

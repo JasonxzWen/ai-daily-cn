@@ -468,7 +468,7 @@ test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () 
   assert(html.includes("模块：date-scope"));
   assert(html.includes("需要确认"));
 
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
   const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
   assert(selfCheckSection.content.includes("为什么要改：避免低质量硬凑。"));
   assert(!selfCheckSection.content.includes("。；为什么要改"));
@@ -706,7 +706,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
       watch_next: "显著变化时回到模型发布和价格页核验。"
     }
   ];
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
 
   assert.equal(input.template, "research-explainer");
   assert.equal(input.renderMode, "pre-rendered");
@@ -849,7 +849,7 @@ test("每日追踪没有可核验变化时不渲染公开正文板块", async ()
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
 
   assert(!input.sections.some((section) => section.title === "每日追踪"));
   assert(!input.heroStats.some((item) => item.label === "追踪"));
@@ -980,7 +980,7 @@ test("GitHub Trending project highlights deduplicate overlapping project text", 
   const validation = validateReport(report);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
-  const input = reportToInteractionInput(validation.value);
+  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
   const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
   assert(section.content.includes("压缩工具输出、日志、文件和 RAG chunks"));
   assert(section.content.includes("领域：LLM 工具链、RAG、MCP"));
@@ -1007,7 +1007,7 @@ test("interaction input rewrites generation-log summaries into editorial summari
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
 
   assert(!input.summary.includes("最新 main"));
   assert(!input.summary.includes("重新生成"));
@@ -1389,7 +1389,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   assert(!section.includes("\u6765\u6e90\uff1a"));
   assert(!section.includes("\u8bed\u8a00\uff1a"));
 
-  const input = reportToInteractionInput(validation.value);
+  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
   const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
   assert(trendingSection);
   assert(trendingSection.content.includes("3. **[![hardikpandya/stop-slop]"));
@@ -1454,7 +1454,7 @@ test("HTML and interaction input attach evidence assets to matching report items
   assert(mainHtml.includes("Claude Opus 4.8 performance comparison"));
   assert(mainHtml.includes("Agentic coding"));
 
-  const input = reportToInteractionInput(validation.value);
+  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
   const qualitySection = input.sections.find((section) => section.title === "发布质量说明");
   assert(qualitySection);
   assert(qualitySection.content.includes("hot_blogs"));
@@ -1560,7 +1560,7 @@ test("interaction source icon cache covers high-frequency AI daily sources and s
     }
   };
 
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
   const auditSection = input.sections.find((section) => section.group === "verification" && typeof section.content === "string" && section.content.includes("HNRSS Frontpage"));
   assert(auditSection, "source audit section should be present");
   const mainContent = mainMarkdownContent(input);
@@ -4253,7 +4253,7 @@ test("daily runner writes launcher summary and stops before real publish by defa
       remote_main_sha: "1111111111111111111111111111111111111111"
     }),
     runStage: async (stage, context) => {
-      calls.push({ id: stage.id, cwd: context.cleanRoot });
+      calls.push({ id: stage.id, cwd: context.cleanRoot, args: stage.command.args });
       return { ok: true, output: { stage: stage.id } };
     }
   });
@@ -4271,6 +4271,54 @@ test("daily runner writes launcher summary and stops before real publish by defa
 
   const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
   assert.equal(saved.final_status, "generated_only");
+});
+
+test("daily runner wires platform exempt discovery outputs into report draft", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-platforms-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-09",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.deepEqual(
+    calls
+      .map((stage) => stage.id)
+      .filter((id) => id.includes("platform")),
+    ["discover_wechat_platform", "discover_zhihu_platform", "discover_reddit_platform"]
+  );
+  const reportDraft = calls.find((stage) => stage.id === "report_draft");
+  const inputIndex = reportDraft.command.args.indexOf("--input");
+  const inputPaths = reportDraft.command.args[inputIndex + 1].split(",");
+  assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
+  assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
+  assert(inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
+});
+
+test("reddit platform source is enabled with deterministic safety gates", async () => {
+  const config = JSON.parse(
+    await fs.readFile(path.join(rootDir, "config", "sources", "reddit-platform-sources.json"), "utf8")
+  );
+  const redditSource = config.sources.find((source) => source.id === "platform-reddit-local-llama-feed");
+
+  assert(redditSource);
+  assert.equal(redditSource.kill_switch, false);
+  assert.equal(redditSource.verification_policy, "platform_signal_exempt");
+  assert(redditSource.allowed_hosts.includes("reddit.com"));
+  assert(redditSource.exclude_keywords.includes("slop"));
+  assert(redditSource.exclude_keywords.includes("bot"));
 });
 
 test("daily runner hands AI repair back to Codex with publish review budget", async () => {
@@ -5309,6 +5357,138 @@ test("buildSite ignores source status history metadata in reports-data", async (
   assert(result.writtenFiles.includes(`data/${year}/${month}/${structuredReport.report_date}.json`));
 });
 
+test("buildSite writes reader-safe public data without internal fields or candidate pools", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-data-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+
+  report.candidate_pool_path = `data/${year}/${month}/${report.report_date}.candidates.json`;
+  report.main_items[0].why_it_matters = "Internal rationale must not be public data.";
+  report.main_items[0].reader_relevance = "Internal reader relevance must not be public data.";
+  report.main_items[0].watch_next = "Internal watch-next must not be public data.";
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed",
+      source_level: "primary",
+      summary: "Public summary.",
+      evidence: "OpenRouter public page snapshot parsed successfully.",
+      metrics: [],
+      watch_points: ["Top models and providers remain visible in the parsed snapshot."],
+      snapshot: openRouterSnapshotFixture()
+    },
+    {
+      id: "internal-blocked-tracker",
+      name: "Internal Blocked Tracker",
+      url: "https://example.com/internal",
+      event_date: report.report_date,
+      source: "Internal",
+      category: "model_usage",
+      importance: "general",
+      publish_to_public: false,
+      change_status: "blocked",
+      verification_status: "unverified",
+      source_level: "primary",
+      summary: "This should not be copied to public data.",
+      evidence: "Internal tracker blocked.",
+      metrics: [],
+      watch_points: ["Internal tracker should remain out of public data."]
+    }
+  ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Valid source asset",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/valid-source-asset.jpg",
+      caption: "Valid source asset.",
+      extraction_status: "source_image",
+      width: 640,
+      height: 360,
+      capture_kind: "source_asset"
+    },
+    {
+      type: "figure",
+      title: "Full page screenshot",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/full-page.png",
+      caption: "Full page browser screenshot.",
+      extraction_status: "source_image",
+      width: 1280,
+      height: 900,
+      capture_kind: "full_page_screenshot"
+    }
+  ];
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.candidates.json`), `${JSON.stringify({
+    schema_version: 1,
+    report_date: report.report_date,
+    generated_at: fixedGeneratedAt,
+    sources: [],
+    candidates: [
+      {
+        id: "internal-candidate",
+        source_id: "internal-source",
+        title: "Internal candidate",
+        url: report.main_items[0].url,
+        event_date: report.report_date,
+        status: "included",
+        included_in: "main_items"
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert(result.writtenFiles.includes(`data/${year}/${month}/${report.report_date}.json`));
+  assert(!result.writtenFiles.includes(`data/${year}/${month}/${report.report_date}.candidates.json`));
+  assert.equal(await exists(path.join(outDir, `data/${year}/${month}/${report.report_date}.candidates.json`)), false);
+
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  const keys = collectJsonKeys(publicData);
+  for (const key of [
+    "candidate_id",
+    "candidate_pool_path",
+    "source_audit",
+    "self_check",
+    "why_it_matters",
+    "reader_relevance",
+    "watch_next",
+    "source_id",
+    "source_level",
+    "verification_status",
+    "blocking_issues",
+    "degraded_sections",
+    "publish_status"
+  ]) {
+    assert(!keys.has(key), `${key} must not appear in public docs data`);
+  }
+  assert.equal(publicData.daily_tracking.length, 1);
+  assert.equal(publicData.daily_tracking[0].id, "openrouter-rankings");
+  assert.equal(publicData.evidence_assets.length, 1);
+  assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
+});
+
 test("buildSite writes trend index and injects scoped trend tags without mutating report data", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-trend-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
@@ -5698,6 +5878,16 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
     source_level: "original_social",
     original_url: "https://x.com/builder/status/1794993600000000999"
   });
+  discovery.evidence_assets = [
+    {
+      type: "figure",
+      title: "OpenRouter browser screenshot",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-page.png",
+      caption: "OpenRouter Rankings 页面截图，不应进入公开日报主体证据。",
+      extraction_status: "source_image"
+    }
+  ];
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
   const drafted = await generateReportDraft({
@@ -5717,6 +5907,9 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
     "swe-bench-pro-public"
   ]);
   assert(drafted.report.daily_tracking.every((item) => item.watch_points.length > 0 && item.metrics.length > 0));
+  assert(!drafted.report.evidence_assets.some((asset) =>
+    /openrouter|browser screenshot|页面截图|screenshot/i.test(`${asset.title || ""} ${asset.caption || ""} ${asset.local_path || ""}`)
+  ));
   assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   assert(drafted.report.github_trending.every((item) => item.source === "GitHub Trending daily"));
   assert(!drafted.report.github_trending.some((item) => item.repo === "example/weekly-project"));
@@ -5755,7 +5948,12 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
     "可信信号",
     "发布或更新了这条信号",
     "自动草稿译述",
-    "工程雷达线索"
+    "工程雷达线索",
+    "这次放出的信息主要落在",
+    "当前公开信息主要落在",
+    "公开细节集中在",
+    "最有用的公开信息，通常是",
+    "当前公开信息主要集中在"
   ]) {
     assert(!publicAutodraftText.includes(phrase), `public autodraft text should not include ${phrase}`);
   }
@@ -6057,8 +6255,7 @@ test("report:draft prefers specific hot blog evidence over generic feed announce
 
   assert(selectedUrls.has(rocketmqUrl), "specific RocketMQ write-up should survive public selection");
   assert(selectedUrls.has(agentscopeUrl), "specific AgentScope write-up should survive public selection");
-  assert(hotUrls.has(tokenmaxxingUrl), "method essay should remain available in hot_blogs");
-  assert(!mainUrls.has(tokenmaxxingUrl), "method essay should not crowd main_items");
+  assert(selectedUrls.has(tokenmaxxingUrl), "method essay should remain available in public selection");
   assert(!selectedUrls.has(genericOneUrl), "generic feed announcement should be filtered out");
   assert(!selectedUrls.has(genericTwoUrl), "generic feed announcement should be filtered out");
 });
@@ -6407,10 +6604,10 @@ test("report:draft keeps minor consumer AI feature rollouts out of main_items", 
   });
 
   const titles = drafted.report.main_items.map((item) => item.title);
-  assert.deepEqual(titles, [
-    "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击",
-    "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行"
-  ]);
+  assert.equal(titles.length, 2);
+  assert(titles.includes("WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击"));
+  assert(titles.includes("NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行"));
+  assert(!titles.some((title) => /Alexa|merch|Shopping/i.test(title)));
 });
 
 test("report:draft limits low-signal vendor partnership items in main coverage", async () => {
@@ -6478,7 +6675,7 @@ test("report:draft limits low-signal vendor partnership items in main coverage",
   assert(drafted.report.main_items.some((item) => item.source === "Anthropic News"));
 });
 
-test("report:draft promotes reader-relevant company actions from primary sources", async () => {
+test("report:draft promotes public-important company actions from primary sources", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-reader-selection-"));
   const reportDate = "2026-05-26";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -6575,9 +6772,10 @@ test("report:draft promotes reader-relevant company actions from primary sources
 
   const mainIds = new Set(drafted.report.main_items.map((item) => item.candidate_id));
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
-  for (const candidate of companyCandidates) {
-    assert(mainUrls.has(candidate.url), `reader-relevant company action should enter main_items: ${candidate.id}`);
-  }
+  const selectedCompanyCandidates = companyCandidates.filter((candidate) => mainUrls.has(candidate.url));
+  assert(mainUrls.has(companyCandidates[0].url), "Tencent public company action should enter main_items");
+  assert(mainUrls.has(companyCandidates[1].url), "Alibaba public company action should enter main_items");
+  assert(selectedCompanyCandidates.length >= 2, "public-important company actions should not be crowded out");
   assert(!mainIds.has("google-news-company-rumor"));
   assert(!mainUrls.has("https://news.google.com/rss/articles/example"));
   assert(drafted.report.main_items.some((item) => item.editorial_category === "company_business"));
@@ -6689,11 +6887,61 @@ test("report:draft promotes official product and platform deep dives into main_i
   const discoveryPath = path.join(tmp, "discovery.json");
   const discovery = autodraftDiscoveryFixture(reportDate);
   const notebooklmUrl = "https://blog.google/innovation-and-ai/products/notebooklm/better-research-notebooklm/";
+  const appleSiriUrl = "https://www.apple.com/newsroom/2026/06/apple-intelligence-and-siri-at-wwdc/";
+  const applePersonalSiriUrl = "https://www.apple.com/newsroom/2026/06/apple-introduces-siri-ai-a-profoundly-more-capable-and-personal-assistant/";
+  const openAiExchangeUrl = "https://openai.com/index/economic-research-exchange/";
+  const awsCrossRegionUrl = "https://aws.amazon.com/blogs/machine-learning/unlocking-ai-flexibility-in-europe-a-guide-to-cross-region-inference-for-eu-data-processing-and-model-access/";
   const agentcoreUrl = "https://aws.amazon.com/blogs/machine-learning/its-safe-to-close-your-laptop-now-hosting-coding-agents-on-amazon-bedrock-agentcore/";
   const rocketmqUrl = "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233";
   const nemotronUrl = "https://developer.nvidia.com/blog/nvidia-nemotron-3-ultra-powers-faster-more-efficient-reasoning-for-long-running-agents/";
+  const blackwellUrl = "https://developer.nvidia.com/blog/blackwell-nvfp4-and-jax-ai-inference/";
 
   discovery.candidates = [
+    {
+      id: "apple-siri-wwdc-ai",
+      source_id: "content-apple-newsroom",
+      category: "community_lead",
+      title: "Apple updates Siri and Apple Intelligence at WWDC",
+      url: appleSiriUrl,
+      source: "Apple Newsroom",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Apple Newsroom describes Siri, Apple Intelligence, developer APIs, and platform rollout details from WWDC.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: appleSiriUrl,
+      verification_sources: [appleSiriUrl]
+    },
+    {
+      id: "apple-personal-siri-ai",
+      source_id: "content-apple-newsroom",
+      category: "community_lead",
+      title: "Apple introduces Siri AI, a profoundly more capable and personal assistant",
+      url: applePersonalSiriUrl,
+      source: "Apple Newsroom",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Apple Newsroom separately describes Siri AI as a more capable and personal assistant with system context and privacy boundaries.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: applePersonalSiriUrl,
+      verification_sources: [applePersonalSiriUrl]
+    },
+    {
+      id: "openai-economic-research-exchange",
+      source_id: "content-openai-news",
+      category: "community_lead",
+      title: "OpenAI launches Economic Research Exchange for AI labor market research",
+      url: openAiExchangeUrl,
+      source: "OpenAI News RSS",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "OpenAI announced an Economic Research Exchange focused on AI, labor markets, measurement, and public research collaboration.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: openAiExchangeUrl,
+      verification_sources: [openAiExchangeUrl]
+    },
     {
       id: "notebooklm-product-upgrade",
       source_id: "content-google-keyword-blog",
@@ -6708,6 +6956,21 @@ test("report:draft promotes official product and platform deep dives into main_i
       source_level: "official",
       primary_url: notebooklmUrl,
       verification_sources: [notebooklmUrl]
+    },
+    {
+      id: "aws-cross-region-inference-eu",
+      source_id: "content-aws-machine-learning-blog",
+      category: "hot_blog",
+      title: "Unlocking AI flexibility in Europe: A guide to cross-region inference for EU data processing and model access",
+      url: awsCrossRegionUrl,
+      source: "AWS Machine Learning Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official AWS post explains cross-region inference for EU data processing, model access, and operational setup.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: awsCrossRegionUrl,
+      verification_sources: [awsCrossRegionUrl]
     },
     {
       id: "agentcore-hosted-coding-agents",
@@ -6753,6 +7016,21 @@ test("report:draft promotes official product and platform deep dives into main_i
       source_level: "official",
       primary_url: nemotronUrl,
       verification_sources: [nemotronUrl]
+    },
+    {
+      id: "nvidia-blackwell-jax-nvfp4",
+      source_id: "content-nvidia-developer-blog",
+      category: "hot_blog",
+      title: "NVIDIA Blackwell NVFP4 and JAX improve AI inference efficiency",
+      url: blackwellUrl,
+      source: "NVIDIA Developer Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "NVIDIA describes Blackwell NVFP4, JAX support, and AI inference efficiency changes for model serving.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: blackwellUrl,
+      verification_sources: [blackwellUrl]
     }
   ];
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
@@ -6767,12 +7045,33 @@ test("report:draft promotes official product and platform deep dives into main_i
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
   const hotBlogUrls = new Set(drafted.report.hot_blogs.map((item) => item.url));
+  const orderedMainUrls = drafted.report.main_items.map((item) => item.url);
 
+  assert(mainUrls.has(appleSiriUrl), "Apple Siri and Apple Intelligence update should enter main_items");
+  assert(mainUrls.has(applePersonalSiriUrl), "Apple personal Siri AI update should enter main_items");
+  assert(mainUrls.has(openAiExchangeUrl), "OpenAI public research exchange should enter main_items");
+  assert(mainUrls.has(blackwellUrl), "NVIDIA Blackwell AI inference update should enter main_items");
   assert(mainUrls.has(notebooklmUrl), "official NotebookLM product update should enter main_items");
+  assert(mainUrls.has(awsCrossRegionUrl), "official AWS cross-region inference update should remain in main_items");
   assert(mainUrls.has(agentcoreUrl), "official Bedrock AgentCore workflow update should enter main_items");
   assert(mainUrls.has(rocketmqUrl), "official RocketMQ workflow infrastructure update should enter main_items");
-  assert(!mainUrls.has(nemotronUrl), "pure model deep dive should not automatically crowd main_items");
-  assert(hotBlogUrls.has(nemotronUrl), "pure model deep dive should remain available in hot_blogs");
+  assert(new Set([...mainUrls, ...hotBlogUrls]).has(nemotronUrl), "official NVIDIA model deep dive should remain available in public selection");
+  const firstNarrowEngineeringIndex = Math.min(
+    orderedMainUrls.indexOf(awsCrossRegionUrl),
+    orderedMainUrls.indexOf(agentcoreUrl),
+    orderedMainUrls.indexOf(rocketmqUrl)
+  );
+  for (const headlineUrl of [appleSiriUrl, openAiExchangeUrl, blackwellUrl]) {
+    assert(
+      orderedMainUrls.indexOf(headlineUrl) > -1 && orderedMainUrls.indexOf(headlineUrl) < firstNarrowEngineeringIndex,
+      `${headlineUrl} should rank before narrow engineering blog items`
+    );
+  }
+  assert.equal(
+    new Set(drafted.report.main_items.map((item) => item.title)).size,
+    drafted.report.main_items.length,
+    "main_items should not expose duplicate display titles"
+  );
 });
 
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
@@ -7430,7 +7729,7 @@ test("publish quality degrades strict daily reports whose summary reads like a g
   );
 });
 
-test("publish quality degrades strict daily reports missing engineer relevance fields", () => {
+test("publish quality accepts strict daily reports without explanation metadata", () => {
   const report = strictPublishReportFixture();
   delete report.main_items[0].reader_relevance;
   delete report.main_items[0].why_it_matters;
@@ -7438,11 +7737,7 @@ test("publish quality degrades strict daily reports missing engineer relevance f
   const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
   assert.deepEqual(classification.blocking_issues, []);
-  assert(
-    classification.degraded_sections.some(
-      (issue) => issue.code === "main_items_editorial_context_missing" && issue.section === "main_items"
-    )
-  );
+  assert(!classification.degraded_sections.some((issue) => issue.code === "main_items_editorial_context_missing"));
 });
 
 test("publish quality blocks strict daily reports when intermediary sources enter mainline facts", () => {
@@ -7714,7 +8009,7 @@ test("publish quality blocks strict daily reports with summarized Builder observ
   );
 });
 
-test("publish quality degrades strict daily reports without linked local evidence assets", () => {
+test("publish quality accepts strict daily reports without linked local evidence assets", () => {
   const report = strictPublishReportFixture();
   report.evidence_assets = [
     {
@@ -7730,7 +8025,8 @@ test("publish quality degrades strict daily reports without linked local evidenc
   const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
 
   assert.deepEqual(classification.blocking_issues, []);
-  assert(classification.degraded_sections.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+  assert(!classification.degraded_sections.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+  assert(!classification.degraded_sections.some((issue) => issue.error_code === "public_media_contract_failed"));
 });
 
 test("publish quality degrades strict daily reports when linked local evidence file is missing", () => {
@@ -7739,7 +8035,13 @@ test("publish quality degrades strict daily reports when linked local evidence f
   const classification = classifyPublishQuality(report, { existingAssetPaths: new Set() });
 
   assert.deepEqual(classification.blocking_issues, []);
-  assert(classification.degraded_sections.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+  assert(
+    classification.degraded_sections.some(
+      (issue) =>
+        issue.error_code === "public_media_contract_failed" &&
+        issue.violations.some((violation) => violation.reason === "linked_local_evidence_file_missing")
+    )
+  );
 });
 
 test("publish quality degrades strict daily reports whose model releases are not mirrored in main_items", () => {
@@ -7780,6 +8082,215 @@ test("publish quality keeps strict coverage gate scoped to 2026-06-02 and later"
   assert(!issues.some((issue) => issue.error_code === "github_trending_top10_gate_failed"));
   assert(!issues.some((issue) => issue.error_code === "builder_x_coverage_gate_failed"));
   assert(!issues.some((issue) => issue.error_code === "evidence_assets_gate_failed"));
+});
+
+test("public daily contract accepts no-image short news without explanation fields", () => {
+  const report = strictPublishReportFixture();
+  report.main_items = report.main_items.map((item, index) => {
+    const updated = {
+      ...item,
+      summary: `第 ${index + 1} 条主体短新闻只保留可回源事实、对象和变化，不输出判断或启示。`,
+      bullets: [
+        `事实 ${index + 1}：官方页面记录了明确发布时间、对象和变化范围。`,
+        `来源 ${index + 1}：原文链接保留，读者可直接打开核对。`
+      ]
+    };
+    delete updated.why_it_matters;
+    delete updated.reader_relevance;
+    delete updated.watch_next;
+    return updated;
+  });
+  report.evidence_assets = [];
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+  const issueCodes = [
+    ...classification.blocking_issues,
+    ...classification.degraded_sections
+  ].flatMap((issue) => [issue.error_code, issue.code].filter(Boolean));
+
+  assert(!issueCodes.includes("editorial_context_gate_failed"));
+  assert(!issueCodes.includes("evidence_assets_gate_failed"));
+});
+
+test("public daily contract rejects invalid public media but allows missing media", () => {
+  const report = strictPublishReportFixture();
+  const options = strictPublishOptionsFixture();
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "Tiny favicon should not be public evidence",
+      source_url: report.main_items[0].url,
+      local_path: "assets/evidence/tiny-favicon.png",
+      caption: "28x28 icon from a source page.",
+      extraction_status: "source_image",
+      width: 28,
+      height: 28,
+      byte_size: 398,
+      asset_role: "icon"
+    },
+    {
+      type: "figure",
+      title: "OpenRouter full page screenshot",
+      source_url: report.main_items[1].url,
+      local_path: "assets/evidence/openrouter-full-page.png",
+      caption: "Full browser page capture.",
+      extraction_status: "source_image",
+      width: 1280,
+      height: 900,
+      capture_kind: "full_page_screenshot"
+    }
+  ];
+  options.existingAssetPaths = new Set(report.evidence_assets.map((asset) => asset.local_path));
+
+  const classification = classifyPublishQuality(report, options);
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    classification.degraded_sections.some(
+      (issue) =>
+        issue.error_code === "public_media_contract_failed" &&
+        issue.violations.some((violation) => violation.reason === "image_dimensions_too_small") &&
+        issue.violations.some((violation) => violation.reason === "full_page_screenshot_not_public_content")
+    )
+  );
+});
+
+test("public daily contract renders tables instead of screenshots and hides audit appendices", () => {
+  const report = strictPublishReportFixture();
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "OpenRouter 公开榜单解析出 Top 10 模型、供应商、调用量和周变化。",
+      metrics: [],
+      snapshot: openRouterSnapshotFixture()
+    }
+  ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "OpenRouter browser screenshot",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-browser-shot.png",
+      caption: "Browser viewport screenshot should not be the public main content.",
+      extraction_status: "source_image",
+      width: 1280,
+      height: 900,
+      capture_kind: "full_page_screenshot"
+    },
+    {
+      type: "figure",
+      title: "Tiny source icon",
+      source_url: report.hot_blogs[0].url,
+      local_path: "assets/evidence/tiny-source-icon.png",
+      caption: "28x28 source icon.",
+      extraction_status: "source_image",
+      width: 28,
+      height: 28,
+      byte_size: 398,
+      asset_role: "icon"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const tracking = input.sections.find((section) => section.title === "每日追踪");
+  const hotBlogs = input.sections.find((section) => section.title === "热门博客");
+  const serialized = JSON.stringify(input.sections);
+
+  assert(tracking);
+  assert.equal(tracking.items[0].media, undefined);
+  assert.equal(tracking.items[0].table.rows.length, 10);
+  assert(hotBlogs.items.every((item) => !item.media));
+  assert(!input.sections.some((section) => ["信源审计", "自检与产物", "发布质量说明"].includes(section.title)));
+  assert(!serialized.includes("source_audit"));
+  assert(!serialized.includes("候选 / 入选"));
+  assert(!serialized.includes("why_it_matters"));
+});
+
+test("public daily contract renders main items as one short-news stream", () => {
+  const report = strictPublishReportFixture();
+  const categories = [
+    "ai_industry",
+    "company_business",
+    "product_radar",
+    "open_source",
+    "content_aigc"
+  ];
+  report.main_items = report.main_items.map((item, index) => ({
+    ...item,
+    editorial_category: categories[index % categories.length],
+    summary: `Main short news item ${index + 1} keeps source-grounded facts only.`,
+    bullets: [
+      `Fact line ${index + 1}: the source states the object and change.`,
+      `Source line ${index + 1}: the original URL remains attached.`
+    ]
+  }));
+
+  const input = reportToInteractionInput(report);
+  const mainSections = input.sections.filter((section) => section.group === "main" && section.type === "markdown");
+  const content = mainSections.map((section) => section.content || "").join("\n");
+
+  assert.equal(mainSections.length, 1);
+  assert.equal(mainSections[0].title, "AI 资讯");
+  assert(content.includes("1. **["));
+  assert(content.includes(`${report.main_items.length}. **[`));
+  for (const item of report.main_items) {
+    assert(content.includes(item.title));
+  }
+  assert(!input.sections.some((section) => ["大厂与政策", "产品与开源", "AIGC 动态"].includes(section.title)));
+});
+
+test("public daily contract replays 2026-06-09 bad media and short-main regression", async () => {
+  const fixture = JSON.parse(await readFixture("reports/bad/public-daily-2026-06-09-regression.json"));
+  const report = strictPublishReportFixture();
+  report.report_date = fixture.report_date;
+  report.title = `AI Daily ${fixture.report_date} bad regression replay`;
+  report.main_items = report.main_items.slice(0, fixture.main_item_count);
+  report.self_check.report_date = fixture.report_date;
+  report.self_check.main_items = report.main_items.length;
+  report.daily_tracking = fixture.daily_tracking.map((item) => ({
+    ...item,
+    snapshot: item.snapshot_fixture === "openrouter_top_10" ? openRouterSnapshotFixture() : undefined
+  }));
+  report.hot_blogs[0].url = fixture.evidence_assets.find((asset) => asset.asset_role === "icon").source_url;
+  report.evidence_assets = fixture.evidence_assets;
+
+  const options = strictPublishOptionsFixture();
+  options.existingAssetPaths = new Set(fixture.evidence_assets.map((asset) => asset.local_path));
+  const classification = classifyPublishQuality(report, options);
+  const issueCodes = [
+    ...classification.blocking_issues,
+    ...classification.degraded_sections
+  ].flatMap((issue) => [issue.error_code, issue.code].filter(Boolean));
+  const mediaIssue = classification.degraded_sections.find((issue) => issue.error_code === "public_media_contract_failed");
+
+  assert(issueCodes.includes("main_items_below_strict_minimum"), JSON.stringify(issueCodes));
+  assert(mediaIssue);
+  assert(mediaIssue.violations.some((violation) => violation.reason === "full_page_screenshot_not_public_content"));
+  assert(mediaIssue.violations.some((violation) => violation.reason === "non_content_image_asset"));
+
+  const input = reportToInteractionInput(report);
+  const openRouterCard = input.sections
+    .flatMap((section) => section.items || [])
+    .find((item) => item.title === "OpenRouter");
+  const serialized = JSON.stringify(input.sections);
+
+  assert(openRouterCard);
+  assert.equal(openRouterCard.media, undefined);
+  assert.equal(openRouterCard.table.rows.length, 10);
+  assert(!serialized.includes("source_audit"));
+  assert(!serialized.includes("why_it_matters"));
+  assert(!serialized.includes("full-page browser screenshot"));
+  assert(!serialized.includes("28x28 source icon"));
 });
 
 test("report:write derives degraded quality status for blocked content discovery", async () => {
@@ -7886,7 +8397,7 @@ test("report:write includes public network guidance for discovery outages", asyn
     )
   );
 
-  const input = reportToInteractionInput(report);
+  const input = reportToInteractionInput(report, { includeInternalSections: true });
   const qualitySection = input.sections.find((section) => section.title.includes("质量") || section.title.includes("Quality"));
   assert(qualitySection);
   assert.match(qualitySection.content, /config\.toml/);
@@ -8112,7 +8623,7 @@ test("report:write rejects expanded main items with templated prose or thin deta
   );
 });
 
-test("report:write rejects expanded main items with only two clean public bullets", async () => {
+test("report:write accepts expanded main items with two compact factual bullets", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseItem = draft.main_items[0];
@@ -8142,15 +8653,14 @@ test("report:write rejects expanded main items with only two clean public bullet
   }));
   draft.evidence_assets = [];
 
-  assertPublisherCode(
-    () =>
-      normalizeReportDraft(draft, {
-        siteUrl,
-        generatedAt: fixedGeneratedAt,
-        candidatePool
-      }),
-    "main_items_format_weak"
-  );
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.main_items.length, 8);
+  assert.equal(report.quality_status.status, "ok");
 });
 
 test("report:write marks thin main_items degraded when enough main candidates exist", async () => {
@@ -8369,6 +8879,23 @@ test("platform exempt report sections require public audit disclosure and render
     generatedAt: fixedGeneratedAt,
     candidatePool
   });
+  report.reddit_items = [
+    {
+      platform: "reddit",
+      source_id: "platform-reddit-local-llama-feed",
+      rule_id: "platform-reddit-local-llama-feed",
+      title: "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Xiaomi just claimed 1,000+ tps on a 1T model using a standard 8-GPU...”",
+      url: "https://www.reddit.com/r/LocalLLaMA/comments/1u0buhm/xiaomi_just_claimed_1000_tps_on_a_1t_model_using/",
+      event_date: "2026-06-08",
+      source: "Reddit LocalLLaMA Platform Feed",
+      source_level: "platform_exempt_signal",
+      verification_status: "platform_exempt_unverified",
+      claim_text: "Just saw Xiaomi MiMo announce MiMo-V2.5-Pro UltraSpeed, claiming they broke the 1,000 tokens/sec output barrier on a 1 trillion parameter MoE model. Crazy if true.",
+      why_watch: "This is a platform discussion weak signal.",
+      disclosure: "平台内扩散发现，未做一手回源核验。",
+      matched_terms: ["AI", "model"]
+    }
+  ];
   const input = reportToInteractionInput(report);
   const renderedText = JSON.stringify(input);
 
@@ -8376,8 +8903,17 @@ test("platform exempt report sections require public audit disclosure and render
   assert.equal(report.zhihu_items[0].rule_id, "zhihu-ai-agent-feed");
   assert.equal(report.quality_status.status, "ok");
   assert(renderedText.includes("知乎线索"));
-  assert(renderedText.includes("zhihu-ai-agent-feed"));
   assert(renderedText.includes("未做一手回源核验"));
+  assert(renderedText.includes("Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称"));
+  assert(renderedText.includes("标准 8-GPU 节点"));
+  assert(!renderedText.includes("source_id"));
+  assert(!renderedText.includes("rule_id"));
+  assert(!renderedText.includes("verification_status"));
+  assert(!renderedText.includes("matched_terms"));
+  assert(!renderedText.includes("观察理由"));
+  assert(!renderedText.includes("zhihu-ai-agent-feed"));
+  assert(!renderedText.includes("Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新"));
+  assert(!renderedText.includes("Crazy if true"));
 });
 
 test("platform exempt report rejects fact-style claims and wrong section placement", async () => {
@@ -8525,6 +9061,13 @@ test("report:draft publishes platform exempt candidates into independent section
   assert.equal(drafted.report.zhihu_items.length, 1);
   assert.equal(drafted.report.zhihu_items[0].candidate_id, "zhihu-platform-draft-signal");
   assert.equal(drafted.report.zhihu_items[0].verification_status, "platform_exempt_unverified");
+  assert.equal(drafted.report.zhihu_items[0].risk_label, "medium");
+  const normalized = normalizeReportDraft(drafted.report, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool: drafted.candidatePool
+  });
+  assert.equal(validateReport(normalized).valid, true, JSON.stringify(validateReport(normalized).errors));
   assert.equal(drafted.report.source_audit.zhihu_sources.included, 1);
   assert(!drafted.report.main_items.some((item) => item.candidate_id === "zhihu-platform-draft-signal"));
   assert(drafted.candidatePool.candidates.some((candidate) =>
@@ -8963,6 +9506,20 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("额外项目列表"));
   assert(prompt.includes("star 变化"));
   assert(prompt.includes("加粗变色文字"));
+  assert(prompt.includes("8-12 条短新闻流"));
+  assert(prompt.includes("公共 AI 重要性"));
+  assert(prompt.includes("不按用户个人工作直接相关性"));
+  assert(prompt.includes("结构化表格"));
+  assert(prompt.includes("OpenRouter"));
+  assert(prompt.includes("Artificial Analysis"));
+  assert(prompt.includes("无图日报可以通过"));
+  assert(prompt.includes("公开页不渲染 `why_it_matters`"));
+  assert(prompt.includes("公开日报默认隐藏 source audit"));
+  assert(!prompt.includes("`main_items` 每条必须填写 `why_it_matters` 或 `reader_relevance`"));
+  assert(!prompt.includes("`main_items` 必须至少填写其一"));
+  assert(!prompt.includes("每条用 3-5 个短 bullet"));
+  assert(!prompt.includes("每条 3-5 个短 bullet"));
+  assert(!prompt.includes("每条用 2-4 个短 bullet"));
   assert(prompt.includes("follow-builders central feed"));
   assert(prompt.includes("Product Hunt"));
   assert(prompt.includes("Product Hunt Trending"));
@@ -9520,6 +10077,23 @@ async function exists(filePath) {
   } catch {
     return false;
   }
+}
+
+function collectJsonKeys(value, keys = new Set()) {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectJsonKeys(item, keys);
+    }
+    return keys;
+  }
+  if (!value || typeof value !== "object") {
+    return keys;
+  }
+  for (const [key, entryValue] of Object.entries(value)) {
+    keys.add(key);
+    collectJsonKeys(entryValue, keys);
+  }
+  return keys;
 }
 
 async function runHarnessValidate(cwd) {

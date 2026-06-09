@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
+import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
@@ -217,30 +218,6 @@ structuredReport.source_audit = {
 structuredReport.evidence_assets = [
   {
     type: "figure",
-    title: "OpenRouter chart 1",
-    source_url: "https://openrouter.ai/rankings",
-    local_path: "assets/evidence/e2e-openrouter-1.png",
-    caption: "OpenRouter chart 1.",
-    extraction_status: "source_image"
-  },
-  {
-    type: "figure",
-    title: "OpenRouter chart 2",
-    source_url: "https://openrouter.ai/rankings",
-    local_path: "assets/evidence/e2e-openrouter-2.png",
-    caption: "OpenRouter chart 2.",
-    extraction_status: "source_image"
-  },
-  {
-    type: "figure",
-    title: "OpenRouter chart 3",
-    source_url: "https://openrouter.ai/rankings",
-    local_path: "assets/evidence/e2e-openrouter-3.png",
-    caption: "OpenRouter chart 3.",
-    extraction_status: "source_image"
-  },
-  {
-    type: "figure",
     title: "ExampleModel benchmark",
     source_url: firstModel.url,
     local_path: "assets/evidence/e2e-model-benchmark.png",
@@ -313,9 +290,6 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
-await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-1.png"));
-await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-2.png"));
-await writeTinyPng(path.join(outDir, "assets/evidence/e2e-openrouter-3.png"));
 
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();
@@ -339,10 +313,11 @@ try {
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
   assert.match(await page.locator("#report-top").textContent(), /日报导航/);
   assert.match(await page.locator("body").textContent(), /主体信息/);
-  assert.match(await page.locator("body").textContent(), /信源审计/);
+  assert.doesNotMatch(await page.locator("body").textContent(), /信源审计|自检与产物|发布质量说明/);
   assert.equal(await page.locator("#report-top a[href='https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-13.json']").count(), 1);
   assert.equal(await page.locator("link[rel='stylesheet']").count(), 0);
-  assert.equal(await page.locator("style").count(), 1);
+  assert((await page.locator("style").count()) >= 1);
+  assert.equal(await page.locator("style[data-ai-daily-css-overrides]").count(), 1);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
@@ -687,9 +662,53 @@ async function projectCardsAreHorizontalAndEven(page) {
 
 async function writeTinyPng(filePath) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
-  const png = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAr9c6yQAAAAASUVORK5CYII=",
-    "base64"
-  );
-  await fs.writeFile(filePath, png);
+  await fs.writeFile(filePath, readablePngFixture());
+}
+
+function readablePngFixture(width = 360, height = 240) {
+  const signature = Buffer.from("89504e470d0a1a0a", "hex");
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 2;
+
+  const rows = [];
+  for (let y = 0; y < height; y += 1) {
+    const row = Buffer.alloc(1 + width * 3);
+    for (let x = 0; x < width; x += 1) {
+      const offset = 1 + x * 3;
+      row[offset] = (x + y) % 256;
+      row[offset + 1] = (x * 2) % 256;
+      row[offset + 2] = (y * 2) % 256;
+    }
+    rows.push(row);
+  }
+
+  return Buffer.concat([
+    signature,
+    pngChunk("IHDR", ihdr),
+    pngChunk("IDAT", zlib.deflateSync(Buffer.concat(rows), { level: 9 })),
+    pngChunk("IEND", Buffer.alloc(0))
+  ]);
+}
+
+function pngChunk(type, data) {
+  const typeBuffer = Buffer.from(type);
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(data.length);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])));
+  return Buffer.concat([length, typeBuffer, data, crc]);
+}
+
+function crc32(buffer) {
+  let checksum = 0xffffffff;
+  for (const byte of buffer) {
+    checksum ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      checksum = (checksum >>> 1) ^ (0xedb88320 & -(checksum & 1));
+    }
+  }
+  return (checksum ^ 0xffffffff) >>> 0;
 }

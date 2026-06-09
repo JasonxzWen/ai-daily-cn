@@ -15,193 +15,8 @@
       "reason": "Mistral 把 RAG 检索基础设施、长周期 productivity agent、工业工程 AI 放到同一天的企业叙事里。"
     }
   ],
-  "source_window": {
-    "date_from": "2026-05-27",
-    "date_to": "2026-05-29",
-    "fallback_window_used": true,
-    "notes": "本地 Node 发现命令外网 fetch 失败，因此保留机器审计中的 blocked 状态，并用网页检索逐条打开一手来源。主体信息限定在 2026-05-27 至 2026-05-28 的官方发布、研究和工程博客。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending daily",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "npm run discover:github-trending fetch failed; retry_failed_after_1"
-        },
-        {
-          "name": "GitHub Trending daily web fallback",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "web fallback parsed current Top 10 from GitHub Trending page"
-        }
-      ],
-      "candidates_found": 16,
-      "included": 10,
-      "notes": "GitHub Trending daily Top 10 已独立展示；Node 抓取失败没有丢弃审计，页面内容由网页 fallback 打开并逐项写入候选池。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders X feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-          "status": "blocked",
-          "notes": "fetch failed; retry_failed_after_1"
-        },
-        {
-          "name": "follow-builders podcast feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
-          "status": "checked",
-          "notes": "feed generated 2026-05-28; parsed Every AI & I episode published 2026-05-27"
-        },
-        {
-          "name": "Claude official X fallback",
-          "url": "https://x.com/claudeai/status/2060042702150930686",
-          "status": "checked",
-          "notes": "original X status for Claude Opus 4.8 release"
-        },
-        {
-          "name": "Simon Willison Weblog",
-          "url": "https://simonwillison.net/2026/May/27/product-market-fit/",
-          "status": "checked",
-          "notes": "one recent builder blog parsed"
-        }
-      ],
-      "candidates_found": 3,
-      "included": 3,
-      "blocked_reason": "follow_builders_x_feed_failed_podcast_fallback_checked",
-      "last_successful_feed_at": null,
-      "notes": "follow-builders X feed 仍为空并返回上游错误；podcast feed 可访问，补入 Dan Shipper / Every 原始访谈文字稿。最终 Builder 观察使用 Claude official X、Simon Willison 原文和 Every 原始访谈，共 3 条。"
-    },
-    "content_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "Anthropic News",
-          "url": "https://www.anthropic.com/news/claude-opus-4-8",
-          "status": "checked",
-          "notes": "Claude Opus 4.8 launch"
-        },
-        {
-          "name": "Mistral News",
-          "url": "https://mistral.ai/news/ai-now-summit-2026/",
-          "status": "checked",
-          "notes": "AI Now Summit and Vibe announcement"
-        },
-        {
-          "name": "AWS What's New",
-          "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/",
-          "status": "checked",
-          "notes": "Claude Opus 4.8 availability on AWS"
-        },
-        {
-          "name": "Hugging Face Blog",
-          "url": "https://huggingface.co/blog/ibm-research/itbench-aa",
-          "status": "checked",
-          "notes": "ITBench-AA benchmark article"
-        }
-      ],
-      "candidates_found": 9,
-      "included": 6,
-      "blocked_reason": "node_fetch_failed_for_registered_feeds",
-      "last_successful_feed_at": null,
-      "notes": "固定 content-sources 命令在本地全部 fetch failed；本轮使用网页检索打开官方与原始博客来源，未使用微信公众号、自媒体或二手媒体作为事实来源。"
-    },
-    "search_sources": {
-      "checked": true,
-      "shadow": true,
-      "sources": [
-        {
-          "name": "GDELT",
-          "url": "https://api.gdeltproject.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "OpenAlex",
-          "url": "https://api.openalex.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "arXiv",
-          "url": "https://export.arxiv.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "provider_runtime_ms": {},
-      "provider_cost_units": {},
-      "notes": "discover:search-news 作为影子运行执行，shell 网络失败时不把搜索摘要写入正文。"
-    },
-    "sources_health": {
-      "checked": true,
-      "sources": [
-        {
-          "id": "content-openai-news",
-          "name": "OpenAI News RSS",
-          "url": "https://openai.com/news/rss.xml",
-          "source_kind": "rss",
-          "tier": "T0",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        },
-        {
-          "id": "content-anthropic-news",
-          "name": "Anthropic News",
-          "url": "https://www.anthropic.com/news",
-          "source_kind": "html_index",
-          "tier": "T0",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        },
-        {
-          "id": "content-hugging-face-blog",
-          "name": "Hugging Face Blog",
-          "url": "https://huggingface.co/blog/feed.xml",
-          "source_kind": "rss",
-          "tier": "T1",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "notes": "sources:health 对 core,optional registry 执行后，当前 shell 网络环境返回 fetch failed；网页 fallback 只用于内容核验，不覆盖健康检查结果。"
-    }
-  },
   "github_trending": [
     {
-      "candidate_id": "trend-harry0703-moneyprinterturbo",
       "repo": "harry0703/MoneyPrinterTurbo",
       "name": "harry0703/MoneyPrinterTurbo",
       "description": "用大模型一键生成高清短视频的 Python 流水线，覆盖脚本、素材、配音与成片生产。",
@@ -214,11 +29,9 @@
       "previous_rank": 1,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "GitHub Trending daily rank 1, 4,685 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-affaan-m-ecc",
       "repo": "affaan-m/ECC",
       "name": "affaan-m/ECC",
       "description": "面向 Claude Code、Codex、opencode、Cursor 的 agent harness 性能优化体系，包含 skills、memory、安全和研究优先流程。",
@@ -231,11 +44,9 @@
       "previous_rank": 4,
       "rank_delta": 2,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 2, 1,388 stars today.",
       "importance": "notable"
     },
     {
-      "candidate_id": "trend-leonxlnx-taste-skill",
       "repo": "Leonxlnx/taste-skill",
       "name": "Leonxlnx/taste-skill",
       "description": "用 shell skill 约束 AI 输出风格，减少空泛文本和低质生成。",
@@ -248,11 +59,9 @@
       "previous_rank": 6,
       "rank_delta": 3,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 3, 2,235 stars today.",
       "importance": "notable"
     },
     {
-      "candidate_id": "trend-hardikpandya-stop-slop",
       "repo": "hardikpandya/stop-slop",
       "name": "hardikpandya/stop-slop",
       "description": "单文件写作 skill，用规则去除 AI 文章中的常见腔调。",
@@ -265,11 +74,9 @@
       "previous_rank": 3,
       "rank_delta": -1,
       "trend": "down",
-      "evidence": "GitHub Trending daily rank 4, 755 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-twentyhq-twenty",
       "repo": "twentyhq/twenty",
       "name": "twentyhq/twenty",
       "description": "开源 CRM，把 Salesforce 类业务对象与 AI 场景结合。",
@@ -282,11 +89,9 @@
       "previous_rank": 10,
       "rank_delta": 5,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 5, 495 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-digitalplatdev-freedomain",
       "repo": "DigitalPlatDev/FreeDomain",
       "name": "DigitalPlatDev/FreeDomain",
       "description": "免费域名申请与管理项目；与 AI 工程关联度较低，本轮只作为 GitHub Trending 榜单记录。",
@@ -299,11 +104,9 @@
       "previous_rank": 12,
       "rank_delta": 6,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 6, 1,769 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-byoungd-english-level-up-tips",
       "repo": "byoungd/English-level-up-tips",
       "name": "byoungd/English-level-up-tips",
       "description": "英语学习资料库；关联 AI 工程较弱，保留趋势记录但不放入项目区。",
@@ -316,11 +119,9 @@
       "previous_rank": 14,
       "rank_delta": 7,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 7, 2,015 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-microsoft-markitdown",
       "repo": "microsoft/markitdown",
       "name": "microsoft/markitdown",
       "description": "微软维护的文件与 Office 文档转 Markdown 工具，可作为 RAG 和文档摄取前处理。",
@@ -333,11 +134,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 8, 1,263 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-obra-superpowers",
       "repo": "obra/superpowers",
       "name": "obra/superpowers",
       "description": "agentic skills 框架与软件开发方法论，用仓库规则约束 agent 工作。",
@@ -350,11 +149,9 @@
       "previous_rank": 13,
       "rank_delta": 4,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 9, 1,726 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-revfactory-harness",
       "repo": "revfactory/harness",
       "name": "revfactory/harness",
       "description": "生成特定领域 agent 团队和 skills 的 meta-skill，面向 Claude Code、Codex、Cursor 等工具。",
@@ -367,13 +164,11 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 10, 68 stars today.",
       "importance": "general"
     }
   ],
   "main_items": [
     {
-      "candidate_id": "main-aws-claude-opus-48",
       "title": "Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径",
       "event_date": "2026-05-28",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/",
@@ -395,7 +190,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-mistral-ai-now-2026",
       "title": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
       "event_date": "2026-05-28",
       "url": "https://mistral.ai/news/ai-now-summit-2026/",
@@ -417,7 +211,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-bedrock-mantle-quotas",
       "title": "Bedrock Mantle 的 token 配额进入 Service Quotas，兼容端点开始补生产可观测性",
       "event_date": "2026-05-27",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/5/amazon-bedrock-service-quotas/",
@@ -440,7 +233,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-anthropic-social-sciences",
       "title": "Anthropic 调研显示 coding agents 在社科研究中采用率只有 20%，且差异很大",
       "event_date": "2026-05-27",
       "url": "https://www.anthropic.com/research/coding-agents-social-sciences",
@@ -464,7 +256,6 @@
   ],
   "model_releases": [
     {
-      "candidate_id": "model-anthropic-claude-opus-48",
       "name": "Claude Opus 4.8",
       "provider": "Anthropic",
       "availability": "closed_api",
@@ -473,14 +264,12 @@
       "url": "https://www.anthropic.com/news/claude-opus-4-8",
       "source": "Anthropic",
       "summary": "Anthropic 发布 Claude Opus 4.8，称其相对 Opus 4.7 在 coding、agentic skills、reasoning 和 practical knowledge work 上改进，并更会标记自身不确定性。官方还强调同价可用，system card 给出更完整评估。",
-      "notes": "同日 AWS 宣布该模型可通过 Amazon Bedrock 和 Claude Platform on AWS 使用；日报主体用 AWS URL 记录企业访问路径，避免同一 URL 在 main/model 重复。",
       "image_urls": [],
       "importance": "major"
     }
   ],
   "hot_blogs": [
     {
-      "candidate_id": "blog-mistral-search-toolkit",
       "title": "Introducing Search Toolkit",
       "url": "https://mistral.ai/news/search-toolkit/",
       "publisher": "Mistral AI",
@@ -493,7 +282,6 @@
       "importance": "notable"
     },
     {
-      "candidate_id": "blog-hf-monet",
       "title": "MONET: Lowering the bar for World-Class Image Generation research",
       "url": "https://huggingface.co/blog/jasperai/monet",
       "publisher": "Hugging Face",
@@ -508,7 +296,6 @@
   ],
   "projects": [
     {
-      "candidate_id": "project-mistral-vibe",
       "name": "mistralai/mistral-vibe",
       "description": "Mistral 官方开源 CLI coding assistant，README 列出 read_file、write_file、search_replace、bash、grep / ripgrep、todo、ask_user_question 和 subagents 等工具。它和 AI Now Summit 中的 Vibe 叙事相互印证：Mistral 正在把模型能力包成可在终端、编辑器和 web app 间移动的长任务 agent。",
       "domains": [
@@ -521,11 +308,9 @@
       "event_date": "2026-05-28",
       "source": "GitHub",
       "signal": "official_update",
-      "evidence": "Official Mistral repository describes Vibe as a CLI coding assistant powered by Mistral models.",
       "importance": "general"
     },
     {
-      "candidate_id": "project-mistral-search-toolkit-docs",
       "name": "Mistral Search Toolkit",
       "description": "Mistral Docs 显示 Search Toolkit 可通过 uv 安装，提供 ingestion、retrieval、evaluation 的可插拔组件，并支持多格式提取、chunking、metadata enrichment、vector stores 和检索评测。",
       "domains": [
@@ -538,44 +323,37 @@
       "event_date": "2026-05-28",
       "source": "Mistral Docs",
       "signal": "official_update",
-      "evidence": "Official docs list installation commands and key features for Search Toolkit.",
       "importance": "general"
     }
   ],
   "builder_observations": [
     {
-      "candidate_id": "builder-claudeai-x-opus-48",
       "author": "Claude official account",
       "role": "Official product account",
       "content": "Claude 官方 X 原帖同步发布 Opus 4.8，并把变化概括为更强 judgment、更诚实地标记进度、能独立工作更久。这个原始 status 适合做发布时间线锚点；真正的能力判断仍应回到 Anthropic post、system card 和自家回归集。",
       "url": "https://x.com/claudeai/status/2060042702150930686",
       "event_date": "2026-05-28",
       "source": "Claude official X",
-      "evidence": "Original X status referenced by live search results.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-simon-product-market-fit",
       "author": "Simon Willison",
       "role": "Builder / researcher",
       "content": "Simon Willison 把 Anthropic 和 OpenAI 的 coding-agent 增长解释为 frontier labs 直接拿到企业预算的拐点，并把 SpaceX S-1 中 Anthropic 每月大额算力合同作为推断线索。可采纳的是成本结构视角：coding agent 不再只是 API 调用量问题，而是订阅、企业席位、推理容量和中间工具被挤压的组合。",
       "url": "https://simonwillison.net/2026/May/27/product-market-fit/",
       "event_date": "2026-05-27",
       "source": "Simon Willison Weblog",
-      "evidence": "Original builder blog post published on 2026-05-27.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-dan-shipper-after-automation-podcast",
       "author": "Dan Shipper",
       "role": "Founder / operator",
       "content": "Dan Shipper 在 Every 的 AI & I 访谈里把“自动化越多，人类工作越多”落到 agent-native 组织实践：Claude Code、Codex 和内部代理让更多人跨职能产出 PR、文章和运营流程，但真正稀缺的是专家设规则、审稿、把接近可用的输出推进到可发布。这个信号适合补足 Builder 观察，因为它来自原始访谈文字稿而不是二手摘要。",
       "url": "https://every.to/podcast/transcript-we-automated-everything-with-ai-and-tripled-our-headcount",
       "event_date": "2026-05-27",
       "source": "AI & I / Every",
-      "evidence": "follow-builders podcast feed listed the YouTube episode; Every published the transcript on 2026-05-27.",
       "image_urls": [],
       "importance": "notable"
     }
@@ -583,32 +361,11 @@
   "community_leads": [],
   "quality_status": {
     "status": "degraded",
-    "reasons": [
-      "content_sources_blocked",
-      "builder_sources_blocked"
-    ],
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
     "affected_sections": [
       "hot_blogs",
       "builder_observations"
-    ],
-    "degraded_sections": [
-      {
-        "code": "content_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "hot_blogs",
-        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      },
-      {
-        "code": "builder_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "builder_observations",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      }
-    ],
-    "blocking_issues": [],
-    "public_note": "Content source coverage is degraded; some sections may be incomplete."
+    ]
   },
   "evidence_assets": [
     {
@@ -750,54 +507,11 @@
       ]
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-29",
-    "main_items": 4,
-    "builder_observations": 3,
-    "builder_skill_used": [
-      "github-ai-trending",
-      "follow-builders",
-      "official-ai-releases",
-      "discover:github-trending",
-      "discover:builders",
-      "discover:content-sources",
-      "discover:search-news",
-      "sources:health",
-      "web primary-source fallback"
-    ],
-    "fallback_sources": [
-      "GitHub Trending web fallback after Node fetch failed",
-      "Official Anthropic, AWS, Mistral and Hugging Face pages opened through web search",
-      "Claude official X status and Simon Willison original blog for Builder observations",
-      "follow-builders podcast feed and Every transcript fallback for Builder observations"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "本地发现命令保留执行痕迹；shell 网络环境对部分源返回 fetch failed。Builder 侧重新核验 follow-builders feeds：X feed 为空并带上游错误，podcast feed 可访问，因此补入 Every / AI & I 原始访谈文字稿，使 Builder 观察达到 3 条。正文继续只使用一手或原始来源。",
-    "optimization_suggestions": [
-      {
-        "observed_issue": "本地发现命令网络失败后，网页 fallback 候选需要人工写回",
-        "suggestion": "在 discovery-audit 或 publish-workflow 中增加 web fallback 输出合同，要求把网页核验得到的 sources/candidates 写成统一 JSON，再由 report:write 读取。",
-        "expected_benefit": "减少手工整理候选池时的 schema 风险，并让 source_audit 能区分 shell fetch failed 与 web fallback checked。"
-      },
-      {
-        "observed_issue": "Builder X 硬门禁把官方产品 X 与个人 builder X 放在同一验收路径",
-        "suggestion": "在 source-policy 中把 official_product_social、builder_original_social、x_search_fallback 三类分开，并给每类定义是否可进入 Builder 观察。",
-        "expected_benefit": "保留原始 X status 的硬要求，同时避免把官方模型发布帖误写成普通 builder 观点。"
-      }
-    ]
-  },
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-29.html",
   "html_path": "reports/2026/05/2026-05-29.html",
-  "candidate_pool_path": "data/2026/05/2026-05-29.candidates.json",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-29.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-28T18:48:09.023Z",
-  "daily_tracking": []
+  "daily_tracking": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

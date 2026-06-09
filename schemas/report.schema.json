@@ -394,6 +394,24 @@
         "extraction_status": {
           "enum": ["source_image", "extracted_from_image", "manual_table", "unavailable"]
         },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "asset_role": {
+          "enum": ["content", "chart", "diagram", "table", "icon", "favicon", "logo", "avatar", "decorative"]
+        },
+        "capture_kind": {
+          "enum": ["source_asset", "source_image", "page_screenshot", "browser_screenshot", "full_page_screenshot", "viewport_screenshot"]
+        },
         "data": {
           "type": "array",
           "items": {

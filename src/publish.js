@@ -853,7 +853,6 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
     `${outPrefix}/index.html`,
     `${outPrefix}/trends.json`,
     `${outPrefix}/${paths.dataPath}`,
-    `${outPrefix}/${paths.candidateDataPath}`,
     `${outPrefix}/${paths.htmlPath}`
   ]);
   if (paths.markdownPath) {

@@ -3,12 +3,6 @@
   "report_date": "2026-05-20",
   "title": "AI 日报 2026-05-20",
   "summary": "今天可回源的 AI 工程动态集中在 2026-05-19 的官方发布。主体信息保留 6 条：Google I/O 把 Gemini 3.5 Flash、Antigravity 2.0、Managed Agents 和 AI Studio 连成 agent 开发栈；GitHub Copilot 同日接入 Gemini 3.5 Flash 并强化评审到修复的 handoff；OpenAI 与 Google 同步推进 C2PA、SynthID 和检测 API；Chrome DevTools for agents 1.0 让 coding agent 能观察真实浏览器；Anthropic 与 KPMG 把 Claude 扩到审计、税务、法务和 PE 客户工作流；dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新。模型发布和热门技术博客单列，不再挤占主体条目。",
-  "source_window": {
-    "date_from": "2026-05-19",
-    "date_to": "2026-05-20",
-    "fallback_window_used": false,
-    "notes": "按 2026-05-20 Asia/Shanghai 生成。优先采样 2026-05-19 至 2026-05-20 的官方博客、官方 changelog、开发者文档和 Hugging Face team/community article；Google I/O 同日多条 AI 产品发布合并为一个 Google 开发者栈主体条目，GitHub Copilot 同日多条小更新合并为一个 Copilot 主体条目。Mistral 3 官方页虽有高信号模型信息，但页面本轮未暴露稳定 published date，按规则降级为社区线索。Anthropic Stainless 收购是 2026-05-18 的高信号事件，因本轮 24 小时内主体已足够，未作为主体扩窗补入。"
-  },
   "main_items": [
     {
       "title": "Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈",
@@ -156,7 +150,6 @@
       "url": "https://blog.google/intl/en-africa/products/explore-get-answers/gemini-3-5/",
       "source": "Google Blog",
       "summary": "Google 发布 Gemini 3.5 系列并先推出 3.5 Flash，面向 Gemini app、AI Mode、Antigravity、Gemini API、AI Studio、Android Studio 和企业平台开放。",
-      "notes": "重点定位为 agentic workflows 与 coding；Google 同时披露 3.5 Pro 已在内部使用，计划下月推出。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -168,7 +161,6 @@
       "url": "https://blog.google/innovation-and-ai/models-and-research/google-labs/flow-updates/",
       "source": "Google Blog",
       "summary": "Google Flow 和 Gemini app 发布 Gemini Omni Flash，强调从文本、图像、视频输入生成或编辑视频，并支持 conversational editing。",
-      "notes": "Google 表示 Omni Flash 今日在 Gemini app、Google Flow 和 YouTube Shorts 可用，API/企业入口会在后续数周推出。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -180,7 +172,6 @@
       "url": "https://huggingface.co/blog/ettin-reranker",
       "source": "Hugging Face Blog",
       "summary": "Tom Aarsen 发布 6 个基于 Ettin ModernBERT encoder 的 Sentence Transformers CrossEncoder reranker，覆盖 17M 到 1B 参数。",
-      "notes": "文章给出模型链接、蒸馏数据和训练 recipe，适合 RAG 检索后重排链路直接试用或复训。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -192,7 +183,6 @@
       "url": "https://huggingface.co/blog/allenai/olmoearth-v1-1",
       "source": "Hugging Face Blog / Ai2",
       "summary": "Ai2 发布 OlmoEarth v1.1，更高效的地球观测模型家族，并提供模型 collection、tech report 和 code。",
-      "notes": "面向环境监测、作物类型映射、森林损失驱动识别等地理空间 AI 任务；属于垂直领域模型发布。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -206,7 +196,6 @@
       "event_date": "2026-05-19",
       "topic": "Agent debugging / browser runtime verification",
       "summary": "Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。",
-      "why_it_matters": "这篇文章提供了 agent 端到端验证的具体接口清单，可直接影响前端 coding agent 的验收和调试方式。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -218,7 +207,6 @@
       "event_date": "2026-05-19",
       "topic": "RAG reranking / Sentence Transformers",
       "summary": "文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。",
-      "why_it_matters": "RAG 工程里重排常是质量与成本的折中点；该文给了可复现训练路径和不同尺寸模型选择。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -230,7 +218,6 @@
       "event_date": "2026-05-19",
       "topic": "Analytics engineering agents / MCP / BYOK",
       "summary": "dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。",
-      "why_it_matters": "它展示了数据平台厂商如何把 AI assistant 接入身份、lineage、文档和作业排错，而不是只做 SQL 自动补全。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -300,71 +287,19 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-20",
-    "main_items": 6,
-    "hot_blogs": 3,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "official-ai-releases: 使用 Google Blog、GitHub Changelog、OpenAI、Anthropic、Chrome for Developers、dbt Labs 和 Hugging Face 原始页面",
-      "github-ai-trending: 检查 agent/coding/RAG/analytics 工具线索，最终只保留有官方 release/article 的项目到 projects 或 model_releases",
-      "follow-builders: 本轮没有使用 X/YouTube 二手 builder 内容；builder_observations 保持空数组"
-    ],
-    "fallback_sources": [
-      "官方博客",
-      "官方 changelog 月度页",
-      "官方开发者博客",
-      "Hugging Face 原文",
-      "社区线索仅用于降级待复核"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "本轮没有为了凑数扩大到 48 小时主体窗口。Google I/O 的模型、agent、Search、Workspace、Flow 等多条同厂商发布合并为一个开发者栈主体条目，Gemini 3.5 Flash 和 Omni 进入 model_releases。GitHub 5 月 19 日 Copilot 两条更新合并为一个主体条目。Chrome DevTools for agents 1.0 虽同属 Google，但属于独立 Chrome 开发者工具稳定版，单独保留。Mistral 3 因页面缺少稳定发布日期降级为 community_leads；Anthropic Stainless 因 24 小时内主体已足够且事件日期为 2026-05-18，作为社区线索提示后续复核。",
-    "optimization_suggestions": [
-      {
-        "issue": "聚合型主体条目仍只有单一 url 字段，Google I/O 与 GitHub Copilot 这类同日多子发布只能挂总页或代表页。",
-        "evidence": "本轮 Google I/O 开发者栈涉及 Gemini 3.5、Managed Agents、Antigravity、AI Studio；GitHub Copilot 涉及 Gemini 3.5 Flash 和 Fix with Copilot。单 URL 会丢失部分子页面证据。",
-        "suggested_module": "schemas/report.schema.json 与 src/render.js",
-        "expected_benefit": "为 main_items 增加 optional related_urls 后，可以合并同厂商动态同时保留可审计子链接。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "model_releases 只能用单一 availability 表达可用性，难以描述同一模型同时进入 API、产品和第三方平台。",
-        "evidence": "Gemini 3.5 Flash 同时出现在 Gemini app、AI Mode、Antigravity、Gemini API、AI Studio、GitHub Copilot 和企业平台；当前只能选 closed_api 并把其余信息塞进 notes。",
-        "suggested_module": "schemas/report.schema.json 与 prompts/ai-daily/modules/structured-report-json.md",
-        "expected_benefit": "增加 platforms 或 availability_notes 字段后，模型区块会更适合跟踪跨产品/跨平台发布。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "社区线索没有结构化状态字段，导致 Mistral 3 这类“内容可信但日期证据不足”的项目只能写在自然语言里。",
-        "evidence": "Mistral 3 官方页有完整模型信息和可用路径，但本轮没有稳定 published date；需要表达为 date_unverified，而不是普通 community lead。",
-        "suggested_module": "schemas/report.schema.json 与 prompts/ai-daily/modules/source-policy.md",
-        "expected_benefit": "给 community_leads 增加 status/reason，可让后续自动复核更稳定，并减少旧闻误入主体。",
-        "needs_user_confirmation": true
-      }
-    ]
-  },
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-20.html",
   "html_path": "reports/2026/05/2026-05-20.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-20.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-20T06:14:47.546Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

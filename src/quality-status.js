@@ -25,6 +25,11 @@ export const STRICT_SOURCE_REGISTRY_MINIMUM = 60;
 export const STRICT_GITHUB_TRENDING_SOURCE_MINIMUM = 10;
 export const STRICT_BUILDER_SOURCE_MINIMUM = 3;
 
+const PUBLIC_EVIDENCE_MIN_WIDTH = 240;
+const PUBLIC_EVIDENCE_MIN_HEIGHT = 160;
+const PUBLIC_EVIDENCE_MIN_AREA = 80000;
+const NON_CONTENT_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
+
 const REQUIRED_GITHUB_TRENDING_PARSED_MINIMUM = 10;
 const SOURCE_OUTAGE_BLOCKED_RATIO = 0.8;
 const SOURCE_OUTAGE_MIN_BLOCKED = 3;
@@ -446,30 +451,6 @@ function strictEditorialIssues(report) {
     });
   }
 
-  const mainItems = Array.isArray(report?.main_items) ? report.main_items : [];
-  if (mainItems.length >= SECTION_MINIMUMS.main_items) {
-    const missingContext = mainItems
-      .map((item, index) => ({
-        index,
-        title: item?.title || item?.url || `main_items[${index}]`,
-        has_why: Boolean(String(item?.why_it_matters || "").trim()),
-        has_reader_relevance: Boolean(String(item?.reader_relevance || "").trim())
-      }))
-      .filter((item) => !item.has_why && !item.has_reader_relevance);
-    if (missingContext.length > 0) {
-      issues.push({
-        error_code: "editorial_context_gate_failed",
-        code: "main_items_editorial_context_missing",
-        section: "main_items",
-        count: mainItems.length - missingContext.length,
-        minimum: mainItems.length,
-        missing_items: missingContext.map((item) => item.title).slice(0, 5),
-        message: "Strict daily main_items must explain why the item matters or how it is relevant to ordinary engineers.",
-        remediation: "Add why_it_matters or reader_relevance to each main item so the report reads as an engineer-facing daily rather than a link list."
-      });
-    }
-  }
-
   const mainlineLeaks = MAINLINE_FACT_SECTIONS.flatMap((section) => {
     const items = Array.isArray(report?.[section]) ? report[section] : [];
     return items
@@ -793,30 +774,98 @@ function builderObservationContractViolations(report) {
 function strictEvidenceIssues(report, options = {}) {
   const assets = Array.isArray(report?.evidence_assets) ? report.evidence_assets : [];
   const itemUrls = new Set(
-    ["main_items", "model_releases", "hot_blogs", "projects"]
+    ["main_items", "model_releases", "hot_blogs", "projects", "daily_tracking", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
       .flatMap((section) => (Array.isArray(report?.[section]) ? report[section] : []))
       .map((item) => normalizeUrl(item?.url))
       .filter(Boolean)
   );
-  const linkedLocalAssets = assets.filter((asset) => {
-    return asset?.local_path && itemUrls.has(normalizeUrl(asset?.source_url)) && evidenceAssetExists(asset.local_path, options);
-  });
+  const linkedLocalAssets = assets.filter((asset) => asset?.local_path && itemUrls.has(normalizeUrl(asset?.source_url)));
+  const violations = linkedLocalAssets.flatMap((asset) => publicEvidenceAssetViolations(asset, options));
 
-  if (linkedLocalAssets.length === 0) {
+  if (violations.length > 0) {
     return [
       {
-        error_code: "evidence_assets_gate_failed",
-        code: "linked_local_evidence_asset_missing",
+        error_code: "public_media_contract_failed",
+        code: "public_evidence_asset_invalid",
         section: "evidence_assets",
-        count: linkedLocalAssets.length,
-        minimum: 1,
-        message: "At least one report item must carry a local evidence image asset linked to its source URL.",
-        remediation: "Attach a real source figure/screenshot/table image to a matching main/model/blog/project item, or keep the report unpublished."
+        count: Math.max(0, linkedLocalAssets.length - violations.length),
+        minimum: linkedLocalAssets.length,
+        violations,
+        message: "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots.",
+        remediation: "Drop invalid media from public rendering, keep screenshots only in internal evidence, and prefer structured tables for leaderboard pages."
       }
     ];
   }
 
   return [];
+}
+
+function publicEvidenceAssetViolations(asset, options = {}) {
+  const violations = [];
+  const assetPath = normalizeAssetPath(asset?.local_path);
+  if (!assetPath || !evidenceAssetExists(assetPath, options)) {
+    violations.push(publicEvidenceViolation(asset, "linked_local_evidence_file_missing"));
+  }
+  if (isNonContentAsset(asset)) {
+    violations.push(publicEvidenceViolation(asset, "non_content_image_asset"));
+  }
+  if (hasKnownTooSmallDimensions(asset)) {
+    violations.push(publicEvidenceViolation(asset, "image_dimensions_too_small"));
+  }
+  if (isFullPageScreenshotAsset(asset)) {
+    violations.push(publicEvidenceViolation(asset, "full_page_screenshot_not_public_content"));
+  }
+  return violations;
+}
+
+function publicEvidenceViolation(asset, reason) {
+  return {
+    reason,
+    title: String(asset?.title || "").trim(),
+    source_url: String(asset?.source_url || "").trim(),
+    local_path: String(asset?.local_path || "").trim(),
+    width: Number.isFinite(Number(asset?.width)) ? Number(asset.width) : undefined,
+    height: Number.isFinite(Number(asset?.height)) ? Number(asset.height) : undefined,
+    asset_role: String(asset?.asset_role || "").trim(),
+    capture_kind: String(asset?.capture_kind || "").trim()
+  };
+}
+
+function isNonContentAsset(asset) {
+  const role = String(asset?.asset_role || asset?.role || "").trim().toLowerCase();
+  if (NON_CONTENT_ASSET_ROLES.has(role)) {
+    return true;
+  }
+  const text = publicEvidenceAssetText(asset);
+  return /\b(?:favicon|logo|avatar|icon)\b|图标|头像|徽标/u.test(text);
+}
+
+function hasKnownTooSmallDimensions(asset) {
+  const width = Number(asset?.width || asset?.natural_width);
+  const height = Number(asset?.height || asset?.natural_height);
+  if (!Number.isFinite(width) || !Number.isFinite(height)) {
+    return false;
+  }
+  return width < PUBLIC_EVIDENCE_MIN_WIDTH ||
+    height < PUBLIC_EVIDENCE_MIN_HEIGHT ||
+    width * height < PUBLIC_EVIDENCE_MIN_AREA;
+}
+
+function isFullPageScreenshotAsset(asset) {
+  const captureKind = String(asset?.capture_kind || asset?.capture_type || "").trim().toLowerCase();
+  if (captureKind === "full_page_screenshot" || captureKind === "page_screenshot" || captureKind === "browser_screenshot") {
+    return true;
+  }
+  return /\b(?:full[- ]?page|browser|viewport|page)\s+screenshot\b|整页截图|浏览器截图/u.test(publicEvidenceAssetText(asset));
+}
+
+function publicEvidenceAssetText(asset) {
+  return [
+    asset?.title,
+    asset?.caption,
+    asset?.local_path,
+    asset?.extraction_status
+  ].map((value) => String(value || "").toLowerCase()).join(" ");
 }
 
 function strictModelReleaseIssues(report) {

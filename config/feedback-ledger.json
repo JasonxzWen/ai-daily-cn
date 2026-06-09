@@ -222,6 +222,195 @@
       }
     },
     {
+      "id": "feedback/p1-public-daily-content-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Public daily content is compact news, not explanations",
+      "problem": "The public daily report could render too few main stories while spending visible space on selection rationale, why-it-matters prose, watch-next advice, and other AI-flavored filler instead of concise source-backed news.",
+      "expected_behavior": "When enough candidates exist, the main stream contains 8-12 compact news items. Each visible main item renders only a title, two to three source-grounded factual lines, and source links; explanation metadata such as `why_it_matters`, `reader_relevance`, selection criteria, candidate counts, and watch-next filler stays out of the public page.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/structured-report-json.md",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/source-policy.md",
+        "prompts/ai-daily/modules/discovery-audit.md",
+        "prompts/ai-daily/modules/plain-language.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "src/report.js",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "src/quality-loop.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily contract accepts no-image short news without explanation fields",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-media-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Public media must be readable content assets",
+      "problem": "The public page used full-page browser screenshots as main evidence for public leaderboards and rendered tiny icons, favicons, logos, or unreadable images as article media.",
+      "expected_behavior": "Full-page screenshots, browser viewport captures, icons, favicons, logos, avatars, undersized images, and unreadable media do not render as public正文 content. No-image reports can still pass. OpenRouter, Artificial Analysis, and similar public pages prefer parsed DOM/JSON/text tables with ranks, models, providers, scores/tokens, and changes.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/structured-report-json.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/evidence-cache.js",
+        "src/interaction-report.js",
+        "src/quality-loop.js",
+        "src/page-checklist.js",
+        "src/quality-status.js",
+        "tests/unit.test.js",
+        "tests/e2e/site.e2e.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily contract rejects invalid public media but allows missing media",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-internal-report-separation",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Separate reader report from internal quality report",
+      "problem": "Reader-facing daily pages exposed source audit appendices, self-check output, degradation logs, candidate/inclusion diagnostics, and other internal publishing mechanics as if they were article content.",
+      "expected_behavior": "Public daily HTML hides internal audit/debug/quality sections by default. Internal sections are available only through explicit internal report options or JSON artifacts, while public pages keep the reader-focused sections and source links.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily contract renders tables instead of screenshots and hides audit appendices",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-importance-selection",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Rank by public AI importance, not personal relevance",
+      "problem": "Selection rules could suppress broad AI news, official product updates, big-company moves, and general AI热点 because they were not directly tied to the user's immediate work.",
+      "expected_behavior": "Candidate scoring gives explicit weight to public AI importance: AI news volume, major company/lab authority, official product/platform changes, model/API/pricing/benchmark/regulatory/capital signals, and broad AI热点. The LLM may draft summaries but must not decide section structure, item count, media policy, or blocking strategy.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "prompts/ai-daily/modules/structured-report-json.md",
+        "src/draft.js",
+        "src/report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "report:draft promotes official product and platform deep dives into main_items",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-data-minimization",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Public docs data must not expose internal drafting state",
+      "problem": "The public GitHub Pages data artifact under docs/data exposed internal fields such as candidate_id, source_audit, self_check, why_it_matters, reader_relevance, watch_next, and full candidate pools.",
+      "expected_behavior": "Build output writes a reader-safe docs/data report that omits internal audit, self-check, candidate, scoring, rationale, and publish-debug fields. Candidate pools stay in reports-data only and are not copied to public docs/data by default.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/site.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "buildSite writes reader-safe public data without internal fields or candidate pools",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-platform-exempt-discovery-wiring",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Wire platform exempt discovery into daily runs",
+      "problem": "PR #68 added low-threshold WeChat, Zhihu, and Reddit discovery commands, but the daily runner did not execute those commands or pass their outputs into report:draft, so the feature was merged but ineffective.",
+      "expected_behavior": "Daily generation runs discover:wechat-platform, discover:zhihu-platform, and discover:reddit-platform before report:draft and includes their JSON artifacts in the report:draft input list. Kill-switched or empty platform sources produce auditable no-signal output rather than invented content.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/daily-runner.js",
+        "src/draft.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "daily runner wires platform exempt discovery outputs into report draft",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-platform-exempt-public-rendering",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Render platform exempt items as reader-facing weak signals",
+      "problem": "Low-threshold platform sections could technically work while still publishing internal discovery fields, machine-generated feed titles, or long English excerpts as reader content.",
+      "expected_behavior": "Public WeChat, Zhihu, and Reddit cards render concise reader-facing titles and summaries, keep only explicit weak-signal disclosure, and never expose source_id, rule_id, source_level, verification_status, matched_terms, why_watch, collection notes, or raw English thread dumps in public HTML.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/interaction-report.js",
+        "tasks/daily-publish-runbook.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "platform exempt report sections require public audit disclosure and render independently",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-2026-06-09-regression-replay",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Replay the 2026-06-09 bad public daily",
+      "problem": "The 2026-06-09 daily report had only three main items, public full-page screenshots, tiny broken-looking images, and public debug sections, yet the old page quality gate reported success.",
+      "expected_behavior": "A fixture replay of the 2026-06-09 failure triggers main-density and media-contract issues, renders leaderboard data as a table instead of screenshot media, and keeps internal audit/debug text out of public interaction input.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "tests/fixtures/reports/bad/public-daily-2026-06-09-regression.json",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "src/quality-loop.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily contract replays 2026-06-09 bad media and short-main regression",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-feedback-memory-self-check",
       "severity": "P1",
       "status": "implemented",

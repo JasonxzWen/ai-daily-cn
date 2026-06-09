@@ -10,141 +10,8 @@
       "reason": "这是今天最值得放在 header 的产品消息：Microsoft 不只是发布一个 agent demo，而是把 UI 操作、工作流节点、Work IQ、MCP 和 A2A 放进企业低代码平台。"
     }
   ],
-  "source_window": {
-    "date_from": "2026-05-25",
-    "date_to": "2026-05-27",
-    "fallback_window_used": false,
-    "notes": "主体信息来自 2026-05-26 的官方发布或状态页；2026-05-25 的 Hugging Face agent glossary 和 Borealis 只进入博客/模型区；Builder 观察来自 2026-05-26 的 follow-builders central X feed。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending discovery command",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "npm run discover:github-trending -- --date 2026-05-27 --limit 50 returned fetch failed for GitHub Trending pages and OSSInsight API."
-        },
-        {
-          "name": "GitHub Trending web check",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "Web open confirmed GitHub Trending page availability, but repo rows were not reliably exposed in captured text."
-        },
-        {
-          "name": "TrendingRepo anthropics/knowledge-work-plugins",
-          "url": "https://trendingrepo.com/repo/anthropics/knowledge-work-plugins",
-          "status": "checked",
-          "notes": "Used only as discovery evidence, then verified the repository directly on GitHub."
-        }
-      ],
-      "candidates_found": 1,
-      "included": 1,
-      "notes": "Only anthropics/knowledge-work-plugins had enough direct GitHub evidence and a clear use case for the project section."
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders X feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-          "status": "checked",
-          "notes": "18 recent original entries parsed; 2 were selected as Builder observations."
-        },
-        {
-          "name": "follow-builders podcast feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
-          "status": "no_signal",
-          "notes": "0 recent original entries parsed."
-        },
-        {
-          "name": "follow-builders blog feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
-          "status": "no_signal",
-          "notes": "0 recent original entries parsed."
-        },
-        {
-          "name": "Simon Willison Weblog",
-          "url": "https://simonwillison.net/atom/everything/",
-          "status": "checked",
-          "notes": "6 recent original entries parsed; none selected because today's Builder section focused on agent self-test and eval discussion from X."
-        },
-        {
-          "name": "Chip Huyen Blog",
-          "url": "https://huyenchip.com/feed.xml",
-          "status": "no_signal",
-          "notes": "0 recent original entries parsed."
-        },
-        {
-          "name": "Andrej Karpathy Blog",
-          "url": "https://karpathy.github.io/feed.xml",
-          "status": "no_signal",
-          "notes": "0 recent original entries parsed."
-        }
-      ],
-      "candidates_found": 18,
-      "included": 2,
-      "blocked_reason": "",
-      "last_successful_feed_at": "2026-05-27T04:28:44.802Z",
-      "notes": "follow-builders central feed is now the first checked Builder source, so fixed RSS failures no longer make the Builder section empty by default."
-    },
-    "content_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "OpenAI News RSS",
-          "url": "https://openai.com/news/rss.xml",
-          "status": "checked",
-          "notes": "1 recent blog/interview entries parsed."
-        },
-        {
-          "name": "Anthropic News",
-          "url": "https://www.anthropic.com/news",
-          "status": "checked",
-          "notes": "2 recent blog/interview entries parsed from the HTML index."
-        },
-        {
-          "name": "Hugging Face Blog",
-          "url": "https://huggingface.co/blog/feed.xml",
-          "status": "checked",
-          "notes": "1 recent blog/interview entries parsed; 1 selected."
-        },
-        {
-          "name": "Google Research Blog",
-          "url": "https://research.google/blog/rss/",
-          "status": "no_signal",
-          "notes": "0 recent blog/interview entries parsed."
-        },
-        {
-          "name": "Google DeepMind Blog",
-          "url": "https://deepmind.google/discover/blog/",
-          "status": "no_signal",
-          "notes": "0 recent blog/interview entries parsed by the HTML index parser."
-        },
-        {
-          "name": "Meta AI Blog",
-          "url": "https://ai.meta.com/blog/",
-          "status": "no_signal",
-          "notes": "0 recent blog/interview entries parsed by the HTML index parser."
-        },
-        {
-          "name": "Product Hunt Developer Tools Feed",
-          "url": "https://www.producthunt.com/feed?category=developer-tools",
-          "status": "checked",
-          "notes": "50 recent product/project entries parsed; none selected before product-homepage cross-check."
-        }
-      ],
-      "candidates_found": 12,
-      "included": 1,
-      "blocked_reason": "",
-      "last_successful_feed_at": "2026-05-27T04:30:40.425Z",
-      "notes": "The content discovery surface now covers official RSS, HTML-only lab pages, high-quality newsletters and Product Hunt project candidates."
-    }
-  },
   "main_items": [
     {
-      "candidate_id": "main-microsoft-copilot-studio-computer-use",
       "title": "Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新",
       "event_date": "2026-05-26",
       "url": "https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/",
@@ -167,7 +34,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-openai-fedramp-login-status",
       "title": "OpenAI Status 显示 FedRAMP 用户登录问题仍在处理",
       "event_date": "2026-05-26",
       "url": "https://status.openai.com/",
@@ -189,7 +55,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-checkpoint-frontier-ai-readiness",
       "title": "Check Point 把 frontier AI 扫描结果落到安全发布流程",
       "event_date": "2026-05-26",
       "url": "https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/",
@@ -213,7 +78,6 @@
   ],
   "model_releases": [
     {
-      "candidate_id": "model-borealis-5b-it",
       "name": "Borealis-5B-IT",
       "provider": "VikhrModels / Hugging Face",
       "availability": "open_weights",
@@ -222,14 +86,12 @@
       "url": "https://huggingface.co/Vikhrmodels/Borealis-5b-it",
       "source": "Hugging Face Model Card",
       "summary": "Borealis-5B-IT 是 Apache-2.0 的 audio-language model：Whisper Large V3 作为冻结音频编码器，Qwen3-4B 作为语言模型，中间用 adapter 对齐音频嵌入，并提供 transformers 与 vLLM 插件路径。",
-      "notes": "Hugging Face 社区文章在 2026-05-25 公开训练配方、数据和实现细节；本轮放在模型区，不放进主体信息。",
       "image_urls": [],
       "importance": "notable"
     }
   ],
   "hot_blogs": [
     {
-      "candidate_id": "blog-hf-agent-glossary",
       "title": "Harness, Scaffold, and the AI Agent Terms Worth Getting Right",
       "url": "https://huggingface.co/blog/agent-glossary",
       "publisher": "Hugging Face",
@@ -244,7 +106,6 @@
   ],
   "projects": [
     {
-      "candidate_id": "project-anthropics-knowledge-work-plugins",
       "name": "anthropics/knowledge-work-plugins",
       "description": "Anthropic 的 GitHub 仓库提供面向 Claude Cowork 和 Claude Code 的角色插件，插件由 skill、connector、slash command 和 sub-agent 组成；本轮通过趋势线索发现，再由 GitHub 页面确认仓库内容和 Apache-2.0 许可。",
       "url": "https://github.com/anthropics/knowledge-work-plugins",
@@ -258,104 +119,46 @@
       "event_date": "2026-05-26",
       "source": "GitHub",
       "signal": "star_velocity",
-      "evidence": "GitHub 页面显示仓库、README、许可和插件结构；TrendingRepo 只作为 2026-05-26 的动量发现线索。",
       "importance": "general"
     }
   ],
   "builder_observations": [
     {
-      "candidate_id": "builder-peter-yang-codex-browser-test",
       "author": "Peter Yang",
       "role": "AI product builder",
       "content": "Peter Yang 说 Codex 已经很强，尤其让他印象深的是会用浏览器测试自己的工作；但设计和前端任务上 Claude 仍然更占优。这条观察把 coding agent 的分水岭说得很具体：不是只看生成代码，而是看它能否把浏览器自测、视觉检查和结果验证纳入工作流。",
       "url": "https://x.com/petergyang/status/2059099566377693305",
       "event_date": "2026-05-26",
       "source": "follow-builders X feed",
-      "evidence": "Original X URL was collected from follow-builders central feed on 2026-05-27.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-garry-tan-agent-evals",
       "author": "Garry Tan",
       "role": "YC CEO / investor-builder",
       "content": "Garry Tan 提到一种 agent eval 做法：让 agent 把某个 skill file 调用的输入和输出交给三个 frontier models 评审，并按效果打分。这个说法值得记录，因为它把“写 skill”从一次性提示词工程推进到可复核的评分流程，也呼应了今天博客区的 harness 主题。",
       "url": "https://x.com/garrytan/status/2059148823403082154",
       "event_date": "2026-05-26",
       "source": "follow-builders X feed",
-      "evidence": "Original X URL was collected from follow-builders central feed on 2026-05-27.",
       "image_urls": [],
       "importance": "notable"
     }
   ],
   "community_leads": [],
-  "self_check": {
-    "report_date": "2026-05-27",
-    "main_items": 3,
-    "builder_observations": 2,
-    "builder_skill_used": [
-      "official-ai-releases: checked Microsoft Copilot Blog, OpenAI Status, Check Point Blog, Hugging Face model card and Hugging Face Blog for 2026-05-25..2026-05-27.",
-      "github-ai-trending: retained the existing verified anthropics/knowledge-work-plugins project line; shell GitHub Trending remained unreliable, so GitHub repository content was used as the final source.",
-      "follow-builders: npm run discover:builders -- --date 2026-05-27 --limit 12 parsed 18 recent X entries from the central feed; 2 original X URLs were selected.",
-      "content-sources: npm run discover:content-sources -- --date 2026-05-27 --limit 12 checked OpenAI, Anthropic, Hugging Face, Google Research, DeepMind, Meta AI, Microsoft Research, Latent.Space, Interconnects and Product Hunt."
-    ],
-    "fallback_sources": [
-      "Microsoft Copilot Blog",
-      "OpenAI Status",
-      "Check Point Blog",
-      "Hugging Face Blog",
-      "Hugging Face Model Card",
-      "GitHub",
-      "follow-builders central feed",
-      "Product Hunt Developer Tools Feed"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "本轮补齐了 header 精选、博客长摘要、项目领域/作用和 Builder 观察。Product Hunt feed 已进入候选池，但项目入选前仍需打开官网、GitHub 或文档确认用途，因此今天没有把 Product Hunt 条目直接写入项目区。",
-    "optimization_suggestions": [
-      {
-        "area": "product_discovery",
-        "observed_issue": "Product Hunt feed 能稳定产生项目候选，但自动化还没有继续打开产品官网或 GitHub 做用途确认。",
-        "evidence": "discover:content-sources parsed 50 product/project entries from Product Hunt developer-tools feed on 2026-05-27.",
-        "suggested_module": "src/discovery.js",
-        "expected_benefit": "后续可以把 Product Hunt 候选自动补充官网、GitHub、README 或 docs 链接，减少项目区人工判断量。",
-        "needs_user_confirmation": true
-      }
-    ]
-  },
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-27.html",
   "html_path": "reports/2026/05/2026-05-27.html",
-  "candidate_pool_path": "data/2026/05/2026-05-27.candidates.json",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-27.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-27T04:35:00.000Z",
   "quality_status": {
     "status": "degraded",
-    "reasons": [
-      "github_trending_blocked"
-    ],
+    "public_note": "Some discovery coverage is degraded; this report may be incomplete.",
     "affected_sections": [
       "github_trending"
-    ],
-    "degraded_sections": [
-      {
-        "code": "github_trending_blocked",
-        "error_code": "quality_degraded",
-        "section": "github_trending",
-        "message": "github_trending coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      }
-    ],
-    "blocking_issues": [],
-    "public_note": "Some discovery coverage is degraded; this report may be incomplete."
+    ]
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

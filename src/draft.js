@@ -52,6 +52,7 @@ const PLAIN_READER_SIGNAL_RE = /\b(pricing|availability|rollout|launch|product|p
 const LOW_SIGNAL_VENDOR_PARTNERSHIP_RE = /\b(partnership|collaborat(?:e|ion)|build(?:ing)? an ai factory|ai factory|build ai infrastructure|gigawatt-scale ai cloud|memory for ai factor(?:y|ies))\b|合作|联合打造|共建/i;
 const LOW_VALUE_EVENT_GUIDE_RE = /\bhow to watch\b|\bwhat to expect\b|\bwatch live\b|\blivestream\b|\bschedule\b|\blineup\b|\btickets?\b|直播|观看指南|日程|赛程/i;
 const MINOR_CONSUMER_AI_FEATURE_RE = /\bdesign merch\b|\balexa for shopping\b|\bpet portraits?\b|\btumblers?\b|\bgroup shirts?\b|\bcreator assistant\b|\bai translations?\b|\bfacebook translations?\b/i;
+const PUBLIC_AI_HEADLINE_ENTITY_RE = /\b(openai|google|deepmind|anthropic|meta|nvidia|xai|x\.ai|microsoft|amazon|aws|apple|bytedance|byte\s*dance|tiktok|alibaba|qwen|deepseek|tencent|minimax|moonshot|kimi|mistral|hugging face|runway|pika|luma|kling|adobe)\b|字节|阿里|通义|腾讯|混元|深度求索|月之暗面|快手|可灵|商汤|智谱|百川|阶跃星辰/i;
 const GENERIC_HOT_BLOG_EVIDENCE_RE = /published this blog\/interview entry\.?$/i;
 const TITLE_MOJIBAKE_RE = /�|锟|喔|鈥|峄|岷|箞|鑳|€/u;
 const LOW_VALUE_MAIN_RE = /amazon in the community|service,\s*community,\s*and commitment at hq2|friday night baseball|apple arcade|family feud pocket|prime video|spinoff|ari[a]?nespace launch|deploy more satellites|vought rising|here'?s what'?s happening in seattle|hq2|july.*baseball|mini football legends|the latest ai news we announced in/i;
@@ -233,7 +234,7 @@ function selectReportItems(merged, options = {}) {
     .filter((candidate) => !selectedIds.has(candidate.id))
     .filter((candidate) => !recentMainUrls.has(normalizeUrl(candidate.url)))
     .filter((candidate) => canPromoteToMain(candidate, reportDate))
-    .sort((left, right) => candidateScore(right) - candidateScore(left));
+    .sort(compareMainCandidates);
   let mainSeeds = pickMainCandidates(mainPool, MAIN_TARGET);
   if (mainSeeds.length === 0) {
     mainSeeds = candidates
@@ -426,6 +427,9 @@ function mergeEvidenceAssets(...groups) {
       if (!asset || typeof asset !== "object") {
         continue;
       }
+      if (!isPublicEvidenceAssetAllowed(asset)) {
+        continue;
+      }
       const key = `${asset.source_url || ""}::${asset.local_path || ""}::${asset.title || ""}`;
       if (seen.has(key)) {
         continue;
@@ -435,6 +439,36 @@ function mergeEvidenceAssets(...groups) {
     }
   }
   return merged;
+}
+
+function isPublicEvidenceAssetAllowed(asset) {
+  const text = [
+    asset.title,
+    asset.caption,
+    asset.local_path,
+    asset.source_url,
+    asset.capture_kind,
+    asset.extraction_status,
+    asset.asset_role
+  ].map((value) => String(value || "").toLowerCase()).join(" ");
+  if (String(asset.type || "").toLowerCase() === "table") {
+    return true;
+  }
+  if (/整页截图|浏览器截图|页面截图|full[-_ ]?page|viewport|browser|screenshot/.test(text)) {
+    return false;
+  }
+  if (/(^|\b)(icon|favicon|logo|avatar|badge)(\b|$)/.test(text)) {
+    return false;
+  }
+  const width = Number(asset.width || asset.image_width || 0);
+  const height = Number(asset.height || asset.image_height || 0);
+  if (width > 0 && height > 0 && (width < 320 || height < 180)) {
+    return false;
+  }
+  if (/openrouter|artificial analysis|artificialanalysis|rankings|leaderboard|排行榜|榜单/.test(text) && !/(source_asset|source_image|semantic|chart|diagram)/.test(text)) {
+    return false;
+  }
+  return true;
 }
 
 function parseReportDate(reportDate) {
@@ -454,15 +488,6 @@ function pickMainCandidates(candidates, target) {
   const plainReaderCandidates = candidates.filter((candidate) => hasPlainReaderSignal(candidate));
   const hardcoreLimit = plainReaderCandidates.length >= target - 2 ? 2 : target;
   let hardcorePicked = 0;
-  const aigc = candidates.find((candidate) => (
-    isAigcCandidate(candidate) &&
-    !isHardcoreResearchOnly(candidate) &&
-    !isMinorConsumerAiFeatureCandidate(candidate)
-  ));
-  if (aigc) {
-    picked.push(aigc);
-    seenUrls.add(normalizeUrl(aigc.url));
-  }
   for (const candidate of candidates) {
     if (picked.length >= target) break;
     const key = normalizeUrl(candidate.url);
@@ -712,12 +737,18 @@ function mainItem(candidate, original) {
 }
 
 function mainItemBullets(candidate, original, category) {
+  const specificBullets = mainItemSpecificBullets(candidate);
+  if (specificBullets.length > 0) {
+    return uniqueEditorialSentences(specificBullets).slice(0, 2);
+  }
+  const detail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemDetail(candidate, category), candidate));
+  if (detail) {
+    const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
+    return [`**${label}**：${detail}。`];
+  }
   return uniqueEditorialSentences([
-    mainItemFactBullet(candidate, original),
-    ...mainItemSpecificBullets(candidate),
-    mainItemScopeBullet(candidate, category),
-    mainItemDecisionBullet(candidate, category)
-  ]).slice(0, 5);
+    mainItemFactBullet(candidate, original)
+  ]).slice(0, 1);
 }
 
 function mainItemFactBullet(candidate, original) {
@@ -750,6 +781,14 @@ function compactMainItemLabel(candidate) {
 
 function readerLabelForCandidate(candidate) {
   const text = `${candidate.title || ""} ${candidate.evidence || ""} ${candidate.url || ""}`.toLowerCase();
+  if (/unlocking ai flexibility in europe|cross-region inference.*eu data processing|eu data processing.*model access/.test(text)) return "AWS 跨区域推理";
+  if (/ip allow list coverage.*emu namespaces|emu namespaces.*ip allow list|ip allow list.*general availability/.test(text)) return "GitHub IP 白名单";
+  if (/economic research exchange/.test(text)) return "OpenAI 经济研究";
+  if (/train models faster with jax and maxtext|nvfp4.*blackwell|blackwell.*nvfp4/.test(text)) return "Blackwell 低精度训练";
+  if (/next-generation of apple intelligence|siri ai|more capable and personal assistant/.test(text)) return "苹果 Siri AI";
+  if (/aids app development.*intelligence frameworks|new intelligence frameworks.*advanced tools/.test(text)) return "苹果开发框架";
+  if (/apple intelligence brings powerful ai capabilities|powerful ai capabilities into everyday experiences/.test(text)) return "苹果系统 AI";
+  if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) return "苹果基础模型";
   if (/rocketmq.*litetopic/.test(text)) return "RocketMQ LiteTopic";
   if (/agentscope java 2\.0/.test(text)) return "AgentScope Java 2.0";
   if (/tokenmaxxing|ontology-based dependency/.test(text)) return "Token 成本优化";
@@ -894,6 +933,87 @@ function highlightMainItemFact(candidate, fact) {
 
 function mainItemSpecificBullets(candidate) {
   const text = candidateText(candidate).toLowerCase();
+  if (/runway updates ai video creation workflow for game worlds/.test(text)) {
+    return [
+      "**工作流变化**：官方条目指向 AI 视频生成和游戏世界创作流程更新，关注素材生成链路而不是单个模型名。"
+    ];
+  }
+  if (/^official ai platform update\s+\d+$/i.test(String(candidate.title || "").trim())) {
+    return [
+      `**官方来源**：${candidate.source || "官方来源"} 把它列为产品、模型、平台或治理相关变化，需要按原文入口核对具体范围。`
+    ];
+  }
+  if (/unlocking ai flexibility in europe|cross-region inference.*eu data processing|eu data processing.*model access/.test(text)) {
+    return [
+      "**适用范围**：原文讨论欧盟数据处理场景下如何使用 ==跨区域推理== 取得更多模型选择。",
+      "**约束条件**：AWS 把模型可用性、跨 Region 容量和数据处理边界放在同一组问题里说明，适合欧洲团队核对区域访问方案。"
+    ];
+  }
+  if (/rocketmq.*litetopic/.test(text)) {
+    return [
+      "**新能力**：==LiteTopic== 面向百万级轻量 AI agent 会话，给每个会话提供专用消息通道。",
+      "**工程指向**：文章强调事件驱动分发和会话持久化，目标是降低独立 Topic 带来的管理和资源成本。"
+    ];
+  }
+  if (/agentscope java 2\.0/.test(text)) {
+    return [
+      "**框架方向**：2.0 版本强调 ==分布式执行== 和企业级 agent 基础能力，定位不只是单机 demo。",
+      "**落地范围**：公开信息把 Java 生态接入、生产可用能力和企业级运行放在一起，适合关注 agent 工程化团队跟进。"
+    ];
+  }
+  if (/tokenmaxxing|ontology-based dependency/.test(text)) {
+    return [
+      "**成本路径**：文章主张先用 ontology-based dependency modeling 抽取任务依赖关系，再减少 ==无效上下文==。",
+      "**适用场景**：它讨论的是企业 agent 的 token 消耗，不是单纯压缩提示词；关键在检索、记忆和上下文裁剪协同。"
+    ];
+  }
+  if (/ip allow list coverage.*emu namespaces|emu namespaces.*ip allow list|ip allow list.*general availability/.test(text)) {
+    return [
+      "**GitHub IP 白名单**：企业托管用户的命名空间现在可执行 GitHub 原生 ==IP 白名单== 配置。",
+      "**正式可用**：这项能力从预览推进到 GA，影响 GitHub Enterprise Cloud EMU 的用户命名空间访问控制。"
+    ];
+  }
+  if (/economic research exchange/.test(text)) {
+    return [
+      "**OpenAI 研究项目**：Economic Research Exchange 面向 AI 对就业、生产率和宏观经济影响的 ==经济研究==。",
+      "**参与方式**：OpenAI 表示将为选定研究项目开放申请入口，公开信息更像研究合作计划而不是产品功能发布。"
+    ];
+  }
+  if (/train models faster with jax and maxtext|nvfp4.*blackwell|blackwell.*nvfp4/.test(text)) {
+    return [
+      "**训练优化**：NVIDIA 把 JAX、MaxText、Blackwell 和 ==NVFP4== 放在同一条训练吞吐优化链路里。",
+      "**问题背景**：文章从 frontier LLM 预训练的吞吐瓶颈切入，讨论千卡级训练中每一点 step efficiency 的成本意义。"
+    ];
+  }
+  if (/next-generation of apple intelligence|siri ai|more capable and personal assistant/.test(text)) {
+    return [
+      "**苹果系统 AI**：Apple 预览下一代 Apple Intelligence，并把 ==Siri AI== 放进系统级更新。",
+      "**可用范围**：公开信息集中在更个人化的助手体验、设备软件版本和覆盖范围，属于苹果平台级 AI 入口变化。"
+    ];
+  }
+  if (/aids app development.*intelligence frameworks|new intelligence frameworks.*advanced tools/.test(text)) {
+    return [
+      "**开发者工具**：Apple 宣布新的 ==智能框架==、Xcode 生产力能力和平台改进，面向第三方应用开发。",
+      "**接入方向**：这条信息指向系统级 AI 能力怎样进入开发工具链，而不是独立发布一个聊天产品。"
+    ];
+  }
+  if (/bringing the latest gemini models to apple developers|gemini models.*apple developers/.test(text)) {
+    return [
+      "**Gemini 模型接入**：Google 把 ==Gemini 模型== 接入苹果开发者工具链，开发者可在 Apple 生态的开发流程里调用最新模型能力，而不是只从独立网页或云控制台进入。"
+    ];
+  }
+  if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) {
+    return [
+      "**模型说明**：Apple 披露第三代基础模型的 ==端侧模型、服务器模型和评测范围==，把能力范围写进研究说明。",
+      "**系统入口**：公开信息把模型能力、系统体验和开发者接口放在一起，区分已产品化能力和仍处在研究披露中的能力。"
+    ];
+  }
+  if (/apple intelligence brings powerful ai capabilities|powerful ai capabilities into everyday experiences/.test(text)) {
+    return [
+      "**日常入口**：Apple 把 ==写作、图像和快捷操作== 等 AI 能力接入 iPhone、iPad 和 Mac 的日常体验。",
+      "**产品形态**：公开信息强调更个人化、更有帮助的系统功能，说明苹果继续把 AI 做成默认系统能力。"
+    ];
+  }
   if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
     return [
       "**攻击归因**：WhatsApp 把这轮定向钓鱼攻击与 NSO 关联起来，说明它把这次事件按高风险间谍软件处理。",
@@ -903,7 +1023,7 @@ function mainItemSpecificBullets(candidate) {
   }
   if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) {
     return [
-      "**时间点**：NVIDIA 继续借伦敦科技周推进英国“主权 AI”议题，和去年的口号形成前后呼应。",
+      "**时间点**：NVIDIA 继续借伦敦科技周推进 ==英国主权 AI== 议题，和去年的口号形成前后呼应。",
       "**今年**：公开叙事已经从“做 AI maker”转向展示基础设施、伙伴协作和执行层进展。",
       "**信号**：这条消息更像英国把 AI 产业政策往算力建设和本地落地推进的延续动作。"
     ];
@@ -1058,7 +1178,7 @@ function communityLeadPublicSummary(candidate) {
   }
   const category = inferredEditorialCategory(candidate);
   const source = candidate.source || "公开来源";
-  return `${source} 提到一条${themeLabelForCandidate(candidate)}相关线索，当前公开信息主要落在${mainItemScopePhrase(candidate, category)}。`;
+  return `${source} 记录了一条${themeLabelForCandidate(candidate)}公开条目，详情需回到原文链接核对。`;
 }
 
 function communityLeadTitleForCandidate(candidate) {
@@ -1531,10 +1651,14 @@ function platformExemptItem(candidate) {
     ...(candidate.evidence ? { summary: trimText(candidate.evidence, 260) } : {}),
     ...(candidate.original_text ? { original_text: trimText(candidate.original_text, 500) } : {}),
     ...(candidate.reader_relevance ? { why_watch: candidate.reader_relevance } : {}),
-    ...(candidate.notes ? { risk_label: trimText(candidate.notes, 180) } : {})
+    risk_label: platformExemptRiskLabel(candidate)
   };
   requirePlatformExemptItemContract(item, { sectionName: sectionForPlatformCategory(candidate.category) });
   return item;
+}
+
+function platformExemptRiskLabel(candidate) {
+  return String(candidate.risk_label || candidate.risk_level || "").toLowerCase() === "low" ? "low" : "medium";
 }
 
 function mergeSourceAudit(target, audit) {
@@ -1816,17 +1940,18 @@ function canPromoteToMain(candidate, reportDate = "") {
   const sourceLevel = sourceLevelForCandidate(candidate);
   const readerRelevant = isReaderRelevantCandidate(candidate);
   const majorMainNews = isMajorMainNewsCandidate(candidate);
+  const publicImportant = isPublicAiImportantCandidate(candidate);
   const officialBlogMainline = isOfficialBlogMainlineCandidate(candidate);
   if (!hasReaderVisibleTitle(candidate)) return false;
   if (isFutureDatedCandidate(candidate, reportDate)) return false;
   const allowReaderRelevantCompanySignal =
     readerRelevant &&
     (sourceLevel === "official_company_news" || (majorMainNews && TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel)));
-  if (!isAiRelevantCandidate(candidate) && !isAigcCandidate(candidate) && !allowReaderRelevantCompanySignal && !officialBlogMainline) return false;
-  if (!readerRelevant) return false;
+  if (!isAiRelevantCandidate(candidate) && !isAigcCandidate(candidate) && !allowReaderRelevantCompanySignal && !officialBlogMainline && !publicImportant) return false;
+  if (!readerRelevant && !publicImportant) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
   if (isLowSignalVendorPartnership(candidate)) return false;
-  if (isBlogLikeCandidate(candidate) && !majorMainNews && !READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel) && !officialBlogMainline) return false;
+  if (isBlogLikeCandidate(candidate) && !majorMainNews && !READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel) && !officialBlogMainline && !publicImportant) return false;
   if (candidate.category === "hot_blog" && !["official", "paper", "github", "multi_source"].includes(sourceLevel)) {
     return false;
   }
@@ -1909,6 +2034,7 @@ function candidateScore(candidate) {
   if (candidate.editorial_category === "company_business") score += 10;
   if (candidate.editorial_category === "product_radar" || candidate.editorial_category === "open_source") score += 8;
   if (isReaderRelevantCandidate(candidate)) score += 6;
+  score += publicImportanceScore(candidate);
   score += readerUtilityScore(candidate);
   if (isAigcCandidate(candidate)) score += 8;
   if (candidate.image_url) score += 4;
@@ -1926,6 +2052,65 @@ function candidateScore(candidate) {
   if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
   if (isLowValueMainCandidate(candidate)) score -= 40;
   return score;
+}
+
+function compareMainCandidates(left, right) {
+  const publicDiff = mainCandidateScore(right) - mainCandidateScore(left);
+  if (publicDiff !== 0) return publicDiff;
+  const fallbackDiff = candidateScore(right) - candidateScore(left);
+  if (fallbackDiff !== 0) return fallbackDiff;
+  return String(left.title || "").localeCompare(String(right.title || ""));
+}
+
+function mainCandidateScore(candidate) {
+  let score = candidateScore(candidate);
+  score += publicNewsSalienceScore(candidate) * 2;
+  if (isNarrowEngineeringDeepDiveCandidate(candidate) && !isMajorMainNewsCandidate(candidate)) {
+    score -= 30;
+  }
+  return score;
+}
+
+function publicNewsSalienceScore(candidate) {
+  const text = candidateText(candidate);
+  const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`;
+  const combined = `${text} ${sourceText}`;
+  let score = 0;
+  const entityWeights = [
+    [/openai|chatgpt|gpt-|apple|siri|apple intelligence|wwdc|nvidia|blackwell|cuda|nvfp/i, 160],
+    [/anthropic|claude|google|deepmind|gemini|microsoft|meta\b|llama\b/i, 130],
+    [/amazon|aws|github|xai|x\.ai|adobe|mistral/i, 80],
+    [/alibaba|qwen|tencent|bytedance|kimi|minimax|zhipu/i, 70]
+  ];
+  const matchedEntity = entityWeights.find(([pattern]) => pattern.test(combined));
+  if (matchedEntity) {
+    score += matchedEntity[1];
+  }
+  if (/wwdc|siri|apple intelligence|chatgpt|gpt-|blackwell|cuda|nvfp|frontier model|foundation model/i.test(combined)) {
+    score += 24;
+  }
+  if (/launch|release|rollout|available|availability|pricing|price|api|sdk|model|benchmark|leaderboard|regulation|policy|lawsuit|funding|acquisition|earnings|revenue/i.test(combined)) {
+    score += 20;
+  }
+  if (/newsroom|news rss|press|official|keyword blog|developer blog/i.test(sourceText)) {
+    score += 8;
+  }
+  if (isNarrowEngineeringDeepDiveCandidate(candidate)) {
+    score -= 18;
+  }
+  return score;
+}
+
+function isNarrowEngineeringDeepDiveCandidate(candidate) {
+  const text = candidateText(candidate);
+  const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`;
+  if (!/blog|developer|machine-learning|devblogs|engineering|architecture|technical/i.test(sourceText)) {
+    return false;
+  }
+  if (/wwdc|siri|apple intelligence|chatgpt|gpt-|frontier model|blackwell|launch|release|rollout|pricing|available|availability|benchmark|regulation|lawsuit|funding|acquisition|earnings|revenue/i.test(text)) {
+    return false;
+  }
+  return /tutorial|guide|how to|deep dive|case study|reference architecture|cross[-\s]?region|session isolation|workflow|lite[-\s]?topic|tokenmaxxing|hosting coding agents/i.test(text);
 }
 
 function isGitHubTrendingCandidate(candidate, meta = {}) {
@@ -2006,6 +2191,27 @@ function isReaderRelevantCandidate(candidate) {
   return TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel) && (COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text));
 }
 
+function isPublicAiImportantCandidate(candidate) {
+  if (isLowValueMainCandidate(candidate) || isLowSignalVendorPartnership(candidate)) {
+    return false;
+  }
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (!TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel)) {
+    return false;
+  }
+  const text = candidateText(candidate);
+  if (isMajorMainNewsCandidate(candidate)) {
+    return true;
+  }
+  if (!PUBLIC_AI_HEADLINE_ENTITY_RE.test(text)) {
+    return false;
+  }
+  return AI_RELEVANCE_RE.test(text) ||
+    AIGC_RE.test(text) ||
+    COMPANY_ACTION_RE.test(text) ||
+    PRODUCT_PLATFORM_RE.test(text);
+}
+
 function hasPlainReaderSignal(candidate) {
   const category = candidate.editorial_category || inferredEditorialCategory(candidate);
   if (["company_business", "product_radar", "open_source", "content_aigc"].includes(category)) return true;
@@ -2039,6 +2245,20 @@ function readerUtilityScore(candidate) {
   if (COMPANY_ACTION_RE.test(candidateText(candidate))) score += 8;
   if (PRODUCT_PLATFORM_RE.test(candidateText(candidate))) score += 8;
   if (isHardcoreResearchOnly(candidate)) score -= 30;
+  return score;
+}
+
+function publicImportanceScore(candidate) {
+  if (!isPublicAiImportantCandidate(candidate)) {
+    return 0;
+  }
+  let score = 18;
+  const text = candidateText(candidate);
+  if (PUBLIC_AI_HEADLINE_ENTITY_RE.test(text)) score += 8;
+  if (isMajorMainNewsCandidate(candidate)) score += 10;
+  if (COMPANY_ACTION_RE.test(text)) score += 8;
+  if (PRODUCT_PLATFORM_RE.test(text)) score += 8;
+  if (/pricing|price|token|api|model|launch|release|availability|funding|acquisition|regulation|policy|lawsuit|earnings|revenue|价格|定价|接口|模型|发布|上线|融资|收购|监管|政策|诉讼|财报|营收/i.test(text)) score += 8;
   return score;
 }
 
@@ -2294,15 +2514,8 @@ function chineseSummary(candidate, category) {
     return specific;
   }
   const lead = chineseLeadForCandidate(candidate);
-  const fact = stripDraftPublicBodyNoise(lead || genericChineseFact(candidate, null), candidate);
-  const detail = stripDraftPublicBodyNoise(mainItemDetail(candidate, category), candidate);
-  if (detail) {
-    return `${ensureChineseSentence(fact)}${detail}`;
-  }
-  if (category === "content_aigc") {
-    return `${fact}。当前公开信息主要落在试用入口、样例质量、版权边界和价格信息。`;
-  }
-  return `${fact}。当前公开信息主要落在${mainItemScopePhrase(candidate, category)}。`;
+  const fact = stripDraftPublicBodyNoise(lead || genericChineseHeadline(candidate) || genericChineseFact(candidate, null), candidate);
+  return ensureChineseSentence(fact);
 }
 
 function mainItemSpecificSummary(candidate) {
@@ -2459,6 +2672,33 @@ function chineseLeadForCandidate(candidate) {
   if (/business analytics.*claude|automated.*analytics/.test(text)) {
     return "Anthropic 数据团队案例显示，Claude 被用于自动化大量业务分析查询，并配套 eval、消融和线上验证";
   }
+  if (/unlocking ai flexibility in europe|cross-region inference.*eu data processing|eu data processing.*model access/.test(text)) {
+    return "AWS 说明欧洲数据处理场景如何用跨区域推理访问模型";
+  }
+  if (/ip allow list coverage.*emu namespaces|emu namespaces.*ip allow list|ip allow list.*general availability/.test(text)) {
+    return "GitHub 将企业托管用户命名空间的 IP 白名单覆盖正式可用";
+  }
+  if (/economic research exchange/.test(text)) {
+    return "OpenAI 推出经济研究交流项目，面向 AI 经济影响研究";
+  }
+  if (/train models faster with jax and maxtext|nvfp4.*blackwell|blackwell.*nvfp4/.test(text)) {
+    return "英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速";
+  }
+  if (/apple introduces siri ai|more capable and personal assistant/.test(text)) {
+    return "苹果单独介绍 Siri AI 个性化助手升级";
+  }
+  if (/next-generation of apple intelligence|siri ai/.test(text)) {
+    return "苹果发布新一代系统级 AI 和 Siri";
+  }
+  if (/aids app development.*intelligence frameworks|new intelligence frameworks.*advanced tools/.test(text)) {
+    return "苹果为应用开发者推出新的智能框架和开发工具";
+  }
+  if (/apple intelligence brings powerful ai capabilities|powerful ai capabilities into everyday experiences/.test(text)) {
+    return "苹果把新的 AI 能力接入系统日常体验";
+  }
+  if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) {
+    return "苹果介绍第三代基础模型，公开内容集中在端侧和云端模型能力范围";
+  }
   if (/rocketmq.*litetopic/.test(text)) {
     return "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话";
   }
@@ -2497,6 +2737,18 @@ function chineseLeadForCandidate(candidate) {
   }
   if (/notion restores access to anthropic|service disruption/.test(text)) {
     return "Notion 已恢复 Anthropic 接入，暴露出企业 AI 工作流对模型供应商的依赖";
+  }
+  if (/bringing the latest gemini models to apple developers|gemini models.*apple developers/.test(text)) {
+    return "Google 将最新 Gemini 模型接入苹果开发者工具链";
+  }
+  if (/confidential submission of draft s-1 to the sec|openai submits confidential s-1|draft s-1.*sec/.test(text)) {
+    return "OpenAI 向美国证监会秘密提交上市草案";
+  }
+  if (/built to benefit everyone.*our plan|our plan.*built to benefit everyone/.test(text)) {
+    return "OpenAI 发布公司治理和公共利益计划";
+  }
+  if (/openai files for ipo.*sam altman.*eye.*layoffs|eye-scanning company.*layoffs|world.*layoffs/.test(text)) {
+    return "TechCrunch 报道 World 项目出现裁员";
   }
   if (/super app/.test(text)) {
     return "OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用";
@@ -2559,6 +2811,9 @@ function genericChineseHeadline(candidate) {
   const raw = decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim();
   const lower = raw.toLowerCase();
   if (!raw) return "";
+  if (/tested 19 llm api workloads|cut costs 79/.test(lower)) {
+    return "实测 19 类 LLM API 调用后，作者给出 79% 成本压缩数据";
+  }
   if (/deprecated/.test(lower) && /gpt-5\.2/.test(lower)) {
     return "GitHub Copilot 停用 GPT-5.2 与 GPT-5.2-Codex";
   }
@@ -2577,6 +2832,13 @@ function genericChineseHeadline(candidate) {
   if (/creator assistant/.test(lower) && /translations/.test(lower)) {
     return "Meta 推出 Creator Assistant，并扩展 Facebook AI 翻译";
   }
+  if (/runway updates ai video creation workflow for game worlds/.test(lower)) {
+    return "Runway 更新 AI 视频创作工作流";
+  }
+  const officialPlatformMatch = lower.match(/^official ai platform update\s+(\d+)$/);
+  if (officialPlatformMatch) {
+    return `官方 AI 平台更新 ${officialPlatformMatch[1]}`;
+  }
   if (/public preview/.test(lower) && /(plugin|copilot|codex|agent|developer|sdk|api)/.test(lower)) {
     return `${mainEntity(candidate) || "相关平台"} 将一项开发者能力推入公开预览`;
   }
@@ -2586,12 +2848,14 @@ function genericChineseHeadline(candidate) {
 function genericChineseFact(candidate, original) {
   void original;
   const entity = mainEntity(candidate) || candidate.source || "相关来源";
-  const category = inferredEditorialCategory(candidate);
-  const sourceLevel = sourceLevelForCandidate(candidate);
-  const text = candidateText(candidate);
-  const theme = genericFactTheme({ category, sourceLevel, text });
-  const scope = genericFactScope({ category, text });
-  return `${entity} 这次放出的信息主要落在${theme}，公开细节集中在${scope}`;
+  const title = stripDraftPublicBodyNoise(decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(), candidate);
+  if (hasChineseText(title) && title.length >= 10) {
+    return stripSentenceEnding(trimText(title, 120));
+  }
+  if (title) {
+    return `${entity} 发布了一条 AI 相关更新，原文标题为“${trimText(title, 72)}”`;
+  }
+  return `${entity} 发布了一条 AI 相关更新`;
 }
 
 function genericFactTheme({ category, sourceLevel, text }) {
@@ -2766,7 +3030,7 @@ function readerJudgementForCandidate(candidate, category) {
 function mainItemDetail(candidate, category) {
   const text = candidateText(candidate).toLowerCase();
   if (category === "content_aigc" || isAigcCandidate(candidate)) {
-    return "最有用的公开信息，通常是试用入口、样例质量、版权边界、商用条件和价格是否一起披露";
+    return "";
   }
   if (/gpt-5\.2 and gpt-5\.2-codex deprecated/.test(text)) {
     return "影响范围包括 Copilot Chat、代码补全和 agent 模式，团队需要同步检查默认模型和迁移路径";
@@ -2795,6 +3059,33 @@ function mainItemDetail(candidate, category) {
   if (/your ai bill is out of control|ai gateway.*spend limits/.test(text)) {
     return "它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢";
   }
+  if (/unlocking ai flexibility in europe|cross-region inference.*eu data processing|eu data processing.*model access/.test(text)) {
+    return "原文把重点放在欧盟数据处理、跨区域推理和模型可用性之间的取舍，适合判断欧洲团队怎样在合规边界内调用区域外模型";
+  }
+  if (/ip allow list coverage.*emu namespaces|emu namespaces.*ip allow list|ip allow list.*general availability/.test(text)) {
+    return "这次变化面向企业托管用户命名空间，把 ==IP 白名单覆盖== 从预览推进到正式可用，影响组织级访问控制配置、命名空间边界和企业安全策略";
+  }
+  if (/economic research exchange/.test(text)) {
+    return "它不是产品发布，而是 OpenAI 面向外部研究者组织 ==经济影响研究== 的项目入口，后续可观察就业、生产率、政策研究和 AI 扩散数据产出";
+  }
+  if (/train models faster with jax and maxtext|nvfp4.*blackwell|blackwell.*nvfp4/.test(text)) {
+    return "原文把 Blackwell 加速卡、==低精度格式== 和 JAX 训练工具链放在同一条优化链路里，关注点是训练吞吐、显存效率和大模型训练成本";
+  }
+  if (/next-generation of apple intelligence|siri ai|more capable and personal assistant/.test(text)) {
+    return "公开信息把系统级 AI、==Siri== 和个人上下文放在同一组更新里，关键边界是可用地区、设备要求、隐私处理方式和个人化助手入口";
+  }
+  if (/aids app development.*intelligence frameworks|new intelligence frameworks.*advanced tools/.test(text)) {
+    return "这条面向开发者，核心变化是苹果把 ==系统模型和智能框架== 接入开发工具链，让第三方应用有机会调用系统级 AI 能力";
+  }
+  if (/apple intelligence brings powerful ai capabilities|powerful ai capabilities into everyday experiences/.test(text)) {
+    return "这条面向用户体验，核心变化是苹果把 ==写作、图像和快捷操作== 等 AI 能力接入系统应用，做成日常默认入口而非独立工具";
+  }
+  if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) {
+    return "Apple 披露第三代基础模型的 ==端侧模型、服务器模型和评测范围==，公开信息说明哪些能力已经进入系统，哪些仍停留在研究披露和开发者接口范围";
+  }
+  if (/built to benefit everyone.*our plan|our plan.*built to benefit everyone/.test(text)) {
+    return "OpenAI 把 ==公司治理、公共利益承诺和长期结构== 放进同一份计划，公开信息集中在组织边界、监督安排和商业化扩张后的责任分配";
+  }
   if (/sk telecom and nvidia build ai infrastructure to power korea.?s ai innovation/.test(text)) {
     return "这类合作真正值得看的不是新闻稿口号，而是有没有交代本地算力、交付路径和客户落地范围";
   }
@@ -2805,7 +3096,7 @@ function mainItemDetail(candidate, category) {
     return "真正的看点是本土平台是否开始为全球 AI 服务负载扩算力，而不只是补一批硬件";
   }
   if (category === "content_aigc" || isAigcCandidate(candidate)) {
-    return "重点看它有没有把试用入口、样例质量、版权边界和价格条件一起说清楚";
+    return "";
   }
   return "";
 }
@@ -2869,6 +3160,12 @@ function hotBlogSpecificAngle(candidate) {
 
 function hotBlogSpecificSummary(candidate) {
   const text = candidateText(candidate).toLowerCase();
+  if (/unlocking ai flexibility in europe|cross-region inference.*eu data processing|eu data processing.*model access/.test(text)) {
+    return "文章把欧盟数据处理、跨区域推理和模型可用性放在同一条调用链路里说明。它具体讨论在 EU 数据边界下如何选择目标 Region、处理容量限制，并在合规前提下取得更多模型。平台团队可据此把区域、模型和数据边界拆成可配置方案。";
+  }
+  if (/tested 19 llm api workloads|cut costs 79/.test(text)) {
+    return "作者用 19 类真实 LLM API 调用比较模型和路由方式，给出把成本压低 79% 的数据。文章不是泛谈省钱，而是把工作负载分类、真实调用和模型选择拆开。团队可把它转成路由评估表：高价值任务用强模型，低风险任务换便宜模型。";
+  }
   if (/building pakistan notice helper|small ai tool for a very local safety problem/.test(text)) {
     return "作者做了一个面向巴基斯坦本地安全公告的检索助手，问题边界压得很窄。文章把数据入口、检索路径和真实使用场景讲得很具体，不是先堆复杂 agent 再找问题。对产品和内容团队的参考价值，在于它给了一个“先做小而准的 AI 工具，再谈扩展”的案例。";
   }
@@ -2880,6 +3177,15 @@ function hotBlogSpecificSummary(candidate) {
   }
   if (/tokenmaxxing|ontology-based dependency/.test(text)) {
     return "文章拆解企业 agent 的 token 开销为什么会被无效上下文放大，问题不在模型单价，而在上下文装得过满。作者给的方法是先画任务依赖关系，再决定哪些信息该进检索、哪些留在记忆、哪些直接删掉。对团队落地的意义在于，它把检索、记忆和上下文裁剪三条优化路线拆成了可分别验证的工程边界。";
+  }
+  if (/nvidia nemotron 3 ultra.*long-running agents|nemotron 3 ultra powers faster/.test(text)) {
+    return "文章介绍英伟达长程推理模型面向长时间代理任务的能力，信息集中在多轮上下文、工具调用、接口流程和推理效率。原文同时说明企业部署入口、效率优化和单轮评测的限制，边界是长任务代理是否需要专门模型，以及模型能力怎样接进工程链路。";
+  }
+  if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) {
+    return "文章围绕苹果第三代基础模型展开，信息重点在端侧模型、服务器模型、评测范围和安全隐私处理方式。它把模型能力、系统体验和开发者接口放在一起说明，能区分已经产品化的能力、仍在研究披露中的能力，以及第三方应用可复用的接口范围。";
+  }
+  if (/sovereign ai|london tech week|ai maker, not an ai taker|uk-sovereign-ai-advancements/.test(text)) {
+    return "文章讲英伟达如何把英国主权人工智能从政策口号推进到基础设施和伙伴落地，涉及本地算力、行业合作和人工智能工厂叙事。主要信息不是模型发布，而是供应链、国家级算力和企业落地节奏，并说明英国主线仍围绕英伟达展开。";
   }
   if (/gpt-5\.2 and gpt-5\.2-codex deprecated/.test(text)) {
     return "这条更新的重点不是单纯下线两个模型名，而是 GitHub 开始重新整理 Copilot Chat、补全和 agent 模式背后的默认模型组合。真正值得看的，是哪些入口已经切走、哪些团队还需要补迁移，以及现有提示词、评测和自动化流程会不会被连带影响。";

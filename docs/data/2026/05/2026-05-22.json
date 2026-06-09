@@ -2,104 +2,6 @@
   "report_date": "2026-05-22",
   "title": "AI 日报 2026-05-22",
   "summary": "本轮重点集中在 agent 工程栈：Google 把 Gemini 3.5、Antigravity、WebMCP 和托管 agent 放到同一条开发链路；Vercel AI Gateway 连续接入 Qwen 3.7 Max 与 Grok Build 0.1；GitHub Copilot 加强任务路由与语义 issue 检索；AWS SageMaker 用 OpenAI-compatible API 降低迁移成本；Anthropic 继续把 Claude Managed Agents 的执行环境和私有 MCP 访问边界拆开。GitHub Trending 继续显示 coding-agent skills、代码图谱、MCP 和 agent memory 工具升温；Builder feed 本轮受网络限制未收录。",
-  "source_window": {
-    "date_from": "2026-05-19",
-    "date_to": "2026-05-22",
-    "fallback_window_used": true,
-    "notes": "按 2026-05-22 Asia/Shanghai 生成。最近 24 小时内高质量 T0/T1 主体信息不足 5 条，因此先扩展信源覆盖，再纳入 2026-05-19 至 2026-05-21 的官方发布、模型卡、GitHub Changelog、Claude Code changelog、Vercel Changelog、GitHub Trending 与 Hugging Face Blog；每条保留真实 event_date，没有把旧事件包装成今日发布。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "npm run discover:github-trending -- 50",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "仓库命令在 shell 环境返回 fetch failed，未产出候选；随后用浏览器复核 GitHub Trending 页面。"
-        },
-        {
-          "name": "GitHub Trending daily",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "浏览器可访问；抽样命中 anthropics/claude-plugins-official、colbymchenry/codegraph、HKUDS/CLI-Anything、ChromeDevTools/chrome-devtools-mcp 等。"
-        },
-        {
-          "name": "GitHub Trending weekly",
-          "url": "https://github.com/trending?since=weekly",
-          "status": "checked",
-          "notes": "浏览器可访问；抽样命中 tinyhumansai/openhuman、colbymchenry/codegraph、rohitg00/agentmemory 等。"
-        },
-        {
-          "name": "GitHub Trending Python daily",
-          "url": "https://github.com/trending/python?since=daily",
-          "status": "checked",
-          "notes": "浏览器可访问；抽样命中 Claude Code 插件、CLI-Anything、notebooklm-py、forge、karpathy/autoresearch。"
-        },
-        {
-          "name": "GitHub Trending TypeScript daily",
-          "url": "https://github.com/trending/typescript?since=daily",
-          "status": "checked",
-          "notes": "浏览器可访问；抽样命中 codegraph、chrome-devtools-mcp、oh-my-pi、Understand-Anything、stitch-skills。"
-        },
-        {
-          "name": "GitHub Trending Rust daily",
-          "url": "https://github.com/trending/rust?since=daily",
-          "status": "checked",
-          "notes": "页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。"
-        },
-        {
-          "name": "GitHub Trending Go daily",
-          "url": "https://github.com/trending/go?since=daily",
-          "status": "checked",
-          "notes": "页面可访问，本轮未从首屏抽取进入项目表的 AI 工程候选。"
-        },
-        {
-          "name": "OSSInsight AI trending",
-          "url": "https://ossinsight.io/trending/ai",
-          "status": "checked",
-          "notes": "搜索结果确认该页用于 AI agent、LLM tools、MCP、coding agents 与 RAG 工具趋势交叉检查。"
-        },
-        {
-          "name": "Trendshift GitHub trending repositories",
-          "url": "https://trendshift.io/github-trending-repositories",
-          "status": "checked",
-          "notes": "搜索结果确认可作为 GitHub trending 历史和 AI agent topic 交叉源。"
-        }
-      ],
-      "candidates_found": 25,
-      "included": 6,
-      "notes": "shell 内置发现命令受网络限制；浏览器复核后只纳入与 coding agent、MCP、代码知识图谱、agent memory 或 agent skills 直接相关的项目，未把泛化课程、非 AI 项目或可疑高星噪声写入项目表。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders prepare-digest",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "blocked",
-          "notes": "node prepare-digest.js 返回 fetch failed，无法取得本轮中心 feed。"
-        },
-        {
-          "name": "X direct original links spot check",
-          "url": "https://x.com",
-          "status": "blocked",
-          "notes": "直接打开 X status 页面返回空 HTML，无法可靠读取原帖正文。"
-        },
-        {
-          "name": "Builder web search",
-          "url": "https://www.google.com/search?q=AI+builder+May+21+2026+agent+coding",
-          "status": "no_signal",
-          "notes": "搜索结果未给出可稳定回源的本日 builder 原帖正文；本轮不硬凑 Builder 观察。"
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "notes": "已按规则检查 follow-builders 与原始 X 来源，但当前环境没有可验证正文，因此 builder_observations 保持空数组。",
-      "blocked_reason": "fetch_failed",
-      "last_successful_feed_at": "2026-05-20T07:32:12.985Z"
-    }
-  },
   "main_items": [
     {
       "title": "Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路",
@@ -260,7 +162,6 @@
       "url": "https://deepmind.google/models/model-cards/gemini-3-5-flash/",
       "source": "Google DeepMind Model Card",
       "summary": "Google DeepMind 发布 Gemini 3.5 Flash model card，并在 I/O 2026 开发者发布中把它作为 agentic coding 和 long-horizon agent 任务的重要模型。",
-      "notes": "同时出现在 Google I/O 官方汇总、Antigravity、Gemini API、GitHub Copilot 和 Vercel AI Gateway 相关发布中；本轮只按官方来源记录可用性。",
       "release_scope": "model_card_update",
       "image_urls": [],
       "importance": "notable"
@@ -273,7 +174,6 @@
       "url": "https://vercel.com/changelog",
       "source": "Vercel Changelog",
       "summary": "Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。",
-      "notes": "按 Vercel 官方网关可用性记录；未使用二手媒体中的 Alibaba 发布细节。",
       "release_scope": "gateway_availability",
       "image_urls": [],
       "importance": "notable"
@@ -286,7 +186,6 @@
       "url": "https://vercel.com/changelog",
       "source": "Vercel Changelog",
       "summary": "Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。",
-      "notes": "官方 changelog 说明 reasoning effort 不可配置，也没有 non-reasoning mode。",
       "release_scope": "gateway_availability",
       "image_urls": [],
       "importance": "notable"
@@ -299,7 +198,6 @@
       "url": "https://huggingface.co/blog/ettin-reranker",
       "source": "Hugging Face Blog",
       "summary": "Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。",
-      "notes": "适合 RAG pipeline 的 retrieve-then-rerank 实验；上线前仍应在自有查询集上离线评估。",
       "release_scope": "provider_official_launch",
       "image_urls": [],
       "importance": "major"
@@ -314,7 +212,6 @@
       "event_date": "2026-05-19",
       "topic": "agentic development / WebMCP / Antigravity",
       "summary": "Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。",
-      "why_it_matters": "这篇文章能作为跟踪 Google agent 开发平台边界的主索引，覆盖模型、IDE、浏览器标准和托管运行环境。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -326,7 +223,6 @@
       "event_date": "2026-05-20",
       "topic": "model serving / OpenAI-compatible API",
       "summary": "SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。",
-      "why_it_matters": "它把 OpenAI-compatible interface 和企业自有推理端点连接起来，是模型服务迁移和 agent 平台集成的关键适配层。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -338,7 +234,6 @@
       "event_date": "2026-05-19",
       "topic": "managed agents / sandboxing / MCP",
       "summary": "Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。",
-      "why_it_matters": "文章直接讨论 agent loop、工具执行、私有网络和企业安全边界的拆分，适合作为生产级 agent 架构参考。",
       "image_urls": [],
       "importance": "notable"
     },
@@ -350,7 +245,6 @@
       "event_date": "2026-05-19",
       "topic": "reranker / RAG",
       "summary": "Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。",
-      "why_it_matters": "RAG 系统的质量通常依赖 rerank 层；小型 cross-encoder reranker 能改善延迟和部署成本。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -363,7 +257,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending daily / Python daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily 显示该项目为 Official, Anthropic-managed directory of high quality Claude Code Plugins，并显示 891 stars today；Python daily 抽样也命中。",
       "domains": [],
       "importance": "notable"
     },
@@ -374,7 +267,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending daily / weekly / TypeScript daily",
       "signal": "star_velocity",
-      "evidence": "GitHub Trending daily 显示 4,222 stars today；weekly 显示 6,731 stars this week；TypeScript daily 也命中。",
       "domains": [],
       "importance": "general"
     },
@@ -385,7 +277,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending daily / TypeScript daily",
       "signal": "trending",
-      "evidence": "GitHub Trending TypeScript daily 描述为 Chrome DevTools for coding agents，并显示 132 stars today。",
       "domains": [],
       "importance": "notable"
     },
@@ -396,7 +287,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending daily / Python daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily 描述为 Making ALL Software Agent-Native；Python daily 抽样显示 890 stars today。",
       "domains": [],
       "importance": "notable"
     },
@@ -407,7 +297,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending weekly",
       "signal": "star_velocity",
-      "evidence": "GitHub Trending weekly 描述为 #1 Persistent memory for AI coding agents based on real-world benchmarks，并显示 7,976 stars this week。",
       "domains": [],
       "importance": "general"
     },
@@ -418,7 +307,6 @@
       "event_date": "2026-05-22",
       "source": "GitHub Trending TypeScript daily",
       "signal": "trending",
-      "evidence": "GitHub Trending TypeScript daily 描述为 Turn any code into an interactive knowledge graph，并显示覆盖多种 coding agents。",
       "domains": [],
       "importance": "notable"
     }
@@ -450,77 +338,23 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-22",
-    "main_items": 7,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "official-ai-releases: checked Google Developers Blog, Google DeepMind model card, AWS Machine Learning Blog, Claude Blog, Vercel Changelog, GitHub Changelog, Claude Code Docs and Hugging Face Blog for 2026-05-19..2026-05-22",
-      "github-ai-trending: npm run discover:github-trending -- 50 failed with fetch failed; browser fallback checked GitHub Trending daily/weekly plus Python, TypeScript, Rust and Go pages; 25 candidates sampled and 6 included",
-      "follow-builders: platform detected as other; prepare-digest.js failed with fetch failed; direct X status pages returned empty HTML; builder_observations kept empty"
-    ],
-    "fallback_sources": [
-      "Google Developers Blog",
-      "Google Blog I/O 2026 announcements",
-      "Google DeepMind Model Card",
-      "Vercel Changelog",
-      "GitHub Changelog",
-      "AWS Machine Learning Blog",
-      "Claude Blog",
-      "Claude Code Docs",
-      "Hugging Face Blog",
-      "GitHub Trending",
-      "OSSInsight",
-      "Trendshift"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "主体信息 7 条，未强行凑满 10 条。source_window 扩展到 2026-05-19..2026-05-22，因为 24 小时内 T0/T1 信息不足；GitHub Trending 通过浏览器复核补足，Builder feed 与 X 原帖读取受阻，未收录 builder_observations。真实发布准备门已返回 git_not_writable，后续若 publish 失败应保留本地 HTML/JSON 产物并报告 publish_error。",
-    "optimization_suggestions": []
-  },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-22.html",
   "html_path": "reports/2026/05/2026-05-22.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-22.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-21T18:40:13.114Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "degraded",
-    "reasons": [
-      "github_trending_blocked",
-      "builder_sources_blocked"
-    ],
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
     "affected_sections": [
       "github_trending",
       "builder_observations"
-    ],
-    "degraded_sections": [
-      {
-        "code": "github_trending_blocked",
-        "error_code": "quality_degraded",
-        "section": "github_trending",
-        "message": "github_trending coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      },
-      {
-        "code": "builder_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "builder_observations",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      }
-    ],
-    "blocking_issues": [],
-    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete."
+    ]
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

@@ -5,71 +5,8 @@
   "summary": "2026-05-25 这版日报只保留 3 条主体信息：OpenAI Codex 速率限制 incident 在 2026-05-23 恢复，Hugging Face 社区在 2026-05-24 更新 PapersWithCode 复刻站，GitHub 今日趋势里 agent 工具、代码上下文和视频生成基础设施继续活跃。模型发布区为空，没有把旧发布重新包装成今日内容。",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-25.html",
   "html_path": "reports/2026/05/2026-05-25.html",
-  "source_window": {
-    "date_from": "2026-05-23",
-    "date_to": "2026-05-25",
-    "fallback_window_used": true,
-    "notes": "默认 24 小时内一手发布不足，扩展到 48 小时。未使用 5 天补充窗口；Google I/O、SageMaker、Copilot 自动路由、Kedro 1.2.0 等旧内容只留在候选池排除记录。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending daily",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "16 repositories parsed"
-        },
-        {
-          "name": "GitHub Trending weekly",
-          "url": "https://github.com/trending?since=weekly",
-          "status": "checked",
-          "notes": "17 repositories parsed"
-        },
-        {
-          "name": "GitHub Trending Python daily",
-          "url": "https://github.com/trending/python?since=daily",
-          "status": "checked",
-          "notes": "18 repositories parsed"
-        },
-        {
-          "name": "GitHub Trending TypeScript daily",
-          "url": "https://github.com/trending/typescript?since=daily",
-          "status": "checked",
-          "notes": "16 repositories parsed"
-        },
-        {
-          "name": "GitHub repo metadata via gh api",
-          "url": "https://api.github.com/",
-          "status": "checked",
-          "notes": "直接 REST 请求返回 403；gh api 可用，用于核对 selected repo 的 pushed_at、release 和描述。"
-        }
-      ],
-      "candidates_found": 127,
-      "included": 4,
-      "notes": "只收录能用 release、commit page 或 gh api 交叉确认的项目；纯榜单热度不单独当作 release。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders prepare-digest",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "checked",
-          "notes": "feedGeneratedAt=2026-05-24T07:25:51.477Z；包含 8 位 X builder、18 条 X posts 和 1 个 podcast。"
-        }
-      ],
-      "candidates_found": 8,
-      "included": 2,
-      "blocked_reason": "",
-      "last_successful_feed_at": "2026-05-24T07:25:51.477Z",
-      "notes": "只选保留原始 URL、与工程工作流直接相关、且不依赖二手转述的 Builder 内容。"
-    }
-  },
   "main_items": [
     {
-      "candidate_id": "main-openai-codex-rate-limit",
       "title": "OpenAI Codex 速率限制 incident 已恢复",
       "event_date": "2026-05-23",
       "url": "https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN",
@@ -90,7 +27,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-hf-paperswithcode",
       "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
       "event_date": "2026-05-24",
       "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
@@ -112,7 +48,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-github-agent-tooling",
       "title": "GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施",
       "event_date": "2026-05-25",
       "url": "https://github.com/trending?since=daily",
@@ -138,155 +73,80 @@
   "hot_blogs": [],
   "projects": [
     {
-      "candidate_id": "project-pi-v0755",
       "name": "earendil-works/pi",
       "description": "AI agent toolkit 的 v0.75.5 发布，包含 read tool 展示、Windows 文件工具、package update 和 provider 配置相关修复。",
       "url": "https://github.com/earendil-works/pi/releases/tag/v0.75.5",
       "event_date": "2026-05-23",
       "source": "GitHub Release",
       "signal": "release",
-      "evidence": "Release page lists v0.75.5 and 2026-05-23 release time。",
       "domains": [],
       "importance": "general"
     },
     {
-      "candidate_id": "project-anthropic-knowledge-work-plugins",
       "name": "anthropics/knowledge-work-plugins",
       "description": "Anthropic 管理的 Claude Cowork knowledge-work plugin 仓库；2026-05-24 有 Workload Identity Federation 相关 CI 迁移提交。",
       "url": "https://github.com/anthropics/knowledge-work-plugins/commits/main/",
       "event_date": "2026-05-24",
       "source": "GitHub commits",
       "signal": "official_update",
-      "evidence": "Commit history shows a 2026-05-24 commit on main。",
       "domains": [],
       "importance": "general"
     },
     {
-      "candidate_id": "project-longlive",
       "name": "NVlabs/LongLive",
       "description": "Long-video generation infra 项目；2026-05-25 提交更新 NVFP4 inference path 和 README throughput 描述。",
       "url": "https://github.com/NVlabs/LongLive/commits/main/",
       "event_date": "2026-05-25",
       "source": "GitHub commits",
       "signal": "notable_pr",
-      "evidence": "Commit history shows 2026-05-25 commits: Optimize NVFP4 inference path, Bold README throughput improvement。",
       "domains": [],
       "importance": "general"
     },
     {
-      "candidate_id": "project-mirofish",
       "name": "666ghj/MiroFish",
       "description": "面向预测任务的 swarm intelligence engine；GitHub metadata 显示 2026-05-24 有仓库更新，进入项目区但不写成 release。",
       "url": "https://github.com/666ghj/MiroFish",
       "event_date": "2026-05-24",
       "source": "GitHub repo metadata",
       "signal": "trending",
-      "evidence": "discover:github-trending 收录该仓库；gh api reports pushed_at=2026-05-24T16:48:58Z。",
       "domains": [],
       "importance": "notable"
     }
   ],
   "builder_observations": [
     {
-      "candidate_id": "builder-thariq-cost-prompt",
       "author": "Thariq",
       "content": "Claude Code 团队成员 Thariq 提到，用类似“please save me money”的提示让 agent 检查遗留服务和成本项，在他的旧项目里确实能产生可执行结果。",
       "url": "https://x.com/trq212/status/2058377974882210096",
       "role": "Claude Code engineer",
       "event_date": "2026-05-24",
       "source": "X",
-      "evidence": "follow-builders feed includes original X post and follow-up about cleaning leftover services.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-steipete-scratch-log",
       "author": "Peter Steinberger",
       "content": "Peter Steinberger 建议在较大的 Codex 重构任务里让 agent 维护 scratch-log，记录决策、取舍和 review 修复，方便事后看清代理做过哪些判断。",
       "url": "https://x.com/steipete/status/2058308112134635528",
       "role": "OpenClaw / OpenAI builder",
       "event_date": "2026-05-23",
       "source": "X",
-      "evidence": "Original X post is included in follow-builders feed.",
       "image_urls": [],
       "importance": "notable"
     }
   ],
   "community_leads": [],
-  "self_check": {
-    "report_date": "2026-05-25",
-    "main_items": 3,
-    "builder_observations": 2,
-    "builder_skill_used": [
-      "official-ai-releases: checked official OpenAI, Anthropic, Google, GitHub Changelog, AWS, Mistral and model registry searches for 2026-05-23..2026-05-25",
-      "github-ai-trending: ran npm run discover:github-trending -- 50 and verified selected repositories with gh api or commit/release pages",
-      "follow-builders: ran prepare-digest.js; central feed returned X posts and one podcast, only fresh original X posts were included"
-    ],
-    "fallback_sources": [
-      "OpenAI Status",
-      "Hugging Face Blog",
-      "GitHub Trending",
-      "GitHub Release pages",
-      "GitHub commit pages",
-      "follow-builders central feed"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "主体信息只有 3 条，这是新鲜度门禁下的正常结果。没有模型发布入选；没有把 2026-05-22 以前的旧发布放进主体。Kedro、Google I/O、GitHub Copilot web model list、No Priors Cerebras podcast 等内容已保留为候选池排除项。",
-    "optimization_suggestions": [
-      {
-        "area": "github_trending",
-        "observed_issue": "直接 GitHub REST 抓取 selected repos 时返回 403，但本机 gh api 可以成功读取 repo metadata。",
-        "evidence": "PowerShell Invoke-RestMethod 对 api.github.com/repos 返回 403；gh api repos/... 成功返回 pushed_at、stars 和 latest release。",
-        "suggested_module": "src/discovery.js",
-        "expected_benefit": "把 gh api 作为本地已登录环境的正式兜底，减少人工核对项目区的时间。",
-        "needs_user_confirmation": true
-      },
-      {
-        "area": "candidate_pool",
-        "observed_issue": "follow-builders 输出需要人工摘取 Builder 条目并映射 candidate_id。",
-        "evidence": "prepare-digest 已返回结构化 X posts，但当前候选池仍手工写入 builder_observation candidate。",
-        "suggested_module": "src/candidates.js",
-        "expected_benefit": "自动把合格 Builder 原始链接转为候选，降低漏收和格式错误。",
-        "needs_user_confirmation": true
-      },
-      {
-        "area": "freshness_gate",
-        "observed_issue": "当前硬门禁会拦截旧内容进入 main_items，但旧内容仍可手工进入 projects 或 hot_blogs。",
-        "evidence": "本轮人工排除了 Kedro 1.2.0 和 GitHub Copilot web model list；门禁本身没有覆盖这些区的旧内容。",
-        "suggested_module": "src/quality-gates.js",
-        "expected_benefit": "把 48 小时规则扩展到 projects 和 hot_blogs，避免旧内容换区出现。",
-        "needs_user_confirmation": true
-      }
-    ],
-    "publish_status": {
-      "html_generated": false,
-      "repo_updated": false,
-      "repo_pushed": false,
-      "pages_url": "",
-      "publish_error": ""
-    }
-  },
-  "publish_status": {
-    "html_generated": false,
-    "repo_updated": false,
-    "repo_pushed": false,
-    "pages_url": "",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-25T04:35:00.000Z",
-  "candidate_pool_path": "data/2026/05/2026-05-25.candidates.json",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }
