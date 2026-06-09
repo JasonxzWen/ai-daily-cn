@@ -3,6 +3,12 @@ import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { reportRelativePaths } from "./paths.js";
 import { validateCandidatePool } from "./schema.js";
+import {
+  isPlatformExemptCategory,
+  PLATFORM_CATEGORY_TO_SECTION,
+  PLATFORM_SECTIONS,
+  requirePlatformExemptItemContract
+} from "./platform-exempt.js";
 
 const REQUIRED_SECTIONS = {
   main_items: "main_item",
@@ -10,7 +16,8 @@ const REQUIRED_SECTIONS = {
   model_releases: "model_release",
   hot_blogs: "hot_blog",
   projects: "project",
-  builder_observations: "builder_observation"
+  builder_observations: "builder_observation",
+  ...Object.fromEntries(Object.entries(PLATFORM_CATEGORY_TO_SECTION).map(([category, section]) => [section, category]))
 };
 const FACT_SECTION_NAMES = new Set(["main_items", "model_releases"]);
 const NON_PRIMARY_DISCLOSURE_SECTIONS = new Set(["hot_blogs", "projects", "builder_observations"]);
@@ -120,6 +127,12 @@ export function requireCandidateCoverage(report, candidatePool) {
           message: `candidate category 必须是 ${expectedCategory}，实际是 ${candidate.category}。`
         });
       }
+      if (isPlatformExemptCategory(candidate.category) && !PLATFORM_SECTIONS.includes(sectionName)) {
+        errors.push({
+          path: `${pathName}.candidate_id`,
+          message: `platform exempt candidate cannot enter ${sectionName}: ${item.candidate_id}`
+        });
+      }
       if (candidate.included_in && candidate.included_in !== sectionName) {
         errors.push({
           path: `${pathName}.candidate_id`,
@@ -134,6 +147,24 @@ export function requireCandidateCoverage(report, candidatePool) {
           path: `${pathName}.event_date`,
           message: `条目 event_date 必须与候选 event_date 一致：${item.candidate_id}`
         });
+      }
+      if (PLATFORM_SECTIONS.includes(sectionName)) {
+        try {
+          requirePlatformExemptItemContract(item, { sectionName, candidate });
+        } catch (error) {
+          errors.push({
+            path: `${pathName}.candidate_id`,
+            message: error.message
+          });
+        }
+        for (const field of ["platform", "source_id", "rule_id", "source_level", "verification_status", "exemption_policy", "published_by_gate"]) {
+          if (candidate[field] !== undefined && item[field] !== candidate[field]) {
+            errors.push({
+              path: `${pathName}.${field}`,
+              message: `platform exempt item ${field} must match candidate ${item.candidate_id}`
+            });
+          }
+        }
       }
       if (requiresPrimaryVerification(sectionName, candidate, item) && !hasPrimaryVerification(candidate)) {
         errors.push({

@@ -2,6 +2,16 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { loadSourceRegistry } from "./source-registry.js";
 import { loadWeChatArticleInput, WECHAT_ARTICLE_INPUT_SOURCE } from "./wechat-input.js";
+import {
+  auditGroupForPlatform,
+  isPlatformExemptCategory,
+  PLATFORM_EXEMPT_PLATFORMS,
+  PLATFORM_EXEMPT_POLICY,
+  platformEntryToCandidate,
+  platformFromCandidateCategory,
+  platformSourceRejectReason,
+  sectionForPlatformCategory
+} from "./platform-exempt.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -1182,7 +1192,8 @@ export async function collectContentSources(options = {}) {
 
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
-  const sources = await loadContentSources(options);
+  const platformExempt = normalizePlatformExemptOption(options.platformExempt);
+  const sources = filterPlatformExemptSources(await loadContentSources(options), platformExempt);
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
@@ -1193,7 +1204,7 @@ export async function collectContentSources(options = {}) {
   const startedAt = Date.now();
   const budgetMs = Number.isInteger(options.budgetMs) && options.budgetMs > 0 ? options.budgetMs : 300000;
 
-  if (shouldCheckWeChatArticleInput(options)) {
+  if (!platformExempt && shouldCheckWeChatArticleInput(options)) {
     const wechatInput = await loadWeChatArticleInput({
       reportDate,
       inputPath: options.wechatInputPath,
@@ -1213,20 +1224,26 @@ export async function collectContentSources(options = {}) {
     const currentSource = normalizeGenericSource(rawSource, "content");
     const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
     candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
+    if (isPlatformExemptCategory(candidateCategory) && currentSource.kill_switch === true) {
+      const notes = "kill_switch_enabled";
+      markSource(candidateSources.at(-1), "no_signal", notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "no_signal", notes, platformAuditSourceExtra(currentSource, { parsed_count: 0 })));
+      continue;
+    }
     if (currentSource.source_kind === "manual") {
       markSource(candidateSources.at(-1), "skipped_manual_review_required", "manual whitelist source");
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata"));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata", platformAuditSourceExtra(currentSource)));
       continue;
     }
     const skipped = contentSourceSkipReason(currentSource, options.env || process.env);
     if (skipped) {
       markSource(candidateSources.at(-1), "blocked", skipped);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, skipped, skipped));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, skipped, skipped, platformAuditSourceExtra(currentSource)));
       continue;
     }
     if (Date.now() - startedAt > budgetMs) {
       markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded"));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded", platformAuditSourceExtra(currentSource)));
       continue;
     }
     if (currentSource.source_kind === OPENROUTER_RANKINGS_SOURCE_KIND) {
@@ -1265,13 +1282,13 @@ export async function collectContentSources(options = {}) {
           options
         });
         const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
-        const entries = result.entries
+        const datedEntries = result.entries
           .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
-        const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
-          ? currentSource.maxItemsPerRun
-          : perSourceLimit;
+        const rejected = {};
+        const entries = filterPlatformEntries(datedEntries, currentSource, candidateCategory, rejected);
+        const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
         for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
-          candidates.push({
+          candidates.push(platformCandidateOrContentCandidate({
             id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
             source_id: currentSource.id,
             category: candidateCategory,
@@ -1284,16 +1301,16 @@ export async function collectContentSources(options = {}) {
             notes: [contentCandidateNotes(entry, currentSource, ""), `source_report_url=${sanitizeNoteValue(entry.source_report_url || currentSource.url)}`].filter(Boolean).join("; "),
             ...contentVerificationFields({ ...entry, url: entry.source_report_url || entry.url }, currentSource, ""),
             ...(candidateCategory === "project" ? { signal: currentSource.signal || "github_report" } : {})
-          });
+          }, entry, currentSource, candidates));
         }
         const status = entries.length > 0 ? result.status : "no_signal";
-        const notes = `${result.notes}; ${entries.length} within ${sourceLookbackDays}d source window`;
+        const notes = appendPlatformRejectedNotes(`${result.notes}; ${entries.length} within ${sourceLookbackDays}d source window`, rejected);
         markSource(candidateSources.at(-1), status, notes);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
       } catch (error) {
         const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
         markSource(candidateSources.at(-1), "blocked", notes);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes, platformAuditSourceExtra(currentSource)));
       }
       continue;
     }
@@ -1319,7 +1336,7 @@ export async function collectContentSources(options = {}) {
         });
         if (!cached) {
           markSource(candidateSources.at(-1), "blocked", notes);
-          sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+          sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes, platformAuditSourceExtra(currentSource)));
           continue;
         }
         responseText = cached.content;
@@ -1342,26 +1359,27 @@ export async function collectContentSources(options = {}) {
         fetchImpl
       );
       const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
-      const entries = parsedEntries
+      const datedEntries = parsedEntries
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
+      const rejected = {};
+      const entries = filterPlatformEntries(datedEntries, currentSource, candidateCategory, rejected);
       const status = entries.length > 0 ? "checked" : "no_signal";
       let notes = cacheFallbackNote
         ? `${entries.length} recent ${entryLabel} entries parsed; ${cacheFallbackNote}`
         : withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, responseForRetryNote);
+      notes = appendPlatformRejectedNotes(notes, rejected);
       let confirmedProductCrossChecks = 0;
       let unresolvedProductCrossChecks = 0;
       let skippedOriginalUrlChecks = 0;
 
-      const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
-        ? currentSource.maxItemsPerRun
-        : perSourceLimit;
+      const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
       for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
         if (requiresOriginalUrl(currentSource) && !originalUrl) {
           skippedOriginalUrlChecks += 1;
           continue;
         }
-        let candidate = {
+        let candidate = platformCandidateOrContentCandidate({
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
           category: candidateCategory,
@@ -1375,7 +1393,7 @@ export async function collectContentSources(options = {}) {
           ...contentVerificationFields(entry, currentSource, originalUrl),
           ...contentCandidateImageFields(entry),
           ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
-        };
+        }, entry, currentSource, candidates);
 
         if (candidateCategory === "project" && shouldCrossCheckProductCandidate(currentSource, options)) {
           const result = await crossCheckProductCandidate({
@@ -1405,7 +1423,7 @@ export async function collectContentSources(options = {}) {
         notes = `${notes}; ${skippedOriginalUrlChecks} skipped without original URL`;
       }
       markSource(candidateSources.at(-1), status, notes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
     } catch (error) {
       const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
       const cached = await readContentSourceCache({
@@ -1416,7 +1434,7 @@ export async function collectContentSources(options = {}) {
       });
       if (!cached) {
         markSource(candidateSources.at(-1), "blocked", notes);
-        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes));
+        sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", notes, platformAuditSourceExtra(currentSource)));
         continue;
       }
       const parsedEntries = await hydrateSearchApiEntries(
@@ -1425,12 +1443,12 @@ export async function collectContentSources(options = {}) {
         fetchImpl
       );
       const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
-      const entries = parsedEntries
+      const datedEntries = parsedEntries
         .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
+      const rejected = {};
+      const entries = filterPlatformEntries(datedEntries, currentSource, contentSourceKinds(currentSource).candidateCategory, rejected);
       const status = entries.length > 0 ? "checked" : "no_signal";
-      const sourceLimit = Number.isInteger(currentSource.maxItemsPerRun) && currentSource.maxItemsPerRun > 0
-        ? currentSource.maxItemsPerRun
-        : perSourceLimit;
+      const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
       let skippedOriginalUrlChecks = 0;
       for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
@@ -1438,7 +1456,7 @@ export async function collectContentSources(options = {}) {
           skippedOriginalUrlChecks += 1;
           continue;
         }
-        candidates.push({
+        candidates.push(platformCandidateOrContentCandidate({
           id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
           source_id: currentSource.id,
           category: candidateCategory,
@@ -1451,17 +1469,18 @@ export async function collectContentSources(options = {}) {
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
           ...contentCandidateImageFields(entry)
-        });
+        }, entry, currentSource, candidates));
       }
-      const cacheNotes = `${entries.length} recent ${entryLabel} entries parsed; cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}${skippedOriginalUrlChecks > 0 ? `; ${skippedOriginalUrlChecks} skipped without original URL` : ""}`;
+      const cacheNotes = appendPlatformRejectedNotes(`${entries.length} recent ${entryLabel} entries parsed; cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}${skippedOriginalUrlChecks > 0 ? `; ${skippedOriginalUrlChecks} skipped without original URL` : ""}`, rejected);
       markSource(candidateSources.at(-1), status, cacheNotes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
     }
   }
+  const auditGroupName = platformExempt ? auditGroupForPlatform(platformExempt) : "content_sources";
 
   return {
     source_audit: {
-      content_sources: {
+      [auditGroupName]: {
         checked: true,
         sources: sourceResults,
         candidates_found: candidates.length,
@@ -1472,7 +1491,9 @@ export async function collectContentSources(options = {}) {
         source_kind_counts: countBy(sources, "source_kind"),
         blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
-        notes: "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
+        notes: platformExempt
+          ? `${platformExempt} platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.`
+          : "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
       }
     },
     sources: candidateSources,
@@ -1545,7 +1566,28 @@ async function loadContentSources(options = {}) {
   }
 }
 
+function normalizePlatformExemptOption(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return PLATFORM_EXEMPT_PLATFORMS.includes(normalized) ? normalized : "";
+}
+
+function filterPlatformExemptSources(sources, platform) {
+  if (!platform) {
+    return sources;
+  }
+  return sources.filter((source) => {
+    const candidateCategory = source.candidate_category || source.candidateCategory;
+    const candidatePlatform = source.platform || platformFromCandidateCategory(candidateCategory);
+    return source.verification_policy === PLATFORM_EXEMPT_POLICY &&
+      candidatePlatform === platform &&
+      platformFromCandidateCategory(candidateCategory) === platform;
+  });
+}
+
 function contentSourceKinds(sourceInfo) {
+  if (isPlatformExemptCategory(sourceInfo.candidate_category)) {
+    return { sourceCategory: "community", candidateCategory: sourceInfo.candidate_category, entryLabel: "platform signal" };
+  }
   if (sourceInfo.candidate_category === "project" || sourceInfo.category === "project") {
     return { sourceCategory: "project", candidateCategory: "project", entryLabel: "product/project" };
   }
@@ -1556,6 +1598,74 @@ function contentSourceKinds(sourceInfo) {
     return { sourceCategory: "community", candidateCategory: "community_lead", entryLabel: "X hotspot" };
   }
   return { sourceCategory: "blog", candidateCategory: sourceInfo.candidate_category || "hot_blog", entryLabel: "blog/interview" };
+}
+
+function platformCandidateOrContentCandidate(candidate, entry, sourceInfo, existingCandidates) {
+  if (!isPlatformExemptCategory(candidate.category)) {
+    return candidate;
+  }
+  const platformFields = platformEntryToCandidate(entry, sourceInfo, existingCandidates);
+  return {
+    ...candidate,
+    status: "included",
+    included_in: sectionForPlatformCategory(candidate.category),
+    evidence: summarizeEvidence(entry.summary || entry.description || entry.content || "", `${sourceInfo.name} platform entry passed deterministic rules.`),
+    notes: appendSentence(candidate.notes, `platform_exempt=true; rule_id=${sanitizeNoteValue(platformFields.rule_id)}; primary_verification_required=false`),
+    ...platformFields,
+    verification_sources: []
+  };
+}
+
+function filterPlatformEntries(entries, sourceInfo, candidateCategory, rejected) {
+  if (!isPlatformExemptCategory(candidateCategory)) {
+    return entries;
+  }
+  return entries.filter((entry) => {
+    const reason = platformSourceRejectReason(entry, sourceInfo);
+    if (!reason) {
+      return true;
+    }
+    rejected[reason] = (rejected[reason] || 0) + 1;
+    return false;
+  });
+}
+
+function appendPlatformRejectedNotes(notes, rejected = {}) {
+  const parts = Object.entries(rejected)
+    .filter(([, count]) => count > 0)
+    .map(([reason, count]) => `${reason}=${count}`);
+  if (parts.length === 0) {
+    return notes;
+  }
+  return appendSentence(notes, `platform_rejections: ${parts.join(", ")}`);
+}
+
+function platformAuditSourceExtra(sourceInfo, extra = {}) {
+  if (!isPlatformExemptCategory(sourceInfo.candidate_category)) {
+    return extra;
+  }
+  return {
+    id: sourceInfo.id,
+    source_kind: sourceInfo.source_kind,
+    tier: sourceInfo.tier,
+    authority: sourceInfo.authority,
+    enablement: sourceInfo.enablement,
+    verification_policy: sourceInfo.verification_policy,
+    platform: sourceInfo.platform || platformFromCandidateCategory(sourceInfo.candidate_category),
+    ...extra
+  };
+}
+
+function sourceMaxItemsPerRun(sourceInfo, fallback) {
+  const camel = Number(sourceInfo.maxItemsPerRun);
+  if (Number.isInteger(camel) && camel > 0) {
+    return camel;
+  }
+  const snake = Number(sourceInfo.max_items_per_run);
+  if (Number.isInteger(snake) && snake > 0) {
+    return snake;
+  }
+  return fallback;
 }
 
 function requiresOriginalUrl(sourceInfo) {
@@ -2403,7 +2513,13 @@ function toCandidateSource(sourceItem, category, checkedAt, status, notes) {
     category,
     status,
     checked_at: checkedAt,
-    notes
+    notes,
+    ...(sourceItem.platform ? { platform: sourceItem.platform } : {}),
+    ...(sourceItem.rule_id || sourceItem.id ? { rule_id: sourceItem.rule_id || sourceItem.id } : {}),
+    ...(isPlatformExemptCategory(sourceItem.candidate_category) ? {
+      source_level: "platform_exempt_signal",
+      verification_status: "platform_exempt_unverified"
+    } : {})
   };
 }
 

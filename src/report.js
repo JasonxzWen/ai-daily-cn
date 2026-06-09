@@ -24,6 +24,13 @@ import {
   writeCandidatePool
 } from "./candidates.js";
 import { validateReport } from "./schema.js";
+import {
+  auditGroupForPlatform,
+  PLATFORM_AUDIT_GROUPS,
+  PLATFORM_SECTIONS,
+  platformForSection,
+  requirePlatformExemptItemContract
+} from "./platform-exempt.js";
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -109,6 +116,9 @@ export function normalizeReportDraft(draft, options = {}) {
     projects: Array.isArray(draft.projects) ? draft.projects : [],
     builder_observations: Array.isArray(draft.builder_observations) ? draft.builder_observations : [],
     community_leads: Array.isArray(draft.community_leads) ? draft.community_leads : [],
+    ...(Array.isArray(draft.wechat_items) ? { wechat_items: draft.wechat_items } : {}),
+    ...(Array.isArray(draft.zhihu_items) ? { zhihu_items: draft.zhihu_items } : {}),
+    ...(Array.isArray(draft.reddit_items) ? { reddit_items: draft.reddit_items } : {}),
     evidence_assets: Array.isArray(draft.evidence_assets) ? draft.evidence_assets : [],
     publish_status: draft.publish_status || defaultPublishStatus(canonicalUrl),
     generated_at: draft.generated_at || options.generatedAt || defaultGeneratedAt()
@@ -125,6 +135,11 @@ export function normalizeReportDraft(draft, options = {}) {
     "community_leads"
   ]) {
     report[sectionName] = withDefaultImportance(sectionName, report[sectionName]);
+  }
+  for (const sectionName of PLATFORM_SECTIONS) {
+    if (Array.isArray(report[sectionName])) {
+      report[sectionName] = withDefaultImportance(sectionName, report[sectionName]);
+    }
   }
 
   if (report.self_check && typeof report.self_check === "object") {
@@ -149,6 +164,7 @@ export function normalizeReportDraft(draft, options = {}) {
   }
 
   requireSourceAudit(validation.value);
+  requirePlatformExemptSections(validation.value);
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
@@ -160,6 +176,19 @@ export function normalizeReportDraft(draft, options = {}) {
   });
 
   return stripPrivateDisclosureFields(validation.value);
+}
+
+function requirePlatformExemptSections(report) {
+  for (const sectionName of PLATFORM_SECTIONS) {
+    const items = Array.isArray(report?.[sectionName]) ? report[sectionName] : [];
+    if (items.length > 0) {
+      const groupName = auditGroupForPlatform(platformForSection(sectionName));
+      requireAuditGroup(report?.source_audit?.[groupName], `source_audit.${groupName}`);
+    }
+    for (const item of items) {
+      requirePlatformExemptItemContract(item, { sectionName });
+    }
+  }
 }
 
 function stripPrivateDisclosureFields(report) {
@@ -252,7 +281,10 @@ function requireSourceAudit(report) {
     throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录固定发现面和源健康检查结果。");
   }
 
-  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"]) {
+  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS]) {
+    if (PLATFORM_AUDIT_GROUPS.includes(groupName) && !audit[groupName]) {
+      continue;
+    }
     requireAuditGroup(audit[groupName], `source_audit.${groupName}`);
   }
 }

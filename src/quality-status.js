@@ -3,6 +3,7 @@ import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./automation-revision.js";
 import { normalizeUrlIdentity } from "./url.js";
+import { PLATFORM_TO_AUDIT_GROUP } from "./platform-exempt.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 const SOURCE_AVAILABLE_STATUSES = new Set(["checked", "no_signal"]);
@@ -41,7 +42,7 @@ const CANDIDATE_SECTION_MAP = {
 const MAINLINE_FACT_SECTIONS = ["main_items", "model_releases"];
 const NON_PRIMARY_ALLOWED_SECTIONS = ["hot_blogs", "projects", "builder_observations", "community_leads"];
 const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source"]);
-const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified", "platform_exempt_unverified"]);
 
 const FIXED_SOURCE_REQUIREMENTS = [
   {
@@ -155,6 +156,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
     affectedSections
   });
   addDailyTrackingDegradation({ report, reasons, affectedSections });
+  addPlatformSourceDegradation({ report, reasons, affectedSections });
 
   addSelectionDegradation({ report, candidatePool, reasons, affectedSections });
 
@@ -349,7 +351,10 @@ function degradedReasonForSection(reasons, section) {
     github_trending: "github_trending_blocked",
     hot_blogs: "content_sources_blocked",
     builder_observations: "builder_sources_blocked",
-    daily_tracking: "daily_tracking_source_blocked"
+    daily_tracking: "daily_tracking_source_blocked",
+    wechat_items: "wechat_sources_blocked",
+    zhihu_items: "zhihu_sources_blocked",
+    reddit_items: "reddit_sources_blocked"
   }[section];
   if (mapped && reasons.includes(mapped)) {
     return mapped;
@@ -873,6 +878,21 @@ function addDailyTrackingDegradation({ report, reasons, affectedSections }) {
   }
   reasons.push("daily_tracking_source_blocked");
   affectedSections.push("daily_tracking");
+}
+
+function addPlatformSourceDegradation({ report, reasons, affectedSections }) {
+  for (const [platform, groupName] of Object.entries(PLATFORM_TO_AUDIT_GROUP)) {
+    const section = `${platform}_items`;
+    const group = report?.source_audit?.[groupName];
+    if (!groupHasBlockingSignal(group)) {
+      continue;
+    }
+    if (sectionCount(report, section) > 0) {
+      continue;
+    }
+    reasons.push(`${groupName}_blocked`);
+    affectedSections.push(section);
+  }
 }
 
 function sourceAuditHasBlockedDailyTracker(sourceAudit) {

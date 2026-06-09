@@ -21,8 +21,10 @@ export async function checkSourcesHealth(options = {}) {
   for (const source of sources) {
     const skipped = skipReasonForSource(source);
     if (skipped) {
-      results.push(healthResult(source, skipped, {
-        notes: skipped
+      const status = typeof skipped === "string" ? skipped : skipped.status;
+      const notes = typeof skipped === "string" ? skipped : skipped.notes;
+      results.push(healthResult(source, status, {
+        notes
       }));
       continue;
     }
@@ -88,6 +90,12 @@ function skipReasonForSource(source) {
   if (source.source_kind === "manual") {
     return "skipped_manual_source";
   }
+  if (source.verification_policy === "platform_signal_exempt" && source.kill_switch === true) {
+    return {
+      status: "skipped_manual_source",
+      notes: "kill_switch_enabled"
+    };
+  }
   return contentSourceSkipReason(source);
 }
 
@@ -101,6 +109,7 @@ function healthResult(source, status, extra = {}) {
     authority: source.authority,
     enablement: source.enablement,
     verification_policy: source.verification_policy,
+    ...(source.platform ? { platform: source.platform } : {}),
     requires_original_url: source.requires_original_url === true || source.requiresOriginalUrl === true,
     status,
     http_status: extra.http_status || null,

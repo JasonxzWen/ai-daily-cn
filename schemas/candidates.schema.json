@@ -76,7 +76,8 @@
         "paper_aggregator",
         "ai_news_aggregator",
         "aigc_content_industry",
-        "ai_funding_product_radar"
+        "ai_funding_product_radar",
+        "platform_exempt_signal"
       ]
     },
     "verification_status": {
@@ -85,7 +86,8 @@
         "multi_source_confirmed",
         "intermediary_only",
         "original_social_only",
-        "unverified"
+        "unverified",
+        "platform_exempt_unverified"
       ]
     },
     "source": {
@@ -185,6 +187,12 @@
         },
         "trend": {
           "enum": ["new", "up", "down", "same"]
+        },
+        "platform": {
+          "enum": ["wechat", "zhihu", "reddit"]
+        },
+        "rule_id": {
+          "$ref": "#/$defs/id"
         }
       }
     },
@@ -200,7 +208,7 @@
           "$ref": "#/$defs/id"
         },
         "category": {
-          "enum": ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead"]
+          "enum": ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", "wechat_item", "zhihu_item", "reddit_item"]
         },
         "title": {
           "type": "string",
@@ -221,7 +229,7 @@
           "enum": ["included", "excluded"]
         },
         "included_in": {
-          "enum": ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads"]
+          "enum": ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
         },
         "exclusion_reason": {
           "type": "string"
@@ -305,6 +313,37 @@
             "$ref": "#/$defs/absolute_url"
           },
           "default": []
+        },
+        "platform": {
+          "enum": ["wechat", "zhihu", "reddit"]
+        },
+        "rule_id": {
+          "$ref": "#/$defs/id"
+        },
+        "claim_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_watch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disclosure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "matched_terms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exemption_policy": {
+          "enum": ["platform_signal_exempt"]
+        },
+        "published_by_gate": {
+          "enum": ["deterministic_platform_gate"]
         }
       }
     },
