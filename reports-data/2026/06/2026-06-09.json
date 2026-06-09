@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-09",
   "title": "AI 日报 2026-06-09",
-  "summary": "今天最值得看的主线是 NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行；热门博客这轮主要看 消息层怎么承接百万级 agent 会话、企业级 agent 基座怎么做分布式和治理、agent 和开发工具的落地边界；GitHub Trending 继续保留完整 Top 10，方便对照开源侧动向。",
+  "summary": "今天最值得看的主线有 RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话；AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走；NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行；热门博客这轮主要看 agent 和开发工具的落地边界、企业 agent 的 token 成本该先从哪里下手；GitHub Trending 继续保留完整 Top 10，方便对照开源侧动向。",
   "source_window": {
     "date_from": "2026-06-09",
     "date_to": "2026-06-09",
@@ -10,6 +10,16 @@
     "notes": "覆盖当日固定信源；正文只采用已回到一手、官方、论文、GitHub 或多源确认的事实，未确认线索留在观察区。"
   },
   "hero_highlights": [
+    {
+      "title": "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话",
+      "url": "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
+      "reason": "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话。当前公开信息主要落在代码示例、许可证、模型卡和维护节奏。"
+    },
+    {
+      "title": "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走",
+      "url": "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231",
+      "reason": "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走。当前公开信息主要落在代码示例、许可证、模型卡和维护节奏。"
+    },
     {
       "title": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行",
       "url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
@@ -1064,7 +1074,7 @@
         }
       ],
       "candidates_found": 60,
-      "included": 12,
+      "included": 14,
       "sources_checked": 128,
       "enablement_counts": {
         "core": 54,
@@ -1928,6 +1938,54 @@
   },
   "main_items": [
     {
+      "title": "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话",
+      "candidate_id": "main-content-alibaba-cloud-blog-apache-rocketmq-5-5-0-open-source-litetopic-dedicated",
+      "editorial_category": "open_source",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-08",
+      "url": "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话。当前公开信息主要落在代码示例、许可证、模型卡和维护节奏。",
+      "bullets": [
+        "**RocketMQ LiteTopic**：RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话。",
+        "当前公开的是代码、接口、许可证、维护节奏和可复用边界。",
+        "这会影响团队是否把它放进 PoC、评估清单或现有工作流。"
+      ],
+      "why_it_matters": "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态",
+      "reader_relevance": "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走",
+      "candidate_id": "main-content-alibaba-cloud-blog-agentscope-java-2-0-building-a-distributed-enterprise",
+      "editorial_category": "open_source",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-08",
+      "url": "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走。当前公开信息主要落在代码示例、许可证、模型卡和维护节奏。",
+      "bullets": [
+        "**AgentScope Java 2.0**：AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走。",
+        "当前公开的是代码、接口、许可证、维护节奏和可复用边界。",
+        "这会影响团队是否把它放进 PoC、评估清单或现有工作流。"
+      ],
+      "why_it_matters": "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态",
+      "reader_relevance": "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
       "title": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行",
       "candidate_id": "main-content-nvidia-newsroom-rss-how-the-uk-is-turning-sovereign-ai-ambition-into-act",
       "editorial_category": "ai_industry",
@@ -2129,44 +2187,6 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "title": "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话",
-      "candidate_id": "content-alibaba-cloud-blog-apache-rocketmq-5-5-0-open-source-litetopic-dedicated",
-      "editorial_category": "viewpoint_analysis",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "image_alt": "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of AI Sessions",
-      "image_source": "html_index",
-      "url": "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
-      "publisher": "Alibaba Cloud Blog",
-      "author": "Alibaba Cloud Blog",
-      "event_date": "2026-06-08",
-      "topic": "AI engineering tools",
-      "summary": "文章介绍 RocketMQ 5.5.0 的 LiteTopic，目标是承接百万级轻量 AI agent 会话。作者把事件分发、会话隔离和持久化这些消息层约束讲得比模型故事更具体，也给出了对应场景。对工程团队的价值，在于判断多 agent 或高并发系统里，消息层是不是要单独设计。",
-      "content_type": "blog",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "title": "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走",
-      "candidate_id": "content-alibaba-cloud-blog-agentscope-java-2-0-building-a-distributed-enterprise",
-      "editorial_category": "viewpoint_analysis",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "image_alt": "AgentScope Java 2.0: Building a Distributed, Enterprise-Grade Foundation for AI Agents",
-      "image_source": "html_index",
-      "url": "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231",
-      "publisher": "Alibaba Cloud Blog",
-      "author": "Alibaba Cloud Blog",
-      "event_date": "2026-06-08",
-      "topic": "AI engineering tools",
-      "summary": "文章讲 AgentScope Java 2.0 如何补齐分布式调度、企业级部署和生产可用能力。它关心的是 Java 团队真正会卡住的稳定性、集成和治理问题，不只是 demo 体验。团队更需要看清的是，企业内部 agent 平台到底要不要走 JVM 路线。",
-      "content_type": "blog",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
       "title": "NVIDIA 介绍 Nemotron 3 Ultra 面向长程 agent 的推理能力，重点在多轮上下文、工具使用和推理效率",
       "candidate_id": "content-nvidia-developer-blog-nvidia-nemotron-3-ultra-powers-faster-more-efficie",
       "editorial_category": "viewpoint_analysis",
@@ -2178,6 +2198,41 @@
       "event_date": "2026-06-08",
       "topic": "AI engineering tools",
       "summary": "NVIDIA 介绍 Nemotron 3 Ultra 面向长程 agent 的推理能力，重点在多轮上下文、工具使用和推理效率。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "这篇文章讨论企业 agent 怎么降 token 成本，重点是先建依赖关系再减无效上下文",
+      "candidate_id": "content-alibaba-cloud-blog-tokenmaxxing-dilemma-are-there-immediate-solutions-fo",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
+      "image_alt": "Tokenmaxxing Dilemma: Are There Immediate Solutions for Improvement?",
+      "image_source": "html_index",
+      "url": "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232",
+      "publisher": "Alibaba Cloud Blog",
+      "author": "Alibaba Cloud Blog",
+      "event_date": "2026-06-08",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解企业 agent 的 token 开销为什么会被无效上下文放大，问题不在模型单价，而在上下文装得过满。作者给的方法是先画任务依赖关系，再决定哪些信息该进检索、哪些留在记忆、哪些直接删掉。对团队落地的意义在于，它把检索、记忆和上下文裁剪三条优化路线拆成了可分别验证的工程边界。",
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "AWS Machine Learning Blog 这次放出的信息主要落在agent、开发工具或自动化工作流，公开细节集中在适用版本、权限边界、接入方式、失败恢复和团队落地成本",
+      "candidate_id": "content-aws-machine-learning-it-s-safe-to-close-your-laptop-now-hosting-coding-a",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "url": "https://aws.amazon.com/blogs/machine-learning/its-safe-to-close-your-laptop-now-hosting-coding-agents-on-amazon-bedrock-agentcore/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "AWS Machine Learning Blog",
+      "event_date": "2026-06-08",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -2922,17 +2977,17 @@
     },
     {
       "type": "figure",
-      "title": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
-      "source_url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
-      "local_path": "assets/evidence/how-the-uk-is-turning-sovereign-ai-ambition-into-action-with-nvidia-technologies-2026-06-09.jpg",
-      "caption": "图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "title": "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of ...",
+      "source_url": "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
+      "local_path": "assets/evidence/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions-2026-0.png",
+      "caption": "图片来自 Alibaba Cloud Blog，由 html_index 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
       "extraction_status": "source_image"
     },
     {
       "type": "figure",
-      "title": "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of ...",
-      "source_url": "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233",
-      "local_path": "assets/evidence/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions-2026-0.png",
+      "title": "Tokenmaxxing Dilemma: Are There Immediate Solutions for Improvement?",
+      "source_url": "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232",
+      "local_path": "assets/evidence/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement-2026-06-09.png",
       "caption": "图片来自 Alibaba Cloud Blog，由 html_index 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
       "extraction_status": "source_image"
     },
@@ -2955,22 +3010,22 @@
   ],
   "self_check": {
     "report_date": "2026-06-09",
-    "main_items": 1,
+    "main_items": 3,
     "builder_observations": 6,
     "builder_skill_used": [
       "candidate-pool-autodraft"
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 1,
-        "selected": 1
+        "eligible_candidates": 3,
+        "selected": 3
       },
       "github_trending": {
         "eligible_candidates": 10,
         "selected": 10
       },
       "hot_blogs": {
-        "eligible_candidates": 9,
+        "eligible_candidates": 7,
         "selected": 3
       },
       "projects": {
@@ -2997,11 +3052,11 @@
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "dd21a5b87fa9c411a8b03ea3acf6251d7898a4c4",
-      "git_commit_short": "dd21a5b87fa9",
+      "git_commit": "89b1b5ee9c82be1f434414db31a496afb07331da",
+      "git_commit_short": "89b1b5ee9c82",
       "git_branch": "main",
-      "origin_main_sha": "dd21a5b87fa9c411a8b03ea3acf6251d7898a4c4",
-      "origin_main_short": "dd21a5b87fa9",
+      "origin_main_sha": "89b1b5ee9c82be1f434414db31a496afb07331da",
+      "origin_main_short": "89b1b5ee9c82",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -3034,7 +3089,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-08T16:42:30.530Z",
+  "generated_at": "2026-06-09T02:20:42.448Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-09.html",
   "html_path": "reports/2026/06/2026-06-09.html",
