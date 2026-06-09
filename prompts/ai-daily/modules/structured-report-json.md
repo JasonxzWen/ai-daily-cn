@@ -38,8 +38,8 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `editorial_category`：如 `ai_industry`、`engineering_toolchain`、`model_release`、`product_radar`、`open_source`、`viewpoint_analysis`、`podcast`、`x_discussion`、`community_signal`。
 - `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；观点、播客、社区、产品雷达线索可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露。
 - `verification_status`：`main_items` 和 `model_releases` 只接受 `primary_confirmed` 或 `multi_source_confirmed`；`hot_blogs`、`projects`、`builder_observations`、`community_leads` 可保留 `intermediary_only` 或 `original_social_only`，但要写 `verification_note` 或 `risk_note`。
-- `why_it_matters` / `reader_relevance`：`main_items` 必须至少填写其一，说明为什么内容、产品、平台、策略或工程读者需要看；不要写“本日报后续跟进”之类的生产过程说明。
-- `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客。公开 HTML 只展示必要的来源层级、待确认边界或风险说明；热门博客和社区线索不要把读者画像、后续跟进或风险模板渲染成重复卡片分点。
+- `why_it_matters` / `reader_relevance`：历史兼容或内部元数据字段；新草稿不需要填写，公开 HTML 不得把它们渲染成“为什么重要 / 启示 / 读者相关性 / 入选条件”分点。
+- `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客的内部边界记录。公开 HTML 只展示必要的来源层级、待确认边界或具体风险事实；不要把读者画像、后续跟进、watch-next 或风险模板渲染成重复卡片分点。
 
 `main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
 
@@ -61,7 +61,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 内容密度目标：
 
 - 新日报目标为 33-45 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
-- `main_items` 目标为 8-12 条，默认 10 条；每条用 3-5 个短 bullet 分点汇报，并包含 `**...**` 或 `==...==` 重点标注。`==...==` 只用于正文关键词，公开页会渲染为加粗变色文字，不是 tag/chip。bullet 只写该新闻本身的事实、数据、限制、影响和对比，不写“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等对日报自身的反思建议。
+- `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
 - 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
 - `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。
 - 低于 27 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
@@ -74,12 +74,12 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 `evidence_assets` 用于把来源链接里的关键图、表或已转写数据挂到对应日报条目旁边；它不是独立图片展板。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
 
 证据图表拉取与展示规范：
-- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或截图证据时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图一律不拉。
-- 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
+- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或结构化指标时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图、整页截图、浏览器截图和 viewport 截图一律不拉入公开正文。
+- 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图或其它网页内部语义图片资产；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
 - 主线条目、热门博客和项目都适用同一规则：只有原文图能帮助读者理解能力边界、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个条目最多优先展示 1-2 张最重要图片。每张图的 `source_url` 必须等于对应日报条目的 `url`。模型相关图片必须挂在对应 `main_items` 或 `hot_blogs` 条目下展示；`model_releases` 不再单独渲染公开图片行。
-- 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。若有 `local_path`，页面展示居中的图片和图片下方中文说明；只有没有图片时才用 `data` 退化为表格展示，表格说明必须在表格下方。`title` 必须是短中文图名或表名，`caption` 写清数据/图表来自原文哪个部分。
-- 图片展示必须保持可点开放大；不要把来源 icon、站点 favicon 或低信息密度封面图当成证据图。
-- 排版约束：图片必须是可读的原图或清晰裁切，避免整页截图；宽图优先裁到图表本体，移动端不能横向撑破页面。不要为了“有图”而展示图片，不能清晰增强读者理解的图宁可不放。
+- 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。榜单类公开页面优先使用从 DOM、JSON 或页面文本解析出的 `data` 表格，例如排名、模型、供应商、分数/token、周变化；截图最多作为内部或折叠证据，不得作为公开主内容。`title` 必须是短中文图名或表名，`caption` 写清数据/图表来自原文哪个部分。
+- 图片展示必须保持可点开放大；不要把来源 icon、站点 favicon、logo、头像、低信息密度封面图或 tiny image 当成证据图。无图日报可以通过，不要为了“有图”展示低质量图片。
+- 排版约束：图片必须是可读的原图或清晰裁切，禁止整页截图作为公开正文主要信息载体；宽图优先裁到图表本体，移动端不能横向撑破页面。不能清晰增强读者理解的图宁可不放。
 
 证据图表的选择必须克制：
 - 原文已有架构图、流程图、benchmark 图、数据图或官方信息图时，优先把原文图片缓存为 `figure`，不要把同一信息再人工改写成表格。

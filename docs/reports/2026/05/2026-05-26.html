@@ -2620,6 +2620,34 @@ summary:focus-visible {
 
 
 table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 4px}.markdown-table-scroll table{margin:0}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}.markdown-table-scroll table{min-width:100%;font-size:12.5px}.markdown-table-scroll th,.markdown-table-scroll td{padding:7px 8px;word-break:break-word}}</style>
+<style data-ai-daily-css-overrides>
+@media (max-width: 760px) {
+  .tracking-card .card-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tracking-card .card-data-table {
+    width: max-content;
+    min-width: 620px;
+    table-layout: auto;
+  }
+
+  .tracking-card .card-data-table th,
+  .tracking-card .card-data-table td {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .tracking-card .card-data-table th:nth-child(2),
+  .tracking-card .card-data-table td:nth-child(2) {
+    min-width: 160px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+</style>
 </head>
 <body>
   <main class="report-shell">
@@ -2650,44 +2678,40 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="report-nav-group" data-nav-group="reading-order">
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-html-work-report-1" title="其他信号" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>其他信号</span></a>
+      <a href="#section-ai-1" title="AI 资讯" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 资讯</span></a>
 <a href="#section-html-work-report-2" title="热门博客" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>热门博客</span></a>
 <a href="#section-x-twitter-3" title="X/Twitter 讨论" data-nav-link data-nav-index="3" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-html-work-report-4" title="信源状态概览" data-nav-link data-nav-index="4" data-nav-group-name="verification" data-nav-status="warning"><span>信源状态概览</span></a>
-<a href="#section-html-work-report-5" title="发布质量说明" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="info"><span>发布质量说明</span></a>
-<a href="#section-html-work-report-6" title="信源审计" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源审计</span></a>
-<a href="#section-html-work-report-7" title="自检与产物" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>自检与产物</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel rich-section" id="section-html-work-report-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel rich-section" id="section-ai-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
-      <h2>其他信号</h2>
+      <h2>AI 资讯</h2>
 
     </div>
 
   </div>
     <div class="rendered-markdown"><ol><li><strong><a href="https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;amp;language=en_US&amp;amp;type=5" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U0g8L3RleHQ+PC9zdmc+" alt="Salesforce Help" decoding="async"> Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-26，T0）</li></ol>
-<ul><li>这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。</li><li>团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。</li><li>同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。</li></ul>
+<ul><li>Salesforce 的 LLM support 文档显示，Bedrock 上的 Claude 4 Sonnet 在 2026-05-26 改路由到 Claude Sonnet 4.6。</li><li>这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。</li><li>团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。</li></ul>
 <ol start="2"><li><strong><a href="https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R1dVPC90ZXh0Pjwvc3ZnPg==" alt="Google Workspace Updates" decoding="async"> Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-26，T0）</li></ol>
-<ul><li>Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。</li><li>Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。</li><li>Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。</li></ul>
+<ul><li>Google Workspace Updates 显示，Gemini in Chat 的多语言 refine 能力在 Scheduled Release 域从 2026-05-26 开始完整 rollout；Ask Gemini in Drive 的额外语言 rollout 同日进入 Scheduled Release。</li><li>Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。</li><li>Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。</li></ul>
 <ol start="3"><li><strong><a href="https://status.claude.com/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QzwvdGV4dD48L3N2Zz4=" alt="Claude Status" decoding="async"> Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-25，T0）</li></ol>
-<ul><li>这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。</li><li>状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。</li><li>如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。</li></ul></div>
+<ul><li>Claude Status 记录了 Opus 4.7 在 2026-05-25 06:30-10:30 UTC 的错误率升高，并在 10:39 UTC 标记 resolved。</li><li>这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。</li><li>状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。</li></ul></div>
     <template data-rich-source data-source-fallback>1. **[![Salesforce Help](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+U0g8L3RleHQ+PC9zdmc+) Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6](https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&amp;language=en_US&amp;type=5)** ==tag-major|重大==（2026-05-26，T0）
+  - Salesforce 的 LLM support 文档显示，Bedrock 上的 Claude 4 Sonnet 在 2026-05-26 改路由到 Claude Sonnet 4.6。
   - 这会影响依赖 Salesforce Agentforce AWS-hosted option 的 prompt、agent action 和测试基线；模型目标变化不一定伴随应用代码变化。
   - 团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。
-  - 同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。
 
 2. **[![Google Workspace Updates](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R1dVPC90ZXh0Pjwvc3ZnPg==) Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力](https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html)** ==tag-major|重大==（2026-05-26，T0）
+  - Google Workspace Updates 显示，Gemini in Chat 的多语言 refine 能力在 Scheduled Release 域从 2026-05-26 开始完整 rollout；Ask Gemini in Drive 的额外语言 rollout 同日进入 Scheduled Release。
   - Chat refine 从英文扩展到法语、德语、意大利语、日语、韩语、葡萄牙语和西班牙语，适合跨语言团队在聊天窗口里直接润色消息。
   - Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。
-  - Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。
 
 3. **[![Claude Status](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QzwvdGV4dD48L3N2Zz4=) Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident](https://status.claude.com/)** ==tag-major|重大==（2026-05-25，T0）
+  - Claude Status 记录了 Opus 4.7 在 2026-05-25 06:30-10:30 UTC 的错误率升高，并在 10:39 UTC 标记 resolved。
   - 这类 incident 会影响把 Opus 4.7 用在长任务、批处理或自动化代理中的团队，尤其是没有幂等重试和降级模型配置的流程。
-  - 状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。
-  - 如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。</template>
+  - 状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。</template>
   </section>
 <section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
@@ -2722,128 +2746,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <template data-rich-source data-source-fallback>- **降级说明**：本轮已检查 X/Twitter 相关来源，但未形成可入选的原始 status 条目。原因：fetch_failed
 - **检查来源**：follow-builders prepare-digest:blocked（node prepare-digest.js failed with fetch failed.）；follow-builders local cache:no_signal（Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.）</template>
   </section>
-<section class="panel chart-panel" id="section-html-work-report-4" data-section-type="chart" data-section-group="verification" data-section-status="warning" data-trust-level="mixed-trust" data-chart-section data-chart-type="bar" data-chart-alt="按信源组展示 checked 数量，并在状态列列出 blocked、no_signal 和 skipped。">
-    <div class="section-heading split-row">
-    <div>
-      <h2>信源状态概览</h2>
-
-    </div>
-
-  </div>
-    <figure role="group" aria-label="按信源组展示 checked 数量，并在状态列列出 blocked、no_signal 和 skipped。">
-      <figcaption data-chart-takeaway>
-        <strong>各信源组 checked 数量</strong>
-        <span>本轮有 4 个来源阻塞；已检查 1 个来源，no_signal 1 个。</span>
-      </figcaption>
-      <div class="chart-bars" aria-hidden="true">
-    <div class="chart-bar-row">
-        <span class="chart-bar-label">GitHub Trending</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">checked 1 / no_signal 0 / blocked 3 / skipped 0</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">Builder 原始源</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:3%"></span></span>
-        <span class="chart-bar-value">0</span>
-        <span class="chart-bar-status">checked 0 / no_signal 1 / blocked 1 / skipped 0</span>
-      </div>
-  </div>
-      <p class="chart-source-row"><a class="source-link" data-chart-source href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json" rel="noopener noreferrer">source_audit</a></p>
-      <div class="chart-table-fallback table-scroll" data-chart-table-fallback>
-    <table class="report-data-table" data-report-data-table>
-      <thead><tr><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0" data-align="left">group</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1" data-align="left">checked</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2" data-align="left">status</th></tr></thead>
-      <tbody><tr><td tabindex="0" data-table-cell data-table-row="1" data-table-column="0" data-align="left">GitHub Trending</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="1" data-align="left">1</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="2" data-align="left">checked 1 / no_signal 0 / blocked 3 / skipped 0</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="2" data-table-column="0" data-align="left">Builder 原始源</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="1" data-align="left">0</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="2" data-align="left">checked 0 / no_signal 1 / blocked 1 / skipped 0</td></tr></tbody>
-    </table>
-  </div>
-    </figure>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <div class="section-heading split-row">
-    <div>
-      <h2>发布质量说明</h2>
-
-    </div>
-
-  </div>
-    <div class="rendered-markdown"><ul><li><strong>状态</strong>：降级</li><li><strong>公开说明</strong>：Builder source coverage is degraded; Builder observations may be incomplete.</li><li><strong>github_trending</strong>（github_trending_blocked）：github_trending coverage is degraded and should be disclosed in the public report.</li><li><strong>builder_observations</strong>（builder_sources_blocked）：builder_observations coverage is degraded and should be disclosed in the public report.</li></ul></div>
-    <template data-rich-source data-source-fallback>- **状态**：降级
-- **公开说明**：Builder source coverage is degraded; Builder observations may be incomplete.
-- **github_trending**（github_trending_blocked）：github_trending coverage is degraded and should be disclosed in the public report.
-- **builder_observations**（builder_sources_blocked）：builder_observations coverage is degraded and should be disclosed in the public report.</template>
-  </section>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">附录</span>
-        <span class="collapsible-title">信源审计</span>
-        <span class="collapsible-subtitle">来源、候选池和重试记录，默认折叠。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-    <div class="rendered-markdown"><h4>GitHub Trending</h4>
-<ul><li>Source status: <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 1；<mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0；<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 3；<mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</li><li>审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。</li><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>说明：项目区保持空数组；没有把无法确认 event_date 的趋势排名写成项目更新。</li></ul>
-<ul><li><a href="https://github.com/trending?since=daily" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="GitHub Trending daily" decoding="async"> GitHub Trending daily</a>：<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark>，npm run discover:github-trending -- 50 returned fetch failed.</li><li><a href="https://github.com/trending?since=weekly" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="GitHub Trending weekly" decoding="async"> GitHub Trending weekly</a>：<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark>，npm run discover:github-trending -- 50 returned fetch failed.</li><li><a href="https://github.com/trending/python?since=daily" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="GitHub Trending Python/TypeScript/Rust/Go" decoding="async"> GitHub Trending Python/TypeScript/Rust/Go</a>：<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark>，The discovery command could not fetch language trending pages in this shell.</li><li><a href="https://ossinsight.io/trending/ai" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0FUPC90ZXh0Pjwvc3ZnPg==" alt="OSSInsight AI Trending" decoding="async"> OSSInsight AI Trending</a>：<mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark>，Web search showed 28-day movers, but no per-repo dated release or commit was suitable for today&#39;s project table.</li></ul>
-<h4>Builder 原始源</h4>
-<ul><li>Source status: <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 0；<mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 1；<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 1；<mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</li><li>审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。</li><li>检查状态：已检查</li><li>候选 / 入选：0 / 0</li><li>阻塞原因：fetch_failed</li><li>上次成功获取：2026-04-27T08:20:43.831Z</li><li>说明：Builder 观察保持空数组；没有使用四周前的 X posts 或 podcast。</li></ul>
-<ul><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="follow-builders prepare-digest" decoding="async"> follow-builders prepare-digest</a>：<mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark>，node prepare-digest.js failed with fetch failed.</li><li><a href="https://github.com/zarazhangrui/follow-builders" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="follow-builders local cache" decoding="async"> follow-builders local cache</a>：<mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark>，Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.</li></ul></div>
-    <template data-rich-source data-source-fallback>### GitHub Trending
-
-- Source status: ==tag-status-checked|checked== 1；==tag-status-no-signal|no_signal== 0；==tag-status-blocked|blocked== 3；==tag-status-skipped|skipped== 0
-- 审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。
-- 检查状态：已检查
-- 候选 / 入选：0 / 0
-- 说明：项目区保持空数组；没有把无法确认 event_date 的趋势排名写成项目更新。
-
-- [![GitHub Trending daily](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) GitHub Trending daily](https://github.com/trending?since=daily)：==tag-status-blocked|blocked==，npm run discover:github-trending -- 50 returned fetch failed.
-- [![GitHub Trending weekly](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) GitHub Trending weekly](https://github.com/trending?since=weekly)：==tag-status-blocked|blocked==，npm run discover:github-trending -- 50 returned fetch failed.
-- [![GitHub Trending Python/TypeScript/Rust/Go](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) GitHub Trending Python/TypeScript/Rust/Go](https://github.com/trending/python?since=daily)：==tag-status-blocked|blocked==，The discovery command could not fetch language trending pages in this shell.
-- [![OSSInsight AI Trending](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T0FUPC90ZXh0Pjwvc3ZnPg==) OSSInsight AI Trending](https://ossinsight.io/trending/ai)：==tag-status-checked|checked==，Web search showed 28-day movers, but no per-repo dated release or commit was suitable for today&#39;s project table.
-
-### Builder 原始源
-
-- Source status: ==tag-status-checked|checked== 0；==tag-status-no-signal|no_signal== 1；==tag-status-blocked|blocked== 1；==tag-status-skipped|skipped== 0
-- 审计语义：记录本次抓取和解析结果，不保证来源没有被遗漏的动态；no_signal/blocked 需看发布质量说明。
-- 检查状态：已检查
-- 候选 / 入选：0 / 0
-- 阻塞原因：fetch_failed
-- 上次成功获取：2026-04-27T08:20:43.831Z
-- 说明：Builder 观察保持空数组；没有使用四周前的 X posts 或 podcast。
-
-- [![follow-builders prepare-digest](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) follow-builders prepare-digest](https://github.com/zarazhangrui/follow-builders)：==tag-status-blocked|blocked==，node prepare-digest.js failed with fetch failed.
-- [![follow-builders local cache](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) follow-builders local cache](https://github.com/zarazhangrui/follow-builders)：==tag-status-no-signal|no_signal==，Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report.</template></div>
-  </details>
-<details class="panel rich-section collapsible-panel appendix-panel" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-section-appendix="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">附录</span>
-        <span class="collapsible-title">自检与产物</span>
-        <span class="collapsible-subtitle">验证结果、结构化 JSON 和后续规则建议，默认折叠。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-    <div class="rendered-markdown"><ul><li>主线条目：3</li><li>Builder 观察：0</li><li>一手链接：通过</li><li>无禁用表达：通过</li><li>无无源数字：通过</li><li>说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。</li></ul>
-<h4>提示词与规则迭代建议</h4>
-<ul><li><strong>当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。</strong>：为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。</li><li><strong>follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。</strong>：为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。</li><li><strong>状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。</strong>：为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。</li></ul>
-<ul><li><a href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" decoding="async"> 结构化 JSON</a></li></ul></div>
-    <template data-rich-source data-source-fallback>- 主线条目：3
-- Builder 观察：0
-- 一手链接：通过
-- 无禁用表达：通过
-- 无无源数字：通过
-- 说明：主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。
-
-### 提示词与规则迭代建议
-
-- **当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。**：为什么要改：加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。
-- **follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。**：为什么要改：增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。
-- **状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。**：为什么要改：增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。
-
-- [![结构化 JSON](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=) 结构化 JSON](https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-26.json)</template></div>
-  </details>
 
 
 

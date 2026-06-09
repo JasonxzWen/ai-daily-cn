@@ -5,12 +5,6 @@
   "summary": "今天同日可回源的 AI 产品与工程发布不足 5 条，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-18。主体信息保留 5 条真正改变工程工作流的产品和平台动态：OpenAI 与 Dell 把 Codex 推向混合和本地企业环境，GitHub Copilot 集中增强 cloud agent、Spaces 和远程会话控制，xAI 推出 Grok Skills，Sigma 发布面向 AI coding agents 的数据建模能力，Zignal AI 把公开信息处理成可供 agent workflow 消费的结构化情报。PaddleOCR 3.5 的 Hugging Face 工程文章单列到热门技术博客，不再计入主体条目。",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-19.html",
   "html_path": "reports/2026/05/2026-05-19.html",
-  "source_window": {
-    "date_from": "2026-05-18",
-    "date_to": "2026-05-19",
-    "fallback_window_used": true,
-    "notes": "按 2026-05-19 Asia/Shanghai 生成。先检查 2026-05-19 当天的 OpenAI、Anthropic、Google Developers、xAI、Mistral、GitHub Changelog、Hugging Face、AWS、Azure/Google Cloud release notes 等官方来源；当天稳定 dated release 不足 5 条，因此按提示词扩展到 48 小时。OpenAI 与 Dell 的 Codex/企业本地化公告按同一合作事件合并为一条；GitHub 5 月 18 日多条 Copilot 小更新按同厂商动态合并。Google I/O 预告、Mistral 3 页面和 Anthropic MCP 安全活动因不是当天可验证产品 release，或页面日期/事件性质不满足主体规则，降级为社区线索。"
-  },
   "main_items": [
     {
       "title": "OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境",
@@ -138,7 +132,6 @@
       "event_date": "2026-05-18",
       "topic": "Document AI / OCR / Transformers backend",
       "summary": "PaddlePaddle 团队说明 PaddleOCR 3.5 的 OCR 与文档解析模型现在可以通过 Hugging Face Transformers 后端运行。",
-      "why_it_matters": "这篇文章更像工程实现说明而不是综合新闻：它直接影响 Document AI、RAG ingestion 和文档 agent 的前置解析链路，因此单列为热门技术博客。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -195,70 +188,17 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-19",
-    "main_items": 5,
-    "hot_blogs": 1,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "official-ai-releases: 使用 OpenAI News、xAI News、GitHub Changelog、Hugging Face team article、Sigma announcement 和 Zignal Labs press release 等可回源页面",
-      "github-ai-trending: 检查 GitHub Copilot/Spaces/CLI、PaddleOCR、agent workflow 相关开源与工具线索；缺少稳定 dated release 的项目不升入主体",
-      "follow-builders: 按技能约束检查 builder 观察入口；本轮未找到可回源且适合独立入选的 builder 原始帖，因此 builder_observations 为空"
-    ],
-    "fallback_sources": [
-      "官方新闻页",
-      "官方 changelog",
-      "官方公司公告",
-      "Hugging Face team article",
-      "GitHub Changelog 汇总页",
-      "Press release 仅在公司原始发布信息明确时使用"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "2026-05-19 当天稳定 T0/T1 发布不足 5 条，因此扩展到 2026-05-18；主体保留真实 event_date。OpenAI 与 Dell 的 Codex 合作合并为一条，Dell Deskside Agentic AI 作为项目补充而非再拆一条主体，避免同一会议同一供应商堆叠。GitHub Copilot 同日多条小更新合并为一条厂商动态。PaddleOCR 3.5 Hugging Face 文章从主体条目迁移到 hot_blogs，避免热门工程博客挤占 main_items。Google I/O 和 Mistral 3 因发布详情或日期稳定性不足，降级为 community_leads。",
-    "optimization_suggestions": [
-      {
-        "issue": "同一合作事件有双方官方发布页时，当前 schema 的 main_items 只有单一 url 字段，容易诱导拆成两条来保留两个来源。",
-        "evidence": "OpenAI-Dell Codex 合作有 OpenAI 页面和 Dell 新闻稿；本轮为避免重复计数，只把 OpenAI 作为主体 URL，Dell 相关页面放入 projects。",
-        "suggested_module": "schemas/report.schema.json 与 prompts/ai-daily/modules/output-html.md",
-        "expected_benefit": "增加 optional additional_urls 后，可以合并同一事件并保留双方一手来源，减少重复条目和证据丢失。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "官方首页和搜索结果会把旧文章或预告卡片排在前面，若只看首页摘要容易误判为今日发布。",
-        "evidence": "Google Developers 首页和搜索结果在 2026-05-19 显示 Google I/O 与 Gemini 相关卡片，但详情页日期多为 2026-02 或 2026-04，Mistral 3 页面也缺少稳定日期交叉确认。",
-        "suggested_module": "prompts/ai-daily/modules/source-policy.md",
-        "expected_benefit": "明确要求以详情页 published date、dated changelog、RSS 或 commit 为准，可减少首页卡片造成的旧闻入选。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "GitHub Changelog 同日会出现多条同产品小更新，当前合并规则没有要求列出被合并的子链接。",
-        "evidence": "2026-05-18 GitHub Copilot 同日包含 Actions 一键修复、低成本模型、Web 上下文问答、配置 API、Spaces API 和远程控制等多条更新；主体只能挂 GitHub Changelog 汇总页。",
-        "suggested_module": "prompts/ai-daily/modules/selection-rules.md",
-        "expected_benefit": "要求合并条目在 projects 或 self_check 中保留代表性子链接，便于读者追到具体功能页。",
-        "needs_user_confirmation": true
-      }
-    ]
-  },
-  "publish_status": {
-    "html_generated": false,
-    "repo_updated": false,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-19.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-19T07:28:39.901Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

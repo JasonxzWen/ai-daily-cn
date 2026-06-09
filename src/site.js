@@ -17,6 +17,73 @@ const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
+const PUBLIC_DATA_PRIVATE_KEYS = new Set([
+  "candidate_id",
+  "candidate_pool_path",
+  "source_audit",
+  "self_check",
+  "source_window",
+  "publish_status",
+  "markdown_path",
+  "why_it_matters",
+  "reader_relevance",
+  "watch_next",
+  "why_watch",
+  "selection_snapshot",
+  "optimization_suggestions",
+  "blocking_issues",
+  "degraded_sections",
+  "source_id",
+  "rule_id",
+  "source_level",
+  "verification_status",
+  "verification_note",
+  "verification_sources",
+  "primary_url",
+  "risk_note",
+  "risk_level",
+  "exemption_policy",
+  "published_by_gate",
+  "matched_terms",
+  "published_by",
+  "notes",
+  "status",
+  "evidence",
+  "included_in",
+  "debug",
+  "raw",
+  "publish_to_public"
+]);
+const NON_PUBLIC_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "thumbnail"]);
+const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page[_-]?capture)/i;
+const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
+@media (max-width: 760px) {
+  .tracking-card .card-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tracking-card .card-data-table {
+    width: max-content;
+    min-width: 620px;
+    table-layout: auto;
+  }
+
+  .tracking-card .card-data-table th,
+  .tracking-card .card-data-table td {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .tracking-card .card-data-table th:nth-child(2),
+  .tracking-card .card-data-table td:nth-child(2) {
+    min-width: 160px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+</style>`;
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -73,7 +140,8 @@ export async function buildSite(options = {}) {
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
       trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date],
-      fetchImpl: options.fetchImpl
+      fetchImpl: options.fetchImpl,
+      includeInternalData: Boolean(options.includeInternalData)
     });
   }
 
@@ -150,7 +218,7 @@ export async function planGeneratedFiles(options = {}) {
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
     files.push(...reportManagedAssetPaths(report));
-    if (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date)))) {
+    if (options.includeInternalData && (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date))))) {
       files.push(paths.candidateDataPath);
     }
     if (report.markdown_path) {
@@ -269,18 +337,29 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
   await localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, {
     fetchImpl: options.fetchImpl
   });
-  const reportHtml = await renderReportWithEffectiveInteract(report, {
+  const reportHtml = applyDailyReportHtmlOverrides(await renderReportWithEffectiveInteract(report, {
     rootDir,
+    assetRootDir: outDir,
     trendAnnotations: options.trendAnnotations
-  });
-  await writeJsonTracked(outDir, paths.dataPath, report, writtenFiles);
+  }));
+  await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
-  if (reportJsonPath) {
+  if (options.includeInternalData && reportJsonPath) {
     await copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles);
   }
   if (markdown !== null && report.markdown_path) {
     await writeFileTracked(outDir, report.markdown_path, markdown.replace(/\r\n/g, "\n"), writtenFiles);
   }
+}
+
+function applyDailyReportHtmlOverrides(html) {
+  if (!html || html.includes("data-ai-daily-css-overrides")) {
+    return html;
+  }
+  if (html.includes("</head>")) {
+    return html.replace("</head>", `${DAILY_REPORT_HTML_OVERRIDES}\n</head>`);
+  }
+  return `${DAILY_REPORT_HTML_OVERRIDES}\n${html}`;
 }
 
 async function readReportJson(filePath) {
@@ -318,11 +397,86 @@ function withDefaultImportanceForReport(report) {
     "projects",
     "github_trending",
     "builder_observations",
-    "community_leads"
+    "community_leads",
+    "wechat_items",
+    "zhihu_items",
+    "reddit_items"
   ]) {
     result[sectionName] = withDefaultImportance(sectionName, result[sectionName]);
   }
   return result;
+}
+
+function publicReportData(report) {
+  const result = sanitizePublicValue(report);
+  result.quality_status = publicQualityStatus(report?.quality_status);
+  result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
+    .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false);
+  result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
+  return result;
+}
+
+function sanitizePublicValue(value, key = "") {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizePublicValue(item, key));
+  }
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+  if (key === "quality_status") {
+    return publicQualityStatus(value);
+  }
+  if (key === "evidence_assets") {
+    return publicEvidenceAssets(value);
+  }
+  const result = {};
+  for (const [entryKey, entryValue] of Object.entries(value)) {
+    if (PUBLIC_DATA_PRIVATE_KEYS.has(entryKey)) {
+      continue;
+    }
+    result[entryKey] = sanitizePublicValue(entryValue, entryKey);
+  }
+  return result;
+}
+
+function publicQualityStatus(status = {}) {
+  if (!status || typeof status !== "object") {
+    return undefined;
+  }
+  const result = {};
+  for (const key of ["status", "public_note", "affected_sections"]) {
+    if (status[key] !== undefined) {
+      result[key] = sanitizePublicValue(status[key], key);
+    }
+  }
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+function publicEvidenceAssets(assets) {
+  return (Array.isArray(assets) ? assets : [])
+    .filter(isPublicEvidenceAsset)
+    .map((asset) => sanitizePublicValue(asset));
+}
+
+function isPublicEvidenceAsset(asset = {}) {
+  const type = String(asset.type || "").toLowerCase();
+  if (type === "table") {
+    return true;
+  }
+  const role = String(asset.asset_role || "").toLowerCase();
+  const captureKind = String(asset.capture_kind || asset.extraction_status || "").toLowerCase();
+  if (NON_PUBLIC_ASSET_ROLES.has(role)) {
+    return false;
+  }
+  if (SCREENSHOT_CAPTURE_RE.test(captureKind)) {
+    return false;
+  }
+  const width = Number(asset.width || 0);
+  const height = Number(asset.height || 0);
+  if ((width > 0 && width < 320) || (height > 0 && height < 180)) {
+    return false;
+  }
+  return Boolean(asset.local_path);
 }
 
 async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {

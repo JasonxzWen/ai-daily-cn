@@ -74,6 +74,8 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert.equal(plan.reports.length, 1);
   assert.equal(plan.reports[0].report_date, "2026-05-13");
   assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+  assert(plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.json"));
+  assert(!plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.candidates.json"));
 });
 
 test("publish dry-run allows degraded Builder coverage and exposes degraded sections", async () => {
@@ -767,7 +769,7 @@ test("github api publish 跳过远端已一致的发布产物", async () => {
 
 test("github api publish can use planned generated files when the worktree is clean", async () => {
   const repoRoot = await tempRepoWithFixture();
-  await buildSite({
+  const buildResult = await buildSite({
     rootDir: repoRoot,
     inputDir: "reports-source",
     dataInputDir: "reports-data",
@@ -775,9 +777,10 @@ test("github api publish can use planned generated files when the worktree is cl
     generatedAt: fixedGeneratedAt
   });
   await fs.mkdir(path.join(repoRoot, "reports-data/2026/05"), { recursive: true });
-  await fs.copyFile(
-    path.join(repoRoot, "docs/data/2026/05/2026-05-13.json"),
-    path.join(repoRoot, "reports-data/2026/05/2026-05-13.json")
+  await fs.writeFile(
+    path.join(repoRoot, "reports-data/2026/05/2026-05-13.json"),
+    `${JSON.stringify(buildResult.reports[0], null, 2)}\n`,
+    "utf8"
   );
 
   const calls = [];

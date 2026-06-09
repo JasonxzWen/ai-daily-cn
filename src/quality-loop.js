@@ -26,7 +26,12 @@ const AUTO_DRAFT_TEMPLATE_PHRASES = [
   "适合工程团队判断是否需要跟进",
   "候选池标记为一手或可信来源",
   "report:draft 自动从固定发现候选池选取",
-  "report:draft 已从候选池自动选取"
+  "report:draft 已从候选池自动选取",
+  "这次放出的信息主要落在",
+  "当前公开信息主要落在",
+  "公开细节集中在",
+  "最有用的公开信息，通常是",
+  "当前公开信息主要集中在"
 ];
 
 const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;

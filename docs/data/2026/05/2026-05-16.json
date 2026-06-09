@@ -2,12 +2,6 @@
   "report_date": "2026-05-16",
   "title": "AI 日报 2026-05-16",
   "summary": "今天的新增一手来源集中在产品入口、模型生命周期和 agent 工程控制面：OpenAI 在 ChatGPT 推出个人财务体验，xAI 与 Databricks 都进入模型退役和替换节点，GitHub 继续把 Copilot agent 工作台化，Google 为 Genkit 增加 middleware 控制层。由于 2026-05-15 新发布项不足 5 条，本轮扩展到 48 小时并显式记录与上一期的重叠风险。",
-  "source_window": {
-    "date_from": "2026-05-14",
-    "date_to": "2026-05-16",
-    "fallback_window_used": true,
-    "notes": "按 2026-05-16 Asia/Shanghai 生成。先拓展官方 release notes、开发者博客、云厂商文档、模型迁移文档和 GitHub Changelog；2026-05-15 新增高质量工程条目不足 5 条，因此扩展到 48 小时。GitHub Copilot app 与 Genkit Middleware 已在 2026-05-15 日报中覆盖，本轮保留为 48 小时窗口内仍需追踪的工程信号，并在自检中记录跨日重复风险。"
-  },
   "main_items": [
     {
       "title": "OpenAI 在 ChatGPT 中推出个人财务体验",
@@ -184,74 +178,22 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-16",
-    "main_items": 5,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "official-ai-releases: 使用 OpenAI Help Center、xAI Docs、Databricks Docs、GitHub Changelog、Google Developers Blog 等一手来源",
-      "github-ai-trending: 检查 GitHub/Copilot agent 工作流更新，未把无 release 的 repo 热度计入主体",
-      "follow-builders: 仅读取技能约束；未找到可回源且适合入选的 builder 原帖"
-    ],
-    "fallback_sources": [
-      "官方 release notes",
-      "官方迁移文档",
-      "云厂商模型目录",
-      "GitHub Changelog",
-      "Google Developers Blog",
-      "已覆盖条目降级为社区线索"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "本轮 2026-05-15 新增 T0 工程/产品条目不足 5 条，扩展到 2026-05-14..2026-05-16。xAI 在上一期仅因缺少 dated changelog 被列为社区线索，本轮迁移页 last updated 2026-05-14 且明确 2026-05-15 生效，升级为主体。GitHub Copilot app 与 Genkit Middleware 与上一期重叠，因仍在 48 小时窗口内且主体数量不足而保留；OpenAI Codex remote、Hugging Face、Anthropic、AWS 等上一期主体降级为社区线索。",
-    "optimization_suggestions": [
-      {
-        "issue": "48 小时扩展会把上一期主体重新带入候选集，容易形成跨日报重复。",
-        "evidence": "本轮 GitHub Copilot app 与 Genkit Middleware 同时出现在 2026-05-15 与 2026-05-16 的主体候选中。",
-        "suggested_module": "prompts/ai-daily/modules/selection-rules.md",
-        "expected_benefit": "在主体不足时优先补入未覆盖的 dated official docs 或模型生命周期节点，减少重复阅读负担。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "模型退役和重定向通常出现在官方 docs，而不是 blog 或 changelog，现有规则容易把它们降级。",
-        "evidence": "xAI 迁移页和 Databricks 模型目录都有明确生效日期、last updated 和迁移建议，且直接影响 API 行为和成本。",
-        "suggested_module": "prompts/ai-daily/modules/source-policy.md",
-        "expected_benefit": "把带生效日期和 last updated 的官方迁移文档纳入可入主体的 T0 来源，提升模型生命周期覆盖。",
-        "needs_user_confirmation": true
-      },
-      {
-        "issue": "搜索摘要中的发布日期可能与源页面正文日期不一致。",
-        "evidence": "OpenAI Codex Windows sandbox 在搜索摘要中显示为 2026-05-15，但源页面正文日期为 2026-05-13，因此本轮没有作为新增主体使用。",
-        "suggested_module": "prompts/ai-daily/modules/source-policy.md",
-        "expected_benefit": "要求最终日期以源页面正文或机器可解析元数据为准，降低旧事件被包装成新事件的风险。",
-        "needs_user_confirmation": true
-      }
-    ]
-  },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-16.html",
   "html_path": "reports/2026/05/2026-05-16.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-16.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-15T18:46:24.275Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "model_releases": [],
   "hot_blogs": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

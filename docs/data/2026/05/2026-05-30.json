@@ -15,263 +15,16 @@
       "reason": "Google Cloud 把 Gemini 3.1 Flash Image 与 Gemini 3 Pro Image 对应的图像模型推入 Gemini Enterprise Agent Platform。"
     }
   ],
-  "source_window": {
-    "date_from": "2026-05-28",
-    "date_to": "2026-05-30",
-    "fallback_window_used": true,
-    "notes": "固定 Node 发现命令在当前 shell 网络环境中全部 fetch failed；本轮保留机器审计中的 blocked 状态，并使用网页打开的一手官方来源、原始访谈和 GitHub Trending 页面作为降级核验输入。主体信息限定在 2026-05-28 至 2026-05-29。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending discovery command",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "npm run discover:github-trending returned fetch failed; retry_failed_after_1"
-        },
-        {
-          "name": "GitHub Trending daily web fallback",
-          "url": "https://github.com/trending?since=daily",
-          "status": "checked",
-          "notes": "web fallback parsed the current daily Top 10"
-        }
-      ],
-      "candidates_found": 14,
-      "included": 10,
-      "notes": "GitHub Trending daily Top 10 独立展示；shell 抓取失败没有覆盖审计，页面 fallback 按当前顺序写入候选池。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders X feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
-          "status": "blocked",
-          "notes": "npm run discover:builders returned fetch failed; retry_failed_after_1"
-        },
-        {
-          "name": "follow-builders podcast feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
-          "status": "blocked",
-          "notes": "npm run discover:builders returned fetch failed; retry_failed_after_1"
-        },
-        {
-          "name": "Claude official X fallback",
-          "url": "https://x.com/claudeai/status/2060042702150930686",
-          "status": "checked",
-          "notes": "current search results located the original X status for Claude Opus 4.8"
-        },
-        {
-          "name": "TechCrunch Scott Wu interview",
-          "url": "https://techcrunch.com/2026/05/29/cognitions-scott-wu-says-ai-coding-agents-shouldnt-replace-humans/",
-          "status": "checked",
-          "notes": "opened original interview page with Cognition CEO Scott Wu"
-        },
-        {
-          "name": "OpenAI Rosalind partner detail",
-          "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
-          "status": "checked",
-          "notes": "official OpenAI post includes partner deployment context for GPT-Rosalind"
-        }
-      ],
-      "candidates_found": 3,
-      "included": 3,
-      "blocked_reason": "follow_builders_feeds_fetch_failed_web_original_fallback_checked",
-      "last_successful_feed_at": null,
-      "notes": "follow-builders X 和 podcast feed 在 shell 中不可访问；本轮补足 1 条原始 X status、1 条原始访谈和 1 条官方伙伴来源，避免用二手摘要替代 Builder 观察。"
-    },
-    "content_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "Registered content sources",
-          "url": "https://github.com/jasonxzwen/ai-daily-cn/tree/main/config/sources",
-          "status": "blocked",
-          "notes": "npm run discover:content-sources returned fetch failed for registered feeds"
-        },
-        {
-          "name": "OpenAI News",
-          "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
-          "status": "checked",
-          "notes": "official Rosalind Biodefense announcement"
-        },
-        {
-          "name": "Google Cloud Blog",
-          "url": "https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available",
-          "status": "checked",
-          "notes": "official Nano Banana 2 and Nano Banana Pro GA announcement"
-        },
-        {
-          "name": "Anthropic News",
-          "url": "https://www.anthropic.com/news/series-h",
-          "status": "checked",
-          "notes": "official Series H and infrastructure announcement"
-        },
-        {
-          "name": "OpenAI Help Center",
-          "url": "https://help.openai.com/en/articles/6825453-chatgpt-on-whatsapp-update",
-          "status": "checked",
-          "notes": "official ChatGPT release notes"
-        },
-        {
-          "name": "AWS Machine Learning Blog",
-          "url": "https://aws.amazon.com/blogs/machine-learning/claude-opus-4-8-is-now-available-on-aws/",
-          "status": "checked",
-          "notes": "official AWS implementation guide"
-        },
-        {
-          "name": "Google Research Blog",
-          "url": "https://research.google/blog/a-new-era-of-innovation-google-research-at-io-2026/",
-          "status": "checked",
-          "notes": "official Google Research I/O 2026 recap"
-        }
-      ],
-      "candidates_found": 9,
-      "included": 6,
-      "blocked_reason": "node_fetch_failed_for_registered_feeds_web_primary_fallback_checked",
-      "last_successful_feed_at": null,
-      "notes": "固定 content-sources 命令全部 fetch failed；正文只使用官方发布、官方博客和原始访谈，不使用二手新闻或社媒截图作为事实终点。"
-    },
-    "search_sources": {
-      "checked": true,
-      "shadow": true,
-      "sources": [
-        {
-          "name": "GDELT",
-          "url": "https://api.gdeltproject.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "OpenAlex",
-          "url": "https://api.openalex.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        },
-        {
-          "name": "arXiv",
-          "url": "https://export.arxiv.org/",
-          "status": "blocked",
-          "notes": "fetch_failed"
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "provider_runtime_ms": {},
-      "provider_cost_units": {},
-      "notes": "discover:search-news 作为影子运行执行；shell 网络失败时不把搜索摘要写入正文。"
-    },
-    "sources_health": {
-      "checked": true,
-      "sources": [
-        {
-          "id": "content-openai-news",
-          "name": "OpenAI News RSS",
-          "url": "https://openai.com/news/rss.xml",
-          "source_kind": "rss",
-          "tier": "T0",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        },
-        {
-          "id": "content-anthropic-news",
-          "name": "Anthropic News",
-          "url": "https://www.anthropic.com/news",
-          "source_kind": "html_index",
-          "tier": "T0",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        },
-        {
-          "id": "content-google-cloud-blog",
-          "name": "Google Cloud Blog RSS",
-          "url": "https://cloudblog.withgoogle.com/rss/",
-          "source_kind": "rss",
-          "tier": "T0",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        },
-        {
-          "id": "content-hugging-face-blog",
-          "name": "Hugging Face Blog",
-          "url": "https://huggingface.co/blog/feed.xml",
-          "source_kind": "rss",
-          "tier": "T1",
-          "authority": "primary",
-          "enablement": "core",
-          "verification_policy": "primary_allowed",
-          "requires_original_url": false,
-          "status": "blocked",
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "fetch failed"
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "notes": "sources:health 对 core,optional,manual registry 执行后，当前 shell 网络环境返回 fetch failed；网页 fallback 只用于事实核验，不改写健康检查结果。"
-    }
-  },
   "quality_status": {
     "status": "degraded",
-    "reasons": [
-      "builder_sources_blocked",
-      "shell_fetch_failed_for_registered_sources"
-    ],
+    "public_note": "Fixed discovery commands failed in the local shell; this report used verified web fallback sources and keeps the blocked audit trail.",
     "affected_sections": [
       "builder_observations",
       "source_audit"
-    ],
-    "degraded_sections": [
-      {
-        "code": "builder_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "builder_observations",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      },
-      {
-        "code": "builder_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "source_audit",
-        "message": "source_audit coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      }
-    ],
-    "blocking_issues": [],
-    "public_note": "Fixed discovery commands failed in the local shell; this report used verified web fallback sources and keeps the blocked audit trail."
+    ]
   },
   "github_trending": [
     {
-      "candidate_id": "trend-harry0703-moneyprinterturbo",
       "repo": "harry0703/MoneyPrinterTurbo",
       "name": "harry0703/MoneyPrinterTurbo",
       "description": "大模型短视频生成流水线，覆盖脚本、素材、配音、字幕和成片生产。",
@@ -284,11 +37,9 @@
       "previous_rank": 1,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "GitHub Trending daily rank 1; previous daily rank 1.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-microsoft-markitdown",
       "repo": "microsoft/markitdown",
       "name": "microsoft/markitdown",
       "description": "Microsoft 文件转 Markdown 工具，适合把 Office、PDF、图片和网页内容送入 RAG 或检索流水线。",
@@ -301,11 +52,9 @@
       "previous_rank": 8,
       "rank_delta": 6,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 2; previous daily rank 8.",
       "importance": "notable"
     },
     {
-      "candidate_id": "trend-everyinc-compound-engineering-plugin",
       "repo": "EveryInc/compound-engineering-plugin",
       "name": "EveryInc/compound-engineering-plugin",
       "description": "Every 的 Compound Engineering 插件仓库，面向 AI 辅助评审和研发流程约束。",
@@ -318,11 +67,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 3; not in the prior daily Top 10.",
       "importance": "notable"
     },
     {
-      "candidate_id": "trend-twentyhq-twenty",
       "repo": "twentyhq/twenty",
       "name": "twentyhq/twenty",
       "description": "开源 CRM，面向团队客户、销售和业务对象管理。",
@@ -335,11 +82,9 @@
       "previous_rank": 5,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "GitHub Trending daily rank 4; previous daily rank 5.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-anthropics-claude-code",
       "repo": "anthropics/claude-code",
       "name": "anthropics/claude-code",
       "description": "Anthropic 官方 Claude Code 仓库，用于命令行和编辑器中的代码代理工作流。",
@@ -352,11 +97,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 5; not in the prior daily Top 10.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-leonxlnx-taste-skill",
       "repo": "Leonxlnx/taste-skill",
       "name": "Leonxlnx/taste-skill",
       "description": "约束 AI 输出风格的 shell skill，强调品味、删减和代码审美。",
@@ -369,11 +112,9 @@
       "previous_rank": 3,
       "rank_delta": -3,
       "trend": "down",
-      "evidence": "GitHub Trending daily rank 6; previous daily rank 3.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-cursor-plugins",
       "repo": "cursor/plugins",
       "name": "cursor/plugins",
       "description": "Cursor 插件仓库，用于扩展编辑器内的 AI 编程体验。",
@@ -386,11 +127,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 7; not in the prior daily Top 10.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-run-llama-liteparse",
       "repo": "run-llama/liteparse",
       "name": "run-llama/liteparse",
       "description": "Run Llama 的文档解析工具，适合把非结构化文件转成检索和索引可用的中间表示。",
@@ -403,11 +142,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 8; not in the prior daily Top 10.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-galilai-stable-worldmodel",
       "repo": "galilai-group/stable-worldmodel",
       "name": "galilai-group/stable-worldmodel",
       "description": "World model 相关研究仓库，关注稳定世界建模和评测复现。",
@@ -420,11 +157,9 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "GitHub Trending daily rank 9, 346 stars today.",
       "importance": "general"
     },
     {
-      "candidate_id": "trend-byoungd-english-level-up-tips",
       "repo": "byoungd/English-level-up-tips",
       "name": "byoungd/English-level-up-tips",
       "description": "英语学习资料库，本身与 AI 关系较弱，但仍进入当日 GitHub Trending Top 10。",
@@ -437,13 +172,11 @@
       "previous_rank": 7,
       "rank_delta": -3,
       "trend": "down",
-      "evidence": "GitHub Trending daily rank 10; previous daily rank 7.",
       "importance": "general"
     }
   ],
   "main_items": [
     {
-      "candidate_id": "main-openai-rosalind-biodefense",
       "title": "OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问",
       "event_date": "2026-05-29",
       "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
@@ -466,7 +199,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-google-cloud-nano-banana-ga",
       "title": "Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA",
       "event_date": "2026-05-29",
       "url": "https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available",
@@ -489,7 +221,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-anthropic-series-h",
       "title": "Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴",
       "event_date": "2026-05-28",
       "url": "https://www.anthropic.com/news/series-h",
@@ -520,7 +251,6 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "candidate_id": "hot-openai-chatgpt-release-notes-gpt55",
       "title": "ChatGPT release notes: GPT-5.5 Instant 更新与旧模型退场日期",
       "url": "https://help.openai.com/en/articles/6825453-chatgpt-on-whatsapp-update",
       "publisher": "OpenAI Help Center",
@@ -529,12 +259,10 @@
       "topic": "ChatGPT 产品更新与模型生命周期",
       "summary": "OpenAI Help Center 的更新记录把 GPT-5.5 Instant 的写作与代码输出调整、canvas 调用变化、以及 ChatGPT 内 OpenAI o3 与 GPT-4.5 的退场日期放在同一条 release note 中。这里最值得产品团队核对的是界面行为：复杂写作和代码将更多以聊天内代码块完成，而不是自动进入 canvas。其次是模型生命周期：ChatGPT 产品里的 o3 和 GPT-4.5 有明确退场日，但说明同时写明这些退场不影响 API。做内部模型选择器或用户文档时，应把 ChatGPT UI 的变化与 API 可用性分开记录。",
       "content_type": "engineering_note",
-      "why_it_matters": "产品和支持团队需要同步 UI 行为与模型退场日期，避免把 ChatGPT 产品变化误读成 API 变更。",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "hot-aws-ml-claude-opus-48-bedrock",
       "title": "Claude Opus 4.8 is now available on AWS",
       "url": "https://aws.amazon.com/blogs/machine-learning/claude-opus-4-8-is-now-available-on-aws/",
       "publisher": "AWS Machine Learning Blog",
@@ -543,12 +271,10 @@
       "topic": "Bedrock 上的 Claude Opus 4.8 集成",
       "summary": "AWS 这篇文章不是再宣布一次模型发布，而是把 Claude Opus 4.8 在 Bedrock 与 Claude Platform on AWS 两条路径中的接入方式写成可执行说明。它列出 Bedrock 控制台试用、Anthropic Messages API 通过 bedrock-runtime 调用、Converse API 调用、模型 ID、权限前提和区域可用性。对已经在 Bedrock 做多模型网关的团队，文章的价值在于把模型能力描述和接入细节放在同一处：可以直接核对 IAM、SDK、区域、调用 API 和是否需要 Claude Platform 原生体验。",
       "content_type": "engineering_note",
-      "why_it_matters": "已经使用 Bedrock 的团队可以据此拆分试用、权限、区域和 API 调用检查项。",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "hot-google-research-io-2026",
       "title": "A New Era of Innovation: Google Research at I/O 2026",
       "url": "https://research.google/blog/a-new-era-of-innovation-google-research-at-io-2026/",
       "publisher": "Google Research Blog",
@@ -557,14 +283,12 @@
       "topic": "Google I/O 2026 研究工具汇总",
       "summary": "Google Research 的 I/O 回顾把 Gemini for Science、ERA、Co-Scientist、Computational Discovery、Hypothesis Generation、Literature Insights 和 Science Skills 放在一条研究产品线里。文章值得单独读，是因为它没有只讲单个模型，而是展示 Google 如何把代码搜索、论文综合、多 agent 假设生成和科研工作流串成工具集合。对于做内部研究助理、实验自动化或文献分析的团队，这篇文章提供了拆分模块的线索：代码优化、假设生成、可点击引用、结构化文献结果和领域技能应该分别验证。",
       "content_type": "blog",
-      "why_it_matters": "科研助理和文献工具不应只验证回答质量，还要分别验证代码、引用、假设生成和领域技能。",
       "image_urls": [],
       "importance": "notable"
     }
   ],
   "projects": [
     {
-      "candidate_id": "project-anthropics-claude-code",
       "name": "anthropics/claude-code",
       "description": "Anthropic 官方 Claude Code 仓库，随着 Opus 4.8 和 Claude Code 动态工作流讨论进入 GitHub Trending 前排。",
       "domains": [
@@ -577,11 +301,9 @@
       "event_date": "2026-05-30",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 5; official Anthropic repository.",
       "importance": "notable"
     },
     {
-      "candidate_id": "project-microsoft-markitdown",
       "name": "microsoft/markitdown",
       "description": "Microsoft 的文件转 Markdown 工具，适合把 Office、PDF、图片和网页内容转成可检索文本。",
       "domains": [
@@ -594,11 +316,9 @@
       "event_date": "2026-05-30",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 2; previous daily rank 8.",
       "importance": "notable"
     },
     {
-      "candidate_id": "project-run-llama-liteparse",
       "name": "run-llama/liteparse",
       "description": "Run Llama 文档解析仓库，关注把非结构化文件转换为检索和索引友好的结构。",
       "domains": [
@@ -611,100 +331,48 @@
       "event_date": "2026-05-30",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GitHub Trending daily rank 8; not in the prior daily Top 10.",
       "importance": "notable"
     }
   ],
   "builder_observations": [
     {
-      "candidate_id": "builder-claude-official-x-opus-48",
       "author": "Claude",
       "content": "Claude 官方 X status 将 Opus 4.8 表述为面向更长独立工作、更清晰进度自检和更强判断力的版本。今天不再把它作为主体重复发布，只保留为 Builder 来源门所需的原始 X 观察。",
       "url": "https://x.com/claudeai/status/2060042702150930686",
       "role": "Anthropic official product account",
       "event_date": "2026-05-28",
       "source": "Claude official X",
-      "evidence": "Current web search results identified the exact original X status ID for Claude Opus 4.8.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-scott-wu-devin-human-loop",
       "author": "Scott Wu",
       "content": "Scott Wu 在 TechCrunch 访谈中把 Devin 描述为帮助程序员构建更多东西的伙伴，而不是替代程序员。他同时承认 Devin 可独立完成部分任务，但更强调把维护、迁移等长尾工作从程序员手中移走，让人继续负责判断和创造。",
       "url": "https://techcrunch.com/2026/05/29/cognitions-scott-wu-says-ai-coding-agents-shouldnt-replace-humans/",
       "role": "Cognition CEO",
       "event_date": "2026-05-29",
       "source": "TechCrunch interview",
-      "evidence": "Interview page dated May 29, 2026 quotes Wu on Devin, self-driving software development and human control.",
       "image_urls": [],
       "importance": "notable"
     },
     {
-      "candidate_id": "builder-gary-abel-gpt-rosalind",
       "author": "Gary Abel",
       "content": "OpenAI 的 Rosalind Biodefense 文章把 GPT-Rosalind 的使用放进 Fourth Eon Biosecurity 等伙伴场景中，强调分析、筛查和生物防御准备。这里可见的 Builder 取向是先限定用户和任务，再讨论模型能力。",
       "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
       "role": "Fourth Eon Biosecurity Co-Founder and Chief Scientist",
       "event_date": "2026-05-29",
       "source": "OpenAI",
-      "evidence": "OpenAI official post lists trusted access and partner use cases for GPT-Rosalind.",
       "image_urls": [],
       "importance": "notable"
     }
   ],
   "community_leads": [],
   "evidence_assets": [],
-  "self_check": {
-    "report_date": "2026-05-30",
-    "main_items": 3,
-    "builder_observations": 3,
-    "builder_skill_used": [
-      "official-ai-releases",
-      "github-ai-trending",
-      "follow-builders"
-    ],
-    "fallback_sources": [
-      "GitHub Trending web fallback",
-      "official provider pages opened through web",
-      "original interview pages opened through web"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "固定发现命令、搜索影子命令和源健康检查均执行；当前 shell 网络全部 fetch failed，因此正文只采用网页打开并核验的一手来源、官方博客和原始访谈。GitHub Trending Top 10 独立列出，Builder 观察补足 3 条并包含 1 条原始 X status。",
-    "optimization_suggestions": [
-      {
-        "title": "为 GitHub Trending 增加浏览器导出 fallback",
-        "why": "shell fetch 失败时仍需要机器可读的排名、previous_rank 和 rank_delta，避免手工转写。"
-      },
-      {
-        "title": "把 Builder fallback 分成 X、访谈、官方伙伴三类",
-        "why": "follow-builders feed 阻断时，发布质量门要求 3 条来源；分类后更容易判断哪些可用于正文、哪些只能作背景。"
-      },
-      {
-        "title": "记录发现命令网络失败的 errno",
-        "why": "当前输出只有 fetch failed，不足以区分 DNS、代理、TLS、GitHub 阻断或运行时权限问题。"
-      }
-    ],
-    "publish_status": {
-      "html_generated": false,
-      "repo_updated": false,
-      "repo_pushed": false,
-      "pages_url": "",
-      "publish_error": ""
-    }
-  },
-  "publish_status": {
-    "html_generated": false,
-    "repo_updated": false,
-    "repo_pushed": false,
-    "pages_url": "",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-29T18:39:17.274Z",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-30.html",
   "html_path": "reports/2026/05/2026-05-30.html",
-  "candidate_pool_path": "data/2026/05/2026-05-30.candidates.json",
-  "daily_tracking": []
+  "daily_tracking": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

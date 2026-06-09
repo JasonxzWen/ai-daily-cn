@@ -379,6 +379,9 @@ function buildInitialWorkflowStages({ reportDate }) {
     tmp("content-sources"),
     tmp("statuspage-incidents"),
     tmp("search-news"),
+    tmp("wechat-platform"),
+    tmp("zhihu-platform"),
+    tmp("reddit-platform"),
     tmp("sources-health")
   ].join(",");
   const stages = [
@@ -439,6 +442,33 @@ function buildInitialWorkflowStages({ reportDate }) {
       "--shadow",
       "--output",
       tmp("search-news")
+    ]),
+    nodeCliStage("discover_wechat_platform", [
+      "discover:wechat-platform",
+      "--date",
+      reportDate,
+      "--limit",
+      "20",
+      "--output",
+      tmp("wechat-platform")
+    ]),
+    nodeCliStage("discover_zhihu_platform", [
+      "discover:zhihu-platform",
+      "--date",
+      reportDate,
+      "--limit",
+      "20",
+      "--output",
+      tmp("zhihu-platform")
+    ]),
+    nodeCliStage("discover_reddit_platform", [
+      "discover:reddit-platform",
+      "--date",
+      reportDate,
+      "--limit",
+      "20",
+      "--output",
+      tmp("reddit-platform")
     ]),
     nodeCliStage("sources_health", [
       "sources:health",

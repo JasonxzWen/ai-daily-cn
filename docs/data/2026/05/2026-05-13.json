@@ -2,12 +2,6 @@
   "report_date": "2026-05-13",
   "title": "AI 日报 2026-05-13",
   "summary": "今日一手大厂发布较少，日报保留近一周内对工程团队更可执行的模型、API、Agent 工具和开源发布：语音实时模型、默认模型升级、金融 Agent 模板、Grok 连接器、模型迁移提醒，以及 Ollama、vLLM、Codex、LangChain 的近期版本信号。",
-  "source_window": {
-    "date_from": "2026-05-05",
-    "date_to": "2026-05-13",
-    "fallback_window_used": true,
-    "notes": "2026-05-12 至 2026-05-13 的 T0/T2 一手信息不足 5 条；扩展到近一周并保留每条真实 event_date，未把旧事件包装成今日发布。"
-  },
   "main_items": [
     {
       "title": "OpenAI 在 API 中发布新一代实时语音模型",
@@ -258,73 +252,22 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-13",
-    "main_items": 10,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "follow-builders: 仅使用 SKILL.md 约束；本轮没有可验证的一手 builder 观察入选"
-    ],
-    "fallback_sources": [
-      "官方新闻页",
-      "官方文档",
-      "GitHub Releases",
-      "搜索结果仅作发现线索"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "24h/48h 内高质量 T0/T2 信息不足，因此扩展到 2026-05-05 至 2026-05-13；所有主体条目使用官方页面、官方文档或 GitHub Release，并保留真实事件日期。Mistral 3 因页面缺少明确发布日期降级为社区线索。",
-    "optimization_suggestions": [
-      {
-        "issue": "当 48 小时窗口不足时，当前提示词没有定义是否允许扩展到 7 天。",
-        "evidence": "本轮 2026-05-12 至 2026-05-13 一手条目不足 5 条，但 2026-05-05 至 2026-05-13 有多条高价值官方发布。",
-        "module": "date-scope",
-        "suggestion": "增加“48 小时不足时可扩展到 7 天，但必须在 source_window 和 self_check notes 写明”的规则。",
-        "expected_benefit": "减少低质量硬凑，同时让窗口扩展可审计。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "官方页面没有显式发布日期时缺少统一处理规则。",
-        "evidence": "Mistral 3 页面正文可用但未暴露明确日期，本轮只能降级为社区线索。",
-        "module": "source-policy",
-        "suggestion": "要求无发布日期的一手页面必须用模型卡、GitHub/Hugging Face 发布时间或官方 RSS 交叉确认后才可入选主体。",
-        "expected_benefit": "避免把无法定日的发布写入日报主体。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "Builder 观察在无一手帖子时容易空缺。",
-        "evidence": "本轮没有可验证原始 builder 链接，builder_observations 保持空数组。",
-        "module": "selection-rules",
-        "suggestion": "保留“宁可为空”的规则，并在自检中记录 builder 线索为空的原因。",
-        "expected_benefit": "防止用二手转述填充 builder 区域。",
-        "requires_user_confirmation": true
-      }
-    ]
-  },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html",
   "html_path": "reports/2026/05/2026-05-13.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-13T08:43:54.469Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "model_releases": [],
   "hot_blogs": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

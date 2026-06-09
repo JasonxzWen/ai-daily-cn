@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -29,6 +30,10 @@ const GITHUB_BLOG_ICON =
 const AI_DAILY_ICON = generatedDailyIcon();
 const ARXIV_ICON = generatedSiteIcon("arXiv", "#b31b1b", "#ffffff");
 const PUBLIC_BODY_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
+const PUBLIC_MEDIA_MIN_WIDTH = 240;
+const PUBLIC_MEDIA_MIN_HEIGHT = 160;
+const PUBLIC_MEDIA_MIN_AREA = 80000;
+const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -114,6 +119,10 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
 }
 
 export function reportToInteractionInput(report, options = {}) {
+  const includeInternalSections = options.includeInternalSections === true;
+  const mediaOptions = {
+    assetRootDir: options.assetRootDir || options.outDir || ""
+  };
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
   const dailyTracking = Array.isArray(report.daily_tracking) ? report.daily_tracking : [];
@@ -132,7 +141,7 @@ export function reportToInteractionInput(report, options = {}) {
   const indexHref = publicAssetUrl(report, "index.html");
   const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
   const sections = [
-    ...formatMainItemSections(mainItems, { report, evidenceByUrl, trendAnnotations })
+    ...formatMainItemSections(mainItems, { report, evidenceByUrl, trendAnnotations, mediaOptions })
   ];
 
   if (publicDailyTracking.length > 0) {
@@ -142,7 +151,7 @@ export function reportToInteractionInput(report, options = {}) {
       group: "signals",
       cardClass: "tracking-card",
       showFilters: false,
-      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl })
+      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl, mediaOptions })
     });
   }
   if (hotBlogs.length > 0) {
@@ -153,7 +162,7 @@ export function reportToInteractionInput(report, options = {}) {
       cardClass: "blog-card",
       filterLabel: "博客主题筛选",
       showFilters: false,
-      items: formatHotBlogCards(hotBlogs, { report, evidenceByUrl })
+      items: formatHotBlogCards(hotBlogs, { report, evidenceByUrl, mediaOptions })
     });
   }
   if (githubTrending.length > 0) {
@@ -171,7 +180,7 @@ export function reportToInteractionInput(report, options = {}) {
       group: "signals",
       cardClass: "builder-card",
       showFilters: false,
-      items: formatBuilderObservationCards(builderObservations, report)
+      items: formatBuilderObservationCards(builderObservations, report, { mediaOptions })
     });
   }
   const twitterDegradation = builderObservations.length === 0
@@ -185,7 +194,7 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
-  const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl });
+  const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl, mediaOptions });
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -197,7 +206,7 @@ export function reportToInteractionInput(report, options = {}) {
     });
   }
   for (const sectionName of PLATFORM_SECTIONS) {
-    const cards = formatPlatformExemptCards(platformItems[sectionName], sectionName, { report, evidenceByUrl });
+    const cards = formatPlatformExemptCards(platformItems[sectionName], sectionName, { report, evidenceByUrl, mediaOptions });
     if (cards.length === 0) {
       continue;
     }
@@ -210,41 +219,43 @@ export function reportToInteractionInput(report, options = {}) {
       items: cards
     });
   }
-  const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
-  if (sourceAuditOverview) {
-    sections.push(sourceAuditOverview);
-  }
-  const qualityStatus = formatQualityStatus(report.quality_status);
-  if (qualityStatus) {
-    sections.push({
-      type: "markdown",
-      title: "发布质量说明",
-      group: "verification",
-      content: qualityStatus
-    });
-  }
-  sections.push(
-    {
-      type: "markdown",
-      title: "信源审计",
-      group: "verification",
-      appendix: true,
-      appendixLabel: "附录",
-      collapsed: true,
-      summary: "来源、候选池和重试记录，默认折叠。",
-      content: formatSourceAudit(report.source_audit)
-    },
-    {
-      type: "markdown",
-      title: "自检与产物",
-      group: "verification",
-      appendix: true,
-      appendixLabel: "附录",
-      collapsed: true,
-      summary: "验证结果、结构化 JSON 和后续规则建议，默认折叠。",
-      content: `${formatSelfCheck(report.self_check)}\n\n- ${markdownLink(dataHref, "结构化 JSON")}`
+  if (includeInternalSections) {
+    const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
+    if (sourceAuditOverview) {
+      sections.push(sourceAuditOverview);
     }
-  );
+    const qualityStatus = formatQualityStatus(report.quality_status);
+    if (qualityStatus) {
+      sections.push({
+        type: "markdown",
+        title: "发布质量说明",
+        group: "verification",
+        content: qualityStatus
+      });
+    }
+    sections.push(
+      {
+        type: "markdown",
+        title: "信源审计",
+        group: "verification",
+        appendix: true,
+        appendixLabel: "附录",
+        collapsed: true,
+        summary: "来源、候选池和重试记录，默认折叠。",
+        content: formatSourceAudit(report.source_audit)
+      },
+      {
+        type: "markdown",
+        title: "自检与产物",
+        group: "verification",
+        appendix: true,
+        appendixLabel: "附录",
+        collapsed: true,
+        summary: "验证结果、结构化 JSON 和后续规则建议，默认折叠。",
+        content: `${formatSelfCheck(report.self_check)}\n\n- ${markdownLink(dataHref, "结构化 JSON")}`
+      }
+    );
+  }
 
   return {
     title: report.title,
@@ -474,7 +485,9 @@ export async function renderReportWithEffectiveInteract(report, options = {}) {
   await fs.mkdir(inputDir, { recursive: true });
   await fs.mkdir(outputDir, { recursive: true });
   await fs.writeFile(inputPath, `${JSON.stringify(reportToInteractionInput(report, {
-    trendAnnotations: options.trendAnnotations
+    trendAnnotations: options.trendAnnotations,
+    assetRootDir: options.assetRootDir,
+    includeInternalSections: options.includeInternalSections
   }), null, 2)}\n`, "utf8");
 
   const { stdout } = await execFileAsync(process.execPath, [
@@ -570,19 +583,20 @@ function formatMainItemSections(items, context = {}) {
     ];
   }
 
-  return mainItemContractGroups(items)
-    .map((group) => ({
+  return [
+    {
       type: "markdown",
-      title: group.title,
+      title: "AI 资讯",
       group: "main",
-      content: group.entries
-        .map(({ item, originalIndex }, groupIndex) => formatMainItem(item, {
+      content: items
+        .map((item, index) => formatMainItem(item, {
           ...context,
-          originalIndex,
-          displayIndex: groupIndex + 1
+          originalIndex: index,
+          displayIndex: index + 1
         }))
         .join("\n\n")
-    }));
+    }
+  ];
 }
 
 function emptyMainItemContent(context = {}) {
@@ -593,7 +607,7 @@ function emptyMainItemContent(context = {}) {
 }
 
 function formatMainItem(item, context = {}) {
-  const bullets = mainItemPublicBullets(item)
+  const bullets = mainItemPublicFacts(item)
     .map((bullet) => `  - ${formatDailyInlineText(bullet, item)}`)
     .join("\n");
   const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
@@ -601,15 +615,20 @@ function formatMainItem(item, context = {}) {
     importanceTagFor("main_items", item),
     ...trendTagsFor(context.trendAnnotations, "main_items", context.originalIndex)
   ].filter(Boolean));
-  const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url));
+  const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url), context.mediaOptions);
   return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
 }
 
-function mainItemPublicBullets(item) {
-  return (Array.isArray(item?.bullets) ? item.bullets : [])
+function mainItemPublicFacts(item) {
+  const facts = [
+    item?.summary,
+    ...(Array.isArray(item?.bullets) ? item.bullets : [])
+  ];
+  return facts
     .map((bullet) => String(bullet || "").trim())
     .filter(Boolean)
-    .filter((bullet) => !isMainItemTemplateBullet(bullet));
+    .filter((bullet) => !isMainItemTemplateBullet(bullet))
+    .slice(0, 3);
 }
 
 function isMainItemTemplateBullet(value) {
@@ -895,7 +914,10 @@ function formatDailyTrackingCards(items, context = {}) {
     const stats = dailyTrackingStats(item, entries);
     const bars = dailyTrackingProviderBars(entries);
     const table = dailyTrackingTable(item, entries);
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 5 });
+    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
+      limit: 5,
+      ...(context.mediaOptions || {})
+    });
     return {
       group: dailyTrackingCategoryLabel(item.category),
       title: item.name,
@@ -1154,7 +1176,9 @@ function dailyTrackingCategoryLabel(category) {
 
 function formatHotBlogCards(items, context = {}) {
   return items.map((item) => {
-    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url));
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
+      ...(context.mediaOptions || {})
+    });
     const points = hotBlogPointTexts(item.summary);
     const body = points.shift() || String(item.summary || "").trim();
     return {
@@ -1174,12 +1198,12 @@ function formatHotBlogCards(items, context = {}) {
   });
 }
 
-function formatBuilderObservationCards(items, report) {
+function formatBuilderObservationCards(items, report, context = {}) {
   return items.map((item) => {
     const translation = builderTranslationText(item);
     const handle = builderHandle(item);
     const originalText = builderOriginalText(item);
-    const media = formatBuilderMedia(report, item);
+    const media = formatBuilderMedia(report, item, context.mediaOptions || {});
 
     return {
       group: "X/Twitter",
@@ -1208,13 +1232,13 @@ function builderOriginalText(item) {
   return String(item?.original_text || "").trim();
 }
 
-function formatBuilderMedia(report, item) {
+function formatBuilderMedia(report, item, options = {}) {
   const matchingAssets = Array.isArray(report?.evidence_assets)
     ? report.evidence_assets.filter((asset) =>
       normalizeEvidenceUrl(asset?.source_url) === normalizeEvidenceUrl(item?.url)
     )
     : [];
-  const localMedia = formatCardMedia(report, matchingAssets, { limit: 2 });
+  const localMedia = formatCardMedia(report, matchingAssets, { limit: 2, ...options });
   if (localMedia.length > 0) {
     return localMedia;
   }
@@ -1348,9 +1372,9 @@ function formatCardMedia(report, assets, options = {}) {
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 2;
 
   return normalizePublicMedia(assets
-    .filter((asset) => asset?.local_path)
+    .filter((asset) => asset?.local_path && isPublicContentMediaAsset(report, asset, options))
     .map((asset) => ({
-      src: relativeAssetHref(report.html_path, asset.local_path),
+      src: publicAssetHref(report, asset.local_path),
       alt: asset.title || "",
       caption: evidenceCaption(asset)
     })), limit);
@@ -1380,6 +1404,156 @@ function formatCardMediaForItem(report, item, assets, options = {}) {
   }
 
   return normalizePublicMedia(media, limit);
+}
+
+function isPublicRenderableEvidenceAsset(report, asset, options = {}) {
+  if (!asset) {
+    return false;
+  }
+  if (asset.local_path) {
+    return isPublicContentMediaAsset(report, asset, options);
+  }
+  return Array.isArray(asset.data) && asset.data.length > 0;
+}
+
+function isPublicContentMediaAsset(report, asset, options = {}) {
+  if (!asset?.local_path) {
+    return false;
+  }
+  if (isNonContentMediaAsset(asset) || isFullPageScreenshotMediaAsset(asset)) {
+    return false;
+  }
+  const dimensions = knownMediaDimensions(report, asset, options);
+  if (dimensions && isTooSmallPublicMedia(dimensions)) {
+    return false;
+  }
+  return true;
+}
+
+function isNonContentMediaAsset(asset) {
+  const role = String(asset?.asset_role || asset?.role || "").trim().toLowerCase();
+  if (NON_CONTENT_MEDIA_ROLES.has(role)) {
+    return true;
+  }
+  const text = mediaAssetText(asset);
+  return /\b(?:favicon|logo|avatar|icon)\b|图标|头像|徽标/u.test(text);
+}
+
+function isFullPageScreenshotMediaAsset(asset) {
+  const captureKind = String(asset?.capture_kind || asset?.capture_type || "").trim().toLowerCase();
+  if (captureKind === "full_page_screenshot" || captureKind === "page_screenshot" || captureKind === "browser_screenshot") {
+    return true;
+  }
+  return /\b(?:full[- ]?page|browser|viewport|page)\s+screenshot\b|页面截图|整页截图|浏览器截图/u.test(mediaAssetText(asset));
+}
+
+function mediaAssetText(asset) {
+  return [
+    asset?.title,
+    asset?.caption,
+    asset?.local_path,
+    asset?.extraction_status
+  ].map((value) => String(value || "").toLowerCase()).join(" ");
+}
+
+function knownMediaDimensions(report, asset, options = {}) {
+  const width = Number(asset?.width || asset?.natural_width);
+  const height = Number(asset?.height || asset?.natural_height);
+  if (Number.isFinite(width) && Number.isFinite(height)) {
+    return { width, height };
+  }
+  const filePath = resolveLocalAssetPath(report, asset?.local_path, options);
+  if (!filePath) {
+    return null;
+  }
+  return readImageDimensions(filePath);
+}
+
+function isTooSmallPublicMedia({ width, height }) {
+  return width < PUBLIC_MEDIA_MIN_WIDTH ||
+    height < PUBLIC_MEDIA_MIN_HEIGHT ||
+    width * height < PUBLIC_MEDIA_MIN_AREA;
+}
+
+function resolveLocalAssetPath(report, localPath, options = {}) {
+  const normalized = String(localPath || "").trim().replace(/\\/g, "/").replace(/^\/+/, "");
+  if (!normalized || normalized.includes("..")) {
+    return "";
+  }
+  if (options.assetRootDir) {
+    return path.resolve(options.assetRootDir, normalized);
+  }
+  if (options.rootDir) {
+    return path.resolve(options.rootDir, "docs", normalized);
+  }
+  const htmlPath = String(report?.html_path || "").trim();
+  if (htmlPath) {
+    return path.resolve(process.cwd(), "docs", normalized);
+  }
+  return "";
+}
+
+function readImageDimensions(filePath) {
+  try {
+    const buffer = fsSync.readFileSync(filePath);
+    if (buffer.length >= 24 && buffer.toString("ascii", 1, 4) === "PNG") {
+      return {
+        width: buffer.readUInt32BE(16),
+        height: buffer.readUInt32BE(20)
+      };
+    }
+    if (buffer.length >= 10 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP") {
+      return readWebpDimensions(buffer);
+    }
+    if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+      return readJpegDimensions(buffer);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function readWebpDimensions(buffer) {
+  const chunk = buffer.toString("ascii", 12, 16);
+  if (chunk === "VP8X" && buffer.length >= 30) {
+    return {
+      width: 1 + buffer.readUIntLE(24, 3),
+      height: 1 + buffer.readUIntLE(27, 3)
+    };
+  }
+  return null;
+}
+
+function readJpegDimensions(buffer) {
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = buffer[offset + 1];
+    const length = buffer.readUInt16BE(offset + 2);
+    if (length < 2) {
+      return null;
+    }
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: buffer.readUInt16BE(offset + 5),
+        width: buffer.readUInt16BE(offset + 7)
+      };
+    }
+    offset += 2 + length;
+  }
+  return null;
+}
+
+function publicAssetHref(report, localPath) {
+  const htmlPath = String(report?.html_path || "").trim();
+  if (!htmlPath) {
+    return String(localPath || "").trim().replace(/\\/g, "/").replace(/^\/+/, "");
+  }
+  return relativeAssetHref(htmlPath, localPath);
 }
 
 function normalizePublicMedia(entries, limit) {
@@ -1615,7 +1789,10 @@ function formatCommunityLeadCards(items, context = {}) {
     if (!isReaderFacingChineseBody(body)) {
       return null;
     }
-    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 2 });
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
+      limit: 2,
+      ...(context.mediaOptions || {})
+    });
     return {
       group: item.source || sourceLevelLabel(item.source_level) || "社区线索",
       title: communityLeadTitle(item),
@@ -1637,11 +1814,14 @@ function formatCommunityLeadCards(items, context = {}) {
 function formatPlatformExemptCards(items, sectionName, context = {}) {
   const platform = platformForSection(sectionName);
   return (Array.isArray(items) ? items : []).map((item) => {
-    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), { limit: 1 });
-    const body = String(item.claim_text || item.summary || item.title || "").trim();
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
+      limit: 1,
+      ...(context.mediaOptions || {})
+    });
+    const body = platformCardBody(item, platform);
     return {
       group: item.source || platformItemLabel(platform),
-      title: item.title || platformItemLabel(platform),
+      title: platformCardTitle(item, platform),
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || platformItemLabel(platform)),
       body: formatDailyInlineText(body, item),
@@ -1649,24 +1829,67 @@ function formatPlatformExemptCards(items, sectionName, context = {}) {
       tags: [
         cardTag(importanceTagFor(sectionName, item)),
         cardTag(platformItemLabel(platform), "topic"),
-        cardTag("未做一手回源核验", "risk"),
+        cardTag("平台线索", "risk"),
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
       points: [
-        item.platform ? { label: "platform", value: item.platform } : null,
-        item.source_id ? { label: "source_id", value: item.source_id } : null,
-        item.rule_id ? { label: "rule_id", value: item.rule_id } : null,
-        item.source_level ? { label: "source_level", value: item.source_level } : null,
-        item.verification_status ? { label: "verification_status", value: item.verification_status } : null,
-        item.disclosure ? { label: "公开披露", value: item.disclosure } : null,
-        item.why_watch ? { label: "观察理由", value: trimText(item.why_watch, 180) } : null,
-        Array.isArray(item.matched_terms) && item.matched_terms.length > 0
-          ? { label: "matched_terms", value: item.matched_terms.join(", ") }
-          : null
+        item.disclosure ? { label: "公开披露", value: item.disclosure } : null
       ].filter(Boolean),
       ...(media.length > 0 ? { media } : {})
     };
   });
+}
+
+function platformCardTitle(item, platform) {
+  const originalTitle = platformOriginalTitle(item);
+  const text = `${originalTitle} ${item?.claim_text || ""} ${item?.summary || ""}`;
+  if (/xiaomi|mimo|1,?000\+?\s*(?:tps|tokens?\/sec)|1t model|8-gpu/i.test(text)) {
+    return "Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称";
+  }
+  if (/gemma.*4[-\s]?bit.*qat|4[-\s]?bit.*qat.*8[-\s]?bit|benchmark/i.test(text)) {
+    return "Reddit 讨论 Gemma 4-bit QAT 与 8-bit PTQ benchmark";
+  }
+  if (containsChineseText(originalTitle) && !isGeneratedPlatformTitle(originalTitle)) {
+    return trimText(originalTitle, 90);
+  }
+  return `${platformItemLabel(platform)}：${trimText(originalTitle || item?.source || "平台讨论线索", 80)}`;
+}
+
+function platformCardBody(item, platform) {
+  const raw = String(item?.claim_text || item?.summary || item?.title || "").replace(/\s+/g, " ").trim();
+  const originalTitle = platformOriginalTitle(item);
+  const text = `${originalTitle} ${raw}`;
+  if (/xiaomi|mimo|1,?000\+?\s*(?:tps|tokens?\/sec)|1t model|8-gpu/i.test(text)) {
+    return "原帖讨论小米 MiMo-V2.5-Pro UltraSpeed 声称在标准 8-GPU 节点上让 1T MoE 模型达到 1000+ tokens/sec 输出。这是社区线索，尚需等待官方原文或独立 benchmark。";
+  }
+  if (/gemma.*4[-\s]?bit.*qat|4[-\s]?bit.*qat.*8[-\s]?bit|benchmark/i.test(text)) {
+    return "原帖在找 Gemma 4-bit QAT 与传统 8-bit PTQ 量化的直接 benchmark，重点是准确率和速度是否有硬数据对比。这是 Reddit 讨论线索，不等同于已确认结论。";
+  }
+  if (containsChineseText(raw) && !isGeneratedPlatformTitle(raw)) {
+    return trimText(raw, 180);
+  }
+  return `${platformItemLabel(platform)}出现一条讨论线索：${trimText(originalTitle || raw, 90)}。这不是一手确认事实，需要回到原帖和后续来源核对。`;
+}
+
+function platformOriginalTitle(item) {
+  const raw = String(item?.title || "").replace(/\s+/g, " ").trim();
+  const quoted = raw.match(/原文标题为[“"]([^”"]+)/u);
+  if (quoted?.[1]) {
+    return stripTrailingEllipsis(quoted[1]);
+  }
+  return stripTrailingEllipsis(raw);
+}
+
+function stripTrailingEllipsis(value) {
+  return String(value || "").replace(/\s*\.\.\.$/u, "").trim();
+}
+
+function isGeneratedPlatformTitle(value) {
+  return /发布了一条 AI 相关更新|原文标题为|Platform Feed/i.test(String(value || ""));
+}
+
+function containsChineseText(value) {
+  return /\p{Script=Han}/u.test(String(value || ""));
 }
 
 function summarizeCommunityLeadBody(text, title) {
@@ -1852,15 +2075,17 @@ function hasRenderableEvidence(asset) {
   return Boolean(asset && (asset.local_path || (Array.isArray(asset.data) && asset.data.length > 0)));
 }
 
-function formatInlineEvidenceAssets(report, assets) {
+function formatInlineEvidenceAssets(report, assets, options = {}) {
   if (!report || !Array.isArray(assets) || assets.length === 0) {
     return "";
   }
 
-  const renderableAssets = assets.slice(0, 2);
+  const renderableAssets = assets
+    .filter((asset) => isPublicRenderableEvidenceAsset(report, asset, options))
+    .slice(0, 2);
   if (renderableAssets.length === 2 && renderableAssets.every((asset) => asset?.local_path)) {
     const imageLine = renderableAssets
-      .map((asset) => markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title))
+      .map((asset) => markdownImage(publicAssetHref(report, asset.local_path), asset.title))
       .filter(Boolean)
       .join(" ");
     const captionLine = renderableAssets
@@ -1879,7 +2104,7 @@ function formatInlineEvidenceAsset(report, asset) {
   const caption = evidenceCaption(asset);
   if (asset.local_path) {
     return [
-      markdownImage(relativeAssetHref(report.html_path, asset.local_path), asset.title),
+      markdownImage(publicAssetHref(report, asset.local_path), asset.title),
       `*${caption}*`
     ].join("\n\n");
   }

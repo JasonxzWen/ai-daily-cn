@@ -15,13 +15,13 @@
       "allowed_hosts": ["reddit.com", "www.reddit.com", "old.reddit.com", "redd.it"],
       "allowed_url_patterns": ["^https://(www\\.|old\\.)?reddit\\.com/r/[^/]+/comments/"],
       "include_keywords": ["AI", "LLM", "agent", "model", "benchmark", "eval", "open source", "inference"],
-      "exclude_keywords": ["meme", "shitpost", "giveaway", "sponsor", "advertisement", "hiring"],
+      "exclude_keywords": ["meme", "shitpost", "giveaway", "sponsor", "advertisement", "hiring", "slop", "bot", "joke", "satire"],
       "public_disclosure_label": "平台内扩散发现，未做一手回源核验。",
       "max_items_per_run": 3,
       "lookback_days": 2,
       "timeout_ms": 15000,
-      "kill_switch": true,
-      "notes": "Disable kill_switch only after confirming the RSS endpoint remains parseable and low-noise."
+      "kill_switch": false,
+      "notes": "RSS endpoint verified on 2026-06-09; keep as low-threshold Reddit weak-signal feed with keyword and noise filters."
     }
   ]
 }

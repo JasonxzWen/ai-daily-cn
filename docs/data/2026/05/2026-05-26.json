@@ -5,71 +5,8 @@
   "summary": "2026-05-26 这版日报保留 3 条主体信息：Salesforce Agentforce 的 Claude Sonnet 4 路由切换今天生效，Google Workspace 的 Gemini Chat 与 Drive 能力在 Scheduled Release 域继续展开，Claude Status 记录了 2026-05-25 Opus 4.7 错误率 incident 并已恢复。GitHub Trending 与 Builder feed 在当前环境抓取失败，没有用旧项目或旧帖子补齐页面。",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-26.html",
   "html_path": "reports/2026/05/2026-05-26.html",
-  "source_window": {
-    "date_from": "2026-05-25",
-    "date_to": "2026-05-26",
-    "fallback_window_used": false,
-    "notes": "本轮主体信息都在 2026-05-25 至 2026-05-26 内；没有把 2026-05-22 的 Anthropic Glasswing update 或 2026-05-21 的 OpenAI Codex release notes 重新包装成今日内容。"
-  },
-  "source_audit": {
-    "github_trending": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "GitHub Trending daily",
-          "url": "https://github.com/trending?since=daily",
-          "status": "blocked",
-          "notes": "npm run discover:github-trending -- 50 returned fetch failed."
-        },
-        {
-          "name": "GitHub Trending weekly",
-          "url": "https://github.com/trending?since=weekly",
-          "status": "blocked",
-          "notes": "npm run discover:github-trending -- 50 returned fetch failed."
-        },
-        {
-          "name": "GitHub Trending Python/TypeScript/Rust/Go",
-          "url": "https://github.com/trending/python?since=daily",
-          "status": "blocked",
-          "notes": "The discovery command could not fetch language trending pages in this shell."
-        },
-        {
-          "name": "OSSInsight AI Trending",
-          "url": "https://ossinsight.io/trending/ai",
-          "status": "checked",
-          "notes": "Web search showed 28-day movers, but no per-repo dated release or commit was suitable for today's project table."
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "notes": "项目区保持空数组；没有把无法确认 event_date 的趋势排名写成项目更新。"
-    },
-    "builder_sources": {
-      "checked": true,
-      "sources": [
-        {
-          "name": "follow-builders prepare-digest",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "blocked",
-          "notes": "node prepare-digest.js failed with fetch failed."
-        },
-        {
-          "name": "follow-builders local cache",
-          "url": "https://github.com/zarazhangrui/follow-builders",
-          "status": "no_signal",
-          "notes": "Local feed cache generatedAt is 2026-04-27T08:20:43.831Z, too old for a 2026-05-26 report."
-        }
-      ],
-      "candidates_found": 0,
-      "included": 0,
-      "blocked_reason": "fetch_failed",
-      "last_successful_feed_at": "2026-04-27T08:20:43.831Z",
-      "notes": "Builder 观察保持空数组；没有使用四周前的 X posts 或 podcast。"
-    }
-  },
   "main_items": [
     {
-      "candidate_id": "main-salesforce-agentforce-claude-reroute",
       "title": "Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6",
       "event_date": "2026-05-26",
       "url": "https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&language=en_US&type=5",
@@ -91,7 +28,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-google-workspace-gemini-rollout",
       "title": "Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力",
       "event_date": "2026-05-26",
       "url": "https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html",
@@ -113,7 +49,6 @@
       "importance": "major"
     },
     {
-      "candidate_id": "main-claude-opus-status",
       "title": "Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident",
       "event_date": "2026-05-25",
       "url": "https://status.claude.com/",
@@ -138,7 +73,6 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "candidate_id": "blog-platform-ai-debt-shadow-ai",
       "title": "AI Debt, Shadow AI Force a Platform Rethink",
       "url": "https://platformengineering.com/features/ai-debt-shadow-ai-force-a-platform-rethink/",
       "publisher": "Platform Engineering",
@@ -146,7 +80,6 @@
       "event_date": "2026-05-25",
       "topic": "Platform governance for AI-generated code",
       "summary": "文章把问题落在 unapproved AI tools、AI-generated code 和平台团队治理上，适合给内部 AI 工具准入、代码审查和可维护性规则做参考。",
-      "why_it_matters": "很多团队已经在生产路径里使用 AI 代码和代理，平台侧需要更早定义可观测、审批、依赖和维护边界。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -161,101 +94,20 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-26",
-    "main_items": 3,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "official-ai-releases: checked official Google Workspace Updates, Salesforce Help, Claude Status, OpenAI release notes and Anthropic research pages for 2026-05-25..2026-05-26.",
-      "github-ai-trending: ran npm run discover:github-trending -- 50; shell fetch failed, then Web checked GitHub Trending and OSSInsight, but no dated project candidate was included.",
-      "follow-builders: ran prepare-digest.js; fetch failed, and local cache generatedAt 2026-04-27T08:20:43.831Z was rejected as stale."
-    ],
-    "fallback_sources": [
-      "Google Workspace Updates",
-      "Salesforce Help",
-      "Claude Status",
-      "Platform Engineering",
-      "BenchFlow News",
-      "OSSInsight AI Trending"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "主体信息 3 条，模型发布、项目区和 Builder 观察为空是本轮筛选结果。未使用旧 Google I/O、OpenAI Codex release notes、Anthropic Glasswing update 或 2026-04-27 follow-builders cache 填充页面。",
-    "optimization_suggestions": [
-      {
-        "area": "github_trending",
-        "observed_issue": "当前 shell 里 discover:github-trending 对 GitHub Trending 全部 fetch failed，Web 文本也不稳定暴露仓库列表。",
-        "evidence": "npm run discover:github-trending -- 50 returned blocked sources with fetch failed; Web open of GitHub Trending showed navigation and language selector but not reliable repo rows.",
-        "suggested_module": "src/discovery.js",
-        "expected_benefit": "加入 browser-export 或 OSSInsight API fallback 后，项目区可以继续保持可复现候选池，而不是人工跳过。",
-        "needs_user_confirmation": true
-      },
-      {
-        "area": "builder_sources",
-        "observed_issue": "follow-builders 只有中心 feed 这一条自动化入口；fetch failed 时 Builder 观察会长期为空。",
-        "evidence": "prepare-digest.js failed with fetch failed; local feed cache last_successful_feed_at was 2026-04-27T08:20:43.831Z and was too old for today's report.",
-        "suggested_module": "prompts/ai-daily/modules/discovery-audit.md",
-        "expected_benefit": "增加少量固定原始源 fallback 后，可以在中心 feed 失败时仍保留可审计的 Builder 候选。",
-        "needs_user_confirmation": true
-      },
-      {
-        "area": "status_sources",
-        "observed_issue": "状态页 incident 对工程团队有用，但现在需要人工从 Statuspage 页面摘取时间和影响范围。",
-        "evidence": "Claude Status 页面可以直接读到 Opus 4.7 incident 的 start、resolved 和 component，但候选池仍是手工写入。",
-        "suggested_module": "src/candidates.js",
-        "expected_benefit": "增加 Statuspage Atom/RSS 解析后，供应商故障类候选可以自动生成并统一去重。",
-        "needs_user_confirmation": true
-      }
-    ],
-    "publish_status": {
-      "html_generated": false,
-      "repo_updated": false,
-      "repo_pushed": false,
-      "pages_url": "",
-      "publish_error": ""
-    }
-  },
-  "publish_status": {
-    "html_generated": false,
-    "repo_updated": false,
-    "repo_pushed": false,
-    "pages_url": "",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-25T18:36:48.879Z",
-  "candidate_pool_path": "data/2026/05/2026-05-26.candidates.json",
   "hero_highlights": [],
   "quality_status": {
     "status": "degraded",
-    "reasons": [
-      "github_trending_blocked",
-      "builder_sources_blocked"
-    ],
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
     "affected_sections": [
       "github_trending",
       "builder_observations"
-    ],
-    "degraded_sections": [
-      {
-        "code": "github_trending_blocked",
-        "error_code": "quality_degraded",
-        "section": "github_trending",
-        "message": "github_trending coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      },
-      {
-        "code": "builder_sources_blocked",
-        "error_code": "quality_degraded",
-        "section": "builder_observations",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      }
-    ],
-    "blocking_issues": [],
-    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete."
+    ]
   },
   "github_trending": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

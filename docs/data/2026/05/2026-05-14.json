@@ -2,12 +2,6 @@
   "report_date": "2026-05-14",
   "title": "AI 日报 2026-05-14",
   "summary": "今天可回源的一手动态集中在 Agent 产品化、企业治理和实时交互模型：Anthropic 把 Claude Cowork 打包给小企业，GitHub 开放 Copilot cloud agent 任务 API，SAP 发布 Business AI Platform 与 Autonomous Suite，OpenAI 复盘 Parameter Golf 中 AI coding agent 对开放研究竞赛的改变，Thinking Machines 则给出原生实时交互模型的研究预览。",
-  "source_window": {
-    "date_from": "2026-05-11",
-    "date_to": "2026-05-14",
-    "fallback_window_used": true,
-    "notes": "按 2026-05-14 Asia/Shanghai 生成。2026-05-13 至 2026-05-14 的高质量 T0/T2 主体信息不足 5 条；按提示词先扩到 48 小时后仍偏少，因此保留 2026-05-11 的 Thinking Machines 官方研究预览，并在自检与规则建议中记录该扩窗。"
-  },
   "main_items": [
     {
       "title": "Anthropic 发布 Claude for Small Business",
@@ -165,75 +159,22 @@
       "importance": "general"
     }
   ],
-  "self_check": {
-    "report_date": "2026-05-14",
-    "main_items": 5,
-    "builder_observations": 0,
-    "builder_skill_used": [
-      "follow-builders: 仅读取 SKILL.md 约束；本轮没有可回源的一手 builder 原帖入选"
-    ],
-    "fallback_sources": [
-      "官方博客",
-      "官方新闻稿",
-      "官方文档",
-      "GitHub Changelog",
-      "搜索结果仅作发现线索",
-      "媒体/聚合站仅用于降级线索"
-    ],
-    "primary_links": true,
-    "no_banned_words": true,
-    "no_unsourced_numbers": true,
-    "notes": "主体条目均使用官方或原始来源。24 小时内高质量一手主体条目偏少，48 小时窗口内保留 Anthropic、GitHub、SAP、OpenAI 四条；为避免低质量硬凑，将窗口扩到 2026-05-11 并加入 Thinking Machines 官方研究预览。OpenAI Daybreak 与 Claude Opus fast mode 因发布日期或文档一致性不足，仅放入社区线索。",
-    "optimization_suggestions": [
-      {
-        "issue": "当前 date-scope 只允许 24 小时不足时扩展到 48 小时，但实际日报可能仍不足 5 条。",
-        "evidence": "本轮 2026-05-13 至 2026-05-14 与 48 小时窗口内只有 4 条高质量 T0 主体信息；Thinking Machines 的 2026-05-11 官方研究预览质量高但超出 48 小时。",
-        "module": "date-scope",
-        "suggestion": "增加“48 小时仍不足 5 条时，可扩展到 72 小时或最近一个工作日，但必须在 source_window 与 self_check notes 写明”的规则。",
-        "expected_benefit": "避免为了满足条目数引入弱来源，同时让扩窗边界可审计。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "官方产品页未显式标注发布日期时，当前规则缺少统一降级处理。",
-        "evidence": "OpenAI Daybreak 官方页可访问且内容完整，但页面正文未暴露发布日期；搜索与媒体显示近期发布，本轮仍未写入主体。",
-        "module": "source-policy",
-        "suggestion": "要求无显式发布日期的官方页面必须由官方 dated post、官方 changelog、RSS 或 docs 更新页交叉确认后才可入选主体。",
-        "expected_benefit": "减少把无法定日的产品页误判成今日发布。",
-        "requires_user_confirmation": true
-      },
-      {
-        "issue": "T1 builder 观察缺少可用原帖时容易空缺。",
-        "evidence": "本轮 Claude fast mode 线索来自 X 聚合，且官方 docs 与线索存在版本不一致，builder_observations 继续保持空数组。",
-        "module": "selection-rules",
-        "suggestion": "保留“没有原始 builder 链接或官方文档不一致时宁可为空/降级”的规则，并要求在 self_check 记录降级原因。",
-        "expected_benefit": "防止用二手转述填充 Builder 区域，提升日报可追溯性。",
-        "requires_user_confirmation": true
-      }
-    ]
-  },
   "schema_version": 1,
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-14.html",
   "html_path": "reports/2026/05/2026-05-14.html",
-  "publish_status": {
-    "html_generated": true,
-    "repo_updated": true,
-    "repo_pushed": false,
-    "pages_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-14.html",
-    "publish_error": ""
-  },
   "generated_at": "2026-05-13T18:42:18.601Z",
   "hero_highlights": [],
   "quality_status": {
     "status": "ok",
-    "reasons": [],
-    "affected_sections": [],
-    "degraded_sections": [],
-    "blocking_issues": [],
-    "public_note": "Core discovery checks completed without blocking degradation."
+    "public_note": "Core discovery checks completed without blocking degradation.",
+    "affected_sections": []
   },
   "github_trending": [],
   "model_releases": [],
   "hot_blogs": [],
   "daily_tracking": [],
-  "evidence_assets": []
+  "evidence_assets": [],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": []
 }

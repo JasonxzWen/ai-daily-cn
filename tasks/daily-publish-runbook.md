@@ -58,13 +58,18 @@ node src/cli.js discover:statuspage-incidents --date YYYY-MM-DD --limit 20 --out
 
 ```powershell
 node src/cli.js discover:search-news --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --provider-timeout-ms 45000 --shadow --output .tmp/search-news-YYYY-MM-DD.json
+node src/cli.js discover:wechat-platform --date YYYY-MM-DD --limit 20 --output .tmp/wechat-platform-YYYY-MM-DD.json
+node src/cli.js discover:zhihu-platform --date YYYY-MM-DD --limit 20 --output .tmp/zhihu-platform-YYYY-MM-DD.json
+node src/cli.js discover:reddit-platform --date YYYY-MM-DD --limit 20 --output .tmp/reddit-platform-YYYY-MM-DD.json
 node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual --output .tmp/sources-health-YYYY-MM-DD.json
 ```
+
+- Treat WeChat/Zhihu/Reddit as low-threshold weak-signal lanes, not factual source shortcuts. Kill-switched or empty platform configs must produce auditable no-signal JSON rather than being silently skipped or backfilled with invented items.
 
 - Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
 
 ```powershell
-npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/wechat-platform-YYYY-MM-DD.json,.tmp/zhihu-platform-YYYY-MM-DD.json,.tmp/reddit-platform-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
@@ -92,6 +97,7 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 - Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
 - GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
 - Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`. The target public count is 5-20 when qualified candidates exist.
+- WeChat/Zhihu/Reddit platform-exempt items must render as disclosed weak-signal cards, not confirmed facts. Public cards may show concise reader-facing title, compact summary, source link, platform tag, date, and disclosure; they must not show `source_id`, `rule_id`, `source_level`, `verification_status`, `matched_terms`, `why_watch`, collection notes, feed-style machine titles, or long raw English excerpts.
 
 ## AI Quality Review And Repair
 
@@ -145,6 +151,7 @@ npm run build
 npm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
 ```
 - After build, inspect the affected daily HTML and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the lightbox on desktop and mobile.
+- If the affected page includes WeChat/Zhihu/Reddit sections, inspect the HTML or interaction input and confirm no platform card exposes `source_id`, `rule_id`, `source_level`, `verification_status`, `matched_terms`, `why_watch`, collection notes, or raw thread dumps.
 - Run the full gate before any real publish:
 
 ```powershell
