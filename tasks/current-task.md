@@ -8,7 +8,7 @@ non-trivial
 
 ### Goal
 
-完成这一轮 AI 日报内容升级，并基于新合同重新生成、验收、发布 `2026-06-09` 日报。
+修复这一轮 AI 日报内容升级在 `2026-06-09` 正式稿上的主线欠选问题，并基于修正后的合同重新生成、验收、发布 `2026-06-09` 日报。
 
 ### Authority
 
@@ -24,11 +24,12 @@ non-trivial
 ### Current Execution Target
 
 - `2026-06-08`：固定回归样本，只用于分支内逻辑回归、fixture 验证和预览验收。
-- `2026-06-09`：正式目标日报，只能在 latest `origin/main` clean checkout 上重新生成、验收和发布。
+- `2026-06-09`：已发布稿存在主新闻数量明显偏低的问题；修正后仍只能在 latest `origin/main` clean checkout 上重新生成、验收和发布。
 
 ### User-Visible Behavior
 
 - 主新闻不再写成“变化 / 落点 / 判断点 / why it matters / watch_next”模板，而是 `3-5` 条短 bullet，直接讲事实、范围、影响，并保留重点词高亮。
+- 官方产品 / 平台 / 开源深读，只要明确影响产品判断、工作流、成本、可用范围或企业接入路径，不能仅因为来源长得像 blog 就被默认压进“热门博客”或“社区线索”。
 - `hot_blogs` 对外统一显示为“热门博客”，内容边界扩到内容、产品、平台、策略、组织方法、访谈和高质量播客，不再局限“工程博客”。
 - Builder / X 卡片必须同时展示干净原文和完整中文，不混入点赞、回复、图片占位、按钮文案或网页壳信息。
 - `daily_tracking` 对 OpenRouter、Artificial Analysis 优先展示 `3-5` 张高信息密度图片；抓图失败时允许降级，但不把抓取过程写进公开页。
@@ -53,7 +54,7 @@ non-trivial
 ### Workstreams
 
 1. 主新闻改写合同
-   - `src/draft.js`：收紧候选升主规则，过滤低价值小发布、弱合作稿、轻运营更新、无能力边界变化的厂商小新闻。
+   - `src/draft.js`：收紧候选升主规则，过滤低价值小发布、弱合作稿、轻运营更新、无能力边界变化的厂商小新闻，同时把符合“官方产品 / 平台 / 开源深读”条件的条目补回主线。
    - `src/interaction-report.js`：主新闻公开形态固定为 `3-5` 条 bullet，不再渲染旧模板话术。
    - `src/quality-loop.js`：拦截“读者应重点看”“判断点”“把它当作信号”“后续继续跟踪”等模板腔。
 2. 热门博客扩边界
@@ -79,6 +80,7 @@ non-trivial
 ## Acceptance Criteria
 
 - 主新闻公开层全部是 `3-5` 条短 bullet，没有旧模板前缀和空判断句。
+- 当天存在多条官方产品 / 平台 / 开源动作时，`main_items` 不能被误筛到只剩 1 条；这类条目应优先进入主线，而不是被默认压到 `hot_blogs`。
 - “热门博客”在所有公开路径命名一致，摘要像内容提炼，不像推荐语。
 - Builder / X 卡片原文干净、中文完整，没有网页元信息噪音。
 - 社区线索是一行一条新闻流，保留图片，去掉同题重复和流程腔。
@@ -137,11 +139,17 @@ non-trivial
 - `feedback/p1-feedback-memory-self-check`
 
 本轮处理方式不是只改文案，而是同时收紧候选筛选、公开渲染、质量门和页面验收，避免主新闻模板腔、旧栏目名、Builder 噪音、社区流程腔和机器日志再次回流到公开页。
+这次新增回放的具体风险是：不能把大量官方产品 / 平台 / 开源条目因为“看起来像 blog”而误压到边栏，导致正式稿主新闻只剩 1 条。
 
 ## Regression Self-Check
 
+- 已执行 `node --test tests/unit.test.js --test-name-pattern "report:draft promotes official product and platform deep dives into main_items|report:draft prefers specific hot blog evidence over generic feed announcements"`，确认主线补回 RocketMQ / AgentScope，Nemotron 继续留在 `hot_blogs`。
+- 已执行 `node src/cli.js report:draft --date 2026-06-09 --input .tmp/publish-worktrees/main/.tmp/github-trending-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/builders-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/content-sources-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/statuspage-incidents-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/search-news-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/sources-health-2026-06-09.json --output .tmp/daily-report-2026-06-09.json --candidate-output .tmp/source-candidates-2026-06-09.json`，确认 `main_items` 从已发布稿的 `1` 条恢复到 `3` 条。
+- 已执行 `npm run quality:review -- .tmp/daily-report-2026-06-09.json .tmp/quality-review-2026-06-09.json .tmp/source-candidates-2026-06-09.json`，结果为 `status: ok`；当前只剩主新闻高亮密度 warning，不是阻塞项。
+
 - 本轮回归自检聚焦“用户已经指出的问题不能再次回流到公开日报”。
 - 检查 `src/draft.js`：低价值小新闻不过主线；社区线索去重并保持可读摘要。
+- 检查 `src/draft.js`：官方产品 / 平台 / 开源深读在具备明确工作流、成本、可用范围或接入影响时，可以进入 `main_items`，而不是被 `isBlogLikeCandidate()` 一刀误杀。
 - 检查 `src/interaction-report.js`：主新闻、热门博客、Builder / X、社区线索、Tracking 的公开形态都按新合同输出。
 - 检查 `src/evidence-cache.js`：已有本地图不重复抓取，并为 `community_leads` 预留证据图名额。
 - 检查 `src/page-checklist.js`：公开页远程图、旧口径、Tracking 图数、坏图和加载超时都有显式检查。
@@ -149,6 +157,14 @@ non-trivial
 - 检查正式发布门：最终日报必须回 latest `origin/main` clean checkout 重跑，不能在功能分支直接落正式产物。
 
 ## Red Test
+
+本轮新增红灯证据：
+
+```powershell
+node --test tests/unit.test.js --test-name-pattern "report:draft promotes official product and platform deep dives into main_items"
+```
+
+失败点是：`official NotebookLM product update should enter main_items`，证明旧规则会把该进主线的官方产品 / 平台深读误压到边栏。
 
 实现前先以固定样本和既有失败点做红灯约束：
 

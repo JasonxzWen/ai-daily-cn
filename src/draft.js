@@ -1683,21 +1683,63 @@ function canPromoteToMain(candidate, reportDate = "") {
   const sourceLevel = sourceLevelForCandidate(candidate);
   const readerRelevant = isReaderRelevantCandidate(candidate);
   const majorMainNews = isMajorMainNewsCandidate(candidate);
+  const officialBlogMainline = isOfficialBlogMainlineCandidate(candidate);
   if (!hasReaderVisibleTitle(candidate)) return false;
   if (isFutureDatedCandidate(candidate, reportDate)) return false;
   const allowReaderRelevantCompanySignal =
     readerRelevant &&
     (sourceLevel === "official_company_news" || (majorMainNews && TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel)));
-  if (!isAiRelevantCandidate(candidate) && !isAigcCandidate(candidate) && !allowReaderRelevantCompanySignal) return false;
+  if (!isAiRelevantCandidate(candidate) && !isAigcCandidate(candidate) && !allowReaderRelevantCompanySignal && !officialBlogMainline) return false;
   if (!readerRelevant) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
   if (isLowSignalVendorPartnership(candidate)) return false;
-  if (isBlogLikeCandidate(candidate) && !majorMainNews && !READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel)) return false;
+  if (isBlogLikeCandidate(candidate) && !majorMainNews && !READER_RELEVANT_SOURCE_LEVELS.has(sourceLevel) && !officialBlogMainline) return false;
   if (candidate.category === "hot_blog" && !["official", "paper", "github", "multi_source"].includes(sourceLevel)) {
     return false;
   }
   const trustedSourceLevel = TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel);
   return trustedSourceLevel && (!candidate.verification_status || PRIMARY_STATUSES.has(candidate.verification_status));
+}
+
+function isOfficialBlogMainlineCandidate(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (sourceLevel !== "official") return false;
+  if (!isBlogLikeCandidate(candidate)) return false;
+  if (!hasPlainReaderSignal(candidate)) return false;
+  if (!hasConcreteHotBlogMaterial(candidate)) return false;
+  if (isLowValueMainCandidate(candidate)) return false;
+  if (isMinorConsumerAiFeatureCandidate(candidate)) return false;
+  if (isLowSignalVendorPartnership(candidate)) return false;
+
+  const category = candidate.editorial_category || inferredEditorialCategory(candidate);
+  const mainlineText = `${candidate.title || ""} ${candidate.evidence || ""} ${candidate.summary || ""}`.toLowerCase();
+  const titleText = `${candidate.title || ""}`.toLowerCase();
+  const negatedSurfaceRe = /\b(no|not|without|rather than)\b.{0,48}\b(product|availability|launch|release|pricing|rollout|feature|update)\b/;
+  const platformSignalRe = /\b(workflow|developer|enterprise|availability|pricing|quota|open source|session|platform|cloud|app|service|product|launch|rollout|api|sdk|hosting|hosted|permissions?|reliability|framework|feature|version|production-ready|runtime|workspace|gateway|observability|microvm|cloud computer|source finding|version history|cli|litetopic|agentcore)\b|工作流|开发者|企业|可用|价格|配额|开源|会话|平台|云|产品|上线|接口|权限|可靠性|框架|功能|版本|生产可用|运行时|工作区|观测|版本历史/u;
+  const concreteSurfaceRe = /\b(adds?|added|ships?|shipped|launch(?:es|ed)?|release[sd]?|roll(?:s|ed)? out|available|availability|pricing|quota|supports?|supporting|hosting|hosted|permissions?|reliability|framework|feature|features|version|production-ready|runtime|workspace|gateway|observability|microvm|persistent workspace|tool access|open source|cloud computer|source finding|version history|session persistence|litetopic|agentcore|v\d+(?:\.\d+)+|\d+\.\d+)\b|新增|发布|上线|可用|价格|配额|支持|托管|权限|可靠性|框架|功能|版本|生产可用|运行时|工作区|观测|开源|版本历史/u;
+  const abstractEssayTitleRe = /\b(dilemma|how to|guide|lessons?|tips|analysis|overview|improvement|best practices?)\b|困境|指南|经验|技巧|分析|概览|优化|最佳实践/u;
+  const deepDiveOnlyRe = /\b(reasoning|benchmark|inference|throughput|latency|accuracy|eval|evaluation|ablation|reasoning quality|efficiency details?|ontology|dependency modeling|token consumption)\b|推理|评测|基准|吞吐|延迟|准确率|消融|依赖建模|token 成本/u;
+  const allowedCategories = new Set(["company_business", "product_radar", "open_source", "engineering_toolchain", "content_aigc", "ai_industry"]);
+
+  if (!allowedCategories.has(category) && !PRODUCT_PLATFORM_RE.test(mainlineText)) {
+    return false;
+  }
+  if (negatedSurfaceRe.test(mainlineText) && !/(launch(?:es|ed)?|release[sd]?|available now|now available|pricing starts?|roll(?:s|ed)? out|open[-\s]?source[sd]?)/.test(mainlineText)) {
+    return false;
+  }
+  if (!platformSignalRe.test(mainlineText)) {
+    return false;
+  }
+  if (!concreteSurfaceRe.test(mainlineText)) {
+    return false;
+  }
+  if (abstractEssayTitleRe.test(titleText) && !/(availability|pricing|quota|platform|service|api|sdk|hosting|hosted|framework|feature|version|open source|cloud computer|source finding|version history|litetopic|agentcore|可用|价格|配额|平台|服务|接口|托管|框架|功能|版本|开源|版本历史)/u.test(mainlineText)) {
+    return false;
+  }
+  if (deepDiveOnlyRe.test(mainlineText) && !/(workflow|availability|pricing|quota|session|platform|service|api|sdk|hosting|hosted|permissions?|reliability|framework|feature|version|production-ready|cloud computer|source finding|version history|cli|agentcore|litetopic|工作流|可用|价格|配额|会话|平台|服务|接口|托管|权限|可靠性|框架|功能|版本|生产可用|版本历史)/u.test(mainlineText)) {
+    return false;
+  }
+  return true;
 }
 
 function canFallbackToSingleMain(candidate) {
@@ -2057,6 +2099,7 @@ function isMajorMainNewsCandidate(candidate) {
   const text = candidateText(candidate).toLowerCase();
   const sourceText = `${candidate.source || ""} ${candidate.source_id || ""}`.toLowerCase();
   const sourceLevel = sourceLevelForCandidate(candidate);
+  const negatedSurfaceRe = /\b(no|not|without|rather than)\b.{0,48}\b(product|availability|launch|release|pricing|rollout|feature|update)\b/;
   if (isLowSignalVendorPartnership(candidate)) {
     return false;
   }
@@ -2068,6 +2111,9 @@ function isMajorMainNewsCandidate(candidate) {
   }
   if (/newsroom|news rss|anthropic news|media center|press/.test(sourceText) && (COMPANY_ACTION_RE.test(text) || PRODUCT_PLATFORM_RE.test(text))) {
     return true;
+  }
+  if (negatedSurfaceRe.test(text) && !/(launch(?:es|ed)?|release[sd]?|available now|now available|pricing starts?|roll(?:s|ed)? out|open[-\s]?source[sd]?)/.test(text)) {
+    return false;
   }
   return /spyware|phishing|security|attack|vulnerability|lawsuit|ban|policy|regulation|government|prime minister|minister|sovereign ai|annual general meeting|earnings|revenue|profit|layoffs?|reorganization|funding|acquisition|ipo|pricing|availability|rollout|launch|restores? access|service disruption|conference|summit|keynote|wwdc/i.test(text);
 }
