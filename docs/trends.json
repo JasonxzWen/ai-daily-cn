@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T10:08:51.729Z",
+  "generated_at": "2026-06-08T16:43:09.138Z",
   "window_days": 7,
   "source": {
-    "report_count": 26,
-    "date_from": "2026-06-02",
-    "date_to": "2026-06-08"
+    "report_count": 27,
+    "date_from": "2026-06-03",
+    "date_to": "2026-06-09"
   },
   "thresholds": {
     "watching": {
@@ -32,7 +32,7 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 26,
+      "occurrences": 22,
       "active_days": 7,
       "sections": [
         "builder_observations",
@@ -43,7 +43,6 @@
       ],
       "entities": [
         "Anthropic",
-        "AWS",
         "Claude Code",
         "Codex",
         "GitHub",
@@ -51,89 +50,53 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-06-02",
         "2026-06-03",
         "2026-06-04",
         "2026-06-05",
         "2026-06-06",
         "2026-06-07",
-        "2026-06-08"
+        "2026-06-08",
+        "2026-06-09"
       ],
       "related_reports": [
-        "2026-06-02",
         "2026-06-03",
         "2026-06-04",
         "2026-06-05",
         "2026-06-06",
         "2026-06-07",
-        "2026-06-08"
-      ]
-    },
-    {
-      "id": "mcp",
-      "label": "MCP",
-      "status": "watching",
-      "occurrences": 3,
-      "active_days": 2,
-      "sections": [
-        "github_trending",
-        "main_items",
-        "projects"
-      ],
-      "entities": [
-        "AWS",
-        "GitHub"
-      ],
-      "dates": [
-        "2026-06-02",
-        "2026-06-03"
-      ],
-      "related_reports": [
-        "2026-06-02",
-        "2026-06-03"
-      ]
-    },
-    {
-      "id": "enterprise-agent-governance",
-      "label": "enterprise agent governance",
-      "status": "watching",
-      "occurrences": 2,
-      "active_days": 2,
-      "sections": [
-        "github_trending",
-        "hot_blogs"
-      ],
-      "entities": [
-        "Claude Code",
-        "Codex",
-        "GitHub"
-      ],
-      "dates": [
-        "2026-06-02",
-        "2026-06-03"
-      ],
-      "related_reports": [
-        "2026-06-02",
-        "2026-06-03"
+        "2026-06-08",
+        "2026-06-09"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "github",
-      "occurrences": 113,
+      "occurrences": 112,
       "active_days": 7,
       "display": false
     },
     {
       "term": "with",
-      "occurrences": 106,
+      "occurrences": 112,
       "active_days": 7,
       "display": false
     },
     {
       "term": "trending",
       "occurrences": 92,
+      "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "appeared",
+      "occurrences": 91,
+      "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "appeared github",
+      "occurrences": 91,
       "active_days": 7,
       "display": false
     },
@@ -145,25 +108,19 @@
     },
     {
       "term": "stars",
-      "occurrences": 90,
+      "occurrences": 91,
+      "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "with stars",
+      "occurrences": 91,
       "active_days": 7,
       "display": false
     },
     {
       "term": "today",
-      "occurrences": 89,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "appeared",
-      "occurrences": 88,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "appeared github",
-      "occurrences": 88,
+      "occurrences": 90,
       "active_days": 7,
       "display": false
     },
@@ -174,20 +131,14 @@
       "display": false
     },
     {
-      "term": "with stars",
-      "occurrences": 88,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "agent",
-      "occurrences": 86,
+      "term": "daily with",
+      "occurrences": 87,
       "active_days": 7,
       "display": false
     },
     {
       "term": "stars today",
-      "occurrences": 86,
+      "occurrences": 87,
       "active_days": 7,
       "display": false
     },
@@ -198,15 +149,27 @@
       "display": false
     },
     {
-      "term": "daily with",
-      "occurrences": 84,
+      "term": "agent",
+      "occurrences": 78,
       "active_days": 7,
       "display": false
     },
     {
       "term": "all",
-      "occurrences": 72,
+      "occurrences": 73,
       "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "top",
+      "occurrences": 66,
+      "active_days": 5,
+      "display": false
+    },
+    {
+      "term": "trending top",
+      "occurrences": 65,
+      "active_days": 5,
       "display": false
     },
     {
@@ -216,26 +179,14 @@
       "display": false
     },
     {
-      "term": "commit",
-      "occurrences": 55,
-      "active_days": 7,
-      "display": false
-    },
-    {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 54,
+      "occurrences": 53,
       "active_days": 7,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 54,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "是否有",
-      "occurrences": 54,
+      "occurrences": 53,
       "active_days": 7,
       "display": false
     }
@@ -1556,6 +1507,10 @@
       "github_trending": []
     },
     "2026-06-08": {
+      "main_items": [],
+      "github_trending": []
+    },
+    "2026-06-09": {
       "main_items": [],
       "github_trending": []
     }
