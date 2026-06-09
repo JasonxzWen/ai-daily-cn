@@ -2,13 +2,16 @@
 
 ## Current State
 
-- Active goal: finish the content-upgrade rollout, then regenerate, verify, PR, and publish the `2026-06-09` daily report.
-- Branch state: `codex/daily-content-upgrade`.
+- Active goal: hotfix the `2026-06-09` mainline under-selection bug, then PR, merge, and republish the daily report from latest `origin/main`.
+- Branch state: `codex/hotfix-mainline-selection`.
 - Regression sample: branch logic and preview acceptance use the fixed `2026-06-08` clean-main discovery inputs.
 - Release gate: final `report:write` / publish is still blocked on this branch because the repository requires latest `origin/main`.
 
 ## Completed
 
+- Fixed the `src/draft.js` mainline gate so official product / platform / open-source deep dives can re-enter `main_items` when they carry concrete workflow, capability, availability, cost, or integration changes.
+- Added a focused regression in `tests/unit.test.js` for official blog candidates that should promote to `main_items`, while keeping pure model deep dives in `hot_blogs`.
+- Re-generated the fixed `2026-06-09` draft from the clean-main discovery inputs and restored `main_items` from `1` to `3`.
 - Rewrote `tasks/current-task.md` into a smaller executable spec and re-passed `node scripts/harness-validate.mjs`.
 - Kept the rollout aligned with:
   - `prompts/ai-daily/modules/editorial-authority.md`
@@ -45,11 +48,15 @@
 | `npm run quality:page-check -- 2026-06-08 .tmp/preview-site-2026-06-08 .tmp/page-check-2026-06-08-preview.json` | pass | Desktop and mobile both pass: 3-5 tracking images, local-only media, no old copy, no horizontal overflow. |
 | Playwright preview acceptance on `.tmp/preview-site-2026-06-08/reports/2026/06/2026-06-08.html` | pass | Desktop screenshot confirms “热门博客”, no old labels, two tracking cards each with 5 images; mobile screenshot confirms no horizontal overflow and the same section structure. |
 | `npm run validate` | pass | Full repository validation passed after the latest task-state updates and preview-flow checks. |
+| `node --test tests/unit.test.js --test-name-pattern "report:draft promotes official product and platform deep dives into main_items|report:draft prefers specific hot blog evidence over generic feed announcements"` | pass | Hotfix regression confirms RocketMQ / AgentScope can return to mainline while Nemotron stays in hot blogs. |
+| `node src/cli.js report:draft --date 2026-06-09 --input .tmp/publish-worktrees/main/.tmp/github-trending-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/builders-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/content-sources-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/statuspage-incidents-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/search-news-2026-06-09.json,.tmp/publish-worktrees/main/.tmp/sources-health-2026-06-09.json --output .tmp/daily-report-2026-06-09.json --candidate-output .tmp/source-candidates-2026-06-09.json` | pass | Hotfix draft regenerated with `main_items: 3`, `hot_blogs: 3`, `community_leads: 8`. |
+| `npm run quality:review -- .tmp/daily-report-2026-06-09.json .tmp/quality-review-2026-06-09.json .tmp/source-candidates-2026-06-09.json` | pass | Review status is `ok`; only highlight-density warnings remain. |
+| `npm run report:write -- .tmp/daily-report-2026-06-09.json reports-data 2026-06-09` | blocked (expected) | Blocked by `automation_revision_gate_failed` because the branch is not latest `origin/main`; confirms final publish must continue after PR/merge. |
 
 ## Pending
 
-- Update git metadata files and commit the branch changes.
-- Push `codex/daily-content-upgrade` and open a PR.
+- Commit the hotfix branch changes.
+- Push `codex/hotfix-mainline-selection` and open a PR.
 - Merge the PR so the new logic exists on latest `origin/main`.
 - From a clean publish checkout on latest `origin/main`, generate and publish the real `2026-06-09` report:
   - discovery commands

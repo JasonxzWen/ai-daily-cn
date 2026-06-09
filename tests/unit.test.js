@@ -6046,12 +6046,21 @@ test("report:draft prefers specific hot blog evidence over generic feed announce
     cacheEvidence: false
   });
 
-  const titles = drafted.report.hot_blogs.map((item) => item.title);
-  assert.deepEqual(titles, [
-    "RocketMQ 5.5.0 新增 LiteTopic，专门处理百万级 AI agent 会话",
-    "AgentScope Java 2.0 补齐分布式和生产可用能力，继续往企业级 agent 框架走",
-    "这篇文章讨论企业 agent 怎么降 token 成本，重点是先建依赖关系再减无效上下文"
-  ]);
+  const rocketmqUrl = "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233";
+  const tokenmaxxingUrl = "https://www.alibabacloud.com/blog/tokenmaxxing-dilemma-are-there-immediate-solutions-for-improvement_603232";
+  const agentscopeUrl = "https://www.alibabacloud.com/blog/agentscope-java-2-0-building-a-distributed-enterprise-grade-foundation-for-ai-agents_603231";
+  const genericOneUrl = "https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-sim-v3";
+  const genericTwoUrl = "https://huggingface.co/blog/openenv-agentic-rl";
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  const hotUrls = new Set(drafted.report.hot_blogs.map((item) => item.url));
+  const selectedUrls = new Set([...mainUrls, ...hotUrls]);
+
+  assert(selectedUrls.has(rocketmqUrl), "specific RocketMQ write-up should survive public selection");
+  assert(selectedUrls.has(agentscopeUrl), "specific AgentScope write-up should survive public selection");
+  assert(hotUrls.has(tokenmaxxingUrl), "method essay should remain available in hot_blogs");
+  assert(!mainUrls.has(tokenmaxxingUrl), "method essay should not crowd main_items");
+  assert(!selectedUrls.has(genericOneUrl), "generic feed announcement should be filtered out");
+  assert(!selectedUrls.has(genericTwoUrl), "generic feed announcement should be filtered out");
 });
 
 test("report:draft filters unreadable blog titles and low-signal community leads", async () => {
@@ -6672,6 +6681,98 @@ test("report:draft favors plain-reader utility over hardcore research details", 
     assert.match(item.description, /(?:进入|进了) GitHub Trending Top 10/);
     assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
   }
+});
+
+test("report:draft promotes official product and platform deep dives into main_items", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-mainline-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const notebooklmUrl = "https://blog.google/innovation-and-ai/products/notebooklm/better-research-notebooklm/";
+  const agentcoreUrl = "https://aws.amazon.com/blogs/machine-learning/its-safe-to-close-your-laptop-now-hosting-coding-agents-on-amazon-bedrock-agentcore/";
+  const rocketmqUrl = "https://www.alibabacloud.com/blog/apache-rocketmq-5-5-0-open-source-litetopic-dedicated-channel-for-millions-of-ai-sessions_603233";
+  const nemotronUrl = "https://developer.nvidia.com/blog/nvidia-nemotron-3-ultra-powers-faster-more-efficient-reasoning-for-long-running-agents/";
+
+  discovery.candidates = [
+    {
+      id: "notebooklm-product-upgrade",
+      source_id: "content-google-keyword-blog",
+      category: "community_lead",
+      title: "Do better research with NotebookLM",
+      url: notebooklmUrl,
+      source: "Google Keyword Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Google post explains NotebookLM adds a cloud computer, better source finding, and workflow changes for research users.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: notebooklmUrl,
+      verification_sources: [notebooklmUrl]
+    },
+    {
+      id: "agentcore-hosted-coding-agents",
+      source_id: "content-aws-machine-learning-blog",
+      category: "hot_blog",
+      title: "It’s safe to close your laptop now: Hosting coding agents on Amazon Bedrock AgentCore",
+      url: agentcoreUrl,
+      source: "AWS Machine Learning Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official AWS post details how Bedrock AgentCore hosts long-running coding agents in the cloud, with workflow, permissions, and reliability implications for developers.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: agentcoreUrl,
+      verification_sources: [agentcoreUrl]
+    },
+    {
+      id: "rocketmq-litetopic-mainline",
+      source_id: "content-alibaba-cloud-blog",
+      category: "hot_blog",
+      title: "Apache RocketMQ 5.5.0 Open Source LiteTopic: Dedicated Channel for Millions of AI Sessions",
+      url: rocketmqUrl,
+      source: "Alibaba Cloud Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official Alibaba Cloud post explains LiteTopic, session isolation, and event distribution for million-scale AI agent sessions in production.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: rocketmqUrl,
+      verification_sources: [rocketmqUrl]
+    },
+    {
+      id: "nemotron-deep-dive-stays-blog",
+      source_id: "content-nvidia-developer-blog",
+      category: "hot_blog",
+      title: "NVIDIA Nemotron 3 Ultra Powers Faster, More Efficient Reasoning for Long-Running Agents",
+      url: nemotronUrl,
+      source: "NVIDIA Developer Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official NVIDIA post focuses on long-running agent reasoning quality and efficiency details rather than a new public product or availability change.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: nemotronUrl,
+      verification_sources: [nemotronUrl]
+    }
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  const hotBlogUrls = new Set(drafted.report.hot_blogs.map((item) => item.url));
+
+  assert(mainUrls.has(notebooklmUrl), "official NotebookLM product update should enter main_items");
+  assert(mainUrls.has(agentcoreUrl), "official Bedrock AgentCore workflow update should enter main_items");
+  assert(mainUrls.has(rocketmqUrl), "official RocketMQ workflow infrastructure update should enter main_items");
+  assert(!mainUrls.has(nemotronUrl), "pure model deep dive should not automatically crowd main_items");
+  assert(hotBlogUrls.has(nemotronUrl), "pure model deep dive should remain available in hot_blogs");
 });
 
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
