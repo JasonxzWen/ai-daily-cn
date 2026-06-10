@@ -6,14 +6,15 @@ const PROMPT_MANIFEST = "prompts/ai-daily/manifest.json";
 
 export const AUTOMATION_REVISION_RULES = [
   "main_items_min_8_when_candidates_available",
-  "content_units_min_27_when_candidates_available",
+  "content_units_min_45_when_candidates_available",
   "model_releases_must_mirror_main_items",
   "github_api_fallback_for_git_transport",
   "fixed_source_checklist"
 ];
 
 export const AUTOMATION_REVISION_RULE_ALIASES = {
-  content_units_min_27_when_candidates_available: [
+  content_units_min_45_when_candidates_available: [
+    "content_units_min_27_when_candidates_available",
     "content_units_min_18_when_candidates_available"
   ]
 };

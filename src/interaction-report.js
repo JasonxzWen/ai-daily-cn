@@ -613,6 +613,7 @@ function formatMainItem(item, context = {}) {
   const title = markdownLink(item.url, mainItemTitle(item), { icon: mainItemIconFor(item), iconLabel: item.source });
   const trendTags = formatHighlightTags([
     importanceTagFor("main_items", item),
+    sourceTrustHighlightTag(item),
     ...trendTagsFor(context.trendAnnotations, "main_items", context.originalIndex)
   ].filter(Boolean));
   const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url), context.mediaOptions);
@@ -685,6 +686,7 @@ function formatGithubTrending(items, context = {}) {
       const tag = githubTrendStatusHighlightTag(item);
       const tagText = formatHighlightTags([
         importanceTagFor("github_trending", item),
+        sourceTrustHighlightTag(item),
         tag,
         githubStarsTag(item),
         ...(project ? projectHeatTags(project) : []),
@@ -1188,7 +1190,11 @@ function formatHotBlogCards(items, context = {}) {
       titleIcon: siteIconForUrl(item.url, item.publisher || item.title),
       body,
       showGroup: false,
-      tags: [cardTag(importanceTagFor("hot_blogs", item)), ...hotBlogTags(item).map((tag) => cardTag(tag, "topic"))].filter(Boolean),
+      tags: [
+        cardTag(importanceTagFor("hot_blogs", item)),
+        sourceTrustCardTag(item),
+        ...hotBlogTags(item).map((tag) => cardTag(tag, "topic"))
+      ].filter(Boolean),
       points: [
         ...points.map((value, index) => ({ label: `要点 ${index + 2}`, value })),
         ...editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false })
@@ -1215,6 +1221,7 @@ function formatBuilderObservationCards(items, report, context = {}) {
       showGroup: false,
       tags: [
         cardTag(importanceTagFor("builder_observations", item)),
+        sourceTrustCardTag(item),
         item.role ? cardTag(item.role, "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
@@ -1340,28 +1347,76 @@ function hasNonPrimarySourceSignal(item = {}) {
 function sourceLevelLabel(value) {
   const labels = {
     platform_exempt_signal: "平台豁免线索",
-    primary: "一手来源",
-    official: "官方来源",
+    primary: "已核查事实",
+    official: "官方一手来源",
     paper: "论文/研究来源",
     github: "GitHub/仓库来源",
-    multi_source: "多源确认",
-    intermediary: "中介/媒体线索",
+    multi_source: "已核查事实",
+    intermediary: "第三方报道",
     community: "社区线索",
     original_social: "原始社交动态",
-    unverified: "未核验线索",
-    wechat_primary_like: "白名单公众号/近一手",
-    wechat_industry_whitelist: "白名单公众号/行业线索",
+    unverified: "社区线索",
+    wechat_primary_like: "官方一手来源",
+    wechat_industry_whitelist: "第三方报道",
     weekly_paper_aggregator: "论文周报聚合",
     open_source_aggregator: "开源聚合",
-    tech_weekly_aggregator: "技术周报聚合",
+    tech_weekly_aggregator: "第三方报道",
     paper_api: "论文 API",
-    community_api: "社区 API",
+    community_api: "社区线索",
     paper_aggregator: "论文聚合",
-    ai_news_aggregator: "AI 新闻聚合",
-    aigc_content_industry: "AIGC 内容产业线索",
-    ai_funding_product_radar: "融资/产品雷达线索"
+    ai_news_aggregator: "第三方报道",
+    aigc_content_industry: "第三方报道",
+    ai_funding_product_radar: "第三方报道"
   };
   return labels[value] || String(value || "").trim();
+}
+
+function sourceTrustLabel(item = {}) {
+  const sourceLevel = String(item?.source_level || "").trim();
+  const status = String(item?.verification_status || "").trim();
+  const sourceText = `${item?.source || ""} ${item?.url || ""}`.toLowerCase();
+  if (status === "multi_source_confirmed" || sourceLevel === "multi_source") return "已核查事实";
+  if (sourceLevel === "official" || sourceLevel === "official_company_news" || sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account") return "官方一手来源";
+  if (status === "primary_confirmed" || sourceLevel === "primary") return "已核查事实";
+  if (sourceLevel === "paper" || sourceLevel === "paper_api") return "论文/研究来源";
+  if (sourceLevel === "github") return "GitHub/仓库来源";
+  if (sourceLevel === "original_social" || status === "original_social_only") return "原始社交动态";
+  if (sourceLevel === "platform_exempt_signal" || status === "platform_exempt_unverified") return "平台线索";
+  if (status === "intermediary_only" || isThirdPartySourceLevel(sourceLevel)) return "第三方报道";
+  if (status === "unverified" || sourceLevel === "community" || sourceLevel === "community_api") return "社区线索";
+  if (sourceText.includes("github.com") || sourceText.includes("github trending")) return "GitHub/仓库来源";
+  if (sourceText.includes("x.com/") || sourceText.includes("twitter.com/")) return "原始社交动态";
+  return sourceLevelLabel(sourceLevel);
+}
+
+function isThirdPartySourceLevel(value) {
+  return [
+    "intermediary",
+    "wechat_industry_whitelist",
+    "weekly_paper_aggregator",
+    "open_source_aggregator",
+    "tech_weekly_aggregator",
+    "paper_aggregator",
+    "ai_news_aggregator",
+    "aigc_content_industry",
+    "ai_funding_product_radar"
+  ].includes(String(value || "").trim());
+}
+
+function sourceTrustKind(item = {}) {
+  const label = sourceTrustLabel(item);
+  if (["第三方报道", "社区线索", "平台线索"].includes(label)) return "risk";
+  return "source";
+}
+
+function sourceTrustCardTag(item = {}) {
+  const label = sourceTrustLabel(item);
+  return label ? cardTag(label, sourceTrustKind(item)) : "";
+}
+
+function sourceTrustHighlightTag(item = {}) {
+  const label = sourceTrustLabel(item);
+  return label ? `tag-${sourceTrustKind(item)}|${label}` : "";
 }
 
 function formatCardMedia(report, assets, options = {}) {
@@ -1802,7 +1857,7 @@ function formatCommunityLeadCards(items, context = {}) {
       showGroup: false,
       tags: [
         cardTag(importanceTagFor("community_leads", item)),
-        item.source_level ? cardTag(sourceLevelLabel(item.source_level), "topic") : "",
+        sourceTrustCardTag(item),
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
       points: [],
@@ -1829,7 +1884,7 @@ function formatPlatformExemptCards(items, sectionName, context = {}) {
       tags: [
         cardTag(importanceTagFor(sectionName, item)),
         cardTag(platformItemLabel(platform), "topic"),
-        cardTag("平台线索", "risk"),
+        sourceTrustCardTag(item) || cardTag("平台线索", "risk"),
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
       points: [

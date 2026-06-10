@@ -14,12 +14,12 @@ export const STRICT_COVERAGE_EFFECTIVE_DATE = "2026-06-02";
 export const SECTION_MINIMUMS = {
   main_items: 8,
   github_trending: 10,
-  hot_blogs: 3,
-  projects: 3,
-  builder_observations: 5
+  hot_blogs: 6,
+  projects: 8,
+  builder_observations: 8
 };
 
-export const CONTENT_UNIT_MINIMUM = 27;
+export const CONTENT_UNIT_MINIMUM = 45;
 export const STRICT_CONTENT_SOURCE_MINIMUM = 50;
 export const STRICT_SOURCE_REGISTRY_MINIMUM = 60;
 export const STRICT_GITHUB_TRENDING_SOURCE_MINIMUM = 10;
