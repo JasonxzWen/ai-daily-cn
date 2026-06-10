@@ -324,6 +324,24 @@ try {
   const reportBody = await page.locator("body").textContent();
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
+  await page.evaluate(() => {
+    const section = document.createElement("section");
+    section.setAttribute("data-test-public-engineering-term", "ledger");
+    section.textContent = "Auto-FL uses an experiment ledger to keep research runs comparable.";
+    document.body.append(section);
+  });
+  const publicLedgerTermChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(publicLedgerTermChecklist.ok, true, JSON.stringify(publicLedgerTermChecklist.issues, null, 2));
+  await page.evaluate(() => {
+    const section = document.createElement("section");
+    section.setAttribute("data-test-public-debug-leak", "source_audit");
+    section.textContent = "source_audit should never render as public reader content.";
+    document.body.append(section);
+  });
+  const debugFieldChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(debugFieldChecklist.ok, false);
+  assert(debugFieldChecklist.issues.some((issue) => issue.id === "public_debug_sections_absent"));
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   assert.doesNotMatch(reportBody, /模型发布/);
   assert.doesNotMatch(reportBody, /ExampleModel 2/);
   assert.equal(await page.locator("#model-releases").count(), 0);
