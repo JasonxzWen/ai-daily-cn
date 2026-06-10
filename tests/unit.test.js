@@ -8956,7 +8956,7 @@ test("report:write rejects expanded main items with templated prose or thin deta
   );
 });
 
-test("report:write accepts expanded main items with two compact factual bullets", async () => {
+test("report:write accepts expanded main items with three compact factual bullets", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseItem = draft.main_items[0];
@@ -8972,7 +8972,8 @@ test("report:write accepts expanded main items with two compact factual bullets"
       url,
       bullets: [
         `**Fixture ${index + 1}** confirms a concrete product or platform update for readers.`,
-        `==keyword-notable|边界== ${index + 1}：这条信息说明接入方式、可用范围或限制条件。`
+        `==keyword-notable|边界== ${index + 1}：这条信息说明接入方式、可用范围或限制条件。`,
+        `**Fixture ${index + 1} detail** records another factual line about availability, pricing, benchmark, or deployment scope.`
       ]
     };
   });

@@ -324,8 +324,8 @@ function requireExpandedMainItemFormat(report) {
     const summary = String(item.summary || "").trim();
     const factLines = [summary, ...bullets].map((line) => line.trim()).filter(Boolean);
     const text = factLines.join("\n");
-    if (factLines.length < 2 || factLines.length > 3) {
-      errors.push(`main_items[${index}] must contain 2-3 compact factual lines plus title/link`);
+    if (factLines.length < 2 || factLines.length > 4) {
+      errors.push(`main_items[${index}] must contain 2-4 compact factual lines plus title/link`);
     }
     if (!/\*\*[^*]+\*\*/.test(text) && !/==[^=\n]+==/.test(text)) {
       errors.push(`main_items[${index}] missing emphasis`);
