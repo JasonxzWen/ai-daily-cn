@@ -441,9 +441,11 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Hot blog cards should render as reader-facing Chinese analysis with 3-5 readable points, not untranslated excerpts or thin summaries.",
       { weak_cards: weakBlogCards }
     );
+    const internalDebugPattern =
+      /信源审计|自检与产物|发布质量说明|Source status|候选\s*\/\s*入选|source_audit|self_check|candidate_pool|feedback-ledger|config\/feedback-ledger\.json|Feedback Ledger Review|Regression Self-Check|降级项/;
     const publicDebugSections = Array.from(document.querySelectorAll("section, details, nav a"))
       .map((node) => node.textContent?.replace(/\s+/g, " ").trim() || "")
-      .filter((text) => /信源审计|自检与产物|发布质量说明|Source status|候选\s*\/\s*入选|source_audit|ledger|降级项/.test(text));
+      .filter((text) => internalDebugPattern.test(text));
     addCheck(
       "public_debug_sections_absent",
       publicDebugSections.length === 0,
