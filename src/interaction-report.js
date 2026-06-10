@@ -626,7 +626,7 @@ function formatMainItem(item, context = {}) {
     ...trendTagsFor(context.trendAnnotations, "main_items", context.originalIndex)
   ].filter(Boolean));
   const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url), context.mediaOptions);
-  return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}，${item.tier}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+  return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
 }
 
 function mainItemPublicFacts(item) {
