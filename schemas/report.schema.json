@@ -753,6 +753,15 @@
           "type": "string",
           "minLength": 1
         },
+        "key_points": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "content_type": {
           "enum": ["blog", "interview", "podcast", "engineering_note"]
         },

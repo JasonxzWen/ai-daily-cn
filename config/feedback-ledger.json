@@ -456,6 +456,35 @@
         "test_name": "report:draft expands public signal coverage beyond strict factual sections",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-editorial-importance-density-source-visibility",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Preserve editorial importance, blog density, and source gap visibility",
+      "problem": "Daily reports could miss the original model launch, split channel availability into separate main stories, render one-line hot blog summaries, recycle low-utility vendor PR, and hide WeChat/Zhihu source gaps from the public page.",
+      "expected_behavior": "Original model/provider launches outrank duplicate channel availability; channel availability is folded into the original story. Hot blogs expose 3-5 concrete public key points. Recent duplicate or low-utility vendor PRs are excluded or downgraded. Public daily pages show source coverage gaps for WeChat, Zhihu, Reddit/X, Builder, and content sources without exposing internal candidate pools or debug appendices.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "prompts/ai-daily/modules/source-policy.md",
+        "prompts/ai-daily/modules/structured-report-json.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "src/quality-loop.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "report:draft promotes original Anthropic Fable/Mythos launch over platform availability duplicates",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

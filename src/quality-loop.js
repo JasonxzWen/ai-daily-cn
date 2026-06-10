@@ -35,7 +35,10 @@ const AUTO_DRAFT_TEMPLATE_PHRASES = [
 ];
 
 const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
-const HOT_BLOG_SUMMARY_MAX_LENGTH = 260;
+const HOT_BLOG_SUMMARY_MAX_LENGTH = 520;
+const HOT_BLOG_MIN_POINTS = 3;
+const HOT_BLOG_MAX_POINTS = 5;
+const HOT_BLOG_MIN_POINT_LENGTH = 18;
 const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
 const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
@@ -77,6 +80,7 @@ const PUBLIC_TEXT_FIELDS = [
   ["main_items", "*", "watch_next"],
   ["hot_blogs", "*", "title"],
   ["hot_blogs", "*", "summary"],
+  ["hot_blogs", "*", "key_points", "*"],
   ["hot_blogs", "*", "reader_relevance"],
   ["hot_blogs", "*", "verification_note"],
   ["hot_blogs", "*", "risk_note"],
@@ -108,6 +112,7 @@ const REPAIRABLE_PUBLIC_TEXT_PATTERNS = [
   /^main_items\[\d+\]\.(?:title|summary|why_it_matters|reader_relevance|verification_note|risk_note|watch_next)$/,
   /^main_items\[\d+\]\.bullets\[\d+\]$/,
   /^hot_blogs\[\d+\]\.(?:title|summary|reader_relevance|verification_note|risk_note|watch_next)$/,
+  /^hot_blogs\[\d+\]\.key_points\[\d+\]$/,
   /^projects\[\d+\]\.(?:description|use_case|reader_relevance|verification_note|risk_note|watch_next)$/,
   /^github_trending\[\d+\]\.description$/,
   /^builder_observations\[\d+\]\.(?:translation|content|reader_relevance|verification_note|risk_note|watch_next)$/,
@@ -333,7 +338,7 @@ function collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks) {
 }
 
 function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|main_items\[\d+\]\.(?:summary|bullets\[\d+\])|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.summary|github_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:summary|bullets\[\d+\])|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.(?:summary|key_points\[\d+\])|github_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   if (!PUBLIC_TEMPLATE_BODY_RE.test(String(entry.value || ""))) {
@@ -354,7 +359,7 @@ function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
 }
 
 function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
-  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary)|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
@@ -378,7 +383,7 @@ function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
 }
 
 function collectPublicInternalReviewLanguageIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary)|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
@@ -422,7 +427,7 @@ function publicSourceLabelsForPath(report, pathName) {
 }
 
 function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|hero_highlights\[\d+\]\.(?:title|reason)|main_items\[\d+\]\.title|hot_blogs\[\d+\]\.title|builder_observations\[\d+\]\.(?:title|content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|hero_highlights\[\d+\]\.(?:title|reason)|main_items\[\d+\]\.title|hot_blogs\[\d+\]\.(?:title|key_points\[\d+\])|builder_observations\[\d+\]\.(?:title|content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
@@ -592,8 +597,17 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
   items.forEach((item, index) => {
     const pathName = `hot_blogs[${index}].summary`;
     const summary = String(item?.summary || "").replace(/\s+/g, " ").trim();
-    const plain = stripMarkup(summary);
-    const sentenceCount = hotBlogPublicPoints(summary).length;
+    const explicitPoints = hotBlogExplicitKeyPoints(item);
+    const publicPoints = explicitPoints.length > 0 ? explicitPoints : hotBlogPublicPoints(summary);
+    const combinedPublicText = explicitPoints.length > 0
+      ? `${summary} ${explicitPoints.join(" ")}`
+      : summary;
+    const plain = stripMarkup(combinedPublicText).replace(/\s+/g, " ").trim();
+    const summaryPlain = stripMarkup(summary).replace(/\s+/g, " ").trim();
+    const pointCount = publicPoints.length;
+    const weakPointText = publicPoints
+      .map((point) => stripMarkup(point).replace(/\s+/g, " ").trim())
+      .some((point) => point.length > 0 && point.length < HOT_BLOG_MIN_POINT_LENGTH);
     const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
     const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
     const ratioBase = chineseChars + latinChars;
@@ -603,11 +617,14 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
     if (plain.length < HOT_BLOG_SUMMARY_MIN_LENGTH) {
       problems.push("summary_too_short");
     }
-    if (plain.length > HOT_BLOG_SUMMARY_MAX_LENGTH) {
+    if (summaryPlain.length > HOT_BLOG_SUMMARY_MAX_LENGTH) {
       problems.push("summary_too_long");
     }
-    if (sentenceCount < 2 || sentenceCount > 4) {
-      problems.push("points_not_2_to_4");
+    if (pointCount < HOT_BLOG_MIN_POINTS || pointCount > HOT_BLOG_MAX_POINTS) {
+      problems.push("points_not_3_to_5");
+    }
+    if (weakPointText) {
+      problems.push("point_too_short");
     }
     if (chineseChars < HOT_BLOG_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
       problems.push("not_chinese_editorial_summary");
@@ -624,19 +641,20 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
       ? "hot_blog_summary_untranslated"
       : problems.includes("template_or_low_information")
         ? "hot_blog_summary_template"
-        : problems.includes("points_not_2_to_4")
-          ? "hot_blog_points_invalid"
-          : "hot_blog_summary_too_thin";
+      : problems.includes("points_not_3_to_5") || problems.includes("point_too_short")
+        ? "hot_blog_points_invalid"
+        : "hot_blog_summary_too_thin";
     issues.push({
       code,
       severity: "error",
       path: pathName,
-      message: "Hot blog summaries must be reader-facing Chinese analysis: 2-4 points, about 100-160 Chinese characters, and no untranslated English excerpt.",
+      message: "Hot blog entries must expose reader-facing Chinese analysis: 3-5 public points, enough detail to explain what the article says, and no untranslated English excerpt.",
       repairable: false,
       details: {
         problems,
         length: plain.length,
-        sentence_count: sentenceCount,
+        summary_length: summaryPlain.length,
+        point_count: pointCount,
         chinese_chars: chineseChars,
         chinese_ratio: Number(chineseRatio.toFixed(3))
       }
@@ -644,9 +662,15 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
     aiReviewTasks.push({
       kind: "hot_blog_editorial_rewrite",
       path: pathName,
-      instruction: "Rewrite the hot blog summary in Chinese for general readers: 2-4 concise points, about 100-160 Chinese characters total, explain what the article says, why it matters, and what to watch without changing facts or links."
+      instruction: "Rewrite the hot blog entry in Chinese for general readers: provide 3-5 concrete public points, explain what the article says, what evidence or method it gives, why it matters, and what boundary to watch without changing facts or links."
     });
   });
+}
+
+function hotBlogExplicitKeyPoints(item) {
+  return (Array.isArray(item?.key_points) ? item.key_points : [])
+    .map((point) => String(point || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
 }
 
 function hotBlogPublicPoints(summary) {

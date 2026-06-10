@@ -49,7 +49,7 @@ const COMPANY_ACTION_RE = /\b(earnings|quarterly results?|financial results?|rev
 const PRODUCT_PLATFORM_RE = /\b(product|platform|app|service|cloud|enterprise|developer|api|sdk|release|launch|availability|pricing|quota|github|hugging face|open[-\s]?source|repo|repository)\b|产品|平台|应用|服务|云|企业|开发者|接口|发布|上线|可用|价格|配额|开源|仓库/i;
 const HARDCORE_RESEARCH_RE = /\b(arxiv|paper|benchmark|evaluation|eval|reasoning traces?|transformer inference|inference benchmark|ablation|dataset|pre[-\s]?train|post[-\s]?training|fine[-\s]?tuning|rlvr|loss|gradient|tokenizer|architecture|throughput|latency|context window)\b|论文|基准|评测|推理轨迹|消融|数据集|训练|微调|架构|吞吐|延迟/i;
 const PLAIN_READER_SIGNAL_RE = /\b(pricing|availability|rollout|launch|product|platform|app|service|enterprise|developer|api|sdk|conference|summit|partnership|customer|use case|workflow|open[-\s]?source|github|hugging face|model weights?|layoffs?|job cuts?|reorganization|restructuring|earnings|revenue|guidance)\b|价格|定价|可用|发布|上线|产品|平台|应用|服务|企业|开发者|接口|大会|峰会|合作|客户|用例|工作流|开源|模型权重|裁员|组织调整|重组|财报|营收|指引/i;
-const LOW_SIGNAL_VENDOR_PARTNERSHIP_RE = /\b(partnership|collaborat(?:e|ion)|build(?:ing)? an ai factory|ai factory|build ai infrastructure|gigawatt-scale ai cloud|memory for ai factor(?:y|ies))\b|合作|联合打造|共建/i;
+const LOW_SIGNAL_VENDOR_PARTNERSHIP_RE = /\b(partnership|collaborat(?:e|ion)|build(?:ing)? an ai factory|ai factory|build ai infrastructure|gigawatt-scale ai cloud|memory for ai factor(?:y|ies)|uk sovereign ai|sovereign ai advancements|ai maker,\s*not an ai taker)\b|合作|联合打造|共建/i;
 const LOW_VALUE_EVENT_GUIDE_RE = /\bhow to watch\b|\bwhat to expect\b|\bwatch live\b|\blivestream\b|\bschedule\b|\blineup\b|\btickets?\b|直播|观看指南|日程|赛程/i;
 const MINOR_CONSUMER_AI_FEATURE_RE = /\bdesign merch\b|\balexa for shopping\b|\bpet portraits?\b|\btumblers?\b|\bgroup shirts?\b|\bcreator assistant\b|\bai translations?\b|\bfacebook translations?\b/i;
 const PUBLIC_AI_HEADLINE_ENTITY_RE = /\b(openai|google|deepmind|anthropic|meta|nvidia|xai|x\.ai|microsoft|amazon|aws|apple|bytedance|byte\s*dance|tiktok|alibaba|qwen|deepseek|tencent|minimax|moonshot|kimi|mistral|hugging face|runway|pika|luma|kling|adobe)\b|字节|阿里|通义|腾讯|混元|深度求索|月之暗面|快手|可灵|商汤|智谱|百川|阶跃星辰/i;
@@ -299,6 +299,7 @@ function selectReportItems(merged, options = {}) {
   const hotBlogSeenUrls = new Set(mainItems.map((item) => normalizeUrl(item.url)).filter(Boolean));
   const hotBlogPool = candidates
     .filter((candidate) => !selectedIds.has(candidate.id))
+    .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
     .filter((candidate) => canPromoteToHotBlog(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
   const hotBlogSeeds = [];
@@ -541,6 +542,7 @@ function formatReportDate(date) {
 function pickMainCandidates(candidates, target) {
   const picked = [];
   const seenUrls = new Set();
+  const seenTopics = new Set();
   let lowSignalPartnershipCount = 0;
   const plainReaderCandidates = candidates.filter((candidate) => hasPlainReaderSignal(candidate));
   const hardcoreLimit = plainReaderCandidates.length >= target - 2 ? 2 : target;
@@ -549,6 +551,8 @@ function pickMainCandidates(candidates, target) {
     if (picked.length >= target) break;
     const key = normalizeUrl(candidate.url);
     if (!key || seenUrls.has(key)) continue;
+    const topicKey = mainTopicKey(candidate);
+    if (topicKey && seenTopics.has(topicKey)) continue;
     if (isLowSignalVendorPartnership(candidate)) {
       if (lowSignalPartnershipCount >= 1) continue;
       lowSignalPartnershipCount += 1;
@@ -559,8 +563,28 @@ function pickMainCandidates(candidates, target) {
     }
     picked.push(candidate);
     seenUrls.add(key);
+    if (topicKey) {
+      seenTopics.add(topicKey);
+    }
   }
   return picked;
+}
+
+function mainTopicKey(candidate) {
+  return modelLaunchTopicKey(candidate) || "";
+}
+
+function modelLaunchTopicKey(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+    return "model:claude-fable-5-mythos-5";
+  }
+  const namedModel = text.match(/\b(?:claude\s+(?:opus|sonnet|haiku)\s*\d(?:\.\d+)?|gpt-\d(?:\.\d+)?(?:-[a-z0-9]+)?|gemini\s+\d(?:\.\d+)?\s*(?:pro|flash|ultra)?|grok\s+\d(?:\.\d+)?|qwen\s*\d(?:\.\d+)?|deepseek\s+[a-z0-9.-]+|mistral\s+[a-z0-9.-]+)\b/i);
+  if (!namedModel) {
+    return "";
+  }
+  const releaseLike = /\b(model|launch|release|released|available|availability|rollout|preview|api|sdk|bedrock|copilot|foundry|vertex|azure|aws)\b/i.test(text);
+  return releaseLike ? `model:${namedModel[0].replace(/\s+/g, "-").toLowerCase()}` : "";
 }
 
 function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evidenceAssets }) {
@@ -796,7 +820,7 @@ function mainItem(candidate, original) {
 function mainItemBullets(candidate, original, category) {
   const specificBullets = mainItemSpecificBullets(candidate);
   if (specificBullets.length > 0) {
-    return uniqueEditorialSentences(specificBullets).slice(0, 2);
+    return uniqueEditorialSentences(specificBullets).slice(0, 3);
   }
   const detail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemDetail(candidate, category), candidate));
   if (detail) {
@@ -854,6 +878,7 @@ function readerLabelForCandidate(candidate) {
   if (/sk telecom.*ai cloud|gigawatt-scale ai cloud/.test(text)) return "SKT AI Cloud";
   if (/lg group.*ai factory/.test(text)) return "LG AI Factory";
   if (/doosan.*ai factory/.test(text)) return "Doosan AI Factory";
+  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) return "Claude Fable/Mythos";
   return "";
 }
 
@@ -990,6 +1015,13 @@ function highlightMainItemFact(candidate, fact) {
 
 function mainItemSpecificBullets(candidate) {
   const text = candidateText(candidate).toLowerCase();
+  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+    return [
+      "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
+      "**安全边界**：Fable 5 在 cyber、bio、chemical 和模型蒸馏等敏感场景由分类器接管，并 fallback 到 Claude Opus 4.8，官方称平均少于 5% sessions 触发。",
+      "**可用性/价格**：Fable 5 面向公开产品和 API 可用；Mythos 5 仅限 Project Glasswing/可信访问，两者标价都是 $10/M input、$50/M output。"
+    ];
+  }
   if (/runway updates ai video creation workflow for game worlds/.test(text)) {
     return [
       "**工作流变化**：官方条目指向 AI 视频生成和游戏世界创作流程更新，关注素材生成链路而不是单个模型名。"
@@ -1157,6 +1189,7 @@ function projectItem(candidate, meta) {
 
 function hotBlogItem(candidate) {
   const fields = nonPrimaryDisclosureFields(candidate);
+  const summary = hotBlogSummary(candidate);
   return {
     title: hotBlogTitleForCandidate(candidate),
     candidate_id: candidate.id,
@@ -1168,7 +1201,8 @@ function hotBlogItem(candidate) {
     author: candidate.author || candidate.source || "Unknown",
     event_date: candidate.event_date,
     topic: topicForCandidate(candidate),
-    summary: hotBlogSummary(candidate),
+    summary,
+    key_points: hotBlogKeyPoints(candidate, summary),
     content_type: "blog"
   };
 }
@@ -2106,6 +2140,8 @@ function candidateScore(candidate) {
   if (candidate.category === "community_lead" && sourceLevel === "github") score -= 8;
   if (isMinorConsumerAiFeatureCandidate(candidate)) score -= 35;
   if (isFutureDatedCandidate(candidate)) score -= 30;
+  if (isOriginalModelLaunchCandidate(candidate)) score += 120;
+  if (isModelAvailabilityDuplicateCandidate(candidate)) score -= 90;
   if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
   if (isLowValueMainCandidate(candidate)) score -= 40;
   return score;
@@ -2122,10 +2158,44 @@ function compareMainCandidates(left, right) {
 function mainCandidateScore(candidate) {
   let score = candidateScore(candidate);
   score += publicNewsSalienceScore(candidate) * 2;
+  if (isOriginalModelLaunchCandidate(candidate)) {
+    score += 220;
+  }
+  if (isModelAvailabilityDuplicateCandidate(candidate)) {
+    score -= 160;
+  }
   if (isNarrowEngineeringDeepDiveCandidate(candidate) && !isMajorMainNewsCandidate(candidate)) {
     score -= 30;
   }
   return score;
+}
+
+function isOriginalModelLaunchCandidate(candidate) {
+  const topicKey = modelLaunchTopicKey(candidate);
+  if (!topicKey) {
+    return false;
+  }
+  const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`.toLowerCase();
+  const text = candidateText(candidate).toLowerCase();
+  if (topicKey === "model:claude-fable-5-mythos-5") {
+    return /anthropic|claude/.test(sourceText) &&
+      /(fable\s*5|mythos\s*5)/.test(text) &&
+      /(same underlying model|mythos-class|safe for general use|trusted access|safeguards|claude fable 5 and claude mythos 5)/.test(text);
+  }
+  const originalProviderRe = /openai|anthropic|google|deepmind|xai|x\.ai|mistral|qwen|alibaba|deepseek|minimax|moonshot|kimi|meta|nvidia|adobe|runway|pika|luma|kling/;
+  const platformOnlyRe = /aws|amazon|bedrock|azure|microsoft|foundry|github|copilot|vertex|google cloud|sagemaker|openrouter/;
+  return originalProviderRe.test(sourceText) && !platformOnlyRe.test(sourceText) && /\b(launch|release|introduc|announc|new model|model card)\b/i.test(text);
+}
+
+function isModelAvailabilityDuplicateCandidate(candidate) {
+  if (!modelLaunchTopicKey(candidate)) {
+    return false;
+  }
+  if (isOriginalModelLaunchCandidate(candidate)) {
+    return false;
+  }
+  const text = `${candidateText(candidate)} ${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`.toLowerCase();
+  return /\b(available|availability|now available|launches in|comes to|on bedrock|in bedrock|copilot|foundry|azure|aws|amazon|microsoft|github|sagemaker|vertex|google cloud)\b/.test(text);
 }
 
 function publicNewsSalienceScore(candidate) {
@@ -2340,6 +2410,7 @@ function canPromoteToHotBlog(candidate, reportDate = "") {
   if (isFutureDatedCandidate(candidate, reportDate)) return false;
   if (isStatuspageCandidate(candidate)) return false;
   if (isSearchShadowCandidate(candidate)) return false;
+  if (isLowSignalVendorPartnership(candidate)) return false;
   return true;
 }
 
@@ -2416,7 +2487,7 @@ function hasConcreteHotBlogMaterial(candidate) {
   if (evidence.length >= 90) {
     return true;
   }
-  return /\b(introduces|explains|shows|details|describes|breaks down|designed|workflow|session|distributed|enterprise|ontology|dependency)\b/i.test(evidence);
+  return /\b(introduces|explains|shows|details|describes|breaks down|designed|workflows?|sessions?|distributed|enterprise|ontology|dependency|methods?|case studies?|benchmarks?|architecture|implementation)\b/i.test(evidence);
 }
 
 function isKnownIntermediaryCandidate(candidate) {
@@ -2584,11 +2655,11 @@ function chineseSummary(candidate, category) {
 
 function mainItemSpecificSummary(candidate) {
   const text = candidateText(candidate).toLowerCase();
+  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+    return "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。";
+  }
   if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
     return "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击，公开信息主要集中在攻击归因、拦截动作和受影响范围说明。";
-  }
-  if (/sovereign ai|london tech week|ai maker, not an ai taker/.test(text)) {
-    return "NVIDIA 借伦敦科技周继续推进英国主权 AI，公开信息主要落在基础设施展示、伙伴协作和执行层进展。";
   }
   return "";
 }
@@ -3248,9 +3319,6 @@ function hotBlogSpecificSummary(candidate) {
   if (/third generation of apple.*foundation models|introducing the third generation of apple/.test(text)) {
     return "文章围绕苹果第三代基础模型展开，信息重点在端侧模型、服务器模型、评测范围和安全隐私处理方式。它把模型能力、系统体验和开发者接口放在一起说明，能区分已经产品化的能力、仍在研究披露中的能力，以及第三方应用可复用的接口范围。";
   }
-  if (/sovereign ai|london tech week|ai maker, not an ai taker|uk-sovereign-ai-advancements/.test(text)) {
-    return "文章讲英伟达如何把英国主权人工智能从政策口号推进到基础设施和伙伴落地，涉及本地算力、行业合作和人工智能工厂叙事。主要信息不是模型发布，而是供应链、国家级算力和企业落地节奏，并说明英国主线仍围绕英伟达展开。";
-  }
   if (/gpt-5\.2 and gpt-5\.2-codex deprecated/.test(text)) {
     return "这条更新的重点不是单纯下线两个模型名，而是 GitHub 开始重新整理 Copilot Chat、补全和 agent 模式背后的默认模型组合。真正值得看的，是哪些入口已经切走、哪些团队还需要补迁移，以及现有提示词、评测和自动化流程会不会被连带影响。";
   }
@@ -3284,12 +3352,69 @@ function hotBlogSpecificSummary(candidate) {
 export function hotBlogSummary(candidate) {
   const specific = hotBlogSpecificSummary(candidate);
   if (specific) {
-    return trimText(specific, 220);
+    return trimText(specific, 420);
   }
   const digest = candidateReaderDigest(candidate) || hotBlogClaimForCandidate(candidate);
   const angle = hotBlogSpecificAngle(candidate) || hotBlogEvidenceForCandidate(candidate);
   const action = hotBlogActionForCandidate(candidate);
-  return trimText(`${digest}。${angle}。${action}。`, 220);
+  return trimText(`${digest}。${angle}。${action}。`, 420);
+}
+
+function hotBlogKeyPoints(candidate, summary) {
+  const explicitPoints = Array.isArray(candidate.key_points) ? candidate.key_points : [];
+  const candidates = [
+    ...explicitPoints,
+    ...splitHotBlogSummaryPoints(summary),
+    hotBlogClaimForCandidate(candidate),
+    hotBlogSpecificAngle(candidate),
+    hotBlogEvidenceForCandidate(candidate),
+    hotBlogAngleSentence(candidate),
+    hotBlogActionForCandidate(candidate),
+    hotBlogReaderValueSentence(candidate)
+  ];
+  const cleaned = [];
+  const seen = new Set();
+  for (const value of candidates) {
+    const point = normalizeHotBlogPoint(value, candidate);
+    if (!point) continue;
+    const key = point.replace(/\s+/g, " ").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cleaned.push(point);
+    if (cleaned.length >= 5) break;
+  }
+  while (cleaned.length < 3) {
+    const fallback = normalizeHotBlogPoint(hotBlogFallbackPoint(candidate, cleaned.length), candidate);
+    if (!fallback) break;
+    const key = fallback.replace(/\s+/g, " ").toLowerCase();
+    if (seen.has(key)) break;
+    seen.add(key);
+    cleaned.push(fallback);
+  }
+  return cleaned.slice(0, 5);
+}
+
+function splitHotBlogSummaryPoints(summary) {
+  const text = String(summary || "").replace(/\s+/g, " ").trim();
+  if (!text) return [];
+  return text
+    .split(/(?<=[。！？!?；;])\s*/u)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function normalizeHotBlogPoint(value, candidate) {
+  const cleaned = stripDraftPublicBodyNoise(stripSentenceEnding(String(value || "")), candidate)
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned || cleaned.length < 12) return "";
+  return ensureChineseSentence(trimText(cleaned, 150));
+}
+
+function hotBlogFallbackPoint(candidate, index) {
+  if (index === 0) return hotBlogClaimForCandidate(candidate);
+  if (index === 1) return hotBlogEvidenceForCandidate(candidate);
+  return hotBlogActionForCandidate(candidate);
 }
 
 function hotBlogClaimForCandidate(candidate) {
