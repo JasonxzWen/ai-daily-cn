@@ -1038,6 +1038,53 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   assert(!mainMarkdownContent(input).includes("行业媒体/播客整理"));
 });
 
+test("interaction input renders source trust tags on public daily items", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.main_items[0] = {
+    ...report.main_items[0],
+    source_level: "official",
+    verification_status: "primary_confirmed"
+  };
+  report.hot_blogs[0] = {
+    ...report.hot_blogs[0],
+    source_level: "intermediary",
+    verification_status: "intermediary_only"
+  };
+  report.builder_observations = [
+    {
+      author: "Example Builder",
+      handle: "examplebuilder",
+      role: "maintainer",
+      original_text: "AI agents need eval loops before unattended work.",
+      translation: "AI agent 在无人值守工作之前需要 eval loops。",
+      content: "AI agent 在无人值守工作之前需要 eval loops。",
+      url: "https://x.com/examplebuilder/status/1794993600000000000",
+      event_date: "2026-05-15",
+      source: "follow-builders X feed",
+      verification_status: "original_social_only",
+      source_level: "original_social"
+    }
+  ];
+  report.community_leads = [
+    {
+      title: "AI agent 市场线索",
+      content: "第三方报道提到 AI agent 平台的企业采用信号。",
+      url: "https://techcrunch.com/example-ai-agent-signal",
+      event_date: "2026-05-15",
+      source: "TechCrunch AI",
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const rendered = JSON.stringify(input);
+
+  assert(rendered.includes("官方一手来源"));
+  assert(rendered.includes("第三方报道"));
+  assert(rendered.includes("原始社交动态"));
+});
+
 test("builder interaction section renders translated Twitter-style cards and omits explicit evidence bullets", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
@@ -6536,8 +6583,82 @@ test("report:draft limits paper and GitHub overflow in community leads while kee
 
   assert(drafted.report.community_leads.some((item) => item.candidate_id === "super-app-visual"));
   assert(drafted.report.community_leads.some((item) => item.candidate_id === "climate-visual"));
-  assert(drafted.report.community_leads.filter((item) => item.source_level === "paper").length <= 1);
-  assert(drafted.report.community_leads.filter((item) => item.source_level === "github").length <= 1);
+  assert(drafted.report.community_leads.filter((item) => item.source_level === "paper").length <= 3);
+  assert(drafted.report.community_leads.filter((item) => item.source_level === "github").length <= 3);
+});
+
+test("report:draft expands public signal coverage beyond strict factual sections", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-expanded-signals-"));
+  const reportDate = "2026-06-08";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+
+  const extraHotBlogs = Array.from({ length: 12 }, (_, index) => ({
+    id: `third-party-hot-blog-${index + 1}`,
+    source_id: `content-latent-space-extra-${index + 1}`,
+    category: "hot_blog",
+    title: `AI agent platform field report ${index + 1}`,
+    url: `https://www.latent.space/p/agent-platform-field-report-${index + 1}`,
+    source: "Latent.Space",
+    author: "Latent.Space",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: `A detailed AI agent platform field report ${index + 1} covering enterprise workflow design, model orchestration, deployment constraints, evaluation loops, and developer adoption signals.`,
+    verification_status: "intermediary_only",
+    source_level: "intermediary"
+  }));
+  const extraBuilders = Array.from({ length: 14 }, (_, index) => ({
+    id: `builder-expanded-${index + 1}`,
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: `Builder note ${index + 1}: AI agents need production evals`,
+    url: `https://x.com/builder/status/179499360000000${index + 1}`,
+    source: "follow-builders X feed",
+    author: `Builder ${index + 1}`,
+    handle: `builder${index + 1}`,
+    event_date: reportDate,
+    status: "excluded",
+    original_text: `AI agents need production eval loops, tool traces, and rollback plans before unattended workflow use ${index + 1}.`,
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social"
+  }));
+  const extraCommunityLeads = Array.from({ length: 30 }, (_, index) => ({
+    id: `community-expanded-${index + 1}`,
+    source_id: `content-techcrunch-ai-expanded-${index + 1}`,
+    category: "community_lead",
+    title: `AI agent market signal ${index + 1}`,
+    url: `https://techcrunch.com/2026/06/08/ai-agent-market-signal-${index + 1}/`,
+    source: "TechCrunch AI",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: `Third-party reporting describes AI agent market signal ${index + 1}, including product rollout, enterprise workflow adoption, pricing implications, and developer platform context.`,
+    verification_status: "intermediary_only",
+    source_level: "intermediary"
+  }));
+
+  discovery.candidates = [
+    ...discovery.candidates,
+    ...extraHotBlogs,
+    ...extraBuilders,
+    ...extraCommunityLeads
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.projects.length, 10);
+  assert.equal(drafted.report.hot_blogs.length, 8);
+  assert.equal(drafted.report.builder_observations.length, 12);
+  assert.equal(drafted.report.community_leads.length, 24);
+  assert(drafted.report.hot_blogs.some((item) => item.source_level === "intermediary"));
+  assert(drafted.report.community_leads.some((item) => item.verification_status === "intermediary_only"));
 });
 
 test("report:draft keeps minor consumer AI feature rollouts out of main_items", async () => {
@@ -7958,7 +8079,7 @@ test("publish quality degrades strict daily reports missing follow-builders X st
   );
 });
 
-test("publish quality degrades strict daily reports with fewer than five Builder observations", () => {
+test("publish quality degrades strict daily reports with fewer than eight Builder observations", () => {
   const report = strictPublishReportFixture();
   report.builder_observations = report.builder_observations.slice(0, 3);
   report.self_check.builder_observations = report.builder_observations.length;
@@ -7973,7 +8094,7 @@ test("publish quality degrades strict daily reports with fewer than five Builder
       (issue) =>
         issue.error_code === "strict_section_coverage_gate_failed" &&
         issue.code === "builder_observations_below_strict_minimum" &&
-        issue.minimum === 5
+        issue.minimum === 8
       )
   );
 });
@@ -8435,7 +8556,7 @@ test("report:write keeps low-signal checked sources out of degraded status", asy
 test("report:write flags selection degradation when candidate pool has enough unused candidates", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
-  draft.source_audit.content_sources.candidates_found = 3;
+  draft.source_audit.content_sources.candidates_found = 6;
   draft.source_audit.content_sources.included = 0;
   candidatePool.sources.push({
     id: "content-hot-blog-source",
@@ -8444,7 +8565,7 @@ test("report:write flags selection degradation when candidate pool has enough un
     category: "blog",
     status: "checked"
   });
-  for (const index of [1, 2, 3]) {
+  for (const index of [1, 2, 3, 4, 5, 6]) {
     candidatePool.candidates.push({
       id: `hot-blog-unused-${index}`,
       source_id: "content-hot-blog-source",
@@ -8703,7 +8824,7 @@ test("report:write marks low content unit density degraded when enough candidate
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const baseCandidate = candidatePool.candidates[0];
 
-  for (let index = 1; index <= 27; index += 1) {
+  for (let index = 1; index <= 45; index += 1) {
     candidatePool.candidates.push({
       ...baseCandidate,
       id: `project-unused-${index}`,
@@ -10001,7 +10122,7 @@ function strictAutomationRevisionFixture() {
     source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
       "main_items_min_8_when_candidates_available",
-      "content_units_min_27_when_candidates_available",
+      "content_units_min_45_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",
       "fixed_source_checklist"

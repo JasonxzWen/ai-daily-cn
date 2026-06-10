@@ -11,7 +11,7 @@
 - 正文证据图和热门博客/卡片图片必须通过 effective-interact 的 lightbox 交互支持点开放大；内嵌来源 icon 不参与放大。
 - `model_releases` 只保留为结构化 JSON 索引，不渲染公开“模型发布”正文板块；相关模型新闻必须先进入 `main_items`。
 - `projects` 只作为 GitHub Trending 条目内的项目 highlight tag 和行内说明数据来源；不渲染公开“今日值得关注的项目”独立板块，也不渲染“项目 highlights”子标题或额外项目列表。未匹配到 GitHub Trending Top 10 的 `projects` 不公开展示。
-- 非一手来源进入观点、产品、Builder 或社区板块时，interaction input 必须保留来源层级、待确认边界或风险说明，但不要把读者画像、后续跟进和风险模板渲染成重复卡片分点。
+- 非一手来源进入观点、产品、Builder 或社区板块时，interaction input 必须用 tag 明确展示“已核查事实 / 官方一手来源 / 第三方报道 / 社区线索 / 原始社交动态”等来源层级；不要把读者画像、后续跟进和风险模板渲染成重复卡片分点。
 - `main_items` 渲染为 8-12 条短新闻流：标题、2-3 句/行事实概括和来源链接；公开页不渲染 `why_it_matters`、`reader_relevance`、入选条件、候选分数或 watch-next。
 - 榜单类内容优先用结构化表格呈现；OpenRouter、Artificial Analysis 等公开页面不得把整页截图、浏览器截图或 viewport 截图作为正文主内容。
 - 图片不是必填项；只有尺寸、语义和可读性合格的网页内部图片资产可公开展示，tiny icon、favicon、logo、头像、装饰图和不可读截图都不得展示。

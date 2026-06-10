@@ -60,11 +60,11 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 内容密度目标：
 
-- 新日报目标为 33-45 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
+- 新日报目标为 55-75 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
 - `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
 - 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
 - `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。
-- 低于 27 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
+- 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 
 `self_check.optimization_suggestions` 最多 3 条，必须使用 canonical 对象字段：`issue`、`evidence`、`module`、`suggestion`、`expected_benefit`、`requires_user_confirmation`。其中 `requires_user_confirmation` 必须是 boolean。不要输出 `suggested_module`、`needs_user_confirmation`、`area`、`title`、`why` 等历史兼容字段；`report:write` 会规范化兼容旧输入，但新草稿应直接满足 canonical schema。

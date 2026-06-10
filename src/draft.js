@@ -82,7 +82,29 @@ const MAIN_ITEM_RECENT_HISTORY_SECTIONS = [
   "builder_observations"
 ];
 const MAIN_TARGET = 10;
-const MAX_PUBLIC_UNITS = 45;
+const GITHUB_TRENDING_TARGET = 10;
+const PROJECT_TARGET = 10;
+const HOT_BLOG_TARGET = 8;
+const BUILDER_OBSERVATION_TARGET = 12;
+const COMMUNITY_LEAD_TARGET = 24;
+const COMMUNITY_PAPER_TARGET = 3;
+const COMMUNITY_GITHUB_TARGET = 3;
+const COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET = 2;
+const MAX_PUBLIC_UNITS = 80;
+const PUBLIC_THIRD_PARTY_SOURCE_LEVELS = new Set([
+  "intermediary",
+  "community",
+  "original_social",
+  "wechat_industry_whitelist",
+  "weekly_paper_aggregator",
+  "open_source_aggregator",
+  "tech_weekly_aggregator",
+  "paper_aggregator",
+  "ai_news_aggregator",
+  "aigc_content_industry",
+  "ai_funding_product_radar",
+  "community_api"
+]);
 
 export async function generateReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -226,7 +248,7 @@ function selectReportItems(merged, options = {}) {
     .filter(({ candidate, meta }) => isGitHubTrendingCandidate(candidate, meta))
     .sort((left, right) => rankOf(left.meta, 999) - rankOf(right.meta, 999));
   const publicGithubCandidates = publicGithubTrendingCandidates(githubSourceCandidates);
-  const githubTrending = publicGithubCandidates.slice(0, 10).map(({ candidate, meta }, index) => {
+  const githubTrending = publicGithubCandidates.slice(0, GITHUB_TRENDING_TARGET).map(({ candidate, meta }, index) => {
     const trendCandidate = derivedCandidate(candidate, {
       idPrefix: "trend",
       category: "github_trending",
@@ -267,7 +289,7 @@ function selectReportItems(merged, options = {}) {
   const projectSeeds = publicGithubCandidates
     .map(({ candidate, meta }) => ({ candidate, meta }))
     .filter(({ candidate }) => !selectedIds.has(`project:${candidate.id}`))
-    .slice(0, 3);
+    .slice(0, PROJECT_TARGET);
   const projects = projectSeeds.map(({ candidate, meta }) => {
     const projectCandidate = markIncludedCandidate(candidate, "project", "projects");
     selectedIds.add(`project:${candidate.id}`);
@@ -281,7 +303,7 @@ function selectReportItems(merged, options = {}) {
     .sort((left, right) => candidateScore(right) - candidateScore(left));
   const hotBlogSeeds = [];
   for (const candidate of hotBlogPool) {
-    if (hotBlogSeeds.length >= 3) break;
+    if (hotBlogSeeds.length >= HOT_BLOG_TARGET) break;
     const key = normalizeUrl(candidate.url);
     if (!key || hotBlogSeenUrls.has(key)) continue;
     hotBlogSeenUrls.add(key);
@@ -297,7 +319,7 @@ function selectReportItems(merged, options = {}) {
     .filter((candidate) => candidate.category === "builder_observation" && !selectedIds.has(candidate.id))
     .filter((candidate) => canPromoteToBuilderObservation(candidate))
     .sort((left, right) => candidateScore(right) - candidateScore(left))
-    .slice(0, 6);
+    .slice(0, BUILDER_OBSERVATION_TARGET);
   const builderObservations = builderSeeds.map((candidate) => {
     const builderCandidate = markIncludedCandidate(candidate, "builder_observation", "builder_observations");
     selectedIds.add(candidate.id);
@@ -315,14 +337,14 @@ function selectReportItems(merged, options = {}) {
   let communityGithubCount = 0;
   const communityTopicKeys = new Set();
   for (const candidate of communityPool) {
-    if (communitySeeds.length >= 8) break;
+    if (communitySeeds.length >= COMMUNITY_LEAD_TARGET) break;
     const sourceLevel = sourceLevelForCandidate(candidate);
     if (isLowSignalVendorPartnership(candidate)) {
-      if (communityLowSignalPartnerships >= 1) continue;
+      if (communityLowSignalPartnerships >= COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET) continue;
       communityLowSignalPartnerships += 1;
     }
-    if ((sourceLevel === "paper" || sourceLevel === "paper_api") && communityPaperCount >= 1) continue;
-    if (sourceLevel === "github" && communityGithubCount >= 1) continue;
+    if ((sourceLevel === "paper" || sourceLevel === "paper_api") && communityPaperCount >= COMMUNITY_PAPER_TARGET) continue;
+    if (sourceLevel === "github" && communityGithubCount >= COMMUNITY_GITHUB_TARGET) continue;
     const topicKey = communityLeadTopicKey(candidate);
     if (topicKey && communityTopicKeys.has(topicKey)) continue;
     communitySeeds.push(candidate);
@@ -2307,8 +2329,10 @@ function canPromoteToBuilderObservation(candidate) {
 
 function canPromoteToHotBlog(candidate, reportDate = "") {
   const sourceLevel = sourceLevelForCandidate(candidate);
-  if (!["official", "primary", "paper", "multi_source"].includes(sourceLevel)) return false;
-  if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
+  const isPrimaryLike = TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel);
+  const isDisclosedThirdParty = isPublicThirdPartySignalCandidate(candidate);
+  if (!isPrimaryLike && !isDisclosedThirdParty) return false;
+  if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status) && !isDisclosedThirdParty) return false;
   if (!isAiRelevantCandidate(candidate)) return false;
   if (!isBlogLikeCandidate(candidate)) return false;
   if (!hasConcreteHotBlogMaterial(candidate)) return false;
@@ -2317,6 +2341,11 @@ function canPromoteToHotBlog(candidate, reportDate = "") {
   if (isStatuspageCandidate(candidate)) return false;
   if (isSearchShadowCandidate(candidate)) return false;
   return true;
+}
+
+function isPublicThirdPartySignalCandidate(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  return PUBLIC_THIRD_PARTY_SOURCE_LEVELS.has(sourceLevel) || isKnownIntermediaryCandidate(candidate);
 }
 
 function canPromoteToCommunityLead(candidate, reportDate = "") {

@@ -118,9 +118,9 @@
 
 ### 内容扩容验收
 
-- 目标公开内容单元为 33-45 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`。
+- 目标公开内容单元为 55-75 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`；`main_items` 继续只收严格事实，其他板块用来源可信度 tag 承载第三方报道、社区线索和原始社交动态。
 - `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写候选事实、数据、图表、限制和影响，不写“为什么重要/启示/入选条件/日报跟踪/报道边界/后续建议”类元评论。
-- 低于 27 个内容单元时，`quality_status.status` 应为 `degraded`，或在 `self_check.notes` 明确说明低信号、网络阻塞、回源失败或人工未选入。
+- 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，或在 `self_check.notes` 明确说明低信号、网络阻塞、回源失败或人工未选入。
 - 每日候选池应至少尝试覆盖：AIGC/内容产业 6 条、大厂动作/平台政策/监管/算力/商业化 8 条、产品/融资 8 条、博客/播客 5 条、Builder/X 原始观察 10-20 条、泛 X/社区讨论 4 个事件。候选不足时记录 `no_signal`，不要伪造。
 - 参考用户给定的飞书日报板块结构做发现面覆盖：内容赛道动态、AI 行业动态、观点与分析、值得关注的产品、精选播客更新、Twitter 讨论都必须在候选池中有对应检查记录；没有候选时写 `no_signal` 或阻塞原因。
 - `content_sources` 至少记录 core 官方/工程源、Product Hunt、一个博客/访谈聚合源、一个广义科技/产业源的检查结果或阻塞原因。
