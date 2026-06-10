@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T08:53:31.604Z",
+  "generated_at": "2026-06-10T03:42:17.135Z",
   "window_days": 7,
   "source": {
-    "report_count": 27,
-    "date_from": "2026-06-03",
-    "date_to": "2026-06-09"
+    "report_count": 28,
+    "date_from": "2026-06-04",
+    "date_to": "2026-06-10"
   },
   "thresholds": {
     "watching": {
@@ -32,14 +32,12 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 24,
+      "occurrences": 23,
       "active_days": 7,
       "sections": [
         "builder_observations",
-        "github_trending",
         "hot_blogs",
-        "main_items",
-        "projects"
+        "main_items"
       ],
       "entities": [
         "Anthropic",
@@ -51,41 +49,35 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-06-03",
         "2026-06-04",
         "2026-06-05",
         "2026-06-06",
         "2026-06-07",
         "2026-06-08",
-        "2026-06-09"
+        "2026-06-09",
+        "2026-06-10"
       ],
       "related_reports": [
-        "2026-06-03",
         "2026-06-04",
         "2026-06-05",
         "2026-06-06",
         "2026-06-07",
         "2026-06-08",
-        "2026-06-09"
+        "2026-06-09",
+        "2026-06-10"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "github",
-      "occurrences": 112,
+      "occurrences": 110,
       "active_days": 7,
       "display": false
     },
     {
       "term": "with",
       "occurrences": 109,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "trending",
-      "occurrences": 92,
       "active_days": 7,
       "display": false
     },
@@ -109,6 +101,12 @@
     },
     {
       "term": "stars",
+      "occurrences": 91,
+      "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "trending",
       "occurrences": 91,
       "active_days": 7,
       "display": false
@@ -150,44 +148,44 @@
       "display": false
     },
     {
-      "term": "agent",
-      "occurrences": 79,
-      "active_days": 7,
-      "display": false
-    },
-    {
-      "term": "all",
-      "occurrences": 73,
-      "active_days": 7,
-      "display": false
-    },
-    {
       "term": "top",
-      "occurrences": 66,
-      "active_days": 5,
+      "occurrences": 79,
+      "active_days": 6,
       "display": false
     },
     {
       "term": "trending top",
-      "occurrences": 65,
-      "active_days": 5,
+      "occurrences": 78,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "all",
+      "occurrences": 74,
+      "active_days": 7,
+      "display": false
+    },
+    {
+      "term": "agent",
+      "occurrences": 67,
+      "active_days": 7,
       "display": false
     },
     {
       "term": "release",
-      "occurrences": 59,
+      "occurrences": 62,
       "active_days": 7,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 53,
+      "occurrences": 56,
       "active_days": 7,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 53,
+      "occurrences": 56,
       "active_days": 7,
       "display": false
     }
@@ -1513,6 +1511,51 @@
     },
     "2026-06-09": {
       "main_items": [],
+      "github_trending": []
+    },
+    "2026-06-10": {
+      "main_items": [
+        {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 23x/7d",
+              "window_days": 7,
+              "occurrences": 23,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 23x/7d",
+              "window_days": 7,
+              "occurrences": 23,
+              "active_days": 7,
+              "entities": [
+                "Anthropic",
+                "Claude Code",
+                "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ],
       "github_trending": []
     }
   }

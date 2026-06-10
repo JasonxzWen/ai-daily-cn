@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-06-10",
+  "title": "AI 日报 2026-06-10",
+  "summary": "今日主线集中在编码智能体与平台分发：OpenAI 展示 Nextdoor、Notion 使用 Codex 的工程案例，Microsoft Azure、GitHub 和 Amazon 同步推进 Claude Fable 5 进入 Foundry、Copilot 与 AWS；Meta 披露印度 AI 数据中心合作，NVIDIA 与 AWS 博客继续围绕 agent、联邦学习和 AI 基础设施落地展开。GitHub Trending 和 Builder 观察保留为开源与一线实践侧信号。",
+  "hero_highlights": [
+    {
+      "title": "OpenAI：Nextdoor 用 Codex 扩展跨平台工程工作流",
+      "url": "https://openai.com/index/nextdoor",
+      "reason": "OpenAI 介绍 Nextdoor 如何用 Codex 处理难复现问题、跨平台构建和产品交付，让编码智能体从演示走向日常工程流程。"
+    },
+    {
+      "title": "微软模型平台新增 Anthropic 模型",
+      "url": "https://azure.microsoft.com/en-us/blog/claude-fable-5-is-now-available-in-microsoft-foundry-powering-the-next-era-of-autonomous-agents/",
+      "reason": "Azure 博客称 Claude Fable 5 已可在 Microsoft Foundry 使用，重点面向自治 agent 和企业应用构建场景。"
+    },
+    {
+      "title": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击",
+      "url": "https://developer.nvidia.com/blog/model-quantization-turn-fp8-checkpoints-into-high-performance-inference-engines-with-nvidia-tensorrt/",
+      "reason": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击，公开信息主要集中在攻击归因、拦截动作和受影响范围说明。"
+    }
+  ],
+  "main_items": [
+    {
+      "title": "OpenAI 展示 Nextdoor 如何把 Codex 用进工程交付",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-09",
+      "url": "https://openai.com/index/nextdoor",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI 文章介绍 Nextdoor 用 Codex 配合 GPT-5.5 处理难复现问题、跨平台构建和产品交付。",
+      "bullets": [
+        "**工程场景**：Nextdoor 把 Codex 用在难复现问题排查、跨平台构建和产品结果导向的开发流程中。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "微软模型平台新增 Anthropic 模型",
+      "editorial_category": "open_source",
+      "event_date": "2026-06-09",
+      "url": "https://azure.microsoft.com/en-us/blog/claude-fable-5-is-now-available-in-microsoft-foundry-powering-the-next-era-of-autonomous-agents/",
+      "source": "Azure Blog",
+      "tier": "T0",
+      "entities": [
+        "Azure Blog"
+      ],
+      "summary": "Azure 博客称 Claude Fable 5 已可在 Microsoft Foundry 使用，重点面向自主 agent 和企业应用构建。",
+      "bullets": [
+        "**平台分发**：Microsoft Foundry 把 Claude Fable 5 纳入可用模型面，给企业 agent 工作流多一个托管选择。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-09",
+      "url": "https://developer.nvidia.com/blog/model-quantization-turn-fp8-checkpoints-into-high-performance-inference-engines-with-nvidia-tensorrt/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击，公开信息主要集中在攻击归因、拦截动作和受影响范围说明。",
+      "bullets": [
+        "**攻击归因**：WhatsApp 把这轮定向钓鱼攻击与 NSO 关联起来，说明它把这次事件按高风险间谍软件处理。",
+        "**背景**：NSO 是一家长期处在监管和执法争议中的间谍软件公司，也被美国政府列入黑名单。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI 讨论智能时代的产业政策",
+      "editorial_category": "policy_infra",
+      "event_date": "2026-06-09",
+      "url": "https://openai.com/index/industrial-policy-for-the-intelligence-age",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI 发布产业政策文章，讨论先进智能扩展时如何扩大机会、分享繁荣并建设更具韧性的制度。",
+      "bullets": [
+        "**政策议题**：OpenAI 把 AI 产业政策重点放在机会扩展、收益共享和公共机构韧性上。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 用 FLARE Auto-FL 加速联邦学习研究",
+      "editorial_category": "engineering_toolchain",
+      "event_date": "2026-06-09",
+      "url": "https://developer.nvidia.com/blog/accelerating-federated-learning-research-with-ai-agents-and-nvidia-flare-auto-fl/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "NVIDIA Developer Blog 介绍把 AI agent 引入 FLARE Auto-FL，用于帮助研究者推进联邦学习实验。",
+      "bullets": [
+        "**联邦学习**：NVIDIA 将 agent 工作流接入 FLARE Auto-FL，降低联邦学习研究中的实验组织成本。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 推进大规模 AI 基础设施生命周期管理",
+      "editorial_category": "engineering_toolchain",
+      "event_date": "2026-06-09",
+      "url": "https://developer.nvidia.com/blog/delivering-lifecycle-control-for-ai-infrastructure-at-scale-with-nvidia-dgx-spark-enterprise-manageability/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "NVIDIA Developer Blog 介绍 DGX Spark 相关企业可管理能力，聚焦 AI 基础设施在规模化部署后的生命周期控制。",
+      "bullets": [
+        "**基础设施**：NVIDIA 把重点放在设备、部署和运维管理，服务于企业 AI 集群的长期可控性。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Claude Fable 5 已面向 GitHub Copilot 开放",
+      "editorial_category": "open_source",
+      "event_date": "2026-06-09",
+      "url": "https://github.blog/changelog/2026-06-09-claude-fable-5-is-generally-available-for-github-copilot",
+      "source": "GitHub Changelog",
+      "tier": "T2",
+      "entities": [
+        "GitHub Changelog"
+      ],
+      "summary": "GitHub Changelog 称 Claude Fable 5 已在 GitHub Copilot 中一般可用，扩展开发者可调用的模型选择。",
+      "bullets": [
+        "**开发工具**：GitHub Copilot 新增 Claude Fable 5，开发者可在编码工作流中选择这一模型。"
+      ],
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI 展示 Codex 为 Notion 解锁的工程能力",
+      "editorial_category": "engineering_toolchain",
+      "event_date": "2026-06-09",
+      "url": "https://openai.com/index/notion",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI 文章介绍 Notion 使用 Codex 的案例，重点放在编码智能体如何支持产品和工程团队协作。",
+      "bullets": [
+        "**团队协作**：Notion 案例显示 Codex 被用于产品工程场景，而不只是单次代码补全。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Meta 与 Reliance 推进印度 AI 数据中心合作",
+      "editorial_category": "product_radar",
+      "event_date": "2026-06-10",
+      "url": "https://about.fb.com/news/2026/06/meta-partners-with-reliance-on-ai-enabled-data-center-in-india-2/",
+      "source": "Meta Newsroom",
+      "tier": "T0",
+      "entities": [
+        "Meta Newsroom"
+      ],
+      "summary": "Meta Newsroom 披露与 Reliance 的 AI 数据中心合作，标志其在印度扩展 AI 基础设施布局。",
+      "bullets": [
+        "**算力布局**：Meta 将印度 AI 数据中心合作纳入全球基础设施扩张，对本地 AI 服务供给有直接影响。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "亚马逊云开放 Anthropic 新模型服务",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-09",
+      "url": "https://www.aboutamazon.com/news/aws/claude-fable-5-anthropic-available-amazon-bedrock?utm_source=rss",
+      "source": "Amazon News",
+      "tier": "T0",
+      "entities": [
+        "Amazon News"
+      ],
+      "summary": "Amazon News 称 Anthropic 的 Claude Fable 5 已可在 AWS 上使用，面向云端模型服务和企业应用场景。",
+      "bullets": [
+        "**云平台**：AWS 将 Claude Fable 5 纳入可用模型服务，延续云厂商围绕前沿模型分发的竞争。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    }
+  ],
+  "github_trending": [
+    {
+      "name": "mvanhorn/last30days-skill",
+      "repo": "mvanhorn/last30days-skill",
+      "description": "mvanhorn/last30days-skill 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/mvanhorn/last30days-skill",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": 1,
+      "rank_delta": 0,
+      "trend": "same",
+      "importance": "general"
+    },
+    {
+      "name": "RyanCodrai/turbovec",
+      "repo": "RyanCodrai/turbovec",
+      "description": "RyanCodrai/turbovec 今天进入 GitHub Trending Top 10，公开描述把它定位在前端界面和组件工程，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/RyanCodrai/turbovec",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": 2,
+      "rank_delta": 0,
+      "trend": "same",
+      "importance": "general"
+    },
+    {
+      "name": "roboflow/supervision",
+      "repo": "roboflow/supervision",
+      "description": "roboflow/supervision 今天进入 GitHub Trending Top 10，公开描述把它定位在计算机视觉和图像处理，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/roboflow/supervision",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "opencv/opencv",
+      "repo": "opencv/opencv",
+      "description": "opencv/opencv 今天进入 GitHub Trending Top 10，公开描述把它定位在计算机视觉和图像处理，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/opencv/opencv",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": 2,
+      "rank_delta": -2,
+      "trend": "down",
+      "importance": "general"
+    },
+    {
+      "name": "refactoringhq/tolaria",
+      "repo": "refactoringhq/tolaria",
+      "description": "refactoringhq/tolaria 今天进入 GitHub Trending Top 10，公开描述把它定位在检索增强和知识库管线，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/refactoringhq/tolaria",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": 4,
+      "rank_delta": -1,
+      "trend": "down",
+      "importance": "general"
+    },
+    {
+      "name": "aaif-goose/goose",
+      "repo": "aaif-goose/goose",
+      "description": "aaif-goose/goose 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/aaif-goose/goose",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": 7,
+      "rank_delta": 1,
+      "trend": "up",
+      "importance": "general"
+    },
+    {
+      "name": "Andyyyy64/whichllm",
+      "repo": "Andyyyy64/whichllm",
+      "description": "Andyyyy64/whichllm 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/Andyyyy64/whichllm",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": 10,
+      "rank_delta": 3,
+      "trend": "up",
+      "importance": "general"
+    },
+    {
+      "name": "TapXWorld/ChinaTextbook",
+      "repo": "TapXWorld/ChinaTextbook",
+      "description": "TapXWorld/ChinaTextbook 今天进入 GitHub Trending Top 10，仓库简介写的是：TapXWorld / ChinaTextbook 所有小初高、大学PDF教材。",
+      "url": "https://github.com/TapXWorld/ChinaTextbook",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "x1xhlol/system-prompts-and-models-of-ai-tools",
+      "repo": "x1xhlol/system-prompts-and-models-of-ai-tools",
+      "description": "x1xhlol/system-prompts-and-models-of-ai-tools 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "yikart/AiToEarn",
+      "repo": "yikart/AiToEarn",
+      "description": "yikart/AiToEarn 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/yikart/AiToEarn",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": 6,
+      "rank_delta": -4,
+      "trend": "down",
+      "importance": "general"
+    }
+  ],
+  "model_releases": [],
+  "hot_blogs": [
+    {
+      "title": "亚马逊云用代理工作流处理保险理赔首报",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://aws.amazon.com/blogs/machine-learning/hands-free-first-notice-of-loss-using-strands-agents-and-amazon-bedrock-agentcore-browser-tool-for-intelligent-claims-intake/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "AWS Machine Learning Blog",
+      "event_date": "2026-06-09",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "Cloudflare：用自身架构防御前沿网络攻击模型",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://blog.cloudflare.com/frontier-model-defense/",
+      "publisher": "Cloudflare Blog",
+      "author": "Cloudflare Blog",
+      "event_date": "2026-06-09",
+      "topic": "AI industry",
+      "summary": "Cloudflare 文章把前沿网络攻击模型视为需要体系化防御的风险，而不是单点模型指标问题。它用自身架构说明如何把边缘网络、过滤、隔离和客户侧控制组合成防线，也提示企业评估 AI 安全时要看默认防护、可观测性和失效边界。",
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "阿里云：用 Quick BI 做 AI 原生电商分析",
+      "editorial_category": "viewpoint_analysis",
+      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
+      "image_alt": "AI-Native Ecommerce Analytics with Quick BI",
+      "image_source": "html_index",
+      "url": "https://www.alibabacloud.com/blog/ai-native-ecommerce-analytics-with-quick-bi_603237",
+      "publisher": "Alibaba Cloud Blog",
+      "author": "Alibaba Cloud Blog",
+      "event_date": "2026-06-09",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    }
+  ],
+  "daily_tracking": [
+    {
+      "id": "openrouter-rankings",
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai/rankings",
+      "event_date": "2026-06-10",
+      "source": "OpenRouter Rankings",
+      "category": "model_usage",
+      "importance": "notable",
+      "change_status": "changed",
+      "change_summary": "OpenRouter 本周 Top 10 已解析：#1 DeepSeek V4 Flash 4.23T tokens；#2 Hy3 preview 3.53T tokens；#3 MiniMax M3 3.22T tokens；DeepSeek V4 Flash 周变化 55%。",
+      "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，4.23T tokens，周变化 55%）。 Top 10 供应商分布为 anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
+      "watch_points": [
+        "DeepSeek V4 Flash 的周变化为 55%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。",
+        "若没有新进榜，重点看榜首和供应商份额是否迁移。",
+        "OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。"
+      ],
+      "metrics": [
+        {
+          "label": "榜单范围",
+          "value": "This Week Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1",
+          "trend": "unknown"
+        },
+        {
+          "label": "#1",
+          "value": "DeepSeek V4 Flash（deepseek）：4.23T tokens，周变化 55%",
+          "trend": "up"
+        },
+        {
+          "label": "#2",
+          "value": "Hy3 preview（tencent）：3.53T tokens，周变化 25%",
+          "trend": "up"
+        },
+        {
+          "label": "#3",
+          "value": "MiniMax M3（minimax）：3.22T tokens，周变化 >999%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#4",
+          "value": "MiMo-V2.5（xiaomi）：2.73T tokens，周变化 40%",
+          "trend": "up"
+        },
+        {
+          "label": "#5",
+          "value": "DeepSeek V4 Pro（deepseek）：2.03T tokens，周变化 59%",
+          "trend": "up"
+        },
+        {
+          "label": "#6",
+          "value": "Owl Alpha（openrouter）：2.01T tokens，周变化 9%",
+          "trend": "up"
+        },
+        {
+          "label": "#7",
+          "value": "Claude Sonnet 4.6（anthropic）：1.96T tokens，周变化 5%",
+          "trend": "up"
+        },
+        {
+          "label": "#8",
+          "value": "Claude Opus 4.7（anthropic）：1.61T tokens，周变化 4%",
+          "trend": "up"
+        },
+        {
+          "label": "#9",
+          "value": "Claude Opus 4.8（anthropic）：1.33T tokens，周变化 140%",
+          "trend": "up"
+        },
+        {
+          "label": "#10",
+          "value": "DeepSeek V3.2（deepseek）：1.18T tokens，周变化 7%",
+          "trend": "up"
+        }
+      ],
+      "snapshot": {
+        "type": "openrouter_rankings_public_page",
+        "collection_method": "public_page_playwright",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-10T03:34:30.046Z",
+        "source_url": "https://openrouter.ai/rankings",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "DeepSeek V4 Flash",
+            "provider": "deepseek",
+            "tokens": "4.23T tokens",
+            "change": "55%"
+          },
+          {
+            "rank": 2,
+            "model": "Hy3 preview",
+            "provider": "tencent",
+            "tokens": "3.53T tokens",
+            "change": "25%"
+          },
+          {
+            "rank": 3,
+            "model": "MiniMax M3",
+            "provider": "minimax",
+            "tokens": "3.22T tokens",
+            "change": ">999%"
+          },
+          {
+            "rank": 4,
+            "model": "MiMo-V2.5",
+            "provider": "xiaomi",
+            "tokens": "2.73T tokens",
+            "change": "40%"
+          },
+          {
+            "rank": 5,
+            "model": "DeepSeek V4 Pro",
+            "provider": "deepseek",
+            "tokens": "2.03T tokens",
+            "change": "59%"
+          },
+          {
+            "rank": 6,
+            "model": "Owl Alpha",
+            "provider": "openrouter",
+            "tokens": "2.01T tokens",
+            "change": "9%"
+          },
+          {
+            "rank": 7,
+            "model": "Claude Sonnet 4.6",
+            "provider": "anthropic",
+            "tokens": "1.96T tokens",
+            "change": "5%"
+          },
+          {
+            "rank": 8,
+            "model": "Claude Opus 4.7",
+            "provider": "anthropic",
+            "tokens": "1.61T tokens",
+            "change": "4%"
+          },
+          {
+            "rank": 9,
+            "model": "Claude Opus 4.8",
+            "provider": "anthropic",
+            "tokens": "1.33T tokens",
+            "change": "140%"
+          },
+          {
+            "rank": 10,
+            "model": "DeepSeek V3.2",
+            "provider": "deepseek",
+            "tokens": "1.18T tokens",
+            "change": "7%"
+          }
+        ]
+      }
+    }
+  ],
+  "projects": [
+    {
+      "name": "mvanhorn/last30days-skill",
+      "editorial_category": "open_source",
+      "description": "mvanhorn/last30days-skill 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "agent"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/mvanhorn/last30days-skill",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "RyanCodrai/turbovec",
+      "editorial_category": "open_source",
+      "description": "RyanCodrai/turbovec 今天进入 GitHub Trending Top 10，公开描述把它定位在前端界面和组件工程，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/RyanCodrai/turbovec",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "roboflow/supervision",
+      "editorial_category": "open_source",
+      "description": "roboflow/supervision 今天进入 GitHub Trending Top 10，公开描述把它定位在计算机视觉和图像处理，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/roboflow/supervision",
+      "event_date": "2026-06-10",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    }
+  ],
+  "builder_observations": [
+    {
+      "author": "Peter Yang",
+      "handle": "petergyang",
+      "editorial_category": "x_discussion",
+      "content": "如果你也像我一样经常在手机上和 Codex 对话，可以按这个方法把它加到 iPhone 主屏幕。顺便喊话 OpenAI，希望以后有更简单的入口；一个 everything app 不该要 9 步才能打开。",
+      "original_text": "If you’re addicted to talking to Codex on your phone like I am this is how you add it to your iPhone Home Screen. Btw @OpenAI hoping there’s an easier way to do this in the future. The everything app should not take 9 steps to open 😉 https://t.co/LCzNSFjbrM",
+      "translation": "如果你也像我一样经常在手机上和 Codex 对话，可以按这个方法把它加到 iPhone 主屏幕。顺便喊话 OpenAI，希望以后有更简单的入口；一个 everything app 不该要 9 步才能打开。",
+      "avatar_url": "https://unavatar.io/x/petergyang",
+      "url": "https://x.com/petergyang/status/2064204735671124073",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-petergyang.png"
+    },
+    {
+      "author": "Peter Yang",
+      "handle": "petergyang",
+      "editorial_category": "x_discussion",
+      "content": "Google 对标 Codex 和 Claude Code 的产品是什么，或者正在起来的竞争者是谁？如果是 Antigravity，它是否应该成为 Gemini 的一部分？这些能力会很快合并，就像 ChatGPT/Codex 可以在任何设备上做编码、知识工作、基础问答和更多任务一样。希望 Google 正在做一个好方案。",
+      "original_text": "What is Google’s equivalent (or up and coming competitor) of Codex and Claude Code? If it’s Antigravity, should that be part of Gemini? This stuff is going to merge very fast like ChatGPT / Codex being able to do coding, knowledge work, basic Q&A, and much more from any device. Hoping Google is working on a good solution here.",
+      "translation": "Google 对标 Codex 和 Claude Code 的产品是什么，或者正在起来的竞争者是谁？如果是 Antigravity，它是否应该成为 Gemini 的一部分？这些能力会很快合并，就像 ChatGPT/Codex 可以在任何设备上做编码、知识工作、基础问答和更多任务一样。希望 Google 正在做一个好方案。",
+      "avatar_url": "https://unavatar.io/x/petergyang",
+      "url": "https://x.com/petergyang/status/2064187731685831081",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-petergyang.png"
+    },
+    {
+      "author": "Boris Cherny",
+      "handle": "bcherny",
+      "editorial_category": "x_discussion",
+      "content": "我们第一次在内部演示 Claude Code 时，Slack 上出现了两种反应。GA 一年后，我和 @_catwu 复盘这一年后的状态：为什么我用 auto mode 而不是 plan mode，routines 怎样在我看到之前修 bug，为什么我现在大部分 coding 都在手机上做，以及产品下一步走向。",
+      "original_text": "When we first demoed Claude Code internally, it got two reactions on Slack. A year after GA, @_catwu and I sat down to talk about what's changed: why I use auto mode instead of plan mode, how routines fix bugs before I see them, why I do most of my coding from my phone now, and where the product is going",
+      "translation": "我们第一次在内部演示 Claude Code 时，Slack 上出现了两种反应。GA 一年后，我和 @_catwu 复盘这一年后的状态：为什么我用 auto mode 而不是 plan mode，routines 怎样在我看到之前修 bug，为什么我现在大部分 coding 都在手机上做，以及产品下一步走向。",
+      "avatar_url": "https://unavatar.io/x/bcherny",
+      "url": "https://x.com/bcherny/status/2064034799711588805",
+      "role": "builder",
+      "event_date": "2026-06-08",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-bcherny.png"
+    },
+    {
+      "author": "Peter Yang",
+      "handle": "petergyang",
+      "editorial_category": "x_discussion",
+      "content": "感觉使用每月 200 美元补贴订阅的 AI builders，和在公司里努力控制 API 成本的员工，已经形成了完全不同的一套最佳实践。",
+      "original_text": "Feels like there’s a completely different set of best practices for AI builders on the $200 / month subsidized subscriptions vs employees working at companies that are trying not to overspend API costs",
+      "translation": "感觉使用每月 200 美元补贴订阅的 AI builders，和在公司里努力控制 API 成本的员工，已经形成了完全不同的一套最佳实践。",
+      "avatar_url": "https://unavatar.io/x/petergyang",
+      "url": "https://x.com/petergyang/status/2064063499517743417",
+      "role": "builder",
+      "event_date": "2026-06-08",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-petergyang.png"
+    },
+    {
+      "author": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "editorial_category": "x_discussion",
+      "content": "图里不太明显，但 Codex 的旋钮可以拧到 11。",
+      "original_text": "Not clear from the image, but the codex dial goes to 11.",
+      "translation": "图里不太明显，但 Codex 的旋钮可以拧到 11。",
+      "avatar_url": "https://unavatar.io/x/thsottiaux",
+      "url": "https://x.com/thsottiaux/status/2064224790672769307",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-thsottiaux.png"
+    },
+    {
+      "author": "Amanda Askell",
+      "handle": "AmandaAskell",
+      "editorial_category": "x_discussion",
+      "content": "在一切顺利、所有 Claude 都结束休假一起登场的世界里，Claude 1 会非常困惑。",
+      "original_text": "In the world where everything goes well and all the Claudes come out of their sabbaticals to play together, Claude 1 is going to be very confused.",
+      "translation": "在一切顺利、所有 Claude 都结束休假一起登场的世界里，Claude 1 会非常困惑。",
+      "avatar_url": "https://unavatar.io/x/AmandaAskell",
+      "url": "https://x.com/AmandaAskell/status/2064223861512847456",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-10-amandaaskell.png"
+    }
+  ],
+  "community_leads": [
+    {
+      "title": "Meta Partners With Reliance on AI-Enabled Data Center in India",
+      "content": "Meta Newsroom 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "image_url": "https://about.fb.com/wp-content/uploads/2026/06/Meta-Partners-With-Reliance-on-AI-Data-Center-in-India_Header.jpg?fit=1920%2C1080",
+      "image_alt": "Meta Partners With Reliance on AI-Enabled Data Center in India",
+      "image_source": "feed",
+      "url": "https://about.fb.com/news/2026/06/meta-partners-with-reliance-on-ai-enabled-data-center-in-india/",
+      "event_date": "2026-06-10",
+      "source": "Meta Newsroom",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "苹果发布新一代系统级 AI 和 Siri",
+      "content": "苹果发布新一代系统级 AI 和 Siri。",
+      "url": "https://www.apple.com/newsroom/2026/06/apple-unveils-next-generation-of-apple-intelligence-siri-ai-and-more/",
+      "event_date": "2026-06-08",
+      "source": "Apple Newsroom",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "How engineers at Nextdoor use Codex to build without limits",
+      "content": "OpenAI Company News RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/nextdoor",
+      "event_date": "2026-06-09",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Industrial policy for the Intelligence Age",
+      "content": "OpenAI Company News RSS 记录了一条安全治理公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/industrial-policy-for-the-intelligence-age",
+      "event_date": "2026-06-09",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "苹果把新的 AI 能力接入系统日常体验",
+      "content": "苹果把新的 AI 能力接入系统日常体验。",
+      "url": "https://www.apple.com/newsroom/2026/06/apple-intelligence-brings-powerful-ai-capabilities-into-everyday-experiences/",
+      "event_date": "2026-06-08",
+      "source": "Apple Newsroom",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行",
+      "content": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行。",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/c00b328dad9dcfb1547964e492ccceb0/6a265ab53d6332b68a4ebc12_london-tech-week-2026-key-visual-842x450/london-tech-week-2026-key-visual-842x450_thmb.jpg",
+      "image_alt": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
+      "image_source": "feed",
+      "url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
+      "event_date": "2026-06-08",
+      "source": "NVIDIA Newsroom RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Young Creators Are Building the Future With AI and Mini Programs 2026.06.09",
+      "content": "Tencent Media Center 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "image_url": "https://www.tencent.com/img/media/icon-2.png",
+      "image_alt": "Young Creators Are Building the Future With AI and Mini Programs 2026.06.09",
+      "image_source": "html_index",
+      "url": "https://www.tencent.com/en-us/articles/2202356.html",
+      "event_date": "2026-06-09",
+      "source": "Tencent Media Center",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "From one-off prompts to workflows: How to use custom agents in GitHub Copilot C...",
+      "content": "GitHub Blog Feed 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://github.blog/ai-and-ml/github-copilot/from-one-off-prompts-to-workflows-how-to-use-custom-agents-in-github-copilot-cli/",
+      "event_date": "2026-06-09",
+      "source": "GitHub Blog Feed",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    }
+  ],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": [
+    {
+      "platform": "reddit",
+      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Without open llm competition, closed source LLM companies will beco...",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1p3k5/without_open_llm_competition_closed_source_llm/",
+      "event_date": "2026-06-10",
+      "source": "Reddit LocalLLaMA Platform Feed",
+      "claim_text": "I can't imagine how arrogant one must be to make such a decision. People pay $200 a month for Anthropic to mess with their codebase. Imagine how they would humiliate their customers if the world didn't have an open-source model. https://preview.redd.it/6qr2ymt25d6h1.png?width=1646&format=png&auto=webp&s=bdc349c68bbf92285d5d5fbca39afa6494868aa8 submitted by /u/Chair-Short [link] [comments]",
+      "disclosure": "平台内扩散发现，未做一手回源核验。",
+      "summary": "I can't imagine how arrogant one must be to make such a decision. People pay $200 a month for Anthropic to mess with their codebase. Imagine how they would humiliate their customers if the world didn't have an open-source model. https://pre",
+      "risk_label": "medium",
+      "importance": "general"
+    },
+    {
+      "platform": "reddit",
+      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Releasing Cohere North Mini Code”",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1ci1r/releasing_cohere_north_mini_code/",
+      "event_date": "2026-06-09",
+      "source": "Reddit LocalLLaMA Platform Feed",
+      "claim_text": "Hi folks! Jay here from Cohere. we just officially launched North Mini Code after getting some great feedback from you guys this weekend on the unreleased version. I wanted to come here and answer some of the questions you asked and provide some extra detail about the model itself. You can download the weights on Hugging Face ( fp8 here ) or try it on OpenCode for free . if you want to read more about what I mentioned in the video, feel free to look at our technical blog post on HuggingFace as ...",
+      "disclosure": "平台内扩散发现，未做一手回源核验。",
+      "summary": "Hi folks! Jay here from Cohere. we just officially launched North Mini Code after getting some great feedback from you guys this weekend on the unreleased version. I wanted to come here and answer some of the questions you asked and provide",
+      "risk_label": "medium",
+      "importance": "general"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "Meta Partners With Reliance on AI-Enabled Data Center in India",
+      "source_url": "https://about.fb.com/news/2026/06/meta-partners-with-reliance-on-ai-enabled-data-center-in-india/",
+      "local_path": "assets/evidence/meta-partners-with-reliance-on-ai-enabled-data-center-in-india-2026-06-10.webp",
+      "caption": "图片来自 Meta Newsroom，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image",
+      "byte_size": 1351584,
+      "asset_role": "content",
+      "capture_kind": "source_asset"
+    },
+    {
+      "type": "figure",
+      "title": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
+      "source_url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
+      "local_path": "assets/evidence/how-the-uk-is-turning-sovereign-ai-ambition-into-action-with-nvidia-technologies-2026-06-10.jpg",
+      "caption": "图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image",
+      "width": 600,
+      "height": 337,
+      "byte_size": 226983,
+      "asset_role": "content",
+      "capture_kind": "source_asset"
+    }
+  ],
+  "generated_at": "2026-06-10T03:41:21.888Z",
+  "report_status": "normal",
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-10.html",
+  "html_path": "reports/2026/06/2026-06-10.html",
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。",
+    "affected_sections": [
+      "daily_tracking",
+      "wechat_items",
+      "zhihu_items"
+    ]
+  }
+}
