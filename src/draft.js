@@ -53,6 +53,8 @@ const LOW_SIGNAL_VENDOR_PARTNERSHIP_RE = /\b(partnership|collaborat(?:e|ion)|bui
 const LOW_VALUE_EVENT_GUIDE_RE = /\bhow to watch\b|\bwhat to expect\b|\bwatch live\b|\blivestream\b|\bschedule\b|\blineup\b|\btickets?\b|直播|观看指南|日程|赛程/i;
 const MINOR_CONSUMER_AI_FEATURE_RE = /\bdesign merch\b|\balexa for shopping\b|\bpet portraits?\b|\btumblers?\b|\bgroup shirts?\b|\bcreator assistant\b|\bai translations?\b|\bfacebook translations?\b/i;
 const PUBLIC_AI_HEADLINE_ENTITY_RE = /\b(openai|google|deepmind|anthropic|meta|nvidia|xai|x\.ai|microsoft|amazon|aws|apple|bytedance|byte\s*dance|tiktok|alibaba|qwen|deepseek|tencent|minimax|moonshot|kimi|mistral|hugging face|runway|pika|luma|kling|adobe)\b|字节|阿里|通义|腾讯|混元|深度求索|月之暗面|快手|可灵|商汤|智谱|百川|阶跃星辰/i;
+const STRATEGIC_CORE_SOURCE_RE = /\b(openai|anthropic|claude|deepmind|google research|google keyword|meta ai|meta llama|microsoft|zhipu|z\.ai|zai-org|glm|智谱|minimax|moonshot|kimi|deepseek|bytedance|byte\s*dance|seed\.bytedance|tencent|hunyuan|qwen|alibaba|meituan)\b|openai\.com|anthropic\.com|deepmind\.google|research\.google|blog\.google|ai\.meta\.com|about\.fb\.com|microsoft\.com|zhipuai\.cn|minimax\.io|kimi\.com|platform\.kimi\.com|deepseek\.com|bytedance\.com|seed\.bytedance\.com|tencent\.com|hunyuan\.tencent\.com|qwen\.ai|alibabagroup\.com|alibabacloud\.com|meituan\.com|github\.com\/(?:openai|anthropics|google-deepmind|meta-llama|deepseek-ai|qwenlm|moonshotai|minimax-ai|tencent-hunyuan|tencent|bytedance|alibaba|meituan|microsoft)\b|huggingface\.co\/(?:openai|anthropic|deepseek-ai|minimaxai|qwen|zai-org|bytedance-seed|moonshotai|meta-llama|microsoft)\b/i;
+const OVERREPRESENTED_INFRA_VENDOR_SOURCE_RE = /\b(nvidia|aws|amazon web services|amazon bedrock|sagemaker)\b|developer\.nvidia\.com|nvidianews\.nvidia\.com|blogs\.nvidia\.com|aws\.amazon\.com|aboutamazon\.com/i;
 const GENERIC_HOT_BLOG_EVIDENCE_RE = /published this blog\/interview entry\.?$/i;
 const TITLE_MOJIBAKE_RE = /�|锟|喔|鈥|峄|岷|箞|鑳|€/u;
 const LOW_VALUE_MAIN_RE = /amazon in the community|service,\s*community,\s*and commitment at hq2|friday night baseball|apple arcade|family feud pocket|prime video|spinoff|ari[a]?nespace launch|deploy more satellites|vought rising|here'?s what'?s happening in seattle|hq2|july.*baseball|mini football legends|the latest ai news we announced in/i;
@@ -90,6 +92,8 @@ const COMMUNITY_LEAD_TARGET = 24;
 const COMMUNITY_PAPER_TARGET = 3;
 const COMMUNITY_GITHUB_TARGET = 3;
 const COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET = 2;
+const MAX_INFRA_VENDOR_MAIN_ITEMS = 2;
+const MAX_INFRA_VENDOR_HOT_BLOGS = 2;
 const MAX_PUBLIC_UNITS = 80;
 const PUBLIC_THIRD_PARTY_SOURCE_LEVELS = new Set([
   "intermediary",
@@ -303,12 +307,20 @@ function selectReportItems(merged, options = {}) {
     .filter((candidate) => canPromoteToHotBlog(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
   const hotBlogSeeds = [];
+  const enforceHotBlogInfraVendorCap = shouldEnforceInfraVendorCap(hotBlogPool, HOT_BLOG_TARGET);
+  let hotBlogInfraVendorCount = 0;
   for (const candidate of hotBlogPool) {
     if (hotBlogSeeds.length >= HOT_BLOG_TARGET) break;
     const key = normalizeUrl(candidate.url);
     if (!key || hotBlogSeenUrls.has(key)) continue;
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      if (enforceHotBlogInfraVendorCap && hotBlogInfraVendorCount >= MAX_INFRA_VENDOR_HOT_BLOGS) continue;
+    }
     hotBlogSeenUrls.add(key);
     hotBlogSeeds.push(candidate);
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      hotBlogInfraVendorCount += 1;
+    }
   }
   const hotBlogs = hotBlogSeeds.map((candidate) => {
     const hotCandidate = markIncludedCandidate(candidate, "hot_blog", "hot_blogs");
@@ -543,6 +555,8 @@ function pickMainCandidates(candidates, target) {
   const picked = [];
   const seenUrls = new Set();
   const seenTopics = new Set();
+  const enforceInfraVendorCap = shouldEnforceInfraVendorCap(candidates, target);
+  let infraVendorCount = 0;
   let lowSignalPartnershipCount = 0;
   const plainReaderCandidates = candidates.filter((candidate) => hasPlainReaderSignal(candidate));
   const hardcoreLimit = plainReaderCandidates.length >= target - 2 ? 2 : target;
@@ -553,6 +567,9 @@ function pickMainCandidates(candidates, target) {
     if (!key || seenUrls.has(key)) continue;
     const topicKey = mainTopicKey(candidate);
     if (topicKey && seenTopics.has(topicKey)) continue;
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      if (enforceInfraVendorCap && infraVendorCount >= MAX_INFRA_VENDOR_MAIN_ITEMS) continue;
+    }
     if (isLowSignalVendorPartnership(candidate)) {
       if (lowSignalPartnershipCount >= 1) continue;
       lowSignalPartnershipCount += 1;
@@ -563,11 +580,20 @@ function pickMainCandidates(candidates, target) {
     }
     picked.push(candidate);
     seenUrls.add(key);
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      infraVendorCount += 1;
+    }
     if (topicKey) {
       seenTopics.add(topicKey);
     }
   }
   return picked;
+}
+
+function shouldEnforceInfraVendorCap(candidates, target) {
+  const strategicCoreCount = candidates.filter((candidate) => isStrategicCoreOfficialCandidate(candidate)).length;
+  const nonInfraCount = candidates.filter((candidate) => !isOverrepresentedInfraVendorCandidate(candidate)).length;
+  return strategicCoreCount >= 3 || nonInfraCount >= Math.max(3, target - 2);
 }
 
 function mainTopicKey(candidate) {
@@ -2116,6 +2142,8 @@ function candidateScore(candidate) {
   if (sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account") score += 18;
   if (sourceLevel === "paper" || sourceLevel === "paper_api") score += 4;
   if (sourceLevel === "github") score += 10;
+  score += strategicCoreOfficialScore(candidate);
+  if (isOverrepresentedInfraVendorCandidate(candidate)) score -= 35;
   if (candidate.category === "main_item") score += 10;
   if (candidate.category === "hot_blog") score += 6;
   if (candidate.category === "community_lead" && hasCommunityImage) score += 12;
@@ -2142,7 +2170,7 @@ function candidateScore(candidate) {
   if (isFutureDatedCandidate(candidate)) score -= 30;
   if (isOriginalModelLaunchCandidate(candidate)) score += 120;
   if (isModelAvailabilityDuplicateCandidate(candidate)) score -= 90;
-  if (/openai|anthropic|deepmind|google|meta|qwen|bytedance|tencent|minimax|kimi|runway|pika|luma|kling|nvidia|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
+  if (/openai|anthropic|deepmind|google|meta|microsoft|qwen|zhipu|deepseek|bytedance|tencent|minimax|moonshot|kimi|alibaba|meituan|runway|pika|luma|kling|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
   if (isLowValueMainCandidate(candidate)) score -= 40;
   return score;
 }
@@ -2158,6 +2186,12 @@ function compareMainCandidates(left, right) {
 function mainCandidateScore(candidate) {
   let score = candidateScore(candidate);
   score += publicNewsSalienceScore(candidate) * 2;
+  if (isStrategicCoreOfficialCandidate(candidate)) {
+    score += 160;
+  }
+  if (isOverrepresentedInfraVendorCandidate(candidate)) {
+    score -= 80;
+  }
   if (isOriginalModelLaunchCandidate(candidate)) {
     score += 220;
   }
@@ -2203,11 +2237,16 @@ function publicNewsSalienceScore(candidate) {
   const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`;
   const combined = `${text} ${sourceText}`;
   let score = 0;
+  if (isStrategicCoreOfficialCandidate(candidate)) {
+    score += 180;
+  }
+  if (isOverrepresentedInfraVendorCandidate(candidate)) {
+    score -= 40;
+  }
   const entityWeights = [
-    [/openai|chatgpt|gpt-|apple|siri|apple intelligence|wwdc|nvidia|blackwell|cuda|nvfp/i, 160],
-    [/anthropic|claude|google|deepmind|gemini|microsoft|meta\b|llama\b/i, 130],
-    [/amazon|aws|github|xai|x\.ai|adobe|mistral/i, 80],
-    [/alibaba|qwen|tencent|bytedance|kimi|minimax|zhipu/i, 70]
+    [/openai|chatgpt|gpt-|anthropic|claude|google|deepmind|gemini|microsoft|meta\b|llama\b|alibaba|qwen|tencent|bytedance|byte\s*dance|kimi|moonshot|minimax|zhipu|deepseek|meituan/i, 170],
+    [/apple|siri|apple intelligence|wwdc|xai|x\.ai|adobe|mistral/i, 105],
+    [/nvidia|blackwell|cuda|nvfp|amazon|aws|github/i, 65]
   ];
   const matchedEntity = entityWeights.find(([pattern]) => pattern.test(combined));
   if (matchedEntity) {
@@ -2298,6 +2337,44 @@ function isLowValueMainCandidate(candidate) {
     return true;
   }
   return false;
+}
+
+function strategicCoreOfficialScore(candidate) {
+  if (!isStrategicCoreOfficialCandidate(candidate)) {
+    return 0;
+  }
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  let score = 120;
+  if (sourceLevel === "official_company_news") score += 40;
+  if (sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account") score += 30;
+  if (candidate.category === "hot_blog") score += 20;
+  if (isAigcCandidate(candidate)) score += 16;
+  return score;
+}
+
+function isStrategicCoreOfficialCandidate(candidate) {
+  if (isOverrepresentedInfraVendorCandidate(candidate)) {
+    return false;
+  }
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (!TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel)) {
+    return false;
+  }
+  return STRATEGIC_CORE_SOURCE_RE.test(candidateSourceOwnerText(candidate));
+}
+
+function isOverrepresentedInfraVendorCandidate(candidate) {
+  return OVERREPRESENTED_INFRA_VENDOR_SOURCE_RE.test(candidateSourceOwnerText(candidate));
+}
+
+function candidateSourceOwnerText(candidate) {
+  return [
+    candidate?.source,
+    candidate?.source_id,
+    candidate?.source_url,
+    candidate?.url,
+    candidate?.primary_url
+  ].filter(Boolean).join(" ").toLowerCase();
 }
 
 function isReaderRelevantCandidate(candidate) {

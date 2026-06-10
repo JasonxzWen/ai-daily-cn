@@ -345,7 +345,7 @@ try {
   assert.doesNotMatch(reportBody, /模型发布/);
   assert.doesNotMatch(reportBody, /ExampleModel 2/);
   assert.equal(await page.locator("#model-releases").count(), 0);
-  assert.match(await page.locator("body").textContent(), /热门博客/);
+  assert.match(await page.locator("body").textContent(), /精选博客更新/);
   assert.match(await page.locator("body").textContent(), /Harness Engineering for Long Running Agents/);
   assert.match(await page.locator("body").textContent(), /GitHub Trending/);
   assert.match(await page.locator("body").textContent(), /项目 highlight/);
@@ -402,7 +402,7 @@ try {
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   await page.evaluate(() => {
     const stat = Array.from(document.querySelectorAll(".hero-stat span"))
-      .find((node) => (node.textContent || "").includes("热门博客"));
+      .find((node) => (node.textContent || "").includes("精选博客"));
     if (stat) {
       stat.textContent = "技不止术";
     }

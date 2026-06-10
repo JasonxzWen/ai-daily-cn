@@ -721,7 +721,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
       ["主体", "2", "重点条目"],
       ["AIGC", "1", "产品/内容"],
       ["追踪", "1", "榜单变化"],
-      ["热门博客", "1", "深读"],
+      ["精选博客", "1", "深读"],
       ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
       ["覆盖", "05-15", "标准时间范围"]
@@ -739,7 +739,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!input.sections.some((section) => section.title === "主体信息"));
   assert(!JSON.stringify(input.sections).includes("主体信息"));
   assert(JSON.stringify(input.sections).includes("主线条目："));
-  assert(input.sections.some((section) => section.title === "AI 资讯"));
+  assert(input.sections.some((section) => section.title === "AI 行业动态"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
@@ -765,7 +765,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(trackingSection.items[0].table.rows.length, 1);
   assert.equal(trackingSection.items[0].table.rows[0].label, "核心指标");
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "核心指标"));
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "精选博客更新");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
   assert.equal(hotBlogsSection.items.length, 1);
@@ -802,7 +802,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
   assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
-  assert(input.sections.some((section) => section.title === "AI 资讯"));
+  assert(input.sections.some((section) => section.title === "AI 行业动态"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -1028,7 +1028,7 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   };
 
   const input = reportToInteractionInput(report);
-  const hotBlogsSection = input.sections.find((section) => section.title === "热门博客");
+  const hotBlogsSection = input.sections.find((section) => section.title === "精选博客更新");
   const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
 
   assert(pointsText.includes("行业媒体/播客整理"));
@@ -5363,7 +5363,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("多平台可见"));
   assert(!html.includes("官方可用性"));
-  assert(html.includes("热门博客"));
+  assert(html.includes("精选博客更新"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
@@ -6069,6 +6069,162 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert.equal(written.report.quality_status.status, "degraded");
   assert(written.report.quality_status.reasons.includes("daily_tracking_source_blocked"));
   assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
+});
+
+test("report:draft prioritizes strategic official AI company sources over NVIDIA and AWS floods", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-strategic-priority-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const strategicCandidates = [
+    strategicOfficialCandidate(reportDate, {
+      id: "openai-official-model",
+      source: "OpenAI News RSS",
+      url: "https://openai.com/news/gpt-6",
+      title: "OpenAI announces GPT-6 for API and enterprise developers",
+      evidence: "OpenAI announced a GPT-6 model release with API availability, enterprise controls, pricing notes, and developer migration guidance."
+    }),
+    strategicOfficialCandidate(reportDate, {
+      id: "anthropic-official-model",
+      source: "Anthropic News",
+      url: "https://www.anthropic.com/news/claude-fable-5",
+      title: "Claude Fable 5 and Mythos 5 launch from Anthropic",
+      evidence: "Anthropic says Claude Fable 5 and Claude Mythos 5 are the same underlying model, with trusted-access safeguards and general-use deployment guidance."
+    }),
+    strategicOfficialCandidate(reportDate, {
+      id: "zhipu-official-platform",
+      source: "Zhipu AI News",
+      url: "https://www.zhipuai.cn/zh/news/glm-5-api",
+      title: "智谱发布 GLM-5 API 与企业平台更新",
+      evidence: "智谱官方新闻说明 GLM-5 API、企业平台、模型价格、上线节奏和开发者迁移入口。"
+    }),
+    strategicOfficialCandidate(reportDate, {
+      id: "minimax-official-news",
+      source: "MiniMax News",
+      url: "https://www.minimax.io/news/m3-model-release",
+      title: "MiniMax 发布 M3 模型与 Hailuo AI 开发者更新",
+      evidence: "MiniMax 官方新闻介绍 M3 模型、Hailuo AI、API 能力、模型发布节奏和创作者工作流。"
+    }),
+    strategicOfficialCandidate(reportDate, {
+      id: "kimi-official-blog",
+      source: "Kimi Technical Blog",
+      url: "https://www.kimi.com/blog/kimi-k2-agent-update",
+      title: "Kimi 技术博客发布 K2 agent 与长上下文平台更新",
+      evidence: "Kimi 技术博客说明 K2 agent、长上下文、API、开发者平台和工作流上线节奏。"
+    }),
+    strategicOfficialCandidate(reportDate, {
+      id: "meta-official-ai",
+      source: "Meta AI Blog",
+      url: "https://ai.meta.com/blog/llama-agent-platform",
+      title: "Meta AI 发布 Llama agent 平台更新",
+      evidence: "Meta AI 官方博客介绍 Llama agent 平台、开源模型、开发者工具、企业部署和模型权重发布。"
+    })
+  ];
+  const infraCandidates = Array.from({ length: 8 }, (_, index) => {
+    const nvidia = index % 2 === 0;
+    return strategicOfficialCandidate(reportDate, {
+      id: `${nvidia ? "nvidia" : "aws"}-infra-${index + 1}`,
+      source: nvidia ? "NVIDIA Developer Blog" : "AWS Machine Learning Blog",
+      url: nvidia
+        ? `https://developer.nvidia.com/blog/blackwell-training-${index + 1}/`
+        : `https://aws.amazon.com/blogs/machine-learning/bedrock-agentcore-${index + 1}/`,
+      title: nvidia
+        ? `NVIDIA Blackwell CUDA workflow update ${index + 1}`
+        : `AWS Bedrock AgentCore workflow update ${index + 1}`,
+      evidence: nvidia
+        ? "NVIDIA Developer Blog describes Blackwell, CUDA, NVFP4, developer workflow, model training availability, and platform release details."
+        : "AWS Machine Learning Blog describes Bedrock AgentCore, model inference, API availability, quotas, developer workflow, and platform release details.",
+      sourceLevel: "official",
+      category: "hot_blog"
+    });
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [...infraCandidates, ...strategicCandidates],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Zhipu AI News", "MiniMax News", "Kimi Technical Blog", "Meta AI Blog", "NVIDIA Developer Blog", "AWS Machine Learning Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainSources = drafted.report.main_items.map((item) => item.source);
+  assert(mainSources.includes("OpenAI News RSS"));
+  assert(mainSources.includes("Anthropic News"));
+  assert(mainSources.includes("Zhipu AI News"));
+  assert(mainSources.includes("MiniMax News"));
+  assert(mainSources.includes("Kimi Technical Blog"));
+  assert(mainSources.includes("Meta AI Blog"));
+  assert(
+    drafted.report.main_items.filter((item) => /NVIDIA|AWS/i.test(item.source)).length <= 2,
+    "NVIDIA/AWS should not occupy more than two main items when strategic official sources are available"
+  );
+});
+
+test("interaction input renders AI industry, content track, and selected blog sections", () => {
+  const report = {
+    schema_version: 1,
+    report_date: "2026-05-26",
+    title: "AI 日报 2026-05-26",
+    summary: "今日重点覆盖模型、平台和内容赛道。",
+    site_url: siteUrl,
+    main_items: [
+      {
+        title: "OpenAI 发布企业 API 更新",
+        summary: "OpenAI 官方说明企业 API、模型发布、权限边界和开发者迁移节奏。",
+        bullets: ["**平台边界**：API、权限、定价和企业治理需要一起核对。"],
+        url: "https://openai.com/news/example-enterprise-api",
+        event_date: "2026-05-26",
+        source: "OpenAI News RSS",
+        source_level: "official_company_news",
+        verification_status: "primary_confirmed",
+        editorial_category: "ai_industry"
+      },
+      {
+        title: "Runway 更新 AI 视频创作工作流",
+        summary: "Runway 官方 changelog 说明视频生成、游戏世界和创作者工作流的产品变化。",
+        bullets: ["**内容生产**：视频、游戏资产和创作者工具进入同一条产品链路。"],
+        url: "https://runwayml.com/en/changelog/example",
+        event_date: "2026-05-26",
+        source: "Runway Changelog",
+        source_level: "official",
+        verification_status: "primary_confirmed",
+        editorial_category: "content_aigc"
+      }
+    ],
+    hot_blogs: [
+      {
+        title: "Harness Engineering for Long Running Agents",
+        summary: "这篇文章把长运行 agent 的任务规划、上下文治理、工具执行、结果校验和恢复路径拆成清晰层次，适合判断 agent 平台的工程边界。",
+        key_points: ["任务规划需要可回放", "上下文治理决定成本", "工具执行要有权限边界"],
+        url: "https://example.com/blog/harness-engineering",
+        publisher: "Example Blog",
+        author: "Example",
+        event_date: "2026-05-26",
+        topic: "agent harness",
+        source_level: "primary",
+        verification_status: "primary_confirmed"
+      }
+    ],
+    github_trending: [],
+    projects: [],
+    builder_observations: [],
+    community_leads: [],
+    daily_tracking: [],
+    evidence_assets: [],
+    source_audit: {}
+  };
+
+  const input = reportToInteractionInput(report);
+  const titles = input.sections.map((section) => section.title);
+  assert(titles.includes("AI 行业动态"));
+  assert(titles.includes("内容赛道动态"));
+  assert(titles.includes("精选博客更新"));
+  assert(!titles.includes("AI 资讯"));
+  assert(!titles.includes("热门博客"));
 });
 
 test("report:draft cleans Builder original_text shell metadata before publishing", async () => {
@@ -7197,21 +7353,15 @@ test("report:draft promotes official product and platform deep dives into main_i
   assert(mainUrls.has(openAiExchangeUrl), "OpenAI public research exchange should enter main_items");
   assert(mainUrls.has(blackwellUrl), "NVIDIA Blackwell AI inference update should enter main_items");
   assert(mainUrls.has(notebooklmUrl), "official NotebookLM product update should enter main_items");
-  assert(mainUrls.has(awsCrossRegionUrl), "official AWS cross-region inference update should remain in main_items");
-  assert(mainUrls.has(agentcoreUrl), "official Bedrock AgentCore workflow update should enter main_items");
   assert(mainUrls.has(rocketmqUrl), "official RocketMQ workflow infrastructure update should enter main_items");
+  assert(new Set([...mainUrls, ...hotBlogUrls]).has(awsCrossRegionUrl), "official AWS cross-region inference update should remain in public selection");
+  assert(new Set([...mainUrls, ...hotBlogUrls]).has(agentcoreUrl), "official Bedrock AgentCore workflow update should remain in public selection");
   assert(new Set([...mainUrls, ...hotBlogUrls]).has(nemotronUrl), "official NVIDIA model deep dive should remain available in public selection");
-  const firstNarrowEngineeringIndex = Math.min(
-    orderedMainUrls.indexOf(awsCrossRegionUrl),
-    orderedMainUrls.indexOf(agentcoreUrl),
-    orderedMainUrls.indexOf(rocketmqUrl)
+  assert(
+    drafted.report.main_items.filter((item) => /NVIDIA|AWS/i.test(item.source)).length <= 2,
+    "NVIDIA/AWS infrastructure items should not dominate main_items when core official sources exist"
   );
-  for (const headlineUrl of [appleSiriUrl, openAiExchangeUrl, blackwellUrl]) {
-    assert(
-      orderedMainUrls.indexOf(headlineUrl) > -1 && orderedMainUrls.indexOf(headlineUrl) < firstNarrowEngineeringIndex,
-      `${headlineUrl} should rank before narrow engineering blog items`
-    );
-  }
+  assert(orderedMainUrls.indexOf(openAiExchangeUrl) < orderedMainUrls.indexOf(blackwellUrl), "OpenAI official update should rank before NVIDIA infrastructure update");
   assert.equal(
     new Set(drafted.report.main_items.map((item) => item.title)).size,
     drafted.report.main_items.length,
@@ -7720,7 +7870,7 @@ test("report:write allows explicit network-outage empty reports only", async () 
   );
 
   const interaction = reportToInteractionInput(result.report);
-  const aiNewsSection = interaction.sections.find((section) => section.title === "AI 资讯");
+  const aiNewsSection = interaction.sections.find((section) => section.title === "AI 行业动态");
   assert(aiNewsSection.content.includes("未写入未核验主体事实"));
 
   const invalid = structuredClone(result.report);
@@ -8481,7 +8631,7 @@ test("public daily contract renders tables instead of screenshots and hides audi
 
   const input = reportToInteractionInput(report);
   const tracking = input.sections.find((section) => section.title === "每日追踪");
-  const hotBlogs = input.sections.find((section) => section.title === "热门博客");
+  const hotBlogs = input.sections.find((section) => section.title === "精选博客更新");
   const serialized = JSON.stringify(input.sections);
 
   assert(tracking);
@@ -8550,7 +8700,7 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   assert(!serialized.includes("candidate counts"));
 });
 
-test("public daily contract renders main items as one short-news stream", () => {
+test("public daily contract renders main items as industry and content-track streams", () => {
   const report = strictPublishReportFixture();
   const categories = [
     "ai_industry",
@@ -8573,14 +8723,14 @@ test("public daily contract renders main items as one short-news stream", () => 
   const mainSections = input.sections.filter((section) => section.group === "main" && section.type === "markdown");
   const content = mainSections.map((section) => section.content || "").join("\n");
 
-  assert.equal(mainSections.length, 1);
-  assert.equal(mainSections[0].title, "AI 资讯");
+  assert.equal(mainSections.length, 2);
+  assert.deepEqual(mainSections.map((section) => section.title), ["AI 行业动态", "内容赛道动态"]);
   assert(content.includes("1. **["));
   assert(content.includes(`${report.main_items.length}. **[`));
   for (const item of report.main_items) {
     assert(content.includes(item.title));
   }
-  assert(!input.sections.some((section) => ["大厂与政策", "产品与开源", "AIGC 动态"].includes(section.title)));
+  assert(!input.sections.some((section) => ["AI 资讯", "大厂与政策", "产品与开源", "AIGC 动态"].includes(section.title)));
 });
 
 test("public daily contract replays 2026-06-09 bad media and short-main regression", async () => {
@@ -11436,6 +11586,81 @@ function autodraftDiscoveryFixture(reportDate) {
       ...githubCandidates,
       builderCandidate
     ]
+  };
+}
+
+function strategicOfficialCandidate(reportDate, options = {}) {
+  return {
+    id: options.id,
+    source_id: options.sourceId || `content-${String(options.source || "official").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    category: options.category || "community_lead",
+    title: options.title,
+    url: options.url,
+    source: options.source,
+    event_date: reportDate,
+    status: "excluded",
+    evidence: options.evidence,
+    verification_status: "primary_confirmed",
+    source_level: options.sourceLevel || "official_company_news",
+    verification_sources: [options.url],
+    primary_url: options.url,
+    editorial_category: options.editorialCategory || "ai_industry"
+  };
+}
+
+function discoveryEnvelope({ candidates, sourceNames = [] } = {}) {
+  return {
+    source_audit: {
+      github_trending: {
+        checked: true,
+        sources: [],
+        candidates_found: 0,
+        included: 0,
+        notes: "No GitHub trending fixture candidates."
+      },
+      builder_sources: {
+        checked: true,
+        sources: [],
+        candidates_found: 0,
+        included: 0,
+        notes: "No builder fixture candidates."
+      },
+      content_sources: {
+        checked: true,
+        sources: sourceNames.map((name) => ({
+          name,
+          url: `https://example.com/${String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+          status: "checked",
+          notes: "fixture source checked"
+        })),
+        candidates_found: candidates.length,
+        included: 0,
+        sources_checked: sourceNames.length,
+        notes: "Fixture content sources checked."
+      },
+      search_sources: {
+        checked: true,
+        sources: [],
+        candidates_found: 0,
+        included: 0,
+        notes: "No search fixture candidates."
+      },
+      sources_health: {
+        checked: true,
+        sources: [],
+        candidates_found: 0,
+        included: 0,
+        notes: "Source health fixture ok."
+      }
+    },
+    sources: sourceNames.map((name) => ({
+      id: `fixture-${String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      name,
+      url: `https://example.com/${String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      category: "content_sources",
+      status: "checked"
+    })),
+    candidates
   };
 }
 

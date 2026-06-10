@@ -157,7 +157,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (hotBlogs.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "热门博客",
+      title: "精选博客更新",
       group: "main",
       cardClass: "blog-card",
       filterLabel: "博客主题筛选",
@@ -363,7 +363,7 @@ function dailyHeroStats(report, collections) {
   const aigcCount = countAigcSignals(collections);
   const stats = [
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
-    { label: "热门博客", value: String(collections.hotBlogs.length), detail: "深读" },
+    { label: "精选博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
     { label: "Builder", value: String(builderCount), detail: "观察" },
     {
@@ -585,27 +585,25 @@ function formatMainItemSections(items, context = {}) {
     return [
       {
         type: "markdown",
-        title: "AI 资讯",
+        title: "AI 行业动态",
         group: "main",
         content: emptyMainItemContent(context)
       }
     ];
   }
 
-  return [
-    {
-      type: "markdown",
-      title: "AI 资讯",
-      group: "main",
-      content: items
-        .map((item, index) => formatMainItem(item, {
-          ...context,
-          originalIndex: index,
-          displayIndex: index + 1
-        }))
-        .join("\n\n")
-    }
-  ];
+  return mainItemContractGroups(items).map((group) => ({
+    type: "markdown",
+    title: group.title,
+    group: "main",
+    content: group.entries
+      .map(({ item, originalIndex }) => formatMainItem(item, {
+        ...context,
+        originalIndex,
+        displayIndex: originalIndex + 1
+      }))
+      .join("\n\n")
+  }));
 }
 
 function emptyMainItemContent(context = {}) {
@@ -650,27 +648,15 @@ function isMainItemTemplateBullet(value) {
 function mainItemContractGroups(items) {
   const groups = [
     {
-      title: "AI 资讯",
-      categories: new Set(["ai_industry", "model_release", "headline"])
+      title: "AI 行业动态",
+      categories: new Set(["ai_industry", "model_release", "headline", "company_business", "policy_infra", "funding", "engineering_toolchain", "product_radar", "open_source"])
     },
     {
-      title: "大厂与政策",
-      categories: new Set(["company_business", "policy_infra", "funding"])
-    },
-    {
-      title: "产品与开源",
-      categories: new Set(["engineering_toolchain", "product_radar", "open_source"])
-    },
-    {
-      title: "AIGC 动态",
+      title: "内容赛道动态",
       categories: new Set(["content_aigc"])
     }
   ].map((group) => ({ ...group, entries: [] }));
-  const fallback = {
-    title: "其他信号",
-    categories: new Set(),
-    entries: []
-  };
+  const fallback = groups[0];
 
   items.forEach((item, originalIndex) => {
     const category = String(item?.editorial_category || "").trim();
@@ -678,7 +664,7 @@ function mainItemContractGroups(items) {
     group.entries.push({ item, originalIndex });
   });
 
-  return [...groups, fallback].filter((group) => group.entries.length > 0);
+  return groups.filter((group) => group.entries.length > 0);
 }
 
 function formatGithubTrending(items, context = {}) {
@@ -2219,7 +2205,7 @@ function formatSourceAudit(audit) {
   return [
     formatAuditGroup("GitHub Trending", audit.github_trending),
     formatAuditGroup("Builder 原始源", audit.builder_sources),
-    audit.content_sources ? formatAuditGroup("热门博客与访谈源", audit.content_sources) : "",
+    audit.content_sources ? formatAuditGroup("精选博客与访谈源", audit.content_sources) : "",
     audit.search_sources ? formatAuditGroup("搜索 / 新闻影子源", audit.search_sources) : "",
     audit.sources_health ? formatAuditGroup("信源健康检查", audit.sources_health) : "",
     audit.wechat_sources ? formatAuditGroup(platformItemLabel("wechat"), audit.wechat_sources) : "",
@@ -2255,7 +2241,7 @@ function formatPublicSourceCoverageGroup(title, group) {
     counts.no_signal > 0 ||
     counts.blocked > 0 ||
     counts.skipped > 0 ||
-    /微信|知乎|Reddit|X\/Twitter|Builder|热门博客|搜索/.test(title)
+    /微信|知乎|Reddit|X\/Twitter|Builder|精选博客|搜索/.test(title)
   );
   if (!shouldShow) {
     return "";
@@ -2369,7 +2355,7 @@ function sourceAuditGroups(audit) {
   return [
     { title: "GitHub Trending", group: audit.github_trending },
     { title: "Builder 原始源", group: audit.builder_sources },
-    { title: "热门博客与访谈源", group: audit.content_sources },
+    { title: "精选博客与访谈源", group: audit.content_sources },
     { title: "搜索 / 新闻影子源", group: audit.search_sources },
     { title: "信源健康检查", group: audit.sources_health },
     { title: platformItemLabel("wechat"), group: audit.wechat_sources },
