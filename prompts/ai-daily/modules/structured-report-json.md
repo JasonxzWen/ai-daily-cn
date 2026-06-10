@@ -110,9 +110,10 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `event_date`
 - `topic`
 - `summary`
+- `key_points`：3-5 条中文要点，每条写一个可直接复述的信息点，覆盖核心问题、方法/论证、关键结论、适用场景或局限。
 - 可选 `content_type`：`blog`、`interview`、`podcast`、`engineering_note`
 
-`hot_blogs[*].summary` 必须是约 100-160 个中文字符的分点式中文内容摘要，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要另写 `why_it_matters`。历史数据可保留该字段，但新草稿不需要填写。
+`hot_blogs[*].summary` 必须是中文内容摘要，`key_points` 必须给出 3-5 个分点式要点，合计要比一句话摘要更详实，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要另写 `why_it_matters`。历史数据可保留旧字段，但新草稿必须填写 `key_points`。
 
 `github_trending` 用于独立展示 GitHub Trending Top 10 榜单，并承载经过核验的项目 highlight tag。默认展示 Top 10 仓库；没有可核验趋势时使用空数组。每项包含：
 

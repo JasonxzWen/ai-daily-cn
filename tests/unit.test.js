@@ -4694,6 +4694,25 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
 });
 
+test("quality review requires hot blogs to expose three to five public points", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hot_blogs = [
+    {
+      ...report.hot_blogs[0],
+      title: "Two Point Blog",
+      url: "https://example.com/blog/two-points",
+      summary: "这篇博客拆解 agent 平台的任务规划、工具权限和失败恢复，说明团队不能只看模型能力。作者用工程案例说明上下文压缩、审计日志和回放评估会决定长任务稳定性。"
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issue = review.issues.find((item) => item.path === "hot_blogs[0].summary");
+
+  assert.equal(review.ok, false);
+  assert.equal(issue?.code, "hot_blog_points_invalid");
+  assert(issue.details.problems.includes("points_not_3_to_5"));
+});
+
 test("quality review flags untranslated main item source excerpts", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
@@ -5971,12 +5990,16 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(!drafted.report.builder_observations.some((item) => item.original_text?.includes("not anything ai related")));
   assert(drafted.report.hot_blogs.every((item) => {
     const summary = String(item.summary || "");
-    const points = summary
+    const points = Array.isArray(item.key_points) ? item.key_points : summary
       .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
       .map((part) => part.trim())
       .filter(Boolean);
-    return summary.length >= 100 && /\p{Script=Han}/u.test(summary) && points.length >= 2 && points.length <= 4;
+    return summary.length >= 100 && /\p{Script=Han}/u.test(summary) && points.length >= 3 && points.length <= 5;
   }));
+  const draftInput = reportToInteractionInput(drafted.report);
+  const blogCards = draftInput.sections.find((section) => section.cardClass === "blog-card")?.items || [];
+  assert(blogCards.length > 0);
+  assert(blogCards.every((card) => Array.isArray(card.points) && card.points.filter((point) => /^要点\s*\d+/.test(point.label)).length >= 3));
   assert(drafted.report.main_items.every((item) =>
     Array.isArray(item.bullets) &&
     item.bullets.every((bullet) => !/重点看|值不值得试|决策信号/u.test(String(bullet || "")))
@@ -6725,9 +6748,9 @@ test("report:draft keeps minor consumer AI feature rollouts out of main_items", 
   });
 
   const titles = drafted.report.main_items.map((item) => item.title);
-  assert.equal(titles.length, 2);
+  assert.equal(titles.length, 1);
   assert(titles.includes("WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击"));
-  assert(titles.includes("NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行"));
+  assert(!titles.some((title) => /NVIDIA|主权 AI|sovereign/i.test(title)));
   assert(!titles.some((title) => /Alexa|merch|Shopping/i.test(title)));
 });
 
@@ -7195,6 +7218,105 @@ test("report:draft promotes official product and platform deep dives into main_i
   );
 });
 
+test("report:draft promotes original Anthropic Fable/Mythos launch over platform availability duplicates", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-fable-mythos-"));
+  const reportDate = "2026-06-10";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const anthropicUrl = "https://www.anthropic.com/news/claude-fable-5-mythos-5";
+  const foundryUrl = "https://devblogs.microsoft.com/foundry/claude-fable-5-in-foundry/";
+  const githubUrl = "https://github.blog/changelog/2026-06-09-claude-fable-5-is-now-available-in-github-copilot/";
+  const bedrockUrl = "https://aws.amazon.com/about-aws/whats-new/2026/06/claude-fable-5-amazon-bedrock/";
+
+  discovery.candidates.push(
+    {
+      id: "anthropic-fable-mythos-original",
+      source_id: "content-anthropic-company-news",
+      category: "community_lead",
+      title: "Claude Fable 5 and Claude Mythos 5",
+      url: anthropicUrl,
+      source: "Anthropic Company News",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Anthropic says Claude Fable 5 is a Mythos-class model made safe for general use. Mythos 5 is the same underlying model with some safeguards lifted for trusted access. Fable 5 falls back to Claude Opus 4.8 for cyber, bio, chemical, and distillation cases; Fable is broadly available and Mythos is restricted.",
+      verification_status: "primary_confirmed",
+      source_level: "official_company_news",
+      primary_url: anthropicUrl,
+      verification_sources: [anthropicUrl],
+      editorial_category: "ai_industry"
+    },
+    {
+      id: "microsoft-foundry-fable-availability",
+      source_id: "content-microsoft-foundry-blog",
+      category: "community_lead",
+      title: "Claude Fable 5 is available in Microsoft Foundry",
+      url: foundryUrl,
+      source: "Microsoft Foundry Blog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Microsoft says Claude Fable 5 is available in Foundry for developers using Azure platform tooling.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: foundryUrl,
+      verification_sources: [foundryUrl],
+      editorial_category: "product_radar"
+    },
+    {
+      id: "github-copilot-fable-availability",
+      source_id: "content-github-changelog",
+      category: "community_lead",
+      title: "Claude Fable 5 is now available in GitHub Copilot",
+      url: githubUrl,
+      source: "GitHub Changelog",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "GitHub says Claude Fable 5 is now available in Copilot and requires 30-day prompt and output retention for safety classifiers.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: githubUrl,
+      verification_sources: [githubUrl],
+      editorial_category: "product_radar"
+    },
+    {
+      id: "aws-bedrock-fable-availability",
+      source_id: "content-aws-whats-new",
+      category: "community_lead",
+      title: "Claude Fable 5 is available in Amazon Bedrock",
+      url: bedrockUrl,
+      source: "AWS What's New",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "AWS says Claude Fable 5 is available in Amazon Bedrock for model access through AWS accounts.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: bedrockUrl,
+      verification_sources: [bedrockUrl],
+      editorial_category: "product_radar"
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = drafted.report.main_items.map((item) => item.url);
+  const fableMain = drafted.report.main_items.find((item) => item.url === anthropicUrl);
+  assert(fableMain, "Anthropic original Fable/Mythos launch should enter main_items");
+  assert.equal(mainUrls.includes(foundryUrl), false, "Foundry availability should not occupy a separate main slot");
+  assert.equal(mainUrls.includes(githubUrl), false, "GitHub availability should not occupy a separate main slot");
+  assert.equal(mainUrls.includes(bedrockUrl), false, "Bedrock availability should not occupy a separate main slot");
+  assert(mainUrls.indexOf(anthropicUrl) <= 2, "Original Fable/Mythos launch should rank near the top");
+  const fableText = `${fableMain.summary} ${(fableMain.bullets || []).join(" ")}`;
+  assert.match(fableText, /Fable 5/);
+  assert.match(fableText, /Mythos/);
+  assert.match(fableText, /Opus 4\.8|\$10\/M|\$50\/M|trusted/i);
+});
+
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-autodraft-dedupe-"));
   const reportDate = "2026-05-26";
@@ -7232,6 +7354,23 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
     primary_url: "https://www.latent.space/p/axiom",
     verification_sources: ["https://www.latent.space/p/axiom"]
   });
+  const staleNvidiaUrl = "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/";
+  discovery.candidates.push({
+    id: "hot-blog-stale-nvidia-sovereign-ai",
+    source_id: "content-nvidia-newsroom-rss",
+    category: "hot_blog",
+    title: "NVIDIA pushes UK sovereign AI advancements",
+    url: staleNvidiaUrl,
+    source: "NVIDIA Newsroom",
+    author: "NVIDIA",
+    event_date: "2026-06-08",
+    status: "excluded",
+    evidence: "Official NVIDIA post about UK sovereign AI infrastructure, partners, and AI factory positioning.",
+    verification_status: "primary_confirmed",
+    source_level: "official",
+    primary_url: staleNvidiaUrl,
+    verification_sources: [staleNvidiaUrl]
+  });
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
   const historyDir = path.join(tmp, "reports-data", "2026", "05");
@@ -7241,7 +7380,10 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
     `${JSON.stringify({
       report_date: "2026-05-25",
       main_items: [{ url: "https://www.example.com/official/2/?utm_source=feed#seen" }],
-      hot_blogs: [{ url: "https://example.com/official/3?utm_source=feed#seen" }]
+      hot_blogs: [
+        { url: "https://example.com/official/3?utm_source=feed#seen" },
+        { url: `${staleNvidiaUrl}?utm_source=feed#seen` }
+      ]
     }, null, 2)}\n`,
     "utf8"
   );
@@ -7266,6 +7408,11 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
   assert.equal(
     drafted.candidatePool.candidates.find((candidate) => candidate.id === "hot-blog-duplicate-blog-url")?.status,
     "excluded"
+  );
+  assert(!drafted.report.hot_blogs.some((item) => item.url === staleNvidiaUrl));
+  assert.match(
+    drafted.candidatePool.candidates.find((candidate) => candidate.id === "hot-blog-stale-nvidia-sovereign-ai")?.exclusion_reason || "",
+    /recent_duplicate/
   );
 });
 
@@ -8344,6 +8491,62 @@ test("public daily contract renders tables instead of screenshots and hides audi
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("候选 / 入选"));
   assert(!serialized.includes("why_it_matters"));
+});
+
+test("public daily renders source coverage gaps without internal audit dumps", () => {
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.wechat_sources = {
+    checked: true,
+    candidates_found: 0,
+    included: 0,
+    notes: "WeChat sources checked; no public item selected.",
+    sources: [
+      {
+        name: "WeChat Platform AI Feed",
+        url: "https://example.com/ai-daily-cn/platform/wechat.xml",
+        status: "no_signal",
+        notes: "kill_switch_enabled"
+      },
+      {
+        name: "RSSHub NewRank WeChat Route",
+        url: "https://example.com/rsshub/newrank",
+        status: "skipped_missing_base_url",
+        notes: "RSSHUB_BASE_URL missing"
+      }
+    ]
+  };
+  report.source_audit.zhihu_sources = {
+    checked: true,
+    candidates_found: 0,
+    included: 0,
+    notes: "Zhihu sources checked; no public item selected.",
+    sources: [
+      {
+        name: "Zhihu Platform AI Feed",
+        url: "https://example.com/ai-daily-cn/platform/zhihu.xml",
+        status: "no_signal",
+        notes: "kill_switch_enabled"
+      }
+    ]
+  };
+
+  const input = reportToInteractionInput(report);
+  const coverageSection = input.sections.find((section) =>
+    section.group === "verification" &&
+    typeof section.content === "string" &&
+    section.content.includes("kill_switch_enabled")
+  );
+  const serialized = JSON.stringify(input.sections);
+
+  assert(coverageSection, "public coverage summary should mention WeChat/Zhihu source gaps");
+  assert(coverageSection.content.includes("WeChat Platform AI Feed"));
+  assert(coverageSection.content.includes("Zhihu Platform AI Feed"));
+  assert(coverageSection.content.includes("skipped_missing_base_url"));
+  assert(!serialized.includes("source_audit"));
+  assert(!serialized.includes("candidate_pool"));
+  assert(!serialized.includes("Source status"));
+  assert(!serialized.includes("candidate counts"));
 });
 
 test("public daily contract renders main items as one short-news stream", () => {
@@ -9626,7 +9829,8 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("content` 为兼容字段"));
   assert(prompt.includes("不得写成概括"));
   assert(prompt.includes("hero_highlights"));
-  assert(prompt.includes("100-160"));
+  assert(prompt.includes("3-5 个分点式要点"));
+  assert(prompt.includes("key_points"));
   assert(prompt.includes("点开放大"));
   assert(prompt.includes("项目 highlight"));
   assert(prompt.includes("覆盖时间范围"));

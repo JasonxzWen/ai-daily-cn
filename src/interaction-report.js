@@ -219,6 +219,15 @@ export function reportToInteractionInput(report, options = {}) {
       items: cards
     });
   }
+  const publicSourceCoverage = formatPublicSourceCoverage(report.source_audit);
+  if (publicSourceCoverage) {
+    sections.push({
+      type: "markdown",
+      title: "信源覆盖与缺口",
+      group: "verification",
+      content: publicSourceCoverage
+    });
+  }
   if (includeInternalSections) {
     const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
     if (sourceAuditOverview) {
@@ -1181,8 +1190,8 @@ function formatHotBlogCards(items, context = {}) {
     const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
       ...(context.mediaOptions || {})
     });
-    const points = hotBlogPointTexts(item.summary);
-    const body = points.shift() || String(item.summary || "").trim();
+    const points = hotBlogPointTexts(item);
+    const body = String(item.summary || "").trim() || points[0] || "";
     return {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
@@ -1196,7 +1205,7 @@ function formatHotBlogCards(items, context = {}) {
         ...hotBlogTags(item).map((tag) => cardTag(tag, "topic"))
       ].filter(Boolean),
       points: [
-        ...points.map((value, index) => ({ label: `要点 ${index + 2}`, value })),
+        ...points.map((value, index) => ({ label: `要点 ${index + 1}`, value })),
         ...editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false })
       ],
       ...(media.length > 0 ? { media } : {})
@@ -1291,8 +1300,17 @@ function builderAvatarIcon(report, item) {
   return generatedSiteIcon(siteInitials(item?.author || builderHandle(item) || "Builder"), "#111827", "#ffffff");
 }
 
-function hotBlogPointTexts(summary) {
-  const text = String(summary || "").replace(/\s+/g, " ").trim();
+function hotBlogPointTexts(itemOrSummary) {
+  const keyPoints = Array.isArray(itemOrSummary?.key_points)
+    ? itemOrSummary.key_points
+      .map((point) => String(point || "").replace(/\s+/g, " ").trim())
+      .filter(Boolean)
+      .slice(0, 5)
+    : [];
+  if (keyPoints.length > 0) {
+    return keyPoints;
+  }
+  const text = String(typeof itemOrSummary === "object" ? itemOrSummary?.summary : itemOrSummary || "").replace(/\s+/g, " ").trim();
   if (!text) {
     return [];
   }
@@ -1300,7 +1318,7 @@ function hotBlogPointTexts(summary) {
     .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
     .map((part) => part.trim())
     .filter(Boolean);
-  return parts.length >= 2 ? parts.slice(0, 4) : [text];
+  return parts.length >= 2 ? parts.slice(0, 5) : [text];
 }
 
 function editorialBullets(item) {
@@ -2208,6 +2226,68 @@ function formatSourceAudit(audit) {
     audit.zhihu_sources ? formatAuditGroup(platformItemLabel("zhihu"), audit.zhihu_sources) : "",
     audit.reddit_sources ? formatAuditGroup(platformItemLabel("reddit"), audit.reddit_sources) : ""
   ].filter(Boolean).join("\n\n");
+}
+
+function formatPublicSourceCoverage(audit) {
+  if (!audit) {
+    return "";
+  }
+  const rows = sourceAuditGroups(audit)
+    .map(({ title, group }) => formatPublicSourceCoverageGroup(title, group))
+    .filter(Boolean);
+  if (rows.length === 0) {
+    return "";
+  }
+  return [
+    "本节只保留读者需要知道的覆盖缺口：哪些来源本轮检查过、哪些没有信号、哪些因为配置或来源状态跳过。它不展示内部候选池、筛选分数或发布调试记录。",
+    "",
+    ...rows
+  ].join("\n");
+}
+
+function formatPublicSourceCoverageGroup(title, group) {
+  if (!group) {
+    return "";
+  }
+  const counts = sourceStatusCounts(group.sources);
+  const total = counts.checked + counts.no_signal + counts.blocked + counts.skipped;
+  const shouldShow = total > 0 && (
+    counts.no_signal > 0 ||
+    counts.blocked > 0 ||
+    counts.skipped > 0 ||
+    /微信|知乎|Reddit|X\/Twitter|Builder|热门博客|搜索/.test(title)
+  );
+  if (!shouldShow) {
+    return "";
+  }
+  const status = [
+    `checked ${counts.checked}`,
+    `no_signal ${counts.no_signal}`,
+    `blocked ${counts.blocked}`,
+    `skipped ${counts.skipped}`
+  ].join(" / ");
+  const sourceSummary = publicSourceCoverageDetails(group.sources);
+  const details = [
+    group.checked ? "已检查" : "未检查",
+    status,
+    group.blocked_reason ? `阻塞：${group.blocked_reason}` : "",
+    group.notes ? `说明：${group.notes}` : "",
+    sourceSummary ? `来源：${sourceSummary}` : ""
+  ].filter(Boolean).join("；");
+  return `- **${title}**：${details}`;
+}
+
+function publicSourceCoverageDetails(sources) {
+  const items = (Array.isArray(sources) ? sources : [])
+    .filter((source) => source && (String(source.status || "") !== "checked" || source.notes || /wechat|zhihu|reddit|twitter|x feed/i.test(`${source.name || ""} ${source.url || ""}`)))
+    .slice(0, 6)
+    .map((source) => {
+      const name = String(source.name || "未命名来源").trim();
+      const status = String(source.status || "unknown").trim();
+      const notes = String(source.notes || "").trim();
+      return `${name}：${status}${notes ? `（${notes}）` : ""}`;
+    });
+  return items.join("；");
 }
 
 function formatAuditGroup(title, group) {
