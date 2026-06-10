@@ -744,6 +744,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
   assert(!mainContent.includes("来源："));
+  assert(!mainContent.includes("，T0）"));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
   assert(!mainContent.includes("Reader relevance metadata should stay in JSON"));
   assert(!mainContent.includes("Generic follow-up metadata should not render"));
