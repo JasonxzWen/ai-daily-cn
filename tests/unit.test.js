@@ -7117,7 +7117,11 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
   await fs.mkdir(historyDir, { recursive: true });
   await fs.writeFile(
     path.join(historyDir, "2026-05-25.json"),
-    `${JSON.stringify({ report_date: "2026-05-25", main_items: [{ url: "https://www.example.com/official/2/?utm_source=feed#seen" }] }, null, 2)}\n`,
+    `${JSON.stringify({
+      report_date: "2026-05-25",
+      main_items: [{ url: "https://www.example.com/official/2/?utm_source=feed#seen" }],
+      hot_blogs: [{ url: "https://example.com/official/3?utm_source=feed#seen" }]
+    }, null, 2)}\n`,
     "utf8"
   );
 
@@ -7131,6 +7135,11 @@ test("report:draft skips recent main duplicates and same-report hot blog duplica
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
   assert.equal(mainUrls.has("https://example.com/official/2"), false);
+  assert.equal(mainUrls.has("https://example.com/official/3"), false);
+  assert.equal(
+    drafted.candidatePool.candidates.find((candidate) => candidate.id === "official-3")?.exclusion_reason,
+    "recent_duplicate_main_item:2026-05-25:hot_blogs[0]"
+  );
   assert(!drafted.report.hot_blogs.some((item) => mainUrls.has(item.url)));
   assert.equal(new Set(drafted.report.hot_blogs.map((item) => item.url)).size, drafted.report.hot_blogs.length);
   assert.equal(

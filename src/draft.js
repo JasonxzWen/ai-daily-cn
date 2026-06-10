@@ -73,6 +73,14 @@ const READER_RELEVANT_SOURCE_LEVELS = new Set([
   "official_model_host_account",
   "github"
 ]);
+const MAIN_ITEM_RECENT_HISTORY_SECTIONS = [
+  "main_items",
+  "github_trending",
+  "model_releases",
+  "hot_blogs",
+  "projects",
+  "builder_observations"
+];
 const MAIN_TARGET = 10;
 const MAX_PUBLIC_UNITS = 45;
 
@@ -83,8 +91,8 @@ export async function generateReportDraft(options = {}) {
   const inputPaths = normalizeInputPaths(options.inputPaths || options.inputs || options.input);
   const loaded = await loadDiscoveryInputs(rootDir, inputPaths);
   const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
-  const recentMainUrls = await loadRecentMainUrls(rootDir, reportDate);
-  const selection = selectReportItems(merged, { reportDate, recentMainUrls });
+  const recentMainUrlHistory = await loadRecentMainUrlHistory(rootDir, reportDate);
+  const selection = selectReportItems(merged, { reportDate, recentMainUrlHistory });
   const candidatePool = {
     schema_version: 1,
     report_date: reportDate,
@@ -210,7 +218,7 @@ function selectReportItems(merged, options = {}) {
   const candidates = cloneCandidates(merged.candidates);
   const metaById = merged.metaById || new Map();
   const selectedIds = new Set();
-  const recentMainUrls = options.recentMainUrls || new Set();
+  const recentMainUrlHistory = normalizeRecentMainUrlHistory(options.recentMainUrlHistory || options.recentMainUrls);
   const derived = [];
   const includedCandidates = [...candidates];
   const githubSourceCandidates = candidates
@@ -232,14 +240,14 @@ function selectReportItems(merged, options = {}) {
 
   const mainPool = candidates
     .filter((candidate) => !selectedIds.has(candidate.id))
-    .filter((candidate) => !recentMainUrls.has(normalizeUrl(candidate.url)))
+    .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
     .filter((candidate) => canPromoteToMain(candidate, reportDate))
     .sort(compareMainCandidates);
   let mainSeeds = pickMainCandidates(mainPool, MAIN_TARGET);
   if (mainSeeds.length === 0) {
     mainSeeds = candidates
       .filter((candidate) => !selectedIds.has(candidate.id))
-      .filter((candidate) => !recentMainUrls.has(normalizeUrl(candidate.url)))
+      .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
       .filter((candidate) => canFallbackToSingleMain(candidate))
       .sort((left, right) => candidateScore(right) - candidateScore(left))
       .slice(0, 1);
@@ -395,8 +403,8 @@ function canPromoteToPlatformExemptSection(candidate) {
   }
 }
 
-async function loadRecentMainUrls(rootDir, reportDate, lookbackDays = 7) {
-  const urls = new Set();
+async function loadRecentMainUrlHistory(rootDir, reportDate, lookbackDays = 7) {
+  const urls = new Map();
   const baseDate = parseReportDate(reportDate);
   for (let offset = 1; offset <= lookbackDays; offset += 1) {
     const date = new Date(baseDate.getTime());
@@ -411,12 +419,39 @@ async function loadRecentMainUrls(rootDir, reportDate, lookbackDays = 7) {
       if (error.code === "ENOENT") continue;
       continue;
     }
-    for (const item of Array.isArray(parsed?.main_items) ? parsed.main_items : []) {
-      const key = normalizeUrl(item?.url);
-      if (key) urls.add(key);
+    for (const sectionName of MAIN_ITEM_RECENT_HISTORY_SECTIONS) {
+      for (const [index, item] of (Array.isArray(parsed?.[sectionName]) ? parsed[sectionName] : []).entries()) {
+        const key = normalizeUrl(item?.url);
+        if (key && !urls.has(key)) {
+          urls.set(key, `${parsed?.report_date || dateString}:${sectionName}[${index}]`);
+        }
+      }
     }
   }
   return urls;
+}
+
+function normalizeRecentMainUrlHistory(value) {
+  if (value instanceof Map) {
+    return value;
+  }
+  if (value instanceof Set) {
+    return new Map([...value].map((url) => [url, "recent_history"]));
+  }
+  return new Map();
+}
+
+function isFreshForMainItems(candidate, recentMainUrlHistory) {
+  const key = normalizeUrl(candidate?.url);
+  if (!key) {
+    return true;
+  }
+  const previous = recentMainUrlHistory.get(key);
+  if (!previous) {
+    return true;
+  }
+  candidate.exclusion_reason = `recent_duplicate_main_item:${previous}`;
+  return false;
 }
 
 function mergeEvidenceAssets(...groups) {
