@@ -357,7 +357,17 @@ export async function createPublishPlan(options = {}) {
     generated.reports
   );
   const dirtyGeneratedFiles = generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles);
-  const stageFiles = uniqueSorted([...repoFiles, ...dirtyGeneratedFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
+  const dirtyDateScopedEvidenceFiles = dateScopedEvidenceAssetDirtyFiles(
+    statusEntries,
+    options.outDir || "docs",
+    options.reportDate
+  );
+  const stageFiles = uniqueSorted([
+    ...repoFiles,
+    ...dirtyGeneratedFiles,
+    ...dirtyDateScopedEvidenceFiles,
+    ...(await plannedReportsDataFiles(repoRoot, dates))
+  ]);
   assertDirtyPublisherFilesCovered(statusEntries, stageFiles);
   const commitMessage =
     dates.length === 1
@@ -1103,6 +1113,19 @@ function generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles) {
     .map((entry) => entry.path)
     .filter((file) => isPublisherOwnedPath(file))
     .filter((file) => generated.has(file));
+}
+
+function dateScopedEvidenceAssetDirtyFiles(statusEntries, outDir, reportDate) {
+  if (!reportDate) {
+    return [];
+  }
+  const outPrefix = outDir.replaceAll("\\", "/").replace(/\/$/, "");
+  const evidencePrefix = `${outPrefix}/assets/evidence/`;
+  return statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => file.startsWith(evidencePrefix))
+    .filter((file) => path.posix.basename(file).includes(reportDate))
+    .filter((file) => /\.(?:png|jpe?g|webp|gif|avif)$/i.test(file));
 }
 
 function uniqueSorted(values) {

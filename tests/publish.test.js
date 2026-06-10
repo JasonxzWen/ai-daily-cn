@@ -243,6 +243,30 @@ test("publish dry-run stages evidence and builder avatar assets for the selected
   assert(plan.will_stage_files.includes(`docs/assets/avatars/${year}/${month}/${report.report_date}-example.png`));
 });
 
+test("daily dry-run stages date-scoped evidence screenshots created during discovery", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const evidenceDir = path.join(repoRoot, "docs", "assets", "evidence");
+  await fs.mkdir(evidenceDir, { recursive: true });
+  await fs.writeFile(
+    path.join(evidenceDir, "content-openrouter-rankings-2026-05-13-1.png"),
+    "fixture image"
+  );
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: "?? docs/assets/evidence/content-openrouter-rankings-2026-05-13-1.png"
+    })
+  });
+
+  assert(plan.will_stage_files.includes("docs/assets/evidence/content-openrouter-rankings-2026-05-13-1.png"));
+});
+
 test("publish dry-run blocks publisher files outside the selected publish plan", async () => {
   const repoRoot = await tempRepoWithFixture();
 
