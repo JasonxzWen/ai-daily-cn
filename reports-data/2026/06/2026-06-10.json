@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-10",
   "title": "AI 日报 2026-06-10",
-  "summary": "今天的日报主线集中在三个方向：Codex 正在进入真实工程团队的规格、构建和移动端工作流；Claude Fable 5 同时进入 Foundry、GitHub Copilot 和 Bedrock，云平台分发节奏明显加快；NVIDIA、苹果、GitHub 与 DeepMind 的工程文章则补充了推理优化、端侧模型、机器人训练和语音翻译等落地方向。开源侧保留 GitHub Trending Top 10，社区与 Builder 区以来源标签呈现，方便区分已核查事实和早期线索。",
+  "summary": "今天最值得看的主线有 Anthropic Company News 发布了一条 AI 相关更新，原文标题为“Claude Fable 5 and Claude Mythos 5”；OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“How engineers at Nextdoor use Codex to build without limits”；WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击；热门博客这轮主要看 agent 和开发工具的落地边界；GitHub Trending 继续保留完整 Top 10，方便对照开源侧动向。",
   "source_window": {
     "date_from": "2026-06-10",
     "date_to": "2026-06-10",
@@ -11,19 +11,19 @@
   },
   "hero_highlights": [
     {
-      "title": "Nextdoor 用 Codex 扩展工程构建流程",
+      "title": "Anthropic 发 Fable 5 / Mythos 5：同底层模型，不同安全限制",
+      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+      "reason": "Fable 5 是面向通用用户开放的 Mythos-class 安全版；Mythos 5 使用同一底层模型，面向 Project Glasswing 等可信访问场景放宽限制。读者应把这看成同一代能力在不同安全壳下分发。"
+    },
+    {
+      "title": "OpenAI：Nextdoor 把 Codex 用进跨端排障和交付流程",
       "url": "https://openai.com/index/nextdoor",
-      "reason": "OpenAI 案例展示 Codex 如何进入 Nextdoor 的工程构建流程，重点是规格、代码修改和团队协作的实际使用方式。"
+      "reason": "Nextdoor 案例展示 Codex 在难复现问题、跨移动端/前后端实现、数据分析和产品实验里的用法，重点是工程师从反复提示转向设定目标、环境和验收标准。"
     },
     {
-      "title": "Claude Fable 5 登陆 Foundry",
-      "url": "https://azure.microsoft.com/en-us/blog/claude-fable-5-is-now-available-in-microsoft-foundry-powering-the-next-era-of-autonomous-agents/",
-      "reason": "微软在 Foundry 上提供 Claude Fable 5，说明前沿模型继续通过云平台进入企业 agent 和开发工具链。"
-    },
-    {
-      "title": "NVIDIA 讲解 TensorRT 的 FP8 推理转换",
+      "title": "NVIDIA：FP8 量化模型从检查点进入 TensorRT 推理链路",
       "url": "https://developer.nvidia.com/blog/model-quantization-turn-fp8-checkpoints-into-high-performance-inference-engines-with-nvidia-tensorrt/",
-      "reason": "NVIDIA 开发者文章围绕 TensorRT 推理优化，讲的是把 FP8 checkpoint 转成高性能推理引擎，适合关注部署效率的工程团队跟进。"
+      "reason": "NVIDIA 技术博客把 FP8 量化 CLIP 从 ModelOpt 检查点导出到 ONNX，再编译成 TensorRT 引擎，并给出体积、显存和延迟对比。"
     }
   ],
   "source_audit": {
@@ -112,7 +112,7 @@
           "name": "follow-builders X feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
           "status": "checked",
-          "notes": "27 recent original entries parsed"
+          "notes": "38 recent original entries parsed"
         },
         {
           "name": "follow-builders podcast feed",
@@ -123,8 +123,8 @@
         {
           "name": "follow-builders blog feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json",
-          "status": "checked",
-          "notes": "1 recent original entries parsed"
+          "status": "no_signal",
+          "notes": "0 recent original entries parsed"
         },
         {
           "name": "Simon Willison Weblog",
@@ -146,9 +146,9 @@
         }
       ],
       "candidates_found": 26,
-      "included": 7,
+      "included": 12,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-10T05:18:54.322Z",
+      "last_successful_feed_at": "2026-06-10T08:38:16.774Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "content_sources": {
@@ -261,8 +261,9 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
+          "status": "no_signal",
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -274,8 +275,9 @@
         {
           "name": "JD.com Investor News",
           "url": "https://ir.jd.com/news-releases/",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
+          "status": "no_signal",
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed; retry_succeeded_after_1"
         },
         {
           "name": "NetEase Company News",
@@ -308,8 +310,9 @@
         {
           "name": "MiniMax Company News",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "status": "no_signal",
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "OpenAI News RSS",
@@ -523,8 +526,9 @@
         {
           "name": "MiniMax Blog",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "status": "no_signal",
+          "parsed_count": 0,
+          "notes": "0 recent blog/interview entries parsed"
         },
         {
           "name": "Z.ai Research",
@@ -736,7 +740,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-10T05:18:58.617Z",
+            "snapshot_as_of": "2026-06-10T08:38:20.457Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -822,7 +826,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-10T05:18:58.617Z",
+            "snapshot_as_of": "2026-06-10T08:38:20.457Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -923,15 +927,15 @@
           "name": "Google News AI Policy RSS",
           "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "parsed_count": 53,
-          "notes": "53 recent intermediary lead entries parsed"
+          "parsed_count": 54,
+          "notes": "54 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
           "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "parsed_count": 51,
-          "notes": "51 recent intermediary lead entries parsed"
+          "parsed_count": 52,
+          "notes": "52 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -958,8 +962,8 @@
           "name": "Google News Official Open Source Watch RSS",
           "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
           "status": "checked",
-          "parsed_count": 36,
-          "notes": "36 recent intermediary lead entries parsed"
+          "parsed_count": 38,
+          "notes": "38 recent intermediary lead entries parsed"
         },
         {
           "name": "36Kr",
@@ -973,7 +977,7 @@
           "url": "https://www.qbitai.com/feed",
           "status": "checked",
           "parsed_count": 10,
-          "notes": "10 recent intermediary lead entries parsed; retry_succeeded_after_1"
+          "notes": "10 recent intermediary lead entries parsed"
         },
         {
           "name": "Jiqizhixin",
@@ -1182,8 +1186,8 @@
           "name": "PaddlePaddle Hugging Face Organization",
           "url": "https://huggingface.co/PaddlePaddle",
           "status": "checked",
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 10,
+          "notes": "10 recent intermediary lead entries parsed"
         },
         {
           "name": "Microsoft Hugging Face Organization",
@@ -1201,7 +1205,7 @@
         }
       ],
       "candidates_found": 60,
-      "included": 33,
+      "included": 32,
       "sources_checked": 128,
       "enablement_counts": {
         "core": 54,
@@ -1222,7 +1226,7 @@
         "artificial_analysis_index_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-10T05:18:58.617Z",
+      "last_successful_feed_at": "2026-06-10T08:38:20.457Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -1232,8 +1236,8 @@
         {
           "name": "GDELT",
           "url": "https://api.gdeltproject.org/",
-          "status": "checked",
-          "notes": "3 shadow candidates; provider_timeout_exceeded_45000ms"
+          "status": "blocked",
+          "notes": "provider_timeout_exceeded_45000ms"
         },
         {
           "name": "OpenAlex",
@@ -1245,15 +1249,15 @@
           "name": "arXiv",
           "url": "https://export.arxiv.org/",
           "status": "checked",
-          "notes": "1 shadow candidates"
+          "notes": "4 shadow candidates"
         }
       ],
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 54144,
-        "openalex": 7513,
-        "arxiv": 8741
+        "gdelt": 52712,
+        "openalex": 15871,
+        "arxiv": 946
       },
       "provider_cost_units": {
         "gdelt": 3,
@@ -1625,7 +1629,7 @@
         {
           "name": "MiniMax Company News",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
+          "status": "checked",
           "id": "content-minimax-company-news",
           "source_kind": "html_index",
           "tier": "T0",
@@ -1633,10 +1637,11 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": null,
+          "http_status": 200,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
         },
         {
           "name": "OpenAI News RSS",
@@ -2150,7 +2155,7 @@
         {
           "name": "MiniMax Blog",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
+          "status": "checked",
           "id": "content-minimax-blog",
           "source_kind": "html_index",
           "tier": "T0",
@@ -2158,10 +2163,11 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": null,
+          "http_status": 200,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
         },
         {
           "name": "Z.ai Research",
@@ -2227,9 +2233,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 13,
+          "recent_48h_entries": 14,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 13 within 48h"
+          "notes": "20 feed entries parsed; 14 within 48h"
         },
         {
           "name": "The Verge AI",
@@ -2650,9 +2656,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 47,
+          "recent_48h_entries": 50,
           "original_url_count": null,
-          "notes": "50 feed entries parsed; 47 within 48h"
+          "notes": "50 feed entries parsed; 50 within 48h"
         },
         {
           "name": "OpenRouter Rankings",
@@ -2751,9 +2757,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 24,
+          "recent_48h_entries": 29,
           "original_url_count": null,
-          "notes": "53 feed entries parsed; 24 within 48h"
+          "notes": "54 feed entries parsed; 29 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -2768,9 +2774,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 25,
+          "recent_48h_entries": 28,
           "original_url_count": null,
-          "notes": "51 feed entries parsed; 25 within 48h"
+          "notes": "52 feed entries parsed; 28 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -2785,9 +2791,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 25,
+          "recent_48h_entries": 27,
           "original_url_count": null,
-          "notes": "56 feed entries parsed; 25 within 48h"
+          "notes": "56 feed entries parsed; 27 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2836,9 +2842,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 17,
+          "recent_48h_entries": 21,
           "original_url_count": null,
-          "notes": "36 feed entries parsed; 17 within 48h"
+          "notes": "39 feed entries parsed; 21 within 48h"
         },
         {
           "name": "36Kr",
@@ -2904,9 +2910,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 8,
+          "recent_48h_entries": 9,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 8 within 48h"
+          "notes": "20 feed entries parsed; 9 within 48h"
         },
         {
           "name": "InfoQ CN",
@@ -2921,9 +2927,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 17,
+          "recent_48h_entries": 20,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 17 within 48h"
+          "notes": "20 feed entries parsed; 20 within 48h"
         },
         {
           "name": "SSPAI",
@@ -2938,9 +2944,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 5,
+          "recent_48h_entries": 6,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 5 within 48h"
+          "notes": "10 feed entries parsed; 6 within 48h"
         },
         {
           "name": "iFanr",
@@ -2955,9 +2961,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 6,
+          "recent_48h_entries": 7,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 6 within 48h"
+          "notes": "20 feed entries parsed; 7 within 48h"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -3639,8 +3645,8 @@
           "enablement": "manual",
           "verification_policy": "platform_signal_exempt",
           "platform": "reddit",
-          "parsed_count": 17,
-          "notes": "17 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=4, exclude_keywords_matched=4"
+          "parsed_count": 18,
+          "notes": "18 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=3, exclude_keywords_matched=4"
         }
       ],
       "candidates_found": 3,
@@ -3656,13 +3662,37 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-10T05:23:22.935Z",
+      "last_successful_feed_at": "2026-06-10T08:41:36.246Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
   "main_items": [
     {
-      "title": "Nextdoor 用 Codex 扩展工程构建流程",
+      "title": "Anthropic 发 Fable 5 / Mythos 5：同底层模型，不同安全限制",
+      "candidate_id": "main-content-anthropic-company-news-claude-fable-5-and-claude-mythos-5",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-09",
+      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+      "source": "Anthropic Company News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic Company News"
+      ],
+      "summary": "Anthropic 6 月 9 日推出 Fable 5 和 Mythos 5。Fable 5 是开放给通用用户的 Mythos-class 版本，遇到网络、生物、化学和模型蒸馏等敏感请求会由分类器触发并转给 Opus 4.8；Mythos 5 面向 Project Glasswing 等可信访问场景，放宽部分限制。",
+      "bullets": [
+        "**模型关系**：Fable 5 不是低一档产品，而是面向通用使用的 ==Mythos-class 安全版==；Mythos 5 使用同一底层模型，但开放给受信任的防御者和研究场景。",
+        "**安全机制**：Fable 5 对网络、生物、化学和模型蒸馏等敏感请求启用分类器，触发后回退到 Claude Opus 4.8；Anthropic 称平均少于 5% 会话会触发。",
+        "**可用性和价格**：Fable 5 已面向 Claude API 和部分订阅计划开放；Mythos 5 先给 Glasswing 伙伴和后续可信访问计划，两者价格为每百万输入 10 美元、输出 50 美元。"
+      ],
+      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
+      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI：Nextdoor 把 Codex 用进跨端排障和交付流程",
       "candidate_id": "main-content-openai-news-how-engineers-at-nextdoor-use-codex-to-build-without-limits",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -3674,9 +3704,9 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI 发布 Nextdoor 使用 Codex 的案例，重点不是单次生成代码，而是把需求说明、代码修改和评审前准备串进日常工程流程。",
+      "summary": "OpenAI 的 Nextdoor 案例把 Codex 放在核心平台团队的日常工程里：难复现故障、跨平台功能、数据分析和产品实验先交给 agent 调查和实现，工程师负责目标设定、代码审阅和验收。",
       "bullets": [
-        "==工程流程==：Nextdoor 案例显示 Codex 正从问答工具转向可参与构建的工程助手，重点在把规格、代码修改和评审前准备串起来。对团队更有参考价值的是它如何嵌入现有协作流程，而不是一次性生成多少代码。"
+        "**排障方式**：Nextdoor 给 Codex 提供可复现环境、日志和验收目标，让它调查 Kubernetes 启动、嵌入式 Rust 数据库和竞态问题；==工程杠杆== 从写代码转向定位目标。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -3684,29 +3714,7 @@
       "image_urls": []
     },
     {
-      "title": "Claude Fable 5 登陆 Foundry",
-      "candidate_id": "main-content-azure-blog-claude-fable-5-is-now-available-in-microsoft-foundry-powering",
-      "editorial_category": "open_source",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-09",
-      "url": "https://azure.microsoft.com/en-us/blog/claude-fable-5-is-now-available-in-microsoft-foundry-powering-the-next-era-of-autonomous-agents/",
-      "source": "Azure Blog",
-      "tier": "T0",
-      "entities": [
-        "Azure Blog"
-      ],
-      "summary": "Azure 博客宣布 Claude Fable 5 可在 Microsoft Foundry 使用，面向需要把前沿模型接入企业 agent 和应用开发流程的团队。",
-      "bullets": [
-        "==云平台分发==：这条更新说明 Claude Fable 5 已进入 Foundry 模型供应链，企业团队可以从权限、计费、区域和工具接入方式评估落地路径。它也表明前沿模型越来越依赖云平台完成企业级分发。"
-      ],
-      "why_it_matters": "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态",
-      "reader_relevance": "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具",
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "NVIDIA 讲解 TensorRT 的 FP8 推理转换",
+      "title": "NVIDIA：FP8 量化模型从检查点进入 TensorRT 推理链路",
       "candidate_id": "main-content-nvidia-developer-blog-model-quantization-turn-fp8-checkpoints-into-high",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -3718,10 +3726,11 @@
       "entities": [
         "NVIDIA Developer Blog"
       ],
-      "summary": "NVIDIA 开发者文章聚焦模型量化和推理部署，说明如何把 FP8 checkpoint 转成可用于高性能推理的 TensorRT 引擎。",
+      "summary": "NVIDIA 技术博客把 FP8 量化 CLIP 从 ModelOpt 检查点导出到 ONNX，再编译成 TensorRT 引擎，并给出文件体积、显存和延迟对比。重点不是新模型发布，而是量化模型如何进入生产推理。",
       "bullets": [
-        "==推理优化==：文章面向已经有 FP8 权重或部署需求的团队，核心信息是量化后的模型如何进入 TensorRT 推理链路，而不是新的模型发布。它适合被用于评估吞吐、延迟和部署复杂度之间的取舍。",
-        "==部署转换==：这条内容关注 checkpoint 转换、TensorRT 引擎构建和生产推理性能。它属于模型部署链路，读者可把它和量化策略、硬件利用率、上线验证一起评估。"
+        "**部署链路**：流程从 ModelOpt 检查点导出 ONNX Q/DQ 图，再由 TensorRT 构建引擎；TensorRT 会融合 Q/DQ 节点，尽量让 GEMM 和注意力层走 ==FP8 Tensor Core==。",
+        "**收益数据**：文中 CLIP text encoder 的 ONNX 体积约降 34%，image encoder 约降 50%；在 RTX 6000 Ada 测试中，FP8 推理延迟相对 FP16 约有 1.39x 到 1.45x 加速。",
+        "**适用范围**：这篇主要覆盖 CLIP/视觉编码器导出与 TensorRT profiling；量化 LLM 走 TensorRT-LLM，是另一条部署路径。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -3729,7 +3738,7 @@
       "image_urls": []
     },
     {
-      "title": "OpenAI 从智能时代视角讨论产业政策",
+      "title": "OpenAI 更新智能时代产业政策：已收到 400 多份反馈",
       "candidate_id": "main-content-openai-news-industrial-policy-for-the-intelligence-age",
       "editorial_category": "policy_infra",
       "source_level": "official",
@@ -3741,9 +3750,9 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI 发表产业政策文章，把 AI 基础设施、创新扩散和国家竞争力放在同一框架下讨论，偏战略和政策层面。",
+      "summary": "OpenAI 在“智能时代产业政策”页面更新称，围绕其政策想法已收到 400 多份反馈，并暂停继续接收邮箱投稿；页面仍把定位放在机会扩展、共享繁荣和制度韧性等早期政策讨论。",
       "bullets": [
-        "==政策信号==：这篇文章可作为观察 OpenAI 公共政策叙事的材料，重点在算力、人才、产业扩散和治理边界如何被打包成智能时代议题。它更像战略立场更新，适合放在产业政策和基础设施脉络里阅读。"
+        "**政策信号**：OpenAI 把这组想法定位为 ==早期讨论稿==，不是最终方案；同步提到研究资助和 API credits 试点，并在华盛顿举办讨论。"
       ],
       "why_it_matters": "它会影响合规、安全或平台治理口径，适合进入风险观察清单",
       "reader_relevance": "安全、合规和平台团队可用它更新风险登记、上线检查和治理口径",
@@ -3751,7 +3760,7 @@
       "image_urls": []
     },
     {
-      "title": "NVIDIA 用 FLARE Auto-FL 加速联邦学习研究",
+      "title": "NVIDIA Auto-FL：用受控 agent 加速联邦学习实验",
       "candidate_id": "main-content-nvidia-developer-blog-accelerating-federated-learning-research-with-ai-a",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -3763,9 +3772,9 @@
       "entities": [
         "NVIDIA Developer Blog"
       ],
-      "summary": "NVIDIA 开发者文章介绍用 AI agents 和 FLARE Auto-FL 推动联邦学习研究，焦点在跨站点实验流程和自动化协作。",
+      "summary": "NVIDIA FLARE Auto-FL 是一个自动化联邦学习研究循环：给 agent 固定 benchmark、预算、变更范围和实验账本，让它在 FedAvg、FedOpt、SCAFFOLD、FedProx 等策略空间内迭代，同时保持可复现和可比较。",
       "bullets": [
-        "==联邦学习==：文章把 agent 自动化放进 FLARE 工作流，适合关注医疗、隐私数据和多机构训练场景的团队评估实验成本。它的价值在于跨站点研究流程，而不是单个模型效果声明。"
+        "**研究流程**：Auto-FL 用 program.md、固定评测合同和实验记录 约束 agent 行为，允许有限策略变更、文献驱动恢复和可复现报告；==多试想法但不破坏可比性==。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -3773,7 +3782,7 @@
       "image_urls": []
     },
     {
-      "title": "NVIDIA 为 DGX Spark 补上企业级生命周期管理",
+      "title": "NVIDIA 为 DGX Spark 增加企业级生命周期管理",
       "candidate_id": "main-content-nvidia-developer-blog-delivering-lifecycle-control-for-ai-infrastructure",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -3785,9 +3794,9 @@
       "entities": [
         "NVIDIA Developer Blog"
       ],
-      "summary": "NVIDIA 开发者文章讨论 DGX Spark 的企业级管理能力，主题集中在 AI 基础设施规模化后的生命周期控制。",
+      "summary": "NVIDIA 为 DGX Spark 和 GB10 系统介绍 Enterprise Manageability：用无代理 SSH、标准 JSON 输出和现有 IT 工具覆盖采购、配置、监控、维护、响应和退役，支持联网和完全隔离环境。",
       "bullets": [
-        "==基础设施管理==：这条更新关注部署后的设备、策略和运维管理，而不是单点算力指标，适合需要批量管理 AI 基础设施的团队跟进。它把 DGX Spark 放进企业生命周期控制语境里。"
+        "**运维含义**：DGX Spark 的管理框架把健康检查、重启原因、更新编排、安全审计和工厂重置做成可接入 CMDB/SIEM/监控管道的工具；==AI 基础设施开始按关键系统管理==。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -3795,29 +3804,7 @@
       "image_urls": []
     },
     {
-      "title": "Claude Fable 5 在 Copilot 正式可用",
-      "candidate_id": "main-content-github-changelog-claude-fable-5-is-generally-available-for-github-copilo",
-      "editorial_category": "open_source",
-      "source_level": "github",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-09",
-      "url": "https://github.blog/changelog/2026-06-09-claude-fable-5-is-generally-available-for-github-copilot",
-      "source": "GitHub Changelog",
-      "tier": "T2",
-      "entities": [
-        "GitHub Changelog"
-      ],
-      "summary": "GitHub Changelog 宣布 Claude Fable 5 在 GitHub Copilot 中正式可用，显示模型能力继续沿开发者工具入口分发。",
-      "bullets": [
-        "==开发者入口==：Copilot 接入 Claude Fable 5 后，开发团队需要关注可用计划、组织权限和代码任务表现，而不只是模型名称变化。这个入口会直接影响开发者试用新模型的速度和反馈质量。"
-      ],
-      "why_it_matters": "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态",
-      "reader_relevance": "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "title": "Notion 用 Codex 将规格到实现的流程前移",
+      "title": "Notion 用 Codex 把网页语音输入从两周压到数小时",
       "candidate_id": "main-content-openai-news-what-codex-unlocks-for-notion",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -3829,9 +3816,9 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI 发布 Notion 使用 Codex 的案例，重点在从规格说明到功能实现的协作方式，以及小团队如何放大工程产出。",
+      "summary": "OpenAI 的 Notion 案例称，AI Product Engineering 团队用 Codex 交付网页端 AI Voice Input：Codex 先读移动端实现，再按网页验收目标写出首版，开发时间从约两周缩到三四小时。",
       "bullets": [
-        "==产品工程==：Notion 案例把 Codex 放在规格、实现和验证之间，适合产品与工程团队观察哪些环节可以被 agent 接管或加速。更关键的是它如何让小团队把需求澄清和实现推进放到同一节奏里。"
+        "**落地方式**：Notion 把移动端代码、网页目标和验证路径交给 Codex，让它一次性产出接近代码规范的实现；这个案例说明 ==规格和验收== 比手写代码更像新的核心工作。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -3839,7 +3826,7 @@
       "image_urls": []
     },
     {
-      "title": "Meta 与 Reliance 在印度推进 AI 数据中心",
+      "title": "Meta 与 Reliance 合作租用印度 AI 数据中心容量",
       "candidate_id": "main-content-meta-newsroom-meta-partners-with-reliance-on-ai-enabled-data-center-in-i",
       "editorial_category": "product_radar",
       "source_level": "primary",
@@ -3851,9 +3838,9 @@
       "entities": [
         "Meta Newsroom"
       ],
-      "summary": "Meta Newsroom 发布与 Reliance 合作建设 AI 数据中心的消息，焦点在印度市场的基础设施合作和算力布局。",
+      "summary": "Meta 与 Reliance 宣布扩大合作，Meta 将租用 Reliance 在印度建设的 AI-enabled data center capacity。这条新闻的意义在于大模型基础设施继续向印度本地算力和数据中心供给扩展。",
       "bullets": [
-        "==算力布局==：这条消息说明大模型竞争继续向区域数据中心和伙伴网络延伸，印度市场成为 Meta 扩展 AI 基础设施的重点之一。它更接近基础设施和市场布局信号，而不是单个产品发布。"
+        "**基础设施信号**：这不是模型能力更新，而是 Meta 在印度的 AI 数据中心容量布局；==印度本地算力供给== 是更重要的观察点。"
       ],
       "why_it_matters": "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
       "reader_relevance": "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图",
@@ -3861,24 +3848,46 @@
       "image_urls": []
     },
     {
-      "title": "Claude Fable 5 登陆 Bedrock",
-      "candidate_id": "main-content-amazon-news-claude-fable-5-from-anthropic-now-available-on-aws",
-      "editorial_category": "ai_industry",
+      "title": "OpenAI 秘密递交 S-1 草案，保留提前上市选项",
+      "candidate_id": "main-content-openai-company-news-confidential-submission-of-draft-s-1-to-the-sec",
+      "editorial_category": "engineering_toolchain",
       "source_level": "official",
       "verification_status": "primary_confirmed",
-      "event_date": "2026-06-09",
-      "url": "https://www.aboutamazon.com/news/aws/claude-fable-5-anthropic-available-amazon-bedrock?utm_source=rss",
-      "source": "Amazon News",
+      "event_date": "2026-06-08",
+      "url": "https://openai.com/index/openai-submits-confidential-s-1",
+      "source": "OpenAI Company News RSS",
       "tier": "T0",
       "entities": [
-        "Amazon News"
+        "OpenAI Company News RSS"
       ],
-      "summary": "Amazon News 宣布 Anthropic 的 Claude Fable 5 已可在 Amazon Bedrock 使用，延续同一模型跨云平台上架的趋势。",
+      "summary": "OpenAI 6 月 8 日确认已秘密递交 S-1 草案。公司称尚未决定上市时间，因为仍有一些事情作为私营公司更容易推进，但递交草案让它在需要时拥有更早上市的选择权。",
       "bullets": [
-        "==多云分发==：Bedrock 上架 Claude Fable 5 后，企业可在 AWS 既有权限、数据边界和应用架构内评估新模型，而不必单独迁移平台。这也让同一模型在不同云入口的可用性和治理差异更值得比较。"
+        "**上市节奏**：OpenAI 表示递交草案不等于马上 IPO，也不构成证券要约；==保留提前上市选项== 才是这条公告的主要含义。"
       ],
-      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
-      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
+      "why_it_matters": "它反映了 AI 产品、模型或平台策略的实际变化，适合判断是否影响产品路线、架构选择或风险预案",
+      "reader_relevance": "产品和工程团队可用它判断是否需要调整选型、试点范围或内部风险提示",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Meta/Reliance 数据中心合作出现重复链接，核心仍是印度算力",
+      "candidate_id": "main-content-meta-newsroom-meta-partners-with-reliance-on-ai-enabled-data-center-in-i-2",
+      "editorial_category": "product_radar",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-10",
+      "url": "https://about.fb.com/news/2026/06/meta-partners-with-reliance-on-ai-enabled-data-center-in-india/",
+      "source": "Meta Newsroom",
+      "tier": "T0",
+      "entities": [
+        "Meta Newsroom"
+      ],
+      "summary": "Meta Newsroom 的另一条链接也指向同一合作：Meta 与 Reliance 围绕印度 AI-enabled data center capacity 达成租用安排。公开信息仍集中在基础设施布局，而不是新的模型或产品能力。",
+      "bullets": [
+        "**重复说明**：这条来源和上一条同属 Meta/Reliance 数据中心合作，读者可把它理解为同一基础设施主题的补充链接；==印度 AI 算力容量扩张== 是核心事实。"
+      ],
+      "why_it_matters": "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
+      "reader_relevance": "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图",
       "importance": "major",
       "image_urls": []
     }
@@ -4058,7 +4067,7 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "title": "AWS 用 Bedrock AgentCore 做理赔首报自动化",
+      "title": "AWS：浏览器 agent 做保险报案自动化",
       "candidate_id": "content-aws-machine-learning-hands-free-first-notice-of-loss-using-strands-agent",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -4068,13 +4077,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-09",
       "topic": "AI engineering tools",
-      "summary": "文章拆解保险理赔首报场景中的 agent 流程，说明 Strands Agents 和 Bedrock AgentCore Browser Tool 如何用于信息收集。它给团队的参考点在浏览器自动化、权限边界和人工交接，而不只是把表单改成聊天入口。",
+      "summary": "AWS 文章展示 hands-free FNOL 系统：Nova Act 驱动 AgentCore Browser 的隔离 Chrome 会话完成门户操作，Strands Agents 在后台做证据解析和案件复杂度判断。文章给出的是 UI 编排、领域推理、人工升级和审计留痕如何组合。",
+      "key_points": [
+        "原文说明 Nova Act 通过托管 Chrome 会话读取页面状态并执行门户操作，不只是模拟 API 流程。",
+        "Strands Agents 分成证据分析和复杂度分析两个角色，负责解读多模态材料并套用保险业务规则。",
+        "系统自动保留截图、提示词、推理和 UI 状态转换，理赔团队可以回看每一步。",
+        "团队评估时应关注人工最终裁决是否仍在流程里，以及自动化是否只覆盖初始材料校验和案件路由。",
+        "企业 agent 落地的启发是把 UI 编排、领域推理、可观测性和人工裁决拆成清晰层次。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Cloudflare 讨论前沿网络模型防御架构",
+      "title": "Cloudflare：按最坏前沿网络模型来设计防御架构",
       "candidate_id": "content-cloudflare-blog-defend-against-frontier-cyber-models-cloudflare-s-archit",
       "editorial_category": "viewpoint_analysis",
       "source_level": "primary",
@@ -4084,13 +4100,20 @@
       "author": "Cloudflare Blog",
       "event_date": "2026-06-09",
       "topic": "AI industry",
-      "summary": "文章说明 Cloudflare 如何把自身网络架构作为客户防护层，回应更强网络攻击模型带来的风险。它的重点在防御流程、平台覆盖和限制条件，安全团队可据此判断哪些能力需要由边缘平台承担。后续还要看这些防护如何映射到真实攻击样本、误报处理和企业侧可观测性。",
+      "summary": "Cloudflare 文章把 Project Glasswing 后续讨论落到防御架构：前沿网络模型能更快发现漏洞、改写 payload 并扩大试探规模，但真正决定风险的是漏洞被利用后，身份、路径和权限能让攻击走多远。原文给出的是网关、身份、日志和工具权限的防护思路。",
+      "key_points": [
+        "文章说明防御重点不能只放在模型能否发现漏洞，还要看企业网络中凭据、服务边界和东西向访问是否被隔离。",
+        "Cloudflare 建议把 MCP server、内部工具和 agent 出口纳入集中网关，记录每次 agent 动作。",
+        "原文把“模型越强”转成“攻击链越需要被切断”的工程问题，适合安全团队核查现有零信任策略。",
+        "读者应关注日志粒度、工具权限、速率限制和异常检测，而不是只追踪单个模型的网络能力榜单。",
+        "它的局限是偏架构原则，仍需要企业按自己的工具链、身份系统和数据敏感级别落到具体策略。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "阿里云 Quick BI 面向电商分析引入 AI 原生能力",
+      "title": "阿里云 Quick BI：让电商团队用自然语言查经营数据",
       "candidate_id": "content-alibaba-cloud-blog-ai-native-ecommerce-analytics-with-quick-bi",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -4103,48 +4126,20 @@
       "author": "Alibaba Cloud Blog",
       "event_date": "2026-06-09",
       "topic": "AI engineering tools",
-      "summary": "文章围绕电商分析场景说明 Quick BI 的 AI 原生能力，核心是把数据查询、指标解释和业务分析流程放进同一个产品入口。它适合数据团队参考如何把自然语言分析接入既有报表，而不是替代数据治理。后续可观察权限、指标口径和多角色协同是否能在复杂店铺运营中稳定落地。",
+      "summary": "阿里云博客用女包品牌场景说明 Quick BI Smart Q：把 Shopify、Amazon、Alibaba Express、库存、评论和社媒舆情汇到经营分析里，让业务人员直接问销售、ROI、缺货和客户反馈问题。文章重点是自然语言分析如何嵌进日常运营。",
+      "key_points": [
+        "原文的核心不是通用 BI 概念，而是把跨平台电商数据从“查报表”改成“问业务问题”。",
+        "示例覆盖平台收入、渠道 ROI、商品销量、库存风险和评论/社媒反馈等运营问题。",
+        "库存场景会识别某个平台低于阈值，而其他平台仍有库存，从而建议调拨或补货。",
+        "客户反馈场景把内部评论和 Instagram、Reddit 等外部信号结合，用于产品和营销调整。",
+        "电商团队可用它评估自然语言分析是否能进入日常运营，而不只是做展示型 dashboard。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "苹果第三代基础模型强调端侧和云端边界",
-      "candidate_id": "content-apple-machine-learning-introducing-the-third-generation-of-apple-s-found",
-      "editorial_category": "viewpoint_analysis",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "url": "https://machinelearning.apple.com/research/introducing-third-generation-of-apple-foundation-models",
-      "publisher": "Apple Machine Learning Research",
-      "author": "Apple Machine Learning Research",
-      "event_date": "2026-06-08",
-      "topic": "research / evaluation",
-      "summary": "文章围绕苹果第三代基础模型展开，信息重点在端侧模型、服务器模型、评测范围和安全隐私处理方式。它把模型能力、系统体验和开发者接口放在一起说明，能区分已经产品化的能力、仍在研究披露中的能力，以及第三方应用可复用的接口范围。",
-      "content_type": "blog",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "title": "NVIDIA 推动英国主权 AI 落地",
-      "candidate_id": "content-nvidia-newsroom-rss-how-the-uk-is-turning-sovereign-ai-ambition-into-act",
-      "editorial_category": "viewpoint_analysis",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "image_url": "https://iprsoftwaremedia.com/219/files/202606/c00b328dad9dcfb1547964e492ccceb0/6a265ab53d6332b68a4ebc12_london-tech-week-2026-key-visual-842x450/london-tech-week-2026-key-visual-842x450_thmb.jpg",
-      "image_alt": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
-      "image_source": "feed",
-      "url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
-      "publisher": "NVIDIA Newsroom RSS",
-      "author": "NVIDIA Newsroom RSS",
-      "event_date": "2026-06-08",
-      "topic": "AI industry",
-      "summary": "文章讲英伟达如何把英国主权人工智能从政策口号推进到基础设施和伙伴落地，涉及本地算力、行业合作和人工智能工厂叙事。主要信息不是模型发布，而是供应链、国家级算力和企业落地节奏，并说明英国主线仍围绕英伟达展开。",
-      "content_type": "blog",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "title": "Gemini 3.5 强调自然语音翻译",
+      "title": "Google：Gemini 3.5 做实时语音到语音翻译",
       "candidate_id": "content-google-deepmind-rss-fluid-natural-voice-translation-with-gemini-3-5-live",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -4154,13 +4149,20 @@
       "author": "Google DeepMind RSS",
       "event_date": "2026-06-09",
       "topic": "AI industry",
-      "summary": "文章说明 Gemini 3.5 Live Translate 的语音翻译方向，重点在实时对话中保持更自然的语气和交流节奏。产品团队可关注延迟、语言覆盖和隐私边界，因为这些会决定它能否进入会议、客服或跨境协作场景。",
+      "summary": "Google/DeepMind 发布 Gemini 3.5 Live Translate。原文说明该 speech-to-speech 方法采用流式处理，支持 70 多种语言，并在 Google AI Studio、Meet 企业预览和 Translate 移动端分阶段上线。文章给出的重点是延迟、语调保留和产品入口。",
+      "key_points": [
+        "原文说明模型会自动识别 70 多种语言，并尝试保留说话人的语调、节奏和音高。",
+        "方法上采用流式语音处理，在上下文质量和同步速度之间做权衡，通常只落后几秒。",
+        "开发者可通过 Gemini Live API 和 Google AI Studio 公测接入，Google Meet 企业版先做私有预览。",
+        "Google Translate 的 Android/iOS 版本也会获得该能力，并支持耳机和 Android 听筒模式。",
+        "读者需要关注生成语音的 SynthID 水印，以及实时翻译进入会议和移动端后的误译风险。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "AWS 用 Isaac Lab 扩展机器人强化学习",
+      "title": "AWS：把 Isaac Lab 机器人强化学习扩展到 SageMaker",
       "candidate_id": "content-aws-machine-learning-scale-robot-reinforcement-learning-with-nvidia-isaa",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -4170,13 +4172,43 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-09",
       "topic": "AI industry",
-      "summary": "文章拆解在 SageMaker AI 上结合 NVIDIA Isaac Lab 扩展机器人强化学习的流程，关注仿真、训练和云端资源调度。机器人团队可据此评估实验吞吐、成本控制和从仿真到现实部署的风险。",
+      "summary": "AWS 文章展示如何把 NVIDIA Isaac Lab 的机器人强化学习任务迁到 SageMaker AI。原文方法是用同一个训练镜像覆盖 HyperPod 和 Training Jobs，并把 managed cluster、故障恢复和实验追踪纳入大规模仿真训练流程。",
+      "key_points": [
+        "示例任务是 Unitree H1 人形机器人在崎岖地形中按速度指令行走，需要协调 19 个关节保持平衡。",
+        "Isaac Lab 利用 GPU 并行仿真同时跑大量机器人实例，把现实世界数月经验压缩到小时级模拟。",
+        "方案用单一 Docker 镜像承载训练代码，再由生成脚本输出 Kubernetes manifest 和 SageMaker 启动脚本。",
+        "HyperPod 路径使用 Kubernetes PyTorchJob，Training Jobs 路径通过 CreateTrainingJob API 启动。",
+        "读者可核对的落点是机器人强化学习训练如何从本地或 EC2 workshop 迁到可管理的云训练拓扑。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Copilot CLI 用自定义 agent 串起工作流",
+      "title": "Azure：Fable 5 上架 Foundry，面向自主 agent 工作流",
+      "candidate_id": "content-azure-blog-claude-fable-5-is-now-available-in-microsoft-foundry-powering",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "url": "https://azure.microsoft.com/en-us/blog/claude-fable-5-is-now-available-in-microsoft-foundry-powering-the-next-era-of-autonomous-agents/",
+      "publisher": "Azure Blog",
+      "author": "Azure Blog",
+      "event_date": "2026-06-09",
+      "topic": "AI engineering tools",
+      "summary": "Azure 博客报道 Claude Fable 5 在 Microsoft Foundry 可用，重点是把 Anthropic 的 Mythos-class 模型接入 Foundry Agent Service、GitHub Copilot 等工作流。它更像渠道可用性补充，核心事实仍应回到 Anthropic 对 Fable/Mythos 的模型关系说明。",
+      "key_points": [
+        "Azure 这条的增量在企业接入渠道：Foundry 用户可以在既有代理服务里选择 Fable 5。",
+        "它把 Fable 5 定位到自主 agent 和长周期知识工作，而不是只做聊天模型更新。",
+        "对采购和平台团队有用的信息是模型进入 Azure/Microsoft 的权限、账单和治理体系。",
+        "对日报主新闻而言，它应合并到 Anthropic 原始发布下，而不应替代原始模型新闻。",
+        "读者还要留意 Fable 5 的 30 天安全数据留存要求，这会影响企业合规评估。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "GitHub：Copilot CLI 自定义 agent 把提示变成工作流",
       "candidate_id": "content-github-blog-feed-from-one-off-prompts-to-workflows-how-to-use-custom-age",
       "editorial_category": "viewpoint_analysis",
       "source_level": "github",
@@ -4186,7 +4218,37 @@
       "author": "GitHub Blog Feed",
       "event_date": "2026-06-09",
       "topic": "AI engineering tools",
-      "summary": "文章说明如何把一次性提示词沉淀为 GitHub Copilot CLI 的自定义 agent 工作流。它的关键信息在配置、工具调用和复用方式，能帮助开发团队判断哪些命令行任务适合标准化。后续要看这些 agent 如何处理权限、失败恢复和团队共享配置。",
+      "summary": "GitHub 文章介绍 Copilot CLI custom agents：团队可以用仓库里的 Markdown agent profile 描述角色、工具、规则和输出，把一次性终端提示变成可复用、可审查、可版本化的流程。文章关注的是提示工程如何进入代码库治理。",
+      "key_points": [
+        "custom agent 用 Markdown 文件定义角色、可用工具、守护规则和预期输出，行为随仓库版本管理。",
+        "CLI 入口通过 /agent 选择具体 agent，配置文件放在目标仓库的 .github/agents 目录。",
+        "文章建议从重复任务开始，例如安全审计、发布说明、issue 整理、事故响应或跨仓库检查。",
+        "原文把 off-the-shelf agents 和 custom agents 区分开：前者快，后者适合团队规则和内部工具。",
+        "读者要关注 profile 是否进入代码审查和版本管理，因为这决定 prompt 是个人技巧还是团队工程资产。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "GitHub：Fable 5 在 Copilot 可用，但有安全数据留存",
+      "candidate_id": "content-github-changelog-claude-fable-5-is-generally-available-for-github-copilo",
+      "editorial_category": "viewpoint_analysis",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "url": "https://github.blog/changelog/2026-06-09-claude-fable-5-is-generally-available-for-github-copilot",
+      "publisher": "GitHub Changelog",
+      "author": "GitHub Changelog",
+      "event_date": "2026-06-09",
+      "topic": "AI engineering tools",
+      "summary": "GitHub Changelog 报道 Fable 5 已接入 Copilot。原文说明覆盖主流编辑器、命令行、云端代理和移动端入口；商业版、企业版管理员需要在设置里显式开启，Anthropic 安全分类器会保留输入和输出最多 30 天。",
+      "key_points": [
+        "原文说明 GitHub 把 Fable 5 定位为 Mythos class 首个 Copilot 模型，面向长周期自主编码和知识工作。",
+        "内部基准显示，它在自主编码流程里用更少工具调用和令牌完成等价任务。",
+        "可用范围覆盖个人、专业、商业和企业订阅，但上线是逐步开放。",
+        "商业版和企业版管理员需要在 Copilot 设置中开启 Fable 5 策略，默认关闭。",
+        "读者要关注这条数据留存规则：安全分类器最多保留输入和输出 30 天，其他 Claude 模型仍按零数据留存运行。"
+      ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -4280,7 +4342,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-10T05:18:58.617Z",
+        "snapshot_as_of": "2026-06-10T08:38:20.457Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -4444,7 +4506,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-10T05:18:58.617Z",
+        "snapshot_as_of": "2026-06-10T08:38:20.457Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -4741,157 +4803,235 @@
   ],
   "builder_observations": [
     {
-      "author": "Peter Yang",
-      "handle": "petergyang",
-      "candidate_id": "follow-builders-x-peter-yang-if-you-re-addicted-to-talking-to-codex-on-your-phon",
+      "author": "Swyx",
+      "handle": "swyx",
+      "candidate_id": "follow-builders-x-swyx-for-those-keeping-track-at-home-it-was-34-days-between-si",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "如果你也像我一样经常在手机上和 Codex 对话，这是把它添加到 iPhone 主屏幕的方法。顺便说一句，@OpenAI，希望以后能有更简单的方式；一个 everything app 不该需要 9 步才能打开。",
-      "original_text": "If you’re addicted to talking to Codex on your phone like I am this is how you add it to your iPhone Home Screen. Btw @OpenAI hoping there’s an easier way to do this in the future. The everything app should not take 9 steps to open 😉 https://t.co/LCzNSFjbrM",
-      "translation": "如果你也像我一样经常在手机上和 Codex 对话，这是把它添加到 iPhone 主屏幕的方法。顺便说一句，@OpenAI，希望以后能有更简单的方式；一个 everything app 不该需要 9 步才能打开。",
-      "avatar_url": "https://unavatar.io/x/petergyang",
-      "url": "https://x.com/petergyang/status/2064204735671124073",
+      "content": "给在家跟进时间线的人：从签下这笔合作到把 Mythos-class 模型 GA 推向全球，中间只有 34 天。建立在 NVIDIA 技术栈上，确实能把事情推进得很快。",
+      "original_text": "for those keeping track at home it was 34 days between signing this deal and launching Mythos-class model GA to the world. https://t.co/J1dZDZcxMu building on @nvidia stack means you can just do things™.",
+      "translation": "给在家跟进时间线的人：从签下这笔合作到把 Mythos-class 模型 GA 推向全球，中间只有 34 天。建立在 NVIDIA 技术栈上，确实能把事情推进得很快。",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2064421542503797186",
       "role": "builder",
       "event_date": "2026-06-09",
       "source": "follow-builders X feed",
-      "evidence": "If you’re addicted to talking to Codex on your phone like I am this is how you add it to your iPhone Home Screen. Btw @OpenAI hoping there’s an easier way to do this in the future. The everything app should not take 9 steps to open 😉 https",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Peter Yang",
-      "handle": "petergyang",
-      "candidate_id": "follow-builders-x-peter-yang-what-is-google-s-equivalent-or-up-and-coming-compet",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Google 有没有对应 Codex 和 Claude Code 的产品，或者正在冒头的竞争者？如果是 Antigravity，它是不是应该成为 Gemini 的一部分？这类产品会很快融合，就像 ChatGPT 和 Codex 已经能在任何设备上处理编程、知识工作、基础问答和更多任务一样。希望 Google 正在做一个好方案。",
-      "original_text": "What is Google’s equivalent (or up and coming competitor) of Codex and Claude Code? If it’s Antigravity, should that be part of Gemini? This stuff is going to merge very fast like ChatGPT / Codex being able to do coding, knowledge work, basic Q&A, and much more from any device. Hoping Google is working on a good solution here.",
-      "translation": "Google 有没有对应 Codex 和 Claude Code 的产品，或者正在冒头的竞争者？如果是 Antigravity，它是不是应该成为 Gemini 的一部分？这类产品会很快融合，就像 ChatGPT 和 Codex 已经能在任何设备上处理编程、知识工作、基础问答和更多任务一样。希望 Google 正在做一个好方案。",
-      "avatar_url": "https://unavatar.io/x/petergyang",
-      "url": "https://x.com/petergyang/status/2064187731685831081",
-      "role": "builder",
-      "event_date": "2026-06-09",
-      "source": "follow-builders X feed",
-      "evidence": "What is Google’s equivalent (or up and coming competitor) of Codex and Claude Code? If it’s Antigravity, should that be part of Gemini? This stuff is going to merge very fast like ChatGPT / Codex being able to do coding, knowledge work, bas",
+      "evidence": "for those keeping track at home it was 34 days between signing this deal and launching Mythos-class model GA to the world. https://t.co/J1dZDZcxMu building on @nvidia stack means you can just do things™.",
       "importance": "notable",
       "image_urls": []
     },
     {
       "author": "Boris Cherny",
       "handle": "bcherny",
-      "candidate_id": "follow-builders-x-boris-cherny-when-we-first-demoed-claude-code-internally-it-go",
+      "candidate_id": "follow-builders-x-boris-cherny-fable-5-is-the-biggest-step-up-i-ve-felt-in-our-m",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "我们第一次在内部演示 Claude Code 时，Slack 上出现了两种反应。在 GA 一年后，我和 @_catwu 坐下来聊过去一年里的变化，包括为什么我用 auto mode 而不是 plan mode，routines 如何在我发现之前修 bug，为什么我现在大部分编码都在手机上完成，以及产品接下来会走向哪里。",
-      "original_text": "When we first demoed Claude Code internally, it got two reactions on Slack. A year after GA, @_catwu and I sat down to talk about what's changed: why I use auto mode instead of plan mode, how routines fix bugs before I see them, why I do most of my coding from my phone now, and where the product is going",
-      "translation": "我们第一次在内部演示 Claude Code 时，Slack 上出现了两种反应。在 GA 一年后，我和 @_catwu 坐下来聊过去一年里的变化，包括为什么我用 auto mode 而不是 plan mode，routines 如何在我发现之前修 bug，为什么我现在大部分编码都在手机上完成，以及产品接下来会走向哪里。",
+      "content": "Fable 5 是我从去年 11 月 Opus 4.5 以来，在我们模型里感受到的最大跃升。4.5 发布后，我发现自己几周来 100% 都在终端里写代码，于是卸载了 IDE。到 Fable 时，Claude 感觉已经从 coding agent 升级成一起做产品的思考和设计伙伴；它有判断、品味和维度感，让我更愿意把复杂工作交给它。原帖后文被截断。",
+      "original_text": "Fable 5 is the biggest step up I’ve felt in our models since Opus 4.5 back in November. After 4.5 came out I uninstalled my IDE when I realized that I’d been doing 100% of my coding in a terminal for a few weeks. With Fable, it’s felt like Claude has stepped up from being a coding agent to a thought and design partner in building the product. Fable has judgement, taste, and dimensionality in a way that previous models didn’t, leading me to trust it more with the most complex work. I think the f...",
+      "translation": "Fable 5 是我从去年 11 月 Opus 4.5 以来，在我们模型里感受到的最大跃升。4.5 发布后，我发现自己几周来 100% 都在终端里写代码，于是卸载了 IDE。到 Fable 时，Claude 感觉已经从 coding agent 升级成一起做产品的思考和设计伙伴；它有判断、品味和维度感，让我更愿意把复杂工作交给它。原帖后文被截断。",
       "avatar_url": "https://unavatar.io/x/bcherny",
-      "url": "https://x.com/bcherny/status/2064034799711588805",
+      "url": "https://x.com/bcherny/status/2064431111154053187",
       "role": "builder",
-      "event_date": "2026-06-08",
+      "event_date": "2026-06-09",
       "source": "follow-builders X feed",
-      "evidence": "When we first demoed Claude Code internally, it got two reactions on Slack. A year after GA, @_catwu and I sat down to talk about what's changed: why I use auto mode instead of plan mode, how routines fix bugs before I see them, why I do mo",
+      "evidence": "Fable 5 is the biggest step up I’ve felt in our models since Opus 4.5 back in November. After 4.5 came out I uninstalled my IDE when I realized that I’d been doing 100% of my coding in a terminal for a few weeks. With Fable, it’s felt like",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Peter Yang",
-      "handle": "petergyang",
-      "candidate_id": "follow-builders-x-peter-yang-feels-like-there-s-a-completely-different-set-of-be",
+      "author": "Guillermo Rauch",
+      "handle": "rauchg",
+      "candidate_id": "follow-builders-x-guillermo-rauch-vercel-cli-now-allows-you-to-create-ai-gateway",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "感觉在每月 200 美元、带补贴的订阅里做 AI builder，和在公司里工作、同时又要避免 API 成本超支的员工，适用的是一套完全不同的最佳实践。",
-      "original_text": "Feels like there’s a completely different set of best practices for AI builders on the $200 / month subsidized subscriptions vs employees working at companies that are trying not to overspend API costs",
-      "translation": "感觉在每月 200 美元、带补贴的订阅里做 AI builder，和在公司里工作、同时又要避免 API 成本超支的员工，适用的是一套完全不同的最佳实践。",
-      "avatar_url": "https://unavatar.io/x/petergyang",
-      "url": "https://x.com/petergyang/status/2064063499517743417",
+      "content": "Vercel CLI 现在可以创建 AI Gateway API keys、用 --budget 限制花费、用 --refresh-period 设置额度刷新周期。可以把它理解成给 AI token 用的虚拟信用卡。",
+      "original_text": "Vercel CLI now allows you to: ◾ create AI Gateway API keys ◾ pass a --𝚋𝚞𝚍𝚐𝚎𝚝 to cap their spend ◾ set a --𝚛𝚎𝚏𝚛𝚎𝚜𝚑-𝚙𝚎𝚛𝚒𝚘𝚍 for the quota Think of it as virtual credit cards for AI tokens 🤖💳 https://t.co/ZOuhwIp7h5 https://t.co/mvIsJkaBfR",
+      "translation": "Vercel CLI 现在可以创建 AI Gateway API keys、用 --budget 限制花费、用 --refresh-period 设置额度刷新周期。可以把它理解成给 AI token 用的虚拟信用卡。",
+      "avatar_url": "https://unavatar.io/x/rauchg",
+      "url": "https://x.com/rauchg/status/2064551967461114111",
       "role": "builder",
-      "event_date": "2026-06-08",
+      "event_date": "2026-06-10",
       "source": "follow-builders X feed",
-      "evidence": "Feels like there’s a completely different set of best practices for AI builders on the $200 / month subsidized subscriptions vs employees working at companies that are trying not to overspend API costs",
+      "evidence": "Vercel CLI now allows you to: ◾ create AI Gateway API keys ◾ pass a --𝚋𝚞𝚍𝚐𝚎𝚝 to cap their spend ◾ set a --𝚛𝚎𝚏𝚛𝚎𝚜𝚑-𝚙𝚎𝚛𝚒𝚘𝚍 for the quota Think of it as virtual credit cards for AI tokens 🤖💳 https://t.co/ZOuhwIp7h5 https:/",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Andrej Karpathy",
+      "handle": "karpathy",
+      "candidate_id": "follow-builders-x-andrej-karpathy-this-is-a-super-exciting-release-claude-fable",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "这是一个非常令人兴奋的发布：Claude Fable 5 和 Mythos 是同一个底层模型，但增加了 safeguards。benchmark 很强，很多项目上都是明显领先；我还想补充，定性体验上它也配得上一个大版本跃迁，尤其适合很难问题上的长时间解题会话。你可以给它比以往更有野心的任务。原帖后文被截断。",
+      "original_text": "This is a super exciting release - Claude Fable 5 is the same underlying model as Mythos but with added safeguards. The benchmarks are great and it's SOTA on everything by a margin but I'll add that *qualitatively* also, this is a major-version-bump-deserving step change forward (imo of the same order as Claude 4.5 was in November), peaking especially for long problem-solving sessions on very difficult problems. You can give it a lot more ambitious tasks than what you're used to, the model \"get...",
+      "translation": "这是一个非常令人兴奋的发布：Claude Fable 5 和 Mythos 是同一个底层模型，但增加了 safeguards。benchmark 很强，很多项目上都是明显领先；我还想补充，定性体验上它也配得上一个大版本跃迁，尤其适合很难问题上的长时间解题会话。你可以给它比以往更有野心的任务。原帖后文被截断。",
+      "avatar_url": "https://unavatar.io/x/karpathy",
+      "url": "https://x.com/karpathy/status/2064409694761054332",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "evidence": "This is a super exciting release - Claude Fable 5 is the same underlying model as Mythos but with added safeguards. The benchmarks are great and it's SOTA on everything by a margin but I'll add that *qualitatively* also, this is a major-ver",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Swyx",
+      "handle": "swyx",
+      "candidate_id": "follow-builders-x-swyx-btw-insane-amounts-of-alpha-in-telling-claude-code-to-rev",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "顺带说一句，现在趁 Fable 还不是按量付费，让 Claude Code 在 Fable 上“review my code for issues”很有信息量；你可能会惊恐地发现，自己以前竟然没做 Fable Check 就把东西发到生产环境。",
+      "original_text": "btw insane amounts of alpha in telling claude code to \"review my code for issues\" on Fable rn while it is not pay per use be prepared to be in abject horror that you shipped anything to prod without a Fable Check™ first https://t.co/wPCWRO84xV",
+      "translation": "顺带说一句，现在趁 Fable 还不是按量付费，让 Claude Code 在 Fable 上“review my code for issues”很有信息量；你可能会惊恐地发现，自己以前竟然没做 Fable Check 就把东西发到生产环境。",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2064492823781789969",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "evidence": "btw insane amounts of alpha in telling claude code to \"review my code for issues\" on Fable rn while it is not pay per use be prepared to be in abject horror that you shipped anything to prod without a Fable Check™ first https://t.co/wPCWRO8",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Boris Cherny",
+      "handle": "bcherny",
+      "candidate_id": "follow-builders-x-boris-cherny-we-talk-a-lot-about-how-important-it-is-to-set-up",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "我们经常讨论 self-verification loops 有多重要。尤其在强模型能长时间运行的时代，自我验证是关键成分，它能让模型运行更久，并交付更接近你意图的结果，这样你就不用在 Claude 工作时不断检查。Delba Oliveira 对它长什么样以及为什么重要做了很好的拆解。",
+      "original_text": "We talk a lot about how important it is to set up self-verification loops. Especially in the age of powerful models that can run for long periods of time, self-verification is a key ingredient that enables the model to run for much longer, delivering a result that is closer to what you intended, so you can do more without having to constantly check in on Claude as it works. @delba_oliveira gives a great breakdown of what that looks like and why it matters",
+      "translation": "我们经常讨论 self-verification loops 有多重要。尤其在强模型能长时间运行的时代，自我验证是关键成分，它能让模型运行更久，并交付更接近你意图的结果，这样你就不用在 Claude 工作时不断检查。Delba Oliveira 对它长什么样以及为什么重要做了很好的拆解。",
+      "avatar_url": "https://unavatar.io/x/bcherny",
+      "url": "https://x.com/bcherny/status/2064426115255730578",
+      "role": "builder",
+      "event_date": "2026-06-09",
+      "source": "follow-builders X feed",
+      "evidence": "We talk a lot about how important it is to set up self-verification loops. Especially in the age of powerful models that can run for long periods of time, self-verification is a key ingredient that enables the model to run for much longer,",
       "importance": "notable",
       "image_urls": []
     },
     {
       "author": "Thibault Sottiaux",
       "handle": "thsottiaux",
-      "candidate_id": "follow-builders-x-thibault-sottiaux-not-clear-from-the-image-but-the-codex-dial",
+      "candidate_id": "follow-builders-x-thibault-sottiaux-do-you-use-codex-goal-occasionally-or-as-you",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "图片里可能看不清，但 Codex 的刻度盘能转到 11。",
-      "original_text": "Not clear from the image, but the codex dial goes to 11.",
-      "translation": "图片里可能看不清，但 Codex 的刻度盘能转到 11。",
+      "content": "你是偶尔使用 codex /goal，还是把它当作完成事情的主要方式？",
+      "original_text": "Do you use codex /goal occasionally or as your main way to get things done?",
+      "translation": "你是偶尔使用 codex /goal，还是把它当作完成事情的主要方式？",
       "avatar_url": "https://unavatar.io/x/thsottiaux",
-      "url": "https://x.com/thsottiaux/status/2064224790672769307",
+      "url": "https://x.com/thsottiaux/status/2064308436133716008",
       "role": "builder",
       "event_date": "2026-06-09",
       "source": "follow-builders X feed",
-      "evidence": "Not clear from the image, but the codex dial goes to 11.",
+      "evidence": "Do you use codex /goal occasionally or as your main way to get things done?",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Amanda Askell",
-      "handle": "AmandaAskell",
-      "candidate_id": "follow-builders-x-amanda-askell-in-the-world-where-everything-goes-well-and-all",
+      "author": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "candidate_id": "follow-builders-x-thibault-sottiaux-playing-codex-like-an-orchestra-one-goal-at",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "如果一切顺利，所有 Claude 都结束休假一起出来玩，Claude 1 应该会非常困惑。",
-      "original_text": "In the world where everything goes well and all the Claudes come out of their sabbaticals to play together, Claude 1 is going to be very confused.",
-      "translation": "如果一切顺利，所有 Claude 都结束休假一起出来玩，Claude 1 应该会非常困惑。",
-      "avatar_url": "https://unavatar.io/x/AmandaAskell",
-      "url": "https://x.com/AmandaAskell/status/2064223861512847456",
+      "content": "像指挥乐团一样使用 Codex。一次一个 /goal。",
+      "original_text": "Playing codex like an orchestra. One /goal at a time. https://t.co/vlpypZu20A",
+      "translation": "像指挥乐团一样使用 Codex。一次一个 /goal。",
+      "avatar_url": "https://unavatar.io/x/thsottiaux",
+      "url": "https://x.com/thsottiaux/status/2064307859903447396",
       "role": "builder",
       "event_date": "2026-06-09",
       "source": "follow-builders X feed",
-      "evidence": "In the world where everything goes well and all the Claudes come out of their sabbaticals to play together, Claude 1 is going to be very confused.",
+      "evidence": "Playing codex like an orchestra. One /goal at a time. https://t.co/vlpypZu20A",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Aaron Levie",
-      "handle": "levie",
-      "candidate_id": "follow-builders-x-aaron-levie-there-s-no-amount-of-intelligence-that-can-get-pac",
+      "author": "Peter Yang",
+      "handle": "petergyang",
+      "candidate_id": "follow-builders-x-peter-yang-wtf-does-big-model-smell-mean",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "无论 AI 模型里塞进多少智能，都不能取代上下文。对任何足够通用的 AI，你始终需要把它引导到想要的方向，因为它可以走向无限多种路径。只要同一个模型同时被律师、工程师、金融分析师或医疗专业人士使用，只要你要做的是有差异化或很具体的事情，指令、领域上下文和专有信息就仍然必要。",
-      "original_text": "There’s no amount of intelligence that can get packed into AI models that replaces the need for context. For any sufficiently general purpose AI, you will always have to guide it in the direction you want as it has an infinite range of directions it can go in. As long as the same model is used by a lawyer, an engineer, a financial analyst, or a healthcare professional, and as long as you’re trying to do anything uniquely differentiated or specific, then instructions, domain context, and proprie...",
-      "translation": "无论 AI 模型里塞进多少智能，都不能取代上下文。对任何足够通用的 AI，你始终需要把它引导到想要的方向，因为它可以走向无限多种路径。只要同一个模型同时被律师、工程师、金融分析师或医疗专业人士使用，只要你要做的是有差异化或很具体的事情，指令、领域上下文和专有信息就仍然必要。",
-      "avatar_url": "https://unavatar.io/x/levie",
-      "url": "https://x.com/levie/status/2064186766907887941",
+      "content": "Peter Yang 在追问社区里“big model smell”这个说法到底是什么意思；这不是一条事实发布，而是对 Fable 5 体验讨论里出现的新黑话做澄清。",
+      "original_text": "wtf does \"big model smell\" mean",
+      "translation": "Peter Yang 在追问社区里“big model smell”这个说法到底是什么意思；这不是一条事实发布，而是对 Fable 5 体验讨论里出现的新黑话做澄清。",
+      "avatar_url": "https://unavatar.io/x/petergyang",
+      "url": "https://x.com/petergyang/status/2064563041166090672",
+      "role": "builder",
+      "event_date": "2026-06-10",
+      "source": "follow-builders X feed",
+      "evidence": "wtf does \"big model smell\" mean",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Peter Yang",
+      "handle": "petergyang",
+      "candidate_id": "follow-builders-x-peter-yang-btw-this-is-the-prompt-i-used-build-f-zero-futurist",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "顺带说，这是我用的提示词：构建 F-Zero 风格的未来反重力赛车，包含伪 3D 路线、3 个 AI 对手、消耗生命值的 boost meter、400-800 km/h 的速度表现、方向键转向、Shift 加速、3 圈循环路线和检查点，并用霓虹 cyberpunk 风格、HUD、路线扭曲和滚动地面纹理营造速度感。原帖后文被截断。",
+      "original_text": "Btw this is the prompt I used: Build F-Zero: futuristic anti-gravity racer with pseudo-3D track (raycasting or mode-7 style scaling), 3 AI opponents, boost meter that drains health, speed 400-800 km/h with visible sense of speed via track warping and scrolling ground pattern, arrow keys to steer, shift to boost, 3 laps on a looping track with checkpoints. Style it neon cyberpunk (dark sky, glowing track edges, chromatic aberration on boost), show HUD with position/lap/speed/health, and make the...",
+      "translation": "顺带说，这是我用的提示词：构建 F-Zero 风格的未来反重力赛车，包含伪 3D 路线、3 个 AI 对手、消耗生命值的 boost meter、400-800 km/h 的速度表现、方向键转向、Shift 加速、3 圈循环路线和检查点，并用霓虹 cyberpunk 风格、HUD、路线扭曲和滚动地面纹理营造速度感。原帖后文被截断。",
+      "avatar_url": "https://unavatar.io/x/petergyang",
+      "url": "https://x.com/petergyang/status/2064550073594446059",
+      "role": "builder",
+      "event_date": "2026-06-10",
+      "source": "follow-builders X feed",
+      "evidence": "Btw this is the prompt I used: Build F-Zero: futuristic anti-gravity racer with pseudo-3D track (raycasting or mode-7 style scaling), 3 AI opponents, boost meter that drains health, speed 400-800 km/h with visible sense of speed via track w",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Thariq",
+      "handle": "trq212",
+      "candidate_id": "follow-builders-x-thariq-at-code-w-claude-tokyo-say-hi-if-you-see-me-around-t-co",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "我在东京的 Code w/ Claude 活动现场；如果你看到我，可以来打招呼。",
+      "original_text": "at Code w/ Claude Tokyo! say hi if you see me around https://t.co/BXfvEJVvrf",
+      "translation": "我在东京的 Code w/ Claude 活动现场；如果你看到我，可以来打招呼。",
+      "avatar_url": "https://unavatar.io/x/trq212",
+      "url": "https://x.com/trq212/status/2064521202622960058",
+      "role": "builder",
+      "event_date": "2026-06-10",
+      "source": "follow-builders X feed",
+      "evidence": "at Code w/ Claude Tokyo! say hi if you see me around https://t.co/BXfvEJVvrf",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Thariq",
+      "handle": "trq212",
+      "candidate_id": "follow-builders-x-thariq-fable-is-a-step-change-in-models-and-i-hope-it-changes",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "Fable 是模型的一次阶跃变化，我希望它会改变你和 Claude 协作的方式。后面还会发一系列帖子讲它如何重塑我们的工作；但一句话总结：是时候更有野心了。",
+      "original_text": "Fable is a step-change in models, and I hope it changes how you work with Claude. More to come in a series of posts on how it’s reshaped our work, but the TLDR: it’s time to be more ambitious. https://t.co/bWoxbTBShh",
+      "translation": "Fable 是模型的一次阶跃变化，我希望它会改变你和 Claude 协作的方式。后面还会发一系列帖子讲它如何重塑我们的工作；但一句话总结：是时候更有野心了。",
+      "avatar_url": "https://unavatar.io/x/trq212",
+      "url": "https://x.com/trq212/status/2064437561930682672",
       "role": "builder",
       "event_date": "2026-06-09",
       "source": "follow-builders X feed",
-      "evidence": "There’s no amount of intelligence that can get packed into AI models that replaces the need for context. For any sufficiently general purpose AI, you will always have to guide it in the direction you want as it has an infinite range of dire",
+      "evidence": "Fable is a step-change in models, and I hope it changes how you work with Claude. More to come in a series of posts on how it’s reshaped our work, but the TLDR: it’s time to be more ambitious. https://t.co/bWoxbTBShh",
       "importance": "notable",
       "image_urls": []
     }
   ],
   "community_leads": [
-    {
-      "candidate_id": "content-meta-newsroom-meta-partners-with-reliance-on-ai-enabled-data-center-in-i-2",
-      "title": "Meta Partners With Reliance on AI-Enabled Data Center in India",
-      "content": "Meta Newsroom 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
-      "image_url": "https://about.fb.com/wp-content/uploads/2026/06/Meta-Partners-With-Reliance-on-AI-Data-Center-in-India_Header.jpg?fit=1920%2C1080",
-      "image_alt": "Meta Partners With Reliance on AI-Enabled Data Center in India",
-      "image_source": "feed",
-      "url": "https://about.fb.com/news/2026/06/meta-partners-with-reliance-on-ai-enabled-data-center-in-india/",
-      "event_date": "2026-06-10",
-      "source": "Meta Newsroom",
-      "evidence": "We've enetered an agreement with Reliance Industries to lease our first ever AI-enabled data center in India. The post Meta Partners With Reliance on AI-Enabled Data Center in India appeared first on Meta Newsroom . Treat this as a community lead unless it is backed by a primary source.",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
-      "verification_status": "primary_confirmed",
-      "importance": "general",
-      "image_urls": []
-    },
     {
       "candidate_id": "content-apple-newsroom-apple-unveils-next-generation-of-apple-intelligence-siri",
       "title": "苹果发布新一代系统级 AI 和 Siri",
@@ -4980,34 +5120,6 @@
       "image_urls": []
     },
     {
-      "candidate_id": "content-openai-company-news-confidential-submission-of-draft-s-1-to-the-sec",
-      "title": "OpenAI 向美国证监会秘密提交上市草案",
-      "content": "OpenAI 向美国证监会秘密提交上市草案。",
-      "url": "https://openai.com/index/openai-submits-confidential-s-1",
-      "event_date": "2026-06-08",
-      "source": "OpenAI Company News RSS",
-      "evidence": "OpenAI confirms a confidential S-1 submission to the SEC and has not yet determined timing for further action. Treat this as a community lead unless it is backed by a primary source.",
-      "editorial_category": "community_signal",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-anthropic-company-news-claude-fable-5-and-claude-mythos-5",
-      "title": "Claude Fable 5 and Claude Mythos 5",
-      "content": "Anthropic Company News 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
-      "event_date": "2026-06-09",
-      "source": "Anthropic Company News",
-      "evidence": "Our next generation of intelligence for the hardest knowledge work and coding problems. Treat this as a community lead unless it is backed by a primary source.",
-      "editorial_category": "community_signal",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "candidate_id": "content-nvidia-newsroom-rss-nvidia-and-lg-group-build-an-ai-factory-to-advance-p",
       "title": "NVIDIA 与 LG Group 共建 AI factory，覆盖机器人、自动驾驶和 GPU 云",
       "content": "NVIDIA 与 LG Group 共建 AI factory，覆盖机器人、自动驾驶和 GPU 云。",
@@ -5053,6 +5165,23 @@
       "image_urls": []
     },
     {
+      "candidate_id": "content-nvidia-newsroom-rss-how-the-uk-is-turning-sovereign-ai-ambition-into-act",
+      "title": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行",
+      "content": "NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行。",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/c00b328dad9dcfb1547964e492ccceb0/6a265ab53d6332b68a4ebc12_london-tech-week-2026-key-visual-842x450/london-tech-week-2026-key-visual-842x450_thmb.jpg",
+      "image_alt": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
+      "image_source": "feed",
+      "url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
+      "event_date": "2026-06-08",
+      "source": "NVIDIA Newsroom RSS",
+      "evidence": "A year ago at London Tech Week, NVIDIA founder and CEO Jensen Huang and U.K. Prime Minister Keir Starmer made a declaration: the U.K. would be an AI maker, not an AI taker. At this year’s event, NVIDIA and its partners are showcasing how th。Treat this as a community lead unless it is backed by a primary source.",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
       "candidate_id": "content-amazon-news-customers-can-now-design-merch-with-alexa-for-shopping-on-am",
       "title": "Customers can now design merch with Alexa for Shopping on Amazon",
       "content": "Amazon News 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
@@ -5077,6 +5206,20 @@
       "event_date": "2026-06-09",
       "source": "NVIDIA Newsroom RSS",
       "evidence": "NVIDIA GPUs with Confidential Computing are now used for confidential inference in Apple’s Private Cloud Compute (PCC), as it expands beyond Apple’s data centers to Google Cloud. Unveiled during Apple’s annual WWDC gathering for developers。Treat this as a community lead unless it is backed by a primary source.",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-amazon-news-claude-fable-5-from-anthropic-now-available-on-aws",
+      "title": "Claude Fable 5 from Anthropic now available on AWS",
+      "content": "Amazon News 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://www.aboutamazon.com/news/aws/claude-fable-5-anthropic-available-amazon-bedrock?utm_source=rss",
+      "event_date": "2026-06-09",
+      "source": "Amazon News",
+      "evidence": "Anthropic&apos;s 5th-generation AI model makes Mythos-level capabilities available to all customers and shows exceptional performance in coding, knowledge work, and vision—now available on Amazon Bedrock and Claude Platform on AWS. Treat this as a community lead unless it is backed by a primary source.",
       "editorial_category": "community_signal",
       "source_level": "official",
       "verification_status": "primary_confirmed",
@@ -5148,47 +5291,9 @@
       "summary": "Reason 458 why local LLMs are going to be a necessity submitted by /u/onil_gova [link] [comments]",
       "risk_label": "medium",
       "importance": "general"
-    },
-    {
-      "candidate_id": "platform-reddit-local-llama-feed-releasing-cohere-north-mini-code",
-      "platform": "reddit",
-      "source_id": "platform-reddit-local-llama-feed",
-      "rule_id": "platform-reddit-local-llama-feed",
-      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Releasing Cohere North Mini Code”",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1ci1r/releasing_cohere_north_mini_code/",
-      "event_date": "2026-06-09",
-      "source": "Reddit LocalLLaMA Platform Feed",
-      "source_level": "platform_exempt_signal",
-      "verification_status": "platform_exempt_unverified",
-      "claim_text": "Hi folks! Jay here from Cohere. we just officially launched North Mini Code after getting some great feedback from you guys this weekend on the unreleased version. I wanted to come here and answer some of the questions you asked and provide some extra detail about the model itself. You can download the weights on Hugging Face ( fp8 here ) or try it on OpenCode for free . if you want to read more about what I mentioned in the video, feel free to look at our technical blog post on HuggingFace as ...",
-      "why_watch": "这是一条平台讨论弱信号，可用于观察后续是否出现一手来源。",
-      "disclosure": "平台内扩散发现，未做一手回源核验。",
-      "matched_terms": [
-        "AI",
-        "LLM",
-        "model"
-      ],
-      "exemption_policy": "platform_signal_exempt",
-      "published_by_gate": "deterministic_platform_gate",
-      "summary": "Hi folks! Jay here from Cohere. we just officially launched North Mini Code after getting some great feedback from you guys this weekend on the unreleased version. I wanted to come here and answer some of the questions you asked and provide",
-      "risk_label": "medium",
-      "importance": "general"
     }
   ],
   "evidence_assets": [
-    {
-      "type": "figure",
-      "title": "How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies",
-      "source_url": "https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/",
-      "local_path": "assets/evidence/how-the-uk-is-turning-sovereign-ai-ambition-into-action-with-nvidia-technologies-2026-06-10.jpg",
-      "caption": "图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
-      "extraction_status": "source_image",
-      "width": 600,
-      "height": 337,
-      "byte_size": 226983,
-      "asset_role": "content",
-      "capture_kind": "source_asset"
-    },
     {
       "type": "figure",
       "title": "Meta Partners With Reliance on AI-Enabled Data Center in India",
@@ -5199,12 +5304,25 @@
       "byte_size": 1351584,
       "asset_role": "content",
       "capture_kind": "source_asset"
+    },
+    {
+      "type": "figure",
+      "title": "NVIDIA Confidential Computing to Help Expand Apple’s Private Cloud Compute",
+      "source_url": "https://blogs.nvidia.com/blog/nvidia-confidential-computing-apple-private-cloud-compute/",
+      "local_path": "assets/evidence/nvidia-confidential-computing-to-help-expand-apple-s-private-cloud-compute-2026-06-10.jpg",
+      "caption": "图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image",
+      "width": 600,
+      "height": 337,
+      "byte_size": 231154,
+      "asset_role": "content",
+      "capture_kind": "source_asset"
     }
   ],
   "self_check": {
     "report_date": "2026-06-10",
     "main_items": 10,
-    "builder_observations": 7,
+    "builder_observations": 12,
     "builder_skill_used": [
       "candidate-pool-autodraft"
     ],
@@ -5218,7 +5336,7 @@
         "selected": 10
       },
       "hot_blogs": {
-        "eligible_candidates": 13,
+        "eligible_candidates": 12,
         "selected": 8
       },
       "projects": {
@@ -5226,8 +5344,8 @@
         "selected": 10
       },
       "builder_observations": {
-        "eligible_candidates": 7,
-        "selected": 7
+        "eligible_candidates": 14,
+        "selected": 12
       },
       "wechat_items": {
         "eligible_candidates": 0,
@@ -5238,8 +5356,8 @@
         "selected": 0
       },
       "reddit_items": {
-        "eligible_candidates": 3,
-        "selected": 3
+        "eligible_candidates": 2,
+        "selected": 2
       }
     },
     "fallback_sources": [],
@@ -5257,11 +5375,11 @@
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "22aa8389149065c46e3a22a96b3c303fdfa2692c",
-      "git_commit_short": "22aa83891490",
+      "git_commit": "a0a2ee40de6d318cb13d79bdcdb52b6b41985740",
+      "git_commit_short": "a0a2ee40de6d",
       "git_branch": "main",
-      "origin_main_sha": "22aa8389149065c46e3a22a96b3c303fdfa2692c",
-      "origin_main_short": "22aa83891490",
+      "origin_main_sha": "a0a2ee40de6d318cb13d79bdcdb52b6b41985740",
+      "origin_main_short": "a0a2ee40de6d",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -5294,7 +5412,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-10T05:25:35.166Z",
+  "generated_at": "2026-06-10T08:43:37.327Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-10.html",
   "html_path": "reports/2026/06/2026-06-10.html",
@@ -5311,14 +5429,12 @@
     "reasons": [
       "daily_tracking_source_blocked",
       "wechat_sources_blocked",
-      "zhihu_sources_blocked",
-      "builder_observations_selection_degraded"
+      "zhihu_sources_blocked"
     ],
     "affected_sections": [
       "daily_tracking",
       "wechat_items",
-      "zhihu_items",
-      "builder_observations"
+      "zhihu_items"
     ],
     "degraded_sections": [
       {
@@ -5340,13 +5456,6 @@
         "error_code": "quality_degraded",
         "section": "zhihu_items",
         "message": "zhihu_items coverage is degraded and should be disclosed in the public report.",
-        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
-      },
-      {
-        "code": "builder_observations_selection_degraded",
-        "error_code": "quality_degraded",
-        "section": "builder_observations",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
         "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
       }
     ],
