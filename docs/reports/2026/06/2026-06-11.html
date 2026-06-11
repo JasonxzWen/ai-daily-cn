@@ -1,0 +1,3614 @@
+<!doctype html>
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-template="research-explainer" data-runtime-state="not-runtime">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="effective-interact create-interaction.mjs">
+  <meta name="generated-at" content="2026-06-11T02:25:41.940Z">
+  <meta name="render-mode" content="pre-rendered">
+  <title>AI 日报 2026-06-11</title>
+  <style>/* Use case: shared visual primitives for static Effective reports. The generator inlines this into the final <style> block. */
+:root {
+  color-scheme: light;
+  --bg: #faf9f5;
+  --panel: #ffffff;
+  --panel-soft: #f0eee6;
+  --ink: #3d3d3a;
+  --muted: #87867f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757; /* visual token reference: #D97757 */
+  --accent-soft: #fbf1ec;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --code-bg: #141413;
+  --code-panel: #1f1e1b;
+  --code-line: #e8e6de;
+  --code-muted: #9c9a93;
+  --code-border: #3d3d3a;
+  --code-font: "Cascadia Code", "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+a {
+  color: var(--accent);
+}
+
+.rendered-markdown ol > li > strong:first-child,
+.rendered-markdown ol > li > strong:first-child a {
+  font-size: 1.04rem;
+  line-height: 1.36;
+}
+
+.rendered-markdown ol > li > strong:first-child a,
+.card-title-link {
+  text-decoration: none;
+}
+
+.rendered-markdown ol > li > strong:first-child a:hover,
+.card-title-link:hover {
+  color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+  text-decoration: none;
+}
+
+p,
+ul,
+ol {
+  margin-block: 8px;
+}
+
+.rendered-markdown ul,
+.rendered-markdown ol,
+.panel > ul,
+.action-list,
+.claim-limits {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  line-height: 1.62;
+}
+
+.rendered-markdown li + li,
+.panel > ul li + li,
+.action-list li + li,
+.claim-limits li + li {
+  margin-top: 4px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 680;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+.report-hero strong,
+.rendered-markdown strong,
+.report-data-table strong,
+.evidence-card > strong {
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.rendered-markdown strong.text-keyword,
+.report-data-table strong.text-keyword,
+.report-hero strong.text-keyword {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-weight: 820;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.rendered-markdown strong.keyword-major,
+.report-data-table strong.keyword-major,
+.report-hero strong.keyword-major {
+  color: #b42318;
+}
+
+.rendered-markdown strong.keyword-notable,
+.report-data-table strong.keyword-notable,
+.report-hero strong.keyword-notable {
+  color: #9a4a14;
+}
+
+.rendered-markdown strong.keyword-general,
+.report-data-table strong.keyword-general,
+.report-hero strong.keyword-general {
+  color: #0f766e;
+}
+
+.rendered-markdown em,
+.report-data-table em {
+  color: #5f5d57;
+  font-style: italic;
+  font-weight: 520;
+}
+
+.rendered-markdown mark.text-highlight,
+.report-data-table mark.text-highlight,
+.report-hero mark.text-highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.55em;
+  margin: 0 0.24em;
+  padding: 0.08em 0.54em;
+  border: 1px solid #b7c4a3;
+  border-radius: 999px;
+  background: #edf4e4;
+  color: #3f5f32;
+  font-family: var(--code-font);
+  font-size: 0.72em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: 0.08em;
+  box-decoration-break: clone;
+  transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown mark.text-highlight:hover,
+.report-data-table mark.text-highlight:hover,
+.report-hero mark.text-highlight:hover {
+  background: #dcebcf;
+  border-color: #788c5d;
+  color: #263f1d;
+  box-shadow: 0 4px 12px rgba(120, 140, 93, 0.24);
+  transform: translateY(-1px);
+}
+
+.rendered-markdown mark.text-highlight.trend-status,
+.report-data-table mark.text-highlight.trend-status,
+.report-hero mark.text-highlight.trend-status {
+  font-family: var(--ui-font);
+  font-size: 0.7em;
+  letter-spacing: 0.02em;
+}
+
+.rendered-markdown mark.text-highlight.daily-tag,
+.report-data-table mark.text-highlight.daily-tag,
+.report-hero mark.text-highlight.daily-tag {
+  font-family: var(--ui-font);
+  letter-spacing: 0;
+}
+
+.rendered-markdown mark.daily-tag-major,
+.report-data-table mark.daily-tag-major,
+.report-hero mark.daily-tag-major {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.daily-tag-notable,
+.report-data-table mark.daily-tag-notable,
+.report-hero mark.daily-tag-notable {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
+.rendered-markdown mark.daily-tag-general,
+.report-data-table mark.daily-tag-general,
+.report-hero mark.daily-tag-general {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.daily-tag-stars,
+.report-data-table mark.daily-tag-stars,
+.report-hero mark.daily-tag-stars {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.rendered-markdown mark.daily-tag-highlight,
+.report-data-table mark.daily-tag-highlight,
+.report-hero mark.daily-tag-highlight {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.rendered-markdown mark.daily-tag-topic,
+.report-data-table mark.daily-tag-topic,
+.report-hero mark.daily-tag-topic {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.rendered-markdown mark.daily-tag-status-checked,
+.report-data-table mark.daily-tag-status-checked,
+.report-hero mark.daily-tag-status-checked {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.rendered-markdown mark.daily-tag-status-no-signal,
+.report-data-table mark.daily-tag-status-no-signal,
+.report-hero mark.daily-tag-status-no-signal {
+  background: #fef9c3;
+  border-color: #fde047;
+  color: #854d0e;
+}
+
+.rendered-markdown mark.daily-tag-status-blocked,
+.report-data-table mark.daily-tag-status-blocked,
+.report-hero mark.daily-tag-status-blocked {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.daily-tag-status-skipped,
+.report-data-table mark.daily-tag-status-skipped,
+.report-hero mark.daily-tag-status-skipped,
+.rendered-markdown mark.daily-tag-status-unknown,
+.report-data-table mark.daily-tag-status-unknown,
+.report-hero mark.daily-tag-status-unknown {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.trend-status-new,
+.report-data-table mark.trend-status-new,
+.report-hero mark.trend-status-new {
+  background: #ecfeff;
+  border-color: #67e8f9;
+  color: #155e75;
+}
+
+.rendered-markdown mark.trend-status-up,
+.report-data-table mark.trend-status-up,
+.report-hero mark.trend-status-up {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.rendered-markdown mark.trend-status-down,
+.report-data-table mark.trend-status-down,
+.report-hero mark.trend-status-down {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.rendered-markdown mark.trend-status-same,
+.report-data-table mark.trend-status-same,
+.report-hero mark.trend-status-same {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.rendered-markdown mark.text-highlight.trend-status:hover,
+.report-data-table mark.text-highlight.trend-status:hover,
+.report-hero mark.text-highlight.trend-status:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+}
+
+.inline-site-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: -0.2em;
+}
+
+.rendered-markdown .markdown-image {
+  display: block;
+  width: auto;
+  max-width: min(100%, 760px);
+  max-height: 420px;
+  margin: 10px auto 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image],
+.card-media-grid img[data-lightbox-image] {
+  cursor: zoom-in;
+  transition: box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:hover,
+.card-media-grid img[data-lightbox-image]:hover {
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+.rendered-markdown .markdown-image[data-lightbox-image]:focus-visible,
+.card-media-grid img[data-lightbox-image]:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.44);
+  outline-offset: 3px;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image + .markdown-image) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+  margin: 10px 0 0;
+}
+
+.rendered-markdown p:has(> .markdown-image + .markdown-image) .markdown-image {
+  width: 100%;
+  max-width: 100%;
+  max-height: 360px;
+  margin: 0;
+}
+
+.rendered-markdown p:has(> .markdown-image + .markdown-image) + p:has(> em:only-child) {
+  max-width: 100%;
+  margin: 4px 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image + .markdown-image) + p:has(> em:only-child) em {
+  color: inherit;
+  font-style: normal;
+  font-weight: inherit;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) {
+  max-width: min(100%, 760px);
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.rendered-markdown p:has(> .markdown-image:only-child) + p:has(> em:only-child) em {
+  color: inherit;
+  font-style: normal;
+  font-weight: inherit;
+}
+
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 40px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.report-hero,
+.panel,
+.finding,
+.evidence-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.panel {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.section-focus {
+  animation: section-focus-pulse 900ms ease-out 1;
+}
+
+@keyframes section-focus-pulse {
+  from {
+    box-shadow: 0 0 0 7px rgba(217, 119, 87, 0.22), var(--shadow);
+  }
+
+  to {
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+  }
+}
+
+.report-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.report-hero-minimal {
+  padding: 16px 20px;
+}
+
+.report-hero-daily .hero-summary-text {
+  min-height: auto;
+}
+
+.hero-link {
+  text-decoration: none;
+}
+
+.eyebrow,
+.meta,
+.chip,
+.status-pill {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.title-row,
+.toolbar,
+.split-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  font-size: 34px;
+  line-height: 1.08;
+  max-width: 920px;
+  overflow-wrap: anywhere;
+}
+
+.report-date-title {
+  margin: 0;
+  flex: none;
+  max-width: none;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.hero-brief-single {
+  grid-template-columns: 1fr;
+}
+
+.hero-summary-text {
+  min-height: 72px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbf1ec);
+  color: #8a3b1e;
+  font-size: 17px;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+p.hero-summary-text {
+  display: flex;
+  align-items: center;
+}
+
+.hero-summary-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  list-style: none;
+}
+
+.hero-summary-list li {
+  position: relative;
+  max-width: 78ch;
+  padding-left: 17px;
+}
+
+.hero-summary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.hero-highlight-list {
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.hero-highlight-list li {
+  max-width: none;
+  padding-left: 0;
+}
+
+.hero-highlight-list li::before {
+  display: none;
+}
+
+.hero-highlight-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hero-highlight-reason {
+  display: block;
+  margin-top: 6px;
+  color: #5f5d57;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: start;
+}
+
+.hero-stat {
+  display: grid;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.hero-stat span,
+.hero-stat small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.hero-decision-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 10px;
+}
+
+.hero-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.hero-decision-card strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.42;
+}
+
+.hero-criteria-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-criteria-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3b1e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.eyebrow,
+.meta,
+.panel,
+.finding,
+.evidence-card,
+.hero-brief,
+.hero-decision-card,
+.lede-grid > *,
+.metric-grid > *,
+.section-heading,
+.section-summary {
+  overflow-wrap: anywhere;
+}
+
+.lede-grid,
+.metric-grid,
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.supplemental-panel {
+  padding: 20px;
+}
+
+.supplemental-panel > .section-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.collapsible-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.appendix-panel {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--panel) 76%, var(--panel-soft));
+}
+
+.collapsible-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collapsible-summary:hover {
+  background: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+}
+
+.collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-summary::marker {
+  content: "";
+}
+
+.collapsible-summary-main {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.collapsible-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.collapsible-summary-side {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.collapsible-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.collapsible-hint::before {
+  content: "展开";
+}
+
+.collapsible-panel[open] .collapsible-hint::before {
+  content: "收起";
+}
+
+.collapsible-content {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.collapsible-content .rendered-markdown {
+  margin-top: 0;
+}
+
+.appendix-actions-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.claims-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.panel,
+.finding,
+.evidence-card {
+  padding: 16px;
+}
+
+.section-heading {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.section-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.evidence-card h3 {
+  line-height: 1.42;
+}
+
+.evidence-card p {
+  margin: 0;
+  color: #5f5d57;
+  line-height: 1.52;
+}
+
+.card-title-link {
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.card-title-text {
+  display: inline-flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-media-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.card-media-grid[data-count="2"],
+.card-media-grid[data-count="3"],
+.card-media-grid[data-count="4"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-media-grid[data-count="5"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-media-grid figure {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+.card-media-grid img {
+  width: 100%;
+  max-height: 240px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.card-media-grid figcaption {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.card-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.card-stat-label,
+.card-visual-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.card-stat strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-stat-detail {
+  color: #5f5d57;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card-visual {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.card-bars .chart-bars {
+  gap: 7px;
+}
+
+.card-bars .chart-bar-row {
+  grid-template-columns: minmax(92px, 0.65fr) minmax(110px, 1fr) minmax(24px, auto) minmax(42px, auto);
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-bars .chart-bar-label {
+  overflow-wrap: anywhere;
+}
+
+.card-bars .chart-bar-status {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-table-scroll {
+  background: #ffffff;
+}
+
+.card-data-table {
+  min-width: 560px;
+  font-size: 12.5px;
+}
+
+.card-data-table th,
+.card-data-table td {
+  padding: 8px 10px;
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(17, 24, 39, 0.76);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.image-lightbox[hidden] {
+  display: none !important;
+}
+
+.image-lightbox[data-open="true"] {
+  opacity: 1;
+}
+
+.image-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.image-lightbox__figure {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  width: min(96vw, 1400px);
+  max-height: calc(100vh - 56px);
+  margin: 0;
+  place-items: center;
+}
+
+.image-lightbox__image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(82vh, 980px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  object-fit: contain;
+}
+
+.image-lightbox__caption {
+  max-width: min(900px, 92vw);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.image-lightbox__close {
+  justify-self: end;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #111827;
+  background: #ffffff;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.image-lightbox__close:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
+.card-detail-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-detail-list div {
+  display: grid;
+  gap: 3px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.card-detail-list dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-detail-list dd {
+  margin: 0;
+  color: #4b4a45;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  line-height: 1.55;
+}
+
+.card-detail-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.project-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  align-items: stretch;
+}
+
+.project-card {
+  grid-template-columns: minmax(160px, 0.72fr) minmax(0, 1fr);
+  grid-template-areas:
+    "project-title project-body"
+    "project-tags project-body"
+    "project-details project-details";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.project-card h3 {
+  grid-area: project-title;
+  margin: 0;
+}
+
+.project-card .card-tags {
+  grid-area: project-tags;
+  align-content: start;
+}
+
+.project-card > p {
+  grid-area: project-body;
+  min-width: 0;
+}
+
+.project-card .card-detail-list {
+  grid-area: project-details;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tracking-card-grid {
+  grid-template-columns: 1fr;
+}
+
+.tracking-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, 0.24fr) minmax(0, 0.76fr);
+  grid-template-areas:
+    "tracking-title tracking-stats"
+    "tracking-tags tracking-stats"
+    "tracking-bars tracking-table"
+    "tracking-body tracking-table";
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.tracking-card h3 {
+  grid-area: tracking-title;
+  margin: 0;
+}
+
+.tracking-card .card-tags {
+  grid-area: tracking-tags;
+}
+
+.tracking-card > *,
+.tracking-card .card-stat-grid,
+.tracking-card .card-bars,
+.tracking-card .card-table,
+.tracking-card .card-table-scroll {
+  min-width: 0;
+}
+
+.tracking-card .card-stat-grid {
+  grid-area: tracking-stats;
+}
+
+.tracking-card .card-bars {
+  grid-area: tracking-bars;
+}
+
+.tracking-card .card-table {
+  grid-area: tracking-table;
+  max-width: 100%;
+}
+
+.tracking-card > p {
+  grid-area: tracking-body;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+.tracking-card .card-media-grid {
+  grid-column: 1 / -1;
+}
+
+.tracking-card .card-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tracking-card .card-data-table {
+  min-width: min(560px, 100%);
+}
+
+.blog-card .card-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  grid-template-areas:
+    "blog-title blog-media"
+    "blog-tags blog-media"
+    "blog-body blog-body"
+    "blog-details blog-details";
+  column-gap: 20px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.blog-card h3 {
+  grid-area: blog-title;
+  margin: 0;
+}
+
+.blog-card .card-tags {
+  grid-area: blog-tags;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
+  align-items: start;
+}
+
+.blog-card .card-tags .chip {
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.blog-card .card-media-grid {
+  grid-area: blog-media;
+}
+
+.blog-card > p {
+  grid-area: blog-body;
+}
+
+.blog-card .card-detail-list {
+  grid-area: blog-details;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px 14px;
+}
+
+.blog-card .card-detail-list div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: "：";
+}
+
+.builder-card-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.builder-card {
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    "builder-title builder-body"
+    "builder-tags builder-body"
+    ". builder-media"
+    ". builder-details";
+  gap: 10px 18px;
+  align-items: start;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.builder-card h3 {
+  grid-area: builder-title;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+}
+
+.builder-card .card-title-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  object-fit: cover;
+}
+
+.builder-card .card-title-link {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.builder-card .card-title-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.builder-card .card-tags {
+  grid-area: builder-tags;
+  gap: 6px;
+  align-content: start;
+}
+
+.builder-card > p {
+  grid-area: builder-body;
+  margin: 0;
+  color: #25231f;
+  font-size: 15px;
+  line-height: 1.7;
+  min-width: 0;
+}
+
+.builder-card .card-media-grid {
+  grid-area: builder-media;
+  min-width: 0;
+}
+
+.builder-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.builder-card .card-detail-list {
+  grid-area: builder-details;
+  gap: 10px;
+  min-width: 0;
+}
+
+.builder-card .card-detail-list div {
+  padding-top: 10px;
+}
+
+.builder-card .card-detail-list dd {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.builder-card .card-detail-list dd span {
+  overflow-wrap: anywhere;
+}
+
+.community-card-grid {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.community-card {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "community-title"
+    "community-tags"
+    "community-body";
+  gap: 8px 18px;
+  border-color: #d7dce5;
+  background: #ffffff;
+}
+
+.community-card:has(.card-media-grid) {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  grid-template-areas:
+    "community-title community-media"
+    "community-tags community-media"
+    "community-body community-media";
+  align-items: start;
+}
+
+.community-card h3 {
+  grid-area: community-title;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+}
+
+.community-card .card-title-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafc;
+  object-fit: contain;
+}
+
+.community-card .card-title-link {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.community-card .card-tags {
+  grid-area: community-tags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.community-card > p {
+  grid-area: community-body;
+  margin: 0;
+  color: #25231f;
+  font-size: 15px;
+  line-height: 1.68;
+}
+
+.community-card .card-media-grid {
+  grid-area: community-media;
+  min-width: 0;
+  align-self: start;
+}
+
+.community-card .card-media-grid img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
+}
+
+@media (max-width: 760px) {
+  .blog-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-media"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card .card-tags {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .project-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .builder-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .builder-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "builder-title"
+      "builder-tags"
+      "builder-media"
+      "builder-body"
+      "builder-details";
+  }
+
+  .community-card,
+  .community-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-media"
+      "community-body";
+  }
+
+  .community-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "community-title"
+      "community-tags"
+      "community-body";
+  }
+
+  .community-card .card-media-grid img {
+    object-fit: contain;
+  }
+
+  .tracking-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tracking-title"
+      "tracking-tags"
+      "tracking-stats"
+      "tracking-bars"
+      "tracking-table"
+      "tracking-body";
+  }
+
+  .project-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "project-title"
+      "project-tags"
+      "project-body"
+      "project-details";
+  }
+
+  .project-card .card-detail-list,
+  .card-media-grid[data-count="2"],
+  .card-media-grid[data-count="3"],
+  .card-media-grid[data-count="4"],
+  .card-media-grid[data-count="5"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-card {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "blog-title"
+    "blog-tags"
+    "blog-body"
+    "blog-details";
+  gap: 12px;
+}
+
+.blog-card:has(.card-media-grid) {
+  grid-template-columns: minmax(360px, 1fr) minmax(300px, 0.42fr);
+  grid-template-areas:
+    "blog-title blog-media"
+    "blog-tags blog-media"
+    "blog-body blog-media"
+    "blog-details blog-details";
+  column-gap: 22px;
+}
+
+.blog-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.blog-card .card-tags .chip {
+  justify-content: flex-start;
+}
+
+.blog-card > p {
+  max-width: 1080px;
+}
+
+.blog-card .card-detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.blog-card .card-detail-list div {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding-top: 0;
+  border-top: 0;
+  min-width: 0;
+}
+
+.blog-card .card-detail-list div::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: 0.72em;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.blog-card .card-detail-list dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.blog-card .card-detail-list dt::after {
+  content: none;
+}
+
+.blog-card .card-detail-list dd {
+  display: block;
+  color: #312f2c;
+  line-height: 1.58;
+}
+
+@media (max-width: 760px) {
+  .blog-card,
+  .blog-card:has(.card-media-grid) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-media"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card:not(:has(.card-media-grid)) {
+    grid-template-areas:
+      "blog-title"
+      "blog-tags"
+      "blog-body"
+      "blog-details";
+  }
+
+  .blog-card .card-detail-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.interactive-card {
+  scroll-margin-top: 96px;
+  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.evidence-spotlight {
+  position: relative;
+  overflow: hidden;
+  --spotlight-x: 50%;
+  --spotlight-y: 0%;
+}
+
+.evidence-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), rgba(217, 119, 87, 0.12), transparent 54%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.evidence-spotlight:hover::before,
+.evidence-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
+.focus-field.has-filter .interactive-card[hidden] {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+}
+
+.chip,
+.status-pill,
+.file-chip,
+.rich-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  text-transform: none;
+  white-space: normal;
+}
+
+.card-tags,
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-major,
+.chip-importance-major {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.chip-notable,
+.chip-importance-notable {
+  border-color: #fdba74;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.chip-general,
+.chip-importance-general {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.chip-stars {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.chip-topic {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.chip-highlight {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.swatch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.swatch-chip > span {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line));
+  border-radius: 999px;
+  background: var(--swatch, var(--accent));
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.mini-metrics div {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mini-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.mini-metrics dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-ok,
+.rich-status[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  color: var(--ok);
+  background: #e4e9dc;
+}
+
+.status-warn,
+.rich-status[data-state="pending"],
+.rich-status[data-state="degraded"],
+.rich-status[data-state="fallback"] {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: var(--warn);
+  background: #fbf1ec;
+}
+
+.status-danger,
+.rich-status[data-state="failed"],
+.rich-status[data-state="error"] {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  color: var(--danger);
+  background: #f3d9cc;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  color: var(--info);
+  background: #e8efeb;
+}
+
+.source-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: inherit;
+  font-family: var(--code-font);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.source-link::before {
+  content: "#";
+  color: var(--accent);
+}
+
+button,
+.button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 6px 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover,
+.button:hover,
+button[aria-pressed="true"],
+button[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.panel > .toolbar[role="toolbar"],
+.panel > .toolbar[role="tablist"] {
+  justify-content: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.panel > .toolbar[role="toolbar"] button,
+.panel > .toolbar[role="tablist"] button {
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.panel > .toolbar[role="toolbar"] button + button,
+.panel > .toolbar[role="tablist"] button + button {
+  margin-left: -1px;
+}
+
+.panel > .toolbar[role="toolbar"] button:first-child,
+.panel > .toolbar[role="tablist"] button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.panel > .toolbar[role="toolbar"] button:last-child,
+.panel > .toolbar[role="tablist"] button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+button[data-copy-state="success"] {
+  border-color: color-mix(in srgb, var(--ok) 58%, var(--line));
+  background: #e4e9dc;
+  color: var(--ok);
+}
+
+button[data-copy-state="failed"] {
+  border-color: color-mix(in srgb, var(--danger) 58%, var(--line));
+  background: #f3d9cc;
+  color: var(--danger);
+}
+
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group:first-of-type {
+  border-top: 0;
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.report-nav a:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.report-nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-nav a small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .report-nav {
+    position: static;
+  }
+}
+
+.code-panel,
+.diff-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: var(--code-line);
+}
+
+.code-panel header,
+.diff-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-panel);
+  color: #d1cfc5;
+}
+
+.code-panel header > div,
+.diff-panel header > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.diff-panel h2 {
+  color: #faf9f5;
+  font-size: 16px;
+}
+
+.code-panel pre,
+.diff-panel pre,
+.fallback-source-block,
+.rich-render-source pre,
+.mermaid-source pre {
+  overflow: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: var(--code-bg);
+  color: var(--code-line);
+  font: 500 13px/1.35 var(--code-font);
+  tab-size: 2;
+}
+
+.rich-render-source,
+.mermaid-source {
+  margin-top: 10px;
+}
+
+.rich-render-source summary,
+.mermaid-source summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.code-line,
+.line-hot,
+.diff-line {
+  display: block;
+  min-width: max-content;
+  margin-inline: -12px;
+  padding-inline: 58px 12px;
+  position: relative;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.code-line::before,
+.line-hot::before,
+.diff-line::before {
+  content: attr(data-line);
+  position: absolute;
+  left: 12px;
+  width: 36px;
+  color: var(--code-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.line-hot {
+  background: rgba(217, 119, 87, 0.24);
+}
+
+.diff-added {
+  background: rgba(120, 140, 93, 0.24);
+  color: #dce4d2;
+}
+
+.diff-removed {
+  background: rgba(176, 74, 63, 0.25);
+  color: #f3d9cc;
+}
+
+.diff-hunk {
+  color: #f3d9cc;
+  background: rgba(217, 119, 87, 0.22);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name {
+  color: #e0897a;
+  font-weight: 750;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section {
+  color: #b8c99d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #9c9a93;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-attr {
+  color: #f0c36d;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e8c9ba;
+}
+
+.hljs-type,
+.hljs-class,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-function {
+  color: #c9b98a;
+  font-weight: 720;
+}
+
+.hljs-property,
+.hljs-attribute,
+.hljs-params,
+.hljs-subst {
+  color: #8cb6a3;
+}
+
+.hljs-meta,
+.hljs-doctag,
+.hljs-tag,
+.hljs-template-tag {
+  color: #d97757;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #a67c52;
+}
+
+.hljs-addition {
+  color: #b8c99d;
+}
+
+.hljs-deletion {
+  color: #e0897a;
+}
+
+.diagram-panel,
+.mermaid-evidence {
+  border-left: 4px solid var(--accent);
+}
+
+.mermaid-rendered,
+[data-rich-mermaid-target] {
+  display: block;
+  min-height: 180px;
+  max-height: 620px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.diagram-panel svg,
+.mermaid-rendered svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.table-caption {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.report-data-table {
+  width: 100%;
+  min-width: 640px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.report-data-table th,
+.report-data-table td {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.report-data-table thead th {
+  z-index: 2;
+  background: #f0eee6;
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-data-table [data-align="center"] {
+  text-align: center;
+}
+
+.report-data-table [data-align="right"] {
+  text-align: right;
+}
+
+.report-data-table [data-table-cell] {
+  outline: 0;
+}
+
+.report-data-table [data-table-cell]:focus-visible {
+  box-shadow: var(--focus);
+  z-index: 4;
+}
+
+.report-data-table .table-row-highlight {
+  background: color-mix(in srgb, var(--accent-soft) 58%, #ffffff);
+}
+
+.report-data-table .table-column-highlight {
+  background: color-mix(in srgb, #d9f7f1 62%, #ffffff);
+}
+
+.report-data-table .table-row-highlight.table-column-highlight {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.16), rgba(61, 110, 110, 0.16)),
+    #ffffff;
+}
+
+.report-data-table .table-cell-highlight {
+  z-index: 5;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+  transform: scale(1.045);
+  box-shadow: 0 10px 24px rgba(61, 61, 58, 0.16);
+}
+
+.table-cell-list,
+.table-cell-map {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.table-cell-map {
+  display: grid;
+  gap: 5px;
+  padding-left: 0;
+}
+
+.table-cell-map div {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.table-cell-map dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.table-cell-map dd {
+  margin: 0;
+}
+
+.claim-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+}
+
+.claim-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.claim-card-title {
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.46;
+}
+
+.claim-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.claim-evidence-links a,
+.chart-bar-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.chart-panel figure {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.chart-panel figcaption {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.chart-panel figcaption strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.chart-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.7fr) minmax(120px, 2fr) minmax(42px, auto) minmax(72px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-bar-label,
+.chart-bar-value {
+  font-weight: 650;
+}
+
+.chart-bar-track {
+  display: block;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.chart-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.chart-line {
+  width: 100%;
+  min-height: 160px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.chart-line text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.chart-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.chart-matrix-cell,
+.chart-degraded {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.chart-degraded {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.chart-source-row {
+  margin: 0;
+}
+
+.chart-table-fallback {
+  margin-top: 2px;
+}
+
+.runtime-panel .source-link::before {
+  content: "";
+}
+
+.tab-panel[hidden],
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero-brief,
+  .hero-decision-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .report-shell {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
+  .split-row,
+  .code-panel header,
+  .diff-panel header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-hero {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 24px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-stat {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .hero-stat strong {
+    font-size: 19px;
+  }
+
+  .hero-decision-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .hero-decision-card strong {
+    font-size: 13px;
+  }
+
+  .chip,
+  .status-pill,
+  .file-chip {
+    white-space: normal;
+  }
+
+  .report-data-table {
+    min-width: 560px;
+  }
+
+  .chart-bar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .report-data-table .table-cell-highlight {
+    transform: none;
+  }
+}
+
+
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 4px}.markdown-table-scroll table{margin:0}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}.markdown-table-scroll table{min-width:100%;font-size:12.5px}.markdown-table-scroll th,.markdown-table-scroll td{padding:7px 8px;word-break:break-word}}</style>
+<style data-ai-daily-css-overrides>
+@media (max-width: 760px) {
+  .tracking-card .card-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tracking-card .card-data-table {
+    width: max-content;
+    min-width: 620px;
+    table-layout: auto;
+  }
+
+  .tracking-card .card-data-table th,
+  .tracking-card .card-data-table td {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .tracking-card .card-data-table th:nth-child(2),
+  .tracking-card .card-data-table td:nth-child(2) {
+    min-width: 160px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+</style>
+</head>
+<body>
+  <main class="report-shell">
+    <header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="2026-06-11 有哪些值得内容、产品、平台、策略与工程团队一起跟进的 AI 行业、模型、产品、开源、观点和社区动态？" data-time-budget="8 分钟" data-artifact-kind="research">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">AI 日报 · 覆盖 2026-06-11</div>
+          <h1 class="report-title report-date-title">2026-06-11</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
+<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-11.json" rel="noopener noreferrer">结构化 JSON</a></div>
+      </div>
+      <div class="hero-brief hero-brief-single">
+        <ul class="hero-summary-text hero-summary-list"><li>今天的主线集中在云平台接入、影响行动报告和 AI 基础设施三类更新：OpenAI 把模型与 Codex 接入 Oracle 云承诺，OpenAI 同时发布面向美国 AI 讨论的影响行动分析，Meta 继续解释算力在 AI 基础设施中的角色</li><li>开发工具侧，Codex、Copilot、Gemini、Gemma 与本地推理相关更新密集出现，说明模型能力正在进入云采购、浏览器、终端工具和安全审查流程</li></ul>
+        <div class="hero-stat-grid" aria-label="报告摘要指标">
+    <div class="hero-stat"><span>主体</span><strong>10</strong><small>重点条目</small></div>
+<div class="hero-stat"><span>AIGC</span><strong>6</strong><small>产品/内容</small></div>
+<div class="hero-stat"><span>追踪</span><strong>2</strong><small>榜单变化</small></div>
+<div class="hero-stat"><span>精选博客</span><strong>4</strong><small>深读</small></div>
+<div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
+<div class="hero-stat"><span>Builder</span><strong>12</strong><small>观察</small></div>
+<div class="hero-stat"><span>覆盖</span><strong>06-11</strong><small>标准时间范围</small></div>
+  </div>
+      </div>
+    </header>
+
+    <div class="report-layout">
+      <nav class="report-nav" data-report-nav data-nav-order="dom" data-report-region="navigation" aria-label="报告速览">
+    <div class="report-nav-title">速览</div>
+    <div class="report-nav-group" data-nav-group="reading-order">
+      <div class="report-nav-group-title">阅读顺序</div>
+      <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
+      <a href="#section-ai-1" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
+<a href="#section-html-work-report-2" title="每日追踪" data-nav-link data-nav-index="2" data-nav-group-name="signals" data-nav-status="info"><span>每日追踪</span></a>
+<a href="#section-html-work-report-3" title="精选博客更新" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>精选博客更新</span></a>
+<a href="#section-github-trending-top-10-4" title="GitHub Trending · Top 10" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 10</span></a>
+<a href="#section-x-twitter-5" title="X/Twitter 讨论" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-reddit-6" title="Reddit 线索" data-nav-link data-nav-index="6" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
+<a href="#section-html-work-report-7" title="信源覆盖与缺口" data-nav-link data-nav-index="7" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+    </div>
+  </nav>
+      <div class="report-section-stack" data-report-region="sections">
+        <section class="panel rich-section" id="section-ai-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <h2>AI 行业动态</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ol><li><strong><a href="https://openai.com/index/openai-on-oracle-cloud" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI 模型与 Codex 可通过 Oracle 云承诺访问</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 26x/7d</mark>（2026-06-10）</li></ol>
+<ul><li>OpenAI News RSS 的条目说明，用户可以通过 Oracle cloud commitment 访问 OpenAI models 和 Codex。对企业团队来说，这意味着模型能力和编码工具可以进入既有云采购与预算框架。</li><li><strong><strong class="text-keyword keyword-major">云采购入口</strong></strong>：OpenAI 把模型和 Codex 放进 Oracle 云承诺的使用场景里，公开信息的重点是企业如何在既有云合约、预算和开发工具链之间完成接入。</li></ul>
+<ol start="2"><li><strong><a href="https://openai.com/index/prc-linked-influence-operations-ai-debates" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI 报告关联中国的影响行动瞄准美国 AI 讨论</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-10）</li></ol>
+<ul><li>OpenAI News RSS 记录的报告关注 PRC-linked influence operations 如何瞄准美国 AI debates。该条目更适合放在平台安全、政策沟通和信息完整性框架下理解。</li><li><strong><strong class="text-keyword keyword-major">信息完整性</strong></strong>：OpenAI 把影响行动与美国 AI 公共讨论连接起来，相关团队应关注报告中的攻击目标、传播路径、平台处置和可验证证据。</li></ul>
+<ol start="3"><li><strong><a href="https://about.fb.com/news/2026/06/what-is-compute-power-meta-ai-infrastructure/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+" alt="Meta Newsroom" decoding="async"> Meta 解释 AI 基础设施中的算力角色</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">已核查事实</mark>（2026-06-10）</li></ol>
+<ul><li>Meta Newsroom 通过 Infrastructure Explained 系列说明 compute power 如何支撑 AI 基础设施，读者可以把它作为理解模型服务成本、数据中心投入和平台扩张叙事的基础材料。</li><li><strong><strong class="text-keyword keyword-major">算力基础设施</strong></strong>：Meta 用 compute power 解释 AI 服务背后的资源投入，公开页面把模型能力、数据中心扩张和平台长期投入连接起来。</li></ul>
+<p><img class="markdown-image" src="../../../assets/evidence/infrastructure-explained-compute-power-2026-06-11.webp" alt="Infrastructure Explained: Compute Power" loading="lazy" data-lightbox-image="true" data-lightbox-caption="Infrastructure Explained: Compute Power" role="button" tabindex="0" aria-label="点击放大图片：Infrastructure Explained: Compute Power" decoding="async"></p>
+<p><em>Infrastructure Explained: Compute Power：图片来自 Meta Newsroom，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。</em></p>
+<ol start="4"><li><strong><a href="https://blog.google/company-news/inside-google/around-the-globe/google-europe/united-kingdom/future-report-why-young-people-must-help-shape-the-future-of-ai/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google：年轻人应参与塑造 AI 的未来</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-10）</li></ol>
+<ul><li>Google Keyword Blog 的 Future Report 把 AI 未来治理、社会参与和年轻群体放在同一框架下讨论，适合用来观察平台公司如何推动 AI 公共议题。</li><li><strong><strong class="text-keyword keyword-major">公共参与</strong></strong>：Google 将年轻人放进 AI 未来讨论中，说明大型平台公司正在把 AI 议题从产品能力扩展到教育、公共沟通和社会参与责任。</li></ul>
+<ol start="5"><li><strong><a href="https://www.alibabacloud.com/blog/from-black-box-to-transparent-alibaba-cloud-agent-observability-and-audit-data-collection-in-practice_603239" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> 阿里云公开 Agent 可观测与审计数据采集实践</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-10）</li></ol>
+<ul><li>阿里云文章讨论如何让 Agent 从黑箱走向透明，重点落在可观测性和审计数据采集，对企业内部评估 Agent 运行过程、问题追踪和合规留痕有参考价值。</li><li><strong><strong class="text-keyword keyword-major">Agent 观测</strong></strong>：阿里云把 Agent 的透明化落到审计数据采集和可观测实践上，这类能力直接关系到企业内部的运行追踪、异常定位和合规留痕。</li></ul>
+<ol start="6"><li><strong><a href="https://openai.com/index/using-codex-to-simulate-black-holes" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI 展示 Codex 辅助天体物理学家模拟黑洞</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 26x/7d</mark>（2026-06-11）</li></ol>
+<ul><li>OpenAI News RSS 的案例聚焦一位天体物理学家如何使用 Codex 辅助黑洞模拟，价值在于展示编码 agent 进入科学计算、仿真和研究工作流的方式。</li><li><strong><strong class="text-keyword keyword-major">科研编码</strong></strong>：Codex 被放进黑洞模拟案例里，公开信息展示了 AI 编码工具如何辅助科学计算任务，而不只是生成普通应用代码。</li></ul>
+<ol start="7"><li><strong><a href="https://deepmind.google/blog/introducing-gemma-4-12b-a-unified-encoder-free-multimodal-model/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,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" alt="Google DeepMind RSS" decoding="async"> DeepMind 推出统一的无编码器多模态 Gemma 4 12B</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-09）</li></ol>
+<ul><li>Google DeepMind 介绍 Gemma 4 12B，把它定位为统一的无编码器多模态模型。关注开源模型路线的团队可以重点核对模型能力、部署条件和实际可用边界。</li><li><strong><strong class="text-keyword keyword-major">多模态模型</strong></strong>：Gemma 4 12B 的公开说明强调统一多模态和无编码器设计，后续评估应结合模型卡、部署要求、输入输出模态和真实推理体验。</li></ul>
+<ol start="8"><li><strong><a href="https://blog.google/innovation-and-ai/products/gemini-app/gemini-features-for-businesses/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google 用新 Gemini 工具面向企业节省时间并促进增长</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-10）</li></ol>
+<ul><li>Google Keyword Blog 介绍面向企业的 Gemini 新工具，主要信息是把 AI 助手能力进一步嵌入业务增长、效率提升和日常工作流。</li><li><strong><strong class="text-keyword keyword-major">企业 Gemini</strong></strong>：这次更新把 Gemini 放进更具体的企业效率场景，公开信息需要继续核对入口、权限、可用地区以及与现有工作流的连接方式。</li></ul>
+<ol start="9"><li><strong><a href="https://blog.google/products-and-platforms/products/chrome/chrome-expands-latin-america/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google 将 Chrome 中的 Gemini 扩展到更多地区用户</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-10）</li></ol>
+<ul><li>Google 宣布把 Chrome 里的 Gemini 体验扩展到拉丁美洲、非洲等更多地区，说明浏览器入口仍是 AI 助手触达用户的重要渠道。</li><li><strong><strong class="text-keyword keyword-major">浏览器入口</strong></strong>：Gemini in Chrome 的地区扩展覆盖拉丁美洲、非洲等更多用户，说明浏览器仍是 AI 助手触达普通用户的重要入口。</li></ul>
+<ol start="10"><li><strong><a href="https://www.tencent.com/en-us/articles/2202356.html" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVRYhe3WvWsVQRTG4SdRhIDhQhorESxchNhY+EUqEQTtps5/YCMiKCgpxUYQwcLKIohWU1mItR+pRMFmLCSNkIA2Cn6EEC3ixZsLO9mdzWrj2yzLe2bOb8+ZmR1KFNIDIR0tGjumiYLkB7CMddzGglh9KwWYLBhz7vdzNy7jrZDO/E2A82PvB/FUSPeFNNN2snYtCGkKnzBVE7GKi2L1qOmUbStwOpMc9uGhkB4LaX+TCTcrENITnG0Js52+4BruitVGXdCwAldQG1SoadzBMyHN1gX9WQMhLWJ+hyGGWsNN3BCrH6PG6Bq4ji3mDmoPFvBaSHOjxtZdENItXOoJYqgN3MNVsfo8DjCD9xj0DAEfcKH5ORDSPBZr3O8YiNVaW4o258BcxntVkrwtwImM96IkeXOAkPaidi/3D8Ax7Mr4L/sGyPV/WaxW+gbI9f95afJmACFN4Hgmorj8zQA4hNxFY6lvgFz/v+JN3wAnM96SWK33DZBbgJ3Kvz1ASAMc/ncAnMrE/NRxBzQByJX/nVh97BsgtwA7f30eIKRJm/+AOnXufx6AI/I3o05H8H8N9QvBN1ueI2C4wgAAAABJRU5ErkJggg==" alt="Tencent Media Center" decoding="async"> 腾讯展示年轻创作者用 AI 和小程序构建未来</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-09）</li></ol>
+<ul><li>Tencent Media Center 的条目聚焦年轻创作者、AI 和小程序体系，适合观察平台如何把生成式能力与低门槛创作、应用分发结合起来。</li><li><strong><strong class="text-keyword keyword-major">创作者工具</strong></strong>：腾讯把 AI 与小程序创作场景放在一起讲，公开条目强调年轻创作者如何借助平台工具进入应用构建和内容分发流程。</li></ul></div>
+    <template data-rich-source data-source-fallback>1. **[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 模型与 Codex 可通过 Oracle 云承诺访问](https://openai.com/index/openai-on-oracle-cloud)** ==tag-major|重大== ==tag-source|官方一手来源== ==tag-topic|coding agent: 7d 26x/7d==（2026-06-10）
+  - OpenAI News RSS 的条目说明，用户可以通过 Oracle cloud commitment 访问 OpenAI models 和 Codex。对企业团队来说，这意味着模型能力和编码工具可以进入既有云采购与预算框架。
+  - **==keyword-major|云采购入口==**：OpenAI 把模型和 Codex 放进 Oracle 云承诺的使用场景里，公开信息的重点是企业如何在既有云合约、预算和开发工具链之间完成接入。
+
+2. **[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 报告关联中国的影响行动瞄准美国 AI 讨论](https://openai.com/index/prc-linked-influence-operations-ai-debates)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-10）
+  - OpenAI News RSS 记录的报告关注 PRC-linked influence operations 如何瞄准美国 AI debates。该条目更适合放在平台安全、政策沟通和信息完整性框架下理解。
+  - **==keyword-major|信息完整性==**：OpenAI 把影响行动与美国 AI 公共讨论连接起来，相关团队应关注报告中的攻击目标、传播路径、平台处置和可验证证据。
+
+3. **[![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+) Meta 解释 AI 基础设施中的算力角色](https://about.fb.com/news/2026/06/what-is-compute-power-meta-ai-infrastructure/)** ==tag-major|重大== ==tag-source|已核查事实==（2026-06-10）
+  - Meta Newsroom 通过 Infrastructure Explained 系列说明 compute power 如何支撑 AI 基础设施，读者可以把它作为理解模型服务成本、数据中心投入和平台扩张叙事的基础材料。
+  - **==keyword-major|算力基础设施==**：Meta 用 compute power 解释 AI 服务背后的资源投入，公开页面把模型能力、数据中心扩张和平台长期投入连接起来。
+
+![Infrastructure Explained: Compute Power](../../../assets/evidence/infrastructure-explained-compute-power-2026-06-11.webp)
+
+*Infrastructure Explained: Compute Power：图片来自 Meta Newsroom，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。*
+
+4. **[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google：年轻人应参与塑造 AI 的未来](https://blog.google/company-news/inside-google/around-the-globe/google-europe/united-kingdom/future-report-why-young-people-must-help-shape-the-future-of-ai/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-10）
+  - Google Keyword Blog 的 Future Report 把 AI 未来治理、社会参与和年轻群体放在同一框架下讨论，适合用来观察平台公司如何推动 AI 公共议题。
+  - **==keyword-major|公共参与==**：Google 将年轻人放进 AI 未来讨论中，说明大型平台公司正在把 AI 议题从产品能力扩展到教育、公共沟通和社会参与责任。
+
+5. **[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) 阿里云公开 Agent 可观测与审计数据采集实践](https://www.alibabacloud.com/blog/from-black-box-to-transparent-alibaba-cloud-agent-observability-and-audit-data-collection-in-practice_603239)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-10）
+  - 阿里云文章讨论如何让 Agent 从黑箱走向透明，重点落在可观测性和审计数据采集，对企业内部评估 Agent 运行过程、问题追踪和合规留痕有参考价值。
+  - **==keyword-major|Agent 观测==**：阿里云把 Agent 的透明化落到审计数据采集和可观测实践上，这类能力直接关系到企业内部的运行追踪、异常定位和合规留痕。
+
+6. **[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 展示 Codex 辅助天体物理学家模拟黑洞](https://openai.com/index/using-codex-to-simulate-black-holes)** ==tag-major|重大== ==tag-source|官方一手来源== ==tag-topic|coding agent: 7d 26x/7d==（2026-06-11）
+  - OpenAI News RSS 的案例聚焦一位天体物理学家如何使用 Codex 辅助黑洞模拟，价值在于展示编码 agent 进入科学计算、仿真和研究工作流的方式。
+  - **==keyword-major|科研编码==**：Codex 被放进黑洞模拟案例里，公开信息展示了 AI 编码工具如何辅助科学计算任务，而不只是生成普通应用代码。
+
+7. **[![Google DeepMind RSS](data:image/png;base64,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) DeepMind 推出统一的无编码器多模态 Gemma 4 12B](https://deepmind.google/blog/introducing-gemma-4-12b-a-unified-encoder-free-multimodal-model/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-09）
+  - Google DeepMind 介绍 Gemma 4 12B，把它定位为统一的无编码器多模态模型。关注开源模型路线的团队可以重点核对模型能力、部署条件和实际可用边界。
+  - **==keyword-major|多模态模型==**：Gemma 4 12B 的公开说明强调统一多模态和无编码器设计，后续评估应结合模型卡、部署要求、输入输出模态和真实推理体验。
+
+8. **[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google 用新 Gemini 工具面向企业节省时间并促进增长](https://blog.google/innovation-and-ai/products/gemini-app/gemini-features-for-businesses/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-10）
+  - Google Keyword Blog 介绍面向企业的 Gemini 新工具，主要信息是把 AI 助手能力进一步嵌入业务增长、效率提升和日常工作流。
+  - **==keyword-major|企业 Gemini==**：这次更新把 Gemini 放进更具体的企业效率场景，公开信息需要继续核对入口、权限、可用地区以及与现有工作流的连接方式。
+
+9. **[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google 将 Chrome 中的 Gemini 扩展到更多地区用户](https://blog.google/products-and-platforms/products/chrome/chrome-expands-latin-america/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-10）
+  - Google 宣布把 Chrome 里的 Gemini 体验扩展到拉丁美洲、非洲等更多地区，说明浏览器入口仍是 AI 助手触达用户的重要渠道。
+  - **==keyword-major|浏览器入口==**：Gemini in Chrome 的地区扩展覆盖拉丁美洲、非洲等更多用户，说明浏览器仍是 AI 助手触达普通用户的重要入口。
+
+10. **[![Tencent Media Center](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVRYhe3WvWsVQRTG4SdRhIDhQhorESxchNhY+EUqEQTtps5/YCMiKCgpxUYQwcLKIohWU1mItR+pRMFmLCSNkIA2Cn6EEC3ixZsLO9mdzWrj2yzLe2bOb8+ZmR1KFNIDIR0tGjumiYLkB7CMddzGglh9KwWYLBhz7vdzNy7jrZDO/E2A82PvB/FUSPeFNNN2snYtCGkKnzBVE7GKi2L1qOmUbStwOpMc9uGhkB4LaX+TCTcrENITnG0Js52+4BruitVGXdCwAldQG1SoadzBMyHN1gX9WQMhLWJ+hyGGWsNN3BCrH6PG6Bq4ji3mDmoPFvBaSHOjxtZdENItXOoJYqgN3MNVsfo8DjCD9xj0DAEfcKH5ORDSPBZr3O8YiNVaW4o258BcxntVkrwtwImM96IkeXOAkPaidi/3D8Ax7Mr4L/sGyPV/WaxW+gbI9f95afJmACFN4Hgmorj8zQA4hNxFY6lvgFz/v+JN3wAnM96SWK33DZBbgJ3Kvz1ASAMc/ncAnMrE/NRxBzQByJX/nVh97BsgtwA7f30eIKRJm/+AOnXufx6AI/I3o05H8H8N9QvBN1ueI2C4wgAAAABJRU5ErkJggg==) 腾讯展示年轻创作者用 AI 和小程序构建未来](https://www.tencent.com/en-us/articles/2202356.html)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-09）
+  - Tencent Media Center 的条目聚焦年轻创作者、AI 和小程序体系，适合观察平台如何把生成式能力与低门槛创作、应用分发结合起来。
+  - **==keyword-major|创作者工具==**：腾讯把 AI 与小程序创作场景放在一起讲，公开条目强调年轻创作者如何借助平台工具进入应用构建和内容分发流程。</template>
+  </section>
+<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <h2>每日追踪</h2>
+
+    </div>
+
+  </div>
+
+    <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="模型使用" data-search-target="html-work-report">
+    <div class="meta">模型使用</div>
+    <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-11</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">覆盖</span>
+      <strong>Top 10</strong>
+      <span class="card-stat-detail">公开榜单已解析</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">榜首</span>
+      <strong>DeepSeek V4 Flash</strong>
+      <span class="card-stat-detail">deepseek / 4.34T tokens / +55%</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">最大变化</span>
+      <strong>MiniMax M3</strong>
+      <span class="card-stat-detail">+343%</span>
+    </div></div><div class="card-visual card-bars" data-card-bars>
+    <div class="card-visual-title">供应商分布</div>
+    <div class="chart-bars" aria-hidden="true">
+    <div class="chart-bar-row">
+        <span class="chart-bar-label">anthropic</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
+        <span class="chart-bar-value">3</span>
+        <span class="chart-bar-status">3/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">deepseek</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
+        <span class="chart-bar-value">3</span>
+        <span class="chart-bar-status">3/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">minimax</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">openrouter</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">tencent</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">xiaomi</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+  </div>
+  </div><div class="card-visual card-table" data-card-table>
+    <div class="card-visual-title">Top 10 榜单</div>
+
+    <div class="table-scroll card-table-scroll" data-table-wrap>
+      <table class="report-data-table card-data-table" data-report-data-table data-card-data-table>
+        <colgroup><col style="width:64px"><col><col style="width:120px"><col style="width:130px"><col style="width:96px"></colgroup>
+        <thead><tr><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0" data-align="center">排名</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1" data-align="left">模型</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2" data-align="left">供应商</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3" data-align="right">调用量</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4" data-align="right">周变化</th></tr></thead>
+        <tbody><tr><td tabindex="0" data-table-cell data-table-row="1" data-table-column="0" data-align="center">#1</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="1" data-align="left">DeepSeek V4 Flash</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="3" data-align="right">4.34T tokens</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="4" data-align="right">+55%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="2" data-table-column="0" data-align="center">#2</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="1" data-align="left">Hy3 preview</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="2" data-align="left">tencent</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="3" data-align="right">3.79T tokens</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="4" data-align="right">+36%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="3" data-table-column="0" data-align="center">#3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="1" data-align="left">MiniMax M3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="2" data-align="left">minimax</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="3" data-align="right">3.38T tokens</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="4" data-align="right">+343%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="4" data-table-column="0" data-align="center">#4</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="1" data-align="left">MiMo-V2.5</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="2" data-align="left">xiaomi</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="3" data-align="right">2.89T tokens</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="4" data-align="right">+27%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="5" data-table-column="0" data-align="center">#5</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="1" data-align="left">DeepSeek V4 Pro</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="3" data-align="right">2.06T tokens</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="4" data-align="right">+58%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="6" data-table-column="0" data-align="center">#6</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="1" data-align="left">Claude Sonnet 4.6</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="3" data-align="right">2.03T tokens</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="4" data-align="right">+13%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="7" data-table-column="0" data-align="center">#7</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="1" data-align="left">Owl Alpha</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="2" data-align="left">openrouter</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="3" data-align="right">2.01T tokens</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="4" data-align="right">+4%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="8" data-table-column="0" data-align="center">#8</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="1" data-align="left">Claude Opus 4.7</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="3" data-align="right">1.71T tokens</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="4" data-align="right">+13%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="9" data-table-column="0" data-align="center">#9</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="1" data-align="left">Claude Opus 4.8</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="3" data-align="right">1.32T tokens</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="4" data-align="right">+77%</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="10" data-table-column="0" data-align="center">#10</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="1" data-align="left">DeepSeek V3.2</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="3" data-align="right">1.18T tokens</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="4" data-align="right">+7%</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+    <p>这是公开榜单信号，不等同模型能力评测。榜首 DeepSeek V4 Flash（deepseek），4.34T tokens，+55%；最大周变化是 MiniMax M3（+343%）。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="模型基准" data-search-target="html-work-report">
+    <div class="meta">模型基准</div>
+    <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzM4YmRmOCI+QUE8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-11</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">覆盖</span>
+      <strong>Top 10</strong>
+      <span class="card-stat-detail">公开榜单已解析</span>
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">榜首</span>
+      <strong>Claude Fable 5 (with fallback)</strong>
+      <span class="card-stat-detail">anthropic / 65 分 / AA Index</span>
+    </div></div><div class="card-visual card-bars" data-card-bars>
+    <div class="card-visual-title">供应商分布</div>
+    <div class="chart-bars" aria-hidden="true">
+    <div class="chart-bar-row">
+        <span class="chart-bar-label">anthropic</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
+        <span class="chart-bar-value">3</span>
+        <span class="chart-bar-status">3/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">google</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
+        <span class="chart-bar-value">2</span>
+        <span class="chart-bar-status">2/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">openai</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
+        <span class="chart-bar-value">2</span>
+        <span class="chart-bar-status">2/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">alibaba</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">minimax</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+<div class="chart-bar-row">
+        <span class="chart-bar-label">moonshot</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
+        <span class="chart-bar-value">1</span>
+        <span class="chart-bar-status">1/10</span>
+      </div>
+  </div>
+  </div><div class="card-visual card-table" data-card-table>
+    <div class="card-visual-title">Top 10 榜单</div>
+
+    <div class="table-scroll card-table-scroll" data-table-wrap>
+      <table class="report-data-table card-data-table" data-report-data-table data-card-data-table>
+        <colgroup><col style="width:64px"><col><col style="width:120px"><col style="width:130px"><col style="width:96px"></colgroup>
+        <thead><tr><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0" data-align="center">排名</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1" data-align="left">模型</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2" data-align="left">供应商</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3" data-align="right">分数</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4" data-align="right">指标</th></tr></thead>
+        <tbody><tr><td tabindex="0" data-table-cell data-table-row="1" data-table-column="0" data-align="center">#1</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="1" data-align="left">Claude Fable 5 (with fallback)</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="3" data-align="right">65 分</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="2" data-table-column="0" data-align="center">#2</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="1" data-align="left">Claude Opus 4.8 (max)</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="3" data-align="right">61 分</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="3" data-table-column="0" data-align="center">#3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="1" data-align="left">GPT-5.5 (xhigh)</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="2" data-align="left">openai</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="3" data-align="right">60 分</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="4" data-table-column="0" data-align="center">#4</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="1" data-align="left">GPT-5.5 (high)</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="2" data-align="left">openai</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="3" data-align="right">59 分</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="5" data-table-column="0" data-align="center">#5</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="1" data-align="left">Claude Opus 4.7 (max)</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="3" data-align="right">57 分</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="6" data-table-column="0" data-align="center">#6</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="1" data-align="left">Gemini 3.1 Pro Preview</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="2" data-align="left">google</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="3" data-align="right">57 分</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="7" data-table-column="0" data-align="center">#7</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="1" data-align="left">Qwen3.7 Max</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="2" data-align="left">alibaba</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="3" data-align="right">57 分</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="8" data-table-column="0" data-align="center">#8</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="1" data-align="left">Gemini 3.5 Flash</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="2" data-align="left">google</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="3" data-align="right">55 分</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="9" data-table-column="0" data-align="center">#9</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="1" data-align="left">MiniMax-M3</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="2" data-align="left">minimax</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="3" data-align="right">55 分</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="4" data-align="right">AA Index</td></tr>
+<tr><td tabindex="0" data-table-cell data-table-row="10" data-table-column="0" data-align="center">#10</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="1" data-align="left">Kimi K2.6</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="2" data-align="left">moonshot</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="3" data-align="right">54 分</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="4" data-align="right">AA Index</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+    <p>这是公开榜单信号，不等同模型能力评测。榜首 Claude Fable 5 (with fallback)（anthropic），65 分，AA Index。</p>
+
+  </article>
+    </div>
+  </section>
+<section class="panel" id="section-html-work-report-3" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <h2>精选博客更新</h2>
+
+    </div>
+
+  </div>
+
+    <div class="evidence-grid focus-field blog-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-06-10-copilot-chat-now-sees-your-agent-sessions" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>GitHub Copilot Chat 已可查看 agent 会话</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">AI engineering tools</span></div>
+
+
+    <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。</p>
+    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</span></dd></div><div><dt>要点 2</dt><dd><span>原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。</span></dd></div><div><dt>要点 3</dt><dd><span>这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。</span></dd></div><div><dt>要点 4</dt><dd><span>文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。</span></dd></div><div><dt>要点 5</dt><dd><span>对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI industry" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/rtx-ai-garage-local-gemma-diffusion/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>英伟达为本地 AI 加速 DeepMind 的 DiffusionGemma</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">官方一手来源</span><span class="chip chip-topic">AI industry</span></div>
+    <div class="card-media-grid" data-count="1"><figure><img src="../../../assets/evidence/nvidia-accelerates-google-deepmind-s-diffusiongemma-for-local-ai-2026-06-11.jpg" alt="NVIDIA Accelerates Google DeepMind’s DiffusionGemma for Local AI" loading="lazy" data-lightbox-image="true" data-lightbox-caption="NVIDIA Accelerates Google DeepMind’s DiffusionGemma for Local AI：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。" role="button" tabindex="0" aria-label="点击放大图片：NVIDIA Accelerates Google DeepMind’s DiffusionGemma for Local AI：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。" decoding="async"><figcaption>NVIDIA Accelerates Google DeepMind’s DiffusionGemma for Local AI：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。</figcaption></figure></div>
+
+    <p>文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。</p>
+    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。</span></dd></div><div><dt>要点 2</dt><dd><span>真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。</span></dd></div><div><dt>要点 3</dt><dd><span>它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。</span></dd></div><div><dt>要点 4</dt><dd><span>文章真正有用的部分，在于它讲清了它反映的产品方向、平台策略或使用方式是否已经接近普通团队的日常选择，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。</span></dd></div><div><dt>要点 5</dt><dd><span>对读者的价值，在于更新对模型能力、成本和可靠性的预期，而不是只记住排行榜名次。</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/run-diffusiongemma-on-nvidia-for-developer-ready-high-throughput-text-generation/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>英伟达说明如何高吞吐运行 DiffusionGemma</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">官方一手来源</span><span class="chip chip-topic">AI engineering tools</span></div>
+
+
+    <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。</p>
+    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</span></dd></div><div><dt>要点 2</dt><dd><span>真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。</span></dd></div><div><dt>要点 3</dt><dd><span>这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。</span></dd></div><div><dt>要点 4</dt><dd><span>文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。</span></dd></div><div><dt>要点 5</dt><dd><span>对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI industry" data-search-target="html-work-report">
+
+    <h3><a class="card-title-link" href="https://github.blog/ai-and-ml/github-copilot/give-github-copilot-cli-real-code-intelligence-with-language-servers/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>GitHub 让 Copilot CLI 借助语言服务器理解真实代码</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">AI industry</span></div>
+
+
+    <p>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。</p>
+    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。</span></dd></div><div><dt>要点 2</dt><dd><span>原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。</span></dd></div><div><dt>要点 3</dt><dd><span>它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。</span></dd></div><div><dt>要点 4</dt><dd><span>文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。</span></dd></div><div><dt>要点 5</dt><dd><span>对读者的价值，在于快速判断这条技术观点是否会影响产品路线、工具选型或风险预案。</span></dd></div></dl>
+  </article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-github-trending-top-10-4" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <h2>GitHub Trending · Top 10</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/addyosmani/agent-skills" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="addyosmani/agent-skills" decoding="async"> addyosmani/agent-skills</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +821 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。；领域：agent；#1，较前一日持平</li><li><strong><a href="https://github.com/phuryn/pm-skills" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="phuryn/pm-skills" decoding="async"> phuryn/pm-skills</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +6</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +804 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#2，较前一日上升 6 位</li><li><strong><a href="https://github.com/refactoringhq/tolaria" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="refactoringhq/tolaria" decoding="async"> refactoringhq/tolaria</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +612 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在检索增强和知识库管线，仓库首页当前围绕这条能力展开。；领域：AI tooling；#3，较前一日上升 2 位</li><li><strong><a href="https://github.com/mvanhorn/last30days-skill" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="mvanhorn/last30days-skill" decoding="async"> mvanhorn/last30days-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -3</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +2,535 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#4，较前一日下降 3 位</li><li><strong><a href="https://github.com/soxoj/maigret" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="soxoj/maigret" decoding="async"> soxoj/maigret</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +318 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#5，较前一日持平</li><li><strong><a href="https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="x1xhlol/system-prompts-and-models-of-ai-tools" decoding="async"> x1xhlol/system-prompts-and-models-of-ai-tools</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +3</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +393 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。；领域：agent；#6，较前一日上升 3 位</li><li><strong><a href="https://github.com/obra/superpowers" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="obra/superpowers" decoding="async"> obra/superpowers</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,104 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#7，较前一日持平</li><li><strong><a href="https://github.com/masterking32/MasterDnsVPN" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="masterking32/MasterDnsVPN" decoding="async"> masterking32/MasterDnsVPN</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +354 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#8，较前一日持平</li><li><strong><a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="harry0703/MoneyPrinterTurbo" decoding="async"> harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -8</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,389 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 利用 AI 大模型一键生成高清短视频。；领域：AIGC；#9，较前一日下降 8 位</li><li><strong><a href="https://github.com/maziyarpanahi/openmed" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="maziyarpanahi/openmed" decoding="async"> maziyarpanahi/openmed</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-source">GitHub/仓库来源</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +527 stars</mark> <mark class="text-highlight daily-tag daily-tag-highlight">项目 highlight</mark>: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#10，较前一日持平</li></ol></div>
+    <template data-rich-source data-source-fallback>1. **[![addyosmani/agent-skills](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)** ==tag-notable|值得关注== ==tag-source|GitHub/仓库来源== ==trend-new|NEW== ==tag-stars|今日 +821 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。；领域：agent；#1，较前一日持平
+2. **[![phuryn/pm-skills](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) phuryn/pm-skills](https://github.com/phuryn/pm-skills)** ==tag-notable|值得关注== ==tag-source|GitHub/仓库来源== ==trend-up|↑ UP +6== ==tag-stars|今日 +804 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#2，较前一日上升 6 位
+3. **[![refactoringhq/tolaria](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) refactoringhq/tolaria](https://github.com/refactoringhq/tolaria)** ==tag-notable|值得关注== ==tag-source|GitHub/仓库来源== ==trend-up|↑ UP +2== ==tag-stars|今日 +612 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在检索增强和知识库管线，仓库首页当前围绕这条能力展开。；领域：AI tooling；#3，较前一日上升 2 位
+4. **[![mvanhorn/last30days-skill](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-down|↓ DOWN -3== ==tag-stars|今日 +2,535 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#4，较前一日下降 3 位
+5. **[![soxoj/maigret](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) soxoj/maigret](https://github.com/soxoj/maigret)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-new|NEW== ==tag-stars|今日 +318 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#5，较前一日持平
+6. **[![x1xhlol/system-prompts-and-models-of-ai-tools](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) x1xhlol/system-prompts-and-models-of-ai-tools](https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-up|↑ UP +3== ==tag-stars|今日 +393 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 编码和 agent 工作流，仓库首页当前围绕这条能力展开。；领域：agent；#6，较前一日上升 3 位
+7. **[![obra/superpowers](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) obra/superpowers](https://github.com/obra/superpowers)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-new|NEW== ==tag-stars|今日 +1,104 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。；领域：agent；#7，较前一日持平
+8. **[![masterking32/MasterDnsVPN](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) masterking32/MasterDnsVPN](https://github.com/masterking32/MasterDnsVPN)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-new|NEW== ==tag-stars|今日 +354 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#8，较前一日持平
+9. **[![harry0703/MoneyPrinterTurbo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-down|↓ DOWN -8== ==tag-stars|今日 +1,389 stars== ==tag-highlight|项目 highlight==: 利用 AI 大模型一键生成高清短视频。；领域：AIGC；#9，较前一日下降 8 位
+10. **[![maziyarpanahi/openmed](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) maziyarpanahi/openmed](https://github.com/maziyarpanahi/openmed)** ==tag-general|一般== ==tag-source|GitHub/仓库来源== ==trend-new|NEW== ==tag-stars|今日 +527 stars== ==tag-highlight|项目 highlight==: 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。；领域：AI tooling；#10，较前一日持平</template>
+  </section>
+<section class="panel" id="section-x-twitter-5" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <h2>X/Twitter 讨论</h2>
+
+    </div>
+
+  </div>
+
+    <div class="evidence-grid focus-field builder-card-grid" data-focus-field="x-twitter">
+      <article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/swyx/status/2064421542503797186" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-swyx.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Swyx</span><span class="card-subtitle">@swyx</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>如果你在记录时间线，从签下这笔合作到把 Mythos 级模型正式推向全球只用了 34 天。基于 NVIDIA 技术栈建设，意味着很多事情可以更快落地。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>for those keeping track at home it was 34 days between signing this deal and launching Mythos-class model GA to the world. https://t.co/J1dZDZcxMu building on @nvidia stack means you can just do things™.</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/bcherny/status/2064431111154053187" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-bcherny.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Boris Cherny</span><span class="card-subtitle">@bcherny</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者认为 Fable 5 是自去年 11 月 Opus 4.5 以来最明显的一次模型跃升。4.5 发布后，他发现自己已经连续几周完全在终端里写代码，甚至卸载了 IDE；而 Fable 让 Claude 从编码 agent 更进一步，像产品构建中的思考与设计伙伴，具备判断力、品味和多维度能力，因此更值得托付复杂工作。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Fable 5 is the biggest step up I’ve felt in our models since Opus 4.5 back in November. After 4.5 came out I uninstalled my IDE when I realized that I’d been doing 100% of my coding in a terminal for a few weeks. With Fable, it’s felt like Claude has stepped up from being a coding agent to a thought and design partner in building the product. Fable has judgement, taste, and dimensionality in a way that previous models didn’t, leading me to trust it more with the most complex work. I think the f...</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/rauchg/status/2064551967461114111" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-rauchg.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Guillermo Rauch</span><span class="card-subtitle">@rauchg</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>Vercel CLI 现在可以创建 AI Gateway API key、用 --budget 限制支出，并用 --refresh-period 设置额度刷新周期。发帖者把它比作给 AI token 准备的虚拟信用卡。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Vercel CLI now allows you to: ◾ create AI Gateway API keys ◾ pass a --𝚋𝚞𝚍𝚐𝚎𝚝 to cap their spend ◾ set a --𝚛𝚎𝚏𝚛𝚎𝚜𝚑-𝚙𝚎𝚛𝚒𝚘𝚍 for the quota Think of it as virtual credit cards for AI tokens 🤖💳 https://t.co/ZOuhwIp7h5 https://t.co/mvIsJkaBfR</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/karpathy/status/2064409694761054332" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-karpathy.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Andrej Karpathy</span><span class="card-subtitle">@karpathy</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者认为这是一次很令人兴奋的发布：Claude Fable 5 与 Mythos 使用同一底层模型，但增加了安全保护。基准表现很好，而且在多个方向领先；从定性体验看，它也是一次值得称为大版本升级的跃迁，尤其适合长时间处理困难问题，可以承接比以往更有野心的任务。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>This is a super exciting release - Claude Fable 5 is the same underlying model as Mythos but with added safeguards. The benchmarks are great and it&#39;s SOTA on everything by a margin but I&#39;ll add that *qualitatively* also, this is a major-version-bump-deserving step change forward (imo of the same order as Claude 4.5 was in November), peaking especially for long problem-solving sessions on very difficult problems. You can give it a lot more ambitious tasks than what you&#39;re used to, the model &quot;get...</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/swyx/status/2064492823781789969" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-swyx.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Swyx</span><span class="card-subtitle">@swyx</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者建议趁 Fable 还不是按次计费时，让 Claude Code 用“review my code for issues”审查代码；他的夸张说法是，你可能会惊讶自己过去没有先做一次 Fable Check 就把东西发到生产环境。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>btw insane amounts of alpha in telling claude code to &quot;review my code for issues&quot; on Fable rn while it is not pay per use be prepared to be in abject horror that you shipped anything to prod without a Fable Check™ first https://t.co/wPCWRO84xV</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/bcherny/status/2064426115255730578" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-bcherny.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Boris Cherny</span><span class="card-subtitle">@bcherny</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者强调自验证循环的重要性。尤其是在强模型可以长时间运行的阶段，自验证是让模型跑得更久、结果更接近用户意图的关键条件，也能减少人在 Claude 工作过程中不断介入检查的需要。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>We talk a lot about how important it is to set up self-verification loops. Especially in the age of powerful models that can run for long periods of time, self-verification is a key ingredient that enables the model to run for much longer, delivering a result that is closer to what you intended, so you can do more without having to constantly check in on Claude as it works. @delba_oliveira gives a great breakdown of what that looks like and why it matters</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/thsottiaux/status/2064308436133716008" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-thsottiaux.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Thibault Sottiaux</span><span class="card-subtitle">@thsottiaux</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者询问大家是偶尔使用 Codex 的 /goal，还是把它作为完成工作的主要方式。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Do you use codex /goal occasionally or as your main way to get things done?</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/thsottiaux/status/2064307859903447396" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-thsottiaux.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Thibault Sottiaux</span><span class="card-subtitle">@thsottiaux</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者把使用 Codex 形容成指挥一支乐队：一次处理一个 /goal。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Playing codex like an orchestra. One /goal at a time. https://t.co/vlpypZu20A</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/petergyang/status/2064563041166090672" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-petergyang.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Peter Yang</span><span class="card-subtitle">@petergyang</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>发帖者在问：“big model smell”到底是什么意思。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>wtf does &quot;big model smell&quot; mean</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/petergyang/status/2064550073594446059" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-petergyang.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Peter Yang</span><span class="card-subtitle">@petergyang</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>发帖者分享了自己使用的提示词：让模型构建一款类似 F-Zero 的未来反重力竞速游戏，包含伪 3D 路线、3 个 AI 对手、以生命值消耗为代价的加速槽、400 到 800 公里每小时的速度感、方向键转向、Shift 加速、三圈循环路线、检查点、霓虹赛博朋克风格、HUD，以及可见的路线扭曲和地面滚动效果。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Btw this is the prompt I used: Build F-Zero: futuristic anti-gravity racer with pseudo-3D track (raycasting or mode-7 style scaling), 3 AI opponents, boost meter that drains health, speed 400-800 km/h with visible sense of speed via track warping and scrolling ground pattern, arrow keys to steer, shift to boost, 3 laps on a looping track with checkpoints. Style it neon cyberpunk (dark sky, glowing track edges, chromatic aberration on boost), show HUD with position/lap/speed/health, and make the...</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/trq212/status/2064521202622960058" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-trq212.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Thariq</span><span class="card-subtitle">@trq212</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>发帖者说自己在东京的 Code w/ Claude 活动现场，欢迎看到他的人打招呼。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>at Code w/ Claude Tokyo! say hi if you see me around https://t.co/BXfvEJVvrf</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight builder-card" data-evidence-spotlight data-filter-target="x-twitter" data-filter-value="X/Twitter" data-search-target="x-twitter">
+
+    <h3><a class="card-title-link" href="https://x.com/trq212/status/2064437561930682672" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="../../../assets/avatars/2026/06/2026-06-11-trq212.png" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Thariq</span><span class="card-subtitle">@trq212</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-source">已核查事实</span><span class="chip chip-topic">builder</span><span class="chip chip-date">2026-06-09</span></div>
+
+
+    <p>发帖者认为 Fable 是一次模型层面的阶跃变化，并希望它改变大家使用 Claude 的方式。后续会用一系列帖子说明它如何重塑他们的工作，但简短结论是：现在应该更有野心。</p>
+    <dl class="card-detail-list"><div><dt>原文</dt><dd><span>Fable is a step-change in models, and I hope it changes how you work with Claude. More to come in a series of posts on how it’s reshaped our work, but the TLDR: it’s time to be more ambitious. https://t.co/bWoxbTBShh</span></dd></div></dl>
+  </article>
+    </div>
+  </section>
+<section class="panel" id="section-reddit-6" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+    <div class="section-heading split-row">
+    <div>
+      <h2>Reddit 线索</h2>
+
+    </div>
+
+  </div>
+
+    <div class="evidence-grid focus-field platform-card-grid" data-focus-field="reddit">
+      <article class="interactive-card evidence-card evidence-spotlight platform-card" data-evidence-spotlight data-filter-target="reddit" data-filter-value="Reddit LocalLLaMA Platform Feed" data-search-target="reddit">
+
+    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u1za0m/cohere_released_north_mini_code_its_first/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 讨论 Gemma 4-bit QAT 与 8-bit PTQ benchmark</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">Reddit 线索</span><span class="chip chip-risk">平台线索</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>原帖在找 Gemma 4-bit QAT 与传统 8-bit PTQ 量化的直接 benchmark，重点是准确率和速度是否有硬数据对比。这是 Reddit 讨论线索，不等同于已确认结论。</p>
+    <dl class="card-detail-list"><div><dt>公开披露</dt><dd><span>平台内扩散发现，未做一手回源核验。</span></dd></div></dl>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight platform-card" data-evidence-spotlight data-filter-target="reddit" data-filter-value="Reddit LocalLLaMA Platform Feed" data-search-target="reddit">
+
+    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u1s2oz/anthropic_is_intentionally_nerfing_fable_when/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 线索：Anthropic is intentionally nerfing Fable when asked to develop othe</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">Reddit 线索</span><span class="chip chip-risk">平台线索</span><span class="chip chip-date">2026-06-10</span></div>
+
+
+    <p>Reddit 线索出现一条讨论线索：Anthropic is intentionally nerfing Fable when asked to develop othe。这不是一手确认事实，需要回到原帖和后续来源核对。</p>
+    <dl class="card-detail-list"><div><dt>公开披露</dt><dd><span>平台内扩散发现，未做一手回源核验。</span></dd></div></dl>
+  </article>
+    </div>
+  </section>
+<section class="panel rich-section" id="section-html-work-report-7" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+    <div class="section-heading split-row">
+    <div>
+      <h2>信源覆盖与缺口</h2>
+
+    </div>
+
+  </div>
+    <div class="rendered-markdown"><p>本节只保留读者需要知道的覆盖缺口：哪些来源本轮检查过、哪些没有信号、哪些因为配置或来源状态跳过。它不展示内部候选池、筛选分数或发布调试记录。</p>
+<ul><li><strong>Builder 原始源</strong>：已检查；checked 2 / no_signal 4 / blocked 0 / skipped 0；说明：follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL.；来源：follow-builders X feed：checked（38 recent original entries parsed）；follow-builders podcast feed：no_signal（0 recent original entries parsed）；follow-builders blog feed：no_signal（0 recent original entries parsed）；Simon Willison Weblog：checked（8 recent original entries parsed）；Chip Huyen Blog：no_signal（0 recent original entries parsed）；Andrej Karpathy Blog：no_signal（0 recent original entries parsed）</li><li><strong>精选博客与访谈源</strong>：已检查；checked 61 / no_signal 66 / blocked 4 / skipped 0；说明：Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs.；来源：WeChat Article Link Input：no_signal（no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true）；Google Keyword Blog：checked（18 recent intermediary lead entries parsed）；Official Microsoft Blog：no_signal（0 recent intermediary lead entries parsed）；Apple Newsroom：checked（1 recent intermediary lead entries parsed）；Meta Newsroom：checked（4 recent intermediary lead entries parsed）；Amazon News：checked（3 recent intermediary lead entries parsed）</li><li><strong>搜索 / 新闻影子源</strong>：已检查；checked 2 / no_signal 0 / blocked 1 / skipped 0；说明：Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.；来源：GDELT：blocked（provider_timeout_exceeded_45000ms）；OpenAlex：checked（36 shadow candidates）；arXiv：checked（4 shadow candidates）</li><li><strong>信源健康检查</strong>：已检查；checked 92 / no_signal 28 / blocked 13 / skipped 5；说明：Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.；来源：Google Keyword Blog：checked（20 feed entries parsed; 9 within 48h）；Official Microsoft Blog：no_signal（10 feed entries parsed; 0 within 48h）；Apple Newsroom：no_signal（20 feed entries parsed; 0 within 48h）；Meta Newsroom：checked（10 feed entries parsed; 3 within 48h）；Amazon News：checked（10 feed entries parsed; 1 within 48h）；NVIDIA Newsroom RSS：checked（20 feed entries parsed; 2 within 48h）</li><li><strong>微信公众号线索</strong>：已检查；checked 0 / no_signal 1 / blocked 0 / skipped 0；阻塞：no_recent_signal；说明：wechat platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：WeChat Platform AI Feed：no_signal（kill_switch_enabled）</li><li><strong>知乎线索</strong>：已检查；checked 0 / no_signal 1 / blocked 0 / skipped 0；阻塞：no_recent_signal；说明：zhihu platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：Zhihu Platform AI Feed：no_signal（kill_switch_enabled）</li><li><strong>Reddit 线索</strong>：已检查；checked 1 / no_signal 0 / blocked 0 / skipped 0；说明：reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：Reddit LocalLLaMA Platform Feed：checked（17 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=5, exclude_keywords_matched=3）</li></ul></div>
+    <template data-rich-source data-source-fallback>本节只保留读者需要知道的覆盖缺口：哪些来源本轮检查过、哪些没有信号、哪些因为配置或来源状态跳过。它不展示内部候选池、筛选分数或发布调试记录。
+
+- **Builder 原始源**：已检查；checked 2 / no_signal 4 / blocked 0 / skipped 0；说明：follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL.；来源：follow-builders X feed：checked（38 recent original entries parsed）；follow-builders podcast feed：no_signal（0 recent original entries parsed）；follow-builders blog feed：no_signal（0 recent original entries parsed）；Simon Willison Weblog：checked（8 recent original entries parsed）；Chip Huyen Blog：no_signal（0 recent original entries parsed）；Andrej Karpathy Blog：no_signal（0 recent original entries parsed）
+- **精选博客与访谈源**：已检查；checked 61 / no_signal 66 / blocked 4 / skipped 0；说明：Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs.；来源：WeChat Article Link Input：no_signal（no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true）；Google Keyword Blog：checked（18 recent intermediary lead entries parsed）；Official Microsoft Blog：no_signal（0 recent intermediary lead entries parsed）；Apple Newsroom：checked（1 recent intermediary lead entries parsed）；Meta Newsroom：checked（4 recent intermediary lead entries parsed）；Amazon News：checked（3 recent intermediary lead entries parsed）
+- **搜索 / 新闻影子源**：已检查；checked 2 / no_signal 0 / blocked 1 / skipped 0；说明：Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.；来源：GDELT：blocked（provider_timeout_exceeded_45000ms）；OpenAlex：checked（36 shadow candidates）；arXiv：checked（4 shadow candidates）
+- **信源健康检查**：已检查；checked 92 / no_signal 28 / blocked 13 / skipped 5；说明：Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.；来源：Google Keyword Blog：checked（20 feed entries parsed; 9 within 48h）；Official Microsoft Blog：no_signal（10 feed entries parsed; 0 within 48h）；Apple Newsroom：no_signal（20 feed entries parsed; 0 within 48h）；Meta Newsroom：checked（10 feed entries parsed; 3 within 48h）；Amazon News：checked（10 feed entries parsed; 1 within 48h）；NVIDIA Newsroom RSS：checked（20 feed entries parsed; 2 within 48h）
+- **微信公众号线索**：已检查；checked 0 / no_signal 1 / blocked 0 / skipped 0；阻塞：no_recent_signal；说明：wechat platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：WeChat Platform AI Feed：no_signal（kill_switch_enabled）
+- **知乎线索**：已检查；checked 0 / no_signal 1 / blocked 0 / skipped 0；阻塞：no_recent_signal；说明：zhihu platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：Zhihu Platform AI Feed：no_signal（kill_switch_enabled）
+- **Reddit 线索**：已检查；checked 1 / no_signal 0 / blocked 0 / skipped 0；说明：reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.；来源：Reddit LocalLLaMA Platform Feed：checked（17 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=5, exclude_keywords_matched=3）</template>
+  </section>
+
+
+
+
+
+      </div>
+    </div>
+  </main>
+
+  <script>/* Use case: small local interactions for self-contained Effective reports. The generator inlines this into the final <script> block. */
+(function () {
+  var sectionFocusTimer = null;
+  var lastActiveNavId = "";
+
+  function setCopyButtonState(button, label, state) {
+    if (!button) return;
+    if (!button.getAttribute("data-copy-label")) {
+      button.setAttribute("data-copy-label", button.textContent);
+    }
+    if (button.getAttribute("data-copy-timer")) {
+      clearTimeout(Number(button.getAttribute("data-copy-timer")));
+    }
+    button.textContent = label;
+    button.setAttribute("data-copy-state", state);
+    button.setAttribute("aria-live", "polite");
+    var timer = setTimeout(function () {
+      button.textContent = button.getAttribute("data-copy-label") || label;
+      button.removeAttribute("data-copy-state");
+      button.removeAttribute("data-copy-timer");
+    }, 1100);
+    button.setAttribute("data-copy-timer", String(timer));
+  }
+
+  function fallbackCopyText(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(area);
+    }
+  }
+
+  function copyText(text, button) {
+    var value = String(text || "").trim();
+    if (!value) {
+      setCopyButtonState(button, "无内容", "empty");
+      return;
+    }
+    var done = function () {
+      setCopyButtonState(button, "已复制", "success");
+    };
+    var fail = function () {
+      setCopyButtonState(button, "复制失败", "failed");
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(done, function () {
+        if (fallbackCopyText(value)) done();
+        else fail();
+      });
+      return;
+    }
+
+    if (fallbackCopyText(value)) done();
+    else fail();
+  }
+
+  function copySourceText(source) {
+    if (!source) return "";
+    if (source.matches("ul, ol")) {
+      return Array.prototype.slice.call(source.querySelectorAll("li"))
+        .map(function (item) { return "- " + (item.innerText || item.textContent || "").trim(); })
+        .filter(Boolean)
+        .join("\n");
+    }
+    return (source.innerText || source.textContent || "").trim();
+  }
+
+  function applyFilter(button) {
+    var target = button.getAttribute("data-filter-target");
+    var value = button.getAttribute("data-filter-value");
+    if (!target || !value) return;
+
+    document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      var match = value === "all" || item.getAttribute("data-filter-value") === value;
+      item.hidden = !match;
+    });
+
+    document.querySelectorAll("button[data-filter-target='" + target + "']").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+
+    var field = document.querySelector("[data-focus-field='" + target + "']");
+    if (field) {
+      field.classList.toggle("has-filter", value !== "all");
+    }
+  }
+
+  function activateTab(button) {
+    var group = button.getAttribute("data-tab-group");
+    var panel = button.getAttribute("data-tab");
+    if (!group || !panel) return;
+
+    document.querySelectorAll("[data-tab-group='" + group + "'][data-tab]").forEach(function (peer) {
+      peer.setAttribute("aria-selected", String(peer === button));
+    });
+
+    document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
+      item.hidden = item.id !== panel;
+    });
+  }
+
+  function applySearch(input) {
+    var target = input.getAttribute("data-search-for");
+    var query = input.value.trim().toLowerCase();
+    if (!target) return;
+
+    document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
+      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+    });
+  }
+
+  function updateEvidenceSpotlight(card, event) {
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
+    card.style.setProperty("--spotlight-y", event.clientY - rect.top + "px");
+  }
+
+  function clearDataTableHighlight(table) {
+    if (!table) return;
+    table.removeAttribute("data-hover-row");
+    table.removeAttribute("data-hover-column");
+    table.querySelectorAll(".table-row-highlight, .table-column-highlight, .table-cell-highlight").forEach(function (cell) {
+      cell.classList.remove("table-row-highlight", "table-column-highlight", "table-cell-highlight");
+    });
+  }
+
+  function applyDataTableHighlight(cell) {
+    var table = cell.closest("[data-report-data-table]");
+    if (!table) return;
+    var row = cell.getAttribute("data-table-row");
+    var column = cell.getAttribute("data-table-column");
+    clearDataTableHighlight(table);
+    if (!row || !column) return;
+
+    table.setAttribute("data-hover-row", row);
+    table.setAttribute("data-hover-column", column);
+
+    table.querySelectorAll("[data-table-row='" + row + "']").forEach(function (peer) {
+      peer.classList.add("table-row-highlight");
+    });
+    table.querySelectorAll("[data-table-column='" + column + "']").forEach(function (peer) {
+      peer.classList.add("table-column-highlight");
+    });
+    cell.classList.add("table-cell-highlight");
+  }
+
+  function hashTargetId() {
+    if (!window.location.hash || window.location.hash === "#") return "";
+    var raw = window.location.hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  function reportSectionForId(id) {
+    if (!id) return null;
+    var target = document.getElementById(id);
+    if (!target) return null;
+    if (target.matches("#report-top, [data-report-region='hero']")) {
+      return target;
+    }
+    if (target.matches("[id][data-section-type], #evidence, #verification, #next-actions")) {
+      return target;
+    }
+    return target.closest("#report-top, [data-report-region='hero'], [id][data-section-type], #evidence, #verification, #next-actions");
+  }
+
+  function sectionIsVisible(section) {
+    if (!section) return false;
+    var rect = section.getBoundingClientRect();
+    return rect.bottom > 80 && rect.top < window.innerHeight;
+  }
+
+  function highlightTargetSection(id) {
+    document.querySelectorAll(".section-focus").forEach(function (section) {
+      section.classList.remove("section-focus");
+    });
+    if (sectionFocusTimer) {
+      clearTimeout(sectionFocusTimer);
+      sectionFocusTimer = null;
+    }
+
+    var section = reportSectionForId(id);
+    if (!section) return;
+    section.classList.add("section-focus");
+    sectionFocusTimer = setTimeout(function () {
+      section.classList.remove("section-focus");
+      sectionFocusTimer = null;
+    }, 1600);
+  }
+
+  function updateActiveNavigation() {
+    var sections = Array.prototype.slice.call(document.querySelectorAll("#report-top, [id][data-section-type], #evidence, #verification, #next-actions"));
+    var hashSection = reportSectionForId(hashTargetId());
+    var active = sections
+      .map(function (section) {
+        var rect = section.getBoundingClientRect();
+        return { id: section.id, section: section, top: Math.abs(rect.top - 96), visible: sectionIsVisible(section) };
+      })
+      .filter(function (item) { return item.visible; })
+      .sort(function (a, b) { return a.top - b.top; })[0];
+    if (hashSection && sectionIsVisible(hashSection)) {
+      active = { id: hashSection.id, section: hashSection, top: 0, visible: true };
+    }
+
+    var activeLink = null;
+    document.querySelectorAll("[data-nav-link]").forEach(function (link) {
+      var isActive = Boolean(active && link.getAttribute("href") === "#" + active.id);
+      link.setAttribute("aria-current", isActive ? "true" : "false");
+      if (isActive) activeLink = link;
+    });
+
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
+    }
+    lastActiveNavId = active ? active.id : "";
+  }
+
+  var imageLightbox = null;
+  var imageLightboxReturnFocus = null;
+
+  function ensureImageLightbox() {
+    if (imageLightbox) return imageLightbox;
+
+    var root = document.createElement("div");
+    root.className = "image-lightbox";
+    root.hidden = true;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "图片放大预览");
+    root.innerHTML = [
+      '<button class="image-lightbox__backdrop" type="button" data-lightbox-close aria-label="关闭放大图片"></button>',
+      '<figure class="image-lightbox__figure">',
+      '<button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭放大图片">关闭</button>',
+      '<img class="image-lightbox__image" alt="">',
+      '<figcaption class="image-lightbox__caption"></figcaption>',
+      '</figure>'
+    ].join("");
+    document.body.appendChild(root);
+
+    imageLightbox = {
+      root: root,
+      image: root.querySelector(".image-lightbox__image"),
+      caption: root.querySelector(".image-lightbox__caption"),
+      close: root.querySelector(".image-lightbox__close")
+    };
+    return imageLightbox;
+  }
+
+  function imageLightboxCaption(image) {
+    var explicit = image.getAttribute("data-lightbox-caption") || image.getAttribute("alt") || "";
+    if (explicit.trim()) return explicit.trim();
+
+    var figure = image.closest("figure");
+    var caption = figure ? figure.querySelector("figcaption") : null;
+    if (caption && caption.textContent.trim()) return caption.textContent.trim();
+
+    var paragraph = image.closest("p");
+    var next = paragraph ? paragraph.nextElementSibling : null;
+    if (next && next.matches("p") && next.textContent.trim()) {
+      return next.textContent.trim();
+    }
+    return "";
+  }
+
+  function openImageLightbox(image) {
+    var source = image.currentSrc || image.getAttribute("src") || "";
+    if (!source) return;
+
+    var dialog = ensureImageLightbox();
+    var caption = imageLightboxCaption(image);
+    imageLightboxReturnFocus = image;
+    dialog.image.src = source;
+    dialog.image.alt = image.getAttribute("alt") || caption || "放大图片";
+    dialog.caption.textContent = caption;
+    dialog.caption.hidden = !caption;
+    dialog.root.hidden = false;
+    dialog.root.setAttribute("data-open", "true");
+    document.body.classList.add("lightbox-open");
+    window.setTimeout(function () {
+      if (dialog.close && dialog.close.focus) {
+        dialog.close.focus({ preventScroll: true });
+      }
+    }, 0);
+  }
+
+  function closeImageLightbox() {
+    if (!imageLightbox || imageLightbox.root.hidden) return;
+    imageLightbox.root.removeAttribute("data-open");
+    imageLightbox.root.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    imageLightbox.image.removeAttribute("src");
+    if (imageLightboxReturnFocus && imageLightboxReturnFocus.focus) {
+      imageLightboxReturnFocus.focus({ preventScroll: true });
+    }
+    imageLightboxReturnFocus = null;
+  }
+
+  document.addEventListener("click", function (event) {
+    var lightboxClose = event.target.closest("[data-lightbox-close]");
+    if (lightboxClose) {
+      event.preventDefault();
+      closeImageLightbox();
+      return;
+    }
+
+    var lightboxImage = event.target.closest("[data-lightbox-image]");
+    if (lightboxImage) {
+      event.preventDefault();
+      openImageLightbox(lightboxImage);
+      return;
+    }
+
+    var navLink = event.target.closest("[data-nav-link]");
+    if (navLink) {
+      var href = navLink.getAttribute("href") || "";
+      if (href.charAt(0) === "#") {
+        window.setTimeout(function () {
+          highlightTargetSection(hashTargetId());
+          updateActiveNavigation();
+        }, 80);
+      }
+    }
+
+    var button = event.target.closest("button");
+    if (!button) return;
+
+    if (button.matches("[data-copy-text]")) {
+      copyText(button.getAttribute("data-copy-text"), button);
+    }
+
+    if (button.matches("[data-copy-from]")) {
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      copyText(source ? (source.content ? source.content.textContent : copySourceText(source)) : "", button);
+    }
+
+    if (button.matches("[data-filter-target][data-filter-value]")) {
+      applyFilter(button);
+    }
+
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeImageLightbox();
+      return;
+    }
+
+    if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-lightbox-image]")) {
+      event.preventDefault();
+      openImageLightbox(event.target);
+    }
+  });
+
+  document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-search-for]")) {
+      applySearch(event.target);
+    }
+  });
+
+  document.addEventListener("pointermove", function (event) {
+    var card = event.target.closest("[data-evidence-spotlight]");
+    if (card) {
+      updateEvidenceSpotlight(card, event);
+    }
+  });
+
+  document.addEventListener("pointerover", function (event) {
+    var cell = event.target.closest("[data-table-cell]");
+    if (cell) {
+      applyDataTableHighlight(cell);
+    }
+  });
+
+  document.addEventListener("pointerout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches("[data-table-cell]")) {
+      applyDataTableHighlight(event.target);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var table = event.target.closest("[data-report-data-table]");
+    if (table && !table.contains(event.relatedTarget)) {
+      clearDataTableHighlight(table);
+    }
+  });
+
+  document.addEventListener("scroll", updateActiveNavigation, { passive: true });
+  window.addEventListener("resize", updateActiveNavigation);
+  window.addEventListener("hashchange", function () {
+    highlightTargetSection(hashTargetId());
+    updateActiveNavigation();
+  });
+  highlightTargetSection(hashTargetId());
+  updateActiveNavigation();
+})();
+
+</script>
+</body>
+</html>
