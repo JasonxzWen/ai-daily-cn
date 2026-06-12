@@ -49,6 +49,56 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       document.documentElement.getAttribute("data-render-mode") === "pre-rendered",
       "Production daily report should use pre-rendered mode."
     );
+    const mustReadSection = document.querySelector("#section-today-must-read");
+    const overviewSection = document.querySelector("#section-daily-overview");
+    const fullNavigationSection = document.querySelector("#section-full-navigation");
+    const compactMainList = document.querySelector("#section-compact-main-list");
+    const mainDetails = document.querySelector("#section-main-item-details");
+    const sectionOrder = [mustReadSection, overviewSection, fullNavigationSection, compactMainList, mainDetails]
+      .map((node) => node ? Array.from(document.querySelectorAll("main section")).indexOf(node) : -1);
+    addCheck(
+      "today_must_read_first",
+      Boolean(mustReadSection) &&
+        mustReadSection.querySelectorAll(".interactive-card").length === 3 &&
+        sectionOrder[0] >= 0 &&
+        sectionOrder[0] < sectionOrder[1] &&
+        sectionOrder[0] < sectionOrder[2] &&
+        sectionOrder[0] < sectionOrder[3],
+      "Daily report should put exactly three 今日必看 cards before stats, navigation, and the full list.",
+      {
+        order: sectionOrder,
+        must_read_cards: mustReadSection?.querySelectorAll(".interactive-card").length || 0
+      }
+    );
+    addCheck(
+      "stats_and_navigation_sunk",
+      Boolean(overviewSection) &&
+        Boolean(fullNavigationSection) &&
+        sectionOrder[1] > sectionOrder[0] &&
+        sectionOrder[2] > sectionOrder[0] &&
+        !document.querySelector("#report-top .hero-stat-grid") &&
+        !document.querySelector("#report-top .hero-link"),
+      "Stats, full navigation, and JSON links should be below 今日必看, not in the hero toolbar.",
+      {
+        overview_order: sectionOrder[1],
+        navigation_order: sectionOrder[2],
+        hero_stats: Boolean(document.querySelector("#report-top .hero-stat-grid")),
+        hero_links: Boolean(document.querySelector("#report-top .hero-link"))
+      }
+    );
+    addCheck(
+      "compact_main_list_default",
+      Boolean(compactMainList) &&
+        compactMainList.querySelectorAll(".interactive-card").length >= 3 &&
+        mainDetails?.tagName === "DETAILS" &&
+        !mainDetails.open,
+      "The complete main list should default to compact cards, with full bullets in a collapsed details section.",
+      {
+        compact_cards: compactMainList?.querySelectorAll(".interactive-card").length || 0,
+        details_tag: mainDetails?.tagName || "",
+        details_open: Boolean(mainDetails?.open)
+      }
+    );
     addCheck(
       "no_remote_scripts",
       !Array.from(document.scripts).some((script) => /^https?:\/\//i.test(script.src || "")),

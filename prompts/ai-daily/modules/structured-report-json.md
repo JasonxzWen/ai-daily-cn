@@ -135,13 +135,19 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 `github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects` 作为 highlight 元数据，但公开页面仍合并在 GitHub Trending 中展示。
 `github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在 80-140 个中文字符以内，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计或泛化热度判断。页面展示会隐藏来源、语言等审计字段，只保留榜位、变化、star 变化 tag、项目 highlight tag 和中文简介。
 
-`hero_highlights` 用于公开页面 header，最多 1-3 条。每项包含：
+`hero_highlights` 是普通关注者 3 分钟扫读的“今日必看”。正常日报必须从 `main_items` 中选出恰好 3 条；只有 `report_status:"empty_due_to_network_outage"` 或主体不足 3 条时可以少于 3 条或为空。选择时做轻量品类平衡，优先覆盖模型/平台、产品/工具、国内开源/社区、商业/政策、研究/安全等不同视角；不要简单复制 `main_items` 前三条。
+
+每项包含：
 
 - `title`
 - `url`
-- `reason`
+- `reason`：一句话说明为什么今天值得优先看，必须是具体影响，不能写模板句、来源审计或“原文标题为”
+- `what_happened`：只写结果事实，适合首屏展示；不要写技术细节
+- `why_watch`：只写对关注者的影响或后续观察价值，适合首屏展示
+- `category`：`model_platform`、`product_tool`、`china_open_source_community`、`business_policy`、`research_safety` 之一
+- `source_item_ref`：必须回指对应 `main_items[*].candidate_id`；没有 `candidate_id` 时才用对应条目的规范化 URL
 
-只放当天最重磅的消息、项目或观点。没有特大新闻时写 1 条今日主线，禁止写“其余条目见后文”或“本版只保留 N 条”。
+首屏只放结果和影响；实现机制、参数、价格、长背景、风险审计和验证说明下沉到完整列表。禁止写“其余条目见后文”或“本版只保留 N 条”。
 
 没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。空的 `model_releases` 或 `projects` 不应造成公开 HTML 出现空板块；`model_releases` 新草稿默认保持空数组。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。

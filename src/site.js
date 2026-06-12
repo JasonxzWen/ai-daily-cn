@@ -702,10 +702,33 @@ function withDefaultImportanceForReport(report) {
 function publicReportData(report) {
   const result = sanitizePublicValue(report);
   result.quality_status = publicQualityStatus(report?.quality_status);
+  result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false);
   result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
   return result;
+}
+
+function publicHeroHighlights(highlights = []) {
+  return arrayValue(highlights)
+    .filter((item) => item?.title && item?.url)
+    .map((item) => {
+      const result = {
+        title: String(item.title || ""),
+        url: String(item.url || ""),
+        reason: String(item.reason || "").trim()
+      };
+      for (const field of ["what_happened", "why_watch", "category"]) {
+        const value = String(item?.[field] || "").trim();
+        if (value) {
+          result[field] = value;
+        }
+      }
+      if (item.source_item_ref) {
+        result.source_item_ref = String(item.url || item.source_item_ref || "").trim();
+      }
+      return result;
+    });
 }
 
 function sanitizePublicValue(value, key = "") {

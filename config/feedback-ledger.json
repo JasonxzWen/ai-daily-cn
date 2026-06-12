@@ -800,6 +800,30 @@
         "test_name": "collectContentSources stores Artificial Analysis token cost and scatter tabs",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-three-minute-must-read-hero",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Lead daily reports with three must-read items",
+      "problem": "普通关注者只有约 3 分钟扫读日报时，首屏统计、完整导航、JSON 入口和过多主体细节会挤占真正需要先看的结果与影响。",
+      "expected_behavior": "Generated daily reports explicitly produce three `hero_highlights` must-read items with result, impact, category balance, and `source_item_ref`; public single-report pages show those items before stats/navigation and keep the full main list compact by default.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/report.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "tests/unit.test.js",
+        "tests/e2e/site.e2e.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "interaction input puts must read first and compact main list",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

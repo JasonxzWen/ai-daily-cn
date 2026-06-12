@@ -42,6 +42,36 @@ structuredReport.main_items[0].bullets = [
   "**OpenAI** added ==keyword-notable|source-linked evidence== for page checklist validation.",
   "The fixture keeps enough public text to exercise inline highlight rendering and card layout."
 ];
+const baseMainItem = structuredReport.main_items[0];
+structuredReport.main_items = Array.from({ length: 8 }, (_unused, index) => {
+  const category = index === 1 ? "product_radar" : index === 2 ? "open_source" : "ai_industry";
+  const source = index === 2 ? "GitHub Trending daily" : index === 1 ? "Vercel" : "OpenAI News RSS";
+  return {
+    ...baseMainItem,
+    candidate_id: `e2e-main-${index + 1}`,
+    title: `E2E must-read main signal ${index + 1}`,
+    url: `https://example.com/e2e-main-${index + 1}`,
+    source,
+    editorial_category: category,
+    source_level: index === 2 ? "github" : "official",
+    verification_status: "primary_confirmed",
+    summary: `**Signal ${index + 1}** gives readers a concrete AI product, platform, or open-source update for compact scanning.`,
+    bullets: [
+      `==Result== Signal ${index + 1} changes the visible public surface for readers.`,
+      `==Impact== It helps readers decide whether to track model choice, tool adoption, or project activity.`
+    ]
+  };
+});
+structuredReport.hero_highlights = structuredReport.main_items.slice(0, 3).map((item, index) => ({
+  title: item.title,
+  url: item.url,
+  reason: `Signal ${index + 1} changes a practical reader decision surface.`,
+  what_happened: `Signal ${index + 1} shipped a concrete AI update.`,
+  why_watch: "It helps a three-minute reader decide whether to keep tracking this area.",
+  category: index === 0 ? "model_platform" : index === 1 ? "product_tool" : "china_open_source_community",
+  source_item_ref: item.candidate_id
+}));
+structuredReport.self_check.main_items = structuredReport.main_items.length;
 const firstModel = structuredReport.model_releases[0];
 const builderAvatarDataUri = `data:image/svg+xml;base64,${Buffer.from(
   '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" rx="22" fill="#111827"/><text x="22" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff">EB</text></svg>',
@@ -352,6 +382,11 @@ try {
   const reportBody = await page.locator("body").textContent();
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
+  assert.equal(await page.locator("#section-today-must-read .interactive-card").count(), 3);
+  assert.equal(await page.locator("#report-top .hero-stat-grid").count(), 0);
+  assert.equal(await page.locator("nav.report-nav").count(), 0);
+  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.tagName), "DETAILS");
+  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.hasAttribute("open")), false);
   await page.evaluate(() => {
     const section = document.createElement("section");
     section.setAttribute("data-test-public-engineering-term", "ledger");
@@ -441,10 +476,15 @@ try {
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   await page.evaluate(() => {
-    const stat = Array.from(document.querySelectorAll(".hero-stat span"))
+    const stat = Array.from(document.querySelectorAll("#section-daily-overview .interactive-card .meta"))
       .find((node) => (node.textContent || "").includes("精选博客"));
     if (stat) {
       stat.textContent = "技不止术";
+    } else {
+      const fallback = document.querySelector("#section-daily-overview .interactive-card .meta");
+      if (fallback) {
+        fallback.textContent = "技不止术";
+      }
     }
   });
   const legacyCopyChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
