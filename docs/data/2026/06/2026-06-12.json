@@ -2,27 +2,27 @@
   "schema_version": 1,
   "report_date": "2026-06-12",
   "title": "AI 日报 2026-06-12",
-  "summary": "今天值得关注的主线包括：Anthropic 与 DXC 推进 Claude 在银行、航空等受监管行业系统中的集成，阿里云发布 5 月大数据与 AI 平台月报，Anthropic 介绍 Claude Corps，Google DeepMind 投入多智能体 AI 安全研究。热门博客侧重房源广告、智能体评测、Copilot CLI 设置、AI 使用量报告和安全扫描误报治理，GitHub Trending 继续保留 Top 10 供对照开源动向。",
+  "summary": "今日主线集中在企业落地、银行 AI、云平台更新和 Agent 工程实践：Anthropic 与 DXC 推进 Claude 接入银行和航空等企业系统；OpenAI 展示 BBVA 将 AI 纳入核心银行流程；阿里云更新大数据与 AI 平台月报，并补充 Agent 记忆和 Harness 实践文章。热门博客侧重 Agent 评测、用量报告、安全扫描和基础设施边界；开源侧保留 GitHub Trending Top 10 作为对照。",
   "hero_highlights": [
     {
-      "title": "DXC 将把 Claude 接入银行、航空等受监管行业系统",
+      "title": "Anthropic 与 DXC 推进 Claude 接入银行、航空等企业系统",
       "url": "https://www.anthropic.com/news/dxc-anthropic-alliance",
       "reason": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范..."
     },
     {
-      "title": "阿里云发布 5 月大数据与 AI 平台月报",
-      "url": "https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242",
-      "reason": "Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Big Data & AI Platform Monthly Newsletter—May 2026”。"
+      "title": "OpenAI 展示 BBVA 将 AI 放进核心银行流程",
+      "url": "https://openai.com/index/bbva",
+      "reason": "OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“BBVA puts AI at the core of banking with OpenAI”。"
     },
     {
-      "title": "Anthropic 介绍 Claude Corps 项目",
-      "url": "https://www.anthropic.com/news/claude-corps",
-      "reason": "Anthropic News 发布了一条 AI 相关更新，原文标题为“Introducing Claude Corps”。"
+      "title": "阿里云大数据与 AI 平台发布 5 月月度更新",
+      "url": "https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242",
+      "reason": "Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Big Data & AI Platform Monthly Newsletter—May 2026”。"
     }
   ],
   "main_items": [
     {
-      "title": "DXC 将把 Claude 接入银行、航空等受监管行业系统",
+      "title": "Anthropic 与 DXC 推进 Claude 接入银行、航空等企业系统",
       "editorial_category": "ai_industry",
       "event_date": "2026-06-11",
       "url": "https://www.anthropic.com/news/dxc-anthropic-alliance",
@@ -31,17 +31,34 @@
       "entities": [
         "Anthropic News"
       ],
-      "summary": "Anthropic 披露 DXC 将把 Claude 集成进银行、航空和其他受监管行业依赖的系统，重点是企业级部署、行业系统集成和治理要求。",
+      "summary": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。",
       "bullets": [
-        "**企业落地**：这条更新把重点放在 ==Claude 接入核心系统==，而不是单个模型参数或榜单指标。",
-        "**受监管系统**：银行、航空等行业依赖的核心系统通常要求权限控制、审计记录和数据处理责任清晰，Claude 的集成需要落在这些约束内。",
-        "**跟进价值**：后续更值得核对的是 DXC 客户案例、部署范围、合规说明和 Claude 在现有企业流程中的实际触点。"
+        "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
+        "**安全限制**：Fable 5 在 cyber、bio、chemical 和模型蒸馏等敏感场景由分类器接管，并 fallback 到 Claude Opus 4.8，官方称平均少于 5% sessions 触发。",
+        "**可用性/价格**：Fable 5 面向公开产品和 API 可用；Mythos 5 仅限 Project Glasswing/可信访问，两者标价都是 $10/M input、$50/M output。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "阿里云发布 5 月大数据与 AI 平台月报",
+      "title": "OpenAI 与 BBVA 展示银行业务中的 AI 落地方式",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-11",
+      "url": "https://openai.com/index/bbva",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI 介绍 BBVA 将 AI 作为银行业务核心能力推进，适合作为金融机构引入生成式 AI 的组织和流程案例。",
+      "bullets": [
+        "**金融场景**：这条更新的重点是 BBVA 如何把 AI 放进银行业务流程，而不只是把模型当作单点工具试用。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "阿里云大数据与 AI 平台发布 5 月月度更新",
       "editorial_category": "ai_industry",
       "event_date": "2026-06-11",
       "url": "https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242",
@@ -50,15 +67,15 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Big Data & AI Platform Monthly Newsletter—May 2026”。",
+      "summary": "阿里云月报汇总大数据与 AI 平台的 5 月产品更新，适合关注云上数据、模型和工程平台变化的团队快速扫描。",
       "bullets": [
-        "**Alibaba Cloud Blog 发布了一条 AI**：Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Big Data & AI Platform Monthly Newsletter—May 2026”。"
+        "**平台更新**：这条月报把阿里云大数据与 AI 平台的近期变化集中到一处，便于团队评估云上数据和模型工程能力。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "Anthropic 介绍 Claude Corps 项目",
+      "title": "Anthropic 推出 Claude Corps 项目",
       "editorial_category": "ai_industry",
       "event_date": "2026-06-11",
       "url": "https://www.anthropic.com/news/claude-corps",
@@ -67,15 +84,15 @@
       "entities": [
         "Anthropic News"
       ],
-      "summary": "Anthropic News 发布了一条 AI 相关更新，原文标题为“Introducing Claude Corps”。",
+      "summary": "Anthropic 发布 Claude Corps 项目介绍，显示其继续围绕 Claude 的应用生态和组织协作场景扩展。",
       "bullets": [
-        "**Anthropic News 发布了一条 AI 相关更**：Anthropic News 发布了一条 AI 相关更新，原文标题为“Introducing Claude Corps”。"
+        "**生态推进**：Claude Corps 是 Anthropic 当日的项目级更新，值得关注它后续如何连接用户、组织和 Claude 应用场景。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "DeepMind 投入多智能体 AI 安全研究",
+      "title": "DeepMind 加码多 Agent AI 安全研究",
       "editorial_category": "policy_infra",
       "event_date": "2026-06-10",
       "url": "https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research/",
@@ -84,49 +101,15 @@
       "entities": [
         "Google DeepMind RSS"
       ],
-      "summary": "Google DeepMind RSS 发布了一条 AI 相关更新，原文标题为“Investing in multi-agent AI safety research”。",
+      "summary": "Google DeepMind 说明将投入多 Agent AI 安全研究，关注多智能体系统交互、风险和评测边界。",
       "bullets": [
-        "**Google DeepMind RSS 发布了一条 A**：Google DeepMind RSS 发布了一条 AI 相关更新，原文标题为“Investing in multi-agent AI safety research”。"
+        "**安全研究**：这条更新把重点放在多 Agent 系统的安全问题上，适合跟踪复杂 AI 系统治理和评测方法的团队关注。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "BBVA 与 OpenAI 推进银行业 AI 落地",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-11",
-      "url": "https://openai.com/index/bbva",
-      "source": "OpenAI Company News RSS",
-      "tier": "T0",
-      "entities": [
-        "OpenAI Company News RSS"
-      ],
-      "summary": "OpenAI Company News RSS 发布了一条 AI 相关更新，原文标题为“BBVA puts AI at the core of banking with OpenAI”。",
-      "bullets": [
-        "**OpenAI Company News RSS 发布了**：OpenAI Company News RSS 发布了一条 AI 相关更新，原文标题为“BBVA puts AI at the core of banking with OpenAI”。"
-      ],
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "OpenAI 将收购 Ona",
-      "editorial_category": "engineering_toolchain",
-      "event_date": "2026-06-11",
-      "url": "https://openai.com/index/openai-to-acquire-ona",
-      "source": "OpenAI News RSS",
-      "tier": "T0",
-      "entities": [
-        "OpenAI News RSS"
-      ],
-      "summary": "OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“OpenAI to acquire Ona”。",
-      "bullets": [
-        "**OpenAI News RSS 发布了一条 AI 相关**：OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“OpenAI to acquire Ona”。"
-      ],
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "阿里云介绍 PolarDB Mem0 如何为智能体提供长期记忆",
+      "title": "阿里云介绍 PolarDB Mem0 的 Agent 长期记忆方案",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-06-11",
       "url": "https://www.alibabacloud.com/blog/say-goodbye-to-goldfish-memory-polardb-mem0-gives-ai-agents-long-term-memory_603241",
@@ -135,15 +118,15 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云介绍 PolarDB Mem0 为智能体提供长期记忆的做法，主题集中在用数据库能力承载可持久化记忆，让智能体在多轮任务中保留和调用历史信息。",
+      "summary": "阿里云介绍 PolarDB Mem0 如何为 AI Agent 提供长期记忆能力，重点是让 Agent 在多轮任务中保留和调用历史上下文。",
       "bullets": [
-        "**长期记忆**：PolarDB Mem0 的价值点在于把 ==智能体记忆== 从临时上下文推进到可管理、可检索、可持久化的数据层。"
+        "**长期记忆**：PolarDB Mem0 的价值在于把 Agent 记忆从短上下文补丁推进到可持久化、可检索的数据库能力。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "阿里云讨论代码 harness 与自然语言 harness 的取舍",
+      "title": "阿里云讨论代码式 Harness 与自然语言 Harness",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-06-11",
       "url": "https://www.alibabacloud.com/blog/code-harness-or-natural-language-harnesses_603240",
@@ -152,15 +135,15 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云文章讨论代码 harness 与自然语言 harness 的差异，适合关注智能体评测、自动化测试和工作流约束的团队作为方法参考。",
+      "summary": "阿里云文章讨论代码式 Harness 和自然语言 Harness 的取舍，重点是如何组织 AI 应用的测试、约束和执行流程。",
       "bullets": [
-        "**评测方法**：代码 harness 强在可重复和可断言，自然语言 harness 强在表达任务意图；关键是把 ==评测边界== 写清楚。"
+        "**工程取舍**：代码式 Harness 更强调可执行约束，自然语言 Harness 更强调描述和适配，团队需要按任务复杂度选择。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "OpenAI 支持欧洲可信 AI 生态建设",
+      "title": "OpenAI 支持欧洲建设可信 AI 生态",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-06-11",
       "url": "https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem",
@@ -169,15 +152,15 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“Supporting Europe’s work in ensuring a trustworthy AI ecosystem”。",
+      "summary": "OpenAI 说明其支持欧洲推进可信 AI 生态的工作，重点在治理、合作和区域化落地条件。",
       "bullets": [
-        "**OpenAI News RSS 发布了一条 AI 相关**：OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“Supporting Europe’s work in ensuring a trustworthy AI ecosystem”。"
+        "**可信生态**：这条更新适合关注欧洲 AI 治理、合规和产业协作的团队跟踪后续执行细节。"
       ],
       "importance": "major",
       "image_urls": []
     },
     {
-      "title": "谷歌将沃尔玛广告网络接入 DV360",
+      "title": "Google 把沃尔玛广告网络接入展示广告平台",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-06-11",
       "url": "https://blog.google/products/marketingplatform/360/walmart-connect/",
@@ -186,9 +169,26 @@
       "entities": [
         "Google Keyword Blog"
       ],
-      "summary": "Google Keyword Blog 发布了一条 AI 相关更新，原文标题为“We’re bringing Walmart Connect to Display & Video 360.”。",
+      "summary": "Google 介绍沃尔玛广告网络接入其展示广告平台，重点是零售媒体数据和广告投放工具之间的连接。",
       "bullets": [
-        "**Google Keyword Blog 发布了一条 A**：Google Keyword Blog 发布了一条 AI 相关更新，原文标题为“We’re bringing Walmart Connect to Display & Video 360.”。"
+        "**广告平台**：这条更新说明零售媒体资源继续进入更大的广告技术栈，适合关注营销平台和数据协作的团队跟进。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI 宣布收购 Ona",
+      "editorial_category": "engineering_toolchain",
+      "event_date": "2026-06-11",
+      "url": "https://openai.com/index/openai-to-acquire-ona",
+      "source": "OpenAI Company News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI Company News RSS"
+      ],
+      "summary": "OpenAI 发布公司新闻，宣布将收购 Ona；这类交易值得关注其后续对产品能力、团队和企业服务方向的影响。",
+      "bullets": [
+        "**收购信号**：OpenAI 对 Ona 的收购说明其仍在通过团队和产品能力补强来扩展业务边界。"
       ],
       "importance": "major",
       "image_urls": []
@@ -346,10 +346,11 @@
       "importance": "general"
     }
   ],
+  "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [
     {
-      "title": "谷歌本地服务广告扩展到房源广告场景",
+      "title": "Google 推出面向房源的本地服务广告格式",
       "editorial_category": "viewpoint_analysis",
       "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/bring_homebuyers_and_local_agen.max-600x600.format-webp.webp",
       "image_alt": "Enhanced Local Services Ads for Home Listings bring homebuyers and local agents together.",
@@ -372,7 +373,7 @@
       "image_urls": []
     },
     {
-      "title": "AWS 推出 Agent-EvalKit 用于系统评测智能体",
+      "title": "AWS 发布 Agent-EvalKit 用于系统评估 AI Agent",
       "editorial_category": "viewpoint_analysis",
       "url": "https://aws.amazon.com/blogs/machine-learning/evaluate-ai-agents-systematically-with-agent-evalkit/",
       "publisher": "AWS Machine Learning Blog",
@@ -392,7 +393,7 @@
       "image_urls": []
     },
     {
-      "title": "GitHub 更新 AI 使用量报告",
+      "title": "GitHub 更新 AI 用量报告",
       "editorial_category": "viewpoint_analysis",
       "url": "https://github.blog/changelog/2026-06-11-ai-usage-report-updates",
       "publisher": "GitHub Changelog",
@@ -412,7 +413,7 @@
       "image_urls": []
     },
     {
-      "title": "NVIDIA 介绍 AI 工厂电池储能系统的生产级设计",
+      "title": "NVIDIA 讨论 AI 工厂的电池储能系统设计",
       "editorial_category": "viewpoint_analysis",
       "url": "https://developer.nvidia.com/blog/designing-production-ready-battery-energy-storage-systems-for-ai-factories/",
       "publisher": "NVIDIA Developer Blog",
@@ -432,7 +433,7 @@
       "image_urls": []
     },
     {
-      "title": "GitHub 解释如何降低 secret scanning 大规模误报",
+      "title": "GitHub 介绍如何降低密钥扫描误报",
       "editorial_category": "viewpoint_analysis",
       "url": "https://github.blog/security/making-secret-scanning-more-trustworthy-reducing-false-positives-at-scale/",
       "publisher": "GitHub Blog Feed",
@@ -535,7 +536,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-12T02:15:57.181Z",
+        "snapshot_as_of": "2026-06-12T03:12:42.788Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -693,7 +694,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-12T02:15:57.181Z",
+        "snapshot_as_of": "2026-06-12T03:12:42.788Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -917,9 +918,9 @@
       "author": "Thibault Sottiaux",
       "handle": "thsottiaux",
       "editorial_category": "x_discussion",
-      "content": "可以确认，过去 48 小时 Codex 的 token 消耗增长明显；在没有发布新东西时出现这种增长并不常见。",
+      "content": "Thibault Sottiaux 说，过去 48 小时 Codex 的 token 消耗增长出现明显峰值；在没有发布新东西时，这种增长并不寻常。",
       "original_text": "Can confirm we saw a strong spike in growth of token consumption for Codex over last 48 hours. Unusual when we don't launch something. https://t.co/UG7hB1URMC",
-      "translation": "可以确认，过去 48 小时 Codex 的 token 消耗增长明显；在没有发布新东西时出现这种增长并不常见。",
+      "translation": "Thibault Sottiaux 说，过去 48 小时 Codex 的 token 消耗增长出现明显峰值；在没有发布新东西时，这种增长并不寻常。",
       "avatar_url": "https://unavatar.io/x/thsottiaux",
       "url": "https://x.com/thsottiaux/status/2064911328087810308",
       "role": "builder",
@@ -933,9 +934,9 @@
       "author": "Thariq",
       "handle": "trq212",
       "editorial_category": "x_discussion",
-      "content": "很多人问我是怎么用 Fable 剪自己的发布视频，所以我录了说明：它写了大量代码和工具调用，调用转录服务、ffmpeg、调色、Figma MCP、Remotion UI 并完成渲染；我没有打开视频编辑器。",
+      "content": "Thariq 说，很多人问他如何用 Fable 剪它自己的发布视频，所以他做了一个说明视频。简短说，Fable 写了大量代码和工具调用，使用转写服务、ffmpeg、调色、Figma MCP、Remotion UI 并完成渲染；他没有碰视频编辑器。",
       "original_text": "Lots of people asked how I used Fable to edit its own launch video so I made a video about that! TLDR it wrote a lot of code &amp; tool calls to use transcription services, ffmpeg, do colorgrading, use the figma mcp, make remotion UI and render it. I didn't touch a video editor. https://t.co/hJRdJye5Fy",
-      "translation": "很多人问我是怎么用 Fable 剪自己的发布视频，所以我录了说明：它写了大量代码和工具调用，调用转录服务、ffmpeg、调色、Figma MCP、Remotion UI 并完成渲染；我没有打开视频编辑器。",
+      "translation": "Thariq 说，很多人问他如何用 Fable 剪它自己的发布视频，所以他做了一个说明视频。简短说，Fable 写了大量代码和工具调用，使用转写服务、ffmpeg、调色、Figma MCP、Remotion UI 并完成渲染；他没有碰视频编辑器。",
       "avatar_url": "https://unavatar.io/x/trq212",
       "url": "https://x.com/trq212/status/2064826394589442448",
       "role": "builder",
@@ -949,9 +950,9 @@
       "author": "Amjad Masad",
       "handle": "amasad",
       "editorial_category": "x_discussion",
-      "content": "这个企业智能体方案很有意思，祝贺 @markiewagner 发布。",
+      "content": "Amjad Masad 认为这是一个非常有意思的企业 Agent 方法，并祝贺 @markiewagner 完成发布。",
       "original_text": "Super interesting approach to enterprise agents. Congrats on the launch @markiewagner https://t.co/BfGani53y1",
-      "translation": "这个企业智能体方案很有意思，祝贺 @markiewagner 发布。",
+      "translation": "Amjad Masad 认为这是一个非常有意思的企业 Agent 方法，并祝贺 @markiewagner 完成发布。",
       "avatar_url": "https://unavatar.io/x/amasad",
       "url": "https://x.com/amasad/status/2064806473352540643",
       "role": "builder",
@@ -965,9 +966,9 @@
       "author": "Google Labs",
       "handle": "GoogleLabs",
       "editorial_category": "x_discussion",
-      "content": "Project Genie 的访问范围继续扩大：从今天起，全球 Google AI Ultra 5X 订阅者都可以使用 Project Genie。",
+      "content": "Google Labs 表示 Project Genie 的开放范围继续扩大。从今天开始，全球 Google AI Ultra 5X 订阅者这个最新档位都可以使用 Project Genie。",
       "original_text": "🌍 Project Genie access is expanding even more! Starting today, Google AI Ultra 5X subscribers (our latest tier!) globally can access Project Genie. Try it out here! https://t.co/4BFYHSiAMv https://t.co/VL4MCvc44B",
-      "translation": "Project Genie 的访问范围继续扩大：从今天起，全球 Google AI Ultra 5X 订阅者都可以使用 Project Genie。",
+      "translation": "Google Labs 表示 Project Genie 的开放范围继续扩大。从今天开始，全球 Google AI Ultra 5X 订阅者这个最新档位都可以使用 Project Genie。",
       "avatar_url": "https://unavatar.io/x/GoogleLabs",
       "url": "https://x.com/GoogleLabs/status/2064801929339752527",
       "role": "builder",
@@ -981,9 +982,9 @@
       "author": "Josh Woodward",
       "handle": "joshwoodward",
       "editorial_category": "x_discussion",
-      "content": "提醒：Gemini 当前出现服务中断。团队正在处理，部分修复已经上线，其余修复很快跟进，请留意后续更新。",
+      "content": "Josh Woodward 提醒，Gemini 当时发生服务中断，团队正在处理并会尽快恢复；部分修复已经上线，其余修复也会很快跟进。",
       "original_text": "Heads up: Gemini is currently experiencing an outage. We're on it and will get everything back up ASAP. Some of the fixes are in, the rest coming very soon. Stay tuned for updates, and thanks for bearing with us!",
-      "translation": "提醒：Gemini 当前出现服务中断。团队正在处理，部分修复已经上线，其余修复很快跟进，请留意后续更新。",
+      "translation": "Josh Woodward 提醒，Gemini 当时发生服务中断，团队正在处理并会尽快恢复；部分修复已经上线，其余修复也会很快跟进。",
       "avatar_url": "https://unavatar.io/x/joshwoodward",
       "url": "https://x.com/joshwoodward/status/2064762269674918013",
       "role": "builder",
@@ -997,9 +998,9 @@
       "author": "Boris Cherny",
       "handle": "bcherny",
       "editorial_category": "x_discussion",
-      "content": "这是一条来自 Code with Claude Tokyo 活动现场的问候，发帖人附上现场链接，用来记录当天活动中的即时动态。",
+      "content": "Boris Cherny 在东京 Code with Claude 活动现场发帖问候大家，并附上现场照片链接。",
       "original_text": "Hello from Code with Claude Tokyo!! https://t.co/OGzffa1w58",
-      "translation": "这是一条来自 Code with Claude Tokyo 活动现场的问候，发帖人附上现场链接，用来记录当天活动中的即时动态。",
+      "translation": "Boris Cherny 在东京 Code with Claude 活动现场发帖问候大家，并附上现场照片链接。",
       "avatar_url": "https://unavatar.io/x/bcherny",
       "url": "https://x.com/bcherny/status/2064885111477219664",
       "role": "builder",
@@ -1013,9 +1014,9 @@
       "author": "Peter Yang",
       "handle": "petergyang",
       "editorial_category": "x_discussion",
-      "content": "我越用 Codex，提出的需求就越大胆；或者也许这还不够大胆。",
+      "content": "Peter Yang 说，他越用 Codex，提出的需求就越大胆；他还反问，也许这些需求还不够大胆。",
       "original_text": "The more I use Codex the more ambitious my requests get. Or maybe this is not ambitious enough? https://t.co/C0qgjmKGRt",
-      "translation": "我越用 Codex，提出的需求就越大胆；或者也许这还不够大胆。",
+      "translation": "Peter Yang 说，他越用 Codex，提出的需求就越大胆；他还反问，也许这些需求还不够大胆。",
       "avatar_url": "https://unavatar.io/x/petergyang",
       "url": "https://x.com/petergyang/status/2064748427892945313",
       "role": "builder",
@@ -1029,9 +1030,9 @@
       "author": "Madhu Guru",
       "handle": "realmadhuguru",
       "editorial_category": "x_discussion",
-      "content": "从 Gemini 早期开始，企业在质量与成本取舍上常会一开始选最小、最便宜的模型。给客户的经验法则是：如果用 LLM 替换已有传统机器学习模型，可以先从小模型开始，因为你已经知道好结果是什么；如果是在构建新应用，先用最强模型探索上限，做出高质量应用后，再逐步迁移到更小模型。",
+      "content": "Madhu Guru 回忆，从 Gemini 早期开始，企业经常弄错质量和成本的取舍：替换传统机器学习模型时可以从小模型开始，因为已经知道什么叫好；做全新应用时应先用能力最强的模型，先弄清真正可能做到什么，再把高质量应用迁移到更小模型。",
       "original_text": "Right from the early days of Gemini, enterprises would get the quality/cost tradeoff wrong. They’d often start with the smallest, cheapest model. The rule of thumb we gave customers: Replacing a traditional ML model with an LLM - start small, cos you already know what good looks like. Building something new - start with the most capable model. Think magically. Figure out what’s actually possible first. Once they had a high-quality working application, we’d help them move to a smaller model whil...",
-      "translation": "从 Gemini 早期开始，企业在质量与成本取舍上常会一开始选最小、最便宜的模型。给客户的经验法则是：如果用 LLM 替换已有传统机器学习模型，可以先从小模型开始，因为你已经知道好结果是什么；如果是在构建新应用，先用最强模型探索上限，做出高质量应用后，再逐步迁移到更小模型。",
+      "translation": "Madhu Guru 回忆，从 Gemini 早期开始，企业经常弄错质量和成本的取舍：替换传统机器学习模型时可以从小模型开始，因为已经知道什么叫好；做全新应用时应先用能力最强的模型，先弄清真正可能做到什么，再把高质量应用迁移到更小模型。",
       "avatar_url": "https://unavatar.io/x/realmadhuguru",
       "url": "https://x.com/realmadhuguru/status/2064794601320481150",
       "role": "builder",
@@ -1077,9 +1078,9 @@
       "image_urls": []
     },
     {
-      "title": "OpenAI to acquire Ona",
-      "content": "OpenAI Company News RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://openai.com/index/openai-to-acquire-ona",
+      "title": "BBVA puts AI at the core of banking with OpenAI",
+      "content": "OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/bbva",
       "event_date": "2026-06-11",
       "source": "OpenAI Company News RSS",
       "editorial_category": "community_signal",
@@ -1097,9 +1098,9 @@
       "image_urls": []
     },
     {
-      "title": "Supporting Europe’s work in ensuring a trustworthy AI ecosystem",
+      "title": "How an astrophysicist uses Codex to help simulate black holes",
       "content": "OpenAI Company News RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem",
+      "url": "https://openai.com/index/using-codex-to-simulate-black-holes",
       "event_date": "2026-06-11",
       "source": "OpenAI Company News RSS",
       "editorial_category": "community_signal",
@@ -1107,9 +1108,9 @@
       "image_urls": []
     },
     {
-      "title": "How an astrophysicist uses Codex to help simulate black holes",
+      "title": "Supporting Europe’s work in ensuring a trustworthy AI ecosystem",
       "content": "OpenAI Company News RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://openai.com/index/using-codex-to-simulate-black-holes",
+      "url": "https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem",
       "event_date": "2026-06-11",
       "source": "OpenAI Company News RSS",
       "editorial_category": "community_signal",
@@ -1125,6 +1126,46 @@
       "url": "https://blogs.nvidia.com/blog/rtx-ai-garage-local-gemma-diffusion/",
       "event_date": "2026-06-10",
       "source": "NVIDIA Newsroom RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "图像技术",
+      "content": "图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，...",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=68",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "文字识别",
+      "content": "文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用。",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=2",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "人脸与人体识别",
+      "content": "人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【。",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=27",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "内容审核",
+      "content": "内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【重磅上线】「通用卡证票...",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=85",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
       "editorial_category": "community_signal",
       "importance": "general",
       "image_urls": []
@@ -1170,16 +1211,6 @@
       "image_urls": []
     },
     {
-      "title": "SpaceX officially prices shares at $135 in the largest IPO ever",
-      "content": "TechCrunch AI 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://techcrunch.com/2026/06/11/spacex-officially-prices-shares-at-135-in-the-largest-ipo-ever/",
-      "event_date": "2026-06-11",
-      "source": "TechCrunch AI",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "title": "Theker just raised $85M to build the factory robot that doesn’t specialize in a...",
       "content": "TechCrunch AI 记录了一条开源项目公开条目，详情需回到原文链接核对。",
       "url": "https://techcrunch.com/2026/06/11/theker-just-raised-85m-to-build-the-factory-robot-that-doesnt-specialize-in-anything/",
@@ -1200,26 +1231,6 @@
       "image_urls": []
     },
     {
-      "title": "Amazon’s data centers used 2.5 billion gallons of water last year",
-      "content": "The Verge AI 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://www.theverge.com/tech/948534/amazon-data-centers-water-use",
-      "event_date": "2026-06-11",
-      "source": "The Verge AI",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "Deezer launches an AI music detector for other streaming services",
-      "content": "The Verge AI 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/948153/deezer-ai-music-detector-spotify-apple",
-      "event_date": "2026-06-10",
-      "source": "The Verge AI",
-      "editorial_category": "content_aigc",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "title": "A generalist biomedical vision-language model via multi-CLIP knowledge distilla...",
       "content": "Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对。",
       "url": "https://www.nature.com/articles/s41467-026-74120-x",
@@ -1228,35 +1239,13 @@
       "editorial_category": "community_signal",
       "importance": "general",
       "image_urls": []
-    },
-    {
-      "title": "Anthropic apologizes for invisible Claude Fable guardrails",
-      "content": "The Verge AI 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/948280/anthropic-claude-fable-invisible-distillation-guardrail",
-      "event_date": "2026-06-11",
-      "source": "The Verge AI",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
     }
   ],
   "wechat_items": [],
   "zhihu_items": [],
   "reddit_items": [],
-  "evidence_assets": [
-    {
-      "type": "figure",
-      "title": "Infrastructure Explained: Compute Power",
-      "source_url": "https://about.fb.com/news/2026/06/what-is-compute-power-meta-ai-infrastructure/",
-      "local_path": "assets/evidence/infrastructure-explained-compute-power-2026-06-12.webp",
-      "caption": "图片来自 Meta Newsroom，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
-      "extraction_status": "source_image",
-      "byte_size": 1535852,
-      "asset_role": "content",
-      "capture_kind": "source_asset"
-    }
-  ],
-  "generated_at": "2026-06-12T02:21:13.310Z",
+  "evidence_assets": [],
+  "generated_at": "2026-06-12T03:17:51.794Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-12.html",
   "html_path": "reports/2026/06/2026-06-12.html",
@@ -1264,6 +1253,7 @@
     "status": "degraded",
     "public_note": "Content source coverage is degraded; some sections may be incomplete.",
     "affected_sections": [
+      "huggingface_trending",
       "hot_blogs",
       "daily_tracking",
       "wechat_items",
