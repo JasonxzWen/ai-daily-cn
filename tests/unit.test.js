@@ -2400,6 +2400,75 @@ test("content source discovery parses hot blog and interview feeds", async () =>
   assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
 });
 
+test("content source discovery keeps late fixed sources effective under global candidate limit", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-12",
+    generatedAt: fixedGeneratedAt,
+    limit: 3,
+    perSourceLimit: 3,
+    sources: [
+      {
+        id: "content-early-official",
+        name: "Early Official Feed",
+        url: "https://example.com/early.xml",
+        source_kind: "rss",
+        candidate_category: "hot_blog",
+        max_items_per_run: 3
+      },
+      {
+        id: "content-middle-official",
+        name: "Middle Official Feed",
+        url: "https://example.com/middle.xml",
+        source_kind: "rss",
+        candidate_category: "hot_blog",
+        max_items_per_run: 1
+      },
+      {
+        id: "content-late-fixed-source",
+        name: "Late Fixed Source",
+        url: "https://example.com/late.xml",
+        source_kind: "rss",
+        candidate_category: "community_lead",
+        max_items_per_run: 1
+      }
+    ],
+    fetchImpl: async (url) => textResponse(`
+      <rss><channel>
+        <item>
+          <title>${url.includes("early") ? "Early" : url.includes("middle") ? "Middle" : "Late"} AI signal A</title>
+          <link>${String(url).replace(".xml", "/a")}</link>
+          <pubDate>Fri, 12 Jun 2026 01:00:00 GMT</pubDate>
+          <description>${url} entry A</description>
+        </item>
+        <item>
+          <title>${url.includes("early") ? "Early" : url.includes("middle") ? "Middle" : "Late"} AI signal B</title>
+          <link>${String(url).replace(".xml", "/b")}</link>
+          <pubDate>Fri, 12 Jun 2026 02:00:00 GMT</pubDate>
+          <description>${url} entry B</description>
+        </item>
+        <item>
+          <title>${url.includes("early") ? "Early" : url.includes("middle") ? "Middle" : "Late"} AI signal C</title>
+          <link>${String(url).replace(".xml", "/c")}</link>
+          <pubDate>Fri, 12 Jun 2026 03:00:00 GMT</pubDate>
+          <description>${url} entry C</description>
+        </item>
+      </channel></rss>
+    `)
+  });
+
+  assert.equal(collected.candidates.length, 3);
+  assert.deepEqual(
+    collected.candidates.map((candidate) => candidate.source_id),
+    ["content-early-official", "content-middle-official", "content-late-fixed-source"]
+  );
+  assert.equal(collected.source_audit.content_sources.candidates_found, 5);
+  assert(
+    collected.source_audit.content_sources.sources.some(
+      (source) => source.name === "Late Fixed Source" && source.status === "checked" && source.parsed_count === 3
+    )
+  );
+});
+
 test("GitHub report markdown parser extracts report links as discovery leads", () => {
   const entries = parseGitHubReportMarkdownEntries(`
 ## Top AI Papers of the Week (May 24 - May 31) - 2026
@@ -4706,6 +4775,36 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
   assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
+});
+
+test("daily runner gives content source discovery enough candidate budget for the fixed source surface", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-content-budget-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-12",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  const contentDiscovery = calls.find((stage) => stage.id === "discover_content_sources");
+  const limitIndex = contentDiscovery.command.args.indexOf("--limit");
+  const perSourceIndex = contentDiscovery.command.args.indexOf("--per-source-limit");
+  const limit = Number(contentDiscovery.command.args[limitIndex + 1]);
+  const perSourceLimit = Number(contentDiscovery.command.args[perSourceIndex + 1]);
+
+  assert.equal(perSourceLimit, 3);
+  assert(limit >= 150, `content source limit ${limit} is below fixed source surface budget`);
 });
 
 test("reddit platform source is enabled with deterministic safety gates", async () => {

@@ -1395,7 +1395,7 @@ export async function collectContentSources(options = {}) {
     sourceResults.push(auditSource(WECHAT_ARTICLE_INPUT_SOURCE.name, WECHAT_ARTICLE_INPUT_SOURCE.url, status, notes));
     candidateSources.push(toCandidateSource(WECHAT_ARTICLE_INPUT_SOURCE, "community", generatedAt, status, notes));
 
-    for (const article of wechatInput.articles.slice(0, Math.max(limit - candidates.length, 0))) {
+    for (const article of wechatInput.articles) {
       candidates.push(wechatArticleCandidate(article, candidates));
     }
   }
@@ -1467,7 +1467,7 @@ export async function collectContentSources(options = {}) {
         const rejected = {};
         const entries = filterPlatformEntries(datedEntries, currentSource, candidateCategory, rejected);
         const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
-        for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+        for (const entry of entries.slice(0, sourceLimit)) {
           candidates.push(platformCandidateOrContentCandidate({
             id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
             source_id: currentSource.id,
@@ -1553,7 +1553,7 @@ export async function collectContentSources(options = {}) {
       let skippedOriginalUrlChecks = 0;
 
       const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
-      for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+      for (const entry of entries.slice(0, sourceLimit)) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
         if (requiresOriginalUrl(currentSource) && !originalUrl) {
           skippedOriginalUrlChecks += 1;
@@ -1630,7 +1630,7 @@ export async function collectContentSources(options = {}) {
       const status = entries.length > 0 ? "checked" : "no_signal";
       const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
       let skippedOriginalUrlChecks = 0;
-      for (const entry of entries.slice(0, Math.min(sourceLimit, Math.max(limit - candidates.length, 0)))) {
+      for (const entry of entries.slice(0, sourceLimit)) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
         if (requiresOriginalUrl(currentSource) && !originalUrl) {
           skippedOriginalUrlChecks += 1;
@@ -1660,6 +1660,8 @@ export async function collectContentSources(options = {}) {
     ? auditGroupForPlatform(platformExempt)
     : String(options.auditGroupName || "content_sources").trim() || "content_sources";
 
+  const outputCandidates = limitCandidatesBySource(candidates, limit);
+
   return {
     source_audit: {
       [auditGroupName]: {
@@ -1679,9 +1681,47 @@ export async function collectContentSources(options = {}) {
       }
     },
     sources: candidateSources,
-    candidates: candidates.slice(0, limit),
+    candidates: outputCandidates,
     evidence_assets: evidenceAssets
   };
+}
+
+function limitCandidatesBySource(candidates, limit) {
+  if (!Number.isInteger(limit) || limit <= 0 || candidates.length <= limit) {
+    return candidates;
+  }
+
+  const sourceOrder = [];
+  const bySource = new Map();
+  for (const candidate of candidates) {
+    const key = candidate.source_id || candidate.source || candidate.url || "";
+    if (!bySource.has(key)) {
+      bySource.set(key, []);
+      sourceOrder.push(key);
+    }
+    bySource.get(key).push(candidate);
+  }
+
+  const selected = [];
+  for (let round = 0; selected.length < limit; round += 1) {
+    let added = false;
+    for (const key of sourceOrder) {
+      const candidate = bySource.get(key)?.[round];
+      if (!candidate) {
+        continue;
+      }
+      selected.push(candidate);
+      added = true;
+      if (selected.length >= limit) {
+        break;
+      }
+    }
+    if (!added) {
+      break;
+    }
+  }
+
+  return selected;
 }
 
 function shouldCheckWeChatArticleInput(options = {}) {
