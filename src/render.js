@@ -154,10 +154,16 @@ function affectedSectionIssues(status) {
     }));
 }
 
-export function renderIndexHtml(feed, trends = null) {
+export function renderIndexHtml(feed, trends = null, dateIndex = null) {
   const latest = feed.reports[0];
-  const trendOverview = renderTrendOverview(trends);
-  const dateNavigation = renderDateNavigation(feed.reports);
+  const dateItems = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
+  const latestItem = dateItems.find((item) => item.date === latest?.report_date) || dateItems.at(-1) || null;
+  const indexConsole = renderIndexConsole(feed, dateIndex, latestItem);
+  const latestBriefing = renderLatestBriefing(latestItem, latest);
+  const signalHeatStrip = renderSignalHeatStrip(dateIndex);
+  const sourceLaneBoard = renderSourceLaneBoard(dateIndex);
+  const topicRadar = renderTopicRadar(trends);
+  const dateResearchIndex = renderDateResearchIndex(dateIndex, latest);
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -171,29 +177,259 @@ export function renderIndexHtml(feed, trends = null) {
     <span class="site-title">AI 日报</span>
     <span class="site-date">更新于 ${escapeHtml(feed.updated_at)}</span>
   </header>
-  <main class="page">
-    <section class="report-hero">
-      <p class="eyebrow">GitHub Pages 静态归档</p>
-      <h1>${escapeHtml(feed.site_title)}</h1>
-      <p class="summary">${latest ? escapeHtml(latest.summary) : "暂无日报。运行 build 后会在这里展示归档。"}</p>
-      <div class="meta-grid" aria-label="站点统计">
-        <span><strong>${feed.reports.length}</strong> 篇日报</span>
-        <span><strong>${latest ? latest.report_date : "-"}</strong> 最新日期</span>
-      </div>
-    </section>
-
-    ${trendOverview}
-
-    ${dateNavigation}
-
-    <section class="section" id="reports">
-      <h2>历史日报</h2>
-      ${feed.reports.length > 0 ? `<ol class="report-list">${feed.reports.map(renderFeedItem).join("\n")}</ol>` : "<p>暂无可展示日报。</p>"}
-    </section>
+  <main class="report-shell index-page" data-index-style="effective-interact">
+    ${indexConsole}
+    ${renderIndexNav()}
+    <div class="index-dashboard-grid report-section-stack">
+      ${latestBriefing}
+      ${topicRadar}
+    </div>
+    ${signalHeatStrip}
+    ${sourceLaneBoard}
+    ${dateResearchIndex}
   </main>
 </body>
 </html>
 `;
+}
+
+function renderIndexNav() {
+  const links = [
+    ["index-console", "总览"],
+    ["latest-briefing", "最新主线"],
+    ["signal-heat-strip", "时间热力"],
+    ["source-lane-board", "来源结构"],
+    ["topic-radar", "主题线索"],
+    ["date-research-index", "日期索引"]
+  ];
+  return `<nav class="report-nav" aria-label="首页章节">
+      <p class="report-nav-title">日报导航</p>
+      <div class="report-nav-group">
+        <span class="report-nav-group-title">首页模块</span>
+        ${links.map(([id, label]) => `<a href="#${escapeAttribute(id)}" data-nav-link><span>${escapeHtml(label)}</span></a>`).join("\n")}
+      </div>
+    </nav>`;
+}
+
+function renderIndexConsole(feed, dateIndex, latestItem) {
+  const totals = dateIndex?.totals || {};
+  const dateRange = dateIndex?.date_from && dateIndex?.date_to
+    ? `${dateIndex.date_from} 至 ${dateIndex.date_to}`
+    : "暂无完整窗口";
+  const latestUrl = latestItem?.url || feed.reports?.[0]?.url || "";
+  const latestDataUrl = latestItem?.data_url || feed.reports?.[0]?.data_url || "";
+  const reportCount = totals.report_count ?? feed.reports?.length ?? 0;
+  const strongDays = totals.strong_days ?? 0;
+  const degradedDays = totals.degraded_days ?? 0;
+  const mainSignals = totals.main_items ?? 0;
+  return `<section class="report-hero report-hero-index" id="index-console" aria-labelledby="index-console-title" data-report-region="hero">
+      <div class="title-row">
+        <div>
+          <p class="eyebrow">30 天 AI 信号简报</p>
+          <h1 class="report-title" id="index-console-title">${escapeHtml(feed.site_title || "AI 日报")}</h1>
+        </div>
+        <span class="chip status-info">更新 ${escapeHtml(feed.updated_at || "-")}</span>
+      </div>
+      <div class="hero-brief">
+        <p class="hero-summary-text">近 30 天共 ${escapeHtml(reportCount)} 份日报，${escapeHtml(strongDays)} 个强信号日，${escapeHtml(degradedDays)} 个质量降级日；主体信号累计 ${escapeHtml(mainSignals)} 条，最新日期 ${escapeHtml(latestItem?.date || feed.reports?.[0]?.report_date || "-")}。</p>
+        <div class="hero-stat-grid" aria-label="30 天总览">
+          ${renderConsoleStat("时间窗口", dateRange, "date_range")}
+          ${renderConsoleStat("日报", reportCount, "report_count")}
+          ${renderConsoleStat("最新日期", latestItem?.date || feed.reports?.[0]?.report_date || "-", "latest_date")}
+          ${renderConsoleStat("强信号日", strongDays, "strong_days")}
+          ${renderConsoleStat("质量降级日", degradedDays, "degraded_days", "quality")}
+          ${renderConsoleStat("主体信号", mainSignals, "main_items")}
+        </div>
+      </div>
+      <div class="artifact-links index-console-actions card-tags" aria-label="最新日报入口">
+          ${latestUrl ? `<a href="${escapeAttribute(latestUrl)}">打开最新日报</a>` : ""}
+          ${latestDataUrl ? `<a href="${escapeAttribute(latestDataUrl)}">最新 JSON</a>` : ""}
+          <a href="feed.json">feed.json</a>
+          <a href="trends.json">trends.json</a>
+      </div>
+    </section>`;
+}
+
+function renderConsoleStat(label, value, id, variant = "") {
+  return `<span class="hero-stat${variant ? ` hero-stat-${escapeAttribute(variant)}` : ""}" data-console-stat="${escapeAttribute(id)}"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></span>`;
+}
+
+function renderLatestBriefing(latestItem, fallbackReport) {
+  if (!latestItem && !fallbackReport) {
+    return "";
+  }
+  const item = latestItem || {};
+  const report = fallbackReport || {};
+  const quality = item.quality || {};
+  const strength = item.strength || {};
+  const highlights = Array.isArray(item.highlights) ? item.highlights.filter((entry) => entry?.title && entry?.url).slice(0, 3) : [];
+  const highlightHtml = highlights.length > 0
+    ? `<ol class="compact-list latest-highlights">${highlights.map((entry) => `<li><a href="${escapeAttribute(entry.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(entry.title)}</a>${entry.reason ? `：${escapeHtml(firstSentence(entry.reason))}` : ""}</li>`).join("")}</ol>`
+    : `<p class="muted">暂无可展示的 highlights。</p>`;
+  return `<section class="panel latest-briefing" id="latest-briefing" aria-labelledby="latest-briefing-title" data-section-type="summary">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">最新主线</p>
+          <h2 id="latest-briefing-title">${escapeHtml(item.date || report.report_date || "最新日报")}</h2>
+        </div>
+        <span class="chip ${escapeAttribute(statusClassForQuality(quality.status || "ok"))} quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || qualityStatusLabel(quality.status || "ok"))}</span>
+      </div>
+      <p><strong>${escapeHtml(strength.label || "信号")}</strong>：${escapeHtml(firstSentence(item.summary || report.summary) || "暂无摘要")}</p>
+      ${highlightHtml}
+      <nav class="artifact-links" aria-label="最新日报链接">
+        ${item.url || report.url ? `<a href="${escapeAttribute(item.url || report.url)}">打开日报</a>` : ""}
+        ${item.data_url || report.data_url ? `<a href="${escapeAttribute(item.data_url || report.data_url)}">JSON</a>` : ""}
+      </nav>
+    </section>`;
+}
+
+function renderSignalHeatStrip(dateIndex) {
+  const items = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
+  if (items.length === 0) {
+    return "";
+  }
+  return `<section class="panel signal-heat-section" id="signal-heat-strip" aria-labelledby="signal-heat-title" data-section-type="timeline">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">严格时间顺序</p>
+          <h2 id="signal-heat-title">30 天信号热力带</h2>
+        </div>
+        <span class="chip status-info">${escapeHtml(dateIndex.date_from || "")} → ${escapeHtml(dateIndex.date_to || "")}</span>
+      </div>
+      <div class="signal-heat-row" role="list" aria-label="按日期排列的信号强度与质量">
+        ${items.map(renderSignalHeatDay).join("\n")}
+      </div>
+      <p class="muted">条形高度表示信号强度；质量 badge 和边框单独标记 degraded/blocked，不参与强度计算。</p>
+    </section>`;
+}
+
+function renderSignalHeatDay(item) {
+  const strength = item.strength || {};
+  const quality = item.quality || {};
+  const visual = item.visual || {};
+  const intensity = Number.isFinite(Number(visual.intensity || strength.intensity)) ? Number(visual.intensity || strength.intensity) : 1;
+  const height = `${Math.max(18, Math.min(72, intensity * 14))}px`;
+  return `<a class="signal-day signal-${escapeAttribute(strength.level || "quiet")} quality-${escapeAttribute(quality.status || "ok")}"
+      data-signal-day="${escapeAttribute(item.date)}"
+      data-strength-level="${escapeAttribute(strength.level || "quiet")}"
+      data-quality-channel="${escapeAttribute(quality.status || "ok")}"
+      href="${escapeAttribute(item.url || "#date-research-index")}"
+      aria-label="${escapeAttribute(`${item.date} ${strength.label || ""} ${quality.label || quality.status || ""}`)}">
+      <span class="signal-day-bar" style="--signal-day-height:${escapeAttribute(height)}"></span>
+      <span class="signal-day-date">${escapeHtml(item.date?.slice(5) || item.date || "")}</span>
+      <span class="signal-day-quality chip ${escapeAttribute(statusClassForQuality(quality.status || "ok"))}">${escapeHtml(qualityStatusLabel(quality.status || "ok"))}</span>
+    </a>`;
+}
+
+function renderSourceLaneBoard(dateIndex) {
+  const items = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
+  if (items.length === 0) {
+    return "";
+  }
+  const lanes = [
+    sourceLane(items, "main_items", "主体信号", (item) => item.metrics?.main_items_count, "主线事实与产品/产业信号"),
+    sourceLane(items, "github_trending", "GitHub", (item) => item.metrics?.github_trending_count, "项目趋势与开源实现线索"),
+    sourceLane(items, "builder_observations", "Builder", (item) => item.metrics?.builder_observations_count, "开发者与研究者原始动态"),
+    sourceLane(items, "hot_blogs", "博客", (item) => item.metrics?.hot_blogs_count, "深读文章与技术拆解"),
+    sourceLane(items, "daily_tracking", "追踪", (item) => item.metrics?.daily_tracking_count, "榜单、模型和平台变化"),
+    {
+      id: "coverage_quality",
+      label: "覆盖质量",
+      total: items.filter((item) => item.quality?.status === "ok").length,
+      activeDays: items.length,
+      detail: `${items.filter((item) => item.quality?.status === "degraded" || item.quality?.status === "blocked").length} 个日期降级/阻断`
+    }
+  ];
+  return `<section class="panel source-lane-board" id="source-lane-board" aria-labelledby="source-lane-title" data-section-type="metrics">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">来源结构</p>
+          <h2 id="source-lane-title">存量数据通道</h2>
+        </div>
+        <span class="chip status-info">透明统计</span>
+      </div>
+      <div class="table-scroll source-lane-table-scroll">
+        <table class="report-data-table source-lane-table">
+          <thead>
+            <tr>
+              <th scope="col">通道</th>
+              <th scope="col">总量</th>
+              <th scope="col">活跃天</th>
+              <th scope="col">30 天占比</th>
+              <th scope="col">说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lanes.map((lane) => renderSourceLaneRow(lane, items.length)).join("\n")}
+          </tbody>
+        </table>
+      </div>
+    </section>`;
+}
+
+function sourceLane(items, id, label, valueForItem, detail) {
+  const values = items.map((item) => Number(valueForItem(item) || 0));
+  return {
+    id,
+    label,
+    total: values.reduce((sum, value) => sum + value, 0),
+    activeDays: values.filter((value) => value > 0).length,
+    detail
+  };
+}
+
+function renderSourceLaneRow(lane, totalDays) {
+  const activeRatio = totalDays > 0 ? Math.round((Number(lane.activeDays || 0) / totalDays) * 100) : 0;
+  return `<tr data-source-lane="${escapeAttribute(lane.id)}">
+      <th scope="row" data-label="通道">
+        <span class="source-lane-label">${escapeHtml(lane.label)}</span>
+      </th>
+      <td data-label="总量"><strong>${escapeHtml(lane.total)}</strong></td>
+      <td data-label="活跃天">${escapeHtml(lane.activeDays)} 天</td>
+      <td data-label="30 天占比">
+        <span class="source-lane-meter" aria-label="${escapeAttribute(`${lane.label} 活跃占比 ${activeRatio}%`)}"><span style="--source-lane-ratio:${escapeAttribute(String(activeRatio))}%"></span></span>
+        <span class="muted">${escapeHtml(activeRatio)}%</span>
+      </td>
+      <td data-label="说明">${escapeHtml(lane.detail)}</td>
+    </tr>`;
+}
+
+function renderTopicRadar(trends) {
+  const topics = Array.isArray(trends?.topics)
+    ? trends.topics.filter((topic) => topic.status === "hot" || topic.status === "active").slice(0, 6)
+    : [];
+  const topicBody = topics.length > 0
+    ? `<div class="topic-radar-list">
+        ${topics.map(renderTopicRadarItem).join("\n")}
+      </div>`
+    : `<p class="muted" data-topic-empty="true">暂无达到 hot/active 阈值的趋势主题。</p>`;
+  return `<section class="panel topic-radar" id="topic-radar" aria-labelledby="topic-radar-title" data-section-type="details">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">趋势雷达</p>
+          <h2 id="topic-radar-title">热点研究线索</h2>
+        </div>
+        <a class="chip status-info" href="trends.json">trends.json</a>
+      </div>
+      ${topicBody}
+    </section>`;
+}
+
+function renderTopicRadarItem(topic) {
+  const entities = Array.isArray(topic.entities) && topic.entities.length > 0
+    ? `<span class="topic-entities">${topic.entities.slice(0, 4).map((entity) => escapeHtml(entity)).join(" / ")}</span>`
+    : "";
+  return `<article class="topic-radar-item" data-topic-id="${escapeAttribute(topic.id || topic.label || "")}">
+      <div>
+        <h3>${escapeHtml(topic.label || topic.id || "未命名主题")}</h3>
+        ${entities}
+      </div>
+      <div class="topic-radar-metrics">
+        <span><b>${escapeHtml(topic.occurrences || 0)}</b>次</span>
+        <span><b>${escapeHtml(topic.active_days || 0)}</b>天</span>
+        <span class="chip ${escapeAttribute(topic.status === "hot" ? "status-warn" : "status-info")} topic-status topic-status-${escapeAttribute(topic.status || "active")}">${escapeHtml(topic.status || "active")}</span>
+      </div>
+    </article>`;
 }
 
 function renderTrendOverview(trends) {
@@ -222,6 +458,272 @@ function renderTrendItem(topic) {
   <p>近 7 日出现 ${escapeHtml(topic.occurrences)} 次，覆盖 ${escapeHtml(topic.active_days)} 天。</p>
   ${entities}
 </li>`;
+}
+
+function renderDateResearchIndex(dateIndex, latest) {
+  const items = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
+  if (items.length === 0) {
+    return "";
+  }
+  const selectedDate = latest?.report_date || items.at(-1)?.date;
+  return `<section class="panel date-index-section" id="date-research-index" aria-labelledby="date-research-title" data-section-type="details">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">30 天研究索引</p>
+          <h2 id="date-research-title">按日期检索 AI 信号</h2>
+        </div>
+        <a class="chip status-info" href="feed.json">feed.json</a>
+      </div>
+      <div class="date-overview-grid" aria-label="30 天透明统计">
+        ${renderDateOverviewStat("日报", dateIndex.totals?.report_count ?? items.length)}
+        ${renderDateOverviewStat("强信号日", dateIndex.totals?.strong_days ?? 0)}
+        ${renderDateOverviewStat("degraded", dateIndex.totals?.degraded_days ?? 0, "quality")}
+        ${renderDateOverviewStat("主体", dateIndex.totals?.main_items ?? 0)}
+        ${renderDateOverviewStat("GitHub", dateIndex.totals?.github_trending ?? 0)}
+        ${renderDateOverviewStat("Builder", dateIndex.totals?.builder_observations ?? 0)}
+        ${renderDateOverviewStat("博客", dateIndex.totals?.hot_blogs ?? 0)}
+        ${renderDateOverviewStat("追踪", dateIndex.totals?.daily_tracking ?? 0)}
+      </div>
+      ${renderDateFilters(dateIndex)}
+      <div class="date-index-layout">
+        <div class="date-timeline" aria-label="严格时间顺序日期索引">
+          ${items.map((item) => renderDateCard(item, item.date === selectedDate)).join("\n")}
+        </div>
+        <aside class="selected-date-panel" id="selected-date-panel" aria-live="polite">
+          ${items.map((item) => renderDateDetail(item, item.date !== selectedDate)).join("\n")}
+        </aside>
+      </div>
+      <p class="date-index-empty" data-date-index-empty hidden>没有符合筛选条件的日期。</p>
+      ${renderDateIndexScript()}
+    </section>`;
+}
+
+function renderDateOverviewStat(label, value, variant = "") {
+  return `<span class="date-overview-stat${variant ? ` date-overview-stat-${escapeAttribute(variant)}` : ""}"><strong>${escapeHtml(value)}</strong>${escapeHtml(label)}</span>`;
+}
+
+function renderDateFilters(dateIndex) {
+  const months = Array.isArray(dateIndex?.filters?.months) ? dateIndex.filters.months : [];
+  const strengthLevels = Array.isArray(dateIndex?.filters?.strength_levels) ? dateIndex.filters.strength_levels : [];
+  const qualityStatuses = Array.isArray(dateIndex?.filters?.quality_statuses) ? dateIndex.filters.quality_statuses : [];
+  return `<form class="date-index-filters" data-date-index-filters>
+        <label for="date-filter-month">月份</label>
+        <select id="date-filter-month" data-date-filter="month">
+          <option value="">全部</option>
+          ${months.map((month) => `<option value="${escapeAttribute(month)}">${escapeHtml(month)}</option>`).join("")}
+        </select>
+        <label for="date-filter-strength">强度</label>
+        <select id="date-filter-strength" data-date-filter="strength">
+          <option value="">全部</option>
+          ${strengthLevels.map((level) => `<option value="${escapeAttribute(level)}">${escapeHtml(strengthLevelLabel(level))}</option>`).join("")}
+        </select>
+        <label for="date-filter-quality">质量</label>
+        <select id="date-filter-quality" data-date-filter="quality">
+          <option value="">全部</option>
+          ${qualityStatuses.map((status) => `<option value="${escapeAttribute(status)}">${escapeHtml(qualityStatusLabel(status))}</option>`).join("")}
+        </select>
+        <label class="date-toggle"><input id="date-filter-github" type="checkbox" data-date-filter="hasGithub"> GitHub</label>
+        <label class="date-toggle"><input id="date-filter-builder" type="checkbox" data-date-filter="hasBuilder"> Builder</label>
+        <label class="date-toggle"><input id="date-filter-tracking" type="checkbox" data-date-filter="hasTracking"> 追踪</label>
+        <label class="date-toggle"><input id="date-filter-degraded" type="checkbox" data-date-filter="hasDegraded"> degraded</label>
+      </form>`;
+}
+
+function renderDateCard(item, selected = false) {
+  const metrics = item.metrics || {};
+  const quality = item.quality || {};
+  const strength = item.strength || {};
+  const visual = item.visual || {};
+  const flags = item.flags || {};
+  const signalIntensity = Number.isFinite(Number(visual.intensity || strength.intensity))
+    ? Number(visual.intensity || strength.intensity)
+    : 1;
+  const signalWidth = `${Math.max(20, Math.min(100, signalIntensity * 20))}%`;
+  const topTopicChip = item.top_topic?.label
+    ? `\n          <span class="topic-chip">${escapeHtml(item.top_topic.label)}</span>`
+    : "";
+  return `<article class="date-card${selected ? " is-selected" : ""}"
+      data-date-card="${escapeAttribute(item.date)}"
+      data-month="${escapeAttribute(item.month || "")}"
+      data-strength-level="${escapeAttribute(strength.level || "quiet")}"
+      data-quality-status="${escapeAttribute(quality.status || "ok")}"
+      data-quality-channel="${escapeAttribute(visual.quality_channel || quality.status || "ok")}"
+      data-has-github="${flags.has_github ? "true" : "false"}"
+      data-has-builder="${flags.has_builder ? "true" : "false"}"
+      data-has-tracking="${flags.has_tracking ? "true" : "false"}"
+      data-has-degraded="${flags.has_degraded ? "true" : "false"}">
+      <button type="button" class="date-card-button" data-select-date="${escapeAttribute(item.date)}" aria-pressed="${selected ? "true" : "false"}">
+        <span class="date-card-topline">
+          <span><strong>${escapeHtml(item.date)}</strong>${item.weekday ? ` <small>${escapeHtml(item.weekday)}</small>` : ""}</span>
+          <span class="quality-badge quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || quality.status || "ok")}</span>
+        </span>
+        <span class="signal-bar signal-${escapeAttribute(strength.level || "quiet")}" style="--signal-width:${escapeAttribute(signalWidth)}"></span>
+        <span class="date-card-summary">${escapeHtml(firstSentence(item.summary) || item.title || item.date)}</span>
+        <span class="metric-row">
+          ${renderMetricPill("主体", metrics.main_items_count)}
+          ${renderMetricPill("重大", metrics.major_count)}
+          ${renderMetricPill("GitHub", metrics.github_trending_count)}
+          ${renderMetricPill("Builder", metrics.builder_observations_count)}
+          ${renderMetricPill("博客", metrics.hot_blogs_count)}
+          ${renderMetricPill("追踪", metrics.daily_tracking_count)}
+          ${renderMetricPill("覆盖", metrics.section_coverage_count)}
+        </span>
+        <span class="date-card-footer">
+          <span class="strength-label">${escapeHtml(strength.label || strength.level || "quiet")}</span>${topTopicChip}
+        </span>
+      </button>
+    </article>`;
+}
+
+function renderDateDetail(item, hidden = false) {
+  const metrics = item.metrics || {};
+  const strength = item.strength || {};
+  const quality = item.quality || {};
+  return `<article class="date-detail" data-date-detail="${escapeAttribute(item.date)}"${hidden ? " hidden" : ""}>
+      <header class="date-detail-header">
+        <div>
+          <p class="eyebrow">${escapeHtml(item.weekday || "")}</p>
+          <h3>${escapeHtml(item.date)}</h3>
+        </div>
+        <span class="quality-badge quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || quality.status || "ok")}</span>
+      </header>
+      <p><strong>主线：</strong>${escapeHtml(firstSentence(item.summary) || item.title || "暂无摘要")}</p>
+      <div class="date-detail-metrics" aria-label="透明统计">
+        ${renderMetricPill("主体", metrics.main_items_count)}
+        ${renderMetricPill("重大", metrics.major_count)}
+        ${renderMetricPill("GitHub", metrics.github_trending_count)}
+        ${renderMetricPill("Builder", metrics.builder_observations_count)}
+        ${renderMetricPill("博客", metrics.hot_blogs_count)}
+        ${renderMetricPill("追踪", metrics.daily_tracking_count)}
+        ${renderMetricPill("覆盖", metrics.section_coverage_count)}
+      </div>
+      <div class="date-detail-block">
+        <h4>强度原因</h4>
+        ${renderStrengthReasons(strength)}
+      </div>
+      <div class="date-detail-block">
+        <h4>降级影响</h4>
+        ${renderQualityDetail(quality)}
+      </div>
+      ${renderDateHighlights(item.highlights)}
+      <nav class="artifact-links" aria-label="日期入口">
+        ${item.url ? `<a href="${escapeAttribute(item.url)}">打开日报</a>` : ""}
+        ${item.data_url ? `<a href="${escapeAttribute(item.data_url)}">JSON</a>` : ""}
+      </nav>
+    </article>`;
+}
+
+function renderMetricPill(label, value) {
+  return `<span class="metric-pill"><b>${escapeHtml(Number(value || 0))}</b>${escapeHtml(label)}</span>`;
+}
+
+function renderStrengthReasons(strength = {}) {
+  const reasons = Array.isArray(strength.reasons) ? strength.reasons : [];
+  if (reasons.length === 0) {
+    return `<p class="muted">透明统计未触发额外强信号。</p>`;
+  }
+  return `<ul class="compact-list">${reasons.slice(0, 6).map((reason) => `<li>${escapeHtml(reason.label || reason.id)}：${escapeHtml(reason.value ?? "")}</li>`).join("")}</ul>`;
+}
+
+function renderQualityDetail(quality = {}) {
+  if ((quality.status || "ok") === "ok") {
+    return `<p class="muted">覆盖质量正常；强度等级未受到质量状态影响。</p>`;
+  }
+  const sections = Array.isArray(quality.affected_sections) && quality.affected_sections.length > 0
+    ? `影响板块：${quality.affected_sections.map((section) => escapeHtml(section)).join("、")}。`
+    : "";
+  return `<p>${escapeHtml(quality.public_note || "该日期存在覆盖或数据质量降级，需要阅读详情页核对。")} ${sections}</p>`;
+}
+
+function renderDateHighlights(highlights) {
+  const items = Array.isArray(highlights) ? highlights.filter((item) => item?.title && item?.url).slice(0, 3) : [];
+  if (items.length === 0) {
+    return "";
+  }
+  return `<div class="date-detail-block">
+        <h4>Top highlights</h4>
+        <ol class="compact-list">${items.map((item) => `<li><a href="${escapeAttribute(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>${item.reason ? `：${escapeHtml(firstSentence(item.reason))}` : ""}</li>`).join("")}</ol>
+      </div>`;
+}
+
+function renderDateIndexScript() {
+  return `<script data-date-index-script>
+(() => {
+  const root = document.getElementById("date-research-index");
+  if (!root) return;
+  const cards = Array.from(root.querySelectorAll("[data-date-card]"));
+  const details = Array.from(root.querySelectorAll("[data-date-detail]"));
+  const empty = root.querySelector("[data-date-index-empty]");
+  const month = root.querySelector("[data-date-filter='month']");
+  const strength = root.querySelector("[data-date-filter='strength']");
+  const quality = root.querySelector("[data-date-filter='quality']");
+  const toggles = Array.from(root.querySelectorAll("input[data-date-filter]"));
+  const activeDate = () => details.find((detail) => !detail.hidden)?.dataset.dateDetail;
+  const selectDate = (date) => {
+    cards.forEach((card) => {
+      const selected = card.dataset.dateCard === date;
+      card.classList.toggle("is-selected", selected);
+      const button = card.querySelector("[data-select-date]");
+      if (button) button.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
+    details.forEach((detail) => {
+      detail.hidden = detail.dataset.dateDetail !== date;
+    });
+  };
+  const matchesFilters = (card) => {
+    if (month?.value && card.dataset.month !== month.value) return false;
+    if (strength?.value && card.dataset.strengthLevel !== strength.value) return false;
+    if (quality?.value && card.dataset.qualityStatus !== quality.value) return false;
+    for (const toggle of toggles) {
+      if (toggle.checked && card.dataset[toggle.dataset.dateFilter] !== "true") return false;
+    }
+    return true;
+  };
+  const applyFilters = () => {
+    const visible = cards.filter((card) => {
+      const ok = matchesFilters(card);
+      card.hidden = !ok;
+      return ok;
+    });
+    if (empty) empty.hidden = visible.length > 0;
+    const current = activeDate();
+    if (!current || !visible.some((card) => card.dataset.dateCard === current)) {
+      const fallback = visible.at(-1)?.dataset.dateCard;
+      if (fallback) selectDate(fallback);
+    }
+  };
+  root.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-select-date]");
+    if (!button || !root.contains(button)) return;
+    selectDate(button.dataset.selectDate);
+  });
+  [month, strength, quality, ...toggles].filter(Boolean).forEach((control) => {
+    control.addEventListener("change", applyFilters);
+  });
+  applyFilters();
+})();
+</script>`;
+}
+
+function strengthLevelLabel(level) {
+  return level === "strong" ? "强信号" : level === "medium" ? "中等信号" : "低噪/观察";
+}
+
+function qualityStatusLabel(status) {
+  return status === "blocked" ? "阻断" : status === "degraded" ? "降级" : "正常";
+}
+
+function statusClassForQuality(status) {
+  if (status === "blocked") return "status-danger";
+  if (status === "degraded") return "status-warn";
+  return "status-ok";
+}
+
+function firstSentence(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  const match = text.match(/^(.{1,120}?[。！？.!?])\s*/u);
+  return match ? match[1] : text.slice(0, 120);
 }
 
 function renderDateNavigation(reports) {
@@ -275,17 +777,32 @@ function isoWeek(dateString) {
 
 export const defaultStyleCss = `:root {
   color-scheme: light;
-  --bg: #f6f7f9;
+  --bg: #faf9f5;
   --panel: #ffffff;
-  --text: #17202a;
-  --muted: #5f6f7f;
-  --line: #d9e0e7;
-  --accent: #146c94;
-  --accent-2: #246b45;
+  --panel-soft: #f0eee6;
+  --text: #3d3d3a;
+  --ink: #3d3d3a;
+  --muted: #78766f;
+  --line: #d1cfc5;
+  --line-strong: #9c9a93;
+  --accent: #d97757;
+  --accent-2: #3d6e6e;
+  --ok: #788c5d;
+  --warn: #a67c52;
+  --danger: #b04a3f;
+  --info: #3d6e6e;
+  --accent-soft: #fbf1ec;
+  --shadow: 0 14px 40px rgba(61, 61, 58, 0.12);
+  --focus: 0 0 0 3px rgba(217, 119, 87, 0.24);
 }
 
 * {
   box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -293,7 +810,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 a {
@@ -308,7 +826,8 @@ a {
   gap: 16px;
   padding: 16px 24px;
   border-bottom: 1px solid var(--line);
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
 }
 
 .site-title {
@@ -328,15 +847,38 @@ a {
   padding: 32px 0 56px;
 }
 
+.report-shell {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 0 auto;
+  padding: 22px 0 44px;
+}
+
+.report-shell [id] {
+  scroll-margin-top: 86px;
+}
+
+.report-section-stack {
+  display: grid;
+  gap: 14px;
+}
+
 .report-hero {
-  padding: 28px 0 24px;
-  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--accent-2);
+  color: var(--accent);
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 h1,
@@ -365,6 +907,215 @@ h3 {
 .summary {
   max-width: 760px;
   color: var(--muted);
+}
+
+.panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.panel:target,
+.section-focus {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--line));
+  background: linear-gradient(180deg, #ffffff, var(--accent-soft));
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.14), var(--shadow);
+}
+
+.title-row,
+.toolbar,
+.split-row,
+.section-heading-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.report-title {
+  margin: 2px 0 0;
+  flex: 1 1 560px;
+  max-width: 920px;
+  font-size: 2.45rem;
+  line-height: 1.08;
+}
+
+.hero-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.hero-summary-text {
+  display: flex;
+  min-height: 104px;
+  align-items: center;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, var(--accent-soft));
+  color: #8a3b1e;
+  font-size: 1.04rem;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  align-self: stretch;
+}
+
+.hero-stat {
+  display: grid;
+  gap: 4px;
+  align-content: space-between;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.hero-stat small,
+.hero-stat span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+.hero-stat strong {
+  color: var(--ink);
+  font-size: 1.16rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.hero-stat-quality {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  background: #fbf1ec;
+}
+
+.chip,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.status-ok {
+  border-color: color-mix(in srgb, var(--ok) 42%, var(--line));
+  background: #e4e9dc;
+  color: #4d6238;
+}
+
+.status-warn {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  background: var(--accent-soft);
+  color: #8a3b1e;
+}
+
+.status-danger {
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  background: #f3d9cc;
+  color: #8d3028;
+}
+
+.status-info {
+  border-color: color-mix(in srgb, var(--info) 38%, var(--line));
+  background: #e8efeb;
+  color: var(--info);
+}
+
+.report-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.report-nav-title {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 760;
+}
+
+.report-nav-group {
+  display: flex;
+  flex: 1 1 320px;
+  flex-wrap: wrap;
+  gap: 0;
+  overflow: visible;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.report-nav-group-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.report-nav a {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.report-nav a + a {
+  border-left-color: var(--line);
+}
+
+.report-nav a:hover,
+.report-nav a[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .meta-grid {
@@ -398,6 +1149,312 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
+.index-page {
+  width: min(1280px, calc(100vw - 28px));
+}
+
+.index-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 22px;
+  align-items: stretch;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.index-console-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 230px;
+}
+
+.index-console h1 {
+  max-width: 720px;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.08;
+}
+
+.index-console-actions {
+  padding-top: 12px;
+}
+
+.index-console-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-content: stretch;
+}
+
+.index-console-stat {
+  display: flex;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.index-console-stat b {
+  color: var(--text);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.index-console-stat-quality {
+  border-style: dashed;
+  border-color: #c36b1f;
+  background: #fff8ed;
+}
+
+.index-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.index-panel {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.latest-briefing p {
+  margin-top: 0;
+}
+
+.latest-highlights {
+  margin-top: 12px;
+}
+
+.signal-heat-section,
+.source-lane-board,
+.date-index-section {
+  margin-top: 12px;
+}
+
+.signal-heat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+  gap: 6px;
+  align-items: end;
+}
+
+.signal-day {
+  display: grid;
+  grid-template-rows: 72px auto auto;
+  gap: 5px;
+  align-items: end;
+  min-width: 0;
+  padding: 7px 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+}
+
+.signal-day.quality-degraded {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--warn) 56%, var(--line));
+  background: var(--accent-soft);
+}
+
+.signal-day.quality-blocked {
+  border-style: double;
+  border-color: var(--danger);
+  background: #fff5f2;
+}
+
+.signal-day-bar {
+  display: block;
+  width: 100%;
+  height: var(--signal-day-height, 18px);
+  border-radius: 6px 6px 2px 2px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    #8fa39d;
+}
+
+.signal-day.signal-strong .signal-day-bar {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.signal-day.signal-medium .signal-day-bar {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    var(--warn);
+}
+
+.signal-day-date,
+.signal-day-quality {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.signal-day-quality {
+  justify-content: center;
+  min-height: 22px;
+  padding: 2px 5px;
+  font-size: 0.72rem;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.report-data-table {
+  width: 100%;
+  min-width: 720px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 0.9rem;
+  line-height: 1.38;
+}
+
+.report-data-table th,
+.report-data-table td {
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.report-data-table thead th {
+  background: var(--panel-soft);
+  color: #8a3b1e;
+  font-weight: 760;
+}
+
+.report-data-table th:last-child,
+.report-data-table td:last-child {
+  border-right: 0;
+}
+
+.report-data-table tbody tr:last-child th,
+.report-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.source-lane-table th:nth-child(1) {
+  width: 18%;
+}
+
+.source-lane-table th:nth-child(2),
+.source-lane-table th:nth-child(3),
+.source-lane-table th:nth-child(4) {
+  width: 13%;
+}
+
+.source-lane-label,
+.source-lane-card span {
+  color: var(--ink);
+  font-weight: 760;
+}
+
+.source-lane-table strong {
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.source-lane-meter {
+  display: inline-flex;
+  width: min(120px, 100%);
+  height: 12px;
+  overflow: hidden;
+  margin-right: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+  vertical-align: -0.1em;
+}
+
+.source-lane-meter span {
+  display: block;
+  width: var(--source-lane-ratio, 0%);
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.34) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.topic-radar-list {
+  display: grid;
+  gap: 10px;
+}
+
+.topic-radar-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.topic-radar-item h3 {
+  margin-bottom: 3px;
+}
+
+.topic-entities {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.topic-radar-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.topic-radar-metrics span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  min-height: 28px;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.topic-status-hot {
+  border-color: #c36b1f;
+  color: #7a3f00;
+}
+
 .item,
 .report-card {
   margin: 0 0 16px;
@@ -405,6 +1462,280 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.date-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.date-overview-stat {
+  min-height: 68px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+}
+
+.date-overview-stat strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.date-overview-stat-quality {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--warn) 52%, var(--line));
+  background: var(--accent-soft);
+}
+
+.date-index-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.date-index-filters label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.date-index-filters select {
+  min-height: 34px;
+  max-width: 100%;
+  padding: 4px 28px 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text);
+}
+
+.date-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.date-index-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.date-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
+  gap: 12px;
+}
+
+.date-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.date-card[data-quality-status="degraded"],
+.date-card[data-quality-status="blocked"] {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--warn) 52%, var(--line));
+}
+
+.date-card.is-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.date-card-button {
+  display: grid;
+  width: 100%;
+  min-height: 222px;
+  gap: 10px;
+  padding: 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.date-card-button:hover,
+.date-card-button:focus-visible {
+  background: var(--accent-soft);
+}
+
+.date-card-topline,
+.date-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.date-card-topline small {
+  color: var(--muted);
+}
+
+.signal-bar {
+  display: block;
+  width: var(--signal-width, 20%);
+  height: 8px;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    #8fa39d;
+}
+
+.signal-strong {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    var(--accent);
+}
+
+.signal-medium {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    var(--warn);
+}
+
+.signal-quiet {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px),
+    #8fa39d;
+}
+
+.quality-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.quality-degraded {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--warn) 52%, var(--line));
+  background: var(--accent-soft);
+  color: #8a3b1e;
+}
+
+.quality-blocked {
+  border-style: double;
+  border-color: var(--danger);
+  background: #f3d9cc;
+  color: #8d3028;
+}
+
+.date-card-summary {
+  min-height: 58px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.metric-row,
+.date-detail-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  min-height: 28px;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fbfaf5;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.metric-pill b {
+  color: var(--text);
+}
+
+.strength-label,
+.topic-chip {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.topic-chip {
+  max-width: 48%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-date-panel {
+  position: sticky;
+  top: 16px;
+}
+
+.date-detail {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.date-detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.date-detail h3,
+.date-detail h4 {
+  margin: 0 0 8px;
+}
+
+.date-detail-block {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.date-index-empty {
+  margin: 14px 0 0;
+  color: var(--muted);
 }
 
 .builder-card-list {
@@ -603,15 +1934,53 @@ h3 {
 .artifact-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 24px;
+  gap: 8px;
+  padding-top: 14px;
 }
 
 .artifact-links a {
-  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  color: var(--ink);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.artifact-links a:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+@media (max-width: 900px) {
+  .hero-brief {
+    grid-template-columns: 1fr;
+  }
+
+  .index-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-nav {
+    position: static;
+  }
+
+  .report-nav-title {
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {
@@ -626,8 +1995,185 @@ h3 {
     padding-top: 20px;
   }
 
+  .report-shell,
+  .index-page {
+    width: min(100vw - 18px, 1280px);
+    padding-top: 12px;
+  }
+
   h1 {
     font-size: 1.55rem;
+  }
+
+  .report-title {
+    flex-basis: auto;
+    font-size: 1.55rem;
+  }
+
+  .report-hero,
+  .panel {
+    padding: 12px;
+  }
+
+  .hero-summary-text {
+    min-height: auto;
+    padding: 12px;
+    font-size: 0.96rem;
+  }
+
+  .hero-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-nav {
+    align-items: stretch;
+    padding: 8px;
+  }
+
+  .report-nav-group {
+    display: grid;
+    flex-basis: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .report-nav a {
+    min-height: 36px;
+    padding: 7px 6px;
+    text-align: center;
+  }
+
+  .report-nav a + a {
+    border-left-color: transparent;
+  }
+
+  .index-console,
+  .index-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .index-console-copy {
+    min-height: 0;
+  }
+
+  .signal-heat-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .signal-day {
+    grid-template-rows: 58px auto auto;
+    padding: 6px 4px;
+  }
+
+  .topic-radar-item {
+    grid-template-columns: 1fr;
+  }
+
+  .topic-radar-metrics {
+    justify-content: flex-start;
+  }
+
+  .source-lane-table-scroll {
+    overflow-x: visible;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .source-lane-table {
+    display: block;
+    min-width: 0;
+    border-collapse: separate;
+    font-size: 0.86rem;
+  }
+
+  .source-lane-table thead {
+    display: none;
+  }
+
+  .source-lane-table tbody {
+    display: grid;
+    gap: 8px;
+  }
+
+  .source-lane-table tr {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .source-lane-table th,
+  .source-lane-table td {
+    display: grid;
+    grid-template-columns: minmax(76px, 0.36fr) minmax(0, 1fr);
+    gap: 8px;
+    border-right: 0;
+    padding: 8px 10px;
+  }
+
+  .source-lane-table th::before,
+  .source-lane-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 720;
+  }
+
+  .source-lane-table tbody tr:last-child th,
+  .source-lane-table tbody tr:last-child td {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .source-lane-table tbody tr th:last-child,
+  .source-lane-table tbody tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .source-lane-meter {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .section-heading-row,
+  .section-heading,
+  .split-row,
+  .date-card-topline,
+  .date-card-footer,
+  .date-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .date-index-filters {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .date-index-filters select,
+  .date-toggle {
+    width: 100%;
+  }
+
+  .date-index-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .date-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-date-panel {
+    position: static;
+  }
+
+  .date-card-button {
+    min-height: 0;
+  }
+
+  .topic-chip {
+    max-width: 100%;
   }
 
   .builder-card {

@@ -145,6 +145,8 @@ export function reportToInteractionInput(report, options = {}) {
   const dataHref = publicAssetUrl(report, paths.dataPath);
   const indexHref = publicAssetUrl(report, "index.html");
   const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
+  const dateIndexItem = options.dateIndexItem && typeof options.dateIndexItem === "object" ? options.dateIndexItem : null;
+  const reportNavigation = options.reportNavigation && typeof options.reportNavigation === "object" ? options.reportNavigation : null;
   const sections = [
     ...formatMainItemSections(mainItems, { report, evidenceByUrl, trendAnnotations, mediaOptions })
   ];
@@ -305,18 +307,22 @@ export function reportToInteractionInput(report, options = {}) {
     heroMode: "daily-report",
     heroTitle: report.report_date,
     heroEyebrow: dailyHeroEyebrow(report),
-    heroStats: dailyHeroStats(report, {
-      mainItems,
-      hotBlogs,
-      dailyTracking: publicDailyTracking,
-      githubTrending,
-      projects,
-      builderObservations,
-      communityLeads
-    }),
+    heroStats: [
+      ...dateIndexHeroStats(dateIndexItem),
+      ...dailyHeroStats(report, {
+        mainItems,
+        hotBlogs,
+        dailyTracking: publicDailyTracking,
+        githubTrending,
+        projects,
+        builderObservations,
+        communityLeads
+      })
+    ],
     heroLinks: [
       { label: "日报导航", href: indexHref, icon: AI_DAILY_ICON },
       { label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }
+      , ...dailyAdjacentHeroLinks(report, { reportNavigation })
     ],
     hideNavigation: false,
     status: "complete",
@@ -413,6 +419,49 @@ function dailyHeroStats(report, collections) {
     stats.splice(insertAt, 0, { label: "追踪", value: String(collections.dailyTracking.length), detail: "榜单变化" });
   }
   return stats;
+}
+
+function dateIndexHeroStats(item) {
+  if (!item) {
+    return [];
+  }
+  const strengthReasons = Array.isArray(item.strength?.reasons)
+    ? item.strength.reasons.map((reason) => reason?.label).filter(Boolean).slice(0, 2)
+    : [];
+  const affectedSections = Array.isArray(item.quality?.affected_sections)
+    ? item.quality.affected_sections.filter(Boolean).slice(0, 2)
+    : [];
+  return [
+    {
+      label: "日期强度",
+      value: String(item.strength?.label || item.strength?.level || "未分级"),
+      detail: strengthReasons.length > 0 ? strengthReasons.join(" / ") : "透明统计派生"
+    },
+    {
+      label: "质量",
+      value: String(item.quality?.label || item.quality?.status || "正常"),
+      detail: affectedSections.length > 0 ? affectedSections.join(" / ") : "覆盖状态"
+    }
+  ];
+}
+
+function dailyAdjacentHeroLinks(report, { reportNavigation }) {
+  const links = [];
+  if (reportNavigation?.previous?.url) {
+    links.push({
+      label: "上一日",
+      href: publicAssetUrl(report, reportNavigation.previous.url),
+      icon: AI_DAILY_ICON
+    });
+  }
+  if (reportNavigation?.next?.url) {
+    links.push({
+      label: "下一日",
+      href: publicAssetUrl(report, reportNavigation.next.url),
+      icon: AI_DAILY_ICON
+    });
+  }
+  return links;
 }
 
 function dailyHeroEyebrow(report) {

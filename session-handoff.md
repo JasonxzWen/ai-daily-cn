@@ -1,5 +1,15 @@
 # Session Handoff
 
+## Effective-Interact Index PR
+
+- Draft PR #81 is open: `https://github.com/JasonxzWen/ai-daily-cn/pull/81`.
+- Branch: `codex/effective-interact-index`.
+- The PR rewrites `docs/index.html` generation around effective-interact report primitives and includes regenerated public docs artifacts.
+- `npm run validate` passed before the PR branch update.
+- `npm run publish:dry-run` was captured and blocked with `wrong_branch`; direct Pages publish only runs from `main`.
+- No direct Pages publish, automation config change, or remote Pages setting change was performed.
+- `.playwright-cli/` remains unrelated and unstaged.
+
 ## Batch 3 Live Tracking Adapter Update
 
 - Implemented the remaining live adapter layer for the tracking component plan.
