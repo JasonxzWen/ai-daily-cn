@@ -5739,6 +5739,46 @@ test("AI repair contract cannot change source facts or links", async () => {
   assert.equal(result.rejected[0].code, "path_not_allowed");
 });
 
+test("AI repair contract can update hero highlight result and impact copy", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.hero_highlights = [
+    {
+      title: "Hero highlight",
+      url: report.main_items[0].url,
+      reason: "Reader-facing reason.",
+      what_happened: "OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“How Preply combines AI and human tutors to personalize learning”",
+      why_watch: "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
+      category: "model_platform",
+      source_item_ref: report.main_items[0].candidate_id || "main-item-1"
+    }
+  ];
+
+  const result = applyQualityRepairContract(report, {
+    schema_version: 1,
+    report_date: report.report_date,
+    edits: [
+      {
+        path: "hero_highlights[0].what_happened",
+        value: "DXC 将 Claude 接入受监管行业的系统集成项目。",
+        reason: "Repair hero result copy."
+      },
+      {
+        path: "hero_highlights[0].why_watch",
+        value: "这说明模型公司正在通过大型 IT 服务商进入企业交付渠道。",
+        reason: "Repair hero impact copy."
+      }
+    ]
+  });
+
+  assert.equal(result.report.hero_highlights[0].what_happened, "DXC 将 Claude 接入受监管行业的系统集成项目。");
+  assert.equal(result.report.hero_highlights[0].why_watch, "这说明模型公司正在通过大型 IT 服务商进入企业交付渠道。");
+  assert.deepEqual(result.applied.map((edit) => edit.path), [
+    "hero_highlights[0].what_happened",
+    "hero_highlights[0].why_watch"
+  ]);
+  assert.deepEqual(result.rejected, []);
+});
+
 test("sources audit merge writes discovery audit groups into the final report JSON", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-audit-merge-"));
   const historyDir = path.join(tmp, "reports-data", "2026", "05");
