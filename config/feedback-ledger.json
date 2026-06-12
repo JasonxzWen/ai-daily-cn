@@ -103,6 +103,26 @@
       }
     },
     {
+      "id": "feedback/p1-fixed-source-candidate-effectiveness",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep registered fixed sources effective",
+      "problem": "Requested RSS/API/aggregator sources could be present in registries and source_audit but fail to affect daily selection because early feeds consumed the global discovery candidate limit.",
+      "expected_behavior": "Content discovery visits the full enabled source surface, records every source in source_audit, fairly preserves candidates from later fixed sources under global limits, and daily runner gives content discovery enough candidate budget for the fixed source surface.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/discovery.js",
+        "src/daily-runner.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "content source discovery keeps late fixed sources effective under global candidate limit",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-search-provider-partials",
       "severity": "P1",
       "status": "implemented",

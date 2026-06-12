@@ -11,6 +11,8 @@ const DEFAULT_PUBLISH_MAX_REVIEW_REPAIR_LOOPS = 5;
 const DEFAULT_DRY_RUN_MAX_REVIEW_REPAIR_LOOPS = 1;
 const DEFAULT_REPORT_PATH = ".tmp/daily-report.json";
 const OPTIMIZED_REPORT_PATH = ".tmp/daily-report.optimized.json";
+const CONTENT_SOURCE_DISCOVERY_LIMIT = 240;
+const CONTENT_SOURCE_PER_SOURCE_LIMIT = 3;
 
 export async function runDailyWorkflow(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
@@ -434,9 +436,9 @@ function buildInitialWorkflowStages({ reportDate }) {
       "--date",
       reportDate,
       "--limit",
-      "60",
+      String(CONTENT_SOURCE_DISCOVERY_LIMIT),
       "--per-source-limit",
-      "3",
+      String(CONTENT_SOURCE_PER_SOURCE_LIMIT),
       "--output",
       tmp("content-sources")
     ]),
