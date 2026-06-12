@@ -74,7 +74,12 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
   );
 });
 
-test("Harness Hub source commit matches local source HEAD", async (t) => {
+test("Harness Hub source commit matches local source HEAD when strict source check is enabled", async (t) => {
+  if (process.env.HARNESS_HUB_STRICT_SOURCE_CHECK !== "1") {
+    t.skip("Set HARNESS_HUB_STRICT_SOURCE_CHECK=1 during Harness Hub maintenance to compare against the mutable local source checkout.");
+    return;
+  }
+
   const manifestPath = path.join(rootDir, ".codex", "harness-hub-aggregation.json");
   const manifest = JSON.parse(await fsp.readFile(manifestPath, "utf8"));
   const sourceRoot = manifest.source?.path;
