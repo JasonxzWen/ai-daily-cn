@@ -440,7 +440,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         weak_cards: weakCommunityLayoutCards
       }
     );
-    const weakBlogCards = Array.from(document.querySelectorAll(".blog-card"))
+    const weakBlogCards = Array.from(document.querySelectorAll(".interactive-card.blog-card:not(.chinese-media-card)"))
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
         const pointRows = Array.from(card.querySelectorAll(".card-detail-list div"));

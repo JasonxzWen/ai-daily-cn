@@ -91,8 +91,61 @@ export function officialOrgUpdateItem(candidate = {}) {
 function summarizeOfficialUpdate(candidate, organization) {
   const title = cleanText(candidate.title || candidate.name || "");
   const evidence = cleanText(candidate.summary || candidate.evidence || candidate.description || "");
-  const detail = evidence || "官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。";
+  const detail = readerFacingOfficialDetail(candidate, organization, title, evidence);
   return boundedText(`${organization} 的官方动态「${title}」显示，${detail} 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。`, 180, 90, 240);
+}
+
+function readerFacingOfficialDetail(candidate, organization, title, evidence) {
+  const cleanEvidence = sanitizeOfficialEvidence(evidence);
+  if (cleanEvidence) {
+    return cleanEvidence;
+  }
+  const lowerTitle = String(title || "").toLowerCase();
+  const sourceText = [
+    organization,
+    candidate.source,
+    candidate.publisher,
+    candidate.url,
+    candidate.primary_url
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (/preply|human tutors?|personalize learning|personalise learning/.test(lowerTitle)) {
+    return "这条更新介绍 Preply 如何把 AI 练习、课程总结和反馈能力与真人教师辅导结合，用于个性化语言学习。";
+  }
+  if (/combatting ai scams?|ai scams?|security|legislation/.test(lowerTitle)) {
+    return "这条更新围绕 AI 诈骗防护、安全能力和立法协作展开，说明平台如何把安全治理落到产品和政策动作中。";
+  }
+  if (/status|incident|errors?|outage/.test(lowerTitle) || /status/.test(sourceText)) {
+    return "这条状态更新记录了平台服务可用性变化，适合用于追踪受影响组件、恢复进度和稳定性风险。";
+  }
+  if (/github|release|changelog|open source|repository|model|dataset|weights?/.test(lowerTitle)) {
+    return "这条更新涉及官方开源、模型、数据集或开发者生态变化，适合和产品发布及工程采用节奏一起跟踪。";
+  }
+  return "官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。";
+}
+
+function sanitizeOfficialEvidence(value) {
+  const clean = cleanText(value);
+  if (!clean) {
+    return "";
+  }
+  if (containsInternalReviewLanguage(clean) || containsLongEnglishExcerpt(clean)) {
+    return "";
+  }
+  const chineseChars = (clean.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (clean.match(/[A-Za-z]/g) || []).length;
+  const ratioBase = chineseChars + latinChars;
+  if (ratioBase > 0 && chineseChars / ratioBase < 0.35) {
+    return "";
+  }
+  return clean;
+}
+
+function containsInternalReviewLanguage(value) {
+  return /Treat this as a community lead|unless it is backed by a primary source|trace it to a primary source|intermediary\/self-media lead|待确认|仅作(?:发现|社区)?线索|事实性结论/i.test(String(value || ""));
+}
+
+function containsLongEnglishExcerpt(value) {
+  return /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(String(value || ""));
 }
 
 function organizationFromText(text) {

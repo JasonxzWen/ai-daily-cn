@@ -52,7 +52,7 @@ import {
   summarizeGithubReadme
 } from "../src/github-readme.js";
 import { selectChineseMediaDynamics } from "../src/chinese-media.js";
-import { selectOfficialOrgUpdates } from "../src/official-updates.js";
+import { officialOrgUpdateItem, selectOfficialOrgUpdates } from "../src/official-updates.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import {
   normalizeOptimizationSuggestions,
@@ -10889,6 +10889,22 @@ test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Hear
     assert.equal(item.verification_status, "intermediary_only");
   }
   assert.equal(result.source_statuses.find((item) => item.source_key === "jiqizhixin").status, "checked");
+});
+
+test("official organization update summaries strip internal review and English excerpts", () => {
+  const item = officialOrgUpdateItem({
+    id: "official-openai-preply",
+    source: "OpenAI News RSS",
+    source_level: "official_company_news",
+    title: "How Preply combines AI and human tutors to personalize learning",
+    url: "https://openai.com/index/preply",
+    event_date: "2026-06-12",
+    summary: "Preply uses OpenAI to launch AI-generated lesson summaries, providing personalised feedback and language learning exercises. Treat this as a community lead unless it is backed by a primary source."
+  });
+
+  assert.match(item.summary, /Preply/);
+  assert.match(item.summary, /真人教师|个性化语言学习/);
+  assert.doesNotMatch(item.summary, /Treat this as a community lead|unless it is backed|AI-generated lesson summaries/);
 });
 
 test("unconfigured WeChat and Zhihu sources degrade without blocking publish", () => {

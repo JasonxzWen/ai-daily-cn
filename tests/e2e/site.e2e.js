@@ -137,6 +137,25 @@ structuredReport.hot_blogs.push({
   topic: "layout regression",
   summary: "这篇博客用于验证没有证据图时的卡片布局，重点是普通读者能否顺畅扫读。它应让标题、正文和要点占满可读宽度，而不是留下空媒体栏。读者看到的是清楚的中文正文层级、要点分组和链接状态，不会被英文测试文案干扰。"
 });
+structuredReport.chinese_media_dynamics = [
+  {
+    candidate_id: "intermediary-qbitai-e2e",
+    title: "量子位报道一条中文媒体动态",
+    url: "https://www.qbitai.com/2026/05/e2e.html",
+    publisher: "QbitAI",
+    author: "QbitAI",
+    event_date: "2026-05-15",
+    topic: "中文 AI 媒体动态",
+    summary: "QbitAI 今天更新一条中文媒体动态，正文保留为独立中文媒体板块的示例。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+    key_points: [
+      "QbitAI 今天更新一条中文媒体动态",
+      "This fixture intentionally stays weaker than the strict hot blog card contract."
+    ],
+    source_level: "intermediary",
+    verification_status: "intermediary_only"
+  }
+];
+structuredReport.self_check.chinese_media_dynamics = structuredReport.chinese_media_dynamics.length;
 structuredReport.builder_observations = [
   {
     author: "Example Builder",
@@ -416,7 +435,7 @@ try {
   assert.doesNotMatch(await page.locator("#report-top").textContent(), /项目高亮/);
   assert.equal(await allImagesLoaded(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
-  assert.equal(await page.locator(".blog-card").count(), 2);
+  assert.equal(await page.locator(".interactive-card.blog-card:not(.chinese-media-card)").count(), 2);
   assert.equal(await page.locator(".builder-card").count(), 2);
   assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
   assert.equal(await page.locator(".card-media-grid img[src^='http']").count(), 0);
@@ -641,7 +660,7 @@ async function imageLightboxOpensAndCloses(page, selector) {
 
 async function noMediaBlogCardsUseReadableSingleColumn(page) {
   return page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll(".blog-card"))
+    const cards = Array.from(document.querySelectorAll(".interactive-card.blog-card:not(.chinese-media-card)"))
       .filter((card) => !card.querySelector(".card-media-grid"));
 
     if (cards.length === 0) return false;
