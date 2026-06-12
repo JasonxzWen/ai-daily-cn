@@ -177,6 +177,7 @@ export function normalizeReportDraft(draft, options = {}) {
   requireCandidateCoverage(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
   requireExpandedMainItemFormat(validation.value);
+  requireHeroHighlightsContract(validation.value);
   requireChineseGithubTrendingDescriptions(validation.value);
   requirePublishableQuality(validation.value, {
     rootDir: options.rootDir,
@@ -372,6 +373,62 @@ function requireExpandedMainItemFormat(report) {
       { errors }
     );
   }
+}
+
+function requireHeroHighlightsContract(report) {
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  if (report.report_status === "empty_due_to_network_outage" || mainItems.length < 3) {
+    return;
+  }
+
+  const highlights = Array.isArray(report.hero_highlights) ? report.hero_highlights : [];
+  const errors = [];
+  if (highlights.length !== 3) {
+    errors.push(`hero_highlights must contain exactly 3 items; found ${highlights.length}`);
+  }
+
+  const allowedRefs = new Set();
+  for (const item of mainItems) {
+    if (item?.candidate_id) {
+      allowedRefs.add(String(item.candidate_id));
+    }
+    const url = normalizeUrlForEvidenceGate(item?.url);
+    if (url) {
+      allowedRefs.add(url);
+    }
+  }
+
+  highlights.forEach((item, index) => {
+    for (const field of ["title", "url", "reason", "what_happened", "why_watch", "category", "source_item_ref"]) {
+      if (!String(item?.[field] || "").trim()) {
+        errors.push(`hero_highlights[${index}].${field} is required`);
+      }
+    }
+    const ref = String(item?.source_item_ref || "").trim();
+    const normalizedRef = normalizeUrlForEvidenceGate(ref) || ref;
+    if (ref && !allowedRefs.has(ref) && !allowedRefs.has(normalizedRef)) {
+      errors.push(`hero_highlights[${index}].source_item_ref must point to a main_items candidate_id or URL`);
+    }
+    for (const field of ["reason", "what_happened", "why_watch"]) {
+      const text = String(item?.[field] || "");
+      if (isWeakHeroHighlightText(text)) {
+        errors.push(`hero_highlights[${index}].${field} contains generic template prose`);
+      }
+    }
+  });
+
+  if (errors.length > 0) {
+    throw new PublisherError(
+      "hero_highlights_contract_failed",
+      "hero_highlights must be three reader-facing must-read cards with result, impact, and a source item reference.",
+      { errors }
+    );
+  }
+}
+
+function isWeakHeroHighlightText(value) {
+  const text = String(value || "").trim();
+  return /发布了一条\s*AI\s*相关更新|原文标题为|published an ai related update|original title|OpenAI News RSS 发布|Anthropic News 发布/i.test(text);
 }
 
 function requireChineseGithubTrendingDescriptions(report) {

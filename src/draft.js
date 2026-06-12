@@ -721,11 +721,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
       fallback_window_used: false,
       notes: "report:draft 自动从固定发现候选池选取；一手/可信候选进入主体，中介线索仅作社区观察。"
     },
-    hero_highlights: selection.main_items.slice(0, 3).map((item) => ({
-      title: item.title,
-      url: item.url,
-      reason: trimText(item.summary, 120)
-    })),
+    hero_highlights: selectHeroHighlights(selection.main_items),
     source_audit: sourceAudit,
     main_items: selection.main_items,
     github_trending: selection.github_trending,
@@ -806,11 +802,194 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
   return report;
 }
 
+function selectHeroHighlights(mainItems = []) {
+  const eligible = mainItems.filter((item) => item?.title && item?.url);
+  if (eligible.length === 0) {
+    return [];
+  }
+
+  const picked = [];
+  const seenUrls = new Set();
+  const seenEntities = new Set();
+  const lanes = [
+    "model_platform",
+    "product_tool",
+    "china_open_source_community",
+    "business_policy",
+    "research_safety"
+  ];
+  for (const lane of lanes) {
+    const match = eligible.find((item) =>
+      heroHighlightCategory(item) === lane &&
+      canPickHeroHighlight(item, { seenUrls, seenEntities })
+    );
+    if (match) {
+      picked.push(match);
+      rememberHeroHighlight(match, { seenUrls, seenEntities });
+    }
+    if (picked.length >= 3) {
+      break;
+    }
+  }
+
+  for (const item of eligible) {
+    if (picked.length >= 3) {
+      break;
+    }
+    if (!canPickHeroHighlight(item, { seenUrls, seenEntities })) {
+      continue;
+    }
+    picked.push(item);
+    rememberHeroHighlight(item, { seenUrls, seenEntities });
+  }
+
+  for (const item of eligible) {
+    if (picked.length >= 3) {
+      break;
+    }
+    const key = normalizeUrl(item.url);
+    if (!key || seenUrls.has(key)) {
+      continue;
+    }
+    picked.push(item);
+    seenUrls.add(key);
+  }
+
+  return picked.slice(0, 3).map(heroHighlightForMainItem);
+}
+
+function canPickHeroHighlight(item, state) {
+  const key = normalizeUrl(item?.url);
+  if (!key || state.seenUrls.has(key)) {
+    return false;
+  }
+  const entity = heroEntityKey(item);
+  return !entity || !state.seenEntities.has(entity);
+}
+
+function rememberHeroHighlight(item, state) {
+  const key = normalizeUrl(item?.url);
+  if (key) {
+    state.seenUrls.add(key);
+  }
+  const entity = heroEntityKey(item);
+  if (entity) {
+    state.seenEntities.add(entity);
+  }
+}
+
+function heroHighlightForMainItem(item) {
+  const whatHappened = heroWhatHappened(item);
+  const whyWatch = heroWhyWatch(item);
+  return {
+    title: item.title,
+    url: item.url,
+    reason: whyWatch,
+    what_happened: whatHappened,
+    why_watch: whyWatch,
+    category: heroHighlightCategory(item),
+    source_item_ref: item.candidate_id || normalizeUrl(item.url) || item.url
+  };
+}
+
+function heroWhatHappened(item) {
+  return trimText(firstUsefulPublicFact(item) || item.title, 150);
+}
+
+function heroWhyWatch(item) {
+  const explicit = stripDraftPublicBodyNoise(item?.why_it_matters || item?.reader_relevance || "", item);
+  if (explicit) {
+    return trimText(stripSentenceEnding(explicit), 150);
+  }
+  const facts = mainItemPublicFactsForHero(item);
+  const impact = facts.find((fact) => /impact|影响|判断|优先级|adopt|choice|decision|workflow|cost|risk|上线|采购|试用/i.test(fact));
+  if (impact) {
+    return trimText(stripSentenceEnding(impact), 150);
+  }
+  return trimText(heroFallbackWhyWatch(item), 150);
+}
+
+function firstUsefulPublicFact(item) {
+  return mainItemPublicFactsForHero(item)[0] || "";
+}
+
+function mainItemPublicFactsForHero(item) {
+  return [
+    item?.summary,
+    ...(Array.isArray(item?.bullets) ? item.bullets : [])
+  ]
+    .map((value) => stripDraftPublicBodyNoise(value, item))
+    .map(stripMarkdownEmphasis)
+    .map(stripSentenceEnding)
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .filter((value) => !isTemplateHeroText(value));
+}
+
+function stripMarkdownEmphasis(value) {
+  return String(value || "")
+    .replace(/==(?:[^|=\n]+\|)?([^=\n]+)==/g, "$1")
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function heroFallbackWhyWatch(item) {
+  const category = heroHighlightCategory(item);
+  if (category === "model_platform") {
+    return "它会影响模型、平台入口或能力边界的判断";
+  }
+  if (category === "product_tool") {
+    return "它会影响工具试用、团队采购或工作流替换的优先级";
+  }
+  if (category === "china_open_source_community") {
+    return "它补足国内、开源或社区侧信号，避免首屏只看海外大厂";
+  }
+  if (category === "business_policy") {
+    return "它会影响业务投入、监管约束或市场节奏判断";
+  }
+  return "它会影响安全、研究或能力边界的后续跟踪";
+}
+
+function heroHighlightCategory(item) {
+  const category = String(item?.editorial_category || "").trim();
+  const sourceLevel = String(item?.source_level || "").trim();
+  const text = candidateText(item);
+  if (category === "open_source" || sourceLevel === "github" || isChinaAiCandidate(item)) {
+    return "china_open_source_community";
+  }
+  if (category === "product_radar" || category === "engineering_toolchain" || category === "content_aigc" || /tool|workflow|developer|coding|gateway|agent|product|app|api|sdk/i.test(text)) {
+    return "product_tool";
+  }
+  if (category === "company_business" || category === "policy_infra" || category === "funding" || /policy|regulation|governance|earnings|revenue|partnership|pricing/i.test(text)) {
+    return "business_policy";
+  }
+  if (category === "viewpoint_analysis" || /research|paper|safety|security|benchmark|eval|risk/i.test(text)) {
+    return "research_safety";
+  }
+  return "model_platform";
+}
+
+function heroEntityKey(item) {
+  const entities = Array.isArray(item?.entities) ? item.entities : [];
+  const entity = entities.find(Boolean) || item?.source || "";
+  return String(entity || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/gu, " ")
+    .trim();
+}
+
+function isTemplateHeroText(value) {
+  return /发布了一条\s*AI\s*相关更新|原文标题为|published an ai related update|original title/i.test(String(value || ""));
+}
+
 function normalizeAutodraftPublicText(report) {
   report.source_window.notes = "覆盖当日固定信源；正文只采用已回到一手、官方、论文、GitHub 或多源确认的事实，未确认线索留在观察区。";
   report.self_check.notes = "主体事实只保留可回溯来源；高风险和中介线索留在社区观察。";
   for (const item of report.hero_highlights || []) {
     item.reason = stripDraftPublicBodyNoise(item.reason, item);
+    item.what_happened = stripDraftPublicBodyNoise(item.what_happened, item);
+    item.why_watch = stripDraftPublicBodyNoise(item.why_watch, item);
   }
   for (const item of report.main_items || []) {
     item.summary = stripDraftPublicBodyNoise(item.summary, item);

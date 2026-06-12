@@ -589,6 +589,27 @@
         "reason": {
           "type": "string",
           "minLength": 1
+        },
+        "what_happened": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_watch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "model_platform",
+            "product_tool",
+            "china_open_source_community",
+            "business_policy",
+            "research_safety"
+          ]
+        },
+        "source_item_ref": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },

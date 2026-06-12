@@ -110,6 +110,167 @@ function mainMarkdownContent(input) {
     .join("\n\n");
 }
 
+function reportWithThreeMinuteMustRead(report) {
+  const categories = ["model_release", "product_radar", "open_source"];
+  const sources = ["OpenAI News RSS", "Vercel", "GitHub Trending daily"];
+  const base = report.main_items[0] || {};
+  const mainItems = categories.map((category, index) => ({
+    ...base,
+    candidate_id: `must-read-main-${index + 1}`,
+    title: `Must read signal ${index + 1}`,
+    event_date: report.report_date || "2026-05-15",
+    url: `https://example.com/must-read/${index + 1}`,
+    source: sources[index],
+    editorial_category: category,
+    source_level: index === 2 ? "github" : "official",
+    verification_status: "primary_confirmed",
+    importance: "major",
+    summary: `**Signal ${index + 1}** ships a concrete AI change that a three-minute reader can understand before opening technical details.`,
+    bullets: [
+      `==Result== Signal ${index + 1} changes the visible product or project surface today.`,
+      `==Impact== Readers can decide whether this affects model choice, tool adoption, or open-source tracking.`
+    ]
+  }));
+  report.main_items = mainItems;
+  report.self_check = {
+    ...report.self_check,
+    report_date: report.report_date || "2026-05-15",
+    main_items: mainItems.length
+  };
+  report.hero_highlights = mainItems.map((item, index) => ({
+    title: item.title,
+    url: item.url,
+    reason: `Readers should watch signal ${index + 1} because it changes a practical decision surface.`,
+    what_happened: `Signal ${index + 1} shipped a concrete AI update.`,
+    why_watch: `It changes a practical decision surface for a three-minute reader.`,
+    category: ["model_platform", "product_tool", "china_open_source_community"][index],
+    source_item_ref: item.candidate_id
+  }));
+  return report;
+}
+
+test("report:write validation gate requires must read fields for full reports", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+  report.source_audit = sourceAuditFixture();
+  report.github_trending = [];
+  report.huggingface_trending = [];
+  report.model_releases = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.official_org_updates = [];
+  report.community_leads = [];
+  report.hero_highlights = report.hero_highlights.map(({ title, url, reason }) => ({ title, url, reason }));
+  const candidatePool = {
+    report_date: report.report_date,
+    sources: [],
+    candidates: report.main_items.map((item) => ({
+      id: item.candidate_id,
+      source_id: "unit-test",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: item.title,
+      url: item.url,
+      source: item.source,
+      event_date: item.event_date,
+      source_level: item.source_level,
+      verification_status: item.verification_status,
+      verification_sources: [item.url]
+    }))
+  };
+
+  assert.throws(
+    () => normalizeReportDraft(report, { reportDate: report.report_date, candidatePool }),
+    (error) => error instanceof PublisherError && error.code === "hero_highlights_contract_failed"
+  );
+});
+
+test("report:draft selects must read highlights with category balance", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-must-read-draft-"));
+  const reportDate = "2026-05-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.unshift(
+    {
+      id: "must-read-open-source-cn",
+      source_id: "china-ai-qwen",
+      category: "community_lead",
+      title: "Qwen Code updates open-source agent workflow",
+      url: "https://github.com/QwenLM/qwen-code",
+      source: "Qwen GitHub",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official repository update describes a concrete open-source agent workflow change.",
+      verification_status: "primary_confirmed",
+      source_level: "github",
+      primary_url: "https://github.com/QwenLM/qwen-code",
+      verification_sources: ["https://github.com/QwenLM/qwen-code"],
+      editorial_category: "open_source"
+    },
+    {
+      id: "must-read-product-tool",
+      source_id: "content-vercel",
+      category: "community_lead",
+      title: "Vercel AI Gateway adds routing controls for teams",
+      url: "https://vercel.com/changelog/ai-gateway-routing-controls",
+      source: "Vercel",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: "Official changelog describes routing controls, team usage, and model gateway behavior.",
+      verification_status: "primary_confirmed",
+      source_level: "official",
+      primary_url: "https://vercel.com/changelog/ai-gateway-routing-controls",
+      verification_sources: ["https://vercel.com/changelog/ai-gateway-routing-controls"],
+      editorial_category: "product_radar"
+    }
+  );
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.hero_highlights.length, 3);
+  assert(drafted.report.hero_highlights.every((item) =>
+    item.what_happened &&
+    item.why_watch &&
+    item.category &&
+    item.source_item_ref
+  ));
+  assert(new Set(drafted.report.hero_highlights.map((item) => item.category)).size >= 2);
+  assert.notDeepEqual(
+    drafted.report.hero_highlights.map((item) => item.source_item_ref),
+    drafted.report.main_items.slice(0, 3).map((item) => item.candidate_id || item.url)
+  );
+});
+
+test("interaction input puts must read first and compact main list", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+
+  const input = reportToInteractionInput(report);
+  const firstSection = input.sections[0];
+  const mainContent = mainMarkdownContent(input);
+
+  assert.equal(input.hideNavigation, true);
+  assert.deepEqual(input.heroStats, []);
+  assert.deepEqual(input.heroLinks, []);
+  assert.equal(firstSection.richId, "today-must-read");
+  assert.equal(firstSection.type, "filterable-cards");
+  assert.equal(firstSection.items.length, 3);
+  assert(input.sections.findIndex((section) => section.richId === "daily-overview") > 0);
+  const compactList = input.sections.find((section) => section.richId === "compact-main-list");
+  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  assert.equal(compactList.type, "filterable-cards");
+  assert.equal(compactList.items.length, 3);
+  assert.equal(detailSection.collapsed, true);
+  assert(mainContent.includes("Signal 1 changes the visible product or project surface today"));
+});
+
 function openRouterRankingsSampleText(rows = 10) {
   const entries = [
     ["DeepSeek V4 Flash", "deepseek", "2.9T tokens", "18%"],
@@ -391,7 +552,11 @@ test("schema 支持模型发布、hero 精选、博客新契约和项目用途�
     {
       title: "Harness 成为今日主线",
       url: "https://example.com/blog/harness-engineering",
-      reason: "同一天的模型、项目和工程博客都指向 agent harness。"
+      reason: "同一天的模型、项目和工程博客都指向 agent harness。",
+      what_happened: "Agent harness became the leading topic in the fixture.",
+      why_watch: "It changes how readers evaluate long-running agent workflows.",
+      category: "product_tool",
+      source_item_ref: "https://example.com/blog/harness-engineering"
     }
   ];
   enriched.projects = [
@@ -5915,9 +6080,21 @@ test("buildSite writes reader-safe public data without internal fields or candid
   await fs.mkdir(reportDir, { recursive: true });
 
   report.candidate_pool_path = `data/${year}/${month}/${report.report_date}.candidates.json`;
+  report.main_items[0].candidate_id = "internal-candidate";
   report.main_items[0].why_it_matters = "Internal rationale must not be public data.";
   report.main_items[0].reader_relevance = "Internal reader relevance must not be public data.";
   report.main_items[0].watch_next = "Internal watch-next must not be public data.";
+  report.hero_highlights = [
+    {
+      title: report.main_items[0].title,
+      url: report.main_items[0].url,
+      reason: "Public must-read reason.",
+      what_happened: "Public result for the must-read card.",
+      why_watch: "Public impact for the must-read card.",
+      category: "model_platform",
+      source_item_ref: report.main_items[0].candidate_id
+    }
+  ];
   report.daily_tracking = [
     {
       id: "openrouter-rankings",
@@ -6035,6 +6212,9 @@ test("buildSite writes reader-safe public data without internal fields or candid
   }
   assert.equal(publicData.daily_tracking.length, 1);
   assert.equal(publicData.daily_tracking[0].id, "openrouter-rankings");
+  assert.equal(publicData.hero_highlights[0].why_watch, "Public impact for the must-read card.");
+  assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
+  assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
   assert.equal(publicData.evidence_assets.length, 1);
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
@@ -10309,6 +10489,15 @@ test("report:write accepts expanded main items with three compact factual bullet
       ]
     };
   });
+  draft.hero_highlights = draft.main_items.slice(0, 3).map((item, index) => ({
+    title: item.title,
+    url: item.url,
+    reason: `Fixture ${index + 1} changes a concrete reader decision surface.`,
+    what_happened: `Fixture ${index + 1} is a concrete product or platform update.`,
+    why_watch: `It helps readers decide whether to track availability, pricing, benchmark, or deployment scope.`,
+    category: index === 0 ? "model_platform" : index === 1 ? "product_tool" : "business_policy",
+    source_item_ref: item.candidate_id
+  }));
   candidatePool.candidates = draft.main_items.map((item, index) => ({
     ...baseCandidate,
     id: item.candidate_id,
