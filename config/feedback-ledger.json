@@ -824,6 +824,30 @@
         "test_name": "interaction input puts must read first and compact main list",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-authoritative-retrospectives",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep authoritative sanitized retrospectives in the repository",
+      "problem": "Task blockers, iteration advice, and daily publish lessons could remain only in chat, local task state, or raw automation logs, making them hard to reuse safely in future runs.",
+      "expected_behavior": "Non-trivial deliveries and daily publish runs write sanitized retrospective records with explicit run_type and suggestion status, keep one lightweight committed index, finalize publish-mode records before real publish, append selected-date rollup corrections when publish and fallback both fail, and reject private paths, secrets, raw logs, index drift, and implemented suggestions without durable evidence.",
+      "scope": [
+        "schemas/retrospective.schema.json",
+        "scripts/validate-retrospectives.mjs",
+        "scripts/harness-validate.mjs",
+        "src/retrospectives.js",
+        "src/daily-runner.js",
+        "src/publish.js",
+        "retrospectives/index.json",
+        "tests/unit.test.js",
+        "tests/publish.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "daily runner writes sanitized daily publish retrospective before validation",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

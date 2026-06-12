@@ -82,6 +82,12 @@ Use only when a direct red test is not practical. Explain the reason and the det
 
 - No parallel writes unless the task explicitly defines independent worktrees, non-overlapping paths, and an integration point.
 
+## Retrospective Plan
+
+- For non-trivial deliveries, write or update one sanitized record under `retrospectives/YYYY/MM/` with the correct `run_type`.
+- Update `retrospectives/index.json` so it remains the lightweight authority.
+- If the task is trivial, state why no retrospective record is required.
+
 ## Handoff Requirements
 
 - Report red/green evidence.

@@ -366,7 +366,9 @@ export async function createPublishPlan(options = {}) {
     ...repoFiles,
     ...dirtyGeneratedFiles,
     ...dirtyDateScopedEvidenceFiles,
-    ...(await plannedReportsDataFiles(repoRoot, dates))
+    ...(await plannedReportsDataFiles(repoRoot, dates)),
+    ...(await plannedRetrospectiveFiles(repoRoot, dates)),
+    ...dirtyRetrospectiveFiles(statusEntries, dates)
   ]);
   assertDirtyPublisherFilesCovered(statusEntries, stageFiles);
   const commitMessage =
@@ -433,9 +435,7 @@ export async function publishGeneratedArtifacts(options = {}) {
   }
 
   const statusEntries = parsePorcelain(await git.status());
-  const publishFiles = statusEntries
-    .map((entry) => entry.path)
-    .filter((file) => isPublisherOwnedPath(file));
+  const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
 
   if (unrelated.length > 0) {
@@ -443,6 +443,8 @@ export async function publishGeneratedArtifacts(options = {}) {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
+
+  assertDirtyPublisherFilesCovered(statusEntries, publishFiles);
 
   if (publishFiles.length === 0) {
     return {
@@ -528,9 +530,8 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const sourceBranch = await git.branch();
 
   const statusEntries = parsePorcelain(await git.status());
-  const dirtyPublishFiles = statusEntries
-    .map((entry) => entry.path)
-    .filter((file) => isPublisherOwnedPath(file));
+  const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path));
+  const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
 
   if (unrelated.length > 0) {
@@ -541,9 +542,10 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   await requirePublishableReportDate(repoRoot, options.reportDate, {
     currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
   });
+  assertDirtyPublisherFilesCovered(statusEntries, dirtyPublishFiles);
 
   const publishFiles = uniqueSorted(
-    dirtyPublishFiles.length > 0
+    hasPublisherDirtyFiles
       ? dirtyPublishFiles
       : await plannedPublisherFiles(repoRoot, options)
   );
@@ -895,7 +897,11 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
     options.reportDate,
     generated.reports
   );
-  const candidates = uniqueSorted([...docsFiles, ...(await plannedReportsDataFiles(repoRoot, dates))]);
+  const candidates = uniqueSorted([
+    ...docsFiles,
+    ...(await plannedReportsDataFiles(repoRoot, dates)),
+    ...(await plannedRetrospectiveFiles(repoRoot, dates))
+  ]);
   const existing = [];
   for (const file of candidates) {
     if (await exists(path.join(repoRoot, ...file.split("/")))) {
@@ -952,6 +958,49 @@ async function plannedReportsDataFiles(repoRoot, dates) {
     }
   }
   return uniqueSorted(files);
+}
+
+async function plannedRetrospectiveFiles(repoRoot, dates) {
+  const files = [];
+  if (await exists(path.join(repoRoot, "retrospectives", "index.json"))) {
+    files.push("retrospectives/index.json");
+  }
+  for (const date of dates) {
+    const [year, month] = date.split("-");
+    const dir = path.join(repoRoot, "retrospectives", year, month);
+    let entries = [];
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+    for (const entry of entries) {
+      if (!entry.isFile()) {
+        continue;
+      }
+      const repoPath = `retrospectives/${year}/${month}/${entry.name}`;
+      if (isPublishRetrospectiveRecordPath(repoPath) && entry.name.startsWith(`${date}.`)) {
+        files.push(repoPath);
+      }
+    }
+  }
+  return uniqueSorted(files);
+}
+
+function dirtyRetrospectiveFiles(statusEntries, dates) {
+  const dateSet = new Set(dates);
+  return statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => file === "retrospectives/index.json" || isPublishRetrospectiveRecordPath(file))
+    .filter((file) => {
+      if (file === "retrospectives/index.json") {
+        return true;
+      }
+      const date = path.posix.basename(file).split(".")[0];
+      return dateSet.has(date);
+    });
 }
 
 async function exists(filePath) {
@@ -1078,11 +1127,37 @@ function isPublisherOwnedPath(filePath) {
     filePath === "docs/feed.json" ||
     filePath === "docs/index.html" ||
     filePath === "docs/trends.json" ||
+    filePath === "retrospectives/index.json" ||
+    isPublishRetrospectiveRecordPath(filePath) ||
     filePath.startsWith("docs/assets/") ||
     filePath.startsWith("docs/data/") ||
     filePath.startsWith("docs/reports/") ||
     filePath.startsWith("reports-data/")
   );
+}
+
+function isPublishRetrospectiveRecordPath(filePath) {
+  return /^retrospectives\/\d{4}\/\d{2}\/\d{4}-\d{2}-\d{2}\.(?:daily_publish|rollup)\.[a-z0-9][a-z0-9-]*\.json$/.test(String(filePath || ""));
+}
+
+function dirtyPublisherFilesForPublish(statusEntries, reportDate) {
+  const files = statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => isPublisherOwnedPath(file));
+  if (!reportDate) {
+    return uniqueSorted(files);
+  }
+  return uniqueSorted(files.filter((file) => isPublishFileForReportDate(file, reportDate)));
+}
+
+function isPublishFileForReportDate(filePath, reportDate) {
+  if (filePath === "retrospectives/index.json") {
+    return true;
+  }
+  if (isPublishRetrospectiveRecordPath(filePath)) {
+    return path.posix.basename(filePath).split(".")[0] === reportDate;
+  }
+  return true;
 }
 
 function reportEvidenceAssetPaths(report) {

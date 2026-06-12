@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-12.project_iteration.retrospective-harness",
+  "run_type": "project_iteration",
+  "date": "2026-06-12",
+  "title": "Retrospective harness rollout",
+  "status": "completed",
+  "summary": "Project iteration record for landing the authoritative retrospective schema, validator, harness gate, daily publish writer/finalizer/correction flow, publish submission boundary, tests, and seed index.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node scripts/validate-retrospectives.mjs",
+      "node --test tests/unit.test.js",
+      "node --test tests/publish.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Retrospective learning must be stored as repo-owned data, not only in chat or temporary task state.",
+      "evidence": "The final design uses independent records plus retrospectives/index.json as the lightweight authority.",
+      "scope": "project_iteration",
+      "persistence": "implemented",
+      "recommended_action": "Require every non-trivial delivery to update or justify the retrospective record surface."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Retrospective suggestions can become ambiguous unless their lifecycle status and proof are explicit.",
+      "evidence": "The schema requires suggestion.status and the validator enforces evidence for implemented suggestions.",
+      "module": "schemas/retrospective.schema.json",
+      "suggestion": "Keep suggestions stateful with observed, recommended, accepted, implemented, or rejected status.",
+      "expected_benefit": "Future readers can distinguish observations from accepted or shipped process changes.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Bound through the feedback ledger and unit validation.",
+      "ledger_links": [
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "retrospective validation accepts sanitized records and index",
+        "retrospective validation rejects implemented suggestions without durable evidence",
+        "daily runner writes sanitized daily publish retrospective before validation",
+        "daily runner finalizes publish retrospectives before real publish",
+        "daily runner writes blocked correction rollup when publish and fallback fail",
+        "daily dry-run stages sanitized retrospective records for the selected date",
+        "daily dry-run stages selected-date rollup correction retrospective records",
+        "publish keeps dirty retrospective records scoped to the selected report date"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Daily publish writer integration, publish-mode finalization, blocked correction rollups, and selected-date publish staging are included in this delivery.",
+      "owner": "project"
+    }
+  ]
+}

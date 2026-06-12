@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/retrospective.schema.json",
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "required": ["code", "section", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "section": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "stage_id": { "type": "string", "minLength": 1 },
+        "error_code": { "type": "string" }
+      }
+    },
+    "lesson": {
+      "type": "object",
+      "required": ["lesson", "evidence", "scope", "persistence", "recommended_action"],
+      "additionalProperties": false,
+      "properties": {
+        "lesson": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "persistence": {
+          "enum": ["session_note", "ledger_candidate", "implemented"]
+        },
+        "recommended_action": { "type": "string", "minLength": 1 }
+      }
+    },
+    "suggestion": {
+      "type": "object",
+      "required": [
+        "status",
+        "issue",
+        "evidence",
+        "module",
+        "suggestion",
+        "expected_benefit",
+        "requires_user_confirmation",
+        "promotion_path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": ["observed", "recommended", "accepted", "implemented", "rejected"]
+        },
+        "issue": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 },
+        "module": { "type": "string", "minLength": 1 },
+        "suggestion": { "type": "string", "minLength": 1 },
+        "expected_benefit": { "type": "string", "minLength": 1 },
+        "requires_user_confirmation": { "type": "boolean" },
+        "promotion_path": { "type": "string", "minLength": 1 },
+        "ledger_links": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "validation_evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "followup": {
+      "type": "object",
+      "required": ["status", "action", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": ["observed", "recommended", "accepted", "implemented", "rejected"]
+        },
+        "action": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "id",
+        "run_type",
+        "date",
+        "title",
+        "status",
+        "summary",
+        "evidence",
+        "blockers",
+        "degraded_sections",
+        "lessons",
+        "suggestions",
+        "ledger_links",
+        "followups"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "id": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}\\.(daily_publish|project_iteration|rollup)\\.[a-z0-9][a-z0-9-]*$"
+        },
+        "run_type": {
+          "enum": ["daily_publish", "project_iteration", "rollup"]
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "status": {
+          "enum": ["published", "blocked", "degraded", "completed", "generated_only", "rolled_up"]
+        },
+        "summary": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "summary_path": { "type": "string" },
+            "status_self_check_path": { "type": "string" },
+            "report_json": { "type": "string" },
+            "html": { "type": "string" },
+            "pages_url": { "type": "string" },
+            "commits": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "prs": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "validation_commands": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            }
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/issue" }
+        },
+        "degraded_sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/issue" }
+        },
+        "lessons": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/lesson" }
+        },
+        "suggestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/suggestion" }
+        },
+        "ledger_links": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "followups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/followup" }
+        }
+      }
+    },
+    "indexEntry": {
+      "type": "object",
+      "required": ["id", "run_type", "date", "status", "path", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "run_type": {
+          "enum": ["daily_publish", "project_iteration", "rollup"]
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "status": {
+          "enum": ["published", "blocked", "degraded", "completed", "generated_only", "rolled_up"]
+        },
+        "path": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 }
+      }
+    },
+    "index": {
+      "type": "object",
+      "required": ["schema_version", "generated_at", "records"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "generated_at": { "type": "string", "minLength": 1 },
+        "records": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/indexEntry" }
+        }
+      }
+    }
+  }
+}

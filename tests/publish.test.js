@@ -86,6 +86,53 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert(!plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.candidates.json"));
 });
 
+test("daily dry-run stages sanitized retrospective records for the selected date", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeRetrospectiveFixture(repoRoot, "2026-05-13");
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: [
+        " M retrospectives/index.json",
+        "?? retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json"
+      ].join("\n")
+    })
+  });
+
+  assert(plan.will_stage_files.includes("retrospectives/index.json"));
+  assert(plan.will_stage_files.includes("retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json"));
+});
+
+test("daily dry-run stages selected-date rollup correction retrospective records", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeRetrospectiveFixture(repoRoot, "2026-05-13", {
+    runType: "rollup",
+    slug: "daily-publish-correction",
+    status: "blocked"
+  });
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: ""
+    })
+  });
+
+  assert(plan.will_stage_files.includes("retrospectives/index.json"));
+  assert(plan.will_stage_files.includes("retrospectives/2026/05/2026-05-13.rollup.daily-publish-correction.json"));
+});
+
 test("publish dry-run allows degraded Builder coverage and exposes degraded sections", async () => {
   const repoRoot = await tempRepoWithFixture();
   await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
@@ -870,6 +917,59 @@ test("publish 只提交发布器管理的文件", async () => {
   assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "add", "commit", "push"]);
 });
 
+test("publish keeps dirty retrospective records scoped to the selected report date", async () => {
+  const calls = [];
+  await assert.rejects(
+    publishGeneratedArtifacts({
+      confirmPush: true,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          " M retrospectives/index.json",
+          "?? retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json",
+          "?? retrospectives/2026/05/2026-05-14.daily_publish.daily-run.json"
+        ].join("\n"),
+        calls
+      })
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "publisher_dirty_outside_publish_plan" &&
+      error.details.files.includes("retrospectives/2026/05/2026-05-14.daily_publish.daily-run.json")
+  );
+
+  assert.deepEqual(calls.map((call) => call.name), ["fetch"]);
+});
+
+test("github api publish keeps dirty retrospective records scoped to the selected report date", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeRetrospectiveFixture(repoRoot, "2026-05-13");
+  await writeRetrospectiveFixture(repoRoot, "2026-05-14");
+
+  await assert.rejects(
+    publishGeneratedArtifactsViaGitHubApi({
+      repoRoot,
+      confirmPush: true,
+      reportDate: "2026-05-13",
+      token: "test-token",
+      repository: "owner/repo",
+      verifyPages: false,
+      git: fakeGit({
+        status: [
+          " M retrospectives/index.json",
+          "?? retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json",
+          "?? retrospectives/2026/05/2026-05-14.daily_publish.daily-run.json"
+        ].join("\n")
+      }),
+      fetchImpl: fakeGitHubFetch()
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "publisher_dirty_outside_publish_plan" &&
+      error.details.files.includes("retrospectives/2026/05/2026-05-14.daily_publish.daily-run.json")
+  );
+});
+
 test("publish checks push transport before creating a new publish commit", async () => {
   const calls = [];
   await assert.rejects(
@@ -1189,4 +1289,51 @@ async function tempRepoWithFixture() {
     path.join(inputDir, "official-release.md")
   );
   return tmp;
+}
+
+async function writeRetrospectiveFixture(repoRoot, reportDate, options = {}) {
+  const [year, month] = reportDate.split("-");
+  const runType = options.runType || "daily_publish";
+  const slug = options.slug || "daily-run";
+  const record = {
+    schema_version: 1,
+    id: `${reportDate}.${runType}.${slug}`,
+    run_type: runType,
+    date: reportDate,
+    title: `Retrospective ${reportDate}`,
+    status: options.status || "generated_only",
+    summary: "Sanitized daily publish retrospective fixture.",
+    evidence: {
+      report_json: `reports-data/${year}/${month}/${reportDate}.json`,
+      html: `docs/reports/${year}/${month}/${reportDate}.html`,
+      validation_commands: ["npm run validate"]
+    },
+    blockers: [],
+    degraded_sections: [],
+    lessons: [],
+    suggestions: [],
+    ledger_links: ["feedback/p1-authoritative-retrospectives"],
+    followups: []
+  };
+  const recordPath = path.join(repoRoot, "retrospectives", year, month, `${record.id}.json`);
+  await fs.mkdir(path.dirname(recordPath), { recursive: true });
+  await fs.writeFile(recordPath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
+  await fs.writeFile(
+    path.join(repoRoot, "retrospectives", "index.json"),
+    `${JSON.stringify({
+      schema_version: 1,
+      generated_at: "2026-06-12T12:00:00.000Z",
+      records: [
+        {
+          id: record.id,
+          run_type: record.run_type,
+          date: record.date,
+          status: record.status,
+          path: `retrospectives/${year}/${month}/${record.id}.json`,
+          title: record.title
+        }
+      ]
+    }, null, 2)}\n`,
+    "utf8"
+  );
 }
