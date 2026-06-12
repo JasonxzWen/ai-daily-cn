@@ -7,7 +7,8 @@
 - Implemented content-hash cache busting for homepage CSS: `assets/style.css?v=<hash>`.
 - Current generated href: `assets/style.css?v=e5713fe52f44`.
 - Local validation passed with `npm run validate`.
-- Pending: push to `main`, and verify the bare Pages URL returns the versioned stylesheet href.
+- Pushed hotfix commit `6621014` to `main`; GitHub Pages run `27402601518` completed successfully.
+- Verified the bare Pages URL returns `assets/style.css?v=e5713fe52f44` and loads effective-interact index styles in desktop and mobile Chrome screenshots.
 
 ## Effective-Interact Index PR
 

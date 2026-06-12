@@ -95,6 +95,13 @@ npm run validate
 Invoke-WebRequest -UseBasicParsing -Uri "https://jasonxzwen.github.io/ai-daily-cn/" -Headers @{ "Cache-Control" = "no-cache" }
 ```
 
+已完成线上验证：
+
+- GitHub Pages run `27402601518` completed successfully.
+- Bare Pages URL returned `assets/style.css?v=e5713fe52f44`.
+- Versioned CSS returned `.report-shell` and `.report-nav`.
+- Chrome desktop 1440x1000 and mobile 390x844 screenshots loaded the effective-interact index without horizontal overflow.
+
 ## Parallel Writes
 
 无并行写入。文件修改串行完成；只读 diff、status 和认证检查可并行。
@@ -108,6 +115,8 @@ Regression self-check validate summary: checked that this hotfix only changes th
 - 已确认未修改 `docs/data/**`、`docs/reports/**`、`reports-data/**` 或 GitHub Pages 设置。
 - 已确认 `.playwright-cli/` 是未跟踪目录，不纳入 stage。
 - 已确认 `npm run validate` 通过。
+- 已确认线上裸 URL 和版本化 CSS HTTP 验证通过。
+- 已确认线上桌面和移动 Chrome 截图无横向溢出。
 
 ## Handoff Requirements
 

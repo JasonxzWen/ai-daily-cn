@@ -2,12 +2,14 @@
 
 ## 2026-06-12 Index CSS Cache Bust Hotfix
 
-- Status: implemented locally; full validation passed; ready to publish to `main`.
+- Status: published to `main` and verified on GitHub Pages.
 - Root cause: deployed `index.html` referenced `assets/style.css` without a content version, so browsers could keep using a cached old stylesheet even when the bare Pages URL had new HTML.
 - Fix: `buildSite` now passes a SHA-256 content hash of `defaultStyleCss` into `renderIndexHtml`, which emits `assets/style.css?v=<hash>` for the homepage stylesheet.
 - Generated `docs/index.html` now references `assets/style.css?v=e5713fe52f44`.
 - Validation so far: target `buildSite` unit test passed, `node --check src/site.js`, `node --check src/render.js`, `npm run build`, and `npm run validate` passed.
-- Next: commit, push to `main`, and confirm `https://jasonxzwen.github.io/ai-daily-cn/` returns the versioned stylesheet href without requiring a URL query.
+- Published commit: `6621014` (`Bust index stylesheet cache`).
+- GitHub Pages run `27402601518` completed successfully.
+- Live verification: bare `https://jasonxzwen.github.io/ai-daily-cn/` returns `assets/style.css?v=e5713fe52f44`; desktop and mobile Chrome screenshots passed without horizontal overflow.
 
 ## 2026-06-12 Effective-Interact Index PR
 
