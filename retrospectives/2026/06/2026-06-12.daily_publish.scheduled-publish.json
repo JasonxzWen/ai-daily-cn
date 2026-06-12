@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-12.daily_publish.scheduled-publish",
+  "run_type": "daily_publish",
+  "date": "2026-06-12",
+  "title": "Daily publish retrospective seed",
+  "status": "generated_only",
+  "summary": "Seed record proving daily_publish retrospectives use sanitized project records rather than raw automation logs.",
+  "evidence": {
+    "status_self_check_path": "tasks/daily-publish-runbook.md",
+    "report_json": "reports-data/YYYY/MM/YYYY-MM-DD.json",
+    "html": "docs/reports/YYYY/MM/YYYY-MM-DD.html",
+    "validation_commands": [
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "seed_record_not_live_run",
+      "section": "retrospective_contract",
+      "message": "This seed documents the contract shape only; live daily runs should write date-specific sanitized records."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "Daily publish retrospectives need a durable project-level record that survives beyond the automation workspace.",
+      "evidence": "The user required committed sanitized retrospective records as the authoritative reference.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Keep the daily runner writer, publish finalizer, correction rollup, and publish allowlist tests green so each scheduled run leaves sanitized records."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Daily runner needed to call a retrospective writer and publish-result correction flow automatically.",
+      "evidence": "The daily runner now writes a sanitized daily_publish record before validation, finalizes it before real publish, appends a blocked rollup correction when publish and fallback both fail, and publish staging is scoped to selected-date daily_publish or rollup records plus the index.",
+      "module": "src/daily-runner.js",
+      "suggestion": "Generate one sanitized daily_publish retrospective during each daily runner handoff, finalize it before real publish, and append a correction rollup on blocked publish completion.",
+      "expected_benefit": "Every scheduled run leaves consistent sanitized final or correction records without manual reconstruction or private log leakage.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through the retrospective writer and publish boundary tests.",
+      "ledger_links": [
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "daily runner writes sanitized daily publish retrospective before validation",
+        "daily runner finalizes publish retrospectives before real publish",
+        "daily runner writes blocked correction rollup when publish and fallback fail",
+        "daily dry-run stages sanitized retrospective records for the selected date",
+        "daily dry-run stages selected-date rollup correction retrospective records",
+        "publish keeps dirty retrospective records scoped to the selected report date"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Daily runner writes sanitized daily_publish records before validation, finalizes them before real publish, appends blocked correction rollups when publish and fallback both fail, and publish paths only submit selected-date daily_publish or rollup records plus the index.",
+      "owner": "project"
+    }
+  ]
+}

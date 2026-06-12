@@ -4517,6 +4517,10 @@ test("harness SDD TDD accepts trivial current task only with justification", asy
       "",
       "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
       "",
+      "## Retrospective Plan",
+      "",
+      "- Trivial fixture only documents no retrospective record requirement; retrospectives/index.json stays unchanged.",
+      "",
       "## Allowed Paths",
       "",
       "- `docs/example.md`",
@@ -4572,6 +4576,10 @@ test("harness SDD TDD accepts trivial current task only with justification", asy
       "",
       "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
       "",
+      "## Retrospective Plan",
+      "",
+      "- Trivial fixture only documents no retrospective record requirement; retrospectives/index.json stays unchanged.",
+      "",
       "## Allowed Paths",
       "",
       "- `docs/example.md`",
@@ -4625,6 +4633,10 @@ test("harness SDD TDD accepts task class followed by template guidance", async (
       "## Regression Self-Check",
       "",
       "- Self-check confirms the fixture still contains the required regression review before handoff validation.",
+      "",
+      "## Retrospective Plan",
+      "",
+      "- This non-trivial fixture records a project_iteration retrospective plan and keeps retrospectives/index.json aligned.",
       "",
       "## Red Test",
       "",
@@ -4855,6 +4867,161 @@ test("feedback memory self-check rejects quick reference missing ledger item", a
   assert.match(result.stderr, /feedback\/missing-from-quick-reference/);
 });
 
+test("retrospective validation accepts sanitized records and index", async () => {
+  const tmp = await createRetrospectiveFixture();
+
+  const result = await runRetrospectivesValidate(tmp);
+
+  assert.equal(result.code, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.records_checked, 2);
+});
+
+test("retrospective validation rejects local path leakage", async () => {
+  const tmp = await createRetrospectiveFixture({
+    mutateRecord(record) {
+      record.evidence.summary_path = "C:\\Users\\Admin\\.codex\\automations\\ai-daily\\run-worktrees\\run\\.tmp\\run-summary.json";
+    }
+  });
+
+  const result = await runRetrospectivesValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stdout, /local_or_private_path_leak/);
+});
+
+test("retrospective validation rejects index entries without records", async () => {
+  const tmp = await createRetrospectiveFixture({
+    mutateIndex(index) {
+      index.records.push({
+        id: "2026-06-12.rollup.missing",
+        run_type: "rollup",
+        date: "2026-06-12",
+        status: "completed",
+        path: "retrospectives/2026/06/2026-06-12.rollup.missing.json",
+        title: "Missing rollup"
+      });
+    }
+  });
+
+  const result = await runRetrospectivesValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stdout, /index_record_missing/);
+});
+
+test("retrospective validation rejects implemented suggestions without durable evidence", async () => {
+  const tmp = await createRetrospectiveFixture({
+    mutateRecord(record) {
+      record.suggestions = [
+        {
+          status: "implemented",
+          issue: "复盘建议缺少验证绑定。",
+          evidence: "fixture",
+          module: "scripts/validate-retrospectives.mjs",
+          suggestion: "补充验证绑定。",
+          expected_benefit: "防止把未验证建议标为已实现。",
+          requires_user_confirmation: false,
+          promotion_path: "已经实现。"
+        }
+      ];
+    }
+  });
+
+  const result = await runRetrospectivesValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stdout, /implemented_suggestion_missing_evidence/);
+});
+
+test("harness rejects non-trivial current task without retrospective plan", async () => {
+  const tmp = await createHarnessFixture({
+    currentTask: [
+      "# Current Task",
+      "",
+      "## Task Class",
+      "",
+      "non-trivial",
+      "",
+      "## Spec",
+      "",
+      "A non-trivial implementation task.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "- Harness enforces retrospective planning.",
+      "",
+      "## Feedback Ledger Review",
+      "",
+      "- Reviewed `config/feedback-ledger.json` and the quick reference for applicable regressions.",
+      "",
+      "## Regression Self-Check",
+      "",
+      "- Self-check verifies validation, harness, and retrospective regression coverage before handoff.",
+      "",
+      "## Red Test",
+      "",
+      "Run before implementation:",
+      "",
+      "```powershell",
+      "node scripts/harness-validate.mjs",
+      "```",
+      "",
+      "Expected initial failure:",
+      "",
+      "- The pre-change harness rejects this fixture.",
+      "",
+      "## Allowed Paths",
+      "",
+      "- `scripts/harness-validate.mjs`",
+      "",
+      "## Forbidden Paths",
+      "",
+      "- Do not modify generated reports.",
+      "",
+      "## Validation Commands",
+      "",
+      "- `node scripts/harness-validate.mjs`",
+      "",
+      "## Parallel Writes",
+      "",
+      "- No parallel writes.",
+      "",
+      "## Handoff Requirements",
+      "",
+      "- Report validation evidence.",
+      ""
+    ].join("\n")
+  });
+
+  const result = await runHarnessValidate(tmp);
+
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /Retrospective Plan/);
+});
+
+test("retrospective ledger item is bound to validation", async () => {
+  const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
+  const item = ledger.items.find((entry) => entry.id === "feedback/p1-authoritative-retrospectives");
+
+  assert(item, "feedback/p1-authoritative-retrospectives must be recorded in the feedback ledger");
+  assert.equal(item.severity, "P1");
+  assert.equal(item.status, "implemented");
+  assert(item.scope.includes("schemas/retrospective.schema.json"));
+  assert(item.scope.includes("scripts/validate-retrospectives.mjs"));
+  assert(item.scope.includes("src/retrospectives.js"));
+  assert(item.scope.includes("src/daily-runner.js"));
+  assert(item.scope.includes("src/publish.js"));
+  assert(item.scope.includes("retrospectives/index.json"));
+  assert(item.scope.includes("tests/publish.test.js"));
+  assert.equal(item.validation.command, "node --test tests/unit.test.js");
+  assert.equal(item.validation.test_name, "daily runner writes sanitized daily publish retrospective before validation");
+
+  const result = await validateFeedbackContract({ rootDir });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
 test("OpenSpec removed from active package workflow", async () => {
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   const scripts = manifest.scripts || {};
@@ -4904,6 +5071,155 @@ test("daily runner writes launcher summary and stops before real publish by defa
 
   const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
   assert.equal(saved.final_status, "generated_only");
+});
+
+test("daily runner writes sanitized daily publish retrospective before validation", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retrospective-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  await fs.mkdir(path.join(cleanRoot, "schemas"), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "schemas", "retrospective.schema.json"),
+    path.join(cleanRoot, "schemas", "retrospective.schema.json")
+  );
+  const validateObservations = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-15",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "validate") {
+        validateObservations.push(await exists(path.join(
+          cleanRoot,
+          "retrospectives",
+          "2026",
+          "06",
+          "2026-06-15.daily_publish.daily-run.json"
+        )));
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_only");
+  assert.deepEqual(validateObservations, [true]);
+  assert.equal(result.summary.retrospective.ok, true);
+  assert.equal(result.summary.retrospective.record_path, "retrospectives/2026/06/2026-06-15.daily_publish.daily-run.json");
+  assert(result.summary.stages.some((stage) => stage.id === "retrospective_write" && stage.status === "passed"));
+
+  const record = JSON.parse(await fs.readFile(path.join(cleanRoot, result.summary.retrospective.record_path), "utf8"));
+  assert.equal(record.run_type, "daily_publish");
+  assert.equal(record.status, "generated_only");
+  assert.doesNotMatch(JSON.stringify(record), new RegExp(escapeRegExp(launcherRoot)));
+  assert.doesNotMatch(JSON.stringify(record), new RegExp(escapeRegExp(cleanRoot)));
+
+  const validation = await runRetrospectivesValidate(cleanRoot);
+  assert.equal(validation.code, 0, validation.stderr);
+  assert.equal(JSON.parse(validation.stdout).records_checked, 1);
+});
+
+test("daily runner finalizes publish retrospectives before real publish", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retrospective-finalize-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  await fs.mkdir(path.join(cleanRoot, "schemas"), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "schemas", "retrospective.schema.json"),
+    path.join(cleanRoot, "schemas", "retrospective.schema.json")
+  );
+  const recordPath = path.join(cleanRoot, "retrospectives", "2026", "06", "2026-06-16.daily_publish.daily-run.json");
+  const observations = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-16",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "validate") {
+        observations.push({ stage: stage.id, status: JSON.parse(await fs.readFile(recordPath, "utf8")).status });
+      }
+      if (stage.id === "publish_real") {
+        observations.push({ stage: stage.id, status: JSON.parse(await fs.readFile(recordPath, "utf8")).status });
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published");
+  assert.deepEqual(observations, [
+    { stage: "validate", status: "generated_only" },
+    { stage: "publish_real", status: "published" }
+  ]);
+  assert(result.summary.stages.some((stage) => stage.id === "retrospective_finalize" && stage.status === "passed"));
+  assert(result.summary.stages.some((stage) => stage.id === "retrospective_validate" && stage.status === "passed"));
+
+  const record = JSON.parse(await fs.readFile(recordPath, "utf8"));
+  assert.equal(record.run_type, "daily_publish");
+  assert.equal(record.status, "published");
+  assert.doesNotMatch(JSON.stringify(record), new RegExp(escapeRegExp(launcherRoot)));
+  assert.doesNotMatch(JSON.stringify(record), new RegExp(escapeRegExp(cleanRoot)));
+});
+
+test("daily runner writes blocked correction rollup when publish and fallback fail", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retrospective-correction-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  await fs.mkdir(path.join(cleanRoot, "schemas"), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "schemas", "retrospective.schema.json"),
+    path.join(cleanRoot, "schemas", "retrospective.schema.json")
+  );
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-17",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "publish_real") {
+        return { ok: false, output: { ok: false, error: "git_push_failed" } };
+      }
+      if (stage.id === "publish_github_api_fallback") {
+        return { ok: false, output: { ok: false, error: "github_api_error" } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.retrospective_correction.ok, true);
+  assert.equal(
+    result.summary.retrospective_correction.record_path,
+    "retrospectives/2026/06/2026-06-17.rollup.daily-publish-correction.json"
+  );
+  assert(result.summary.stages.some((stage) => stage.id === "retrospective_correction_write" && stage.status === "passed"));
+  assert(result.summary.stages.some((stage) => stage.id === "retrospective_correction_validate" && stage.status === "passed"));
+
+  const correction = JSON.parse(
+    await fs.readFile(path.join(cleanRoot, result.summary.retrospective_correction.record_path), "utf8")
+  );
+  assert.equal(correction.run_type, "rollup");
+  assert.equal(correction.status, "blocked");
+  assert(correction.blockers.some((blocker) => blocker.section === "publish_real"));
+  assert(correction.blockers.some((blocker) => blocker.section === "publish_github_api_fallback"));
+  assert.doesNotMatch(JSON.stringify(correction), new RegExp(escapeRegExp(launcherRoot)));
+  assert.doesNotMatch(JSON.stringify(correction), new RegExp(escapeRegExp(cleanRoot)));
+
+  const validation = await runRetrospectivesValidate(cleanRoot);
+  assert.equal(validation.code, 0, validation.stderr);
+  assert.equal(JSON.parse(validation.stdout).records_checked, 2);
 });
 
 test("daily runner wires platform exempt discovery outputs into report draft", async () => {
@@ -5131,6 +5447,7 @@ test("daily runner resumes from AI repair contract and continues with optimized 
     "validate",
     "sources_phase5_audit",
     "publish_dry_run_daily",
+    "retrospective_validate",
     "publish_real"
   ]);
   const repairStage = calls.find((stage) => stage.id === "quality_ai_repair");
@@ -12440,6 +12757,25 @@ async function runHarnessValidate(cwd) {
   }
 }
 
+async function runRetrospectivesValidate(cwd) {
+  try {
+    const result = await execFileAsync(process.execPath, [path.join(rootDir, "scripts/validate-retrospectives.mjs")], {
+      cwd
+    });
+    return {
+      code: 0,
+      stdout: result.stdout,
+      stderr: result.stderr
+    };
+  } catch (error) {
+    return {
+      code: error.code ?? 1,
+      stdout: error.stdout || "",
+      stderr: error.stderr || error.message || ""
+    };
+  }
+}
+
 async function runHarnessInit(cwd, args = []) {
   try {
     const result = await execFileAsync(process.execPath, [path.join(rootDir, "scripts/harness-init.mjs"), ...args], {
@@ -12459,12 +12795,144 @@ async function runHarnessInit(cwd, args = []) {
   }
 }
 
+async function createRetrospectiveFixture(options = {}) {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-retrospectives-"));
+  await fs.mkdir(path.join(tmp, "schemas"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "retrospectives", "2026", "06"), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "schemas", "retrospective.schema.json"),
+    path.join(tmp, "schemas", "retrospective.schema.json")
+  );
+
+  const records = [
+    retrospectiveRecordFixture({
+      id: "2026-06-12.daily_publish.scheduled-publish",
+      run_type: "daily_publish",
+      title: "2026-06-12 日报发布复盘",
+      slug: "scheduled-publish"
+    }),
+    retrospectiveRecordFixture({
+      id: "2026-06-12.project_iteration.retrospective-harness",
+      run_type: "project_iteration",
+      title: "复盘 harness 落地",
+      slug: "retrospective-harness",
+      status: "completed"
+    })
+  ];
+
+  if (typeof options.mutateRecord === "function") {
+    options.mutateRecord(records[0]);
+  }
+
+  for (const record of records) {
+    const filePath = retrospectiveRecordPath(tmp, record);
+    await fs.writeFile(filePath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
+  }
+
+  const index = {
+    schema_version: 1,
+    generated_at: "2026-06-12T12:00:00.000Z",
+    records: records.map((record) => ({
+      id: record.id,
+      run_type: record.run_type,
+      date: record.date,
+      status: record.status,
+      path: retrospectiveRecordRelativePath(record),
+      title: record.title
+    }))
+  };
+
+  if (typeof options.mutateIndex === "function") {
+    options.mutateIndex(index);
+  }
+
+  await fs.writeFile(path.join(tmp, "retrospectives", "index.json"), `${JSON.stringify(index, null, 2)}\n`, "utf8");
+
+  return tmp;
+}
+
+function retrospectiveRecordFixture({
+  id,
+  run_type,
+  title,
+  slug,
+  status = "published"
+}) {
+  return {
+    schema_version: 1,
+    id,
+    run_type,
+    date: "2026-06-12",
+    title,
+    status,
+    summary: "脱敏复盘记录 fixture。",
+    evidence: {
+      summary_path: ".tmp/run-summary-2026-06-12.json",
+      report_json: "reports-data/2026/06/2026-06-12.json",
+      html: "docs/reports/2026/06/2026-06-12.html",
+      commits: ["4e48249"],
+      prs: ["79"],
+      validation_commands: ["node scripts/validate-retrospectives.mjs", "npm run validate"]
+    },
+    blockers: [],
+    degraded_sections: [
+      {
+        code: "content_sources_blocked",
+        section: "source_audit",
+        message: "部分内容源受阻，已公开标注为降级。"
+      }
+    ],
+    lessons: [
+      {
+        lesson: "复盘必须写成脱敏项目记录，而不是只留在自动化记忆里。",
+        evidence: "用户确认复盘索引提交到仓库但必须脱敏。",
+        scope: run_type,
+        persistence: "implemented",
+        recommended_action: "通过 retrospective validator 和 harness 门禁保持记录完整。"
+      }
+    ],
+    suggestions: [
+      {
+        status: "implemented",
+        issue: "复盘建议需要状态机和验证绑定。",
+        evidence: "本 fixture 记录实现态建议。",
+        module: "scripts/validate-retrospectives.mjs",
+        suggestion: "使用 retrospective schema 和 validator 固定字段。",
+        expected_benefit: "后续任务可以可靠读取项目教训。",
+        requires_user_confirmation: false,
+        promotion_path: "已写入 feedback ledger 并由 unit test 覆盖。",
+        ledger_links: ["feedback/p1-authoritative-retrospectives"],
+        validation_evidence: ["retrospective validation accepts sanitized records and index"]
+      }
+    ],
+    ledger_links: ["feedback/p1-authoritative-retrospectives"],
+    followups: [
+      {
+        status: "recommended",
+        action: "让 daily runner 在发布结束后自动调用复盘写入器。",
+        owner: "future-task"
+      }
+    ],
+    slug
+  };
+}
+
+function retrospectiveRecordRelativePath(record) {
+  return `retrospectives/2026/06/${record.id}.json`;
+}
+
+function retrospectiveRecordPath(root, record) {
+  return path.join(root, retrospectiveRecordRelativePath(record));
+}
+
 async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
   await fs.mkdir(path.join(tmp, "config"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
   await fs.mkdir(path.join(tmp, "prompts", "ai-daily", "modules"), { recursive: true });
   await fs.mkdir(path.join(tmp, "scripts"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "schemas"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "retrospectives", "2026", "06"), { recursive: true });
   await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
 
   await fs.writeFile(
@@ -12564,6 +13032,7 @@ async function createHarnessFixture(options = {}) {
       "## Deterministic Substitute",
       "## Feedback Ledger Review",
       "## Regression Self-Check",
+      "## Retrospective Plan",
       "## Allowed Paths",
       "## Forbidden Paths",
       "## Validation Commands",
@@ -12579,6 +13048,42 @@ async function createHarnessFixture(options = {}) {
   );
   await fs.copyFile(path.join(rootDir, "scripts", "harness-init.mjs"), path.join(tmp, "scripts", "harness-init.mjs"));
   await fs.copyFile(path.join(rootDir, "scripts", "harness-validate.mjs"), path.join(tmp, "scripts", "harness-validate.mjs"));
+  await fs.copyFile(path.join(rootDir, "scripts", "validate-retrospectives.mjs"), path.join(tmp, "scripts", "validate-retrospectives.mjs"));
+  await fs.copyFile(path.join(rootDir, "schemas", "retrospective.schema.json"), path.join(tmp, "schemas", "retrospective.schema.json"));
+  const retrospectiveRecords = [
+    retrospectiveRecordFixture({
+      id: "2026-06-12.daily_publish.scheduled-publish",
+      run_type: "daily_publish",
+      title: "Daily publish fixture",
+      slug: "scheduled-publish"
+    }),
+    retrospectiveRecordFixture({
+      id: "2026-06-12.project_iteration.retrospective-harness",
+      run_type: "project_iteration",
+      title: "Retrospective harness fixture",
+      slug: "retrospective-harness",
+      status: "completed"
+    })
+  ];
+  for (const record of retrospectiveRecords) {
+    await fs.writeFile(retrospectiveRecordPath(tmp, record), `${JSON.stringify(record, null, 2)}\n`, "utf8");
+  }
+  await fs.writeFile(
+    path.join(tmp, "retrospectives", "index.json"),
+    `${JSON.stringify({
+      schema_version: 1,
+      generated_at: "2026-06-12T12:00:00.000Z",
+      records: retrospectiveRecords.map((record) => ({
+        id: record.id,
+        run_type: record.run_type,
+        date: record.date,
+        status: record.status,
+        path: retrospectiveRecordRelativePath(record),
+        title: record.title
+      }))
+    }, null, 2)}\n`,
+    "utf8"
+  );
   await fs.writeFile(
     path.join(tmp, "package.json"),
     JSON.stringify({
@@ -12590,7 +13095,8 @@ async function createHarnessFixture(options = {}) {
         "test:e2e": "node scripts/run-e2e.mjs",
         "harness:init": "node scripts/harness-init.mjs",
         "harness:validate": "node scripts/harness-validate.mjs",
-        validate: "npm run harness:init && npm run harness:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
+        "retrospectives:validate": "node scripts/validate-retrospectives.mjs",
+        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
         "publish:preflight": "node src/cli.js publish:preflight",
@@ -12658,6 +13164,10 @@ function validNonTrivialCurrentTask() {
     "## Regression Self-Check",
     "",
     "- Self-check verifies the fixture includes the required regression review before validation handoff.",
+    "",
+    "## Retrospective Plan",
+    "",
+    "- This non-trivial fixture updates a project_iteration retrospective record and keeps retrospectives/index.json aligned.",
     "",
     "## Red Test",
     "",

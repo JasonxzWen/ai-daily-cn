@@ -16,6 +16,9 @@ const requiredFiles = [
   'tasks/daily-publish-runbook.md',
   'tasks/templates/daily-publish-task.md',
   'tasks/templates/sdd-tdd-task.md',
+  'schemas/retrospective.schema.json',
+  'scripts/validate-retrospectives.mjs',
+  'retrospectives/index.json',
   'prompts/ai-daily/modules/editorial-authority.md',
   'scripts/harness-init.mjs',
   'scripts/harness-validate.mjs',
@@ -57,6 +60,7 @@ const requiredMarkers = {
     'Forbidden Paths',
     'Validation Commands',
     'Parallel Writes',
+    'Retrospective Plan',
     'Handoff Requirements',
   ],
   'tasks/current-task.example.md': [
@@ -67,6 +71,7 @@ const requiredMarkers = {
     'Forbidden Paths',
     'Validation Commands',
     'Parallel Writes',
+    'Retrospective Plan',
     'Handoff Requirements',
   ],
   'tasks/daily-publish-runbook.md': [
@@ -100,6 +105,7 @@ const requiredMarkers = {
     'Deterministic Substitute',
     'Feedback Ledger Review',
     'Regression Self-Check',
+    'Retrospective Plan',
     'Allowed Paths',
     'Forbidden Paths',
     'Validation Commands',
@@ -121,7 +127,8 @@ const requiredPackageScripts = {
   'test:e2e': ['scripts/run-e2e.mjs'],
   'harness:init': ['scripts/harness-init.mjs'],
   'harness:validate': ['scripts/harness-validate.mjs'],
-  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
+  'retrospectives:validate': ['scripts/validate-retrospectives.mjs'],
+  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
   'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],
@@ -367,6 +374,7 @@ function validateCurrentTask(failures) {
   if (redTest.length === 0 && substitute.length > 0 && !/reason|\u7406\u7531|\u4e0d\u53ef|\u65e0\u6cd5|\u56e0\u4e3a|not practical|not feasible/i.test(substitute)) {
     failures.push('tasks/current-task.md: Deterministic Substitute must explain why a direct red test is not practical');
   }
+  validateRetrospectivePlanSection(content, failures);
 }
 
 function validateFeedbackMemorySections(content, failures) {
@@ -389,6 +397,20 @@ function hasMeaningfulFeedbackReview(value) {
 function hasMeaningfulRegressionSelfCheck(value) {
   const text = normalizedSectionText(value);
   return text.length >= 40 && /(自检|self-check|regression|回归|检查|validate|harness|验证)/i.test(text);
+}
+
+function validateRetrospectivePlanSection(content, failures) {
+  const retrospectivePlan = sectionText(content, 'Retrospective Plan').trim();
+  if (!hasMeaningfulRetrospectivePlan(retrospectivePlan)) {
+    failures.push('tasks/current-task.md: non-trivial tasks require a meaningful Retrospective Plan covering retrospective records, run_type, or index updates');
+  }
+}
+
+function hasMeaningfulRetrospectivePlan(value) {
+  const text = normalizedSectionText(value);
+  return text.length >= 40
+    && /(retrospective|retrospectives|\u590d\u76d8|run_type|daily_publish|project_iteration|rollup)/i.test(text)
+    && /(retrospectives\/index\.json|record|index|daily_publish|project_iteration|rollup|non-trivial|\u975e\u5e73\u51e1)/i.test(text);
 }
 
 function normalizedSectionText(value) {

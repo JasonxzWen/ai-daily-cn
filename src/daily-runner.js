@@ -5,6 +5,10 @@ import { promisify } from "node:util";
 import { PublisherError } from "./errors.js";
 import { prepareCleanPublishWorktree } from "./publish.js";
 import { mergeCommandEnv, npmInvocationForArgs } from "./process-runner.js";
+import {
+  writeDailyPublishCorrectionRetrospective,
+  writeDailyPublishRetrospective
+} from "./retrospectives.js";
 
 const execFileAsync = promisify(execFile);
 const DEFAULT_PUBLISH_MAX_REVIEW_REPAIR_LOOPS = 5;
@@ -108,7 +112,9 @@ export async function runDailyWorkflow(options = {}) {
     publish,
     mode,
     summaryPath,
-    maxReviewRepairLoops
+    maxReviewRepairLoops,
+    writeRetrospective: options.writeRetrospective !== false,
+    now
   };
 
   for (const stage of buildInitialWorkflowStages({ reportDate })) {
@@ -229,7 +235,9 @@ async function resumeDailyWorkflowFromAiRepair({
     publish,
     mode,
     summaryPath,
-    maxReviewRepairLoops: effectiveMaxReviewRepairLoops
+    maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
+    writeRetrospective: true,
+    now
   };
   const sourceReportPath = stagePath(summary.current_report_path, context.cleanRoot) || DEFAULT_REPORT_PATH;
   const repairStages = buildAiRepairWorkflowStages({
@@ -312,6 +320,41 @@ async function runPostQualityStages({
   reportPath
 }) {
   for (const stage of buildPostQualityWorkflowStages({ reportDate, publish, reportPath })) {
+    if (stage.id === "validate") {
+      const retrospectiveOutcome = await writeRetrospectiveStage({
+        summary,
+        context,
+        reportDate,
+        status: "generated_only",
+        now
+      });
+      if (retrospectiveOutcome.blocked) {
+        summary.final_status = "blocked";
+        summary.next_action = {
+          kind: "inspect_stage_failure",
+          stage_id: "retrospective_write",
+          summary_path: summaryPath
+        };
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      await writeSummary(summaryPath, summary);
+    }
+
+    if (publish && stage.id === "publish_real") {
+      const finalized = await finalizeRetrospectiveBeforePublish({
+        summary,
+        summaryPath,
+        context,
+        runStage,
+        now,
+        reportDate
+      });
+      if (finalized.blocked) {
+        return { summary, summaryPath };
+      }
+    }
+
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
@@ -323,6 +366,13 @@ async function runPostQualityStages({
           failed_stage_id: fallbackStage.id,
           previous_stage_id: stage.id
         };
+        await writePublishCorrectionForBlockedRun({
+          summary,
+          context,
+          reportDate,
+          now,
+          runStage
+        });
         await writeSummary(summaryPath, summary);
         return { summary, summaryPath };
       }
@@ -334,6 +384,13 @@ async function runPostQualityStages({
           previous_stage_id: stage.id,
           summary_path: summaryPath
         };
+        await writePublishCorrectionForBlockedRun({
+          summary,
+          context,
+          reportDate,
+          now,
+          runStage
+        });
         await writeSummary(summaryPath, summary);
         return { summary, summaryPath };
       }
@@ -364,6 +421,157 @@ async function runPostQualityStages({
   summary.updated_at = now();
   await writeSummary(summaryPath, summary);
   return { summary, summaryPath };
+}
+
+async function finalizeRetrospectiveBeforePublish({
+  summary,
+  summaryPath,
+  context,
+  runStage,
+  now,
+  reportDate
+}) {
+  const retrospectiveOutcome = await writeRetrospectiveStage({
+    summary,
+    context,
+    reportDate,
+    status: "published",
+    now,
+    stageId: "retrospective_finalize",
+    summaryKey: "retrospective_finalization"
+  });
+  if (retrospectiveOutcome.blocked) {
+    summary.final_status = "blocked";
+    summary.next_action = {
+      kind: "inspect_stage_failure",
+      stage_id: "retrospective_finalize",
+      summary_path: summaryPath
+    };
+    await writeSummary(summaryPath, summary);
+    return { blocked: true };
+  }
+  if (retrospectiveOutcome.skipped) {
+    await writeSummary(summaryPath, summary);
+    return { blocked: false, skipped: true };
+  }
+
+  const validationOutcome = await runAndRecordStage({
+    stage: buildRetrospectiveValidateStage("retrospective_validate"),
+    context,
+    summary,
+    runStage,
+    now
+  });
+  if (validationOutcome.blocked) {
+    summary.final_status = "blocked";
+    summary.next_action = blockedNextAction(validationOutcome.error);
+    await writeSummary(summaryPath, summary);
+    return { blocked: true };
+  }
+  if (!validationOutcome.normalized.ok) {
+    summary.final_status = "blocked";
+    summary.next_action = {
+      kind: "inspect_stage_failure",
+      stage_id: "retrospective_validate",
+      summary_path: summaryPath
+    };
+    await writeSummary(summaryPath, summary);
+    return { blocked: true };
+  }
+
+  await writeSummary(summaryPath, summary);
+  return { blocked: false };
+}
+
+async function writeRetrospectiveStage({
+  summary,
+  context,
+  reportDate,
+  status,
+  now,
+  stageId = "retrospective_write",
+  summaryKey = "retrospective"
+}) {
+  if (context.writeRetrospective === false) {
+    return { blocked: false, skipped: true };
+  }
+  try {
+    const output = await writeDailyPublishRetrospective({
+      rootDir: context.cleanRoot,
+      summary,
+      reportDate,
+      status,
+      now
+    });
+    summary[summaryKey] = output;
+    summary.retrospective = output;
+    recordStage(summary, {
+      id: stageId,
+      status: "passed",
+      output,
+      now
+    });
+    return { blocked: false, output };
+  } catch (error) {
+    summary.retrospective = {
+      ok: false,
+      error_code: error.code || "retrospective_write_failed",
+      message: error.message
+    };
+    summary[summaryKey] = summary.retrospective;
+    recordStage(summary, {
+      id: stageId,
+      status: "failed",
+      error,
+      now
+    });
+    return { blocked: true, error };
+  }
+}
+
+async function writePublishCorrectionForBlockedRun({ summary, context, reportDate, now, runStage }) {
+  if (context.writeRetrospective === false) {
+    return { blocked: false, skipped: true };
+  }
+  try {
+    const output = await writeDailyPublishCorrectionRetrospective({
+      rootDir: context.cleanRoot,
+      summary,
+      reportDate,
+      status: "blocked",
+      now
+    });
+    summary.retrospective_correction = output;
+    recordStage(summary, {
+      id: "retrospective_correction_write",
+      status: "passed",
+      output,
+      now
+    });
+    const validationOutcome = await runAndRecordStage({
+      stage: buildRetrospectiveValidateStage("retrospective_correction_validate"),
+      context,
+      summary,
+      runStage,
+      now
+    });
+    return validationOutcome.blocked || !validationOutcome.normalized.ok
+      ? { blocked: true, validationOutcome }
+      : { blocked: false, output };
+  } catch (error) {
+    summary.retrospective_correction = {
+      ok: false,
+      error_code: error.code || "retrospective_correction_failed",
+      message: error.message
+    };
+    recordStage(summary, {
+      id: "retrospective_correction_write",
+      status: "failed",
+      error,
+      now
+    });
+    return { blocked: true, error };
+  }
 }
 
 export function buildDailyWorkflowStages({ reportDate, publish }) {
@@ -594,6 +802,16 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
 
 function buildPublishFallbackStage(reportDate) {
   return npmStage("publish_github_api_fallback", ["run", "publish:github-api", "--", "confirm-push", reportDate]);
+}
+
+function buildRetrospectiveValidateStage(id) {
+  return {
+    id,
+    command: {
+      tool: "node",
+      args: ["scripts/validate-retrospectives.mjs"]
+    }
+  };
 }
 
 async function defaultPrepareCleanWorktree({ launcherRoot, allowedBranch, worktreeDir }) {
