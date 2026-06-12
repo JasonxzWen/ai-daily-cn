@@ -5606,6 +5606,8 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   assert.equal(await exists(path.join(outDir, "feed.json")), true);
   assert.equal(await exists(path.join(outDir, "trends.json")), true);
   assert.equal(await exists(path.join(outDir, "assets/style.css")), true);
+  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  assert.match(indexHtml, /<link rel="stylesheet" href="assets\/style\.css\?v=[a-f0-9]{12}">/);
 
   const trends = JSON.parse(await fs.readFile(path.join(outDir, "trends.json"), "utf8"));
   assert.equal(validateTrends(trends).valid, true);

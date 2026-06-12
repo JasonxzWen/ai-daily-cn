@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
@@ -103,6 +104,7 @@ export async function buildSite(options = {}) {
   await fs.mkdir(outDir, { recursive: true });
   await writeFileTracked(outDir, ".nojekyll", "", writtenFiles);
   await writeFileTracked(outDir, "assets/style.css", defaultStyleCss, writtenFiles);
+  const indexStyleVersion = contentHash(defaultStyleCss);
 
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
@@ -153,7 +155,9 @@ export async function buildSite(options = {}) {
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
-  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex), writtenFiles);
+  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
+    styleVersion: indexStyleVersion
+  }), writtenFiles);
 
   return {
     outDir,
@@ -163,6 +167,10 @@ export async function buildSite(options = {}) {
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
+}
+
+function contentHash(value) {
+  return createHash("sha256").update(String(value)).digest("hex").slice(0, 12);
 }
 
 export async function collectMarkdownFiles(inputDir) {

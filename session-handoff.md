@@ -1,5 +1,14 @@
 # Session Handoff
 
+## Index CSS Cache Bust Hotfix
+
+- User reported that the bare GitHub Pages URL must show the new UI without a changing URL.
+- The deployed bare URL already returned new HTML, but the HTML referenced `assets/style.css` without a version, allowing old browser CSS cache to mask the new UI.
+- Implemented content-hash cache busting for homepage CSS: `assets/style.css?v=<hash>`.
+- Current generated href: `assets/style.css?v=e5713fe52f44`.
+- Local validation passed with `npm run validate`.
+- Pending: push to `main`, and verify the bare Pages URL returns the versioned stylesheet href.
+
 ## Effective-Interact Index PR
 
 - Draft PR #81 is open: `https://github.com/JasonxzWen/ai-daily-cn/pull/81`.

@@ -154,7 +154,7 @@ function affectedSectionIssues(status) {
     }));
 }
 
-export function renderIndexHtml(feed, trends = null, dateIndex = null) {
+export function renderIndexHtml(feed, trends = null, dateIndex = null, options = {}) {
   const latest = feed.reports[0];
   const dateItems = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
   const latestItem = dateItems.find((item) => item.date === latest?.report_date) || dateItems.at(-1) || null;
@@ -170,7 +170,7 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(feed.site_title)}</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="${escapeAttribute(indexStyleHref(options.styleVersion))}">
 </head>
 <body>
   <header class="site-header">
@@ -191,6 +191,11 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null) {
 </body>
 </html>
 `;
+}
+
+function indexStyleHref(styleVersion) {
+  const version = String(styleVersion || "").trim();
+  return version ? `assets/style.css?v=${encodeURIComponent(version)}` : "assets/style.css";
 }
 
 function renderIndexNav() {

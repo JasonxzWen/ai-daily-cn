@@ -6,140 +6,112 @@ non-trivial
 
 ## Spec
 
-完成用户已对齐的 AI 日报质量改造规划，并把要求固化到代码、schema、测试、反馈 ledger 和验证门中。本轮继续完成 Batch 3：OpenRouter / Artificial Analysis live adapter 数据层。
+修复 GitHub Pages 裸地址 `https://jasonxzwen.github.io/ai-daily-cn/` 上新版首页样式可能不生效的问题。页面 URL 必须保持稳定，不要求用户打开带随机参数或 worktree 本地 `file://` URL。
 
-Batch 1 已落地：
+根因假设：`docs/index.html` 已发布新版 HTML，但首页仍引用未版本化的 `assets/style.css`，浏览器或 GitHub Pages 边缘缓存可能继续复用旧 CSS，导致用户在裸地址看到旧视觉。
 
-- 统一 link icon resolver，GitHub 链接统一 GitHub icon，首字母 fallback 必须带 metadata。
-- GitHub README enrichment/cache contract。
-- 中文媒体动态：机器之心、量子位、少数派按当天窗口有几条放几条，源挂了保留 degraded。
-- 官方组织动态独立成区。
-- WeChat/Zhihu 未配置真实入口时可发布但必须明确 degraded。
+本轮只做首页 CSS 资源缓存失效控制：
 
-Batch 2 已落地：
-
-- `tracking_component_snapshot` schema。
-- OpenRouter / Artificial Analysis 本地 tracking component foundation。
-- public trace、tabs、linear/log、tooltip、renderer、E2E 和 page check。
-- 不运行第三方 runtime JS，不用截图当公开主载体，不暴露 raw DOM。
-
-Batch 3 本轮目标：
-
-- OpenRouter source snapshot 保留 `history_entries`，用于 Top Models 历史/周序列 stacked rows。
-- Artificial Analysis source snapshot 保留 `component_tabs`，包括 Score、Token Usage、Cost、Score vs. Token Usage、Score vs. Cost、Score vs. Compute。
-- `src/draft.js` sanitizer 不得丢失这些扩展 snapshot 字段。
-- `src/tracking-components.js` 在源数据存在时使用 AA 非 Score tab 数据，不再显示 `source_tab_not_collected`；源数据确实缺失时继续 fallback，不伪造值。
-- effective-interact 渲染历史 stacked rows、hover trace 和移动端安全布局。
+- `buildSite` 根据 `defaultStyleCss` 内容生成短 SHA-256 hash。
+- `renderIndexHtml` 支持可选 `styleVersion`，生成 `assets/style.css?v=<hash>`。
+- `docs/index.html` 由 `npm run build` 生成，不手写日报页面或单日报告 HTML。
+- 保持 GitHub Pages 访问地址不变，缓存失效只发生在内部 CSS 资源 URL。
 
 ## Acceptance Criteria
 
-- `schemas/report.schema.json` 接受 `daily_tracking.snapshot.history_entries` 和 `daily_tracking.snapshot.component_tabs`。
-- `src/discovery.js` 能从 page text / HTML-like capture 中解析 OpenRouter history rows 和 AA token/cost/scatter rows。
-- `src/draft.js` 保留扩展 snapshot 字段进入公开 `daily_tracking`。
-- `src/tracking-components.js` 将扩展字段映射为 tab-specific `series.rows`。
-- effective-interact 输出 `data-tracking-stack`、tabs、linear/log、hover tooltip、trace，且无 `raw_dom` 泄露。
-- 桌面 1280x900 和移动 375x812 page check 通过，无横向溢出和 tracking card overlap。
-- 不运行 daily publish runner，不 commit/push，不手工编辑单日报 HTML。
+- `docs/index.html` 的 stylesheet href 为 `assets/style.css?v=<12位hex>`。
+- `renderIndexHtml` 在未传 `styleVersion` 时仍保持兼容，输出 `assets/style.css`。
+- `buildSite` 每次基于 stylesheet 内容生成稳定版本号，不依赖日期、随机数或本地路径。
+- `npm run build` 后产物稳定；重复 validate 不应产生额外 docs diff。
+- 推送到 `main` 后，裸 GitHub Pages URL 返回带版本号的 stylesheet href。
 
 ## Feedback Ledger Review
 
-Feedback ledger review: reviewed config/feedback-ledger.json and docs/feedback-buglist-quick-reference.md before implementation; the applicable ledger items are listed below and this task updates the tracking component ledger binding.
+Feedback-ledger review summary: reviewed the repository feedback ledger and applied the relevant origin-main, public-page, and self-check regression rules for this hotfix.
 
 已在实现前复核：
 
 - `config/feedback-ledger.json`
 - `docs/feedback-buglist-quick-reference.md`
 
-适用长期问题：
+适用的长期问题：
 
-- `feedback/p1-ledger-validation-binding`
-- `feedback/p1-public-media-contract`
-- `feedback/p1-tracking-visual-tables`
-- `feedback/p1-tracking-component-reconstruction`
-- `feedback/p1-feedback-memory-self-check`
-
-本轮已更新 `feedback/p1-tracking-component-reconstruction`，要求不只保留组件壳，还要保留 OpenRouter history 和 AA score/token/cost/scatter 源数据。
+- `feedback/p1-origin-main-baseline`：本次 hotfix 从最新 `origin/main` 创建分支，避免基于旧 main 发布。
+- `feedback/p1-feedback-memory-self-check`：本次仓库修改更新当前任务规格，并在交付前记录具体验证。
+- `feedback/p1-public-internal-report-separation`：本次只修改首页资源引用，不把内部审核或候选池内容暴露到公开页面。
+- `feedback/p1-public-data-minimization`：本次不修改 `docs/data/**`，不新增公开数据字段。
 
 ## Red Test
 
-实际红灯命令：
+线上裸 URL 的 HTML 已能返回新版结构，但 stylesheet href 仍为未版本化的 `assets/style.css`，这是用户反馈“裸 GitHub Pages 地址没有更新”的可复现失败面。新增的单元断言会在修复前失败，因为 `buildSite` 生成的 `index.html` 不包含 `assets/style.css?v=<hash>`。
+
+目标测试：
 
 ```powershell
-node --test tests/unit.test.js --test-name-pattern "collectContentSources stores OpenRouter weekly history|collectContentSources stores Artificial Analysis token cost and scatter tabs"
-```
-
-初始失败：
-
-- `snapshot.history_entries` 为 `undefined`。
-- `snapshot.component_tabs` 为 `undefined`。
-
-渲染层补充覆盖：
-
-```powershell
-node --test tests/skills.test.js --test-name-pattern "effective-interact filterable cards render local tracking components|effective-interact renders Artificial Analysis collected tabs"
+node --test tests/unit.test.js --test-name-pattern "buildSite"
 ```
 
 ## Deterministic Substitute
 
-无替代。本轮使用真实 Node unit tests、effective-interact generation/validation、build、page check、E2E 和仓库级 validate。
+外部浏览器缓存命中不可稳定地在 CI 中强制复现，因此用确定性产物断言替代：`buildSite` 必须生成内容 hash 版 CSS href。线上验收再用裸 URL HTTP 响应验证该 href 已发布。
 
 ## Allowed Paths
 
-- `.codex/skills/effective-interact/**`
-- `config/feedback-ledger.json`
-- `docs/feedback-buglist-quick-reference.md`
-- `docs/data/**`
-- `docs/reports/**`
-- `schemas/report.schema.json`
-- `src/**`
-- `tests/**`
+- `src/site.js`
+- `src/render.js`
+- `tests/unit.test.js`
+- `docs/index.html`
 - `tasks/current-task.md`
 - `progress.md`
 - `session-handoff.md`
-- `$CODEX_HOME/automations/ai-2/memory.md`
 
 ## Forbidden Paths
 
-- `.codex/automations/**`
-- GitHub Pages settings, branch protection, automation scheduling
-- 手工编辑单日报 HTML
-- 第三方 runtime JS 作为 OpenRouter / AA 公开组件依赖
-- 未配置真实入口时声称 WeChat/Zhihu 已接入
-- `git reset --hard`、`git checkout --`、`git clean`
-- daily publish runner、commit、push，除非用户明确要求
+- `docs/reports/**`
+- `docs/data/**`
+- `reports-data/**`
+- `.github/workflows/**`
+- GitHub Pages settings
+- `.playwright-cli/**`
+- 手工编辑单日报告 HTML
+- `git reset --hard`
+- `git clean`
 
 ## Validation Commands
 
 已通过：
 
 ```powershell
-node --test tests/unit.test.js --test-name-pattern "collectContentSources stores OpenRouter weekly history|collectContentSources stores Artificial Analysis token cost and scatter tabs"
-node --test tests/skills.test.js --test-name-pattern "effective-interact filterable cards render local tracking components|effective-interact renders Artificial Analysis collected tabs"
-node --test tests/unit.test.js tests/skills.test.js
+node --test tests/unit.test.js --test-name-pattern "buildSite"
+node --check src/site.js
+node --check src/render.js
 npm run build
-npm run quality:page-check -- 2026-06-12 docs .tmp/page-check-2026-06-12-batch3.json
-npm run test:e2e
 npm run validate
-git diff --check
+```
+
+发布后还需验证：
+
+```powershell
+Invoke-WebRequest -UseBasicParsing -Uri "https://jasonxzwen.github.io/ai-daily-cn/" -Headers @{ "Cache-Control" = "no-cache" }
 ```
 
 ## Parallel Writes
 
-无并行写入。文件修改串行完成；只读检查可并行。
+无并行写入。文件修改串行完成；只读 diff、status 和认证检查可并行。
 
 ## Regression Self-Check
 
-Regression self-check: task-specific checks below prevent known feedback regressions for screenshot tracking visuals, raw DOM exposure, missing AA non-score tabs, lost OpenRouter history rows, and mobile layout overflow.
+Regression self-check validate summary: checked that this hotfix only changes the index stylesheet cache key, keeps public report/data content unchanged, and passes the repository validate gate.
 
-- 已确认 OpenRouter history rows 进入 `snapshot.history_entries`，并映射到 `tracking_component_snapshot.series[].rows`。
-- 已确认 AA `component_tabs.token_usage/cost/score_vs_*` 在源数据存在时为 complete，不再 fallback。
-- 已确认 public trace 不包含 `raw_dom`。
-- 已确认 effective-interact 可渲染 `data-tracking-stack`。
-- 已确认 2026-06-12 桌面和移动 page check 通过。
+- 已确认当前分支基于 `origin/main` 的 #81 合并提交。
+- 已确认 `docs/index.html` 只改 stylesheet href，没有改变页面正文数据。
+- 已确认未修改 `docs/data/**`、`docs/reports/**`、`reports-data/**` 或 GitHub Pages 设置。
+- 已确认 `.playwright-cli/` 是未跟踪目录，不纳入 stage。
+- 已确认 `npm run validate` 通过。
 
 ## Handoff Requirements
 
-- 汇报 Batch 1、Batch 2 foundation、Batch 3 live adapter layer 均已落地。
-- 明确说明本轮未运行 daily publish runner、未 commit/push。
-- 汇报最终 `npm run validate` 结果。
-- 若最终 validate 失败，只报告真实失败门和可恢复动作，不声称完成。
+- 汇报根因：裸 URL 页面内部 CSS 未版本化，导致缓存可能遮蔽新版样式。
+- 汇报修复：CSS href 改为内容 hash query，页面 URL 不变。
+- 汇报本地验证和线上裸 URL 验证结果。
+- 若 push 或 Pages 部署失败，明确报告失败 run、错误和下一步恢复动作。
