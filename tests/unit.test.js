@@ -9070,6 +9070,26 @@ test("schema rejects arbitrary optimization_suggestions objects", async () => {
   assert(validation.errors.some((error) => error.path.includes("/self_check/optimization_suggestions/0")));
 });
 
+test("schema accepts Chinese media dynamics with two key points", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.chinese_media_dynamics = [
+    {
+      title: "Chinese media item with concise notes",
+      url: "https://example.com/chinese-media/two-key-points",
+      publisher: "QbitAI",
+      author: "QbitAI",
+      event_date: report.report_date,
+      topic: "Chinese AI media",
+      summary: "This fixture keeps a Chinese media dynamics item with only two concise key points.",
+      key_points: ["First verified note.", "Second verified note."]
+    }
+  ];
+
+  const validation = validateReport(report);
+
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+});
+
 test("optimization suggestions normalize legacy fields into canonical contract", () => {
   const suggestions = normalizeOptimizationSuggestions([
     {
