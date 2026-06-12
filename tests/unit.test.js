@@ -4122,6 +4122,44 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
+test("harness init recreates ignored local state files before validation", async () => {
+  const tmp = await createHarnessFixture();
+  await fs.rm(path.join(tmp, "progress.md"));
+  await fs.rm(path.join(tmp, "session-handoff.md"));
+  await fs.rm(path.join(tmp, "tasks", "current-task.md"));
+
+  const missing = await runHarnessValidate(tmp);
+  assert.notEqual(missing.code, 0);
+  assert.match(missing.stderr, /npm run harness:init/);
+
+  const initialized = await runHarnessInit(tmp, ["--json"]);
+  assert.equal(initialized.code, 0, initialized.stderr);
+  const initResult = JSON.parse(initialized.stdout);
+  assert.equal(initResult.ok, true);
+  assert.deepEqual(
+    initResult.results.map((entry) => entry.status),
+    ["created", "created", "created"]
+  );
+
+  const validated = await runHarnessValidate(tmp);
+  assert.equal(validated.code, 0, validated.stderr);
+});
+
+test("harness init keeps existing local state unless forced", async () => {
+  const tmp = await createHarnessFixture();
+  const progressPath = path.join(tmp, "progress.md");
+  await fs.writeFile(progressPath, "# Progress\n\n## Current State\n\n- Keep this local note.\n", "utf8");
+
+  const kept = await runHarnessInit(tmp, ["--json"]);
+  assert.equal(kept.code, 0, kept.stderr);
+  assert.match(await fs.readFile(progressPath, "utf8"), /Keep this local note/);
+  assert(JSON.parse(kept.stdout).results.some((entry) => entry.target === "progress.md" && entry.status === "kept"));
+
+  const forced = await runHarnessInit(tmp, ["--force", "--json"]);
+  assert.equal(forced.code, 0, forced.stderr);
+  assert.doesNotMatch(await fs.readFile(progressPath, "utf8"), /Keep this local note/);
+});
+
 test("harness SDD TDD rejects non-trivial current task without red test", async () => {
   const tmp = await createHarnessFixture({
     currentTask: [
@@ -4588,7 +4626,9 @@ test("OpenSpec removed from active package workflow", async () => {
   const scripts = manifest.scripts || {};
 
   assert.equal("validate:openspec" in scripts, false);
+  assert.equal(scripts["harness:init"], "node scripts/harness-init.mjs");
   assert.equal(scripts["harness:validate"], "node scripts/harness-validate.mjs");
+  assert.match(scripts.validate || "", /npm run harness:init/);
   assert.match(scripts.validate || "", /npm run harness:validate/);
   assert.doesNotMatch(scripts.test || "", /openspec/i);
   assert.doesNotMatch(scripts.validate || "", /openspec/i);
@@ -12036,6 +12076,25 @@ async function runHarnessValidate(cwd) {
   }
 }
 
+async function runHarnessInit(cwd, args = []) {
+  try {
+    const result = await execFileAsync(process.execPath, [path.join(rootDir, "scripts/harness-init.mjs"), ...args], {
+      cwd
+    });
+    return {
+      code: 0,
+      stdout: result.stdout,
+      stderr: result.stderr
+    };
+  } catch (error) {
+    return {
+      code: error.code ?? 1,
+      stdout: error.stdout || "",
+      stderr: error.stderr || error.message || ""
+    };
+  }
+}
+
 async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
   await fs.mkdir(path.join(tmp, "config"), { recursive: true });
@@ -12058,6 +12117,8 @@ async function createHarnessFixture(options = {}) {
   );
   await fs.writeFile(path.join(tmp, "progress.md"), "# Progress\n\n## Current State\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "session-handoff.md"), "# Session Handoff\n\n## Current Status\n\n- Fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "progress.example.md"), "# Progress\n\n## Current State\n\n- Example fixture.\n", "utf8");
+  await fs.writeFile(path.join(tmp, "session-handoff.example.md"), "# Session Handoff\n\n## Current Status\n\n- Example fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "clean-state-checklist.md"), "# Clean State Checklist\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "definition-of-done.md"), "# Definition Of Done\n\n- Fixture.\n", "utf8");
   await fs.writeFile(
@@ -12147,10 +12208,12 @@ async function createHarnessFixture(options = {}) {
     ].join("\n"),
     "utf8"
   );
+  await fs.writeFile(path.join(tmp, "tasks", "current-task.example.md"), validNonTrivialCurrentTask(), "utf8");
   await fs.copyFile(
     path.join(rootDir, "prompts", "ai-daily", "modules", "editorial-authority.md"),
     path.join(tmp, "prompts", "ai-daily", "modules", "editorial-authority.md")
   );
+  await fs.copyFile(path.join(rootDir, "scripts", "harness-init.mjs"), path.join(tmp, "scripts", "harness-init.mjs"));
   await fs.copyFile(path.join(rootDir, "scripts", "harness-validate.mjs"), path.join(tmp, "scripts", "harness-validate.mjs"));
   await fs.writeFile(
     path.join(tmp, "package.json"),
@@ -12161,8 +12224,9 @@ async function createHarnessFixture(options = {}) {
         build: "node src/cli.js build --data-input reports-data --input reports-source --out docs",
         test: "node --test tests/unit.test.js",
         "test:e2e": "node scripts/run-e2e.mjs",
+        "harness:init": "node scripts/harness-init.mjs",
         "harness:validate": "node scripts/harness-validate.mjs",
-        validate: "npm run harness:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
+        validate: "npm run harness:init && npm run harness:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
         "publish:preflight": "node src/cli.js publish:preflight",
