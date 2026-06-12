@@ -138,9 +138,14 @@ export async function buildSite(options = {}) {
     });
   }
 
+  const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
+  const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
+
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
       trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date],
+      reportNavigation: reportNavigationByDate.get(record.report.report_date),
+      dateIndexItem: dateIndex.items.find((item) => item.date === record.report.report_date),
       fetchImpl: options.fetchImpl,
       includeInternalData: Boolean(options.includeInternalData)
     });
@@ -148,13 +153,14 @@ export async function buildSite(options = {}) {
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
-  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value), writtenFiles);
+  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex), writtenFiles);
 
   return {
     outDir,
     reports,
     feed: feedValidation.value,
     trends: trendValidation.value,
+    dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
 }
@@ -277,6 +283,278 @@ export function mergeFeed(existingFeed, reports, options = {}) {
   };
 }
 
+export function buildDateIndex(feed = {}, reports = [], trends = null) {
+  const feedReports = Array.isArray(feed.reports) ? feed.reports : [];
+  const reportByDate = new Map(
+    (Array.isArray(reports) ? reports : [])
+      .filter((report) => report?.report_date)
+      .map((report) => [report.report_date, report])
+  );
+  const topicByDate = topicLookupByDate(trends);
+  const items = [...feedReports]
+    .sort((a, b) => String(a.report_date || "").localeCompare(String(b.report_date || "")))
+    .map((feedReport) => {
+      const report = reportByDate.get(feedReport.report_date) || {};
+      const metrics = dateSignalMetrics(feedReport, report);
+      const strength = deriveDateSignalStrength(metrics);
+      const quality = publicDateQuality(report.quality_status);
+      const topTopic = topicByDate.get(feedReport.report_date) || null;
+      return {
+        date: feedReport.report_date,
+        weekday: weekdayLabel(feedReport.report_date),
+        month: monthKey(feedReport.report_date),
+        title: String(feedReport.title || ""),
+        summary: String(feedReport.summary || ""),
+        url: feedReport.url,
+        data_url: feedReport.data_url,
+        metrics,
+        strength,
+        quality,
+        top_topic: topTopic,
+        highlights: dateHighlights(report, feedReport),
+        flags: {
+          has_github: metrics.github_trending_count > 0,
+          has_builder: metrics.builder_observations_count > 0,
+          has_tracking: metrics.daily_tracking_count > 0,
+          has_degraded: quality.status === "degraded" || quality.status === "blocked"
+        },
+        visual: {
+          strength_channel: strength.level,
+          quality_channel: quality.status,
+          intensity: strength.intensity
+        }
+      };
+    });
+  const totals = items.reduce((acc, item) => {
+    acc.report_count += 1;
+    acc.strong_days += item.strength.level === "strong" ? 1 : 0;
+    acc.degraded_days += item.quality.status === "degraded" || item.quality.status === "blocked" ? 1 : 0;
+    acc.main_items += item.metrics.main_items_count;
+    acc.github_trending += item.metrics.github_trending_count;
+    acc.builder_observations += item.metrics.builder_observations_count;
+    acc.hot_blogs += item.metrics.hot_blogs_count;
+    acc.daily_tracking += item.metrics.daily_tracking_count;
+    return acc;
+  }, {
+    report_count: 0,
+    strong_days: 0,
+    degraded_days: 0,
+    main_items: 0,
+    github_trending: 0,
+    builder_observations: 0,
+    hot_blogs: 0,
+    daily_tracking: 0
+  });
+
+  return {
+    generated_at: feed.updated_at || defaultGeneratedAt(),
+    date_from: items[0]?.date || "",
+    date_to: items.at(-1)?.date || "",
+    window_days: items.length,
+    totals,
+    filters: {
+      months: uniqueSorted(items.map((item) => item.month).filter(Boolean)),
+      strength_levels: uniqueSorted(items.map((item) => item.strength.level)),
+      quality_statuses: uniqueSorted(items.map((item) => item.quality.status))
+    },
+    items
+  };
+}
+
+export function deriveDateSignalStrength(metrics = {}) {
+  const reasons = [];
+  let score = 0;
+  const addReason = (condition, points, id, label, value) => {
+    if (!condition) return;
+    score += points;
+    reasons.push({ id, label, value });
+  };
+
+  addReason(metrics.main_items_count >= 8, 3, "main_items_high", "主体信号密集", metrics.main_items_count);
+  addReason(metrics.main_items_count >= 4 && metrics.main_items_count < 8, 2, "main_items_medium", "主体信号稳定", metrics.main_items_count);
+  addReason(metrics.main_items_count > 0 && metrics.main_items_count < 4, 1, "main_items_present", "主体信号存在", metrics.main_items_count);
+  addReason(metrics.major_count >= 3, 3, "major_items_high", "重大/高亮信号较多", metrics.major_count);
+  addReason(metrics.major_count > 0 && metrics.major_count < 3, 1, "major_items_present", "存在高亮信号", metrics.major_count);
+  addReason(metrics.github_trending_count >= 10, 2, "github_full", "GitHub Top 10 完整", metrics.github_trending_count);
+  addReason(metrics.github_trending_count > 0 && metrics.github_trending_count < 10, 1, "github_present", "GitHub 信号存在", metrics.github_trending_count);
+  addReason(metrics.builder_observations_count >= 8, 2, "builder_dense", "Builder 观察密集", metrics.builder_observations_count);
+  addReason(metrics.builder_observations_count > 0 && metrics.builder_observations_count < 8, 1, "builder_present", "Builder 观察存在", metrics.builder_observations_count);
+  addReason(metrics.hot_blogs_count >= 4, 1, "hot_blogs_dense", "深读内容充足", metrics.hot_blogs_count);
+  addReason(metrics.daily_tracking_count > 0, 1, "tracking_present", "追踪榜单有变化", metrics.daily_tracking_count);
+  addReason(metrics.section_coverage_count >= 5, 2, "coverage_broad", "覆盖板块较全", metrics.section_coverage_count);
+  addReason(metrics.section_coverage_count >= 3 && metrics.section_coverage_count < 5, 1, "coverage_medium", "覆盖板块中等", metrics.section_coverage_count);
+  addReason(metrics.evidence_assets_count > 0, 1, "evidence_present", "存在公开证据资产", metrics.evidence_assets_count);
+
+  const level = score >= 8 ? "strong" : score >= 4 ? "medium" : "quiet";
+  const label = level === "strong" ? "强信号" : level === "medium" ? "中等信号" : "低噪/观察";
+  return {
+    level,
+    label,
+    score,
+    intensity: Math.max(1, Math.min(5, Math.ceil(score / 2))),
+    reasons
+  };
+}
+
+function buildReportNavigation(feedReports = [], dateIndexItems = []) {
+  const ordered = [...(Array.isArray(feedReports) ? feedReports : [])]
+    .sort((a, b) => String(a.report_date || "").localeCompare(String(b.report_date || "")));
+  const dateIndexByDate = new Map(dateIndexItems.map((item) => [item.date, item]));
+  return new Map(ordered.map((report, index) => [report.report_date, {
+    previous: ordered[index - 1] || null,
+    next: ordered[index + 1] || null,
+    index_url: "index.html",
+    dateIndexItem: dateIndexByDate.get(report.report_date) || null
+  }]));
+}
+
+function topicLookupByDate(trends) {
+  const byDate = new Map();
+  const topics = Array.isArray(trends?.topics) ? trends.topics : [];
+  const sortedTopics = [...topics].sort((a, b) => {
+    const statusRank = { hot: 3, active: 2, watching: 1 };
+    return (statusRank[b.status] || 0) - (statusRank[a.status] || 0) ||
+      Number(b.occurrences || 0) - Number(a.occurrences || 0);
+  });
+  for (const topic of sortedTopics) {
+    const dates = new Set([
+      ...(Array.isArray(topic.dates) ? topic.dates : []),
+      ...(Array.isArray(topic.related_reports) ? topic.related_reports : [])
+    ]);
+    for (const date of dates) {
+      if (!byDate.has(date)) {
+        byDate.set(date, {
+          id: topic.id,
+          label: topic.label,
+          status: topic.status,
+          occurrences: Number(topic.occurrences || 0),
+          active_days: Number(topic.active_days || 0)
+        });
+      }
+    }
+  }
+  return byDate;
+}
+
+function dateSignalMetrics(feedReport = {}, report = {}) {
+  const mainItems = arrayValue(report.main_items);
+  const modelReleases = arrayValue(report.model_releases);
+  const hotBlogs = arrayValue(report.hot_blogs);
+  const dailyTracking = arrayValue(report.daily_tracking).filter((item) => item?.publish_to_public !== false);
+  const githubTrending = arrayValue(report.github_trending);
+  const huggingFaceTrending = arrayValue(report.huggingface_trending);
+  const builderObservations = arrayValue(report.builder_observations);
+  const communityLeads = arrayValue(report.community_leads);
+  const evidenceAssets = arrayValue(report.evidence_assets);
+  const platformItems = [
+    ...arrayValue(report.wechat_items),
+    ...arrayValue(report.zhihu_items),
+    ...arrayValue(report.reddit_items)
+  ];
+  const mainItemsCount = mainItems.length > 0 ? mainItems.length : Number(feedReport.main_items || 0);
+  const builderCount = builderObservations.length > 0 ? builderObservations.length : Number(feedReport.builder_observations || 0);
+  const sectionCounts = [
+    mainItemsCount,
+    modelReleases.length,
+    hotBlogs.length,
+    dailyTracking.length,
+    githubTrending.length,
+    huggingFaceTrending.length,
+    builderCount,
+    communityLeads.length,
+    platformItems.length
+  ];
+
+  return {
+    main_items_count: mainItemsCount,
+    major_count: countMajorItems([
+      ...mainItems,
+      ...modelReleases,
+      ...hotBlogs,
+      ...dailyTracking
+    ]),
+    model_releases_count: modelReleases.length,
+    hot_blogs_count: hotBlogs.length,
+    daily_tracking_count: dailyTracking.length,
+    github_trending_count: githubTrending.length,
+    huggingface_trending_count: huggingFaceTrending.length,
+    builder_observations_count: builderCount,
+    community_leads_count: communityLeads.length,
+    platform_items_count: platformItems.length,
+    evidence_assets_count: evidenceAssets.length,
+    section_coverage_count: sectionCounts.filter((count) => count > 0).length
+  };
+}
+
+function publicDateQuality(status = {}) {
+  const value = status && typeof status === "object" ? status : {};
+  const rawStatus = String(value.status || "ok").toLowerCase();
+  const normalizedStatus = ["ok", "degraded", "blocked"].includes(rawStatus) ? rawStatus : "ok";
+  const affectedSections = Array.isArray(value.affected_sections)
+    ? value.affected_sections.map((section) => String(section || "").trim()).filter(Boolean)
+    : [];
+  return {
+    status: normalizedStatus,
+    label: normalizedStatus === "blocked" ? "阻断" : normalizedStatus === "degraded" ? "降级" : "正常",
+    public_note: String(value.public_note || "").trim(),
+    affected_sections: affectedSections
+  };
+}
+
+function dateHighlights(report = {}, feedReport = {}) {
+  const heroHighlights = arrayValue(report.hero_highlights)
+    .filter((item) => item?.title && item?.url)
+    .slice(0, 3)
+    .map((item) => ({
+      title: String(item.title || ""),
+      url: String(item.url || ""),
+      reason: String(item.reason || "").trim()
+    }));
+  if (heroHighlights.length > 0) {
+    return heroHighlights;
+  }
+  const mainHighlights = arrayValue(report.main_items)
+    .filter((item) => item?.title && item?.url)
+    .slice(0, 3)
+    .map((item) => ({
+      title: String(item.title || ""),
+      url: String(item.url || ""),
+      reason: String(item.summary || item.source || "").trim()
+    }));
+  if (mainHighlights.length > 0) {
+    return mainHighlights;
+  }
+  return [{
+    title: String(feedReport.title || feedReport.report_date || ""),
+    url: String(feedReport.url || ""),
+    reason: String(feedReport.summary || "").trim()
+  }].filter((item) => item.title && item.url);
+}
+
+function countMajorItems(items) {
+  return items.filter((item) => {
+    const importance = String(item?.importance || "").toLowerCase();
+    return importance === "major" || importance === "critical";
+  }).length;
+}
+
+function arrayValue(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function weekdayLabel(dateString) {
+  const date = new Date(`${dateString}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return ["周日", "周一", "周二", "周三", "周四", "周五", "周六"][date.getUTCDay()];
+}
+
+function monthKey(dateString) {
+  const match = String(dateString || "").match(/^(\d{4}-\d{2})-\d{2}$/);
+  return match ? match[1] : "";
+}
+
 function reportsAreEqual(left, right) {
   const normalize = (items) => [...items].sort((a, b) => b.report_date.localeCompare(a.report_date));
   const normalizedLeft = normalize(left);
@@ -341,7 +619,9 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
   const reportHtml = applyDailyReportHtmlOverrides(await renderReportWithEffectiveInteract(report, {
     rootDir,
     assetRootDir: outDir,
-    trendAnnotations: options.trendAnnotations
+    trendAnnotations: options.trendAnnotations,
+    reportNavigation: options.reportNavigation,
+    dateIndexItem: options.dateIndexItem
   }));
   await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);

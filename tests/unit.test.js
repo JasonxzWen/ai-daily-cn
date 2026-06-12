@@ -31,12 +31,12 @@ import {
 } from "../src/source-status-history.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
-import { renderReportHtml } from "../src/render.js";
+import { renderIndexHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { generateReportDraft } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
-import { mergeFeed, buildSite } from "../src/site.js";
+import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite } from "../src/site.js";
 import { validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
@@ -5950,13 +5950,375 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
   assert(html.includes("日报导航"));
 
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(indexHtml.includes("近 7 日趋势"));
-  assert(indexHtml.includes("按年月周导航"));
+  assert(indexHtml.includes('id="topic-radar"'));
+  assert(indexHtml.includes('id="signal-heat-strip"'));
+  assert(!indexHtml.includes("近 7 日趋势"));
+  assert(!indexHtml.includes("按年月周导航"));
   assert(indexHtml.includes("coding agent"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-29.json"), "utf8"));
   assert.equal(data.annotations_by_date, undefined);
   assert.equal(data.trends, undefined);
+});
+
+test("date index view model keeps chronological order and transparent signal strength", async () => {
+  const quietReport = minimalDateIndexReport("2026-05-13", {
+    mainItems: 1,
+    github: 0,
+    builder: 0,
+    hotBlogs: 0,
+    tracking: 0,
+    qualityStatus: { status: "ok" }
+  });
+  const strongDegradedReport = minimalDateIndexReport("2026-05-14", {
+    mainItems: 10,
+    majorItems: 4,
+    github: 10,
+    builder: 8,
+    hotBlogs: 5,
+    tracking: 2,
+    evidence: 1,
+    qualityStatus: {
+      status: "degraded",
+      public_note: "Builder and source coverage were partially degraded.",
+      affected_sections: ["builder_observations", "source_coverage"]
+    }
+  });
+  strongDegradedReport.source_audit = {
+    builder_sources: {
+      checked: true,
+      candidates_found: 8,
+      included: 8,
+      notes: "Internal audit must not appear in the date index."
+    }
+  };
+  strongDegradedReport.self_check = {
+    notes: "Internal self-check must not appear in the date index."
+  };
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(strongDegradedReport), feedEntryFor(quietReport)]
+  };
+  const trends = {
+    topics: [
+      {
+        id: "coding-agent",
+        label: "coding agent",
+        status: "hot",
+        occurrences: 6,
+        active_days: 2,
+        sections: ["main_items", "builder_observations"],
+        entities: ["OpenAI"],
+        dates: ["2026-05-14"],
+        related_reports: ["2026-05-14"]
+      }
+    ]
+  };
+
+  const dateIndex = buildDateIndex(feed, [strongDegradedReport, quietReport], trends);
+
+  assert.deepEqual(dateIndex.items.map((item) => item.date), ["2026-05-13", "2026-05-14"]);
+  assert.equal(dateIndex.totals.report_count, 2);
+  assert.equal(dateIndex.totals.degraded_days, 1);
+  assert.equal(dateIndex.totals.strong_days, 1);
+  assert.equal(dateIndex.items[0].strength.level, "quiet");
+  assert.equal(dateIndex.items[1].strength.level, "strong");
+  assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "main_items_high"));
+  assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "github_full"));
+  assert.equal(dateIndex.items[1].quality.status, "degraded");
+  assert.deepEqual(dateIndex.items[1].quality.affected_sections, ["builder_observations", "source_coverage"]);
+  assert.equal(dateIndex.items[1].flags.has_degraded, true);
+  assert.equal(dateIndex.items[1].top_topic.label, "coding agent");
+  assert.equal(dateIndex.items[1].metrics.main_items_count, 10);
+  assert.equal(dateIndex.items[1].metrics.github_trending_count, 10);
+  assert.equal(dateIndex.items[1].metrics.builder_observations_count, 8);
+  assert.equal(dateIndex.items[1].metrics.daily_tracking_count, 2);
+
+  const serialized = JSON.stringify(dateIndex);
+  assert(!serialized.includes("source_audit"));
+  assert(!serialized.includes("self_check"));
+  assert(!serialized.includes("candidate_pool"));
+  assert(!serialized.includes("Internal audit"));
+
+  assert.equal(deriveDateSignalStrength({
+    main_items_count: 5,
+    major_count: 1,
+    github_trending_count: 2,
+    builder_observations_count: 2,
+    hot_blogs_count: 1,
+    daily_tracking_count: 0,
+    section_coverage_count: 3,
+    evidence_assets_count: 0
+  }).level, "medium");
+});
+
+test("calendar index homepage renders controls and independent quality channel", async () => {
+  const okReport = minimalDateIndexReport("2026-05-13", {
+    mainItems: 2,
+    github: 0,
+    builder: 1,
+    hotBlogs: 0,
+    tracking: 0,
+    qualityStatus: { status: "ok" }
+  });
+  const strongDegradedReport = minimalDateIndexReport("2026-05-14", {
+    mainItems: 10,
+    majorItems: 3,
+    github: 10,
+    builder: 8,
+    hotBlogs: 4,
+    tracking: 2,
+    evidence: 1,
+    qualityStatus: {
+      status: "degraded",
+      public_note: "Some source lanes degraded.",
+      affected_sections: ["source_coverage"]
+    }
+  });
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(strongDegradedReport), feedEntryFor(okReport)]
+  };
+  const dateIndex = buildDateIndex(feed, [strongDegradedReport, okReport], null);
+
+  const html = renderIndexHtml(feed, null, dateIndex);
+
+  assert(html.includes('id="date-research-index"'));
+  assert(html.includes('data-date-card="2026-05-13"'));
+  assert(html.includes('data-date-card="2026-05-14"'));
+  assert(html.indexOf('data-date-card="2026-05-13"') < html.indexOf('data-date-card="2026-05-14"'));
+  assert(html.includes('data-strength-level="strong"'));
+  assert(html.includes('data-quality-status="degraded"'));
+  assert(html.includes('data-quality-channel="degraded"'));
+  assert(html.includes('id="date-filter-strength"'));
+  assert(html.includes('id="date-filter-quality"'));
+  assert(html.includes('id="date-filter-github"'));
+  assert(html.includes('id="selected-date-panel"'));
+  assert(html.includes("data-date-index-script"));
+  assert(html.includes("主线"));
+  assert(html.includes("强度原因"));
+  assert(html.includes("降级影响"));
+});
+
+test("index rewrite renders signal console from stored data", async () => {
+  const quietReport = minimalDateIndexReport("2026-05-13", {
+    mainItems: 2,
+    github: 0,
+    builder: 1,
+    hotBlogs: 0,
+    tracking: 0,
+    qualityStatus: { status: "ok" }
+  });
+  const strongBlockedReport = minimalDateIndexReport("2026-05-14", {
+    mainItems: 10,
+    majorItems: 3,
+    github: 10,
+    builder: 8,
+    hotBlogs: 5,
+    tracking: 2,
+    evidence: 1,
+    qualityStatus: {
+      status: "blocked",
+      public_note: "Report generation is blocked by validation failure.",
+      affected_sections: ["hot_blogs", "daily_tracking"]
+    }
+  });
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(strongBlockedReport), feedEntryFor(quietReport)]
+  };
+  const trends = {
+    topics: [
+      {
+        id: "coding-agent",
+        label: "coding agent",
+        status: "hot",
+        occurrences: 8,
+        active_days: 2,
+        sections: ["main_items", "builder_observations"],
+        entities: ["OpenAI", "Anthropic"],
+        dates: ["2026-05-13", "2026-05-14"],
+        related_reports: ["2026-05-13", "2026-05-14"]
+      }
+    ]
+  };
+  const dateIndex = buildDateIndex(feed, [quietReport, strongBlockedReport], trends);
+
+  const html = renderIndexHtml(feed, trends, dateIndex);
+
+  assert(html.includes('id="index-console"'));
+  assert(html.includes('id="latest-briefing"'));
+  assert(html.includes('id="signal-heat-strip"'));
+  assert(html.includes('id="source-lane-board"'));
+  assert(html.includes('id="topic-radar"'));
+  assert(html.includes('data-signal-day="2026-05-13"'));
+  assert(html.includes('data-signal-day="2026-05-14"'));
+  assert(html.indexOf('data-signal-day="2026-05-13"') < html.indexOf('data-signal-day="2026-05-14"'));
+  assert(html.includes('data-source-lane="main_items"'));
+  assert(html.includes('data-source-lane="github_trending"'));
+  assert(html.includes('data-source-lane="builder_observations"'));
+  assert(html.includes('data-topic-id="coding-agent"'));
+  assert(html.includes('data-quality-channel="blocked"'));
+  assert(!html.includes("GitHub Pages 静态归档"));
+  assert(!html.includes('id="date-navigation"'));
+  assert(!html.includes("<h2>历史日报</h2>"));
+});
+
+test("effective interact index style uses report primitives", async () => {
+  const baseReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const strongBlockedReport = structuredReportForDate(baseReport, "2026-05-14", {
+    report: {
+      main_items: Array.from({ length: 8 }, (_unused, index) => ({
+        ...baseReport.main_items[0],
+        title: `Strong signal ${index + 1}`,
+        url: `https://example.com/effective-index-main-${index + 1}`,
+        importance: index < 3 ? "major" : "notable"
+      })),
+      github_trending: (baseReport.github_trending || []).slice(0, 2),
+      builder_observations: (baseReport.builder_observations || []).slice(0, 2),
+      quality_status: {
+        status: "degraded",
+        blocking_issues: [],
+        degraded_sections: [{ section: "builder_observations", message: "Builder lane degraded." }],
+        affected_sections: ["builder_observations"],
+        notes: "测试降级质量通道。"
+      }
+    }
+  });
+  const quietReport = structuredReportForDate(baseReport, "2026-05-13", {
+    report: {
+      main_items: baseReport.main_items.slice(0, 2),
+      github_trending: [],
+      builder_observations: [],
+      hot_blogs: [],
+      daily_tracking: []
+    }
+  });
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(strongBlockedReport), feedEntryFor(quietReport)]
+  };
+  const trends = {
+    topics: [
+      {
+        id: "effective-interact-style",
+        label: "effective-interact style",
+        status: "hot",
+        occurrences: 4,
+        active_days: 2,
+        entities: ["AI 日报"],
+        dates: ["2026-05-13", "2026-05-14"],
+        related_reports: ["2026-05-13", "2026-05-14"]
+      }
+    ]
+  };
+  const dateIndex = buildDateIndex(feed, [quietReport, strongBlockedReport], trends);
+
+  const html = renderIndexHtml(feed, trends, dateIndex);
+
+  assert(html.includes('data-index-style="effective-interact"'));
+  assert(html.includes('class="report-shell index-page"'));
+  assert(html.includes('class="report-hero report-hero-index"'));
+  assert(html.includes("hero-brief"));
+  assert(html.includes("hero-summary-text"));
+  assert(html.includes("hero-stat-grid"));
+  assert(html.includes("hero-stat"));
+  assert(html.includes('class="report-nav"'));
+  assert(html.includes('data-nav-link'));
+  assert(html.includes('class="panel latest-briefing"'));
+  assert(html.includes('class="panel source-lane-board"'));
+  assert(html.includes("report-data-table"));
+  assert(html.includes("chip"));
+  assert(html.includes("status-warn"));
+  assert(!html.includes("class=\"index-console-stats\""));
+  assert(!html.includes("class=\"source-lane-grid\""));
+});
+
+test("buildSite writes date index homepage without exposing private report fields", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-date-index-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const firstReport = structuredReportForDate(base, "2026-05-13");
+  const secondReport = structuredReportForDate(base, "2026-05-14");
+  const firstMainItem = secondReport.main_items[0];
+  secondReport.main_items = Array.from({ length: 10 }, (_unused, index) => ({
+    ...firstMainItem,
+    title: `${firstMainItem.title} ${index + 1}`,
+    url: `https://example.com/date-index-main-${index + 1}`,
+    importance: index < 3 ? "major" : "notable"
+  }));
+  secondReport.github_trending = Array.from({ length: 10 }, (_unused, index) => ({
+    name: `example/date-index-${index + 1}`,
+    repo: `example/date-index-${index + 1}`,
+    description: `Date index project ${index + 1} with public AI signal.`,
+    url: `https://github.com/example/date-index-${index + 1}`,
+    event_date: secondReport.report_date,
+    source: "GitHub Trending daily",
+    rank: index + 1,
+    trend: "new",
+    evidence: `GitHub Trending daily fixture ${index + 1}.`
+  }));
+  const firstBuilder = secondReport.builder_observations[0];
+  secondReport.builder_observations = Array.from({ length: 8 }, (_unused, index) => ({
+    ...firstBuilder,
+    author: `Date Index Builder ${index + 1}`,
+    handle: `dateindexbuilder${index + 1}`,
+    url: `https://x.com/dateindexbuilder/status/20590000000000000${index + 1}`,
+    original_text: `Date index original builder observation ${index + 1}.`,
+    translation: `日期索引 Builder 观察 ${index + 1}。`,
+    content: `日期索引 Builder 观察 ${index + 1}。`
+  }));
+  secondReport.source_audit = {
+    builder_sources: {
+      checked: true,
+      candidates_found: 8,
+      included: 8,
+      notes: "Internal audit should never be copied to homepage."
+    }
+  };
+  secondReport.self_check.notes = "Internal self-check should never be copied to homepage.";
+
+  await fs.writeFile(path.join(dataInputDir, "2026-05-13.json"), `${JSON.stringify(firstReport, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(dataInputDir, "2026-05-14.json"), `${JSON.stringify(secondReport, null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert(result.writtenFiles.includes("index.html"));
+  assert.equal(result.dateIndex.items.length, 2);
+  const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  assert(html.includes('id="date-research-index"'));
+  assert(html.includes('data-date-card="2026-05-13"'));
+  assert(html.includes('data-date-card="2026-05-14"'));
+  assert(html.indexOf('data-date-card="2026-05-13"') < html.indexOf('data-date-card="2026-05-14"'));
+  assert(html.includes('data-strength-level="strong"'));
+  assert(html.includes("透明统计"));
+  assert(!html.includes("source_audit"));
+  assert(!html.includes("self_check"));
+  assert(!html.includes("candidate_pool"));
+  assert(!html.includes("Internal audit"));
+  assert(!html.includes("Internal self-check"));
 });
 
 test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build", async () => {
@@ -10958,6 +11320,122 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
 
 async function readFixture(relativePath) {
   return fs.readFile(path.join(rootDir, "tests/fixtures", relativePath), "utf8");
+}
+
+function minimalDateIndexReport(reportDate, options = {}) {
+  const mainItems = Array.from({ length: options.mainItems || 0 }, (_unused, index) => ({
+    title: `Main signal ${index + 1}`,
+    summary: `Public summary for signal ${index + 1}.`,
+    url: `https://example.com/${reportDate}/main-${index + 1}`,
+    event_date: reportDate,
+    source: "Example",
+    importance: index < (options.majorItems || 0) ? "major" : "notable"
+  }));
+  const githubTrending = Array.from({ length: options.github || 0 }, (_unused, index) => ({
+    name: `example/date-index-${index + 1}`,
+    repo: `example/date-index-${index + 1}`,
+    url: `https://github.com/example/date-index-${index + 1}`,
+    rank: index + 1,
+    trend: "new",
+    event_date: reportDate,
+    description: `Date index repository ${index + 1}.`
+  }));
+  const builderObservations = Array.from({ length: options.builder || 0 }, (_unused, index) => ({
+    author: `Builder ${index + 1}`,
+    handle: `builder${index + 1}`,
+    url: `https://x.com/builder/status/${reportDate.replaceAll("-", "")}${index + 1}`,
+    event_date: reportDate,
+    content: `Builder observation ${index + 1}.`,
+    original_text: `Builder original ${index + 1}.`
+  }));
+  const hotBlogs = Array.from({ length: options.hotBlogs || 0 }, (_unused, index) => ({
+    title: `Hot blog ${index + 1}`,
+    url: `https://example.com/${reportDate}/blog-${index + 1}`,
+    summary: `Hot blog summary ${index + 1}.`,
+    event_date: reportDate,
+    importance: index === 0 ? "major" : "notable"
+  }));
+  const dailyTracking = Array.from({ length: options.tracking || 0 }, (_unused, index) => ({
+    id: `tracking-${index + 1}`,
+    name: `Tracking ${index + 1}`,
+    url: `https://example.com/${reportDate}/tracking-${index + 1}`,
+    event_date: reportDate,
+    publish_to_public: true,
+    change_status: "changed",
+    summary: `Tracking summary ${index + 1}.`
+  }));
+  const evidenceAssets = Array.from({ length: options.evidence || 0 }, (_unused, index) => ({
+    type: "figure",
+    title: `Evidence ${index + 1}`,
+    local_path: `assets/evidence/${reportDate}-${index + 1}.png`,
+    source_url: mainItems[0]?.url || `https://example.com/${reportDate}`,
+    caption: `Evidence caption ${index + 1}.`
+  }));
+
+  return {
+    report_date: reportDate,
+    title: `AI 日报 ${reportDate}`,
+    summary: `Summary for ${reportDate}.`,
+    generated_at: fixedGeneratedAt,
+    html_path: `reports/${reportDate.slice(0, 4)}/${reportDate.slice(5, 7)}/${reportDate}.html`,
+    canonical_url: `${siteUrl}reports/${reportDate.slice(0, 4)}/${reportDate.slice(5, 7)}/${reportDate}.html`,
+    main_items: mainItems,
+    model_releases: [],
+    hot_blogs: hotBlogs,
+    daily_tracking: dailyTracking,
+    projects: [],
+    github_trending: githubTrending,
+    huggingface_trending: [],
+    builder_observations: builderObservations,
+    community_leads: [],
+    evidence_assets: evidenceAssets,
+    hero_highlights: mainItems.slice(0, 2).map((item) => ({
+      title: item.title,
+      url: item.url,
+      reason: item.summary
+    })),
+    quality_status: options.qualityStatus || { status: "ok" }
+  };
+}
+
+function feedEntryFor(report) {
+  return {
+    report_date: report.report_date,
+    title: report.title,
+    summary: report.summary,
+    url: report.html_path,
+    data_url: `data/${report.report_date.slice(0, 4)}/${report.report_date.slice(5, 7)}/${report.report_date}.json`,
+    main_items: report.main_items.length,
+    builder_observations: report.builder_observations.length,
+    generated_at: report.generated_at
+  };
+}
+
+function structuredReportForDate(base, reportDate) {
+  const report = structuredClone(base);
+  report.report_date = reportDate;
+  report.title = `AI 日报 ${reportDate}`;
+  report.summary = `Structured report for ${reportDate}.`;
+  report.generated_at = fixedGeneratedAt;
+  report.html_path = `reports/${reportDate.slice(0, 4)}/${reportDate.slice(5, 7)}/${reportDate}.html`;
+  report.canonical_url = `${siteUrl}${report.html_path}`;
+  report.self_check.report_date = reportDate;
+  for (const sectionName of [
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "daily_tracking",
+    "projects",
+    "github_trending",
+    "huggingface_trending",
+    "builder_observations",
+    "community_leads"
+  ]) {
+    for (const item of report[sectionName] || []) {
+      item.event_date = reportDate;
+    }
+  }
+  return report;
 }
 
 function platformAuditGroupFixture(name, url, candidatesFound, included) {

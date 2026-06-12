@@ -7,7 +7,7 @@ import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
-import { evaluateDailyPageChecklist } from "../../src/page-checklist.js";
+import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../src/page-checklist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
@@ -300,7 +300,35 @@ try {
   assert.match(await page.locator("h1").textContent(), /AI 日报/);
   assert.equal(await hasRemoteScripts(page), false);
   assert((await page.locator("a[href='reports/2026/05/2026-05-13.html']").count()) >= 1);
-  assert.match(await page.locator("body").textContent(), /按年月周导航/);
+  assert.equal(await page.locator("#index-console").count(), 1);
+  assert.equal(await page.locator("#latest-briefing").count(), 1);
+  assert.equal(await page.locator("#signal-heat-strip").count(), 1);
+  assert.equal(await page.locator("#source-lane-board").count(), 1);
+  assert.equal(await page.locator("#topic-radar").count(), 1);
+  assert.equal(await page.locator('[data-index-style="effective-interact"]').count(), 1);
+  assert.equal(await page.locator("main.report-shell.index-page").count(), 1);
+  assert.equal(await page.locator(".report-hero.report-hero-index").count(), 1);
+  assert.equal(await page.locator("nav.report-nav").count(), 1);
+  assert.equal(await page.locator("#source-lane-board .report-data-table").count(), 1);
+  assert.deepEqual(await signalHeatOrder(page), ["2026-05-13", "2026-05-15", "2026-05-16", "2026-05-17"]);
+  assert.doesNotMatch(await page.locator("body").textContent(), /GitHub Pages 静态归档|按年月周导航/);
+  assert.equal(await page.locator("#date-research-index").count(), 1);
+  const desktopIndexChecklist = await evaluateIndexPageChecklist(page, { expectedMinReports: 4 });
+  assert.equal(desktopIndexChecklist.ok, true, JSON.stringify(desktopIndexChecklist.issues, null, 2));
+  assert.deepEqual(await dateCardOrder(page), ["2026-05-13", "2026-05-15", "2026-05-16", "2026-05-17"]);
+  await page.locator('[data-select-date="2026-05-15"]').click();
+  assert.match(await page.locator('#selected-date-panel [data-date-detail="2026-05-15"]').textContent(), /2026-05-15/);
+  await page.locator("#date-filter-github").check();
+  const githubFilteredDates = await visibleDateCards(page);
+  assert(githubFilteredDates.includes("2026-05-15"));
+  assert(!githubFilteredDates.includes("2026-05-13"));
+  await page.locator("#date-filter-github").uncheck();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileIndexChecklist = await evaluateIndexPageChecklist(page, { expectedMinReports: 4 });
+  assert.equal(mobileIndexChecklist.ok, true, JSON.stringify(mobileIndexChecklist.issues, null, 2));
+  assert.equal(await hasHorizontalOverflow(page), false);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  assert.equal(await page.locator("[data-source-lane]").count(), 6);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
@@ -504,6 +532,31 @@ async function allExternalLinksHaveRel(page) {
 
 async function hasHorizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+}
+
+async function dateCardOrder(page) {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll("[data-date-card]"))
+      .map((card) => card.getAttribute("data-date-card"))
+      .filter(Boolean)
+  );
+}
+
+async function signalHeatOrder(page) {
+  return page.$$eval("[data-signal-day]", (nodes) =>
+    nodes
+      .map((node) => node.getAttribute("data-signal-day"))
+      .filter(Boolean)
+  );
+}
+
+async function visibleDateCards(page) {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll("[data-date-card]"))
+      .filter((card) => !card.hidden)
+      .map((card) => card.getAttribute("data-date-card"))
+      .filter(Boolean)
+  );
 }
 
 async function allImagesLoaded(page) {

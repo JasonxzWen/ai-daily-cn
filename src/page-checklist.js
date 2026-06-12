@@ -549,6 +549,193 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
   };
 }
 
+export async function evaluateIndexPageChecklist(page, options = {}) {
+  const result = await page.evaluate(({ expectedMinReports }) => {
+    const checks = [];
+    const issues = [];
+    const addCheck = (id, ok, message, details = {}) => {
+      checks.push({ id, ok, message, details });
+      if (!ok) {
+        issues.push({ id, message, details });
+      }
+    };
+    const root = document.querySelector("#date-research-index");
+    const consoleRoot = document.querySelector("#index-console");
+    const styleRoot = document.querySelector("[data-index-style='effective-interact']");
+    const reportShell = document.querySelector(".report-shell.index-page");
+    const reportHero = document.querySelector(".report-hero.report-hero-index");
+    const reportNav = document.querySelector("nav.report-nav");
+    const heatStrip = document.querySelector("#signal-heat-strip");
+    const sourceLaneBoard = document.querySelector("#source-lane-board");
+    const topicRadar = document.querySelector("#topic-radar");
+    const cards = Array.from(document.querySelectorAll("[data-date-card]"));
+    const heatDays = Array.from(document.querySelectorAll("[data-signal-day]"));
+    const details = Array.from(document.querySelectorAll("[data-date-detail]"));
+    const dates = cards.map((card) => card.getAttribute("data-date-card") || "").filter(Boolean);
+    const heatDates = heatDays.map((day) => day.getAttribute("data-signal-day") || "").filter(Boolean);
+    const chronological = dates.every((date, index) => index === 0 || dates[index - 1] <= date);
+    const heatChronological = heatDates.every((date, index) => index === 0 || heatDates[index - 1] <= date);
+    const cardsWithoutMetrics = cards
+      .map((card) => ({
+        date: card.getAttribute("data-date-card") || "",
+        metric_count: card.querySelectorAll(".metric-pill").length,
+        strength: card.getAttribute("data-strength-level") || "",
+        quality: card.getAttribute("data-quality-status") || "",
+        quality_channel: card.getAttribute("data-quality-channel") || ""
+      }))
+      .filter((card) => card.metric_count < 6 || !card.strength || !card.quality || !card.quality_channel);
+    const degradedCards = cards.filter((card) => {
+      const status = card.getAttribute("data-quality-status");
+      return status === "degraded" || status === "blocked";
+    });
+    const weakDegradedCards = degradedCards
+      .map((card) => ({
+        date: card.getAttribute("data-date-card") || "",
+        quality_channel: card.getAttribute("data-quality-channel") || "",
+        has_badge: Boolean(card.querySelector(".quality-degraded, .quality-blocked")),
+        border_style: getComputedStyle(card).borderStyle
+      }))
+      .filter((card) => card.quality_channel !== "degraded" && card.quality_channel !== "blocked" || !card.has_badge);
+
+    addCheck(
+      "index_console_present",
+      Boolean(consoleRoot),
+      "Homepage should lead with a data console instead of archive-first framing."
+    );
+    addCheck(
+      "effective_interact_index_style",
+      Boolean(styleRoot && reportShell && reportHero && reportNav),
+      "Homepage should use effective-interact report shell, hero, and grouped navigation primitives.",
+      {
+        style_root: Boolean(styleRoot),
+        report_shell: Boolean(reportShell),
+        report_hero: Boolean(reportHero),
+        report_nav: Boolean(reportNav)
+      }
+    );
+    addCheck(
+      "effective_interact_component_primitives",
+      Boolean(
+        document.querySelector(".hero-brief") &&
+        document.querySelector(".hero-summary-text") &&
+        document.querySelector(".hero-stat-grid") &&
+        document.querySelector(".hero-stat") &&
+        document.querySelector(".panel") &&
+        document.querySelector(".chip")
+      ),
+      "Homepage should reuse effective-interact component primitives rather than a bespoke dashboard skin."
+    );
+    addCheck(
+      "source_lane_comparison_surface",
+      Boolean(sourceLaneBoard && sourceLaneBoard.querySelector(".report-data-table")),
+      "Source lanes should be rendered as a comparable metric surface."
+    );
+    addCheck(
+      "latest_briefing_present",
+      Boolean(document.querySelector("#latest-briefing")),
+      "Homepage should render a latest briefing from stored report data."
+    );
+    addCheck(
+      "signal_heat_strip_present",
+      Boolean(heatStrip) && heatDays.length >= Number(expectedMinReports || 1) && heatChronological,
+      "Homepage should render a chronological signal heat strip.",
+      { count: heatDays.length, dates: heatDates }
+    );
+    addCheck(
+      "source_lane_board_present",
+      Boolean(sourceLaneBoard) && document.querySelectorAll("[data-source-lane]").length >= 5,
+      "Homepage should render source lanes with transparent aggregate counts.",
+      { count: document.querySelectorAll("[data-source-lane]").length }
+    );
+    addCheck(
+      "topic_radar_present",
+      Boolean(topicRadar),
+      "Homepage should render a topic radar when trend data is available."
+    );
+    addCheck(
+      "archive_first_copy_absent",
+      !/GitHub Pages 静态归档|按年月周导航/.test(document.body.textContent || ""),
+      "Homepage should not lead with legacy archive-first copy."
+    );
+    addCheck(
+      "date_research_index_present",
+      Boolean(root),
+      "Homepage should render the 30-day date research index."
+    );
+    addCheck(
+      "date_cards_present",
+      cards.length >= Number(expectedMinReports || 1),
+      "Date index should render report-date cards.",
+      { count: cards.length, expected_min_reports: expectedMinReports }
+    );
+    addCheck(
+      "date_cards_chronological",
+      chronological,
+      "Date cards should keep strict chronological order.",
+      { dates }
+    );
+    addCheck(
+      "date_cards_transparent_metrics",
+      cards.length > 0 && cardsWithoutMetrics.length === 0,
+      "Every date card should expose transparent metrics plus strength and quality channels.",
+      { weak_cards: cardsWithoutMetrics }
+    );
+    addCheck(
+      "date_filters_present",
+      Boolean(
+        document.querySelector("#date-filter-month") &&
+        document.querySelector("#date-filter-strength") &&
+        document.querySelector("#date-filter-quality") &&
+        document.querySelector("#date-filter-github") &&
+        document.querySelector("#date-filter-builder") &&
+        document.querySelector("#date-filter-tracking") &&
+        document.querySelector("#date-filter-degraded")
+      ),
+      "Date index should expose month, strength, quality, and signal filters."
+    );
+    addCheck(
+      "selected_date_panel_present",
+      Boolean(document.querySelector("#selected-date-panel")) && details.length === cards.length,
+      "Date index should render one selected-date detail panel per date.",
+      { detail_count: details.length, card_count: cards.length }
+    );
+    addCheck(
+      "degraded_quality_channel_encoded",
+      weakDegradedCards.length === 0,
+      "Degraded or blocked dates should use an independent quality channel and visible badge.",
+      { degraded_count: degradedCards.length, weak_cards: weakDegradedCards }
+    );
+    addCheck(
+      "index_no_remote_scripts",
+      !Array.from(document.scripts).some((script) => /^https?:\/\//i.test(script.src || "")),
+      "Homepage should not depend on remote scripts."
+    );
+    addCheck(
+      "index_no_horizontal_overflow",
+      document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+      "Homepage should not create horizontal overflow at the current viewport.",
+      {
+        scroll_width: document.documentElement.scrollWidth,
+        client_width: document.documentElement.clientWidth
+      }
+    );
+
+    return {
+      ok: issues.length === 0,
+      checks,
+      issues
+    };
+  }, {
+    expectedMinReports: options.expectedMinReports || 1
+  });
+
+  return {
+    ...result,
+    viewport: await page.viewportSize(),
+    url: page.url()
+  };
+}
+
 async function eagerLoadPageImages(page, timeoutMs) {
   await page.evaluate(async () => {
     const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));

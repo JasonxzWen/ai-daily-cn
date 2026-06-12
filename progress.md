@@ -1,5 +1,15 @@
 # Progress
 
+## 2026-06-12 Effective-Interact Index PR
+
+- Status: index UI rewrite PR is open as draft PR #81.
+- Branch: `codex/effective-interact-index`.
+- PR: `https://github.com/JasonxzWen/ai-daily-cn/pull/81`.
+- Validation before PR update: `npm run validate` passed after the rebase conflict notes were recorded.
+- Publish dry-run was captured before real publish and blocked with `wrong_branch`; direct Pages publish is still gated to `main`.
+- Direct Pages publish was not forced from the feature branch; update the public site after merge to `main` or by rerunning the approved publish flow from `main`.
+- Existing `.playwright-cli/` remains unrelated and was not staged.
+
 ## 2026-06-12 Batch 3 Live Tracking Adapters
 
 - Status: Batch 3 live tracking adapters are implemented and verified.
