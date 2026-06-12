@@ -110,6 +110,7 @@ export function normalizeReportDraft(draft, options = {}) {
     candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
     main_items: Array.isArray(draft.main_items) ? draft.main_items : [],
     github_trending: Array.isArray(draft.github_trending) ? draft.github_trending : [],
+    huggingface_trending: Array.isArray(draft.huggingface_trending) ? draft.huggingface_trending : [],
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
     daily_tracking: Array.isArray(draft.daily_tracking) ? draft.daily_tracking : [],
@@ -131,6 +132,7 @@ export function normalizeReportDraft(draft, options = {}) {
     "daily_tracking",
     "projects",
     "github_trending",
+    "huggingface_trending",
     "builder_observations",
     "community_leads"
   ]) {
@@ -200,6 +202,7 @@ function stripPrivateDisclosureFields(report) {
     "daily_tracking",
     "projects",
     "github_trending",
+    "huggingface_trending",
     "builder_observations",
     "community_leads"
   ]) {
@@ -281,7 +284,12 @@ function requireSourceAudit(report) {
     throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录固定发现面和源健康检查结果。");
   }
 
-  for (const groupName of ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS]) {
+  const requiredGroups = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS];
+  if (String(report.report_date || "") >= "2026-06-11") {
+    requiredGroups.splice(1, 0, "huggingface_trending");
+    requiredGroups.splice(3, 0, "china_ai_sources");
+  }
+  for (const groupName of requiredGroups) {
     if (PLATFORM_AUDIT_GROUPS.includes(groupName) && !audit[groupName]) {
       continue;
     }

@@ -128,6 +128,7 @@ export function reportToInteractionInput(report, options = {}) {
   const dailyTracking = Array.isArray(report.daily_tracking) ? report.daily_tracking : [];
   const publicDailyTracking = dailyTracking.filter(isPublicDailyTrackingChange);
   const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
+  const huggingFaceTrending = Array.isArray(report.huggingface_trending) ? report.huggingface_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
@@ -171,6 +172,14 @@ export function reportToInteractionInput(report, options = {}) {
       title: "GitHub Trending · Top 10",
       group: "projects",
       content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
+    });
+  }
+  if (huggingFaceTrending.length > 0) {
+    sections.push({
+      type: "markdown",
+      title: "Hugging Face Trending 路 Top 10",
+      group: "projects",
+      content: formatHuggingFaceTrending(huggingFaceTrending, { trendAnnotations })
     });
   }
   if (builderObservations.length > 0) {
@@ -219,7 +228,7 @@ export function reportToInteractionInput(report, options = {}) {
       items: cards
     });
   }
-  const publicSourceCoverage = formatPublicSourceCoverage(report.source_audit);
+  const publicSourceCoverage = formatPublicSourceCoverageV2(report.source_audit);
   if (publicSourceCoverage) {
     sections.push({
       type: "markdown",
@@ -693,6 +702,26 @@ function formatGithubTrending(items, context = {}) {
     })
     .join("\n");
   return trendingLines;
+}
+
+function formatHuggingFaceTrending(items, context = {}) {
+  const rows = items.slice(0, 10).map((item, index) => {
+    const tagText = formatHighlightTags([
+      importanceTagFor("huggingface_trending", item),
+      sourceTrustHighlightTag(item),
+      item.task ? `task: ${item.task}` : "",
+      Number(item.likes) > 0 ? `${item.likes} likes` : "",
+      Number(item.downloads) > 0 ? `${item.downloads} downloads` : "",
+      ...trendTagsFor(context.trendAnnotations, "huggingface_trending", index)
+    ].filter(Boolean));
+    const details = [
+      trimText(item.description || item.evidence || "", 120),
+      Number(item.likes) > 0 ? `likes ${item.likes}` : "",
+      Number(item.downloads) > 0 ? `downloads ${item.downloads}` : ""
+    ].filter(Boolean).join(" / ");
+    return `${Number(item.rank || index + 1)}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}${details ? `: ${details}` : ""}`;
+  });
+  return rows.join("\n");
 }
 
 function githubTrendDetails(item, project) {
@@ -1203,7 +1232,7 @@ function formatBuilderObservationCards(items, report, context = {}) {
   return items.map((item) => {
     const translation = builderTranslationText(item);
     const handle = builderHandle(item);
-    const originalText = builderOriginalText(item);
+    const originalText = compactBuilderOriginalText(builderOriginalText(item));
     const media = formatBuilderMedia(report, item, context.mediaOptions || {});
 
     return {
@@ -1232,6 +1261,14 @@ function builderTranslationText(item) {
 
 function builderOriginalText(item) {
   return String(item?.original_text || "").trim();
+}
+
+function compactBuilderOriginalText(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (text.length <= 220) {
+    return text;
+  }
+  return `${text.slice(0, 217).trim()}...`;
 }
 
 function formatBuilderMedia(report, item, options = {}) {
@@ -2231,6 +2268,87 @@ function formatPublicSourceCoverage(audit) {
   ].join("\n");
 }
 
+function formatPublicSourceCoverageV2(audit) {
+  if (!audit) {
+    return "";
+  }
+  const groups = sourceAuditGroups(audit);
+  const rows = groups.map(({ title, group }) => formatPublicSourceCoverageGroupV2(title, group)).filter(Boolean);
+  if (rows.length === 0) {
+    return "";
+  }
+  const totals = groups.reduce((acc, { group }) => {
+    const counts = sourceStatusCounts(group?.sources);
+    acc.checked += counts.checked;
+    acc.no_signal += counts.no_signal;
+    acc.blocked += counts.blocked;
+    acc.skipped += counts.skipped;
+    return acc;
+  }, { checked: 0, no_signal: 0, blocked: 0, skipped: 0 });
+  return [
+    "本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。",
+    "",
+    [
+      `${sourceStatusTag("checked")} ${totals.checked}`,
+      `${sourceStatusTag("no_signal")} ${totals.no_signal}`,
+      `${sourceStatusTag("blocked")} ${totals.blocked}`,
+      `${sourceStatusTag("skipped")} ${totals.skipped}`
+    ].join(" "),
+    "",
+    ...rows
+  ].join("\n");
+}
+
+function formatPublicSourceCoverageGroupV2(title, group) {
+  if (!group) {
+    return "";
+  }
+  const counts = sourceStatusCounts(group.sources);
+  const total = counts.checked + counts.no_signal + counts.blocked + counts.skipped;
+  if (total <= 0) {
+    return "";
+  }
+  const status = [
+    `${sourceStatusTag("checked")} ${counts.checked}`,
+    `${sourceStatusTag("no_signal")} ${counts.no_signal}`,
+    `${sourceStatusTag("blocked")} ${counts.blocked}`,
+    `${sourceStatusTag("skipped")} ${counts.skipped}`
+  ].join(" ");
+  const details = [
+    group.checked ? "checked" : "not checked",
+    group.blocked_reason ? `blocked_reason: ${group.blocked_reason}` : "",
+    group.notes ? `notes: ${trimText(group.notes, 220)}` : ""
+  ].filter(Boolean).join(" · ");
+  const sources = publicSourceCoverageDetailsV2(group.sources);
+  return [
+    `<details><summary><strong>${escapeInlineHtml(title)}</strong> ${status}</summary>`,
+    "",
+    `- ${details || "No group note recorded."}`,
+    sources || "- No source-level details recorded.",
+    "",
+    "</details>"
+  ].join("\n");
+}
+
+function publicSourceCoverageDetailsV2(sources) {
+  return (Array.isArray(sources) ? sources : [])
+    .slice(0, 10)
+    .map((source) => {
+      const name = String(source?.name || "Unknown source").trim();
+      const status = String(source?.status || "unknown").trim();
+      const notes = String(source?.notes || "").trim();
+      return `- ${sourceStatusTag(status)} \`${status}\` ${markdownLink(source?.url, name)}${notes ? `: ${trimText(notes, 180)}` : ""}`;
+    })
+    .join("\n");
+}
+
+function escapeInlineHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function formatPublicSourceCoverageGroup(title, group) {
   if (!group) {
     return "";
@@ -2354,6 +2472,8 @@ function formatSourceAuditOverviewChart(audit, dataHref) {
 function sourceAuditGroups(audit) {
   return [
     { title: "GitHub Trending", group: audit.github_trending },
+    { title: "Hugging Face Trending", group: audit.huggingface_trending },
+    { title: "China AI official sources", group: audit.china_ai_sources },
     { title: "Builder 原始源", group: audit.builder_sources },
     { title: "精选博客与访谈源", group: audit.content_sources },
     { title: "搜索 / 新闻影子源", group: audit.search_sources },

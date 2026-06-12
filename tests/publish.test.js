@@ -25,6 +25,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 
+function withoutGitHubTokenEnv() {
+  return {
+    ...process.env,
+    GH_TOKEN: "",
+    GITHUB_TOKEN: ""
+  };
+}
+
 test("publish dry-run 在干净工作树输出发布计划", async () => {
   const repoRoot = await tempRepoWithFixture();
   const plan = await createPublishPlan({
@@ -1017,6 +1025,7 @@ test("github api publish falls back to git credential helper when gh auth is una
     confirmPush: true,
     repository: "owner/repo",
     verifyPages: false,
+    env: withoutGitHubTokenEnv(),
     commandRunner: async (file, args, options = {}) => {
       commandCalls.push({ file, args, input: options.input, env: options.env || {} });
       if (file === "gh") {

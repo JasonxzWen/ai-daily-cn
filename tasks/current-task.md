@@ -8,168 +8,157 @@ non-trivial
 
 ### Goal
 
-固化 2026-06-09 日报复盘中用户确认的公开日报合同，先用机器可验证的 ledger、fixture、测试和质量门固定回归边界，再调整生成与公开渲染，使日报稳定产出多板块高密度情报页。
+把 2026-06-11 日报审阅暴露的问题固化为当前生成系统的硬门禁、数据契约、渲染规范和回归测试。重点不是修某一天 HTML，而是修生成链路：采集、候选池、草稿选择、质量门、公开渲染、发布前验证都必须能阻止同类问题复发。
+
+### Implemented Contract
+
+- 中国 AI 覆盖成为严格日报硬门禁：`report_date >= 2026-06-11` 的 strict 报告必须有 `source_audit.china_ai_sources`，未执行为 blocking，执行但无候选为 degraded，并公开披露检查结果。
+- 新增中国 AI 固定信源配置与发现入口：腾讯、阿里、Qwen、DeepSeek、智谱、Kimi、MiniMax、字节 Seed、百度等优先中文官方入口；缺 token 的搜索 provider 不能等价为“未检查”。
+- 新增 Hugging Face Trending discovery、schema、draft selection、公开 section 和 runner 阶段，形成类似 GitHub Trending 的趋势板块。
+- 正文图片改为语义准入：只允许 benchmark、表格、图表、架构、产品/演示截图、局部榜单截图等信息图；hero/cover/banner、stock、logo、favicon、头像、泛化计算机/机房装饰图等不进入公开正文。
+- OpenRouter 和 Artificial Analysis 使用结构化数据渲染榜单/表格，不把整页截图或文本图标当主内容。
+- `hot_blogs` 增加中文/中国 AI 分层兜底；存在合格中文技术博客候选时必须入选或在 coverage 中体现排除原因。
+- X/Twitter Builder 讨论改为紧凑 feed：正文摘要保留，原文截断，减少卡片空白。
+- 公开“信源覆盖与缺口”恢复可读可视化：摘要图标、状态 tag、折叠明细、实际访问状态和缺口说明。
+- 长期反馈写入 `config/feedback-ledger.json` 和 `docs/feedback-buglist-quick-reference.md`，所有新增 P1 均绑定 `npm run validate` 覆盖的真实测试或质量门。
+- 发布凭据 fallback 测试补充环境隔离；`resolveGitHubToken` 支持 `options.env`，避免本机 `GH_TOKEN` 让 credential-helper fallback 测试失真。
 
 ### User-Visible Behavior
 
-- 公开日报是多板块高密度情报页，不是调试面板或候选池说明。
-- 主体新闻使用 `8-12` 条短新闻流，按公共 AI 重要性排序，不按个人工作相关性过滤。
-- 每条主体短新闻展示标题、`2-3` 句可追溯事实概括和原文链接；不展示“为什么重要”“启示”“入选原因”“后续观察”等解释型废话。
-- OpenRouter、Artificial Analysis 等榜单/价格/模型排名板块优先展示从 DOM、JSON 或页面文本解析出的结构化表格；整页截图不能作为公开正文主内容。
-- 正文图片是可选增强，不是必需品；没有合格图片也允许成功发布。
-- 公开正文图片必须通过硬门禁；小图标、favicon、logo、头像、不可读图、尺寸不足图和整页截图不进入公开正文。
-- GitHub、博客、Builder、社区、国内动态、平台豁免内容等其他重要板块继续保留，但必须用紧凑列表或表格呈现，不用废话凑数。
-- 公开页不展示重要性分数、入选理由、候选池解释、抓取状态长列表、ledger 命中项、降级日志或调试审计。
-- 内部质量报告保留评分、候选池、降级项、失败回放、截图证据、发布日志和可追溯字段。
+- 每日 runner 会执行 `discover:china-ai` 与 `discover:huggingface-trending`，产物传入 `report:draft` 和 `report:write`。
+- 中国公司新闻优先中文官方页；英文页可作兜底或交叉验证，但不能让中文信源 lane 消失。
+- 如果中国 AI lane 已执行但没有高质量事实信号，日报可以 degraded 发布；未执行 lane 时不能声称 strict 发布成功。
+- 公开页不会展示装饰性正文图片；类似 Anthropic 模型发布应优先展示性能表/评测图，Meta compute 这类泛化配图会被拒绝。
+- 榜单类追踪以表格/指标组件呈现；截图仅允许局部表格裁剪且优先级低于结构化渲染。
+- 中文博客、Hugging Face Trending、Builder 讨论和信源覆盖的公开布局均有确定性测试约束。
 
 ### Boundaries
 
-- 不回滚 PR #68 的 platform exempt channels。
-- 不手工编辑 `docs/` 下已发布日报 HTML 来伪造效果；产物必须由生成/渲染逻辑产生。
-- 不修改远程 Pages 设置、定时任务配置或 GitHub automation，除非用户另行授权。
-- 不把用户确认的规则只写进 prompt；必须绑定 ledger 和验证门。
-- 不要求固定图片数量；只要求出现的公开图片合格。
-- 不为通过数量门生成空泛占位内容；主体 `8-12` 是硬合同，其他板块宁缺毋滥并在内部报告记录不足。
-- 不让 LLM 决定页面结构、条数、图片展示、榜单形态或发布是否阻塞；LLM 只可生成可追溯事实摘要草稿。
-
-### Non-Goals
-
-- 不在本轮重新设计所有信源发现器。
-- 不新增需要登录态、cookie 或第三方密钥的采集。
-- 不自动 commit、push、创建 PR 或修改线上发布设置。
-- 不把内部质量报告做成最终视觉设计，只需先形成清晰的产物边界和验证依据。
+- 不手工编辑单日公开 HTML 来伪造效果；所有页面变化来自生成链路和 `npm run build`。
+- 不修改 `.codex/automations/**`、远端 Pages 设置、GitHub branch protection 或自动化调度配置。
+- 不自动 commit、push 或发布；本轮只改当前工作树源码、配置、测试、文档和构建产物。
+- 中国 AI 硬门禁约束的是“必须检查、必须披露、合格信号必须可见”，不是强行塞低质量中文内容。
+- 搜索 provider/token 不稳定时，系统应记录跳过/失败原因，并继续使用固定中文官方源或其它可用 provider。
 
 ## Acceptance Criteria
 
-- `config/feedback-ledger.json` 增加本轮用户确认的 P1 反馈项，并绑定 `npm run validate` 覆盖的真实测试或运行时质量门。
-- `docs/feedback-buglist-quick-reference.md` 同步新增速查项，后续任务能在开始前回放本轮问题。
-- 2026-06-09 坏日报表现形成 fixture 或确定性测试输入，覆盖主体条数不足、公开图片无效、整页截图主内容、公开页调试化、AI 腔和低重要性排序复发风险。
-- 质量门要求主体新闻 `8-12` 条；少于 8 条且无网络全阻塞解释时为硬失败。
-- 质量门或渲染门禁止公开正文使用整页截图作为主内容，榜单类数据必须优先结构化呈现。
-- 质量门或渲染门禁止不合格图片进入公开正文；`28x28` 等小图标不能作为 evidence 图展示。
-- `report:draft` / `report:write` / 渲染路径不再要求主体新闻具备 `why_it_matters` 或 `reader_relevance`，也不把这类字段作为公开正文必需项。
-- 主体短新闻公开渲染为紧凑新闻流，不展示入选原因、为什么重要、后续观察、评分或候选池解释。
-- OpenRouter / Artificial Analysis 等 daily tracking 内容在公开页以结构化表格或结构化指标呈现；截图最多作为内部或折叠证据，不作为主内容。
-- 自动发布允许非关键图片/榜单/板块局部降级，降级项进入内部质量报告；公开页硬合同失败才阻塞。
+- `config/feedback-ledger.json` 新增 7 个 P1：`feedback/p1-semantic-evidence-images`、`feedback/p1-china-ai-hard-gate`、`feedback/p1-tracking-visual-tables`、`feedback/p1-chinese-hot-blog-slot`、`feedback/p1-huggingface-trending-section`、`feedback/p1-compact-builder-discussion`、`feedback/p1-public-source-coverage-visualization`。
+- `docs/feedback-buglist-quick-reference.md` 同步新增上述规则。
+- `config/sources/china-ai-sources.json` 存在，`npm run sources:validate` 通过且 source count 更新为 148。
+- `src/daily-runner.js` 包含 `discover_huggingface_trending` 与 `discover_china_ai` 阶段，并将 `.tmp/huggingface-trending-<date>.json`、`.tmp/china-ai-<date>.json` 纳入 draft inputs。
+- `src/quality-status.js` 对 2026-06-11 及之后 strict 日报启用中国 AI source audit blocking/degraded 门，并检查非语义公开图片。
+- `src/media-policy.js`、`src/evidence-cache.js`、`src/site.js` 共同限制公开 evidence asset 只能是有信息量的图片。
+- `src/discovery.js`、`src/cli.js`、`package.json` 支持 `discover:huggingface-trending` 与 `discover:china-ai`。
+- `src/draft.js` 能选择 Hugging Face Trending 条目，并为中文/中国 AI 博客保留合格入口。
+- `src/interaction-report.js` 渲染 Hugging Face Trending、结构化榜单、紧凑 Builder 讨论和可折叠信源覆盖明细。
+- `tests/unit.test.js` 覆盖中国 AI 硬门禁、语义图片门、榜单表格、HF Trending、中文博客 slot、紧凑 Builder、信源覆盖可视化。
+- `tests/publish.test.js` 覆盖 gh auth 不可用时 fallback 到 Git credential helper，且不受本机环境 token 干扰。
 - `npm run validate` 通过。
-- 涉及公开页渲染、CSS 或图片展示的改动完成本地构建和浏览器/Playwright 页面验收，并记录结果。
 
 ## Feedback Ledger Review
 
-- `feedback/p1-ledger-validation-binding`: 本轮用户明确确认所有长期问题必须进入 ledger 并绑定验证门；新增项必须满足该合同。
-- `feedback/p1-origin-main-baseline`: 已确认当前工作区更新到 `origin/main` commit `b7bcd06`，包含 PR #68。
-- `feedback/p1-clean-publish-checkout`: 本轮不修改 automation，不 stash/reset/clean，不触碰其他 worktree。
-- `feedback/p1-main-visible-bullets-no-generic-watch-next`: 本轮扩展为公开主体短新闻不得展示 `why_it_matters`、`watch_next`、入选原因和泛化解释。
-- `feedback/p1-ai-quality-review-loop`: 现有质量循环能抓部分 AI 腔，但未覆盖 2026-06-09 的坏图、整页截图和公开页调试化，需要新增回归门。
-- `feedback/p1-feedback-memory-self-check`: 本任务先写规格和回归自检，交付前必须列出对应 ledger、fixture、命令和页面验收。
-- `feedback/p1-source-outage-disclosure`: 非关键采集失败应进入内部降级报告，不应污染公开正文或阻塞合格主体。
-- `feedback/p1-search-provider-partials`: 局部信源/榜单解析失败应保留健康部分并记录 provider/source 级降级项。
-- `feedback/p1-domestic-dynamics-public-visibility`: 多板块高密度页继续保留国内动态和平台内容，不能因主体改短新闻流而隐藏。
+- 已审阅 `config/feedback-ledger.json` 与 `docs/feedback-buglist-quick-reference.md`，本轮新增反馈均按 P1 固化，并绑定真实测试或质量门。
+- `feedback/p1-ledger-validation-binding`：新增 P1 不能只写 prompt，已通过 `node scripts/validate-feedback-contract.mjs` 绑定测试与 scope。
+- `feedback/p1-domestic-dynamics-public-visibility`：升级为中国 AI lane 必检、缺口公开、strict 未执行 blocking。
+- `feedback/p1-public-media-contract`：扩展为语义图片门，拒绝装饰图、整页截图、小图标、logo、头像。
+- `feedback/p1-editorial-importance-density-source-visibility`：恢复公开 coverage 可视化和折叠访问明细。
+- `feedback/p1-public-signal-layering`：中文博客和中国 AI 信号独立分层，不再被海外英文源挤掉。
+- `feedback/p1-ai-quality-review-loop`：页面检查和 unit 测试覆盖图片语义、榜单结构化、coverage、X 紧凑布局等复发点。
+- `feedback/p1-platform-exempt-public-rendering`：Builder/X 保留原始状态但做截断和公开安全渲染，不回退到内部 thread dump。
 
 ## Regression Self-Check
 
-- `feedback/p1-public-daily-content-contract`: `node --test tests/unit.test.js --test-name-pattern "public daily contract"` 通过；新增测试覆盖 8-12 条主体短新闻、无解释字段也可合格、少于 8 条坏样本会被拒绝。
-- `feedback/p1-public-media-contract`: `tests/fixtures/reports/bad/public-daily-2026-06-09-regression.json` 回放 `28x28` 图标和 `1280x900` 整页截图；`src/quality-status.js` 与 `src/page-checklist.js` 均检查公开媒体尺寸、角色和截图语义；无图日报可通过。
-- `feedback/p1-public-internal-report-separation`: `src/interaction-report.js` 默认隐藏 source audit/self-check/ledger/degradation/candidate diagnostics；`npm run quality:page-check -- 2026-06-09 docs .tmp/page-check-2026-06-09-after.json` 验证 `public_debug_sections_absent` 通过。
-- `feedback/p1-public-importance-selection`: `src/draft.js` 使用 public AI importance 加权，允许大厂、模型、产品、API、价格、监管、资本和泛 AI 热点进入主体，不再要求个人工作相关。
-- `feedback/p1-2026-06-09-regression-replay`: 坏日报 fixture 已绑定单测；页面回放验证 OpenRouter / Artificial Analysis 公开呈现为结构化表格，且 `daily_tracking_structured_not_screenshot` 通过。
-- Prompt contract sync: `prompts/ai-daily/modules/editorial-authority.md` 和其它 prompt 模块已同步 8-12 条短新闻流、公共 AI 重要性排序、榜单结构化表格优先、公开/内部报告分离和图片质量门，避免生成入口继续使用旧合同。
-- `feedback/p1-ledger-validation-binding` 与 `feedback/p1-feedback-memory-self-check`: `config/feedback-ledger.json` 新增 P1 项全部绑定真实 scope、`npm run validate` 覆盖命令和测试名；`node scripts/validate-feedback-contract.mjs` 与 `npm run validate` 均通过。
-- 前端/页面验收：已运行 `npm run build`；已运行 `npm run quality:page-check -- 2026-06-09 docs .tmp/page-check-2026-06-09-after.json`，覆盖 1280x900 与 375x812 视口，无横向溢出、无远程媒体、图片全部加载、公开内容图全部合格，且新增 `daily_tracking_table_compact` 防止移动端榜单行高被拉成大空白。
-- 截图验收：`.tmp/visual-2026-06-09-mobile.png` 与裁剪图 `.tmp/visual-2026-06-09-mobile-crop-tracking.png` 已检查；移动端 OpenRouter / Artificial Analysis 表格行高从异常大空白修复为 `38-39px` 紧凑行高。
+- Regression self-check summary: this section maps each known feedback regression to a concrete test, quality gate, page-check, or validation command.
+- 新增 ledger/quick reference 后运行 `node scripts/validate-feedback-contract.mjs`，结果 pass。
+- `feedback/p1-semantic-evidence-images` 对应 `semantic evidence asset gate rejects decorative article images` 与 `public_content_media_valid` page-check。
+- `feedback/p1-china-ai-hard-gate` 对应 `china ai hard gate blocks strict publish when China lane is missing` 与 strict quality gate。
+- `feedback/p1-tracking-visual-tables` 对应 `tracking visual tables render OpenRouter and Artificial Analysis without screenshots` 与 `daily_tracking_structured_not_screenshot` page-check。
+- `feedback/p1-chinese-hot-blog-slot` 对应 `report:draft reserves Chinese hot blog slot when qualified`。
+- `feedback/p1-huggingface-trending-section` 对应 `huggingface trending discovery and public section`。
+- `feedback/p1-compact-builder-discussion` 对应 `compact builder discussion truncates original posts`。
+- `feedback/p1-public-source-coverage-visualization` 对应 `public source coverage visualization uses tags and collapsed details`。
+- 新增/修改 schema、source registry 后运行 JSON parse、`npm run sources:validate`，结果 pass。
+- 新增 runner/workflow 入口后运行 `npm run workflow:validate`，结果 pass。
+- 新增 unit/publish 测试后运行 `npm run test`，308 tests pass。
+- 涉及公开 HTML/CSS/渲染后运行 `npm run build` 和 `npm run quality:page-check -- 2026-06-10 docs .tmp/page-check-2026-06-10-hard-gates.json`，桌面 1280x900 与移动 375x812 均 pass。
+- 用 Playwright 额外截图验收最新可构建日报 `2026-06-10`，确认首屏、榜单区域、移动榜单区域无明显遮挡、错位或横向溢出。
+- 运行 `npm run privacy:validate`，105 public files checked，0 findings。
+- 运行 `npm run test:e2e`，pass。
+- 运行 `npm run validate`，完整仓库级门 pass。
+- 当前仓库本地 reports-data 只到 `2026-06-10`，因此页面验收使用最新可构建页面；`2026-06-11` 真实日报需在下一次 runner 生成后再按同一 page-check 门验收。
 
 ## Red Test
 
-先运行当前代码下的确定性失败验证：
+本轮在实现前定义的红灯边界如下，旧实现无法满足这些断言；最终已把对应断言纳入 `tests/unit.test.js` 和 `tests/publish.test.js` 并跑绿：
 
 ```powershell
-node --test tests/unit.test.js --test-name-pattern "public daily contract"
+node --test tests/unit.test.js --test-name-pattern "china ai hard gate|semantic evidence asset gate|tracking visual tables|huggingface trending|public source coverage visualization|compact builder discussion|Chinese hot blog"
 ```
 
-预期初始失败：
+预期旧实现失败点：
 
-- 当前测试尚未存在，或新增测试会证明当前质量门允许 `28x28` evidence 图、允许整页截图作为 daily tracking 公开主媒体、允许公开页暴露调试审计/入选解释、并仍要求主体解释字段。
-
-实际红灯证据：
-
-- `node --test tests/unit.test.js --test-name-pattern "public daily contract"` 返回 exit code `1`。
-- 失败 1：`public daily contract accepts no-image short news without explanation fields` 命中 `editorial_context_gate_failed`，说明旧质量门仍要求主体解释字段。
-- 失败 2：`public daily contract rejects invalid public media but allows missing media` 未产生 `public_media_contract_failed`，说明旧质量门没有识别 `28x28` 图标和整页截图。
-- 失败 3：`public daily contract renders tables instead of screenshots and hides audit appendices` 在 `formatCardMedia` 尝试渲染截图媒体时失败，说明公开交互输入仍把截图当正文媒体处理。
+- `china ai hard gate`：旧 runner/report quality 没有独立中国 AI audit group，strict 发布不会因 lane 未执行而 blocking。
+- `semantic evidence asset gate`：旧图片过滤主要按 URL/尺寸/角色，不能稳定拒绝 hero 装饰图或泛化配图。
+- `tracking visual tables`：旧公开追踪卡片不保证 OpenRouter/Artificial Analysis 用源站式表格组件呈现。
+- `huggingface trending`：旧链路没有 HF Trending discovery/schema/section。
+- `public source coverage visualization`：旧 coverage 是纯文本列表，可读性差且缺少折叠访问明细。
+- `compact builder discussion`：旧 Builder/X 卡片可能展示大块原文和空白。
+- `Chinese hot blog`：旧 `hot_blogs` 没有中文/中国 AI slot 兜底。
 
 ## Deterministic Substitute
 
-如果无法在新增测试前执行指定 pattern，则先运行以下现状验证作为替代红灯证据：
-
-```powershell
-npm run quality:page-check -- 2026-06-09 docs .tmp/page-check-2026-06-09-current-review.json
-```
-
-当前已知现状：该命令可通过，但 2026-06-09 数据里仍存在 `main_items: 3`、`28x28` evidence 图和 OpenRouter/Artificial Analysis `1280x900` 整页截图。该通过结果证明旧页面质量门无法捕捉用户确认的问题。
+未保留独立的旧代码红灯运行输出；替代证据是本轮新增测试直接断言旧实现不存在的导出、schema 字段、runner 阶段、quality issue code 和公开 DOM 结构，且这些断言全部被 `npm run validate` 覆盖。后续若需要审计红灯，可在临时 worktree 中把本轮实现回退到 HEAD、保留新增测试运行上述 pattern，预期失败。
 
 ## Allowed Paths
 
 - `config/feedback-ledger.json`
+- `config/search-queries.json`
+- `config/sources/**`
+- `docs/data/**`
 - `docs/feedback-buglist-quick-reference.md`
+- `docs/reports/**`
 - `package.json`
 - `prompts/**`
 - `progress.md`
 - `schemas/**`
-- `scripts/**`
 - `session-handoff.md`
 - `src/**`
 - `tasks/current-task.md`
+- `tasks/daily-publish-runbook.md`
 - `tests/**`
 
 ## Forbidden Paths
 
-- 不手工修改 `docs/YYYY/**` 公开日报 HTML 产物来伪造修复。
-- 不修改 `.codex/automations/**`、GitHub Pages 设置、远端分支保护或定时任务配置。
-- 不使用 `git reset --hard`、`git checkout --`、`git clean`、stash 或任何会覆盖用户工作的命令。
+- 不修改 `.codex/automations/**`、远端 Pages 设置、GitHub Actions 发布配置或自动化调度配置。
+- 不使用 `git reset --hard`、`git checkout --`、`git clean`、stash 或覆盖用户工作的命令。
 - 不绕过、弱化或删除 `node scripts/harness-validate.mjs`、`node scripts/validate-feedback-contract.mjs`、`npm run validate`。
+- 不把新增长期要求仅写进 prompt 或会话回复；必须绑定测试或运行时质量门。
 
 ## Validation Commands
 
-- `node --test tests/unit.test.js --test-name-pattern "public daily contract"`
-- `node --test tests/unit.test.js --test-name-pattern "prompt:build"`
-- `node scripts/validate-feedback-contract.mjs`
-- `npm run build`
-- `npm run test:e2e`
-- `npm run quality:page-check -- 2026-06-09 docs .tmp/page-check-2026-06-09-after.json`
-- Playwright screenshot: `.tmp/visual-2026-06-09-mobile.png`
-- `npm run validate`
-- `git diff --check`
+- `node --check src/media-policy.js src/evidence-cache.js src/draft.js src/discovery.js src/cli.js src/daily-runner.js src/interaction-report.js src/quality-status.js src/report.js src/site.js src/publish.js tests/unit.test.js tests/publish.test.js`: pass。
+- JSON parse for changed config/schema/prompt files: pass。
+- `node scripts/validate-feedback-contract.mjs`: pass。
+- `node scripts/harness-validate.mjs`: pass。
+- `npm run sources:validate`: pass。
+- `npm run workflow:validate`: pass。
+- `git diff --check`: pass。
+- `node --test tests/publish.test.js`: pass, 45/45。
+- `npm run test`: pass, 308/308。
+- `npm run build`: pass。
+- `npm run quality:page-check -- 2026-06-10 docs .tmp/page-check-2026-06-10-hard-gates.json`: pass。
+- Playwright screenshots: pass, desktop and mobile latest build checked.
+- `npm run privacy:validate`: pass。
+- `npm run test:e2e`: pass。
+- `npm run validate`: pass。
 
 ## Parallel Writes
 
-No parallel writes. Manual edits use `apply_patch`; generated temporary output is allowed only under ignored temp/cache locations or existing validation outputs.
+No parallel writes. Manual edits used `apply_patch`; generated docs/data/report changes came from `npm run build`; page-check and screenshots are under ignored `.tmp/`.
 
 ## Handoff Requirements
 
-- Report ledger IDs added or updated.
-- Report fixture/test names and the original red/failing evidence.
-- Report implementation files changed at a high level.
-- Report validation commands and browser/page-check evidence.
-- Report residual risks, especially any remaining source discovery or automation behavior not changed in this iteration.
-
-## Generation Addendum
-
-User requested a fresh 2026-06-09 report from the repaired worktree. Safety boundary: do not publish, commit, push, change automation, or hand-edit generated HTML; regenerate through repo commands only.
-
-## Generation Result 2026-06-09
-
-- Regenerated discovery, draft, quality review, `reports-data/2026/06/2026-06-09.json`, `docs/data/2026/06/2026-06-09.json`, and `docs/reports/2026/06/2026-06-09.html` through repo commands.
-- Final counts after platform wiring: `main_items=10`, `github_trending=10`, `hot_blogs=3`, `daily_tracking=3`, `builder_observations=6`, `community_leads=8`, `reddit_items=2`, `wechat_items=0`, `zhihu_items=0`.
-- Public data has no forbidden internal keys and no public candidate pool file; public evidence assets are valid `source_asset` images only.
-- `quality:review` returned `ok: true`, `issues: []`; `quality:page-check` passed desktop/mobile, including structured tracking tables, no screenshot media, no debug sections, valid local media, and no overflow.
-- `publish:dry-run:daily -- --date 2026-06-09` was blocked by `wrong_branch` because this worktree is detached HEAD; no publish or remote/automation change happened.
-
-## Follow-up Fix Addendum
-
-Follow-up findings fixed: public `docs/data` internal leakage, split main sections, public-importance sorting, platform discovery not wired into `daily-runner`, and Reddit public card leakage. PR #68 is present at `b7bcd06`; Reddit is now enabled and selected, while WeChat/Zhihu remain placeholder kill-switched sources with no real feed. Platform cards now render reader-facing titles/summaries and hide `source_id`, `rule_id`, `verification_status`, `matched_terms`, and `why_watch` from public HTML.
-
-## Archive And Workflow Addendum
-
-User requested durable archiving and workflow/checklist hardening for this incident. Added `feedback/p1-platform-exempt-public-rendering` to capture the remaining platform-card presentation failure: platform sections can be wired and selected but still be unacceptable if public cards expose discovery internals, machine feed titles, or raw English thread dumps. Updated the quick reference and `tasks/daily-publish-runbook.md` so future manual runs must execute WeChat/Zhihu/Reddit discovery, pass those JSON outputs into `report:draft`, and inspect public platform cards for internal-field leakage.
-
-Regression self-check for this addendum: `node scripts/validate-feedback-contract.mjs`, `node --test --test-name-pattern "platform exempt report sections require public audit disclosure|daily runner wires platform exempt" tests/unit.test.js`, and `npm run validate`.
+- 汇报硬门禁和规范变更已落地到源码、schema、ledger、prompt、runbook 和测试。
+- 汇报完整验证门通过，以及页面验收使用 `2026-06-10` 的原因。
+- 汇报未执行真实日报发布、未改自动化配置、未推送远端。
+- 汇报残余风险：中文站点访问/动态渲染、provider token、HF Trending 页面结构变化、2026-06-11 真实 runner 生成后仍需按同一 page-check 门验收。

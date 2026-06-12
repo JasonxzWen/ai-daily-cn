@@ -77,6 +77,10 @@
         "ai_news_aggregator",
         "aigc_content_industry",
         "ai_funding_product_radar",
+        "official_company_news",
+        "official_open_source_account",
+        "official_model_host_account",
+        "model_registry",
         "platform_exempt_signal"
       ]
     },
@@ -106,7 +110,7 @@
           "$ref": "#/$defs/absolute_url"
         },
         "category": {
-          "enum": ["official_release", "github_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"]
+          "enum": ["official_release", "github_trending", "huggingface_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"]
         },
         "status": {
           "enum": ["checked", "blocked", "no_signal"]
@@ -186,7 +190,7 @@
           "type": ["integer", "null"]
         },
         "trend": {
-          "enum": ["new", "up", "down", "same"]
+          "enum": ["trending", "new", "up", "down", "same"]
         },
         "platform": {
           "enum": ["wechat", "zhihu", "reddit"]
@@ -208,7 +212,7 @@
           "$ref": "#/$defs/id"
         },
         "category": {
-          "enum": ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", "wechat_item", "zhihu_item", "reddit_item"]
+          "enum": ["main_item", "github_trending", "huggingface_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", "wechat_item", "zhihu_item", "reddit_item"]
         },
         "title": {
           "type": "string",
@@ -229,7 +233,7 @@
           "enum": ["included", "excluded"]
         },
         "included_in": {
-          "enum": ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
+          "enum": ["main_items", "github_trending", "huggingface_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
         },
         "exclusion_reason": {
           "type": "string"
@@ -273,6 +277,29 @@
         "image_source": {
           "type": "string",
           "minLength": 1
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "downloads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "likes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "task": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
         },
         "notes": {
           "type": "string"

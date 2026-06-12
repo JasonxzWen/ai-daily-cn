@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./automation-revision.js";
+import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { normalizeUrlIdentity } from "./url.js";
 import { PLATFORM_TO_AUDIT_GROUP } from "./platform-exempt.js";
 
@@ -14,6 +15,7 @@ export const STRICT_COVERAGE_EFFECTIVE_DATE = "2026-06-02";
 export const SECTION_MINIMUMS = {
   main_items: 8,
   github_trending: 10,
+  huggingface_trending: 10,
   hot_blogs: 6,
   projects: 8,
   builder_observations: 8
@@ -33,13 +35,16 @@ const NON_CONTENT_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "d
 const REQUIRED_GITHUB_TRENDING_PARSED_MINIMUM = 10;
 const SOURCE_OUTAGE_BLOCKED_RATIO = 0.8;
 const SOURCE_OUTAGE_MIN_BLOCKED = 3;
-const SOURCE_OUTAGE_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
+const SOURCE_OUTAGE_GROUPS = ["github_trending", "huggingface_trending", "builder_sources", "china_ai_sources", "content_sources", "search_sources", "sources_health"];
+const CHINA_AI_HARD_GATE_EFFECTIVE_DATE = "2026-06-11";
+const CHINA_AI_SOURCE_MINIMUM = 6;
 const WORKSPACE_WRITE_NETWORK_REMINDER =
   "Check config.toml or Codex settings and enable network access for workspace-write sandbox mode: set [sandbox_workspace_write] network_access = true / 设置“当沙盒设置为工作区写入时允许网络访问”.";
 
 const CANDIDATE_SECTION_MAP = {
   main_item: "main_items",
   github_trending: "github_trending",
+  huggingface_trending: "huggingface_trending",
   hot_blog: "hot_blogs",
   project: "projects",
   builder_observation: "builder_observations"
@@ -141,6 +146,22 @@ export function deriveQualityStatus(report, candidatePool = null) {
     reason: "github_trending_blocked",
     section: "github_trending",
     currentCount: sectionCount(report, "github_trending"),
+    reasons,
+    affectedSections
+  });
+  addSourceDegradation({
+    group: audit.huggingface_trending,
+    reason: "huggingface_trending_blocked",
+    section: "huggingface_trending",
+    currentCount: sectionCount(report, "huggingface_trending"),
+    reasons,
+    affectedSections
+  });
+  addSourceDegradation({
+    group: audit.china_ai_sources,
+    reason: "china_ai_sources_blocked",
+    section: "hot_blogs",
+    currentCount: sectionCount(report, "hot_blogs"),
     reasons,
     affectedSections
   });
@@ -313,8 +334,10 @@ function strictDailyCoverageIssues(report, options = {}) {
 function isBlockingPublishQualityIssue(issue) {
   return issue?.error_code === "automation_revision_gate_failed" ||
     issue?.error_code === "builder_translation_gate_failed" ||
+    issue?.error_code === "china_ai_hard_gate_failed" ||
     issue?.error_code === "mainline_source_authority_gate_failed" ||
     issue?.code === "automation_revision_missing_or_stale" ||
+    issue?.code === "china_ai_source_lane_missing" ||
     issue?.code === "builder_original_translation_missing" ||
     issue?.code === "mainline_source_authority_failed";
 }
@@ -352,8 +375,12 @@ function degradedSectionsFromReasons(reasons, affectedSections) {
 }
 
 function degradedReasonForSection(reasons, section) {
+  if (section === "hot_blogs" && reasons.includes("china_ai_sources_blocked")) {
+    return "china_ai_sources_blocked";
+  }
   const mapped = {
     github_trending: "github_trending_blocked",
+    huggingface_trending: "huggingface_trending_blocked",
     hot_blogs: "content_sources_blocked",
     builder_observations: "builder_sources_blocked",
     daily_tracking: "daily_tracking_source_blocked",
@@ -537,6 +564,7 @@ function strictSourceAuditIssues(report) {
   }
 
   issues.push(...strictGitHubTrendingSourceSignalIssues(githubSources));
+  issues.push(...strictChinaAiSourceIssues(report));
   issues.push(...strictSourceAvailabilityIssues(report));
 
   for (const requirement of FIXED_SOURCE_REQUIREMENTS) {
@@ -658,6 +686,45 @@ function strictGitHubTrendingSourceSignalIssues(group) {
       remediation: "Re-run discover:github-trending, inspect GitHub HTML selectors or network responses for weak sources, and disclose the degraded GitHub Trending source lane before publishing."
     }
   ];
+}
+
+function strictChinaAiSourceIssues(report) {
+  if (String(report?.report_date || "") < CHINA_AI_HARD_GATE_EFFECTIVE_DATE) {
+    return [];
+  }
+  const group = report?.source_audit?.china_ai_sources;
+  const sources = Array.isArray(group?.sources) ? group.sources : [];
+  const activeSources = sources.filter((source) => !String(source?.status || "").startsWith("skipped_manual"));
+  const proofSources = activeSources.filter((source) => SOURCE_AUDIT_PROOF_STATUSES.has(String(source?.status || "")) || String(source?.status || "") === "blocked");
+  if (!group || group.checked !== true || proofSources.length < CHINA_AI_SOURCE_MINIMUM) {
+    return [
+      {
+        error_code: "china_ai_hard_gate_failed",
+        code: "china_ai_source_lane_missing",
+        section: "source_audit.china_ai_sources",
+        count: proofSources.length,
+        minimum: CHINA_AI_SOURCE_MINIMUM,
+        message: "China AI source lane is missing or too small for a strict daily publish.",
+        remediation: "Run discover:china-ai against config/sources/china-ai-sources.json, merge source_audit.china_ai_sources, and prefer Chinese official pages before publishing."
+      }
+    ];
+  }
+
+  if (Number(group.candidates_found || 0) === 0) {
+    return [
+      {
+        error_code: "china_ai_coverage_degraded",
+        code: "china_ai_no_recent_signal",
+        section: "source_audit.china_ai_sources",
+        count: 0,
+        minimum: 1,
+        message: "China AI source lane ran successfully but produced no recent candidates.",
+        remediation: "Disclose the no-signal China AI lane publicly and inspect source selectors/search coverage before relying on overseas mirrors."
+      }
+    ];
+  }
+
+  return [];
 }
 
 function isRequiredGitHubTrendingSource(source) {
@@ -815,6 +882,9 @@ function publicEvidenceAssetViolations(asset, options = {}) {
   if (isFullPageScreenshotAsset(asset)) {
     violations.push(publicEvidenceViolation(asset, "full_page_screenshot_not_public_content"));
   }
+  if (!isMeaningfulPublicEvidenceAsset(asset)) {
+    violations.push(publicEvidenceViolation(asset, "non_semantic_public_image"));
+  }
   return violations;
 }
 
@@ -827,6 +897,7 @@ function publicEvidenceViolation(asset, reason) {
     width: Number.isFinite(Number(asset?.width)) ? Number(asset.width) : undefined,
     height: Number.isFinite(Number(asset?.height)) ? Number(asset.height) : undefined,
     asset_role: String(asset?.asset_role || "").trim(),
+    asset_kind: String(asset?.asset_kind || "").trim(),
     capture_kind: String(asset?.capture_kind || "").trim()
   };
 }
@@ -864,7 +935,10 @@ function publicEvidenceAssetText(asset) {
     asset?.title,
     asset?.caption,
     asset?.local_path,
-    asset?.extraction_status
+    asset?.extraction_status,
+    asset?.asset_kind,
+    asset?.asset_role,
+    asset?.source_url
   ].map((value) => String(value || "").toLowerCase()).join(" ");
 }
 
@@ -1039,13 +1113,14 @@ function countContentUnits(report) {
     "projects",
     "builder_observations",
     "community_leads",
-    "github_trending"
+    "github_trending",
+    "huggingface_trending"
   ].reduce((sum, section) => sum + sectionCount(report, section), 0);
 }
 
 function lowSignalReasons(report) {
   const audit = report?.source_audit || {};
-  const checkedNoSignal = ["github_trending", "content_sources", "builder_sources"].some((groupName) => {
+  const checkedNoSignal = ["github_trending", "huggingface_trending", "content_sources", "china_ai_sources", "builder_sources"].some((groupName) => {
     const group = audit[groupName];
     return group?.checked === true && Number(group.candidates_found || 0) === 0 && !groupHasBlockingSignal(group);
   });

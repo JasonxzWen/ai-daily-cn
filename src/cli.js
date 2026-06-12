@@ -19,6 +19,7 @@ import {
   collectBuilderFallbacks,
   collectContentSources,
   collectGitHubTrending,
+  collectHuggingFaceTrending,
   collectStatuspageIncidents
 } from "./discovery.js";
 import { collectSearchNews } from "./search-news.js";
@@ -359,6 +360,19 @@ try {
       ok: true,
       ...result
     });
+  } else if (command === "discover:huggingface-trending") {
+    const args = parseArgs(argv);
+    const result = await collectHuggingFaceTrending({
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
   } else if (command === "discover:builders") {
     const args = parseArgs(argv);
     const result = await collectBuilderFallbacks({
@@ -388,6 +402,28 @@ try {
       limit: Number.parseInt(args.limit || positionalNumbers[0] || "20", 10),
       perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
       budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+    });
+    printJson({
+      ok: true,
+      ...result
+    });
+  } else if (command === "discover:china-ai") {
+    const args = parseArgs(argv);
+    const positionalNumbers = positiveIntegers(argv);
+    const result = await collectContentSources({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      sourcesPath: args.sources || path.join("config", "sources", "china-ai-sources.json"),
+      registryPath: args.registry,
+      auditGroupName: "china_ai_sources",
+      enablement: args.enablement || firstEnablement(argv) || "core,optional",
+      includeWeChatInput: false,
+      limit: Number.parseInt(args.limit || positionalNumbers[0] || "30", 10),
+      perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
+      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "180000", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });

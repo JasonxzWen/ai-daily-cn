@@ -461,6 +461,13 @@ export const DEFAULT_STATUSPAGE_SOURCES = [
   }
 ];
 
+export const DEFAULT_HUGGINGFACE_TRENDING_SOURCE = {
+  id: "huggingface-trending-models",
+  name: "Hugging Face Trending Models",
+  url: "https://huggingface.co/api/models?sort=trending&direction=-1&limit=50",
+  category: "huggingface_trending"
+};
+
 export function createDiscoveryFetch(fetchImpl, options = {}) {
   if (typeof fetchImpl !== "function") {
     return fetchImpl;
@@ -648,6 +655,170 @@ export async function collectGitHubTrending(options = {}) {
     },
     candidates
   };
+}
+
+export async function collectHuggingFaceTrending(options = {}) {
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
+  if (typeof fetchImpl !== "function") {
+    throw new Error("fetch is not available in this runtime");
+  }
+
+  const reportDate = requireReportDate(options.reportDate);
+  const generatedAt = options.generatedAt || new Date().toISOString();
+  const sourceItem = normalizeGenericSource(options.source || DEFAULT_HUGGINGFACE_TRENDING_SOURCE, "huggingface-trending");
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
+  const sourceResults = [];
+  const candidateSources = [toCandidateSource(sourceItem, "project", generatedAt, "blocked", "")];
+  const candidates = [];
+
+  try {
+    const response = await fetchImpl(sourceItem.url, {
+      headers: {
+        accept: "application/json,text/html,*/*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      },
+      ...timeoutInit(sourceItem.timeoutMs || sourceItem.timeout_ms || 15000)
+    });
+    if (!response.ok) {
+      const notes = withRetryNote(`HTTP ${response.status}`, response);
+      markSource(candidateSources[0], "blocked", notes);
+      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
+      return huggingFaceTrendingResult(sourceResults, candidateSources, candidates);
+    }
+
+    const text = await response.text();
+    const entries = parseHuggingFaceTrendingEntries(text, sourceItem)
+      .filter((entry) => entry.repo && entry.url)
+      .slice(0, limit);
+    for (const [index, entry] of entries.entries()) {
+      candidates.push({
+        id: uniqueCandidateId(candidates, `${sourceItem.id}-${entry.repo}`),
+        source_id: sourceItem.id,
+        category: "huggingface_trending",
+        title: entry.repo,
+        url: entry.url,
+        source: sourceItem.name,
+        event_date: reportDate,
+        status: "excluded",
+        rank: index + 1,
+        downloads: entry.downloads,
+        likes: entry.likes,
+        task: entry.task,
+        tags: entry.tags,
+        evidence: huggingFaceTrendingEvidence(entry),
+        source_level: "model_registry",
+        verification_status: "primary_confirmed",
+        primary_url: entry.url,
+        verification_sources: [entry.url]
+      });
+    }
+    const status = entries.length > 0 ? "checked" : "no_signal";
+    const notes = withRetryNote(`${entries.length} trending models parsed`, response);
+    markSource(candidateSources[0], status, notes);
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes, { parsed_count: entries.length }));
+  } catch (error) {
+    const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
+    markSource(candidateSources[0], "blocked", notes);
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
+  }
+
+  return huggingFaceTrendingResult(sourceResults, candidateSources, candidates);
+}
+
+function huggingFaceTrendingResult(sourceResults, candidateSources, candidates) {
+  return {
+    source_audit: {
+      huggingface_trending: {
+        checked: true,
+        sources: sourceResults,
+        candidates_found: candidates.length,
+        included: 0,
+        sources_checked: sourceResults.length,
+        blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
+        last_successful_feed_at: candidates.length > 0 ? new Date().toISOString() : null,
+        notes: "Hugging Face public model trending is tracked as a separate model/project lane, not as GitHub Trending."
+      }
+    },
+    sources: candidateSources,
+    candidates
+  };
+}
+
+function parseHuggingFaceTrendingEntries(text, sourceItem) {
+  const payload = parseJsonOrNull(text);
+  if (Array.isArray(payload)) {
+    return payload.map((item) => normalizeHuggingFaceTrendingEntry(item)).filter(Boolean);
+  }
+  if (payload && typeof payload === "object") {
+    return arrayFromPossibleKeys(payload, ["models", "items", "data", "results"])
+      .map((item) => normalizeHuggingFaceTrendingEntry(item))
+      .filter(Boolean);
+  }
+  return parseHuggingFaceTrendingHtml(text, sourceItem);
+}
+
+function parseJsonOrNull(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeHuggingFaceTrendingEntry(item) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+  const repo = cleanText(firstString(item.modelId, item.id, item.repo, item.name, item.slug));
+  if (!repo) {
+    return null;
+  }
+  const tags = Array.isArray(item.tags) ? item.tags.map((tag) => cleanText(tag)).filter(Boolean).slice(0, 8) : [];
+  return {
+    repo,
+    url: absoluteUrl(`/` + repo.replace(/^\/+/, ""), "https://huggingface.co"),
+    task: cleanText(firstString(item.pipeline_tag, item.pipelineTag, item.task, item.library_name, item.libraryName, tags[0])),
+    downloads: Number.isFinite(Number(item.downloads)) ? Number(item.downloads) : 0,
+    likes: Number.isFinite(Number(item.likes)) ? Number(item.likes) : 0,
+    tags
+  };
+}
+
+function parseHuggingFaceTrendingHtml(html, sourceItem) {
+  const entries = [];
+  const seen = new Set();
+  const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
+  for (const match of html.matchAll(anchorPattern)) {
+    const href = decodeXml(match[1] || match[2] || match[3] || "");
+    const url = absoluteUrl(href, sourceItem.url);
+    if (!url || !/^https:\/\/huggingface\.co\/[^/?#]+\/[^/?#]+/i.test(url) || seen.has(url)) {
+      continue;
+    }
+    const repo = new URL(url).pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+    if (!repo || repo.split("/").length !== 2) {
+      continue;
+    }
+    seen.add(url);
+    const text = cleanText(match[4]);
+    entries.push({
+      repo,
+      url,
+      task: text && text !== repo ? trimText(text, 40) : "",
+      downloads: 0,
+      likes: 0,
+      tags: []
+    });
+  }
+  return entries;
+}
+
+function huggingFaceTrendingEvidence(entry) {
+  const metrics = [
+    entry.task ? `task=${entry.task}` : "",
+    entry.likes ? `likes=${entry.likes}` : "",
+    entry.downloads ? `downloads=${entry.downloads}` : ""
+  ].filter(Boolean).join("; ");
+  return `Hugging Face trending model entry${metrics ? `; ${metrics}` : ""}.`;
 }
 
 async function collectGitHubTrendingFromBrowserExport(options = {}) {
@@ -1476,7 +1647,9 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
     }
   }
-  const auditGroupName = platformExempt ? auditGroupForPlatform(platformExempt) : "content_sources";
+  const auditGroupName = platformExempt
+    ? auditGroupForPlatform(platformExempt)
+    : String(options.auditGroupName || "content_sources").trim() || "content_sources";
 
   return {
     source_audit: {
@@ -1641,16 +1814,23 @@ function appendPlatformRejectedNotes(notes, rejected = {}) {
 }
 
 function platformAuditSourceExtra(sourceInfo, extra = {}) {
-  if (!isPlatformExemptCategory(sourceInfo.candidate_category)) {
-    return extra;
-  }
-  return {
+  const generic = {
     id: sourceInfo.id,
     source_kind: sourceInfo.source_kind,
     tier: sourceInfo.tier,
     authority: sourceInfo.authority,
     enablement: sourceInfo.enablement,
     verification_policy: sourceInfo.verification_policy,
+    ...(typeof sourceInfo.requires_original_url === "boolean" ? { requires_original_url: sourceInfo.requires_original_url } : {})
+  };
+  if (!isPlatformExemptCategory(sourceInfo.candidate_category)) {
+    return {
+      ...generic,
+      ...extra
+    };
+  }
+  return {
+    ...generic,
     platform: sourceInfo.platform || platformFromCandidateCategory(sourceInfo.candidate_category),
     ...extra
   };

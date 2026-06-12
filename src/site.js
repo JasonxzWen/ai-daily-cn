@@ -12,6 +12,7 @@ import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
+import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -396,6 +397,7 @@ function withDefaultImportanceForReport(report) {
     "daily_tracking",
     "projects",
     "github_trending",
+    "huggingface_trending",
     "builder_observations",
     "community_leads",
     "wechat_items",
@@ -476,7 +478,7 @@ function isPublicEvidenceAsset(asset = {}) {
   if ((width > 0 && width < 320) || (height > 0 && height < 180)) {
     return false;
   }
-  return Boolean(asset.local_path);
+  return Boolean(asset.local_path) && isMeaningfulPublicEvidenceAsset(asset);
 }
 
 async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {

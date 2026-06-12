@@ -69,6 +69,10 @@ export function defaultImportanceForSection(sectionName, item = {}) {
     }
     return "general";
   }
+  if (sectionName === "huggingface_trending") {
+    const rank = Number(item.rank);
+    return Number.isFinite(rank) && rank <= 3 ? "notable" : "general";
+  }
   if (sectionName === "builder_observations") {
     return "notable";
   }

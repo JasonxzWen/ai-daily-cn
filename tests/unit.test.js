@@ -14,6 +14,7 @@ import {
   DEFAULT_CONTENT_SOURCES,
   DEFAULT_GITHUB_TRENDING_SOURCES,
   collectGitHubTrending,
+  collectHuggingFaceTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml,
   parseGitHubReportMarkdownEntries,
@@ -1133,6 +1134,27 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert(!JSON.stringify(section).includes("证据："));
 });
 
+test("compact builder discussion truncates original posts", () => {
+  const report = strictPublishReportFixture();
+  const longOriginal = Array.from({ length: 20 }, (_unused, index) => `sentence-${index + 1} about agent workflow and deployment tradeoffs`).join(" ");
+  report.builder_observations = [
+    {
+      ...report.builder_observations[0],
+      original_text: longOriginal,
+      translation: "这是一条关于 agent workflow 部署取舍的中文摘要。",
+      content: "这是一条关于 agent workflow 部署取舍的中文摘要。"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.group === "signals" && item.cardClass === "builder-card");
+  const originalPoint = section.items[0].points.find((point) => point.value.includes("sentence-1"));
+
+  assert(originalPoint);
+  assert(originalPoint.value.length <= 220);
+  assert(originalPoint.value.endsWith("..."));
+});
+
 test("community leads omit low-signal statuspage troubleshooting items", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
@@ -1875,6 +1897,66 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   assert.equal(collected.candidates[0].repo, "example/agent-runtime");
   assert.equal(collected.candidates[0].category, "project");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
+});
+
+test("huggingface trending discovery and public section", async () => {
+  const collected = await collectHuggingFaceTrending({
+    reportDate: "2026-06-11",
+    limit: 2,
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([["content-type", "application/json"]]),
+      text: async () => JSON.stringify([
+        {
+          modelId: "Qwen/Qwen3-235B-A22B",
+          pipeline_tag: "text-generation",
+          downloads: 12345,
+          likes: 678,
+          tags: ["text-generation", "qwen"]
+        },
+        {
+          modelId: "deepseek-ai/DeepSeek-R2",
+          pipeline_tag: "text-generation",
+          downloads: 5432,
+          likes: 210,
+          tags: ["text-generation", "deepseek"]
+        }
+      ])
+    })
+  });
+
+  assert.equal(collected.source_audit.huggingface_trending.checked, true);
+  assert.equal(collected.candidates.length, 2);
+  assert.equal(collected.candidates[0].category, "huggingface_trending");
+  assert.equal(collected.candidates[0].rank, 1);
+  assert.equal(collected.candidates[0].likes, 678);
+
+  const report = strictPublishReportFixture();
+  report.huggingface_trending = collected.candidates.map((candidate, index) => ({
+    name: candidate.title,
+    repo: candidate.title,
+    candidate_id: candidate.id,
+    description: candidate.evidence,
+    url: candidate.url,
+    event_date: candidate.event_date,
+    source: candidate.source,
+    task: candidate.task,
+    downloads: candidate.downloads,
+    likes: candidate.likes,
+    rank: index + 1,
+    trend: "trending",
+    evidence: candidate.evidence,
+    editorial_category: "open_source",
+    source_level: "model_registry",
+    verification_status: "primary_confirmed"
+  }));
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.title === "Hugging Face Trending 路 Top 10");
+
+  assert(section);
+  assert.match(section.content, /Qwen\/Qwen3-235B-A22B/);
+  assert.match(section.content, /likes 678/);
 });
 
 test("GitHub trending discovery retries transient fetch failures and records retry notes", async () => {
@@ -4350,6 +4432,8 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
   const reportDraft = calls.find((stage) => stage.id === "report_draft");
   const inputIndex = reportDraft.command.args.indexOf("--input");
   const inputPaths = reportDraft.command.args[inputIndex + 1].split(",");
+  assert(inputPaths.includes(".tmp/huggingface-trending-2026-06-09.json"));
+  assert(inputPaths.includes(".tmp/china-ai-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
@@ -5477,14 +5561,16 @@ test("buildSite writes reader-safe public data without internal fields or candid
   report.evidence_assets = [
     {
       type: "figure",
-      title: "Valid source asset",
+      title: "Valid benchmark chart",
       source_url: report.main_items[0].url,
       local_path: "assets/evidence/valid-source-asset.jpg",
-      caption: "Valid source asset.",
+      caption: "Benchmark chart from the source article.",
       extraction_status: "source_image",
       width: 640,
       height: 360,
-      capture_kind: "source_asset"
+      capture_kind: "source_asset",
+      asset_role: "chart",
+      asset_kind: "chart"
     },
     {
       type: "figure",
@@ -6162,6 +6248,82 @@ test("report:draft prioritizes strategic official AI company sources over NVIDIA
     drafted.report.main_items.filter((item) => /NVIDIA|AWS/i.test(item.source)).length <= 2,
     "NVIDIA/AWS should not occupy more than two main items when strategic official sources are available"
   );
+});
+
+test("report:draft reserves Chinese hot blog slot when qualified", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-chinese-hot-blog-"));
+  const reportDate = "2026-06-11";
+  const mainCandidates = Array.from({ length: 10 }, (_unused, index) => ({
+    id: `main-official-${index + 1}`,
+    source_id: "source-main-official",
+    category: "community_lead",
+    title: `Official AI platform update ${index + 1}`,
+    url: `https://example.com/main/${index + 1}`,
+    source: "OpenAI News RSS",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Official platform model API launch with product details, benchmark context, and availability notes for engineering teams.",
+    source_level: "primary",
+    verification_status: "primary_confirmed"
+  }));
+  const overseasBlogs = Array.from({ length: 8 }, (_unused, index) => ({
+    id: `overseas-blog-${index + 1}`,
+    source_id: "source-overseas-blog",
+    category: "hot_blog",
+    title: `Overseas model benchmark architecture blog ${index + 1}`,
+    url: `https://example.com/blog/${index + 1}`,
+    source: "Anthropic News",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "This blog explains model benchmark architecture, implementation details, evaluation workflow, and deployment constraints for AI teams.",
+    source_level: "primary",
+    verification_status: "primary_confirmed"
+  }));
+  const chineseBlog = {
+    id: "qwen-chinese-blog",
+    source_id: "china-ai-qwen-blog",
+    category: "hot_blog",
+    title: "通义千问模型评测与推理架构更新",
+    url: "https://qwen.ai/blog/chinese-model-benchmark",
+    source: "Qwen Blog",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "官方博客说明模型评测、推理架构、API 接入和部署约束，适合中国 AI 覆盖的中文官方博客 slot。",
+    source_level: "official_model_host_account",
+    verification_status: "primary_confirmed"
+  };
+  const inputPath = path.join(tmp, "discovery.json");
+  await fs.writeFile(inputPath, JSON.stringify({
+    source_audit: {
+      content_sources: {
+        checked: true,
+        sources: [{ name: "Anthropic News", url: "https://www.anthropic.com/news", status: "checked", notes: "fixture" }],
+        candidates_found: overseasBlogs.length,
+        included: 0,
+        notes: "fixture"
+      },
+      china_ai_sources: {
+        checked: true,
+        sources: [{ name: "Qwen Blog", url: "https://qwen.ai/blog", status: "checked", notes: "fixture" }],
+        candidates_found: 1,
+        included: 0,
+        notes: "fixture"
+      }
+    },
+    candidates: [...mainCandidates, ...overseasBlogs, chineseBlog]
+  }), "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [inputPath],
+    outputPath: path.join(tmp, "daily-report.json"),
+    candidateOutputPath: path.join(tmp, "source-candidates.json"),
+    cacheEvidence: false
+  });
+
+  assert(drafted.report.hot_blogs.some((item) => item.url === chineseBlog.url));
 });
 
 test("interaction input renders AI industry, content track, and selected blog sections", () => {
@@ -7602,6 +7764,58 @@ test("evidence cache downloads image_url candidates into local evidence assets",
   assert.equal(await exists(path.join(tmp, "docs", result.assets[0].local_path)), true);
 });
 
+test("semantic evidence asset gate rejects decorative article images", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-semantic-"));
+  let fetchCount = 0;
+  const result = await cacheEvidenceImages({
+    rootDir: tmp,
+    reportDate: "2026-06-11",
+    outDir: "docs",
+    maxAssets: 3,
+    candidates: [
+      {
+        id: "decorative-hero",
+        title: "Meta explains compute power",
+        url: "https://about.fb.com/news/2026/06/what-is-compute-power-meta-ai-infrastructure/",
+        source: "Meta Newsroom",
+        status: "included",
+        included_in: "main_items",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/computer-hero.png",
+        image_alt: "Decorative computer hero image",
+        image_source: "html_index"
+      },
+      {
+        id: "benchmark-table",
+        title: "Claude Fable 5 benchmark results",
+        url: "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+        source: "Anthropic News",
+        status: "included",
+        included_in: "main_items",
+        verification_status: "primary_confirmed",
+        image_url: "https://example.com/fable-benchmark.png",
+        image_alt: "Model performance benchmark table",
+        image_source: "source_asset"
+      }
+    ],
+    fetchImpl: async () => {
+      fetchCount += 1;
+      return {
+        ok: true,
+        status: 200,
+        headers: new Map([["content-type", "image/png"]]),
+        arrayBuffer: async () => Buffer.alloc(256, 7)
+      };
+    }
+  });
+
+  assert.equal(fetchCount, 1);
+  assert.equal(result.assets.length, 1);
+  assert.equal(result.assets[0].source_url, "https://www.anthropic.com/news/claude-fable-5-mythos-5");
+  assert.equal(result.assets[0].asset_role, "table");
+  assert.equal(result.assets[0].asset_kind, "table");
+});
+
 test("evidence cache skips sources that already have local evidence and backfills remaining public images", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-evidence-cache-existing-"));
   const result = await cacheEvidenceImages({
@@ -7635,7 +7849,7 @@ test("evidence cache skips sources that already have local evidence and backfill
         included_in: "community_leads",
         verification_status: "intermediary_only",
         image_url: "https://example.com/community-image.png",
-        image_alt: "Community image"
+        image_alt: "Community product UI screenshot"
       }
     ],
     fetchImpl: async () => ({
@@ -7668,7 +7882,7 @@ test("evidence cache preserves a community image slot when hot blogs would other
         included_in: "main_items",
         verification_status: "primary_confirmed",
         image_url: "https://example.com/main-image.png",
-        image_alt: "Main image"
+        image_alt: "Main benchmark chart"
       },
       {
         id: "hot-blog-1",
@@ -7679,7 +7893,7 @@ test("evidence cache preserves a community image slot when hot blogs would other
         included_in: "hot_blogs",
         verification_status: "primary_confirmed",
         image_url: "https://example.com/hot-blog-1.png",
-        image_alt: "Hot blog one"
+        image_alt: "Hot blog one performance chart"
       },
       {
         id: "hot-blog-2",
@@ -7690,7 +7904,7 @@ test("evidence cache preserves a community image slot when hot blogs would other
         included_in: "hot_blogs",
         verification_status: "primary_confirmed",
         image_url: "https://example.com/hot-blog-2.png",
-        image_alt: "Hot blog two"
+        image_alt: "Hot blog two architecture diagram"
       },
       {
         id: "hot-blog-3",
@@ -7701,7 +7915,7 @@ test("evidence cache preserves a community image slot when hot blogs would other
         included_in: "hot_blogs",
         verification_status: "primary_confirmed",
         image_url: "https://example.com/hot-blog-3.png",
-        image_alt: "Hot blog three"
+        image_alt: "Hot blog three leaderboard table"
       },
       {
         id: "community-priority",
@@ -7712,7 +7926,7 @@ test("evidence cache preserves a community image slot when hot blogs would other
         included_in: "community_leads",
         verification_status: "primary_confirmed",
         image_url: "https://example.com/community-priority.png",
-        image_alt: "Community priority"
+        image_alt: "Community product UI screenshot"
       }
     ],
     fetchImpl: async () => ({
@@ -8240,6 +8454,24 @@ test("publish quality blocks strict daily reports not generated from current ori
   );
 });
 
+test("china ai hard gate blocks strict publish when China lane is missing", () => {
+  const report = strictPublishReportFixture();
+  report.report_date = "2026-06-11";
+  report.self_check.report_date = "2026-06-11";
+  delete report.source_audit.china_ai_sources;
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert(
+    classification.blocking_issues.some(
+      (issue) =>
+        issue.error_code === "china_ai_hard_gate_failed" &&
+        issue.code === "china_ai_source_lane_missing" &&
+        issue.section === "source_audit.china_ai_sources"
+    )
+  );
+});
+
 test("publish quality degrades strict daily reports missing requested Chinese source surface", () => {
   const report = strictPublishReportFixture();
   report.source_audit.content_sources.sources = report.source_audit.content_sources.sources
@@ -8644,6 +8876,65 @@ test("public daily contract renders tables instead of screenshots and hides audi
   assert(!serialized.includes("why_it_matters"));
 });
 
+test("tracking visual tables render OpenRouter and Artificial Analysis without screenshots", () => {
+  const report = strictPublishReportFixture();
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "OpenRouter parsed Top 10 model usage rows.",
+      metrics: [],
+      snapshot: openRouterSnapshotFixture()
+    },
+    {
+      id: "artificial-analysis-index",
+      name: "Artificial Analysis Intelligence Index",
+      url: "https://artificialanalysis.ai/models",
+      event_date: report.report_date,
+      source: "Artificial Analysis",
+      category: "model_eval",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "Artificial Analysis parsed Top 10 intelligence index rows.",
+      metrics: [],
+      snapshot: artificialAnalysisSnapshotFixture()
+    }
+  ];
+  report.evidence_assets = [
+    {
+      type: "figure",
+      title: "OpenRouter full page screenshot",
+      source_url: "https://openrouter.ai/rankings",
+      local_path: "assets/evidence/openrouter-full-page.png",
+      caption: "Full page screenshot should not be public.",
+      extraction_status: "source_image",
+      width: 1280,
+      height: 900,
+      capture_kind: "full_page_screenshot"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.group === "signals" && item.cardClass === "tracking-card");
+
+  assert(section);
+  assert.equal(section.items.length, 2);
+  assert(section.items.every((item) => item.table?.rows?.length === 10));
+  assert(section.items.every((item) => item.media === undefined));
+});
+
 test("public daily renders source coverage gaps without internal audit dumps", () => {
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -8698,6 +8989,29 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   assert(!serialized.includes("candidate_pool"));
   assert(!serialized.includes("Source status"));
   assert(!serialized.includes("candidate counts"));
+});
+
+test("public source coverage visualization uses tags and collapsed details", () => {
+  const report = strictPublishReportFixture();
+  report.source_audit.china_ai_sources.sources[1].status = "no_signal";
+  report.source_audit.china_ai_sources.sources[2].status = "blocked";
+  report.source_audit.china_ai_sources.sources[2].notes = "HTTP 403";
+
+  const input = reportToInteractionInput(report);
+  const coverageSection = input.sections.find((section) =>
+    section.group === "verification" &&
+    typeof section.content === "string" &&
+    section.content.includes("China AI official sources")
+  );
+
+  assert(coverageSection);
+  assert.match(coverageSection.content, /<details><summary>/);
+  assert.match(coverageSection.content, /tag-status-checked/);
+  assert.match(coverageSection.content, /tag-status-no-signal/);
+  assert.match(coverageSection.content, /tag-status-blocked/);
+  assert.match(coverageSection.content, /Tencent Newsroom CN/);
+  assert(!coverageSection.content.includes("candidate_pool"));
+  assert(!coverageSection.content.includes("selection_snapshot"));
 });
 
 test("public daily contract renders main items as industry and content-track streams", () => {
@@ -10184,6 +10498,25 @@ function strictPublishReportFixture() {
     verification_status: "primary_confirmed",
     importance: "general"
   }));
+  const huggingFaceTrending = Array.from({ length: 10 }, (_unused, index) => ({
+    candidate_id: `strict-hf-${index + 1}`,
+    repo: `example/strict-model-${index + 1}`,
+    name: `example/strict-model-${index + 1}`,
+    description: "Hugging Face trending model fixture with public model-card metadata.",
+    url: `https://huggingface.co/example/strict-model-${index + 1}`,
+    event_date: reportDate,
+    source: "Hugging Face Trending Models",
+    task: "text-generation",
+    downloads: 1000 + index,
+    likes: 100 + index,
+    rank: index + 1,
+    trend: "trending",
+    evidence: "Hugging Face public model trending fixture.",
+    editorial_category: "open_source",
+    source_level: "model_registry",
+    verification_status: "primary_confirmed",
+    importance: "general"
+  }));
   const hotBlogs = Array.from({ length: 3 }, (_unused, index) => ({
     candidate_id: `strict-blog-${index + 1}`,
     title: `Strict engineering blog ${index + 1}`,
@@ -10379,6 +10712,7 @@ function strictPublishReportFixture() {
     summary: "Strict publish quality fixture.",
     main_items: mainItems,
     github_trending: githubTrending,
+    huggingface_trending: huggingFaceTrending,
     hot_blogs: hotBlogs,
     projects,
     builder_observations: builderObservations,
@@ -10390,8 +10724,13 @@ function strictPublishReportFixture() {
         title: "Strict evidence figure",
         source_url: mainItems[0].url,
         local_path: "assets/evidence/strict-figure.png",
-        caption: "Fixture evidence image.",
-        extraction_status: "source_image"
+        caption: "Benchmark chart from the source page.",
+        extraction_status: "source_image",
+        width: 960,
+        height: 540,
+        asset_role: "chart",
+        asset_kind: "chart",
+        capture_kind: "source_asset"
       }
     ],
     quality_status: {
@@ -10411,6 +10750,21 @@ function strictPublishReportFixture() {
           parsed_count: 10
         })),
         candidates_found: 100,
+        included: 10,
+        notes: "fixture"
+      },
+      huggingface_trending: {
+        checked: true,
+        sources: [
+          {
+            name: "Hugging Face Trending Models",
+            url: "https://huggingface.co/api/models?sort=trending&direction=-1&limit=50",
+            status: "checked",
+            notes: "10 trending models parsed",
+            parsed_count: 10
+          }
+        ],
+        candidates_found: 10,
         included: 10,
         notes: "fixture"
       },
@@ -10438,6 +10792,25 @@ function strictPublishReportFixture() {
         ],
         candidates_found: 12,
         included: 5,
+        notes: "fixture"
+      },
+      china_ai_sources: {
+        checked: true,
+        sources: [
+          "Tencent Newsroom CN",
+          "Alibaba Group News CN",
+          "Alibaba Cloud Blog CN",
+          "Qwen Blog",
+          "DeepSeek News",
+          "Zhipu AI News"
+        ].map((name) => ({
+          name,
+          url: `https://example.cn/${slugId(name)}`,
+          status: "checked",
+          notes: "fixture"
+        })),
+        candidates_found: 6,
+        included: 2,
         notes: "fixture"
       },
       content_sources: {

@@ -48,6 +48,8 @@ npm run prompt:build -- YYYY-MM-DD
 
 ```powershell
 node src/cli.js discover:github-trending --date YYYY-MM-DD --limit 50 --history-root reports-data --output .tmp/github-trending-YYYY-MM-DD.json
+node src/cli.js discover:huggingface-trending --date YYYY-MM-DD --limit 50 --output .tmp/huggingface-trending-YYYY-MM-DD.json
+node src/cli.js discover:china-ai --date YYYY-MM-DD --limit 30 --per-source-limit 3 --output .tmp/china-ai-YYYY-MM-DD.json
 node src/cli.js discover:builders --date YYYY-MM-DD --limit 20 --output .tmp/builders-YYYY-MM-DD.json
 node src/cli.js discover:content-sources --date YYYY-MM-DD --limit 60 --per-source-limit 3 --output .tmp/content-sources-YYYY-MM-DD.json
 node src/cli.js discover:statuspage-incidents --date YYYY-MM-DD --limit 20 --output .tmp/statuspage-incidents-YYYY-MM-DD.json
@@ -66,10 +68,13 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 
 - Treat WeChat/Zhihu/Reddit as low-threshold weak-signal lanes, not factual source shortcuts. Kill-switched or empty platform configs must produce auditable no-signal JSON rather than being silently skipped or backfilled with invented items.
 
+- Hugging Face Trending is a separate model/dataset/Space trend lane, not a substitute for GitHub Trending or ordinary Hugging Face organization pages.
+- `discover:china-ai` is a hard checked lane for reports dated `2026-06-11` or later. Missing `source_audit.china_ai_sources` blocks strict publish; an executed lane with no qualified recent signal is degraded and must be publicly disclosed.
+
 - Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
 
 ```powershell
-npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/wechat-platform-YYYY-MM-DD.json,.tmp/zhihu-platform-YYYY-MM-DD.json,.tmp/reddit-platform-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/huggingface-trending-YYYY-MM-DD.json,.tmp/china-ai-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/wechat-platform-YYYY-MM-DD.json,.tmp/zhihu-platform-YYYY-MM-DD.json,.tmp/reddit-platform-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.

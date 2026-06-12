@@ -59,6 +59,7 @@ const PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE = /(?:待确认|Treat this as a communi
 const CANDIDATE_REF_SECTIONS = [
   "main_items",
   "github_trending",
+  "huggingface_trending",
   "hot_blogs",
   "projects",
   "builder_observations",
@@ -92,6 +93,7 @@ const PUBLIC_TEXT_FIELDS = [
   ["projects", "*", "risk_note"],
   ["projects", "*", "watch_next"],
   ["github_trending", "*", "description"],
+  ["huggingface_trending", "*", "description"],
   ["builder_observations", "*", "translation"],
   ["builder_observations", "*", "content"],
   ["builder_observations", "*", "reader_relevance"],
@@ -115,6 +117,7 @@ const REPAIRABLE_PUBLIC_TEXT_PATTERNS = [
   /^hot_blogs\[\d+\]\.key_points\[\d+\]$/,
   /^projects\[\d+\]\.(?:description|use_case|reader_relevance|verification_note|risk_note|watch_next)$/,
   /^github_trending\[\d+\]\.description$/,
+  /^huggingface_trending\[\d+\]\.description$/,
   /^builder_observations\[\d+\]\.(?:translation|content|reader_relevance|verification_note|risk_note|watch_next)$/,
   /^community_leads\[\d+\]\.(?:content|reader_relevance|verification_note|risk_note|watch_next)$/,
   /^self_check\.notes$/
@@ -338,7 +341,7 @@ function collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks) {
 }
 
 function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|main_items\[\d+\]\.(?:summary|bullets\[\d+\])|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.(?:summary|key_points\[\d+\])|github_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:summary|bullets\[\d+\])|hero_highlights\[\d+\]\.reason|hot_blogs\[\d+\]\.(?:summary|key_points\[\d+\])|github_trending\[\d+\]\.description|huggingface_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   if (!PUBLIC_TEMPLATE_BODY_RE.test(String(entry.value || ""))) {
@@ -359,7 +362,7 @@ function collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks) {
 }
 
 function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
-  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|huggingface_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
@@ -383,7 +386,7 @@ function collectPublicSourcePrefixIssues(entry, issues, aiReviewTasks, report) {
 }
 
 function collectPublicInternalReviewLanguageIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|main_items\[\d+\]\.(?:title|summary|bullets\[\d+\])|hero_highlights\[\d+\]\.(?:title|reason)|hot_blogs\[\d+\]\.(?:title|summary|key_points\[\d+\])|huggingface_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
@@ -427,7 +430,7 @@ function publicSourceLabelsForPath(report, pathName) {
 }
 
 function collectPublicUntranslatedIssues(entry, issues, aiReviewTasks) {
-  if (!/^(summary|hero_highlights\[\d+\]\.(?:title|reason)|main_items\[\d+\]\.title|hot_blogs\[\d+\]\.(?:title|key_points\[\d+\])|builder_observations\[\d+\]\.(?:title|content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
+  if (!/^(summary|hero_highlights\[\d+\]\.(?:title|reason)|main_items\[\d+\]\.title|hot_blogs\[\d+\]\.(?:title|key_points\[\d+\])|huggingface_trending\[\d+\]\.description|builder_observations\[\d+\]\.(?:title|content|translation)|community_leads\[\d+\]\.content)$/.test(entry.path)) {
     return;
   }
   const plain = stripMarkup(entry.value).replace(/\s+/g, " ").trim();
