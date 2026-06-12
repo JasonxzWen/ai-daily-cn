@@ -365,6 +365,18 @@ try {
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
   assert.equal(await page.locator(".builder-card .card-media-grid img").count(), 1);
   assert.equal(await builderCardsUseHorizontalRows(page), true);
+  const trackingComponent = page.locator("[data-tracking-component][data-component-kind='openrouter_rankings']");
+  assert.equal(await trackingComponent.count(), 1);
+  assert.equal(await trackingComponent.locator("[data-scale-mode='linear']").count(), 1);
+  assert.equal(await trackingComponent.locator("[data-scale-mode='log']").count(), 1);
+  await trackingComponent.locator("[data-scale-mode='log']").click();
+  assert.equal(await trackingComponent.getAttribute("data-scale"), "log");
+  await trackingComponent.locator("[data-tab]").nth(1).click();
+  assert.equal(await trackingComponent.locator("[data-tab]").nth(1).getAttribute("aria-selected"), "true");
+  const trackingTooltip = await trackingComponent.locator("[data-tracking-tooltip]").first().getAttribute("data-tracking-tooltip");
+  assert.match(trackingTooltip || "", /DeepSeek V4 Flash/);
+  assert.equal(await trackingComponent.locator("[data-tracking-trace]").count(), 1);
+  assert.doesNotMatch(await trackingComponent.locator("[data-tracking-trace]").textContent(), /raw_dom/i);
   const communityCardsText = await page.locator(".community-card-grid").textContent();
   assert.match(communityCardsText, /token 成本/);
   assert.equal(await page.locator(".community-card .card-media-grid img").count(), 1);

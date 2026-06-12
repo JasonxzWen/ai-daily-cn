@@ -20,6 +20,9 @@ import {
   sectionForPlatformCategory
 } from "./platform-exempt.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
+import { selectChineseMediaDynamics } from "./chinese-media.js";
+import { selectOfficialOrgUpdates } from "./official-updates.js";
+import { buildTrackingComponentSnapshot } from "./tracking-components.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -354,6 +357,10 @@ function selectReportItems(merged, options = {}) {
     selectedIds.add(candidate.id);
     return hotBlogItem(hotCandidate);
   });
+  const chineseMediaDynamics = selectChineseMediaDynamics(candidates, {
+    reportDate,
+    sourceAudit: merged.sourceAudit
+  });
 
   const builderSeeds = candidates
     .filter((candidate) => candidate.category === "builder_observation" && !selectedIds.has(candidate.id))
@@ -365,6 +372,7 @@ function selectReportItems(merged, options = {}) {
     selectedIds.add(candidate.id);
     return builderObservationItem(builderCandidate);
   });
+  const officialOrgUpdates = selectOfficialOrgUpdates(candidates, { reportDate });
 
   const communityPool = candidates
     .filter((candidate) => candidate.category === "community_lead" && !selectedIds.has(candidate.id))
@@ -412,8 +420,11 @@ function selectReportItems(merged, options = {}) {
     github_trending: githubTrending,
     huggingface_trending: huggingFaceTrending,
     hot_blogs: hotBlogs,
+    chinese_media_dynamics: chineseMediaDynamics.items,
+    chinese_media_source_statuses: chineseMediaDynamics.source_statuses,
     projects,
     builder_observations: builderObservations,
+    official_org_updates: officialOrgUpdates,
     community_leads: communityLeads,
     ...platformSelections.sections,
     eligible_counts: {
@@ -421,8 +432,10 @@ function selectReportItems(merged, options = {}) {
       github_trending: publicGithubCandidates.length,
       huggingface_trending: huggingFacePool.length,
       hot_blogs: hotBlogPool.length,
+      chinese_media_dynamics: chineseMediaDynamics.items.length,
       projects: projectSeeds.length,
       builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
+      official_org_updates: officialOrgUpdates.length,
       ...platformSelections.eligibleCounts
     }
   };
@@ -719,9 +732,11 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     huggingface_trending: selection.huggingface_trending,
     model_releases: [],
     hot_blogs: selection.hot_blogs,
+    chinese_media_dynamics: selection.chinese_media_dynamics || [],
     daily_tracking: dailyTrackingItems(reportDate, sourceAudit),
     projects: selection.projects,
     builder_observations: selection.builder_observations,
+    official_org_updates: selection.official_org_updates || [],
     community_leads: selection.community_leads,
     wechat_items: selection.wechat_items || [],
     zhihu_items: selection.zhihu_items || [],
@@ -749,6 +764,10 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
           eligible_candidates: selection.eligible_counts?.hot_blogs || 0,
           selected: selection.hot_blogs.length
         },
+        chinese_media_dynamics: {
+          eligible_candidates: selection.eligible_counts?.chinese_media_dynamics || 0,
+          selected: (selection.chinese_media_dynamics || []).length
+        },
         projects: {
           eligible_candidates: selection.eligible_counts?.projects || 0,
           selected: selection.projects.length
@@ -756,6 +775,10 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
         builder_observations: {
           eligible_candidates: selection.eligible_counts?.builder_observations || 0,
           selected: selection.builder_observations.length
+        },
+        official_org_updates: {
+          eligible_candidates: selection.eligible_counts?.official_org_updates || 0,
+          selected: (selection.official_org_updates || []).length
         },
         wechat_items: {
           eligible_candidates: selection.eligible_counts?.wechat_items || 0,
@@ -795,6 +818,12 @@ function normalizeAutodraftPublicText(report) {
   }
   for (const item of report.community_leads || []) {
     item.content = stripDraftPublicBodyNoise(item.content, item);
+  }
+  for (const item of report.chinese_media_dynamics || []) {
+    item.summary = stripDraftPublicBodyNoise(item.summary, item);
+  }
+  for (const item of report.official_org_updates || []) {
+    item.summary = stripDraftPublicBodyNoise(item.summary, item);
   }
 }
 
@@ -1262,11 +1291,15 @@ function uniqueEditorialSentences(items) {
 
 function githubTrendingItem(candidate, meta, index) {
   const repo = meta.repo || repoFromUrl(candidate.url) || candidate.title;
+  const readmeSummary = String(meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "").trim();
+  const readmeCache = meta.readme_cache || candidate.readme_cache || null;
   return {
     name: meta.name || repo,
     repo,
     candidate_id: candidate.id,
-    description: chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
+    description: readmeSummary || chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
+    ...(readmeSummary ? { readme_summary: readmeSummary } : {}),
+    ...(readmeCache ? { readme_cache: readmeCache } : {}),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "GitHub Trending",
@@ -1311,13 +1344,15 @@ function huggingFaceTrendingItem(candidate, index) {
 
 function projectItem(candidate, meta) {
   const repo = meta.repo || repoFromUrl(candidate.url) || candidate.title;
+  const readmeSummary = String(meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "").trim();
   return {
     name: repo,
     candidate_id: candidate.id,
     editorial_category: "open_source",
     source_level: "github",
     verification_status: "primary_confirmed",
-    description: chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
+    description: readmeSummary || chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
+    ...(readmeSummary ? { readme_summary: readmeSummary } : {}),
     domains: projectDomains(meta.description || candidate.title || ""),
     use_case: "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
     url: candidate.url,
@@ -1524,7 +1559,7 @@ function dailyTrackingItems(reportDate, sourceAudit) {
     const audit = dailyTrackingAuditStatus(sourceAudit, tracker);
     const blocked = audit.status === "blocked" || audit.verificationStatus === "unverified";
     const publishToPublic = audit.changeStatus === "changed" && audit.verificationStatus !== "unverified";
-    return {
+    const item = {
       id: tracker.id,
       name: tracker.name,
       url: tracker.url,
@@ -1546,6 +1581,10 @@ function dailyTrackingItems(reportDate, sourceAudit) {
       watch_next: audit.watchNext || tracker.watchNext,
       ...(audit.snapshot ? { snapshot: audit.snapshot } : {})
     };
+    const trackingComponentSnapshot = buildTrackingComponentSnapshot(item);
+    return trackingComponentSnapshot
+      ? { ...item, tracking_component_snapshot: trackingComponentSnapshot }
+      : item;
   });
 }
 
@@ -1986,6 +2025,19 @@ function sanitizeDailyTrackingSnapshot(snapshot) {
       }))
       .filter((entry) => Number.isInteger(entry.rank) && entry.rank > 0 && entry.model && entry.provider && entry.tokens && entry.change)
     : [];
+  const historyEntries = Array.isArray(snapshot.history_entries)
+    ? snapshot.history_entries
+      .map((entry) => ({
+        week: String(entry?.week || "").trim(),
+        rank: Number(entry?.rank),
+        model: String(entry?.model || "").trim(),
+        provider: String(entry?.provider || "").trim(),
+        tokens: String(entry?.tokens || "").trim(),
+        change: String(entry?.change || entry?.week || "").trim()
+      }))
+      .filter((entry) => entry.week && Number.isInteger(entry.rank) && entry.rank > 0 && entry.model && entry.tokens)
+    : [];
+  const componentTabs = sanitizeDailyTrackingComponentTabs(snapshot.component_tabs);
   return {
     type: String(snapshot.type || "daily_tracking_snapshot"),
     collection_method: String(snapshot.collection_method || "public_page_playwright"),
@@ -1993,7 +2045,60 @@ function sanitizeDailyTrackingSnapshot(snapshot) {
     snapshot_as_of: String(snapshot.snapshot_as_of || new Date().toISOString()),
     source_url: isHttpUrl(snapshot.source_url) ? snapshot.source_url : "https://example.com/",
     top_entries: topEntries,
+    ...(historyEntries.length > 0 ? { history_entries: historyEntries } : {}),
+    ...(componentTabs ? { component_tabs: componentTabs } : {}),
     ...(snapshot.notes ? { notes: String(snapshot.notes) } : {})
+  };
+}
+
+function sanitizeDailyTrackingComponentTabs(componentTabs) {
+  if (!componentTabs || typeof componentTabs !== "object") {
+    return null;
+  }
+  const result = {};
+  for (const key of ["score", "token_usage", "cost", "score_vs_token_usage", "score_vs_cost", "score_vs_compute"]) {
+    const rows = Array.isArray(componentTabs?.[key]?.rows)
+      ? componentTabs[key].rows.map(sanitizeDailyTrackingComponentRow).filter(Boolean)
+      : [];
+    if (rows.length > 0) {
+      result[key] = {
+        rows,
+        ...(componentTabs[key].fallback_reason ? { fallback_reason: String(componentTabs[key].fallback_reason) } : {})
+      };
+    }
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}
+
+function sanitizeDailyTrackingComponentRow(row) {
+  if (!row || typeof row !== "object") {
+    return null;
+  }
+  const rank = Number(row.rank);
+  const model = String(row.model || "").trim();
+  const value = Number(row.value);
+  const provider = String(row.provider || "").trim();
+  const valueLabel = String(row.value_label || row.valueLabel || "").trim();
+  if (!Number.isInteger(rank) || rank <= 0 || !model || !Number.isFinite(value)) {
+    return null;
+  }
+  const segments = row.segments && typeof row.segments === "object"
+    ? Object.fromEntries(Object.entries(row.segments)
+      .map(([key, segmentValue]) => [String(key), String(segmentValue || "").trim()])
+      .filter(([, segmentValue]) => segmentValue))
+    : null;
+  return {
+    rank,
+    model,
+    provider,
+    value,
+    value_label: valueLabel,
+    change: String(row.change || "").trim(),
+    ...(row.metric ? { metric: String(row.metric) } : {}),
+    ...(row.secondary_value !== undefined && Number.isFinite(Number(row.secondary_value)) ? { secondary_value: Number(row.secondary_value) } : {}),
+    ...(row.secondary_value_label ? { secondary_value_label: String(row.secondary_value_label) } : {}),
+    ...(segments && Object.keys(segments).length > 0 ? { segments } : {}),
+    ...(isHttpUrl(row.url) ? { url: row.url } : {})
   };
 }
 

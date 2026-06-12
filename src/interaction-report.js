@@ -15,6 +15,8 @@ import {
 import { defaultImportanceForSection, importanceLabel, importanceTag, normalizeImportance } from "./importance.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "./source-icon-cache.js";
 import { platformForSection, platformItemLabel, PLATFORM_SECTIONS } from "./platform-exempt.js";
+import { resolveLinkIcon } from "./link-icons.js";
+import { trackingComponentForInteraction } from "./tracking-components.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -125,12 +127,14 @@ export function reportToInteractionInput(report, options = {}) {
   };
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
+  const chineseMediaDynamics = Array.isArray(report.chinese_media_dynamics) ? report.chinese_media_dynamics : [];
   const dailyTracking = Array.isArray(report.daily_tracking) ? report.daily_tracking : [];
   const publicDailyTracking = dailyTracking.filter(isPublicDailyTrackingChange);
   const githubTrending = Array.isArray(report.github_trending) ? report.github_trending : [];
   const huggingFaceTrending = Array.isArray(report.huggingface_trending) ? report.huggingface_trending : [];
   const projects = Array.isArray(report.projects) ? report.projects : [];
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
+  const officialOrgUpdates = Array.isArray(report.official_org_updates) ? report.official_org_updates : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const platformItems = Object.fromEntries(
     PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
@@ -166,6 +170,16 @@ export function reportToInteractionInput(report, options = {}) {
       items: formatHotBlogCards(hotBlogs, { report, evidenceByUrl, mediaOptions })
     });
   }
+  if (chineseMediaDynamics.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "中文媒体动态",
+      group: "main",
+      cardClass: "blog-card chinese-media-card",
+      showFilters: false,
+      items: formatHotBlogCards(chineseMediaDynamics, { report, evidenceByUrl, mediaOptions })
+    });
+  }
   if (githubTrending.length > 0) {
     sections.push({
       type: "markdown",
@@ -180,6 +194,16 @@ export function reportToInteractionInput(report, options = {}) {
       title: "Hugging Face Trending 路 Top 10",
       group: "projects",
       content: formatHuggingFaceTrending(huggingFaceTrending, { trendAnnotations })
+    });
+  }
+  if (officialOrgUpdates.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "官方组织动态",
+      group: "signals",
+      cardClass: "official-card",
+      showFilters: false,
+      items: formatOfficialOrgUpdateCards(officialOrgUpdates, { report, evidenceByUrl, mediaOptions })
     });
   }
   if (builderObservations.length > 0) {
@@ -940,6 +964,7 @@ function formatDailyTrackingCards(items, context = {}) {
     const stats = dailyTrackingStats(item, entries);
     const bars = dailyTrackingProviderBars(entries);
     const table = dailyTrackingTable(item, entries);
+    const component = trackingComponentForInteraction(item);
     const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
       limit: 5,
       ...(context.mediaOptions || {})
@@ -958,6 +983,7 @@ function formatDailyTrackingCards(items, context = {}) {
       ].filter(Boolean),
       points: [],
       ...(media.length > 0 ? { media } : {}),
+      ...(component ? { component } : {}),
       ...(stats.length > 0 ? { stats } : {}),
       ...(bars.rows.length > 0 ? { bars } : {}),
       ...(table.rows.length > 0 ? { table } : {})
@@ -1223,6 +1249,29 @@ function formatHotBlogCards(items, context = {}) {
         ...points.map((value, index) => ({ label: `要点 ${index + 1}`, value })),
         ...editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false })
       ],
+      ...(media.length > 0 ? { media } : {})
+    };
+  });
+}
+
+function formatOfficialOrgUpdateCards(items, context = {}) {
+  return items.map((item) => {
+    const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
+      ...(context.mediaOptions || {})
+    });
+    return {
+      group: item.organization || item.source || "Official",
+      title: item.title,
+      href: item.url,
+      titleIcon: siteIconForUrl(item.url, item.organization || item.source || item.title),
+      body: String(item.summary || "").trim(),
+      showGroup: true,
+      tags: [
+        cardTag(importanceTagFor("official_org_updates", item)),
+        sourceTrustCardTag(item),
+        item.event_date ? cardTag(item.event_date, "date") : ""
+      ].filter(Boolean),
+      points: editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false }),
       ...(media.length > 0 ? { media } : {})
     };
   });
@@ -2569,13 +2618,7 @@ function sourceIconForName(name) {
 }
 
 function siteIconForUrl(url, label = "") {
-  try {
-    const parsed = new URL(String(url || ""));
-    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
-    return DOMAIN_ICONS.get(host) || generatedSiteIcon(siteInitials(label || host), siteColor(host), "#ffffff");
-  } catch {
-    return "";
-  }
+  return resolveLinkIcon(url, { label }).icon;
 }
 
 function siteInitials(value) {
