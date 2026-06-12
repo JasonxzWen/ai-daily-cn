@@ -26,21 +26,21 @@
       "enablement": "optional",
       "verification_policy": "primary_required",
       "requires_original_url": false,
-      "max_items_per_run": 3,
+      "max_items_per_run": 20,
       "timeout_ms": 15000
     },
     {
       "id": "intermediary-jiqizhixin",
       "name": "Jiqizhixin",
-      "url": "https://www.jiqizhixin.com/rss",
-      "source_kind": "rss",
+      "url": "https://www.jiqizhixin.com/articles",
+      "source_kind": "html_index",
       "candidate_category": "community_lead",
       "tier": "T3",
       "authority": "intermediary",
       "enablement": "optional",
       "verification_policy": "primary_required",
       "requires_original_url": false,
-      "max_items_per_run": 3,
+      "max_items_per_run": 20,
       "timeout_ms": 15000
     },
     {
@@ -79,10 +79,10 @@
       "candidate_category": "community_lead",
       "tier": "T3",
       "authority": "intermediary",
-      "enablement": "manual",
+      "enablement": "optional",
       "verification_policy": "primary_required",
       "requires_original_url": false,
-      "max_items_per_run": 3,
+      "max_items_per_run": 20,
       "timeout_ms": 15000
     },
     {

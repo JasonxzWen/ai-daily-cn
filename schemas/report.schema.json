@@ -169,6 +169,13 @@
       },
       "default": []
     },
+    "chinese_media_dynamics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hot_blog"
+      },
+      "default": []
+    },
     "daily_tracking": {
       "type": "array",
       "items": {
@@ -187,6 +194,13 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/builder_observation"
+      },
+      "default": []
+    },
+    "official_org_updates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/official_org_update"
       },
       "default": []
     },
@@ -241,6 +255,10 @@
     "absolute_url": {
       "type": "string",
       "format": "uri"
+    },
+    "sha256_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "non_negative_count_map": {
       "type": "object",
@@ -782,6 +800,87 @@
         }
       }
     },
+    "official_org_update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization", "title", "url", "source", "event_date", "summary"],
+      "properties": {
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
+        "importance": {
+          "$ref": "#/$defs/importance"
+        },
+        "organization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verification_status"
+        },
+        "reader_relevance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "github_readme_cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "hit"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hit": {
+          "type": "boolean"
+        },
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha": {
+          "type": "string"
+        },
+        "default_branch": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        }
+      }
+    },
     "project": {
       "type": "object",
       "additionalProperties": false,
@@ -829,6 +928,13 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "readme_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readme_cache": {
+          "$ref": "#/$defs/github_readme_cache"
         },
         "domains": {
           "type": "array",
@@ -913,6 +1019,13 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "readme_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readme_cache": {
+          "$ref": "#/$defs/github_readme_cache"
         },
         "url": {
           "$ref": "#/$defs/absolute_url"
@@ -1240,6 +1353,9 @@
         },
         "snapshot": {
           "$ref": "#/$defs/daily_tracking_snapshot"
+        },
+        "tracking_component_snapshot": {
+          "$ref": "#/$defs/tracking_component_snapshot"
         }
       }
     },
@@ -1271,6 +1387,16 @@
             "$ref": "#/$defs/daily_tracking_snapshot_entry"
           },
           "default": []
+        },
+        "history_entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/daily_tracking_history_entry"
+          },
+          "default": []
+        },
+        "component_tabs": {
+          "$ref": "#/$defs/daily_tracking_component_tabs"
         },
         "notes": {
           "type": "string"
@@ -1304,6 +1430,358 @@
         },
         "url": {
           "$ref": "#/$defs/absolute_url"
+        }
+      }
+    },
+    "daily_tracking_history_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["week", "rank", "model", "provider", "tokens", "change"],
+      "properties": {
+        "week": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string"
+        },
+        "tokens": {
+          "type": "string",
+          "minLength": 1
+        },
+        "change": {
+          "type": "string"
+        }
+      }
+    },
+    "daily_tracking_component_tabs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        },
+        "token_usage": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        },
+        "cost": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        },
+        "score_vs_token_usage": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        },
+        "score_vs_cost": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        },
+        "score_vs_compute": {
+          "$ref": "#/$defs/daily_tracking_component_tab"
+        }
+      }
+    },
+    "daily_tracking_component_tab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rows"],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tracking_component_row"
+          },
+          "default": []
+        },
+        "fallback_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_component_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "component_kind",
+        "source_url",
+        "collected_at",
+        "selector_version",
+        "raw_dom_hash",
+        "data_hash",
+        "tabs",
+        "series",
+        "rows",
+        "previous_snapshot",
+        "diff",
+        "cache_path",
+        "fallback_reason",
+        "public_trace"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_kind": {
+          "enum": ["openrouter_rankings", "artificial_analysis_index"]
+        },
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "selector_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw_dom_hash": {
+          "$ref": "#/$defs/sha256_hash"
+        },
+        "data_hash": {
+          "$ref": "#/$defs/sha256_hash"
+        },
+        "tabs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/tracking_component_tab"
+          }
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tracking_component_series"
+          },
+          "default": []
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tracking_component_row"
+          },
+          "default": []
+        },
+        "previous_snapshot": {
+          "type": ["object", "null"],
+          "additionalProperties": true
+        },
+        "diff": {
+          "$ref": "#/$defs/tracking_component_diff"
+        },
+        "cache_path": {
+          "type": "string"
+        },
+        "fallback_reason": {
+          "type": "string"
+        },
+        "public_trace": {
+          "$ref": "#/$defs/tracking_component_public_trace"
+        }
+      }
+    },
+    "tracking_component_tab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "view", "status", "fallback_reason"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "view": {
+          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter"]
+        },
+        "status": {
+          "enum": ["complete", "partial", "fallback", "blocked"]
+        },
+        "fallback_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_component_series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tab_id", "label", "chart", "rows", "fallback_reason"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tab_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chart": {
+          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter"]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tracking_component_row"
+          },
+          "default": []
+        },
+        "fallback_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_component_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "model", "provider", "value", "value_label", "change"],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "value_label": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "secondary_value": {
+          "type": "number"
+        },
+        "secondary_value_label": {
+          "type": "string"
+        },
+        "segments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        }
+      }
+    },
+    "tracking_component_diff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary", "changed_rows", "new_entries"],
+      "properties": {
+        "status": {
+          "enum": ["first_snapshot", "changed", "unchanged", "fallback"]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "changed_rows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "new_entries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "tracking_component_public_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_url",
+        "collected_at",
+        "selector_version",
+        "data_hash",
+        "top_rows",
+        "diff",
+        "cache_status",
+        "fallback_reason"
+      ],
+      "properties": {
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "selector_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_hash": {
+          "$ref": "#/$defs/sha256_hash"
+        },
+        "top_rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tracking_component_trace_row"
+          },
+          "default": []
+        },
+        "diff": {
+          "$ref": "#/$defs/tracking_component_diff"
+        },
+        "cache_status": {
+          "enum": ["live", "cache", "fallback"]
+        },
+        "fallback_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_component_trace_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "model", "provider", "value_label", "change"],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string"
+        },
+        "value_label": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
         }
       }
     },

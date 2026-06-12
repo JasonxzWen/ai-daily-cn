@@ -56,7 +56,7 @@ export function defaultImportanceForSection(sectionName, item = {}) {
   if (sectionName === "model_releases") {
     return item.release_scope === "provider_official_launch" ? "major" : "notable";
   }
-  if (sectionName === "hot_blogs") {
+  if (sectionName === "hot_blogs" || sectionName === "chinese_media_dynamics") {
     return "notable";
   }
   if (sectionName === "projects") {
@@ -73,7 +73,7 @@ export function defaultImportanceForSection(sectionName, item = {}) {
     const rank = Number(item.rank);
     return Number.isFinite(rank) && rank <= 3 ? "notable" : "general";
   }
-  if (sectionName === "builder_observations") {
+  if (sectionName === "builder_observations" || sectionName === "official_org_updates") {
     return "notable";
   }
   return "general";

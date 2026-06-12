@@ -1185,6 +1185,7 @@ body.lightbox-open {
   grid-template-areas:
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
+    "tracking-component tracking-component"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1238,6 +1239,263 @@ body.lightbox-open {
 
 .tracking-card .card-data-table {
   min-width: min(560px, 100%);
+}
+
+.tracking-card .tracking-component {
+  grid-column: 1 / -1;
+  grid-area: tracking-component;
+}
+
+.tracking-component {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.tracking-component-header {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.tracking-component-meta {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tracking-scale-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.tracking-scale-toggle button,
+.tracking-component-tabs button {
+  min-width: 0;
+  border: 0;
+  padding: 6px 9px;
+  background: transparent;
+  color: #4b4a45;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tracking-scale-toggle button[aria-pressed="true"],
+.tracking-component-tabs button[aria-selected="true"] {
+  background: #3d3d3a;
+  color: #ffffff;
+}
+
+.tracking-component-tabs {
+  gap: 6px;
+  justify-content: start;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tracking-component-panel {
+  min-width: 0;
+}
+
+.tracking-bars {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.tracking-bar-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(140px, 0.72fr) minmax(120px, 1fr) minmax(74px, auto) minmax(48px, auto);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(209, 207, 197, 0.66);
+}
+
+.tracking-rank,
+.tracking-value,
+.tracking-change,
+.tracking-name small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.tracking-name {
+  display: grid;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 820;
+  overflow-wrap: anywhere;
+}
+
+.tracking-bar-track {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+}
+
+.tracking-bar-fill {
+  display: block;
+  width: var(--bar-width-linear);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f766e, #d97757);
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-bar-fill {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tracking-stack-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(86px, 0.24fr) minmax(160px, 1fr) minmax(66px, auto);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.tracking-stack-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tracking-stack-track {
+  display: block;
+  width: var(--bar-width-linear);
+  min-width: 28px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-stack-track {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack-fill {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.tracking-stack-segment {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  background: #0f766e;
+}
+
+.tracking-stack-segment[data-segment="1"] { background: #d97757; }
+.tracking-stack-segment[data-segment="2"] { background: #2563eb; }
+.tracking-stack-segment[data-segment="3"] { background: #9333ea; }
+.tracking-stack-segment[data-segment="4"] { background: #16a34a; }
+.tracking-stack-segment[data-segment="5"] { background: #dc2626; }
+.tracking-stack-segment[data-segment="6"] { background: #0891b2; }
+.tracking-stack-segment[data-segment="7"] { background: #ca8a04; }
+
+.tracking-bar-row[data-tracking-tooltip]:hover::after,
+.tracking-bar-row[data-tracking-tooltip]:focus-within::after,
+.tracking-stack-row[data-tracking-tooltip]:hover::after,
+.tracking-stack-row[data-tracking-tooltip]:focus-within::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 4;
+  max-width: min(420px, 92vw);
+  padding: 7px 9px;
+  border: 1px solid rgba(31, 30, 27, 0.2);
+  border-radius: 6px;
+  background: #1f1e1b;
+  color: #ffffff;
+  content: attr(data-tracking-tooltip);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.22);
+}
+
+.tracking-data-table {
+  min-width: 620px;
+  font-size: 12.5px;
+}
+
+.tracking-component-fallback {
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  color: #5f5d57;
+  background: #fbfaf5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tracking-trace {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  color: #4b4a45;
+  font-size: 12px;
+}
+
+.tracking-trace summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 820;
+}
+
+.tracking-trace dl {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.tracking-trace div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.tracking-trace dt {
+  color: var(--muted);
+  font-weight: 780;
+}
+
+.tracking-trace dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .blog-card .card-detail-list {
@@ -1540,10 +1798,65 @@ body.lightbox-open {
     grid-template-areas:
       "tracking-title"
       "tracking-tags"
+      "tracking-component"
       "tracking-stats"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
+  }
+
+  .tracking-card .tracking-component {
+    grid-area: tracking-component;
+  }
+
+  .tracking-component-header {
+    display: grid;
+  }
+
+  .tracking-bar-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-areas:
+      "rank name"
+      "rank bar"
+      "rank value";
+  }
+
+  .tracking-rank {
+    grid-area: rank;
+  }
+
+  .tracking-name {
+    grid-area: name;
+  }
+
+  .tracking-bar-track {
+    grid-area: bar;
+  }
+
+  .tracking-value {
+    grid-area: value;
+  }
+
+  .tracking-change {
+    grid-area: value;
+    justify-self: end;
+  }
+
+  .tracking-stack-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-component[data-scale="log"] .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-trace div {
+    grid-template-columns: 1fr;
   }
 
   .project-card {
@@ -2658,7 +2971,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <h1 class="report-title report-date-title">2026-06-09</h1>
         </div>
         <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
-<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-09.json" rel="noopener noreferrer">结构化 JSON</a></div>
+<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkpTPC90ZXh0Pjwvc3ZnPg==" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-09.json" rel="noopener noreferrer">结构化 JSON</a></div>
       </div>
       <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天最值得看的主线有 英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速</li><li>苹果发布新一代系统级 AI 和 Siri</li><li>OpenAI 推出经济研究交流项目，面向 AI 经济影响研究</li><li>热门博客这轮主要看 agent 和开发工具的落地边界</li></ul>
@@ -2701,21 +3014,21 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </div>
     <div class="rendered-markdown"><ol><li><strong><a href="https://developer.nvidia.com/blog/train-models-faster-with-jax-and-maxtext-using-nvfp4-on-nvidia-blackwell/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,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" alt="NVIDIA Developer Blog" decoding="async"> 英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速。</li><li><strong>训练优化</strong>：NVIDIA 把 JAX、MaxText、Blackwell 和 <strong class="text-keyword keyword-major">NVFP4</strong> 放在同一条训练吞吐优化链路里。</li><li><strong>问题背景</strong>：文章从 frontier LLM 预训练的吞吐瓶颈切入，讨论千卡级训练中每一点 step efficiency 的成本意义。</li></ul>
-<ol start="2"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-unveils-next-generation-of-apple-intelligence-siri-ai-and-more/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> 苹果发布新一代系统级 AI 和 Siri</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="2"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-unveils-next-generation-of-apple-intelligence-siri-ai-and-more/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> 苹果发布新一代系统级 AI 和 Siri</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>苹果发布新一代系统级 AI 和 Siri。</li><li><strong>苹果系统 AI</strong>：Apple 预览下一代 Apple Intelligence，并把 <strong class="text-keyword keyword-major">Siri AI</strong> 放进系统级更新。</li><li><strong>可用范围</strong>：公开信息集中在更个人化的助手体验、设备软件版本和覆盖范围，属于苹果平台级 AI 入口变化。</li></ul>
 <ol start="3"><li><strong><a href="https://openai.com/index/economic-research-exchange" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI 推出经济研究交流项目，面向 AI 经济影响研究</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>OpenAI 推出经济研究交流项目，面向 AI 经济影响研究。</li><li><strong>OpenAI 研究项目</strong>：Economic Research Exchange 面向 AI 对就业、生产率和宏观经济影响的 <strong class="text-keyword keyword-major">经济研究</strong>。</li><li><strong>参与方式</strong>：OpenAI 表示将为选定研究项目开放申请入口，公开信息更像研究合作计划而不是产品功能发布。</li></ul>
 <ol start="4"><li><strong><a href="https://machinelearning.apple.com/research/introducing-third-generation-of-apple-foundation-models" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,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" alt="Apple Machine Learning Research" decoding="async"> 苹果介绍第三代基础模型，公开内容集中在端侧和云端模型能力范围</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>苹果介绍第三代基础模型，公开内容集中在端侧和云端模型能力范围。</li><li><strong>模型说明</strong>：Apple 披露第三代基础模型的 <strong class="text-keyword keyword-major">端侧模型、服务器模型和评测范围</strong>，把能力范围写进研究说明。</li><li><strong>系统入口</strong>：公开信息把模型能力、系统体验和开发者接口放在一起，区分已产品化能力和仍处在研究披露中的能力。</li></ul>
-<ol start="5"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-intelligence-brings-powerful-ai-capabilities-into-everyday-experiences/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> 苹果把新的 AI 能力接入系统日常体验</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="5"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-intelligence-brings-powerful-ai-capabilities-into-everyday-experiences/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> 苹果把新的 AI 能力接入系统日常体验</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>苹果把新的 AI 能力接入系统日常体验。</li><li><strong>日常入口</strong>：Apple 把 <strong class="text-keyword keyword-major">写作、图像和快捷操作</strong> 等 AI 能力接入 iPhone、iPad 和 Mac 的日常体验。</li><li><strong>产品形态</strong>：公开信息强调更个人化、更有帮助的系统功能，说明苹果继续把 AI 做成默认系统能力。</li></ul>
-<ol start="6"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-introduces-siri-ai-a-profoundly-more-capable-and-personal-assistant/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> 苹果单独介绍 Siri AI 个性化助手升级</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="6"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-introduces-siri-ai-a-profoundly-more-capable-and-personal-assistant/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> 苹果单独介绍 Siri AI 个性化助手升级</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>苹果单独介绍 Siri AI 个性化助手升级。</li><li><strong>苹果系统 AI</strong>：Apple 预览下一代 Apple Intelligence，并把 <strong class="text-keyword keyword-major">Siri AI</strong> 放进系统级更新。</li><li><strong>可用范围</strong>：公开信息集中在更个人化的助手体验、设备软件版本和覆盖范围，属于苹果平台级 AI 入口变化。</li></ul>
-<ol start="7"><li><strong><a href="https://blog.google/innovation-and-ai/technology/developers-tools/bringing-gemini-models-to-apple-developers/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google 将最新 Gemini 模型接入苹果开发者工具链</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="7"><li><strong><a href="https://blog.google/innovation-and-ai/technology/developers-tools/bringing-gemini-models-to-apple-developers/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google 将最新 Gemini 模型接入苹果开发者工具链</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>Google 将最新 Gemini 模型接入苹果开发者工具链。</li><li><strong>Gemini 模型接入</strong>：Google 把 <strong class="text-keyword keyword-major">Gemini 模型</strong> 接入苹果开发者工具链，开发者可在 Apple 生态的开发流程里调用最新模型能力，而不是只从独立网页或云控制台进入。</li></ul>
-<ol start="8"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-aids-app-development-with-new-intelligence-frameworks-and-advanced-tools/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> 苹果为应用开发者推出新的智能框架和开发工具</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="8"><li><strong><a href="https://www.apple.com/newsroom/2026/06/apple-aids-app-development-with-new-intelligence-frameworks-and-advanced-tools/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> 苹果为应用开发者推出新的智能框架和开发工具</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>苹果为应用开发者推出新的智能框架和开发工具。</li><li><strong>开发者工具</strong>：Apple 宣布新的 <strong class="text-keyword keyword-major">智能框架</strong>、Xcode 生产力能力和平台改进，面向第三方应用开发。</li><li><strong>接入方向</strong>：这条信息指向系统级 AI 能力怎样进入开发工具链，而不是独立发布一个聊天产品。</li></ul>
-<ol start="9"><li><strong><a href="https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
+<ol start="9"><li><strong><a href="https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-source">官方一手来源</mark>（2026-06-08）</li></ol>
 <ul><li>NVIDIA 借伦敦科技周继续推进英国主权 AI，公开信息主要落在基础设施展示、伙伴协作和执行层进展。</li><li><strong>时间点</strong>：NVIDIA 继续借伦敦科技周推进 <strong class="text-keyword keyword-major">英国主权 AI</strong> 议题，和去年的口号形成前后呼应。</li><li><strong>今年</strong>：公开叙事已经从“做 AI maker”转向展示基础设施、伙伴协作和执行层进展。</li></ul>
 <p><img class="markdown-image" src="../../../assets/evidence/how-the-uk-is-turning-sovereign-ai-ambition-into-action-with-nvidia-technologies-2026-06-09.jpg" alt="How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies" loading="lazy" data-lightbox-image="true" data-lightbox-caption="How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies" role="button" tabindex="0" aria-label="点击放大图片：How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies" decoding="async"></p>
 <p><em>How the UK Is Turning Sovereign AI Ambition Into Action With NVIDIA Technologies：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。</em></p>
@@ -2726,7 +3039,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - **训练优化**：NVIDIA 把 JAX、MaxText、Blackwell 和 ==keyword-major|NVFP4== 放在同一条训练吞吐优化链路里。
   - **问题背景**：文章从 frontier LLM 预训练的吞吐瓶颈切入，讨论千卡级训练中每一点 step efficiency 的成本意义。
 
-2. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) 苹果发布新一代系统级 AI 和 Siri](https://www.apple.com/newsroom/2026/06/apple-unveils-next-generation-of-apple-intelligence-siri-ai-and-more/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+2. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) 苹果发布新一代系统级 AI 和 Siri](https://www.apple.com/newsroom/2026/06/apple-unveils-next-generation-of-apple-intelligence-siri-ai-and-more/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - 苹果发布新一代系统级 AI 和 Siri。
   - **苹果系统 AI**：Apple 预览下一代 Apple Intelligence，并把 ==keyword-major|Siri AI== 放进系统级更新。
   - **可用范围**：公开信息集中在更个人化的助手体验、设备软件版本和覆盖范围，属于苹果平台级 AI 入口变化。
@@ -2741,26 +3054,26 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - **模型说明**：Apple 披露第三代基础模型的 ==keyword-major|端侧模型、服务器模型和评测范围==，把能力范围写进研究说明。
   - **系统入口**：公开信息把模型能力、系统体验和开发者接口放在一起，区分已产品化能力和仍处在研究披露中的能力。
 
-5. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) 苹果把新的 AI 能力接入系统日常体验](https://www.apple.com/newsroom/2026/06/apple-intelligence-brings-powerful-ai-capabilities-into-everyday-experiences/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+5. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) 苹果把新的 AI 能力接入系统日常体验](https://www.apple.com/newsroom/2026/06/apple-intelligence-brings-powerful-ai-capabilities-into-everyday-experiences/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - 苹果把新的 AI 能力接入系统日常体验。
   - **日常入口**：Apple 把 ==keyword-major|写作、图像和快捷操作== 等 AI 能力接入 iPhone、iPad 和 Mac 的日常体验。
   - **产品形态**：公开信息强调更个人化、更有帮助的系统功能，说明苹果继续把 AI 做成默认系统能力。
 
-6. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) 苹果单独介绍 Siri AI 个性化助手升级](https://www.apple.com/newsroom/2026/06/apple-introduces-siri-ai-a-profoundly-more-capable-and-personal-assistant/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+6. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) 苹果单独介绍 Siri AI 个性化助手升级](https://www.apple.com/newsroom/2026/06/apple-introduces-siri-ai-a-profoundly-more-capable-and-personal-assistant/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - 苹果单独介绍 Siri AI 个性化助手升级。
   - **苹果系统 AI**：Apple 预览下一代 Apple Intelligence，并把 ==keyword-major|Siri AI== 放进系统级更新。
   - **可用范围**：公开信息集中在更个人化的助手体验、设备软件版本和覆盖范围，属于苹果平台级 AI 入口变化。
 
-7. **[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google 将最新 Gemini 模型接入苹果开发者工具链](https://blog.google/innovation-and-ai/technology/developers-tools/bringing-gemini-models-to-apple-developers/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+7. **[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google 将最新 Gemini 模型接入苹果开发者工具链](https://blog.google/innovation-and-ai/technology/developers-tools/bringing-gemini-models-to-apple-developers/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - Google 将最新 Gemini 模型接入苹果开发者工具链。
   - **Gemini 模型接入**：Google 把 ==keyword-major|Gemini 模型== 接入苹果开发者工具链，开发者可在 Apple 生态的开发流程里调用最新模型能力，而不是只从独立网页或云控制台进入。
 
-8. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) 苹果为应用开发者推出新的智能框架和开发工具](https://www.apple.com/newsroom/2026/06/apple-aids-app-development-with-new-intelligence-frameworks-and-advanced-tools/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+8. **[![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) 苹果为应用开发者推出新的智能框架和开发工具](https://www.apple.com/newsroom/2026/06/apple-aids-app-development-with-new-intelligence-frameworks-and-advanced-tools/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - 苹果为应用开发者推出新的智能框架和开发工具。
   - **开发者工具**：Apple 宣布新的 ==keyword-major|智能框架==、Xcode 生产力能力和平台改进，面向第三方应用开发。
   - **接入方向**：这条信息指向系统级 AI 能力怎样进入开发工具链，而不是独立发布一个聊天产品。
 
-9. **[![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==) NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行](https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
+9. **[![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==) NVIDIA 借伦敦科技周继续推动英国主权 AI，从算力口号走向执行](https://blogs.nvidia.com/blog/uk-sovereign-ai-advancements/)** ==tag-major|重大== ==tag-source|官方一手来源==（2026-06-08）
   - NVIDIA 借伦敦科技周继续推进英国主权 AI，公开信息主要落在基础设施展示、伙伴协作和执行层进展。
   - **时间点**：NVIDIA 继续借伦敦科技周推进 ==keyword-major|英国主权 AI== 议题，和去年的口号形成前后呼应。
   - **今年**：公开叙事已经从“做 AI maker”转向展示基础设施、伙伴协作和执行层进展。
@@ -2788,7 +3101,167 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-09</span></div>
 
-    <div class="card-stat-grid" data-card-stats>
+    <div class="tracking-component" data-tracking-component data-component-kind="openrouter_rankings" data-scale="linear">
+    <div class="tracking-component-header">
+      <div>
+        <div class="card-visual-title">OpenRouter</div>
+        <span class="tracking-component-meta">2026-06-09T08:32:15.601Z</span>
+      </div>
+      <div class="tracking-scale-toggle" role="group" aria-label="Scale">
+        <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
+        <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
+      </div>
+    </div>
+    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="OpenRouter tabs"><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-top-models" aria-selected="true">Top Models</button><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-leaderboard" aria-selected="false">LLM Leaderboard</button></div>
+    <div class="tracking-component-panel" id="tracking-openrouter-rankings-top-models" data-tab-panel-group="tracking-openrouter-rankings" >
+      <div class="tracking-bars" aria-label="Top Models"><div class="tracking-bar-row" data-tracking-tooltip="#1 DeepSeek V4 Flash | provider: deepseek | 4.07T tokens | change: 41%" title="#1 DeepSeek V4 Flash | provider: deepseek | 4.07T tokens | change: 41%">
+      <span class="tracking-rank">#1</span>
+      <span class="tracking-name">DeepSeek V4 Flash<small>deepseek</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:100%;--bar-width-log:100%"></span></span>
+      <span class="tracking-value">4.07T tokens</span>
+      <span class="tracking-change">41%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#2 Hy3 preview | provider: tencent | 3.3T tokens | change: 12%" title="#2 Hy3 preview | provider: tencent | 3.3T tokens | change: 12%">
+      <span class="tracking-rank">#2</span>
+      <span class="tracking-name">Hy3 preview<small>tencent</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:81%;--bar-width-log:99%"></span></span>
+      <span class="tracking-value">3.3T tokens</span>
+      <span class="tracking-change">12%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#3 MiniMax M3 | provider: minimax | 2.89T tokens | change: &gt;999%" title="#3 MiniMax M3 | provider: minimax | 2.89T tokens | change: &gt;999%">
+      <span class="tracking-rank">#3</span>
+      <span class="tracking-name">MiniMax M3<small>minimax</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:71%;--bar-width-log:99%"></span></span>
+      <span class="tracking-value">2.89T tokens</span>
+      <span class="tracking-change">&gt;999%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#4 MiMo-V2.5 | provider: xiaomi | 2.44T tokens | change: 43%" title="#4 MiMo-V2.5 | provider: xiaomi | 2.44T tokens | change: 43%">
+      <span class="tracking-rank">#4</span>
+      <span class="tracking-name">MiMo-V2.5<small>xiaomi</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:60%;--bar-width-log:98%"></span></span>
+      <span class="tracking-value">2.44T tokens</span>
+      <span class="tracking-change">43%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#5 Owl Alpha | provider: openrouter | 1.98T tokens | change: 13%" title="#5 Owl Alpha | provider: openrouter | 1.98T tokens | change: 13%">
+      <span class="tracking-rank">#5</span>
+      <span class="tracking-name">Owl Alpha<small>openrouter</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:49%;--bar-width-log:98%"></span></span>
+      <span class="tracking-value">1.98T tokens</span>
+      <span class="tracking-change">13%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#6 DeepSeek V4 Pro | provider: deepseek | 1.86T tokens | change: 48%" title="#6 DeepSeek V4 Pro | provider: deepseek | 1.86T tokens | change: 48%">
+      <span class="tracking-rank">#6</span>
+      <span class="tracking-name">DeepSeek V4 Pro<small>deepseek</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:46%;--bar-width-log:97%"></span></span>
+      <span class="tracking-value">1.86T tokens</span>
+      <span class="tracking-change">48%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#7 Claude Sonnet 4.6 | provider: anthropic | 1.85T tokens | change: 4%" title="#7 Claude Sonnet 4.6 | provider: anthropic | 1.85T tokens | change: 4%">
+      <span class="tracking-rank">#7</span>
+      <span class="tracking-name">Claude Sonnet 4.6<small>anthropic</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:45%;--bar-width-log:97%"></span></span>
+      <span class="tracking-value">1.85T tokens</span>
+      <span class="tracking-change">4%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#8 Claude Opus 4.7 | provider: anthropic | 1.5T tokens | change: 32%" title="#8 Claude Opus 4.7 | provider: anthropic | 1.5T tokens | change: 32%">
+      <span class="tracking-rank">#8</span>
+      <span class="tracking-name">Claude Opus 4.7<small>anthropic</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:37%;--bar-width-log:97%"></span></span>
+      <span class="tracking-value">1.5T tokens</span>
+      <span class="tracking-change">32%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#9 Claude Opus 4.8 | provider: anthropic | 1.26T tokens | change: 199%" title="#9 Claude Opus 4.8 | provider: anthropic | 1.26T tokens | change: 199%">
+      <span class="tracking-rank">#9</span>
+      <span class="tracking-name">Claude Opus 4.8<small>anthropic</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:31%;--bar-width-log:96%"></span></span>
+      <span class="tracking-value">1.26T tokens</span>
+      <span class="tracking-change">199%</span>
+    </div><div class="tracking-bar-row" data-tracking-tooltip="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 8%" title="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 8%">
+      <span class="tracking-rank">#10</span>
+      <span class="tracking-name">DeepSeek V3.2<small>deepseek</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:29%;--bar-width-log:96%"></span></span>
+      <span class="tracking-value">1.18T tokens</span>
+      <span class="tracking-change">8%</span>
+    </div></div>
+    </div><div class="tracking-component-panel" id="tracking-openrouter-rankings-leaderboard" data-tab-panel-group="tracking-openrouter-rankings" hidden>
+      <div class="table-scroll tracking-table-scroll" data-table-wrap>
+    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="LLM Leaderboard">
+      <thead><tr>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0">Rank</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1">Model</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2">Provider</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3">Value</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4">Change</th>
+      </tr></thead>
+      <tbody><tr data-tracking-tooltip="#1 DeepSeek V4 Flash | provider: deepseek | 4.07T tokens | change: 41%" title="#1 DeepSeek V4 Flash | provider: deepseek | 4.07T tokens | change: 41%">
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="0">#1</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="1">DeepSeek V4 Flash</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="2">deepseek</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="3">4.07T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="4">41%</td>
+    </tr><tr data-tracking-tooltip="#2 Hy3 preview | provider: tencent | 3.3T tokens | change: 12%" title="#2 Hy3 preview | provider: tencent | 3.3T tokens | change: 12%">
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="0">#2</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="1">Hy3 preview</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="2">tencent</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="3">3.3T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="4">12%</td>
+    </tr><tr data-tracking-tooltip="#3 MiniMax M3 | provider: minimax | 2.89T tokens | change: &gt;999%" title="#3 MiniMax M3 | provider: minimax | 2.89T tokens | change: &gt;999%">
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="0">#3</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="1">MiniMax M3</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="2">minimax</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="3">2.89T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="4">&gt;999%</td>
+    </tr><tr data-tracking-tooltip="#4 MiMo-V2.5 | provider: xiaomi | 2.44T tokens | change: 43%" title="#4 MiMo-V2.5 | provider: xiaomi | 2.44T tokens | change: 43%">
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="0">#4</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="1">MiMo-V2.5</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="2">xiaomi</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="3">2.44T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="4">43%</td>
+    </tr><tr data-tracking-tooltip="#5 Owl Alpha | provider: openrouter | 1.98T tokens | change: 13%" title="#5 Owl Alpha | provider: openrouter | 1.98T tokens | change: 13%">
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="0">#5</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="1">Owl Alpha</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="2">openrouter</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="3">1.98T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="4">13%</td>
+    </tr><tr data-tracking-tooltip="#6 DeepSeek V4 Pro | provider: deepseek | 1.86T tokens | change: 48%" title="#6 DeepSeek V4 Pro | provider: deepseek | 1.86T tokens | change: 48%">
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="0">#6</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="1">DeepSeek V4 Pro</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="2">deepseek</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="3">1.86T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="4">48%</td>
+    </tr><tr data-tracking-tooltip="#7 Claude Sonnet 4.6 | provider: anthropic | 1.85T tokens | change: 4%" title="#7 Claude Sonnet 4.6 | provider: anthropic | 1.85T tokens | change: 4%">
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="0">#7</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="1">Claude Sonnet 4.6</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="2">anthropic</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="3">1.85T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="4">4%</td>
+    </tr><tr data-tracking-tooltip="#8 Claude Opus 4.7 | provider: anthropic | 1.5T tokens | change: 32%" title="#8 Claude Opus 4.7 | provider: anthropic | 1.5T tokens | change: 32%">
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="0">#8</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="1">Claude Opus 4.7</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="2">anthropic</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="3">1.5T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="4">32%</td>
+    </tr><tr data-tracking-tooltip="#9 Claude Opus 4.8 | provider: anthropic | 1.26T tokens | change: 199%" title="#9 Claude Opus 4.8 | provider: anthropic | 1.26T tokens | change: 199%">
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="0">#9</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="1">Claude Opus 4.8</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="2">anthropic</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="3">1.26T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="4">199%</td>
+    </tr><tr data-tracking-tooltip="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 8%" title="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 8%">
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="0">#10</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="1">DeepSeek V3.2</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="2">deepseek</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="3">1.18T tokens</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="4">8%</td>
+    </tr></tbody>
+    </table>
+  </div>
+    </div>
+    <details class="tracking-trace" data-tracking-trace>
+    <summary>Trace</summary>
+    <dl>
+      <div><dt>Source</dt><dd><a href="https://openrouter.ai/rankings" rel="noopener noreferrer">https://openrouter.ai/rankings</a></dd></div>
+      <div><dt>Selector</dt><dd>openrouter-rankings-v1</dd></div>
+      <div><dt>Data hash</dt><dd>sha256:fbd7b0f3d4513639c4739e5bee6f9fa5d968a2047760e677215bb62ce6f3f2a8</dd></div>
+      <div><dt>DOM hash</dt><dd>sha256:9d85bc8496a501135a694feb02f915e7848ce2c7e2941c7e69b7f5686955a874</dd></div>
+      <div><dt>Cache</dt><dd>live</dd></div>
+      <div><dt>Diff</dt><dd>No previous component snapshot was available for comparison.</dd></div>
+      <div><dt>Top rows</dt><dd>#1 DeepSeek V4 Flash, #2 Hy3 preview, #3 MiniMax M3, #4 MiMo-V2.5, #5 Owl Alpha</dd></div>
+    </dl>
+  </details>
+  </div><div class="card-stat-grid" data-card-stats>
     <div class="card-stat">
       <span class="card-stat-label">覆盖</span>
       <strong>Top 10</strong>
@@ -2868,10 +3341,118 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
 <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="模型基准" data-search-target="html-work-report">
     <div class="meta">模型基准</div>
-    <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzM4YmRmOCI+QUE8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-09</span></div>
 
-    <div class="card-stat-grid" data-card-stats>
+    <div class="tracking-component" data-tracking-component data-component-kind="artificial_analysis_index" data-scale="linear">
+    <div class="tracking-component-header">
+      <div>
+        <div class="card-visual-title">Artificial Analysis</div>
+        <span class="tracking-component-meta">2026-06-09T08:32:15.601Z</span>
+      </div>
+      <div class="tracking-scale-toggle" role="group" aria-label="Scale">
+        <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
+        <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
+      </div>
+    </div>
+    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="Artificial Analysis tabs"><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score" aria-selected="true">Score</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-token-usage" aria-selected="false">Token Usage</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-cost" aria-selected="false">Cost</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-token-usage" aria-selected="false">Score vs. Token Usage</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-cost" aria-selected="false">Score vs. Cost</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-compute" aria-selected="false">Score vs. Compute</button></div>
+    <div class="tracking-component-panel" id="tracking-artificial-analysis-index-score" data-tab-panel-group="tracking-artificial-analysis-index" >
+      <div class="table-scroll tracking-table-scroll" data-table-wrap>
+    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="Score">
+      <thead><tr>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0">Rank</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1">Model</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2">Provider</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3">Value</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4">Change</th>
+      </tr></thead>
+      <tbody><tr data-tracking-tooltip="#1 Claude Opus 4.8 (max) | provider: anthropic | metric: AA Index | 61 分 | change: AA Index" title="#1 Claude Opus 4.8 (max) | provider: anthropic | metric: AA Index | 61 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="0">#1</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="1">Claude Opus 4.8 (max)</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="2">anthropic</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="3">61 分</td>
+      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#2 GPT-5.5 (xhigh) | provider: openai | metric: AA Index | 60 分 | change: AA Index" title="#2 GPT-5.5 (xhigh) | provider: openai | metric: AA Index | 60 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="0">#2</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="1">GPT-5.5 (xhigh)</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="2">openai</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="3">60 分</td>
+      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#3 GPT-5.5 (high) | provider: openai | metric: AA Index | 59 分 | change: AA Index" title="#3 GPT-5.5 (high) | provider: openai | metric: AA Index | 59 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="0">#3</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="1">GPT-5.5 (high)</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="2">openai</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="3">59 分</td>
+      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#4 Claude Opus 4.7 (max) | provider: anthropic | metric: AA Index | 57 分 | change: AA Index" title="#4 Claude Opus 4.7 (max) | provider: anthropic | metric: AA Index | 57 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="0">#4</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="1">Claude Opus 4.7 (max)</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="2">anthropic</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="3">57 分</td>
+      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#5 Gemini 3.1 Pro Preview | provider: google | metric: AA Index | 57 分 | change: AA Index" title="#5 Gemini 3.1 Pro Preview | provider: google | metric: AA Index | 57 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="0">#5</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="1">Gemini 3.1 Pro Preview</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="2">google</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="3">57 分</td>
+      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#6 Qwen3.7 Max | provider: alibaba | metric: AA Index | 57 分 | change: AA Index" title="#6 Qwen3.7 Max | provider: alibaba | metric: AA Index | 57 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="0">#6</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="1">Qwen3.7 Max</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="2">alibaba</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="3">57 分</td>
+      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#7 Gemini 3.5 Flash | provider: google | metric: AA Index | 55 分 | change: AA Index" title="#7 Gemini 3.5 Flash | provider: google | metric: AA Index | 55 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="0">#7</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="1">Gemini 3.5 Flash</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="2">google</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="3">55 分</td>
+      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#8 MiniMax-M3 | provider: minimax | metric: AA Index | 55 分 | change: AA Index" title="#8 MiniMax-M3 | provider: minimax | metric: AA Index | 55 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="0">#8</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="1">MiniMax-M3</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="2">minimax</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="3">55 分</td>
+      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#9 Kimi K2.6 | provider: moonshot | metric: AA Index | 54 分 | change: AA Index" title="#9 Kimi K2.6 | provider: moonshot | metric: AA Index | 54 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="0">#9</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="1">Kimi K2.6</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="2">moonshot</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="3">54 分</td>
+      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="4">AA Index</td>
+    </tr><tr data-tracking-tooltip="#10 MiMo-V2.5-Pro | provider: xiaomi | metric: AA Index | 54 分 | change: AA Index" title="#10 MiMo-V2.5-Pro | provider: xiaomi | metric: AA Index | 54 分 | change: AA Index">
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="0">#10</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="1">MiMo-V2.5-Pro</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="2">xiaomi</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="3">54 分</td>
+      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="4">AA Index</td>
+    </tr></tbody>
+    </table>
+  </div>
+    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-token-usage" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
+      <div class="tracking-component-fallback">source_tab_not_collected</div>
+    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-cost" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
+      <div class="tracking-component-fallback">source_tab_not_collected</div>
+    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-token-usage" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
+      <div class="tracking-component-fallback">source_tab_not_collected</div>
+    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-cost" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
+      <div class="tracking-component-fallback">source_tab_not_collected</div>
+    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-compute" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
+      <div class="tracking-component-fallback">source_tab_not_collected</div>
+    </div>
+    <details class="tracking-trace" data-tracking-trace>
+    <summary>Trace</summary>
+    <dl>
+      <div><dt>Source</dt><dd><a href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer">https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index</a></dd></div>
+      <div><dt>Selector</dt><dd>artificial-analysis-index-v1</dd></div>
+      <div><dt>Data hash</dt><dd>sha256:30b28439271c4dea0bbb55aa60b1d4c0ea583d3b1586c74df00e5835128810ac</dd></div>
+      <div><dt>DOM hash</dt><dd>sha256:768d586f3d53c26ddad9ea153d2b0ca9a8b1038ef0e8e1b4d520d388172f8f38</dd></div>
+      <div><dt>Cache</dt><dd>live</dd></div>
+      <div><dt>Diff</dt><dd>No previous component snapshot was available for comparison.</dd></div>
+      <div><dt>Top rows</dt><dd>#1 Claude Opus 4.8 (max), #2 GPT-5.5 (xhigh), #3 GPT-5.5 (high), #4 Claude Opus 4.7 (max), #5 Gemini 3.1 Pro Preview</dd></div>
+    </dl>
+  </details>
+  </div><div class="card-stat-grid" data-card-stats>
     <div class="card-stat">
       <span class="card-stat-label">覆盖</span>
       <strong>Top 10</strong>
@@ -3089,7 +3670,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="MIT Technology Review" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.technologyreview.com/2026/06/08/1138485/the-download-world-cup-ball-openai-super-app/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TVRSPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.technologyreview.com/2026/06/08/1138485/the-download-world-cup-ball-openai-super-app/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1UPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-source">官方一手来源</span><span class="chip chip-date">2026-06-08</span></div>
 
 
@@ -3110,7 +3691,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="evidence-grid focus-field platform-card-grid" data-focus-field="reddit">
       <article class="interactive-card evidence-card evidence-spotlight platform-card" data-evidence-spotlight data-filter-target="reddit" data-filter-value="Reddit LocalLLaMA Platform Feed" data-search-target="reddit">
 
-    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u0buhm/xiaomi_just_claimed_1000_tps_on_a_1t_model_using/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u0buhm/xiaomi_just_claimed_1000_tps_on_a_1t_model_using/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlJMPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">Reddit 线索</span><span class="chip chip-risk">平台线索</span><span class="chip chip-date">2026-06-08</span></div>
 
 
@@ -3119,7 +3700,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
 <article class="interactive-card evidence-card evidence-spotlight platform-card" data-evidence-spotlight data-filter-target="reddit" data-filter-value="Reddit LocalLLaMA Platform Feed" data-search-target="reddit">
 
-    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u0vltz/anyone_seen_benchmarks_comparing_gemma_4_4bit_qat/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 讨论 Gemma 4-bit QAT 与 8-bit PTQ benchmark</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.reddit.com/r/LocalLLaMA/comments/1u0vltz/anyone_seen_benchmarks_comparing_gemma_4_4bit_qat/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlJMPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Reddit 讨论 Gemma 4-bit QAT 与 8-bit PTQ benchmark</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-topic">Reddit 线索</span><span class="chip chip-risk">平台线索</span><span class="chip chip-date">2026-06-09</span></div>
 
 
@@ -3143,17 +3724,17 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <p>Builder 原始源 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 3 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 3 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
 <ul><li>checked · notes: follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL.</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="follow-builders X feed" decoding="async"> follow-builders X feed</a>: 27 recent original entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="follow-builders podcast feed" decoding="async"> follow-builders podcast feed</a>: 0 recent original entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="follow-builders blog feed" decoding="async"> follow-builders blog feed</a>: 1 recent original entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://simonwillison.net/atom/everything/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfUlEQVQ4jWNgoBAwMjAwMCyatPc/PkVxec6MuORYYIyDe05gVWDvYoHXBUx4ZYkALOgC2GxE9iK6dzAMYGBgYFBQlcBq24PbLzDEqO8FQjaiewduAK7Q9gq2xiq+be1RhAuQA4ZQmkAHtAkDbH4n2gBSvUPbaGRgQIQ2zQAA3OImEjoM1aUAAAAASUVORK5CYII=" alt="Simon Willison Weblog" decoding="async"> Simon Willison Weblog</a>: 2 recent original entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://huyenchip.com/feed.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT01MTU3Nzo6IytIOD89RTRFRTcBCgoKDQwNGg8PGjclHyU3Lzc3Nzc3Mjc3Nzc3NzcyNzcrNzctNzc3NTU3NzUtMTU3ODc1NTQ1NzUxLTUrLTU1Mv/AABEIADAAMAMBIgACEQEDEQH/xAAaAAACAwEBAAAAAAAAAAAAAAAFBgEEBwMC/8QAMhAAAgEDAgQDBwIHAAAAAAAAAQIDAAQRBRIGEyExQWGRBxUiUYHB8COhFDIzQnGC0f/EABgBAAMBAQAAAAAAAAAAAAAAAAIDBAUA/8QAHxEAAgICAwEBAQAAAAAAAAAAAQIAAwQREiExQSIT/9oADAMBAAIRAxEAPwAHwlGG5sBUEYdcZx40x65d2+iaHcTuyyFFCfLecYAGPCgfAscbcRm3ddys8ygf6k/aivtN0tDa2CJCyQNdJG7GTPc9PvWeG/fE/ZY677iO/GlzKv8AD3lsDGT0JcllHh6U1ahdx8yB7KTnrPbL8Q6FgSBk+lVZdJt762ENzZwEqCvNVhuTA7iuvsytL67sxPHJA0cAMKpMmcZIbOQR5012XjsQP5FTqTZaoscjnbOzhuW6KO3Xx/PCjs+q3c7qZkniTb8wQPl26DxH0q97p1GC6aezsdNSR1GW+IA/Q0SPvdEXfpmnzMTk4wAP2pBfY0Jxq37Mz4SvY4+J45y4jjM5w7dsEEUzcc3j6taCxgula3J3m4A6K69Qo/7WfmdveKmMKu5gR/cO1PmkvB7ujieWJ2Zcuo8/KrcXGS2zk3wQci0ouhEDU9Uu7Swms5Yttzj+qHOOo7geYNP/ALJWD2d5boATtR8eopY4hsra6uoIYyd6Sbd8ZzhMeI8vtU6LBq2lXc09rhbbB/XjIJHn5ChyMf1RDrtJGzNiCFmLAb17ADNSOZuAcbF86zW24q1OFNhm3IpwByeg+mDRO2421FFxyYCSen6e1j+9RHGcRouB6mZC3aIoqK4IIZcnPjTpwy2baYMgVy3h/ilxAvYd6PcPxM8U+1ihBGDVwQ2HS+xAcJ2ZVsrq4sbmdLhHWR5mKnHw7T2oqic/mBJTEGGNuOnp6/gFe5raaRNsqLKB2YdCK5YQPvmRsrgbeoqS+u5H5GV12VOnES2IopInSWNFlQ/zKO9UDKkrDYoAXpnGM+dXH1iOGHMduN8qEDK9PlQeBsEEHvTKg3rRNhHiz//Z" alt="Chip Huyen Blog" decoding="async"> Chip Huyen Blog</a>: 0 recent original entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://karpathy.github.io/feed.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAV1BMVEVHcEz////////////////////////8+/739Pz///////9mObr///9kNrlhMbleK7daI7ZVFrTq5PbGuOSTd82sl9jg1/DVyutxRr+giNN6VcOGZci6qd+C6EQ9AAAAC3RSTlMARmq+EKTQ+vQpgJbDn9wAAAO2SURBVFiFnVdn26sgDHVUoSVM9/j/v/MGXGBF+9586lPJITmZJElEXu80K3JKgJT5J0vfsXMRSYuSgC8kL37HSAurYbpqmJjSsp+aqjUWJfsJ413i0bapeyUF5wxFSCnHekaTSPH6Rd3MzCozX7iQeuoQ43MP8cEjzahC5U2EmDoAeuPHmwJUTF6rOwg1tgBFVB9jNkRu311hDSJcu5Ehd1rcqltRowFy5UZmzb+/fvUDES6IQP1Z/6KPCAy5PHvxRv3f1JklwkAeIiB/lf5VHxH6FvIAgEL7k/+7Fz2mlKf/AbL7LzALY2pyzxExAUl9Bxq5fam7qlbbQW5lA1ZN1U07QgV0ByihUtstqrN1N48S71NsROldZYiptR+G3TpNITsi0O8ESHcOaK2HqmuNoca0WNh6XvrDvFnKxQDlazNg/9vxeyfVfpKJbjUhBTodEejNLUCnDoAaiAMoPAb+YgHTBlwgfAYYl/cAjRdi2bjKTsEcBmAUqluA2gPgo7FFVRw54KS7d8G/DGlMk1dJfFQ53+oDTKEPH8xCM3oU6Ad96HwfGJRIgRcZJpongIAFvA4biR8Zdc+AFZ8xZQA5PNLb8voI4MdMVpDkPi2iJo8A4DUeZBFbiddJMDv/BIAFlRDwTOL/ARD+8UcXvi2Y6KM+VSFA6ZcSE/elZGWWIQBGwQOQ96VkZQhzGRuyX6GcP+m3fXjfKROfU3EITrdwqoXHXOyC+WVrAavRN8pOjBuho38WHcYBlwf1hX4N8VygfXi0sX353JF43IZ2DIeesh0Jxwrd/FqnmGDVlRGmOe0PmHZutGxdmSscYmL5VX/lg2n6wFDn7LJvZdBJxz+msRmWkOBWOM47CK1qqcTX+Mfp+Fpm88Jt767d48z13t7IcLV8IFdl4o8mLtSAh7eYBAOiPptvO2oL64bwgrWpcDQKKRWOhqC9hrmyGFBvBtgFZV1wXEcytVZqPKV0c95auCDHpvaiq+vczWbSVd05oYN8dx7O/sqLK8aSI/GmeKJRHuvFyuNSpjw6W0MAwQikSRIiLIFWkdkUAFhXs0A/eeGmuSLUNpHpbOIAQrffO/973zVxO9NaszYKIL721I3I7qhWft6VDgD5vSmvXuRA9jEXBcAMI7E3i0Wo1idHBIALgRtIdq2fuDcXbYRL5XNvVEv0cHSVaVQfNy4shrbWUqhzRtXKPvza6INplwwfjrQZhnMekKZG58P0izCRxZvqrfW+I8XVjC2f372HvNNPGWjnWXqt/g/9taDdaQj+GQAAAABJRU5ErkJggg==" alt="Andrej Karpathy Blog" decoding="async"> Andrej Karpathy Blog</a>: 0 recent original entries parsed</li></ul>
 <p>精选博客与访谈源 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 50 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 72 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 6 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
-<ul><li>checked · notes: Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as con…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://mp.weixin.qq.com/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+V0FMPC90ZXh0Pjwvc3ZnPg==" alt="WeChat Article Link Input" decoding="async"> WeChat Article Link Input</a>: no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://blog.google/rss/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google Keyword Blog</a>: 5 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://blogs.microsoft.com/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T01CPC90ZXh0Pjwvc3ZnPg==" alt="Official Microsoft Blog" decoding="async"> Official Microsoft Blog</a>: 0 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.apple.com/newsroom/rss-feed.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> Apple Newsroom</a>: 7 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://about.fb.com/news/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+" alt="Meta Newsroom" decoding="async"> Meta Newsroom</a>: 2 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.aboutamazon.com/news/rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Amazon News" decoding="async"> Amazon News</a>: 3 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://nvidianews.nvidia.com/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA Newsroom RSS</a>: 7 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://github.blog/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Blog Feed</a>: 1 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://openai.com/news/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" decoding="async"> OpenAI Company News RSS</a>: 3 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://www.anthropic.com/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic Company News" decoding="async"> Anthropic Company News</a>: 0 recent intermediary lead entries parsed</li></ul>
+<ul><li>checked · notes: Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as con…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://mp.weixin.qq.com/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPldBPC90ZXh0Pjwvc3ZnPg==" alt="WeChat Article Link Input" decoding="async"> WeChat Article Link Input</a>: no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://blog.google/rss/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google Keyword Blog</a>: 5 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://blogs.microsoft.com/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" decoding="async"> Official Microsoft Blog</a>: 0 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.apple.com/newsroom/rss-feed.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> Apple Newsroom</a>: 7 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://about.fb.com/news/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" decoding="async"> Meta Newsroom</a>: 2 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.aboutamazon.com/news/rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Amazon News" decoding="async"> Amazon News</a>: 3 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://nvidianews.nvidia.com/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA Newsroom RSS</a>: 7 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://github.blog/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Blog Feed</a>: 1 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://openai.com/news/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" decoding="async"> OpenAI Company News RSS</a>: 3 recent intermediary lead entries parsed</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://www.anthropic.com/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic Company News" decoding="async"> Anthropic Company News</a>: 0 recent intermediary lead entries parsed</li></ul>
 <p>搜索 / 新闻影子源 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 2 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
-<ul><li>checked · notes: Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://api.gdeltproject.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RzwvdGV4dD48L3N2Zz4=" alt="GDELT" decoding="async"> GDELT</a>: 6 shadow candidates; HTTP_429</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://api.openalex.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=" alt="OpenAlex" decoding="async"> OpenAlex</a>: 34 shadow candidates</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://export.arxiv.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjMxYjFiIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QVJYPC90ZXh0Pjwvc3ZnPg==" alt="arXiv" decoding="async"> arXiv</a>: 0 shadow candidates</li></ul>
+<ul><li>checked · notes: Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://api.gdeltproject.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdEPC90ZXh0Pjwvc3ZnPg==" alt="GDELT" decoding="async"> GDELT</a>: 6 shadow candidates; HTTP_429</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://api.openalex.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk9QPC90ZXh0Pjwvc3ZnPg==" alt="OpenAlex" decoding="async"> OpenAlex</a>: 34 shadow candidates</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://export.arxiv.org/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFSPC90ZXh0Pjwvc3ZnPg==" alt="arXiv" decoding="async"> arXiv</a>: 0 shadow candidates</li></ul>
 <p>信源健康检查 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 90 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 28 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 12 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 5</p>
-<ul><li>checked · notes: Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://blog.google/rss/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google Keyword Blog</a>: 20 feed entries parsed; 5 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://blogs.microsoft.com/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T01CPC90ZXh0Pjwvc3ZnPg==" alt="Official Microsoft Blog" decoding="async"> Official Microsoft Blog</a>: 10 feed entries parsed; 0 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.apple.com/newsroom/rss-feed.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Apple Newsroom" decoding="async"> Apple Newsroom</a>: 20 feed entries parsed; 7 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://about.fb.com/news/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+" alt="Meta Newsroom" decoding="async"> Meta Newsroom</a>: 10 feed entries parsed; 2 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.aboutamazon.com/news/rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+" alt="Amazon News" decoding="async"> Amazon News</a>: 10 feed entries parsed; 3 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://nvidianews.nvidia.com/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA Newsroom RSS</a>: 20 feed entries parsed; 2 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://github.blog/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Blog Feed</a>: 10 feed entries parsed; 1 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://openai.com/news/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" decoding="async"> OpenAI Company News RSS</a>: 995 feed entries parsed; 3 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.anthropic.com/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic Company News" decoding="async"> Anthropic Company News</a>: html_index source is reachable; feed_like=false</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://x.ai/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI Company News" decoding="async"> xAI Company News</a>: html_index source is reachable; feed_like=false</li></ul>
+<ul><li>checked · notes: Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://blog.google/rss/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" decoding="async"> Google Keyword Blog</a>: 20 feed entries parsed; 5 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://blogs.microsoft.com/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" decoding="async"> Official Microsoft Blog</a>: 10 feed entries parsed; 0 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.apple.com/newsroom/rss-feed.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Apple Newsroom" decoding="async"> Apple Newsroom</a>: 20 feed entries parsed; 7 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://about.fb.com/news/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" decoding="async"> Meta Newsroom</a>: 10 feed entries parsed; 2 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.aboutamazon.com/news/rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==" alt="Amazon News" decoding="async"> Amazon News</a>: 10 feed entries parsed; 3 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://nvidianews.nvidia.com/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="NVIDIA Newsroom RSS" decoding="async"> NVIDIA Newsroom RSS</a>: 20 feed entries parsed; 2 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://github.blog/feed/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Blog Feed</a>: 10 feed entries parsed; 1 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://openai.com/news/rss.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" decoding="async"> OpenAI Company News RSS</a>: 995 feed entries parsed; 3 within 48h</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.anthropic.com/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic Company News" decoding="async"> Anthropic Company News</a>: html_index source is reachable; feed_like=false</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://x.ai/news" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI Company News" decoding="async"> xAI Company News</a>: html_index source is reachable; feed_like=false</li></ul>
 <p>微信公众号线索 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
-<ul><li>checked · blocked_reason: no_recent_signal · notes: wechat platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://example.com/ai-daily-cn/platform/wechat.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+V1BBPC90ZXh0Pjwvc3ZnPg==" alt="WeChat Platform AI Feed" decoding="async"> WeChat Platform AI Feed</a>: kill_switch_enabled</li></ul>
+<ul><li>checked · blocked_reason: no_recent_signal · notes: wechat platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://example.com/ai-daily-cn/platform/wechat.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPldQPC90ZXh0Pjwvc3ZnPg==" alt="WeChat Platform AI Feed" decoding="async"> WeChat Platform AI Feed</a>: kill_switch_enabled</li></ul>
 <p>知乎线索 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
-<ul><li>checked · blocked_reason: no_recent_signal · notes: zhihu platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://example.com/ai-daily-cn/platform/zhihu.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+WlBBPC90ZXh0Pjwvc3ZnPg==" alt="Zhihu Platform AI Feed" decoding="async"> Zhihu Platform AI Feed</a>: kill_switch_enabled</li></ul>
+<ul><li>checked · blocked_reason: no_recent_signal · notes: zhihu platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> `no_signal` <a href="https://example.com/ai-daily-cn/platform/zhihu.xml" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpQPC90ZXh0Pjwvc3ZnPg==" alt="Zhihu Platform AI Feed" decoding="async"> Zhihu Platform AI Feed</a>: kill_switch_enabled</li></ul>
 <p>Reddit 线索 <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
-<ul><li>checked · notes: reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.reddit.com/r/LocalLLaMA/.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==" alt="Reddit LocalLLaMA Platform Feed" decoding="async"> Reddit LocalLLaMA Platform Feed</a>: 14 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=8, include_keywords_not_matched=3</li></ul></div>
+<ul><li>checked · notes: reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…</li><li><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> `checked` <a href="https://www.reddit.com/r/LocalLLaMA/.rss" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlJMPC90ZXh0Pjwvc3ZnPg==" alt="Reddit LocalLLaMA Platform Feed" decoding="async"> Reddit LocalLLaMA Platform Feed</a>: 14 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=8, include_keywords_not_matched=3</li></ul></div>
     <template data-rich-source data-source-fallback>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。
 
 ==tag-status-checked|checked== 156 ==tag-status-no-signal|no_signal== 106 ==tag-status-blocked|blocked== 18 ==tag-status-skipped|skipped== 5
@@ -3187,13 +3768,13 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
 精选博客与访谈源 ==tag-status-checked|checked== 50 ==tag-status-no-signal|no_signal== 72 ==tag-status-blocked|blocked== 6 ==tag-status-skipped|skipped== 0
 
 - checked · notes: Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as con…
-- ==tag-status-no-signal|no_signal== `no_signal` [![WeChat Article Link Input](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+V0FMPC90ZXh0Pjwvc3ZnPg==) WeChat Article Link Input](https://mp.weixin.qq.com/): no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true
-- ==tag-status-checked|checked== `checked` [![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/rss/): 5 recent intermediary lead entries parsed
-- ==tag-status-no-signal|no_signal== `no_signal` [![Official Microsoft Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T01CPC90ZXh0Pjwvc3ZnPg==) Official Microsoft Blog](https://blogs.microsoft.com/feed/): 0 recent intermediary lead entries parsed
-- ==tag-status-checked|checked== `checked` [![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) Apple Newsroom](https://www.apple.com/newsroom/rss-feed.rss): 7 recent intermediary lead entries parsed
-- ==tag-status-checked|checked== `checked` [![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+) Meta Newsroom](https://about.fb.com/news/feed/): 2 recent intermediary lead entries parsed
-- ==tag-status-checked|checked== `checked` [![Amazon News](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) Amazon News](https://www.aboutamazon.com/news/rss): 3 recent intermediary lead entries parsed
-- ==tag-status-checked|checked== `checked` [![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==) NVIDIA Newsroom RSS](https://nvidianews.nvidia.com/rss.xml): 7 recent intermediary lead entries parsed
+- ==tag-status-no-signal|no_signal== `no_signal` [![WeChat Article Link Input](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPldBPC90ZXh0Pjwvc3ZnPg==) WeChat Article Link Input](https://mp.weixin.qq.com/): no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true
+- ==tag-status-checked|checked== `checked` [![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/rss/): 5 recent intermediary lead entries parsed
+- ==tag-status-no-signal|no_signal== `no_signal` [![Official Microsoft Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) Official Microsoft Blog](https://blogs.microsoft.com/feed/): 0 recent intermediary lead entries parsed
+- ==tag-status-checked|checked== `checked` [![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) Apple Newsroom](https://www.apple.com/newsroom/rss-feed.rss): 7 recent intermediary lead entries parsed
+- ==tag-status-checked|checked== `checked` [![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom](https://about.fb.com/news/feed/): 2 recent intermediary lead entries parsed
+- ==tag-status-checked|checked== `checked` [![Amazon News](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) Amazon News](https://www.aboutamazon.com/news/rss): 3 recent intermediary lead entries parsed
+- ==tag-status-checked|checked== `checked` [![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==) NVIDIA Newsroom RSS](https://nvidianews.nvidia.com/rss.xml): 7 recent intermediary lead entries parsed
 - ==tag-status-checked|checked== `checked` [![GitHub Blog Feed](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Blog Feed](https://github.blog/feed/): 1 recent intermediary lead entries parsed
 - ==tag-status-checked|checked== `checked` [![OpenAI Company News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Company News RSS](https://openai.com/news/rss.xml): 3 recent intermediary lead entries parsed
 - ==tag-status-no-signal|no_signal== `no_signal` [![Anthropic Company News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic Company News](https://www.anthropic.com/news): 0 recent intermediary lead entries parsed
@@ -3202,20 +3783,20 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
 搜索 / 新闻影子源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_signal== 1 ==tag-status-blocked|blocked== 0 ==tag-status-skipped|skipped== 0
 
 - checked · notes: Search/news providers run as shadow discovery by default. Hits remain candidates until the target URL is read and primary-source verification passes.
-- ==tag-status-checked|checked== `checked` [![GDELT](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RzwvdGV4dD48L3N2Zz4=) GDELT](https://api.gdeltproject.org/): 6 shadow candidates; HTTP_429
-- ==tag-status-checked|checked== `checked` [![OpenAlex](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMDQ3ODU3Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TzwvdGV4dD48L3N2Zz4=) OpenAlex](https://api.openalex.org/): 34 shadow candidates
-- ==tag-status-no-signal|no_signal== `no_signal` [![arXiv](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjMxYjFiIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QVJYPC90ZXh0Pjwvc3ZnPg==) arXiv](https://export.arxiv.org/): 0 shadow candidates
+- ==tag-status-checked|checked== `checked` [![GDELT](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdEPC90ZXh0Pjwvc3ZnPg==) GDELT](https://api.gdeltproject.org/): 6 shadow candidates; HTTP_429
+- ==tag-status-checked|checked== `checked` [![OpenAlex](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk9QPC90ZXh0Pjwvc3ZnPg==) OpenAlex](https://api.openalex.org/): 34 shadow candidates
+- ==tag-status-no-signal|no_signal== `no_signal` [![arXiv](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFSPC90ZXh0Pjwvc3ZnPg==) arXiv](https://export.arxiv.org/): 0 shadow candidates
 
 
 信源健康检查 ==tag-status-checked|checked== 90 ==tag-status-no-signal|no_signal== 28 ==tag-status-blocked|blocked== 12 ==tag-status-skipped|skipped== 5
 
 - checked · notes: Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report.
-- ==tag-status-checked|checked== `checked` [![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0tCPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/rss/): 20 feed entries parsed; 5 within 48h
-- ==tag-status-no-signal|no_signal== `no_signal` [![Official Microsoft Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+T01CPC90ZXh0Pjwvc3ZnPg==) Official Microsoft Blog](https://blogs.microsoft.com/feed/): 10 feed entries parsed; 0 within 48h
-- ==tag-status-checked|checked== `checked` [![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) Apple Newsroom](https://www.apple.com/newsroom/rss-feed.rss): 20 feed entries parsed; 7 within 48h
-- ==tag-status-checked|checked== `checked` [![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMGY3NjZlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+TU48L3RleHQ+PC9zdmc+) Meta Newsroom](https://about.fb.com/news/feed/): 10 feed entries parsed; 2 within 48h
-- ==tag-status-checked|checked== `checked` [![Amazon News](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QU48L3RleHQ+PC9zdmc+) Amazon News](https://www.aboutamazon.com/news/rss): 10 feed entries parsed; 3 within 48h
-- ==tag-status-checked|checked== `checked` [![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+Tk5SPC90ZXh0Pjwvc3ZnPg==) NVIDIA Newsroom RSS](https://nvidianews.nvidia.com/rss.xml): 20 feed entries parsed; 2 within 48h
+- ==tag-status-checked|checked== `checked` [![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/rss/): 20 feed entries parsed; 5 within 48h
+- ==tag-status-no-signal|no_signal== `no_signal` [![Official Microsoft Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) Official Microsoft Blog](https://blogs.microsoft.com/feed/): 10 feed entries parsed; 0 within 48h
+- ==tag-status-checked|checked== `checked` [![Apple Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) Apple Newsroom](https://www.apple.com/newsroom/rss-feed.rss): 20 feed entries parsed; 7 within 48h
+- ==tag-status-checked|checked== `checked` [![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom](https://about.fb.com/news/feed/): 10 feed entries parsed; 2 within 48h
+- ==tag-status-checked|checked== `checked` [![Amazon News](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2JlMTIzYyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFOPC90ZXh0Pjwvc3ZnPg==) Amazon News](https://www.aboutamazon.com/news/rss): 10 feed entries parsed; 3 within 48h
+- ==tag-status-checked|checked== `checked` [![NVIDIA Newsroom RSS](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==) NVIDIA Newsroom RSS](https://nvidianews.nvidia.com/rss.xml): 20 feed entries parsed; 2 within 48h
 - ==tag-status-checked|checked== `checked` [![GitHub Blog Feed](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Blog Feed](https://github.blog/feed/): 10 feed entries parsed; 1 within 48h
 - ==tag-status-checked|checked== `checked` [![OpenAI Company News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Company News RSS](https://openai.com/news/rss.xml): 995 feed entries parsed; 3 within 48h
 - ==tag-status-checked|checked== `checked` [![Anthropic Company News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic Company News](https://www.anthropic.com/news): html_index source is reachable; feed_like=false
@@ -3225,19 +3806,19 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
 微信公众号线索 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_signal== 1 ==tag-status-blocked|blocked== 0 ==tag-status-skipped|skipped== 0
 
 - checked · blocked_reason: no_recent_signal · notes: wechat platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…
-- ==tag-status-no-signal|no_signal== `no_signal` [![WeChat Platform AI Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+V1BBPC90ZXh0Pjwvc3ZnPg==) WeChat Platform AI Feed](https://example.com/ai-daily-cn/platform/wechat.xml): kill_switch_enabled
+- ==tag-status-no-signal|no_signal== `no_signal` [![WeChat Platform AI Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPldQPC90ZXh0Pjwvc3ZnPg==) WeChat Platform AI Feed](https://example.com/ai-daily-cn/platform/wechat.xml): kill_switch_enabled
 
 
 知乎线索 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_signal== 1 ==tag-status-blocked|blocked== 0 ==tag-status-skipped|skipped== 0
 
 - checked · blocked_reason: no_recent_signal · notes: zhihu platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…
-- ==tag-status-no-signal|no_signal== `no_signal` [![Zhihu Platform AI Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+WlBBPC90ZXh0Pjwvc3ZnPg==) Zhihu Platform AI Feed](https://example.com/ai-daily-cn/platform/zhihu.xml): kill_switch_enabled
+- ==tag-status-no-signal|no_signal== `no_signal` [![Zhihu Platform AI Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpQPC90ZXh0Pjwvc3ZnPg==) Zhihu Platform AI Feed](https://example.com/ai-daily-cn/platform/zhihu.xml): kill_switch_enabled
 
 
 Reddit 线索 ==tag-status-checked|checked== 1 ==tag-status-no-signal|no_signal== 0 ==tag-status-blocked|blocked== 0 ==tag-status-skipped|skipped== 0
 
 - checked · notes: reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was…
-- ==tag-status-checked|checked== `checked` [![Reddit LocalLLaMA Platform Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYmUxMjNjIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+UkxQPC90ZXh0Pjwvc3ZnPg==) Reddit LocalLLaMA Platform Feed](https://www.reddit.com/r/LocalLLaMA/.rss): 14 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=8, include_keywords_not_matched=3
+- ==tag-status-checked|checked== `checked` [![Reddit LocalLLaMA Platform Feed](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlJMPC90ZXh0Pjwvc3ZnPg==) Reddit LocalLLaMA Platform Feed](https://www.reddit.com/r/LocalLLaMA/.rss): 14 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=8, include_keywords_not_matched=3
 
 </template>
   </section>
@@ -3360,6 +3941,16 @@ Reddit 线索 ==tag-status-checked|checked== 1 ==tag-status-no-signal|no_signal=
 
     document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
       item.hidden = item.id !== panel;
+    });
+  }
+
+  function applyTrackingScale(button) {
+    var mode = button.getAttribute("data-scale-mode");
+    var root = button.closest("[data-tracking-component]");
+    if (!mode || !root) return;
+    root.setAttribute("data-scale", mode);
+    root.querySelectorAll("[data-scale-mode]").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
     });
   }
 
@@ -3608,10 +4199,14 @@ Reddit 线索 ==tag-status-checked|checked== 1 ==tag-status-no-signal|no_signal=
       applyFilter(button);
     }
 
-    if (button.matches("[data-tab-group][data-tab]")) {
-      activateTab(button);
-    }
-  });
+        if (button.matches("[data-tab-group][data-tab]")) {
+          activateTab(button);
+        }
+
+        if (button.matches("[data-scale-mode]")) {
+          applyTrackingScale(button);
+        }
+      });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {

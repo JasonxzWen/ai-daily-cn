@@ -1185,6 +1185,7 @@ body.lightbox-open {
   grid-template-areas:
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
+    "tracking-component tracking-component"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1238,6 +1239,263 @@ body.lightbox-open {
 
 .tracking-card .card-data-table {
   min-width: min(560px, 100%);
+}
+
+.tracking-card .tracking-component {
+  grid-column: 1 / -1;
+  grid-area: tracking-component;
+}
+
+.tracking-component {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.tracking-component-header {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.tracking-component-meta {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tracking-scale-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.tracking-scale-toggle button,
+.tracking-component-tabs button {
+  min-width: 0;
+  border: 0;
+  padding: 6px 9px;
+  background: transparent;
+  color: #4b4a45;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tracking-scale-toggle button[aria-pressed="true"],
+.tracking-component-tabs button[aria-selected="true"] {
+  background: #3d3d3a;
+  color: #ffffff;
+}
+
+.tracking-component-tabs {
+  gap: 6px;
+  justify-content: start;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tracking-component-panel {
+  min-width: 0;
+}
+
+.tracking-bars {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.tracking-bar-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(140px, 0.72fr) minmax(120px, 1fr) minmax(74px, auto) minmax(48px, auto);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(209, 207, 197, 0.66);
+}
+
+.tracking-rank,
+.tracking-value,
+.tracking-change,
+.tracking-name small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.tracking-name {
+  display: grid;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 820;
+  overflow-wrap: anywhere;
+}
+
+.tracking-bar-track {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+}
+
+.tracking-bar-fill {
+  display: block;
+  width: var(--bar-width-linear);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f766e, #d97757);
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-bar-fill {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tracking-stack-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(86px, 0.24fr) minmax(160px, 1fr) minmax(66px, auto);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.tracking-stack-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tracking-stack-track {
+  display: block;
+  width: var(--bar-width-linear);
+  min-width: 28px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-stack-track {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack-fill {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.tracking-stack-segment {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  background: #0f766e;
+}
+
+.tracking-stack-segment[data-segment="1"] { background: #d97757; }
+.tracking-stack-segment[data-segment="2"] { background: #2563eb; }
+.tracking-stack-segment[data-segment="3"] { background: #9333ea; }
+.tracking-stack-segment[data-segment="4"] { background: #16a34a; }
+.tracking-stack-segment[data-segment="5"] { background: #dc2626; }
+.tracking-stack-segment[data-segment="6"] { background: #0891b2; }
+.tracking-stack-segment[data-segment="7"] { background: #ca8a04; }
+
+.tracking-bar-row[data-tracking-tooltip]:hover::after,
+.tracking-bar-row[data-tracking-tooltip]:focus-within::after,
+.tracking-stack-row[data-tracking-tooltip]:hover::after,
+.tracking-stack-row[data-tracking-tooltip]:focus-within::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 4;
+  max-width: min(420px, 92vw);
+  padding: 7px 9px;
+  border: 1px solid rgba(31, 30, 27, 0.2);
+  border-radius: 6px;
+  background: #1f1e1b;
+  color: #ffffff;
+  content: attr(data-tracking-tooltip);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.22);
+}
+
+.tracking-data-table {
+  min-width: 620px;
+  font-size: 12.5px;
+}
+
+.tracking-component-fallback {
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  color: #5f5d57;
+  background: #fbfaf5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tracking-trace {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  color: #4b4a45;
+  font-size: 12px;
+}
+
+.tracking-trace summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 820;
+}
+
+.tracking-trace dl {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.tracking-trace div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.tracking-trace dt {
+  color: var(--muted);
+  font-weight: 780;
+}
+
+.tracking-trace dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .blog-card .card-detail-list {
@@ -1540,10 +1798,65 @@ body.lightbox-open {
     grid-template-areas:
       "tracking-title"
       "tracking-tags"
+      "tracking-component"
       "tracking-stats"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
+  }
+
+  .tracking-card .tracking-component {
+    grid-area: tracking-component;
+  }
+
+  .tracking-component-header {
+    display: grid;
+  }
+
+  .tracking-bar-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-areas:
+      "rank name"
+      "rank bar"
+      "rank value";
+  }
+
+  .tracking-rank {
+    grid-area: rank;
+  }
+
+  .tracking-name {
+    grid-area: name;
+  }
+
+  .tracking-bar-track {
+    grid-area: bar;
+  }
+
+  .tracking-value {
+    grid-area: value;
+  }
+
+  .tracking-change {
+    grid-area: value;
+    justify-self: end;
+  }
+
+  .tracking-stack-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-component[data-scale="log"] .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-trace div {
+    grid-template-columns: 1fr;
   }
 
   .project-card {
@@ -2658,7 +2971,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <h1 class="report-title report-date-title">2026-05-15</h1>
         </div>
         <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
-<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json" rel="noopener noreferrer">结构化 JSON</a></div>
+<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkpTPC90ZXh0Pjwvc3ZnPg==" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json" rel="noopener noreferrer">结构化 JSON</a></div>
       </div>
       <div class="hero-brief hero-brief-single">
         <p class="hero-summary-text">今天的主体信息保持在 2026-05-14 至 2026-05-15 窗口内，通过拓展官方发布页、开发者博客、云厂商公告和 Hugging Face 工程博客补齐：OpenAI 推进 Codex 移动端与 Windows sandbox，GitHub 合并呈现 Copilot app 和 cloud agent 自动选模，Anthropic 把 Claude 投入 Gates Foundation 合作，Google 发布 Genkit middleware，AWS 扩展 SageMaker Qwen3.6 定制，Hugging Face 解释连续批处理异步化。</p>
@@ -2697,7 +3010,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <ul><li>GitHub 在同一窗口更新 Copilot agentic development 体验：Copilot app 进入 technical preview，cloud agent 增加 Auto model selection，说明 GitHub 正把任务入口、模型选择和 PR 后续处理收进统一工作台。</li><li>Copilot app 可从 issue、pull request、prompt 或历史 session 启动 agentic development，session 内可查看计划、diff、命令、预览、测试结果并推进到 pull request。</li><li>Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。</li></ul>
 <ol start="3"><li><strong><a href="https://www.anthropic.com/news/gates-foundation-partnership" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMTExMTExIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2Q4YzRhNSI+QTwvdGV4dD48L3N2Zz4=" alt="Anthropic" decoding="async"> 与 Gates Foundation 建立 2 亿美元合作</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-14）</li></ol>
 <ul><li>Anthropic 宣布与 Gates Foundation 建立 2 亿美元规模合作，包含 grant funding、Claude usage credits 和技术支持，覆盖全球健康、生命科学、教育和经济流动性项目。</li><li>合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。</li><li>健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。</li></ul>
-<ol start="4"><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0RCPC90ZXh0Pjwvc3ZnPg==" alt="Google Developers Blog" decoding="async"> Google 发布 Genkit Middleware 用于加固 agentic apps</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-14）</li></ol>
+<ol start="4"><li><strong><a href="https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdEPC90ZXh0Pjwvc3ZnPg==" alt="Google Developers Blog" decoding="async"> Google 发布 Genkit Middleware 用于加固 agentic apps</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-14）</li></ol>
 <ul><li>Google 为 Genkit 发布 middleware 系统，让开发者在 generation call 和 tool execution loop 中插入 retries、fallbacks、approval、observability 和安全检查。</li><li>每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。</li><li>首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。</li></ul>
 <ol start="5"><li><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjMyZjNlIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmOTkwMCI+QVdTPC90ZXh0Pjwvc3ZnPg==" alt="AWS What&amp;#39;s New" decoding="async"> AWS SageMaker AI 支持 Qwen3.6 serverless model customization</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-14）</li></ol>
 <ul><li>AWS 宣布 Amazon SageMaker AI 支持对 Qwen3.6 27B parameter model 做 serverless model customization，覆盖 supervised fine-tuning 和 reinforcement fine-tuning。</li><li>此前 SageMaker AI 已可部署 Qwen3.6 base model，本次新增用私有数据对模型做领域化定制，减少团队自建训练集群和调度基础设施的成本。</li><li>Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。</li></ul>
@@ -2718,7 +3031,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   - 合作由 Anthropic Beneficial Deployments 团队推动，投入形式包括资金、Claude credits 和工程支持，计划四年内与美国和全球伙伴执行。
   - 健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。
 
-4. **[![Google Developers Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+R0RCPC90ZXh0Pjwvc3ZnPg==) Google 发布 Genkit Middleware 用于加固 agentic apps](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)** ==tag-major|重大==（2026-05-14）
+4. **[![Google Developers Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdEPC90ZXh0Pjwvc3ZnPg==) Google 发布 Genkit Middleware 用于加固 agentic apps](https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/)** ==tag-major|重大==（2026-05-14）
   - Google 为 Genkit 发布 middleware 系统，让开发者在 generation call 和 tool execution loop 中插入 retries、fallbacks、approval、observability 和安全检查。
   - 每个 `generate()` 调用都会经过工具循环：模型输出、工具执行、结果回填，再进入下一轮模型调用，直到任务完成；middleware 可以拦截这些步骤并注入策略。
   - 首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。
@@ -2754,7 +3067,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
 <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://docs.x.ai/developers/models?cluster=us-east-1" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjQ1MzA5Ii8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+RFg8L3RleHQ+PC9zdmc+" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是…</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://docs.x.ai/developers/models?cluster=us-east-1" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>xAI docs 页面显示多款旧模型将在 2026-05-15 12:00 PT retirement，但该页面不是…</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-general">一般</span></div>
 
 
@@ -2882,6 +3195,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     document.querySelectorAll("[data-tab-panel-group='" + group + "']").forEach(function (item) {
       item.hidden = item.id !== panel;
+    });
+  }
+
+  function applyTrackingScale(button) {
+    var mode = button.getAttribute("data-scale-mode");
+    var root = button.closest("[data-tracking-component]");
+    if (!mode || !root) return;
+    root.setAttribute("data-scale", mode);
+    root.querySelectorAll("[data-scale-mode]").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
     });
   }
 
@@ -3130,10 +3453,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       applyFilter(button);
     }
 
-    if (button.matches("[data-tab-group][data-tab]")) {
-      activateTab(button);
-    }
-  });
+        if (button.matches("[data-tab-group][data-tab]")) {
+          activateTab(button);
+        }
+
+        if (button.matches("[data-scale-mode]")) {
+          applyTrackingScale(button);
+        }
+      });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {

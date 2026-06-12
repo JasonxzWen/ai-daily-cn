@@ -31,6 +31,7 @@ import {
   platformForSection,
   requirePlatformExemptItemContract
 } from "./platform-exempt.js";
+import { attachTrackingComponentSnapshots } from "./tracking-components.js";
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -113,9 +114,11 @@ export function normalizeReportDraft(draft, options = {}) {
     huggingface_trending: Array.isArray(draft.huggingface_trending) ? draft.huggingface_trending : [],
     model_releases: Array.isArray(draft.model_releases) ? draft.model_releases : [],
     hot_blogs: Array.isArray(draft.hot_blogs) ? draft.hot_blogs : [],
+    chinese_media_dynamics: Array.isArray(draft.chinese_media_dynamics) ? draft.chinese_media_dynamics : [],
     daily_tracking: Array.isArray(draft.daily_tracking) ? draft.daily_tracking : [],
     projects: Array.isArray(draft.projects) ? draft.projects : [],
     builder_observations: Array.isArray(draft.builder_observations) ? draft.builder_observations : [],
+    official_org_updates: Array.isArray(draft.official_org_updates) ? draft.official_org_updates : [],
     community_leads: Array.isArray(draft.community_leads) ? draft.community_leads : [],
     ...(Array.isArray(draft.wechat_items) ? { wechat_items: draft.wechat_items } : {}),
     ...(Array.isArray(draft.zhihu_items) ? { zhihu_items: draft.zhihu_items } : {}),
@@ -129,11 +132,13 @@ export function normalizeReportDraft(draft, options = {}) {
     "main_items",
     "model_releases",
     "hot_blogs",
+    "chinese_media_dynamics",
     "daily_tracking",
     "projects",
     "github_trending",
     "huggingface_trending",
     "builder_observations",
+    "official_org_updates",
     "community_leads"
   ]) {
     report[sectionName] = withDefaultImportance(sectionName, report[sectionName]);
@@ -143,6 +148,7 @@ export function normalizeReportDraft(draft, options = {}) {
       report[sectionName] = withDefaultImportance(sectionName, report[sectionName]);
     }
   }
+  report.daily_tracking = attachTrackingComponentSnapshots({ daily_tracking: report.daily_tracking }).daily_tracking;
 
   if (report.self_check && typeof report.self_check === "object") {
     report.self_check = {
@@ -199,11 +205,13 @@ function stripPrivateDisclosureFields(report) {
     "main_items",
     "model_releases",
     "hot_blogs",
+    "chinese_media_dynamics",
     "daily_tracking",
     "projects",
     "github_trending",
     "huggingface_trending",
     "builder_observations",
+    "official_org_updates",
     "community_leads"
   ]) {
     if (!Array.isArray(publicReport[sectionName])) {

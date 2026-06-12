@@ -1294,8 +1294,217 @@ function renderCardTable(table) {
   </div>`;
 }
 
+function renderTrackingComponent(component) {
+  if (!component || typeof component !== "object") {
+    return "";
+  }
+  const tabs = Array.isArray(component.tabs) ? component.tabs.filter((tab) => tab && tab.id) : [];
+  if (tabs.length === 0) {
+    return "";
+  }
+  const group = slugify(`tracking-${component.kind || component.source || "component"}`);
+  const buttons = tabs.map((tab, index) => {
+    const panelId = `${group}-${slugify(tab.id || `tab-${index + 1}`)}`;
+    return `<button type="button" data-tab-group="${escapeAttr(group)}" data-tab="${escapeAttr(panelId)}" aria-selected="${index === 0 ? "true" : "false"}">${escapeHtml(tab.label || tab.id)}</button>`;
+  }).join("");
+  const panels = tabs.map((tab, index) => {
+    const panelId = `${group}-${slugify(tab.id || `tab-${index + 1}`)}`;
+    return `<div class="tracking-component-panel" id="${escapeAttr(panelId)}" data-tab-panel-group="${escapeAttr(group)}" ${index === 0 ? "" : "hidden"}>
+      ${renderTrackingComponentPanel(component, tab)}
+    </div>`;
+  }).join("");
+  return `<div class="tracking-component" data-tracking-component data-component-kind="${escapeAttr(component.kind || "")}" data-scale="linear">
+    <div class="tracking-component-header">
+      <div>
+        <div class="card-visual-title">${escapeHtml(component.source || "Tracking component")}</div>
+        ${component.collectedAt ? `<span class="tracking-component-meta">${escapeHtml(component.collectedAt)}</span>` : ""}
+      </div>
+      <div class="tracking-scale-toggle" role="group" aria-label="Scale">
+        <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
+        <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
+      </div>
+    </div>
+    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="${escapeAttr(component.source || "Tracking component")} tabs">${buttons}</div>
+    ${panels}
+    ${renderTrackingTrace(component.trace)}
+  </div>`;
+}
+
+function renderTrackingComponentPanel(component, tab) {
+  const series = trackingSeriesForTab(component, tab.id);
+  const rows = trackingRowsForPanel(component, series);
+  if (tab.status === "fallback" || tab.status === "blocked" || rows.length === 0) {
+    const reason = tab.fallbackReason || series.find((item) => item.fallbackReason)?.fallbackReason || "data unavailable";
+    return `<div class="tracking-component-fallback">${escapeHtml(reason)}</div>`;
+  }
+  if (tab.view === "leaderboard" || tab.view === "score_table") {
+    return renderTrackingLeaderboard(rows, tab);
+  }
+  if (tab.view === "scatter") {
+    return renderTrackingScatterFallback(rows, tab);
+  }
+  return renderTrackingBars(rows, tab);
+}
+
+function trackingSeriesForTab(component, tabId) {
+  return (Array.isArray(component.series) ? component.series : []).filter((series) => {
+    return (series.tabId || series.tab_id) === tabId;
+  });
+}
+
+function trackingRowsForPanel(component, series) {
+  const rows = series.flatMap((item) => Array.isArray(item.rows) ? item.rows : []);
+  if (rows.length > 0) {
+    return rows;
+  }
+  return Array.isArray(component.rows) ? component.rows : [];
+}
+
+function trackingRowValue(row) {
+  const value = Number(row.value);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function trackingRowLabel(row) {
+  const rank = row.rank ? `#${row.rank} ` : "";
+  return `${rank}${row.model || row.label || "item"}`;
+}
+
+function trackingTooltip(row) {
+  return [
+    trackingRowLabel(row),
+    row.provider ? `provider: ${row.provider}` : "",
+    row.metric ? `metric: ${row.metric}` : "",
+    row.valueLabel || row.value_label || "",
+    row.secondaryValueLabel || row.secondary_value_label ? `x: ${row.secondaryValueLabel || row.secondary_value_label}` : "",
+    row.change ? `change: ${row.change}` : ""
+  ].filter(Boolean).join(" | ");
+}
+
+function renderTrackingBars(rows, tab) {
+  if (rows.some((row) => row.metric) && rows.length > 6) {
+    return renderTrackingStackedBars(rows, tab);
+  }
+  const max = Math.max(...rows.map(trackingRowValue), 1);
+  const logMax = Math.log10(max + 1);
+  const renderedRows = rows.slice(0, 30).map((row) => {
+    const value = trackingRowValue(row);
+    const linear = Math.max(2, Math.round((value / max) * 100));
+    const log = logMax > 0 ? Math.max(2, Math.round((Math.log10(value + 1) / logMax) * 100)) : linear;
+    return `<div class="tracking-bar-row" data-tracking-tooltip="${escapeAttr(trackingTooltip(row))}" title="${escapeAttr(trackingTooltip(row))}">
+      <span class="tracking-rank">${escapeHtml(row.rank ? `#${row.rank}` : "")}</span>
+      <span class="tracking-name">${escapeHtml(row.model || row.label || "")}<small>${escapeHtml(row.provider || "")}</small></span>
+      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:${linear}%;--bar-width-log:${log}%"></span></span>
+      <span class="tracking-value">${escapeHtml(row.valueLabel || row.value_label || "")}</span>
+      <span class="tracking-change">${escapeHtml(row.change || "")}</span>
+    </div>`;
+  }).join("");
+  return `<div class="tracking-bars" aria-label="${escapeAttr(tab.label || "Tracking bars")}">${renderedRows}</div>`;
+}
+
+function renderTrackingStackedBars(rows, tab) {
+  const groups = new Map();
+  for (const row of rows) {
+    const key = row.metric || row.change || "current";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+  const groupRows = Array.from(groups.entries()).map(([label, items]) => ({
+    label,
+    items: items.slice().sort((left, right) => trackingRowValue(right) - trackingRowValue(left)),
+    total: items.reduce((sum, item) => sum + trackingRowValue(item), 0)
+  }));
+  const max = Math.max(...groupRows.map((group) => group.total), 1);
+  const logMax = Math.log10(max + 1);
+  const rendered = groupRows.map((group) => {
+    const linear = Math.max(2, Math.round((group.total / max) * 100));
+    const log = logMax > 0 ? Math.max(2, Math.round((Math.log10(group.total + 1) / logMax) * 100)) : linear;
+    const segments = group.items.map((row, index) => {
+      const value = trackingRowValue(row);
+      const width = group.total > 0 ? Math.max(4, Math.round((value / group.total) * 100)) : 4;
+      return `<span class="tracking-stack-segment" data-segment="${index % 8}" style="width:${width}%" data-tracking-tooltip="${escapeAttr(trackingTooltip(row))}" title="${escapeAttr(trackingTooltip(row))}"></span>`;
+    }).join("");
+    const top = group.items[0];
+    return `<div class="tracking-stack-row" data-tracking-stack-row data-tracking-tooltip="${escapeAttr(`${group.label} | total ${formatTrackingTotal(group.total)} | top ${top?.model || ""}`)}" title="${escapeAttr(`${group.label} | total ${formatTrackingTotal(group.total)} | top ${top?.model || ""}`)}">
+      <span class="tracking-stack-label">${escapeHtml(group.label)}</span>
+      <span class="tracking-stack-track" style="--bar-width-linear:${linear}%;--bar-width-log:${log}%"><span class="tracking-stack-fill">${segments}</span></span>
+      <span class="tracking-value">${escapeHtml(formatTrackingTotal(group.total))}</span>
+    </div>`;
+  }).join("");
+  return `<div class="tracking-stack" data-tracking-stack aria-label="${escapeAttr(tab.label || "Tracking stacked bars")}">${rendered}</div>`;
+}
+
+function formatTrackingTotal(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "";
+  if (numeric >= 1_000_000_000_000) return `${(numeric / 1_000_000_000_000).toFixed(numeric >= 10_000_000_000_000 ? 0 : 2).replace(/\.00$/, "")}T`;
+  if (numeric >= 1_000_000_000) return `${(numeric / 1_000_000_000).toFixed(numeric >= 10_000_000_000 ? 0 : 2).replace(/\.00$/, "")}G`;
+  if (numeric >= 1_000_000) return `${(numeric / 1_000_000).toFixed(numeric >= 10_000_000 ? 0 : 2).replace(/\.00$/, "")}M`;
+  if (numeric >= 1_000) return `${(numeric / 1_000).toFixed(numeric >= 10_000 ? 0 : 2).replace(/\.00$/, "")}K`;
+  return String(Math.round(numeric * 100) / 100);
+}
+
+function renderTrackingLeaderboard(rows, tab) {
+  const body = rows.slice(0, 30).map((row, index) => {
+    const tableRow = index + 1;
+    return `<tr data-tracking-tooltip="${escapeAttr(trackingTooltip(row))}" title="${escapeAttr(trackingTooltip(row))}">
+      <td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="0">${escapeHtml(row.rank ? `#${row.rank}` : "")}</td>
+      <td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="1">${escapeHtml(row.model || row.label || "")}</td>
+      <td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="2">${escapeHtml(row.provider || "")}</td>
+      <td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="3">${escapeHtml(row.valueLabel || row.value_label || "")}</td>
+      <td tabindex="0" data-table-cell data-table-row="${tableRow}" data-table-column="4">${escapeHtml(row.change || row.metric || "")}</td>
+    </tr>`;
+  }).join("");
+  return `<div class="table-scroll tracking-table-scroll" data-table-wrap>
+    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="${escapeAttr(tab.label || "Tracking table")}">
+      <thead><tr>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0">Rank</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1">Model</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2">Provider</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3">Value</th>
+        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4">Change</th>
+      </tr></thead>
+      <tbody>${body}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderTrackingScatterFallback(rows, tab) {
+  if (rows.length === 0) {
+    return `<div class="tracking-component-fallback">${escapeHtml(tab.fallbackReason || "source_tab_not_collected")}</div>`;
+  }
+  return renderTrackingLeaderboard(rows, tab);
+}
+
+function renderTrackingTrace(trace) {
+  if (!trace || typeof trace !== "object") {
+    return "";
+  }
+  const sourceUrl = safeLink(trace.sourceUrl || trace.source_url || "");
+  const diff = trace.diff || {};
+  const topRows = Array.isArray(trace.topRows) ? trace.topRows : Array.isArray(trace.top_rows) ? trace.top_rows : [];
+  const topRowsText = topRows
+    .slice(0, 5)
+    .map((row) => `${row.rank ? `#${row.rank} ` : ""}${row.model || row.label || ""}`)
+    .filter(Boolean)
+    .join(", ");
+  return `<details class="tracking-trace" data-tracking-trace>
+    <summary>Trace</summary>
+    <dl>
+      ${sourceUrl ? `<div><dt>Source</dt><dd><a href="${escapeAttr(sourceUrl)}" rel="noreferrer">${escapeHtml(sourceUrl)}</a></dd></div>` : ""}
+      <div><dt>Selector</dt><dd>${escapeHtml(trace.selectorVersion || trace.selector_version || "")}</dd></div>
+      <div><dt>Data hash</dt><dd>${escapeHtml(trace.dataHash || trace.data_hash || "")}</dd></div>
+      <div><dt>DOM hash</dt><dd>${escapeHtml(trace.rawDomHash || trace.domHash || "")}</dd></div>
+      <div><dt>Cache</dt><dd>${escapeHtml(trace.cacheStatus || trace.cache_status || "live")}</dd></div>
+      <div><dt>Diff</dt><dd>${escapeHtml(diff.summary || diff.status || "")}</dd></div>
+      ${topRowsText ? `<div><dt>Top rows</dt><dd>${escapeHtml(topRowsText)}</dd></div>` : ""}
+    </dl>
+  </details>`;
+}
+
 function renderCardVisuals(item) {
   return [
+    renderTrackingComponent(item.component || item.trackingComponent || item.tracking_component),
     renderCardStats(item.stats || item.summaryStats || item.summary_stats),
     renderCardBars(item.bars || item.barChart || item.bar_chart),
     renderCardTable(item.table || item.dataTable || item.data_table)

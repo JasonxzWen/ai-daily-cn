@@ -1185,6 +1185,7 @@ body.lightbox-open {
   grid-template-areas:
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
+    "tracking-component tracking-component"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1238,6 +1239,263 @@ body.lightbox-open {
 
 .tracking-card .card-data-table {
   min-width: min(560px, 100%);
+}
+
+.tracking-card .tracking-component {
+  grid-column: 1 / -1;
+  grid-area: tracking-component;
+}
+
+.tracking-component {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.tracking-component-header {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.tracking-component-meta {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tracking-scale-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.tracking-scale-toggle button,
+.tracking-component-tabs button {
+  min-width: 0;
+  border: 0;
+  padding: 6px 9px;
+  background: transparent;
+  color: #4b4a45;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tracking-scale-toggle button[aria-pressed="true"],
+.tracking-component-tabs button[aria-selected="true"] {
+  background: #3d3d3a;
+  color: #ffffff;
+}
+
+.tracking-component-tabs {
+  gap: 6px;
+  justify-content: start;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tracking-component-panel {
+  min-width: 0;
+}
+
+.tracking-bars {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.tracking-bar-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(140px, 0.72fr) minmax(120px, 1fr) minmax(74px, auto) minmax(48px, auto);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(209, 207, 197, 0.66);
+}
+
+.tracking-rank,
+.tracking-value,
+.tracking-change,
+.tracking-name small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.tracking-name {
+  display: grid;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 820;
+  overflow-wrap: anywhere;
+}
+
+.tracking-bar-track {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+}
+
+.tracking-bar-fill {
+  display: block;
+  width: var(--bar-width-linear);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f766e, #d97757);
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-bar-fill {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tracking-stack-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(86px, 0.24fr) minmax(160px, 1fr) minmax(66px, auto);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.tracking-stack-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tracking-stack-track {
+  display: block;
+  width: var(--bar-width-linear);
+  min-width: 28px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece9df;
+  transition: width 0.18s ease;
+}
+
+.tracking-component[data-scale="log"] .tracking-stack-track {
+  width: var(--bar-width-log);
+}
+
+.tracking-stack-fill {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.tracking-stack-segment {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  background: #0f766e;
+}
+
+.tracking-stack-segment[data-segment="1"] { background: #d97757; }
+.tracking-stack-segment[data-segment="2"] { background: #2563eb; }
+.tracking-stack-segment[data-segment="3"] { background: #9333ea; }
+.tracking-stack-segment[data-segment="4"] { background: #16a34a; }
+.tracking-stack-segment[data-segment="5"] { background: #dc2626; }
+.tracking-stack-segment[data-segment="6"] { background: #0891b2; }
+.tracking-stack-segment[data-segment="7"] { background: #ca8a04; }
+
+.tracking-bar-row[data-tracking-tooltip]:hover::after,
+.tracking-bar-row[data-tracking-tooltip]:focus-within::after,
+.tracking-stack-row[data-tracking-tooltip]:hover::after,
+.tracking-stack-row[data-tracking-tooltip]:focus-within::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 4;
+  max-width: min(420px, 92vw);
+  padding: 7px 9px;
+  border: 1px solid rgba(31, 30, 27, 0.2);
+  border-radius: 6px;
+  background: #1f1e1b;
+  color: #ffffff;
+  content: attr(data-tracking-tooltip);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.22);
+}
+
+.tracking-data-table {
+  min-width: 620px;
+  font-size: 12.5px;
+}
+
+.tracking-component-fallback {
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  color: #5f5d57;
+  background: #fbfaf5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tracking-trace {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  color: #4b4a45;
+  font-size: 12px;
+}
+
+.tracking-trace summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 820;
+}
+
+.tracking-trace dl {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.tracking-trace div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.tracking-trace dt {
+  color: var(--muted);
+  font-weight: 780;
+}
+
+.tracking-trace dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .blog-card .card-detail-list {
@@ -1540,10 +1798,65 @@ body.lightbox-open {
     grid-template-areas:
       "tracking-title"
       "tracking-tags"
+      "tracking-component"
       "tracking-stats"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
+  }
+
+  .tracking-card .tracking-component {
+    grid-area: tracking-component;
+  }
+
+  .tracking-component-header {
+    display: grid;
+  }
+
+  .tracking-bar-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-areas:
+      "rank name"
+      "rank bar"
+      "rank value";
+  }
+
+  .tracking-rank {
+    grid-area: rank;
+  }
+
+  .tracking-name {
+    grid-area: name;
+  }
+
+  .tracking-bar-track {
+    grid-area: bar;
+  }
+
+  .tracking-value {
+    grid-area: value;
+  }
+
+  .tracking-change {
+    grid-area: value;
+    justify-self: end;
+  }
+
+  .tracking-stack-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-component[data-scale="log"] .tracking-stack-track {
+    width: 100%;
+  }
+
+  .tracking-trace div {
+    grid-template-columns: 1fr;
   }
 
   .project-card {
@@ -2658,7 +2971,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <h1 class="report-title report-date-title">2026-06-01</h1>
         </div>
         <div class="toolbar"><span class="status-pill status-ok">已验证</span><img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSI0IiB5MT0iNCIgeDI9IjI4IiB5Mj0iMjgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMwODkxYjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlZjQ0NDQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTkgOS41aDE0YTIgMiAwIDAgMSAyIDJ2MTJIOWEyIDIgMCAwIDEtMi0ydi0xMGEyIDIgMCAwIDEgMi0yWiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjk0Ii8+PHBhdGggZD0iTTExIDE0aDdNMTEgMThoMTBNMTEgMjJoNiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjEuNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjEzLjUiIHI9IjIiIGZpbGw9IiMwNmI2ZDQiLz48cGF0aCBkPSJNMTguNSAyMC41IDIyIDE3bDMgMi44IiBzdHJva2U9IiNlZjQ0NDQiIHN0cm9rZS13aWR0aD0iMS43IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="日报导航" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/index.html" rel="noopener noreferrer">日报导航</a>
-<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjN2MzYWVkIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+SjwvdGV4dD48L3N2Zz4=" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-01.json" rel="noopener noreferrer">结构化 JSON</a></div>
+<img class="inline-site-icon hero-link-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkpTPC90ZXh0Pjwvc3ZnPg==" alt="结构化 JSON" loading="lazy" decoding="async"><a class="button hero-link" href="https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-01.json" rel="noopener noreferrer">结构化 JSON</a></div>
       </div>
       <div class="hero-brief hero-brief-single">
         <ul class="hero-summary-text hero-summary-list"><li>今天主体信息扩展到 10 条：计费与成本归因、企业 agent 平台、国产模型、physical AI、企业 BI、AIGC 内容工具和科研应用一起进入日报视野</li><li>模型可用性 incident 被放入轻量运营线索，模型发布只保留 MiniMax M3 和 Cosmos 3 这类首发</li></ul>
@@ -3118,6 +3431,16 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     });
   }
 
+  function applyTrackingScale(button) {
+    var mode = button.getAttribute("data-scale-mode");
+    var root = button.closest("[data-tracking-component]");
+    if (!mode || !root) return;
+    root.setAttribute("data-scale", mode);
+    root.querySelectorAll("[data-scale-mode]").forEach(function (peer) {
+      peer.setAttribute("aria-pressed", String(peer === button));
+    });
+  }
+
   function applySearch(input) {
     var target = input.getAttribute("data-search-for");
     var query = input.value.trim().toLowerCase();
@@ -3363,10 +3686,14 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
       applyFilter(button);
     }
 
-    if (button.matches("[data-tab-group][data-tab]")) {
-      activateTab(button);
-    }
-  });
+        if (button.matches("[data-tab-group][data-tab]")) {
+          activateTab(button);
+        }
+
+        if (button.matches("[data-scale-mode]")) {
+          applyTrackingScale(button);
+        }
+      });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {

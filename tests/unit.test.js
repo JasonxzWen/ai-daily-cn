@@ -41,6 +41,18 @@ import { validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
+import { resolveLinkIcon } from "../src/link-icons.js";
+import {
+  buildTrackingComponentSnapshot,
+  attachTrackingComponentSnapshots
+} from "../src/tracking-components.js";
+import {
+  applyGithubReadmeSummary,
+  githubReadmeCacheKey,
+  summarizeGithubReadme
+} from "../src/github-readme.js";
+import { selectChineseMediaDynamics } from "../src/chinese-media.js";
+import { selectOfficialOrgUpdates } from "../src/official-updates.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import {
   normalizeOptimizationSuggestions,
@@ -128,6 +140,36 @@ function openRouterRankingsSampleText(rows = 10) {
   ].join("\n");
 }
 
+function openRouterRankingsHistorySampleText() {
+  return [
+    openRouterRankingsSampleText(),
+    "Top Models History",
+    "Week",
+    "2026-05-04",
+    "DeepSeek V4 Flash",
+    "1.8T tokens",
+    "Claude Sonnet 4.6",
+    "1.2T tokens",
+    "MiniMax M3",
+    "620B tokens",
+    "2026-05-11",
+    "DeepSeek V4 Flash",
+    "2.4T tokens",
+    "Claude Sonnet 4.6",
+    "1.5T tokens",
+    "MiniMax M3",
+    "910B tokens",
+    "2026-05-18",
+    "DeepSeek V4 Flash",
+    "2.9T tokens",
+    "Claude Sonnet 4.6",
+    "1.77T tokens",
+    "MiniMax M3",
+    "1.22T tokens",
+    "LLM Leaderboard"
+  ].join("\n");
+}
+
 function openRouterSnapshotFixture(rows = 10) {
   return {
     type: "openrouter_rankings_public_page",
@@ -163,6 +205,80 @@ function artificialAnalysisIndexSampleText(rows = 10) {
     ...entries.map(([model]) => model),
     ...entries.map(([, score]) => score),
     "About the Data"
+  ].join("\n");
+}
+
+function artificialAnalysisComponentSampleText() {
+  return [
+    artificialAnalysisIndexSampleText(),
+    "## Token Usage",
+    "### Artificial Analysis Intelligence Index: Token Usage",
+    "Answer tokens Reasoning tokens Input tokens",
+    "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+    "676M",
+    "Answer tokens",
+    "77M",
+    "Reasoning tokens",
+    "187M",
+    "Input tokens",
+    "412M",
+    "GPT-5.5 (xhigh)",
+    "628M",
+    "Answer tokens",
+    "92M",
+    "Reasoning tokens",
+    "0M",
+    "Input tokens",
+    "536M",
+    "Gemini 3.5 Flash",
+    "671M",
+    "Answer tokens",
+    "62M",
+    "Reasoning tokens",
+    "0M",
+    "Input tokens",
+    "609M",
+    "## Cost",
+    "### Artificial Analysis Intelligence Index: Cost Breakdown",
+    "Answer cost Reasoning cost Input cost",
+    "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+    "$4,309",
+    "Answer cost",
+    "$1,508",
+    "Reasoning cost",
+    "$2,614",
+    "Input cost",
+    "$187",
+    "GPT-5.5 (xhigh)",
+    "$3,357",
+    "Answer cost",
+    "$1,101",
+    "Reasoning cost",
+    "$0",
+    "Input cost",
+    "$2,256",
+    "Gemini 3.5 Flash",
+    "$1,552",
+    "Answer cost",
+    "$898",
+    "Reasoning cost",
+    "$0",
+    "Input cost",
+    "$654",
+    "## Score vs. Compute",
+    "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+    "61",
+    "Compute",
+    "840",
+    "GPT-5.5 (xhigh)",
+    "60",
+    "Compute",
+    "790",
+    "Gemini 3.5 Flash",
+    "55",
+    "Compute",
+    "510",
+    "## Example Tasks"
   ].join("\n");
 }
 
@@ -2373,6 +2489,7 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("HelloGitHub"));
   assert(names.includes("RuanYF Weekly"));
   assert(names.includes("Jiqizhixin"));
+  assert(names.includes("SSPAI"));
   assert(names.includes("arXiv cs.AI"));
   assert(names.includes("Hacker News Topstories API"));
   assert(names.includes("Hugging Face Daily Papers"));
@@ -2417,8 +2534,9 @@ test("registered discovery sources cover the user requested AI source list", asy
     ["Ars Technica", ["https://feeds.arstechnica.com/arstechnica/index"]],
     ["VentureBeat AI", ["https://venturebeat.com/category/ai/feed"]],
     ["HNRSS Frontpage", ["https://hnrss.org/frontpage"]],
-    ["Jiqizhixin", ["https://www.jiqizhixin.com/rss"]],
+    ["Jiqizhixin", ["https://www.jiqizhixin.com/articles"]],
     ["QbitAI", ["https://www.qbitai.com/feed"]],
+    ["SSPAI", ["https://sspai.com/feed"]],
     ["36Kr", ["https://36kr.com/feed", "https://www.36kr.com/feed"]],
     ["InfoQ CN", ["https://www.infoq.cn/feed"]],
     ["arXiv cs.AI", ["http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20"]],
@@ -2568,6 +2686,55 @@ test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomple
   assert.equal(source.snapshot.top_entries.length, 8);
 });
 
+test("collectContentSources stores OpenRouter weekly history for local tracking components", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-openrouter-rankings",
+        name: "OpenRouter Rankings",
+        url: "https://openrouter.ai/rankings",
+        source_kind: "openrouter_rankings_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    openrouterRankingsText: openRouterRankingsHistorySampleText()
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.history_entries.length, 9);
+  assert(source.snapshot.history_entries.some((row) =>
+    row.week === "2026-05-18" &&
+    row.model === "DeepSeek V4 Flash" &&
+    row.tokens === "2.9T tokens"
+  ));
+
+  const component = buildTrackingComponentSnapshot({
+    id: "openrouter-rankings",
+    name: "OpenRouter",
+    url: "https://openrouter.ai/rankings",
+    source: "OpenRouter Rankings",
+    snapshot: source.snapshot
+  });
+
+  const topModels = component.series.find((series) => series.tab_id === "top-models");
+  assert.equal(topModels.fallback_reason, "");
+  assert(topModels.rows.some((row) =>
+    row.metric === "2026-05-18" &&
+    row.model === "DeepSeek V4 Flash" &&
+    row.value_label === "2.9T tokens"
+  ));
+  assert(component.public_trace.top_rows.some((row) => row.model === "DeepSeek V4 Flash"));
+  assert(!JSON.stringify(component.public_trace).includes("raw_dom"));
+});
+
 test("parseArtificialAnalysisIndexText extracts public Intelligence Index Top 10 rows", () => {
   const rows = parseArtificialAnalysisIndexText(artificialAnalysisIndexSampleText());
 
@@ -2614,6 +2781,60 @@ test("collectContentSources stores Artificial Analysis public page snapshot with
   assert.equal(collected.candidates.length, 0);
 });
 
+test("collectContentSources stores Artificial Analysis token cost and scatter tabs", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-artificial-analysis-intelligence-index",
+        name: "Artificial Analysis Intelligence Index",
+        url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        source_kind: "artificial_analysis_index_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    artificialAnalysisIndexText: artificialAnalysisComponentSampleText()
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.component_tabs.token_usage.rows.length, 3);
+  assert.equal(source.snapshot.component_tabs.cost.rows.length, 3);
+  assert.equal(source.snapshot.component_tabs.score_vs_token_usage.rows.length, 3);
+  assert.equal(source.snapshot.component_tabs.score_vs_cost.rows.length, 3);
+  assert.equal(source.snapshot.component_tabs.score_vs_compute.rows.length, 3);
+
+  const component = buildTrackingComponentSnapshot({
+    id: "artificial-analysis-intelligence-index",
+    name: "Artificial Analysis",
+    url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    source: "Artificial Analysis Intelligence Index",
+    snapshot: source.snapshot
+  });
+
+  const tabsById = new Map(component.tabs.map((tab) => [tab.id, tab]));
+  assert.equal(tabsById.get("token-usage").status, "complete");
+  assert.equal(tabsById.get("token-usage").fallback_reason, "");
+  assert.equal(tabsById.get("cost").status, "complete");
+  assert.equal(tabsById.get("score-vs-token-usage").status, "complete");
+  assert.equal(tabsById.get("score-vs-cost").status, "complete");
+  assert.equal(tabsById.get("score-vs-compute").status, "complete");
+
+  const tokenUsage = component.series.find((series) => series.tab_id === "token-usage");
+  const cost = component.series.find((series) => series.tab_id === "cost");
+  const scoreVsCost = component.series.find((series) => series.tab_id === "score-vs-cost");
+  assert(tokenUsage.rows.some((row) => row.model.includes("Claude Opus 4.8") && row.value_label === "676M"));
+  assert(cost.rows.some((row) => row.model.includes("GPT-5.5") && row.value_label === "$3,357"));
+  assert(scoreVsCost.rows.some((row) => row.model.includes("Gemini") && row.metric === "Score vs. Cost"));
+  assert(!JSON.stringify(component.public_trace).includes("raw_dom"));
+});
+
 test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-openrouter-snapshot-"));
   const reportDate = "2026-06-05";
@@ -2641,6 +2862,8 @@ test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking
   assert.equal(tracking.change_status, "changed");
   assert.equal(tracking.verification_status, "primary_confirmed");
   assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert.equal(tracking.tracking_component_snapshot.component_kind, "openrouter_rankings");
+  assert.equal(tracking.tracking_component_snapshot.public_trace.selector_version, "openrouter-rankings-v1");
   assert(tracking.summary.includes("DeepSeek V4 Flash"));
   assert(tracking.metrics.some((metric) => metric.label === "#10" && metric.value.includes("DeepSeek V3.2")));
   assert(tracking.watch_points.some((point) => point.includes("MiniMax M3") || point.includes("MiMo-V2.5")));
@@ -2652,6 +2875,8 @@ test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking
   assert.equal(trackingSection.items[0].title, "OpenRouter");
   assert.equal(trackingSection.items[0].points.length, 0);
   assert.equal(trackingSection.items[0].table.rows.length, 10);
+  assert.equal(trackingSection.items[0].component.kind, "openrouter_rankings");
+  assert.equal(trackingSection.items[0].component.tabs.length, 2);
   assert(trackingSection.items[0].table.rows.some((row) => row.rank === "#1" && row.tokens.includes("2.9T tokens")));
   assert(trackingSection.items[0].table.rows.some((row) => row.rank === "#10" && row.tokens.includes("1.11T tokens")));
   assert(trackingSection.items[0].bars.rows.some((row) => row.label === "deepseek" && row.value === 3));
@@ -2695,6 +2920,8 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(tracking.change_status, "changed");
   assert.equal(tracking.verification_status, "primary_confirmed");
   assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert.equal(tracking.tracking_component_snapshot.component_kind, "artificial_analysis_index");
+  assert.equal(tracking.tracking_component_snapshot.tabs.length, 6);
   assert(tracking.summary.includes("Claude Opus 4.8"));
   assert(tracking.metrics.some((metric) => metric.label === "#10" && metric.value.includes("54 分")));
 
@@ -2703,6 +2930,8 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert(trackingSection);
   const card = trackingSection.items.find((item) => item.title === "Artificial Analysis");
   assert.equal(card.points.length, 0);
+  assert.equal(card.component.kind, "artificial_analysis_index");
+  assert.equal(card.component.tabs.length, 6);
   assert.equal(card.table.rows.length, 10);
   assert(card.table.columns.some((column) => column.key === "tokens" && column.label === "分数"));
   assert(card.table.columns.some((column) => column.key === "change" && column.label === "指标"));
@@ -8962,6 +9191,114 @@ test("tracking visual tables render OpenRouter and Artificial Analysis without s
   assert(section.items.every((item) => item.media === undefined));
 });
 
+test("tracking component snapshot exposes OpenRouter and Artificial Analysis trace data", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "OpenRouter parsed Top Models and leaderboard rows.",
+      watch_points: ["Track Top Models and provider concentration."],
+      evidence: "OpenRouter public rankings page parsed successfully.",
+      metrics: [],
+      snapshot: openRouterSnapshotFixture()
+    },
+    {
+      id: "artificial-analysis-intelligence-index",
+      name: "Artificial Analysis",
+      url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      event_date: report.report_date,
+      source: "Artificial Analysis Intelligence Index",
+      category: "model_benchmark",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "Artificial Analysis parsed score, token and cost component tabs.",
+      watch_points: ["Track Score, Token Usage, Cost and trade-off tabs."],
+      evidence: "Artificial Analysis public Intelligence Index page parsed successfully.",
+      metrics: [],
+      snapshot: artificialAnalysisSnapshotFixture()
+    }
+  ].map((item) => ({
+    ...item,
+    tracking_component_snapshot: buildTrackingComponentSnapshot(item)
+  }));
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, validation.errors?.map((error) => error.message).join("\n"));
+
+  const openRouter = validation.value.daily_tracking.find((item) => item.id === "openrouter-rankings");
+  const artificialAnalysis = validation.value.daily_tracking.find((item) => item.id === "artificial-analysis-intelligence-index");
+  assert.equal(openRouter.tracking_component_snapshot.component_kind, "openrouter_rankings");
+  assert(openRouter.tracking_component_snapshot.tabs.some((tab) => tab.id === "top-models" && tab.view === "stacked_bar"));
+  assert(openRouter.tracking_component_snapshot.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
+  assert.match(openRouter.tracking_component_snapshot.raw_dom_hash, /^sha256:[a-f0-9]{64}$/);
+  assert.match(openRouter.tracking_component_snapshot.data_hash, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(openRouter.tracking_component_snapshot.public_trace.selector_version, "openrouter-rankings-v1");
+  assert(openRouter.tracking_component_snapshot.public_trace.top_rows.some((row) => row.model === "DeepSeek V4 Flash"));
+  assert(!JSON.stringify(openRouter.tracking_component_snapshot.public_trace).includes("raw_dom"));
+
+  assert.equal(artificialAnalysis.tracking_component_snapshot.component_kind, "artificial_analysis_index");
+  assert.deepEqual(
+    artificialAnalysis.tracking_component_snapshot.tabs.map((tab) => tab.id),
+    ["score", "token-usage", "cost", "score-vs-token-usage", "score-vs-cost", "score-vs-compute"]
+  );
+  assert(artificialAnalysis.tracking_component_snapshot.tabs.every((tab) => tab.status === "complete" || tab.fallback_reason));
+
+  const input = reportToInteractionInput(validation.value);
+  const trackingSection = input.sections.find((section) => section.cardClass === "tracking-card");
+  const openRouterCard = trackingSection.items.find((item) => item.title === "OpenRouter");
+  const aaCard = trackingSection.items.find((item) => item.title === "Artificial Analysis");
+  assert.equal(openRouterCard.component.kind, "openrouter_rankings");
+  assert.equal(openRouterCard.component.tabs.length, 2);
+  assert(openRouterCard.component.trace.dataHash.startsWith("sha256:"));
+  assert.equal(aaCard.component.kind, "artificial_analysis_index");
+  assert.equal(aaCard.component.tabs.length, 6);
+  assert(aaCard.component.trace.sourceUrl.includes("artificialanalysis.ai"));
+});
+
+test("tracking component snapshots attach deterministically to daily tracking items", () => {
+  const report = strictPublishReportFixture();
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "OpenRouter parsed Top Models and leaderboard rows.",
+      watch_points: ["Track top model usage and provider share."],
+      evidence: "OpenRouter public page parsed successfully.",
+      metrics: [],
+      snapshot: openRouterSnapshotFixture()
+    }
+  ];
+
+  const enriched = attachTrackingComponentSnapshots(report);
+
+  assert.notEqual(enriched, report);
+  assert.equal(enriched.daily_tracking[0].tracking_component_snapshot.component_kind, "openrouter_rankings");
+  assert.equal(enriched.daily_tracking[0].tracking_component_snapshot.public_trace.top_rows.length, 10);
+  assert(!JSON.stringify(enriched.daily_tracking[0].tracking_component_snapshot.public_trace).includes("raw_dom"));
+});
+
 test("public daily renders source coverage gaps without internal audit dumps", () => {
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -9662,6 +9999,224 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
   assert.equal(report.hot_blogs[0].source_level, "intermediary");
   assert(!("verification_note" in report.hot_blogs[0]));
   assert(!("risk_note" in report.hot_blogs[0]));
+});
+
+test("icon resolver uses link domain icons and records fallback metadata", () => {
+  const githubIcon = resolveLinkIcon("https://github.com/openai/codex", { label: "openai/codex" });
+  assert.equal(githubIcon.host, "github.com");
+  assert.equal(githubIcon.key, "github.com");
+  assert.equal(githubIcon.fallback, false);
+  assert.equal(githubIcon.reason, "github_unified_icon");
+  assert.equal(githubIcon.icon, CACHED_DOMAIN_ICONS["github.com"]);
+
+  const qbitaiIcon = resolveLinkIcon("https://www.qbitai.com/2026/06/example", { label: "QbitAI" });
+  assert.equal(qbitaiIcon.host, "qbitai.com");
+  assert.equal(qbitaiIcon.fallback, false);
+  assert.equal(qbitaiIcon.icon, CACHED_DOMAIN_ICONS["qbitai.com"]);
+
+  const generated = resolveLinkIcon("https://unknown-icon-test.invalid/post", {
+    label: "Unknown Icon Test",
+    allowGeneratedFallback: true
+  });
+  assert.equal(generated.host, "unknown-icon-test.invalid");
+  assert.equal(generated.fallback, true);
+  assert.equal(generated.reason, "generated_initials_fallback");
+  assert.match(generated.icon, /^data:image\/svg\+xml/);
+});
+
+test("GitHub Trending enriches descriptions from cached README summaries", () => {
+  const repo = "example/agent-workbench";
+  const sha = "0123456789abcdef";
+  const key = githubReadmeCacheKey({ repo, defaultBranch: "main", sha });
+  assert.equal(key, "github-readme/example/agent-workbench/main/0123456789abcdef");
+
+  const summary = summarizeGithubReadme({
+    repo,
+    readme: [
+      "# Agent Workbench",
+      "",
+      "Agent Workbench is a local-first workspace for building, evaluating, and debugging AI agents.",
+      "It includes task runners, browser tools, memory inspection, replayable traces, and adapters for common LLM APIs.",
+      "The project ships TypeScript packages, example agents, and CI fixtures for production evaluation."
+    ].join("\n"),
+    maxChars: 120
+  });
+  assert(summary.length >= 80, summary);
+  assert(summary.length <= 130, summary);
+  assert.match(summary, /Agent Workbench|agent|工作区|评测|调试/);
+
+  const item = applyGithubReadmeSummary(
+    {
+      repo,
+      description: "short description",
+      url: `https://github.com/${repo}`
+    },
+    {
+      summary,
+      sha,
+      defaultBranch: "main",
+      cacheKey: key,
+      sourceUrl: `https://raw.githubusercontent.com/${repo}/main/README.md`
+    }
+  );
+  assert.equal(item.description, summary);
+  assert.equal(item.readme_summary, summary);
+  assert.equal(item.readme_cache.key, key);
+  assert.equal(item.readme_cache.hit, true);
+  assert.equal(item.readme_cache.sha, sha);
+});
+
+test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries", () => {
+  const reportDate = "2026-06-12";
+  const result = selectChineseMediaDynamics(
+    [
+      {
+        id: "qbitai-1",
+        source_id: "intermediary-qbitai",
+        source: "QbitAI",
+        title: "量子位报道多模态 Agent 在工业质检落地",
+        url: "https://www.qbitai.com/2026/06/agent-quality",
+        event_date: reportDate,
+        category: "community_lead",
+        evidence: "文章梳理了工业质检场景里多模态 Agent 的部署方式、人工复核比例和失败样例。"
+      },
+      {
+        id: "sspai-1",
+        source_id: "intermediary-sspai",
+        source: "SSPAI",
+        title: "少数派体验本地知识库助手的真实工作流",
+        url: "https://sspai.com/post/100001",
+        event_date: reportDate,
+        category: "community_lead",
+        evidence: "作者记录了从资料导入、语义检索、摘要生成到移动端同步的完整使用体验。"
+      },
+      {
+        id: "jiqizhixin-1",
+        source_id: "intermediary-jiqizhixin",
+        source: "Jiqizhixin",
+        title: "机器之心整理开源推理框架的新一轮优化",
+        url: "https://www.jiqizhixin.com/articles/2026-06-12",
+        event_date: reportDate,
+        category: "community_lead",
+        evidence: "报道比较了连续批处理、KV cache 管理、显存占用和多卡调度的工程差异。"
+      },
+      {
+        id: "old-qbitai",
+        source_id: "intermediary-qbitai",
+        source: "QbitAI",
+        title: "旧文章不应进入今日动态",
+        url: "https://www.qbitai.com/2026/06/old",
+        event_date: "2026-06-09",
+        category: "community_lead"
+      }
+    ],
+    {
+      reportDate,
+      sourceAudit: {
+        content_sources: {
+          sources: [
+            {
+              id: "intermediary-jiqizhixin",
+              name: "Jiqizhixin",
+              url: "https://www.jiqizhixin.com/articles",
+              status: "checked",
+              notes: "HTML adapter parsed 1 article"
+            }
+          ]
+        }
+      }
+    }
+  );
+
+  assert.equal(result.items.length, 3);
+  assert.deepEqual(result.items.map((item) => item.candidate_id), ["qbitai-1", "sspai-1", "jiqizhixin-1"]);
+  for (const item of result.items) {
+    assert(item.summary.length >= 120, item.summary);
+    assert(item.summary.length <= 260, item.summary);
+    assert.equal(item.source_level, "intermediary");
+    assert.equal(item.verification_status, "intermediary_only");
+  }
+  assert.equal(result.source_statuses.find((item) => item.source_key === "jiqizhixin").status, "checked");
+});
+
+test("unconfigured WeChat and Zhihu sources degrade without blocking publish", () => {
+  const report = strictPublishReportFixture();
+  report.wechat_items = [];
+  report.zhihu_items = [];
+  report.source_audit.wechat_sources = {
+    checked: true,
+    sources: [
+      {
+        id: "wechat-placeholder",
+        name: "WeChat placeholder",
+        url: "https://example.com/wechat-placeholder.xml",
+        status: "skipped_missing_base_url",
+        notes: "No real WeChat entrypoint configured; public report must disclose degraded status."
+      }
+    ],
+    candidates_found: 0,
+    included: 0
+  };
+  report.source_audit.zhihu_sources = {
+    checked: true,
+    sources: [
+      {
+        id: "zhihu-placeholder",
+        name: "Zhihu placeholder",
+        url: "https://example.com/zhihu-placeholder.xml",
+        status: "skipped_missing_base_url",
+        notes: "No real Zhihu entrypoint configured; public report must disclose degraded status."
+      }
+    ],
+    candidates_found: 0,
+    included: 0
+  };
+
+  const status = deriveQualityStatus(report);
+  assert.equal(status.status, "degraded");
+  assert(status.reasons.includes("wechat_sources_blocked"));
+  assert(status.reasons.includes("zhihu_sources_blocked"));
+  assert.equal(status.blocking_issues.length, 0);
+});
+
+test("official organization updates render separately from Builder observations", () => {
+  const selected = selectOfficialOrgUpdates(
+    [
+      {
+        id: "openai-news-1",
+        source_id: "content-openai-news",
+        source: "OpenAI News RSS",
+        source_level: "official_company_news",
+        title: "OpenAI updates enterprise admin controls",
+        url: "https://openai.com/news/enterprise-admin-controls",
+        event_date: "2026-06-12",
+        evidence: "OpenAI says enterprise admins now get more granular policy and observability controls for AI deployments."
+      },
+      {
+        id: "builder-x-1",
+        source_id: "follow-builders-x",
+        source: "follow-builders X feed",
+        source_level: "original_social",
+        title: "Builder comment about enterprise AI",
+        url: "https://x.com/example/status/1",
+        event_date: "2026-06-12",
+        evidence: "A builder comments on enterprise AI adoption."
+      }
+    ],
+    { reportDate: "2026-06-12" }
+  );
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].candidate_id, "openai-news-1");
+  assert.equal(selected[0].organization, "OpenAI");
+
+  const report = strictPublishReportFixture();
+  report.official_org_updates = selected;
+  report.builder_observations = [];
+  const input = reportToInteractionInput(report);
+  const rendered = JSON.stringify(input);
+  assert(rendered.includes("官方组织动态"));
+  assert(rendered.includes("OpenAI updates enterprise admin controls"));
+  assert(!rendered.includes("Builder comment about enterprise AI"));
 });
 
 test("platform exempt report sections require public audit disclosure and render independently", async () => {

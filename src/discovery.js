@@ -146,14 +146,23 @@ export const DEFAULT_CONTENT_SOURCES = [
   {
     id: "intermediary-jiqizhixin",
     name: "Jiqizhixin",
-    url: "https://www.jiqizhixin.com/rss",
-    category: "intermediary"
+    url: "https://www.jiqizhixin.com/articles",
+    category: "intermediary",
+    source_kind: "html_index"
   },
   {
     id: "intermediary-qbitai",
     name: "QbitAI",
     url: "https://www.qbitai.com/feed",
-    category: "intermediary"
+    category: "intermediary",
+    max_items_per_run: 20
+  },
+  {
+    id: "intermediary-sspai",
+    name: "SSPAI",
+    url: "https://sspai.com/feed",
+    category: "intermediary",
+    max_items_per_run: 20
   },
   {
     id: "intermediary-36kr",
@@ -3199,8 +3208,10 @@ async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
           }
         : await readOpenRouterRankingsPageSnapshot(sourceInfo, options);
     const text = pageSnapshot.text;
-    const entries = parseOpenRouterRankingsText(text);
-    const snapshot = openRouterRankingsSnapshot(entries, sourceInfo, options.generatedAt);
+    const pageData = parseOpenRouterRankingsPageText(text);
+    const snapshot = openRouterRankingsSnapshot(pageData.entries, sourceInfo, options.generatedAt, {
+      historyEntries: pageData.historyEntries
+    });
     const complete = snapshot.snapshot_status === "complete";
     return {
       status: complete ? "checked" : "no_signal",
@@ -3292,7 +3303,60 @@ export function parseOpenRouterRankingsText(text) {
   return entries;
 }
 
-function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt) {
+export function parseOpenRouterRankingsPageText(text) {
+  const entries = parseOpenRouterRankingsText(text);
+  return {
+    entries,
+    historyEntries: parseOpenRouterHistoryEntries(text, entries)
+  };
+}
+
+function parseOpenRouterHistoryEntries(text, topEntries = []) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => cleanText(line))
+    .filter(Boolean);
+  const start = lines.findIndex((line) => /top models history|weekly usage history|usage history/i.test(line));
+  if (start < 0) {
+    return [];
+  }
+  const end = lines.findIndex((line, index) => index > start && /llm leaderboard|market share|tool calls|images|audio input|show more/i.test(line));
+  const section = lines.slice(start + 1, end > start ? end : undefined);
+  const providerByModel = new Map(topEntries.map((entry) => [normalizeModelKey(entry.model), entry.provider || ""]));
+  const rows = [];
+  let week = "";
+  let rankForWeek = 0;
+
+  for (let index = 0; index < section.length; index += 1) {
+    const line = section[index];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(line)) {
+      week = line;
+      rankForWeek = 0;
+      continue;
+    }
+    if (!week || !line || /^(week|date|model|tokens|usage)$/i.test(line)) {
+      continue;
+    }
+    const next = section[index + 1];
+    if (!/tokens$/i.test(next || "")) {
+      continue;
+    }
+    rankForWeek += 1;
+    rows.push({
+      week,
+      rank: rankForWeek,
+      model: line,
+      provider: providerByModel.get(normalizeModelKey(line)) || "",
+      tokens: next,
+      change: week
+    });
+    index += 1;
+  }
+
+  return rows;
+}
+
+function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {}) {
   const topEntries = entries.slice(0, 10).map((entry) => ({
     rank: entry.rank,
     model: entry.model,
@@ -3300,6 +3364,18 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt) {
     tokens: entry.tokens,
     change: entry.change
   }));
+  const historyEntries = Array.isArray(extras.historyEntries)
+    ? extras.historyEntries
+      .filter((entry) => entry?.week && entry?.model && entry?.tokens)
+      .map((entry) => ({
+        week: entry.week,
+        rank: Number(entry.rank) || 1,
+        model: entry.model,
+        provider: entry.provider || "",
+        tokens: entry.tokens,
+        change: entry.change || entry.week
+      }))
+    : [];
   return {
     type: "openrouter_rankings_public_page",
     collection_method: "public_page_playwright",
@@ -3307,6 +3383,7 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt) {
     snapshot_as_of: generatedAt || new Date().toISOString(),
     source_url: sourceInfo.url,
     top_entries: topEntries,
+    ...(historyEntries.length > 0 ? { history_entries: historyEntries } : {}),
     notes: "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof."
   };
 }
@@ -3347,7 +3424,8 @@ async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
         : await readArtificialAnalysisIndexPageSnapshot(sourceInfo, options);
     const text = pageSnapshot.text;
     const entries = parseArtificialAnalysisIndexText(text);
-    const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt);
+    const componentTabs = parseArtificialAnalysisComponentTabs(text, entries);
+    const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt, componentTabs);
     const complete = snapshot.snapshot_status === "complete";
     return {
       status: complete ? "checked" : "no_signal",
@@ -3491,7 +3569,7 @@ function artificialAnalysisProviderForModel(model) {
   return "";
 }
 
-function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt) {
+function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, componentTabs = {}) {
   const topEntries = entries.slice(0, 10).map((entry) => ({
     rank: entry.rank,
     model: entry.model,
@@ -3499,6 +3577,7 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt) {
     tokens: entry.tokens,
     change: entry.change
   }));
+  const tabs = normalizeArtificialAnalysisComponentTabs(componentTabs, topEntries);
   return {
     type: "artificial_analysis_intelligence_index_public_page",
     collection_method: "public_page_playwright",
@@ -3506,8 +3585,247 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt) {
     snapshot_as_of: generatedAt || new Date().toISOString(),
     source_url: sourceInfo.url,
     top_entries: topEntries,
+    ...(Object.keys(tabs).length > 0 ? { component_tabs: tabs } : {}),
     notes: "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof."
   };
+}
+
+function parseArtificialAnalysisComponentTabs(text, scoreEntries = []) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => cleanText(line))
+    .filter(Boolean);
+  const scoreRows = scoreEntries.map((entry) => ({
+    rank: entry.rank,
+    model: entry.model,
+    provider: entry.provider,
+    value: parseTrackingNumericValue(entry.tokens),
+    value_label: entry.tokens,
+    change: "AA Index",
+    metric: "Score"
+  }));
+  const tokenRows = parseArtificialAnalysisValueRows(
+    sectionBetween(lines, /## Token Usage|Intelligence Index:\s*Token Usage/i, /## Cost|## Score vs|## Example Tasks/i),
+    {
+      metric: "Token Usage",
+      valuePattern: /(?:tokens?|[KMGTP]$)/i,
+      segmentLabels: [
+        ["answer", /answer tokens?/i],
+        ["reasoning", /reasoning tokens?/i],
+        ["input", /input tokens?/i]
+      ]
+    }
+  );
+  const costRows = parseArtificialAnalysisValueRows(
+    sectionBetween(lines, /## Cost|Intelligence Index:\s*Cost Breakdown/i, /## Score vs|## Example Tasks/i),
+    {
+      metric: "Cost",
+      valuePattern: /^\$|cost/i,
+      segmentLabels: [
+        ["answer", /answer cost/i],
+        ["reasoning", /reasoning cost/i],
+        ["input", /input cost/i]
+      ]
+    }
+  );
+  const computeRows = parseArtificialAnalysisScoreComputeRows(sectionBetween(lines, /## Score vs\.?\s*Compute|Score vs\.?\s*Compute/i, /## Example Tasks|## Score|## Token Usage|## Cost/i));
+  return {
+    ...(scoreRows.length > 0 ? { score: { rows: scoreRows } } : {}),
+    ...(tokenRows.length > 0 ? { token_usage: { rows: tokenRows } } : {}),
+    ...(costRows.length > 0 ? { cost: { rows: costRows } } : {}),
+    ...scatterTabsFromArtificialAnalysisRows(scoreRows, tokenRows, costRows, computeRows)
+  };
+}
+
+function normalizeArtificialAnalysisComponentTabs(componentTabs, topEntries) {
+  const normalized = {};
+  const scoreRows = Array.isArray(componentTabs?.score?.rows) && componentTabs.score.rows.length > 0
+    ? componentTabs.score.rows
+    : topEntries.map((entry) => ({
+        rank: entry.rank,
+        model: entry.model,
+        provider: entry.provider,
+        value: parseTrackingNumericValue(entry.tokens),
+        value_label: entry.tokens,
+        change: "AA Index",
+        metric: "Score"
+      }));
+  if (scoreRows.length > 0) {
+    normalized.score = { rows: normalizeSourceComponentRows(scoreRows) };
+  }
+  for (const key of ["token_usage", "cost", "score_vs_token_usage", "score_vs_cost", "score_vs_compute"]) {
+    const rows = normalizeSourceComponentRows(componentTabs?.[key]?.rows || []);
+    if (rows.length > 0) {
+      normalized[key] = { rows };
+    }
+  }
+  return normalized;
+}
+
+function scatterTabsFromArtificialAnalysisRows(scoreRows, tokenRows, costRows, computeRows) {
+  const scoreByModel = new Map(scoreRows.map((row) => [normalizeModelKey(row.model), row]));
+  const scatterFor = (rows, metric) => rows
+    .map((row, index) => {
+      const score = scoreByModel.get(normalizeModelKey(row.model));
+      if (!score) return null;
+      return {
+        rank: score.rank || index + 1,
+        model: score.model,
+        provider: score.provider || row.provider || "",
+        value: score.value,
+        value_label: `${score.value_label} / ${row.value_label}`,
+        change: "",
+        metric,
+        secondary_value: row.value,
+        secondary_value_label: row.value_label
+      };
+    })
+    .filter(Boolean);
+  const scoreVsToken = scatterFor(tokenRows, "Score vs. Token Usage");
+  const scoreVsCost = scatterFor(costRows, "Score vs. Cost");
+  const scoreVsCompute = scatterFor(computeRows, "Score vs. Compute");
+  return {
+    ...(scoreVsToken.length > 0 ? { score_vs_token_usage: { rows: scoreVsToken } } : {}),
+    ...(scoreVsCost.length > 0 ? { score_vs_cost: { rows: scoreVsCost } } : {}),
+    ...(scoreVsCompute.length > 0 ? { score_vs_compute: { rows: scoreVsCompute } } : {})
+  };
+}
+
+function parseArtificialAnalysisValueRows(sectionLines, options = {}) {
+  const rows = [];
+  const segmentLabels = options.segmentLabels || [];
+  for (let index = 0; index < sectionLines.length; index += 1) {
+    const model = sectionLines[index];
+    const provider = artificialAnalysisProviderForModel(model);
+    if (!provider) {
+      continue;
+    }
+    const totalIndex = firstValueLineIndex(sectionLines, index + 1, options.valuePattern);
+    if (totalIndex < 0) {
+      continue;
+    }
+    const total = sectionLines[totalIndex];
+    const segments = {};
+    for (const [key, pattern] of segmentLabels) {
+      const value = valueAfterLabel(sectionLines, totalIndex + 1, pattern, options.valuePattern);
+      if (value) {
+        segments[key] = value;
+      }
+    }
+    rows.push({
+      rank: rows.length + 1,
+      model,
+      provider,
+      value: parseTrackingNumericValue(total),
+      value_label: total,
+      change: "",
+      metric: options.metric || "",
+      ...(Object.keys(segments).length > 0 ? { segments } : {})
+    });
+    index = Math.max(index, totalIndex);
+  }
+  return rows;
+}
+
+function parseArtificialAnalysisScoreComputeRows(sectionLines) {
+  const rows = [];
+  for (let index = 0; index < sectionLines.length; index += 1) {
+    const model = sectionLines[index];
+    const provider = artificialAnalysisProviderForModel(model);
+    if (!provider) {
+      continue;
+    }
+    const scoreIndex = firstValueLineIndex(sectionLines, index + 1, /^\d{1,3}(?:\.\d+)?$/);
+    const compute = valueAfterLabel(sectionLines, scoreIndex + 1, /compute/i, /^\d+(?:\.\d+)?$/);
+    if (scoreIndex < 0 || !compute) {
+      continue;
+    }
+    rows.push({
+      rank: rows.length + 1,
+      model,
+      provider,
+      value: parseTrackingNumericValue(compute),
+      value_label: compute,
+      change: "",
+      metric: "Compute"
+    });
+    index = scoreIndex;
+  }
+  return rows;
+}
+
+function sectionBetween(lines, startPattern, endPattern) {
+  const start = lines.findIndex((line) => startPattern.test(line));
+  if (start < 0) {
+    return [];
+  }
+  const end = lines.findIndex((line, index) => index > start && endPattern.test(line));
+  return lines.slice(start + 1, end > start ? end : undefined);
+}
+
+function firstValueLineIndex(lines, startIndex, valuePattern) {
+  for (let index = Math.max(0, startIndex); index < Math.min(lines.length, startIndex + 8); index += 1) {
+    const line = lines[index];
+    if (looksLikeTrackingValue(line) && (!valuePattern || valuePattern.test(line))) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function valueAfterLabel(lines, startIndex, labelPattern, valuePattern) {
+  for (let index = Math.max(0, startIndex); index < Math.min(lines.length, startIndex + 12); index += 1) {
+    const line = lines[index];
+    const compact = line.match(new RegExp(`${labelPattern.source}\\s+(.+)$`, labelPattern.flags.includes("i") ? "i" : ""));
+    if (compact && looksLikeTrackingValue(compact[1]) && (!valuePattern || valuePattern.test(compact[1]))) {
+      return compact[1];
+    }
+    if (!labelPattern.test(line)) {
+      continue;
+    }
+    const next = lines[index + 1];
+    if (looksLikeTrackingValue(next) && (!valuePattern || valuePattern.test(next))) {
+      return next;
+    }
+  }
+  return "";
+}
+
+function normalizeSourceComponentRows(rows) {
+  return rows
+    .filter((row) => row?.model && Number.isFinite(Number(row.value)))
+    .map((row, index) => ({
+      rank: Number(row.rank) || index + 1,
+      model: row.model,
+      provider: row.provider || "",
+      value: Number(row.value),
+      value_label: row.value_label || String(row.value),
+      change: row.change || "",
+      ...(row.metric ? { metric: row.metric } : {}),
+      ...(row.secondary_value !== undefined ? { secondary_value: Number(row.secondary_value) } : {}),
+      ...(row.secondary_value_label ? { secondary_value_label: row.secondary_value_label } : {}),
+      ...(row.segments && Object.keys(row.segments).length > 0 ? { segments: row.segments } : {})
+    }));
+}
+
+function looksLikeTrackingValue(value) {
+  const text = String(value || "").trim();
+  return /^\$?\d[\d,]*(?:\.\d+)?\s*(?:[KMGTP]|\w+)?(?:\s*tokens?)?$/i.test(text);
+}
+
+function parseTrackingNumericValue(value) {
+  const text = String(value || "").replace(/,/g, "").trim();
+  const amount = Number((text.match(/\d+(?:\.\d+)?/) || [0])[0]);
+  if (!Number.isFinite(amount)) {
+    return 0;
+  }
+  const unit = String((text.match(/\b([KMGTP])(?:\b|(?=\s*tokens?))/i) || [])[1] || "").toUpperCase();
+  const multiplier = unit === "T" ? 1_000_000_000_000 : unit === "G" ? 1_000_000_000 : unit === "M" ? 1_000_000 : unit === "K" ? 1_000 : 1;
+  return amount * multiplier;
+}
+
+function normalizeModelKey(value) {
+  return cleanText(value).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
 async function captureDailyTrackingPageEvidence(options = {}) {

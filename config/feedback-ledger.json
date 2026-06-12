@@ -644,6 +644,142 @@
         "test_name": "report:draft promotes original Anthropic Fable/Mythos launch over platform availability duplicates",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-link-icon-resolver",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Resolve public link icons deterministically",
+      "problem": "Public report cards could fall back to first-letter generated icons even for known domains, making source identity look broken or inconsistent.",
+      "expected_behavior": "All public links go through a unified resolver: explicit icon, unified GitHub icon for GitHub URLs, cached source/domain icon, and only then recorded generated initials fallback.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/link-icons.js",
+        "src/interaction-report.js",
+        "src/source-icon-cache.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "icon resolver uses link domain icons and records fallback metadata",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-github-readme-enrichment",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Enrich GitHub Trending from README",
+      "problem": "GitHub Trending cards could describe repositories with one shallow sentence, duplicate tag text, or no useful explanation of the project's core README content.",
+      "expected_behavior": "GitHub Trending descriptions prefer cached README-level Chinese summaries keyed by repo, branch, and sha; summaries explain capability, use case, and maturity signals while remaining bounded.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/github-readme.js",
+        "src/draft.js",
+        "schemas/report.schema.json",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "GitHub Trending enriches descriptions from cached README summaries",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-chinese-media-dynamics",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Publish Chinese media dynamics",
+      "problem": "Machine Heart, QbitAI, and SSPAI updates could be absent or reduced to a tiny slot, even when users wanted all in-window Chinese media dynamics summarized.",
+      "expected_behavior": "QbitAI and SSPAI use direct RSS, Machine Heart uses a non-RSS HTML/API-style entry, and every in-window entry from those sources is summarized around 200 Chinese characters in an independent public section with source status disclosure.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "config/sources/intermediary-sources.json",
+        "src/chinese-media.js",
+        "src/discovery.js",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "schemas/report.schema.json",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-official-org-updates-section",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Separate official organization updates",
+      "problem": "Official lab/company/product updates could be mixed into Builder/X discussion, making official organization signals hard to scan.",
+      "expected_behavior": "Official organization updates from official company/news/account sources render in a dedicated public section and are not mixed into personal Builder/X observation cards.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/official-updates.js",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "schemas/report.schema.json",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "official organization updates render separately from Builder observations",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-platform-unconfigured-degraded",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Disclose unconfigured platform sources",
+      "problem": "WeChat or Zhihu without a real configured entrypoint could silently disappear or be mistaken for a healthy no-signal run.",
+      "expected_behavior": "Placeholder, missing-base-url, or kill-switched WeChat/Zhihu sources keep daily publishing possible but set explicit degraded quality reasons and public affected sections.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/quality-status.js",
+        "src/platform-exempt.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "unconfigured WeChat and Zhihu sources degrade without blocking publish",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-tracking-component-reconstruction",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Rebuild tracking components locally",
+      "problem": "OpenRouter and Artificial Analysis tracking could regress to screenshots, plain text tables, or opaque raw-page dumps instead of local interactive components with traceable source data.",
+      "expected_behavior": "Daily tracking items emit `tracking_component_snapshot` with normalized tabs, series, rows, hashes, fallback reasons, and public trace; source snapshots preserve OpenRouter weekly history and Artificial Analysis score/token/cost/scatter tab data when collected; the public page renders local tabs, linear/log controls, hover data, stacked/history rows, and trace without third-party runtime JS or raw DOM exposure.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "schemas/report.schema.json",
+        "src/tracking-components.js",
+        "src/draft.js",
+        "src/report.js",
+        "src/interaction-report.js",
+        ".codex/skills/effective-interact/scripts/create-interaction.mjs",
+        ".codex/skills/effective-interact/assets/components/interaction-ui.css",
+        ".codex/skills/effective-interact/assets/components/interaction-ui.js",
+        "tests/unit.test.js",
+        "tests/skills.test.js",
+        "tests/e2e/site.e2e.js"
+      ],
+      "validation": {
+        "command": "npm run test",
+        "test_name": "collectContentSources stores Artificial Analysis token cost and scatter tabs",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

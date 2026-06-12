@@ -833,6 +833,233 @@ test("effective-interact filterable cards render card stats, bars, and tables", 
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
+test("effective-interact filterable cards render local tracking components and public trace", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-component-"));
+  const inputPath = path.join(tmp, "tracking-component.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-06-12",
+      summary: "Tracking component visual check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Daily Tracking",
+          group: "signals",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "model usage",
+              title: "OpenRouter",
+              href: "https://openrouter.ai/rankings",
+              body: "Local component rebuilt from normalized source data.",
+              component: {
+                kind: "openrouter_rankings",
+                source: "OpenRouter",
+                sourceUrl: "https://openrouter.ai/rankings",
+                collectedAt: "2026-06-12T02:00:00+08:00",
+                tabs: [
+                  { id: "top-models", label: "Top Models", view: "stacked_bar", status: "complete" },
+                  { id: "leaderboard", label: "LLM Leaderboard", view: "leaderboard", status: "complete" }
+                ],
+                series: [
+                  {
+                    id: "top-models",
+                    tabId: "top-models",
+                    chart: "stacked_bar",
+                    rows: [
+                      {
+                        rank: 1,
+                        label: "DeepSeek V4 Flash",
+                        model: "DeepSeek V4 Flash",
+                        provider: "deepseek",
+                        value: 4500000000000,
+                        valueLabel: "4.5T tokens",
+                        change: "+55%",
+                        metric: "2026-06-12"
+                      },
+                      { rank: 2, model: "Claude Sonnet 4.6", provider: "anthropic", value: 1770000000000, valueLabel: "1.77T tokens", change: "", metric: "2026-06-12" },
+                      { rank: 3, model: "MiniMax M3", provider: "minimax", value: 1220000000000, valueLabel: "1.22T tokens", change: "", metric: "2026-06-12" },
+                      { rank: 1, model: "DeepSeek V4 Flash", provider: "deepseek", value: 2900000000000, valueLabel: "2.9T tokens", change: "", metric: "2026-06-05" },
+                      { rank: 2, model: "Claude Sonnet 4.6", provider: "anthropic", value: 1410000000000, valueLabel: "1.41T tokens", change: "", metric: "2026-06-05" },
+                      { rank: 3, model: "MiniMax M3", provider: "minimax", value: 910000000000, valueLabel: "910B tokens", change: "", metric: "2026-06-05" },
+                      { rank: 1, model: "DeepSeek V4 Flash", provider: "deepseek", value: 2400000000000, valueLabel: "2.4T tokens", change: "", metric: "2026-05-29" }
+                    ]
+                  }
+                ],
+                rows: [
+                  {
+                    rank: 1,
+                    model: "DeepSeek V4 Flash",
+                    provider: "deepseek",
+                    value: 4500000000000,
+                    value_label: "4.5T tokens",
+                    change: "+55%"
+                  }
+                ],
+                trace: {
+                  sourceUrl: "https://openrouter.ai/rankings",
+                  collectedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "openrouter-rankings-v1",
+                  dataHash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  rawDomHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                  cacheStatus: "live",
+                  topRows: [{ rank: 1, model: "DeepSeek V4 Flash", provider: "deepseek" }],
+                  diff: { status: "first_snapshot", changedRows: [] }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "tracking-component", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-tracking-component/);
+  assert.match(html, /data-component-kind="openrouter_rankings"/);
+  assert.match(html, /data-scale-mode="linear"/);
+  assert.match(html, /data-scale-mode="log"/);
+  assert.match(html, /data-tracking-tooltip/);
+  assert.match(html, /data-tracking-stack/);
+  assert.match(html, /2026-06-12/);
+  assert.match(html, /data-tracking-trace/);
+  assert.match(html, /sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/);
+  assert.doesNotMatch(html, /raw_dom/i);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
+test("effective-interact renders Artificial Analysis collected tabs without fallback panels", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-aa-component-"));
+  const inputPath = path.join(tmp, "aa-component.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-06-12",
+      summary: "AA component visual check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Daily Tracking",
+          group: "signals",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "model benchmark",
+              title: "Artificial Analysis",
+              href: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+              body: "Local component rebuilt from score, token and cost tabs.",
+              component: {
+                kind: "artificial_analysis_index",
+                source: "Artificial Analysis",
+                sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+                collectedAt: "2026-06-12T02:00:00+08:00",
+                tabs: [
+                  { id: "score", label: "Score", view: "score_table", status: "complete" },
+                  { id: "token-usage", label: "Token Usage", view: "stacked_bar", status: "complete" },
+                  { id: "cost", label: "Cost", view: "stacked_bar", status: "complete" },
+                  { id: "score-vs-cost", label: "Score vs. Cost", view: "scatter", status: "complete" }
+                ],
+                series: [
+                  {
+                    id: "aa-score",
+                    tabId: "score",
+                    chart: "score_table",
+                    rows: [
+                      { rank: 1, model: "Claude Opus 4.8", provider: "anthropic", value: 61, valueLabel: "61 分", change: "AA Index" }
+                    ]
+                  },
+                  {
+                    id: "aa-token",
+                    tabId: "token-usage",
+                    chart: "stacked_bar",
+                    rows: [
+                      { rank: 1, model: "Claude Opus 4.8", provider: "anthropic", value: 676000000, valueLabel: "676M", change: "", metric: "Token Usage" }
+                    ]
+                  },
+                  {
+                    id: "aa-cost",
+                    tabId: "cost",
+                    chart: "stacked_bar",
+                    rows: [
+                      { rank: 1, model: "Claude Opus 4.8", provider: "anthropic", value: 4309, valueLabel: "$4,309", change: "", metric: "Cost" }
+                    ]
+                  },
+                  {
+                    id: "aa-score-cost",
+                    tabId: "score-vs-cost",
+                    chart: "scatter",
+                    rows: [
+                      { rank: 1, model: "Claude Opus 4.8", provider: "anthropic", value: 61, valueLabel: "61 分 / $4,309", change: "", metric: "Score vs. Cost", secondaryValue: 4309, secondaryValueLabel: "$4,309" }
+                    ]
+                  }
+                ],
+                rows: [
+                  { rank: 1, model: "Claude Opus 4.8", provider: "anthropic", value: 61, value_label: "61 分", change: "AA Index" }
+                ],
+                trace: {
+                  sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+                  collectedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "artificial-analysis-index-v1",
+                  dataHash: "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                  rawDomHash: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+                  cacheStatus: "live",
+                  topRows: [{ rank: 1, model: "Claude Opus 4.8", provider: "anthropic" }],
+                  diff: { status: "first_snapshot", changedRows: [] }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "aa-component", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-component-kind="artificial_analysis_index"/);
+  assert.match(html, /Token Usage/);
+  assert.match(html, /\$4,309/);
+  assert.match(html, /61 分 \/ \$4,309/);
+  assert.doesNotMatch(html, /source_tab_not_collected/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact filterable cards can hide visual group labels", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hidden-card-group-"));
   const inputPath = path.join(tmp, "hidden-card-group.json");

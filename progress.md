@@ -1,64 +1,160 @@
 # Progress
 
+## 2026-06-12 Batch 3 Live Tracking Adapters
+
+- Status: Batch 3 live tracking adapters are implemented and verified.
+- Added source-backed snapshot extensions:
+  - OpenRouter `history_entries` for weekly stacked usage rows.
+  - Artificial Analysis `component_tabs` for Score, Token Usage, Cost, Score vs. Token Usage, Score vs. Cost, and Score vs. Compute when source text exposes those values.
+- Updated `src/discovery.js` to parse those extended source snapshots from page text/HTML-like captures.
+- Updated `src/draft.js` sanitizer so extended snapshot fields survive source audit to `daily_tracking`.
+- Updated `src/tracking-components.js` so OpenRouter top-models uses historical rows when present and AA tabs stop falling back when source tab rows exist.
+- Extended effective-interact renderer/CSS for grouped stacked rows with hover data and mobile-safe layout.
+- Updated `schemas/report.schema.json`, `config/feedback-ledger.json`, and `docs/feedback-buglist-quick-reference.md`.
+
+### Batch 3 Red Evidence
+
+| Command | Status | Evidence |
+|---|---|---|
+| `node --test tests/unit.test.js --test-name-pattern "collectContentSources stores OpenRouter weekly history|collectContentSources stores Artificial Analysis token cost and scatter tabs"` | red | Failed because `snapshot.history_entries` and `snapshot.component_tabs` were undefined. |
+
+### Batch 3 Green Evidence So Far
+
+| Command | Status | Evidence |
+|---|---|---|
+| `node --test tests/unit.test.js --test-name-pattern "collectContentSources stores OpenRouter weekly history|collectContentSources stores Artificial Analysis token cost and scatter tabs"` | pass | Both extended source snapshot tests passed. |
+| `node --test tests/skills.test.js --test-name-pattern "effective-interact filterable cards render local tracking components|effective-interact renders Artificial Analysis collected tabs"` | pass | OpenRouter stacked rows and AA non-fallback tabs rendered and validated. |
+| `node --test tests/unit.test.js tests/skills.test.js` | pass | 274 passed, 1 skipped. |
+| `npm run build` | pass | Rebuilt public docs after schema/render changes. |
+| `npm run quality:page-check -- 2026-06-12 docs .tmp/page-check-2026-06-12-batch3.json` | pass | Desktop 1280x900 and mobile 375x812 page checks passed. |
+| `npm run test:e2e` | pass | Public page E2E passed. |
+| `npm run validate` | pass | Full repository gate passed: harness, feedback, workflow, sources, tests, build, privacy, E2E, and `git diff --check`. |
+
+## 2026-06-12 Batch 2 Tracking Components
+
+- Status: Batch 2 foundation is implemented and verified.
+- Implemented `src/tracking-components.js` for deterministic `tracking_component_snapshot` generation, public trace shaping, data hashes, fallback reasons, and interaction-card component input.
+- Wired component snapshots through `src/draft.js`, `src/report.js`, `src/interaction-report.js`, and `schemas/report.schema.json`.
+- Added effective-interact rendering for local tracking components: tabs, linear/log scale buttons, hover tooltip attributes, leaderboard/table view, fallback panels, and trace details without third-party runtime JS.
+- Added CSS/JS support in `.codex/skills/effective-interact/assets/components/interaction-ui.css` and `.codex/skills/effective-interact/assets/components/interaction-ui.js`.
+- Added durable feedback item `feedback/p1-tracking-component-reconstruction` and quick-reference row.
+- Added tests in `tests/unit.test.js`, `tests/skills.test.js`, and `tests/e2e/site.e2e.js`.
+
+### Batch 2 Red Evidence
+
+| Command | Status | Evidence |
+|---|---|---|
+| `node --test tests/unit.test.js --test-name-pattern "tracking component snapshot exposes OpenRouter and Artificial Analysis trace data"` | red | Failed with `ERR_MODULE_NOT_FOUND` for `src/tracking-components.js`. |
+| `node --test tests/skills.test.js --test-name-pattern "effective-interact filterable cards render local tracking components and public trace"` | red | Generated HTML lacked `data-tracking-component`. |
+
+### Batch 2 Green Evidence
+
+| Command | Status | Evidence |
+|---|---|---|
+| `node scripts/validate-feedback-contract.mjs` | pass | Returned `{ ok: true, failures: [] }`. |
+| `node --test tests/unit.test.js tests/skills.test.js` | pass | 271 passed, 1 skipped. |
+| `npm run sources:validate` | pass | 148 source registry entries validated. |
+| `npm run build` | pass | Rebuilt public docs for 30 report dates. |
+| `npm run quality:page-check -- 2026-06-12 docs .tmp/page-check-2026-06-12-batch2.json` | pass | Desktop 1280x900 and mobile 375x812 checks passed. |
+| `npm run test:e2e` | pass | E2E passed, including tracking component tabs/scale/tooltip/trace checks. |
+| `npm run validate` | pass | Full repository gate passed: harness, feedback, workflow, sources, tests, build, privacy, E2E, and `git diff --check`. |
+
+### Batch 2 Residual Risk
+
+- Artificial Analysis Token Usage/Cost/Scatter tabs are now explicit component tabs with `source_tab_not_collected` fallback when source snapshots do not yet carry those values.
+- OpenRouter local component currently reconstructs ranked usage bars and leaderboard from available snapshot rows; historical stacked-by-week series still needs a stable source-data adapter.
+
 ## Current State
 
-- Active task: 落地 2026-06-11 日报审阅反馈的硬门禁、生成规范和测试边界。
-- Status: implementation complete, validation complete.
-- Scope completed in current worktree: source registry, discovery, draft selection, quality gates, public rendering, schemas, tests, feedback ledger, runbook/prompt contracts, generated docs build output.
-- No real publish was run in this task. No automation config or remote Pages settings were changed.
+- Active task: implement AI daily content quality plan Batch 1 plus Batch 2 tracking component foundation.
+- Status: Batch 1 and Batch 2 foundation implementation are complete; final full `npm run validate` passed after harness updates.
+- No daily publish runner was executed in this task.
+- Batch 2 local tracking component foundation is implemented. Remaining work is deeper live source adapters for Artificial Analysis token/cost/scatter tabs and OpenRouter historical stacked-by-week series.
 
 ## Completed
 
-- Added semantic media policy in `src/media-policy.js`; evidence cache and public site now reject decorative/non-semantic public images.
-- Added China AI source registry and runner/discovery stages; strict reports from `2026-06-11` require China AI source audit proof.
-- Added Hugging Face Trending discovery, schema support, draft selection and public section.
-- Added Chinese/China AI hot blog slot behavior.
-- Added structured OpenRouter/Artificial Analysis public table rendering and tests.
-- Compact Builder/X cards now truncate original posts and reduce whitespace.
-- Public source coverage now renders visual summary tags plus collapsed source visit details.
-- Added 7 P1 feedback ledger entries and quick-reference rows.
-- Added and expanded unit/publish tests for all new gates.
-- Fixed publish credential fallback test determinism by honoring `options.env`.
+- Reviewed `config/feedback-ledger.json` and `docs/feedback-buglist-quick-reference.md` before implementation.
+- Rewrote the active SDD/TDD spec in `tasks/current-task.md` around the user-aligned plan.
+- Added red unit tests before production implementation.
+- Recorded the initial red failure for the icon resolver contract.
+- Implemented Batch 1 production modules:
+  - `src/link-icons.js`
+  - `src/github-readme.js`
+  - `src/chinese-media.js`
+  - `src/official-updates.js`
+- Wired Batch 1 into report generation and rendering:
+  - `src/draft.js`
+  - `src/report.js`
+  - `src/site.js`
+  - `src/interaction-report.js`
+  - `src/importance.js`
+- Updated schema support in `schemas/report.schema.json`.
+- Updated source configuration:
+  - QbitAI direct RSS remains enabled.
+  - SSPAI direct RSS is enabled.
+  - Machine Heart uses `https://www.jiqizhixin.com/articles` as a non-RSS source entry.
+- Added long-lived feedback ledger coverage:
+  - `feedback/p1-link-icon-resolver`
+  - `feedback/p1-github-readme-enrichment`
+  - `feedback/p1-chinese-media-dynamics`
+  - `feedback/p1-official-org-updates-section`
+  - `feedback/p1-platform-unconfigured-degraded`
+- Updated `docs/feedback-buglist-quick-reference.md`.
+- Ran build and refreshed generated public report JSON/HTML under `docs/data/**` and `docs/reports/**`.
+- Ran desktop and mobile page check for the 2026-06-12 report.
+- Refreshed harness files to match actual Batch 1 implementation state.
+
+## Not Included In This Task
+
+- Daily publish runner.
+- Git commit, push, or GitHub Pages settings changes.
+- Artificial Analysis live Token Usage, Cost, and scatter extraction adapter.
+- OpenRouter historical stacked-by-week extraction adapter.
+
+## Batch 2 Red/Green Flow
+
+### Contract And Static Tests
+
+- Red: missing `tracking_component_snapshot` module/schema and public trace fields.
+- Green: schema/static validators accept normalized snapshots and public trace while keeping raw DOM out of public output.
+
+### Unit Tests
+
+- Red: OpenRouter/AA tracking component helpers and trace diff helpers are missing.
+- Green: available snapshot data produces stable tabs, rows, hashes, cache status, and fallback reasons.
+
+### Integration Tests
+
+- Red: draft/build paths do not emit component snapshots.
+- Green: report JSON includes OpenRouter/AA component snapshots and public trace objects.
+
+### E2E And Visual Tests
+
+- Red: public page lacks local interactive components or hover/tabs.
+- Green: desktop/mobile checks prove components are nonblank, not screenshot-dependent, have tabs/scale/tooltip/trace, and have no overlap.
 
 ## Validation Records
 
 | Command | Status | Evidence |
 |---|---|---|
-| `node --check ...` | pass | Touched JS and tests parse successfully. |
-| JSON parse for changed config/schema/prompt files | pass | `json ok` |
-| `node scripts/validate-feedback-contract.mjs` | pass | `{"ok":true,"failures":[]}` |
-| `node scripts/harness-validate.mjs` | pass | `Harness validation passed.` |
-| `npm run sources:validate` | pass | `source_count: 148` |
-| `npm run workflow:validate` | pass | `ok: true` |
+| `node --test tests/unit.test.js --test-name-pattern "icon resolver uses link domain icons and records fallback metadata"` | red | Failed with `ERR_MODULE_NOT_FOUND` for `src/link-icons.js`, proving the new resolver contract was absent before implementation. |
+| `node --test tests/unit.test.js` | pass | 248 tests passed after implementing Batch 1 modules and schema wiring. |
+| `node scripts/validate-feedback-contract.mjs` | pass | Returned `{ ok: true, failures: [] }`. |
+| `npm run sources:validate` | pass | Source registry validated; QbitAI/SSPAI/Machine Heart source decisions accepted. |
+| `npm run build` | pass | Generated public `docs/data/**` and `docs/reports/**` artifacts without build failure. |
+| `npm run quality:page-check -- 2026-06-12 docs .tmp/page-check-2026-06-12-batch1.json` | pass | Desktop 1280x900 and mobile 375x812 checks passed; no overlap or horizontal overflow reported. |
+| `npm run test:e2e` | pass | E2E suite completed successfully. |
 | `git diff --check` | pass | No whitespace errors. |
-| `node --test tests/publish.test.js` | pass | 45/45 tests pass. |
-| `npm run test` | pass | 308/308 tests pass. |
-| `npm run build` | pass | Latest local report set builds through 2026-06-10. |
-| `npm run quality:page-check -- 2026-06-10 docs .tmp/page-check-2026-06-10-hard-gates.json` | pass | Desktop 1280x900 and mobile 375x812 pass. |
-| Playwright visual screenshots | pass | Desktop/mobile latest build checked; no horizontal overflow or obvious overlap. |
-| `npm run privacy:validate` | pass | 105 files checked, 0 findings. |
-| `npm run test:e2e` | pass | exit 0. |
-| `npm run validate` | pass | Full repository gate passed. |
-
-## Page Check Artifacts
-
-- `C:\Users\Admin\.codex\worktrees\c81c\ai-daily-cn\.tmp\page-check-2026-06-10-hard-gates.json`
-- `C:\Users\Admin\.codex\worktrees\c81c\ai-daily-cn\.tmp\visual-2026-06-10-desktop-top.png`
-- `C:\Users\Admin\.codex\worktrees\c81c\ai-daily-cn\.tmp\visual-2026-06-10-desktop-tracking.png`
-- `C:\Users\Admin\.codex\worktrees\c81c\ai-daily-cn\.tmp\visual-2026-06-10-mobile-tracking.png`
-
-## Notes
-
-- Current local `reports-data` only contains reports through `2026-06-10`; therefore page verification used the latest locally buildable report. The next real `2026-06-11` runner output must be checked with the same hard-gate page-check once generated.
-- `npm run build` regenerated `docs/data/**` and `docs/reports/**` from source data after renderer changes. These are generated publish artifacts, not manual HTML edits.
+| `npm run validate` | pass | Full repository gate passed: harness, feedback, workflow, sources, tests, build, privacy, E2E, and `git diff --check`. |
+| `node scripts/harness-validate.mjs` | pass | Included in `npm run validate`; `Harness validation passed.` |
 
 ## Blockers
 
-- None for the current implementation and validation.
+- None for Batch 1.
 
 ## Residual Risk
 
-- Chinese official sites may use dynamic rendering, anti-bot behavior, redirects, or region-dependent content. The code records checked/skipped/failure states, but live source availability still depends on network conditions.
-- Search provider tokens remain optional; missing tokens should degrade search breadth, not skip fixed Chinese official source checks.
-- Hugging Face page structure can change; parser has HTML/JSON fallbacks but should be watched after live runner use.
-- The 2026-06-11 real report has not been generated or published in this task.
+- Machine Heart extraction is currently configured as a non-RSS source entry; a dedicated dynamic adapter may still be needed if the static HTML route changes or blocks extraction.
+- GitHub README enrichment has deterministic/cache contract wiring; live README fetching and LLM generation policy should be hardened in the next data-collection pass.
+- OpenRouter/AA local component foundation is landed, but the current data adapters do not yet provide every original-site data series. Do not describe AA Token Usage/Cost/scatter or OpenRouter historical stacked-by-week as fully sourced until those adapters are added.
+- Generated historical report artifacts changed because `npm run build` refreshed public outputs after schema/render changes.
