@@ -4922,6 +4922,33 @@ test("quality review rejects templated builder translations", async () => {
   assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
 });
 
+test("quality review rejects builder translations that are too weak for rendered cards", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Boris Cherny",
+      handle: "bcherny",
+      original_text: "Hello from Code with Claude Tokyo!!",
+      translation: "来自 Code with Claude Tokyo 的问候。",
+      content: "来自 Code with Claude Tokyo 的问候。",
+      url: "https://x.com/bcherny/status/2064885111477219664"
+    }
+  ];
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const weakIssues = review.issues.filter((issue) => issue.code === "builder_translation_too_weak");
+
+  assert.equal(review.ok, false);
+  assert.deepEqual(weakIssues.map((issue) => issue.path).sort(), [
+    "builder_observations[0].content",
+    "builder_observations[0].translation"
+  ]);
+  assert(weakIssues.every((issue) => issue.details.chinese_chars < 10));
+  assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite" && task.path === "builder_observations[0].translation"));
+  assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
+});
+
 test("quality review rejects templated impact and watch prose in public body", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {

@@ -43,6 +43,8 @@ const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
 const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_MAX_LATIN_CHARS = 90;
+const BUILDER_TRANSLATION_MIN_CHINESE_CHARS = 10;
+const BUILDER_TRANSLATION_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_GENERIC_TEMPLATE_RE = /(?:重点看|如果你在评估新工具|值不值得试|何时接入|风险放在哪|决策信号)/u;
 const PUBLIC_TITLE_MAX_LATIN_CHARS = 24;
 const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
@@ -812,25 +814,67 @@ function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
       });
     }
     for (const [fieldName, value] of [["translation", translation], ["content", content]]) {
-      if (!value || !BUILDER_TEMPLATE_TRANSLATION_RE.test(value)) {
+      if (!value) {
         continue;
       }
       const path = `builder_observations[${index}].${fieldName}`;
-      issues.push({
-        code: "builder_translation_template",
-        severity: "error",
-        path,
-        message: "Builder observation must use a concrete Chinese translation, not a generic template or repair placeholder.",
-        repairable: true
-      });
-      aiReviewTasks.push({
-        kind: "builder_translation_rewrite",
-        path,
-        source_path: `builder_observations[${index}].original_text`,
-        instruction: "Translate original_text directly into Chinese. Preserve meaning, names, numbers, links and tone; do not summarize into a generic Builder observation."
-      });
+      if (BUILDER_TEMPLATE_TRANSLATION_RE.test(value)) {
+        issues.push({
+          code: "builder_translation_template",
+          severity: "error",
+          path,
+          message: "Builder observation must use a concrete Chinese translation, not a generic template or repair placeholder.",
+          repairable: true
+        });
+        aiReviewTasks.push({
+          kind: "builder_translation_rewrite",
+          path,
+          source_path: `builder_observations[${index}].original_text`,
+          instruction: "Translate original_text directly into Chinese. Preserve meaning, names, numbers, links and tone; do not summarize into a generic Builder observation."
+        });
+      }
+      const readerFacing = builderTranslationReaderFacingStats(value);
+      if (!readerFacing.ok) {
+        issues.push({
+          code: "builder_translation_too_weak",
+          severity: "error",
+          path,
+          message: "Builder observation translation must be substantial Chinese reader-facing text before page rendering.",
+          repairable: true,
+          details: readerFacing.details
+        });
+        aiReviewTasks.push({
+          kind: "builder_translation_rewrite",
+          path,
+          source_path: `builder_observations[${index}].original_text`,
+          instruction: "Translate original_text into concrete Chinese for the public Builder card. Preserve names, numbers, links and tone; for very short posts, include the speaker or event context already present in the item so the rendered body has enough Chinese reader-facing text."
+        });
+      }
     }
   });
+}
+
+function builderTranslationReaderFacingStats(value) {
+  const bodyText = String(value || "").trim();
+  const textWithoutUrls = bodyText.replace(/https?:\/\/\S+/gi, "").trim();
+  const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
+  const latinChars = (bodyText.match(/[A-Za-z]/g) || []).length;
+  const ratioBase = chineseChars + latinChars;
+  const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+  const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
+  const ok =
+    bodyText.length > 0 &&
+    chineseChars >= BUILDER_TRANSLATION_MIN_CHINESE_CHARS &&
+    chineseRatio >= BUILDER_TRANSLATION_MIN_CHINESE_RATIO &&
+    !longEnglishRun;
+  return {
+    ok,
+    details: {
+      chinese_chars: chineseChars,
+      chinese_ratio: Number(chineseRatio.toFixed(3)),
+      long_english_run: longEnglishRun
+    }
+  };
 }
 
 function buildChecklist(issues, aiReviewTasks, context = {}) {
@@ -855,8 +899,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "builder_translation",
-      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch") && !failedCodes.has("builder_translation_template"),
-      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") || failedCodes.has("builder_translation_template") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
+      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch") && !failedCodes.has("builder_translation_template") && !failedCodes.has("builder_translation_too_weak"),
+      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") || failedCodes.has("builder_translation_template") || failedCodes.has("builder_translation_too_weak") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
     },
     {
       id: "content_density",
