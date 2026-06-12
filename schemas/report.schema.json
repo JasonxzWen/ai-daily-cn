@@ -141,6 +141,13 @@
       },
       "default": []
     },
+    "huggingface_trending": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/huggingface_trending_item"
+      },
+      "default": []
+    },
     "main_items": {
       "type": "array",
       "items": {
@@ -288,6 +295,7 @@
         "official_company_news",
         "official_open_source_account",
         "official_model_host_account",
+        "model_registry",
         "platform_exempt_signal"
       ]
     },
@@ -408,6 +416,9 @@
         },
         "asset_role": {
           "enum": ["content", "chart", "diagram", "table", "icon", "favicon", "logo", "avatar", "decorative"]
+        },
+        "asset_kind": {
+          "enum": ["semantic", "leaderboard", "benchmark", "chart", "diagram", "table", "product_screenshot"]
         },
         "capture_kind": {
           "enum": ["source_asset", "source_image", "page_screenshot", "browser_screenshot", "full_page_screenshot", "viewport_screenshot"]
@@ -947,6 +958,73 @@
         },
         "trend": {
           "enum": ["new", "up", "down", "same"]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "huggingface_trending_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "repo", "description", "url", "event_date", "source", "rank", "trend"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
+        "importance": {
+          "$ref": "#/$defs/importance"
+        },
+        "editorial_category": {
+          "$ref": "#/$defs/editorial_category"
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "verification_status": {
+          "$ref": "#/$defs/verification_status"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task": {
+          "type": "string"
+        },
+        "downloads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "likes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "trend": {
+          "enum": ["trending", "new", "up", "down", "same"]
         },
         "evidence": {
           "type": "string",
@@ -1629,7 +1707,13 @@
         "github_trending": {
           "$ref": "#/$defs/source_audit_group"
         },
+        "huggingface_trending": {
+          "$ref": "#/$defs/source_audit_group"
+        },
         "builder_sources": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "china_ai_sources": {
           "$ref": "#/$defs/source_audit_group"
         },
         "content_sources": {

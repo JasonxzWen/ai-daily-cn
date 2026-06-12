@@ -1,5 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  isMeaningfulImageCandidate,
+  meaningfulImageKind,
+  publicEvidenceAssetRole
+} from "./media-policy.js";
 import { normalizeUrlIdentity } from "./url.js";
 
 const DEFAULT_MAX_ASSETS = 4;
@@ -87,7 +92,8 @@ export async function cacheEvidenceImages(options = {}) {
         extraction_status: "source_image",
         ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
         byte_size: bytes.length,
-        asset_role: "content",
+        asset_role: publicEvidenceAssetRole(candidate),
+        asset_kind: meaningfulImageKind(candidate) || "semantic",
         capture_kind: "source_asset"
       });
     } catch (error) {
@@ -158,6 +164,7 @@ function selectImageCandidates(candidates, maxAssets, existingSourceUrls = new S
   const seenUrls = new Set();
   const ranked = candidates
     .filter((candidate) => candidate?.image_url && candidate?.url)
+    .filter(isMeaningfulImageCandidate)
     .filter((candidate) => !existingSourceUrls.has(normalizeUrl(candidate.url)))
     .filter((candidate) => {
       const key = normalizeUrl(candidate.url);

@@ -19,8 +19,18 @@ import {
   requirePlatformExemptItemContract,
   sectionForPlatformCategory
 } from "./platform-exempt.js";
+import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 
-const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS];
+const REQUIRED_AUDIT_GROUPS = [
+  "github_trending",
+  "huggingface_trending",
+  "builder_sources",
+  "china_ai_sources",
+  "content_sources",
+  "search_sources",
+  "sources_health",
+  ...PLATFORM_AUDIT_GROUPS
+];
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
 const PRIMARY_STATUSES = new Set(["primary_confirmed", "multi_source_confirmed"]);
 const REPORT_AUDIT_GROUP_FIELDS = new Set([
@@ -67,7 +77,8 @@ const TRUSTED_PRIMARY_SOURCE_LEVELS = new Set([
   "multi_source",
   "official_company_news",
   "official_open_source_account",
-  "official_model_host_account"
+  "official_model_host_account",
+  "model_registry"
 ]);
 const READER_RELEVANT_SOURCE_LEVELS = new Set([
   "official_company_news",
@@ -85,6 +96,7 @@ const MAIN_ITEM_RECENT_HISTORY_SECTIONS = [
 ];
 const MAIN_TARGET = 10;
 const GITHUB_TRENDING_TARGET = 10;
+const HUGGINGFACE_TRENDING_TARGET = 10;
 const PROJECT_TARGET = 10;
 const HOT_BLOG_TARGET = 8;
 const BUILDER_OBSERVATION_TARGET = 12;
@@ -175,6 +187,7 @@ export async function generateReportDraft(options = {}) {
       candidates: candidatePool.candidates.length,
       main_items: reportWithSourceSuggestions.main_items.length,
       github_trending: reportWithSourceSuggestions.github_trending.length,
+      huggingface_trending: reportWithSourceSuggestions.huggingface_trending.length,
       hot_blogs: reportWithSourceSuggestions.hot_blogs.length,
       daily_tracking: reportWithSourceSuggestions.daily_tracking.length,
       projects: reportWithSourceSuggestions.projects.length,
@@ -263,6 +276,14 @@ function selectReportItems(merged, options = {}) {
     selectedIds.add(candidate.id);
     return githubTrendingItem(trendCandidate, meta, index);
   });
+  const huggingFacePool = candidates
+    .filter((candidate) => candidate.category === "huggingface_trending" && !selectedIds.has(candidate.id))
+    .sort(compareHuggingFaceTrendingCandidates);
+  const huggingFaceTrending = huggingFacePool.slice(0, HUGGINGFACE_TRENDING_TARGET).map((candidate, index) => {
+    const selected = markIncludedCandidate(candidate, "huggingface_trending", "huggingface_trending");
+    selectedIds.add(candidate.id);
+    return huggingFaceTrendingItem(selected, index);
+  });
 
   const mainPool = candidates
     .filter((candidate) => !selectedIds.has(candidate.id))
@@ -306,6 +327,11 @@ function selectReportItems(merged, options = {}) {
     .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
     .filter((candidate) => canPromoteToHotBlog(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
+  const chinaHotBlogFallbackPool = candidates
+    .filter((candidate) => !selectedIds.has(candidate.id))
+    .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
+    .filter((candidate) => canFallbackToChinaAiHotBlog(candidate, reportDate))
+    .sort((left, right) => candidateScore(right) - candidateScore(left));
   const hotBlogSeeds = [];
   const enforceHotBlogInfraVendorCap = shouldEnforceInfraVendorCap(hotBlogPool, HOT_BLOG_TARGET);
   let hotBlogInfraVendorCount = 0;
@@ -322,6 +348,7 @@ function selectReportItems(merged, options = {}) {
       hotBlogInfraVendorCount += 1;
     }
   }
+  ensureChineseHotBlogSeed(hotBlogSeeds, [...hotBlogPool, ...chinaHotBlogFallbackPool], hotBlogSeenUrls);
   const hotBlogs = hotBlogSeeds.map((candidate) => {
     const hotCandidate = markIncludedCandidate(candidate, "hot_blog", "hot_blogs");
     selectedIds.add(candidate.id);
@@ -383,6 +410,7 @@ function selectReportItems(merged, options = {}) {
     candidates: [...includedCandidates, ...derived],
     main_items: mainItems,
     github_trending: githubTrending,
+    huggingface_trending: huggingFaceTrending,
     hot_blogs: hotBlogs,
     projects,
     builder_observations: builderObservations,
@@ -391,6 +419,7 @@ function selectReportItems(merged, options = {}) {
     eligible_counts: {
       main_items: mainPool.length,
       github_trending: publicGithubCandidates.length,
+      huggingface_trending: huggingFacePool.length,
       hot_blogs: hotBlogPool.length,
       projects: projectSeeds.length,
       builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
@@ -535,6 +564,9 @@ function isPublicEvidenceAssetAllowed(asset) {
   if (width > 0 && height > 0 && (width < 320 || height < 180)) {
     return false;
   }
+  if (!isMeaningfulPublicEvidenceAsset(asset)) {
+    return false;
+  }
   if (/openrouter|artificial analysis|artificialanalysis|rankings|leaderboard|排行榜|榜单/.test(text) && !/(source_asset|source_image|semantic|chart|diagram)/.test(text)) {
     return false;
   }
@@ -590,6 +622,55 @@ function pickMainCandidates(candidates, target) {
   return picked;
 }
 
+function compareHuggingFaceTrendingCandidates(left, right) {
+  const leftRank = Number.isInteger(Number(left.rank)) ? Number(left.rank) : 999;
+  const rightRank = Number.isInteger(Number(right.rank)) ? Number(right.rank) : 999;
+  if (leftRank !== rightRank) {
+    return leftRank - rightRank;
+  }
+  return candidateScore(right) - candidateScore(left);
+}
+
+function ensureChineseHotBlogSeed(hotBlogSeeds, hotBlogPool, seenUrls) {
+  if (hotBlogSeeds.some(isChineseHotBlogCandidate)) {
+    return;
+  }
+  const candidate = hotBlogPool.find((item) => {
+    const key = normalizeUrl(item.url);
+    return isChineseHotBlogCandidate(item) && key && !seenUrls.has(key);
+  });
+  if (!candidate) {
+    return;
+  }
+  const key = normalizeUrl(candidate.url);
+  if (hotBlogSeeds.length < HOT_BLOG_TARGET) {
+    hotBlogSeeds.push(candidate);
+  } else {
+    const replaceIndex = hotBlogSeeds.findIndex((item) => !isStrategicCoreOfficialCandidate(item) && !isChineseHotBlogCandidate(item));
+    hotBlogSeeds[replaceIndex >= 0 ? replaceIndex : hotBlogSeeds.length - 1] = candidate;
+  }
+  if (key) {
+    seenUrls.add(key);
+  }
+}
+
+function isChineseHotBlogCandidate(candidate) {
+  const text = candidateText(candidate);
+  if (/[\u4e00-\u9fff]/u.test(text)) {
+    return true;
+  }
+  return /\b(?:qwen|alibaba|alibabacloud|aliyun|tencent|hunyuan|deepseek|zhipu|glm|kimi|moonshot|minimax|bytedance|baidu|qbitai|jiqizhixin|36kr|infoq\.cn)\b|(?:qwen\.ai|alibabagroup\.com|alibabacloud\.com|tencent\.com|hunyuan\.tencent\.com|deepseek\.com|zhipuai\.cn|kimi\.com|minimax\.io|bytedance\.com|baidu\.com|qbitai\.com|jiqizhixin\.com|36kr\.com|infoq\.cn)/i.test(text);
+}
+
+function isChinaAiSourceLaneCandidate(candidate) {
+  return /^china-ai-/i.test(String(candidate?.source_id || "")) ||
+    /china_ai_sources/i.test(String(candidate?.source_category || candidate?.audit_group || ""));
+}
+
+function isChinaAiCandidate(candidate) {
+  return /\b(?:china-ai|qwen|alibaba|alibabacloud|aliyun|tencent|hunyuan|deepseek|zhipu|glm|kimi|moonshot|minimax|bytedance|baidu)\b|(?:qwen\.ai|alibabagroup\.com|alibabacloud\.com|tencent\.com|hunyuan\.tencent\.com|deepseek\.com|zhipuai\.cn|kimi\.com|minimax\.io|bytedance\.com|baidu\.com)/i.test(candidateText(candidate));
+}
+
 function shouldEnforceInfraVendorCap(candidates, target) {
   const strategicCoreCount = candidates.filter((candidate) => isStrategicCoreOfficialCandidate(candidate)).length;
   const nonInfraCount = candidates.filter((candidate) => !isOverrepresentedInfraVendorCandidate(candidate)).length;
@@ -635,6 +716,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     source_audit: sourceAudit,
     main_items: selection.main_items,
     github_trending: selection.github_trending,
+    huggingface_trending: selection.huggingface_trending,
     model_releases: [],
     hot_blogs: selection.hot_blogs,
     daily_tracking: dailyTrackingItems(reportDate, sourceAudit),
@@ -658,6 +740,10 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
         github_trending: {
           eligible_candidates: selection.eligible_counts?.github_trending || 0,
           selected: selection.github_trending.length
+        },
+        huggingface_trending: {
+          eligible_candidates: selection.eligible_counts?.huggingface_trending || 0,
+          selected: selection.huggingface_trending.length
         },
         hot_blogs: {
           eligible_candidates: selection.eligible_counts?.hot_blogs || 0,
@@ -1191,6 +1277,35 @@ function githubTrendingItem(candidate, meta, index) {
     rank_delta: Number.isInteger(meta.rank_delta) ? meta.rank_delta : null,
     trend: ["new", "up", "down", "same"].includes(meta.trend) ? meta.trend : "new",
     evidence: candidate.evidence || meta.evidence || `${repo} appeared in GitHub Trending.`
+  };
+}
+
+function huggingFaceTrendingItem(candidate, index) {
+  const repo = repoFromUrl(candidate.url) || candidate.title;
+  const task = String(candidate.task || "").trim();
+  const metrics = [
+    Number.isFinite(Number(candidate.likes)) && Number(candidate.likes) > 0 ? `${Number(candidate.likes)} likes` : "",
+    Number.isFinite(Number(candidate.downloads)) && Number(candidate.downloads) > 0 ? `${Number(candidate.downloads)} downloads` : "",
+    task ? `task: ${task}` : ""
+  ].filter(Boolean).join("; ");
+  return {
+    name: repo,
+    repo,
+    candidate_id: candidate.id,
+    description: chineseGithubDescription(candidate.evidence || metrics || repo, repo),
+    url: candidate.url,
+    event_date: candidate.event_date,
+    source: candidate.source || "Hugging Face Trending Models",
+    task,
+    downloads: Number.isFinite(Number(candidate.downloads)) ? Number(candidate.downloads) : 0,
+    likes: Number.isFinite(Number(candidate.likes)) ? Number(candidate.likes) : 0,
+    rank: Number.isInteger(Number(candidate.rank)) ? Number(candidate.rank) : index + 1,
+    trend: "trending",
+    evidence: candidate.evidence || `Hugging Face trending entry for ${repo}.`,
+    editorial_category: "open_source",
+    source_level: "model_registry",
+    verification_status: "primary_confirmed",
+    importance: index < 3 ? "notable" : "general"
   };
 }
 
@@ -1888,6 +2003,8 @@ function auditGroupForCandidate(candidate) {
   }
   const source = `${candidate.source_id || ""} ${candidate.source || ""}`.toLowerCase();
   if (source.includes("github") && source.includes("trending")) return "github_trending";
+  if (candidate.category === "huggingface_trending" || source.includes("huggingface-trending") || source.includes("hugging face trending")) return "huggingface_trending";
+  if (source.includes("china-ai") || isChinaAiCandidate(candidate)) return "china_ai_sources";
   if (source.includes("builder") || source.includes("follow-builders") || candidate.category === "builder_observation") return "builder_sources";
   if (source.startsWith("search-") || source.includes("gdelt") || source.includes("openalex")) return "search_sources";
   return "content_sources";
@@ -1906,7 +2023,11 @@ function dedupeAuditSources(sources) {
 function addSourcesFromAudit(sourceMap, audit, generatedAt) {
   if (!audit || typeof audit !== "object") return;
   for (const [groupName, group] of Object.entries(audit)) {
-    const category = groupName === "github_trending" ? "github_trending" : groupName === "builder_sources" ? "builder" : "community";
+    const category = groupName === "github_trending"
+      ? "github_trending"
+      : groupName === "huggingface_trending"
+        ? "project"
+        : groupName === "builder_sources" ? "builder" : "community";
     for (const source of Array.isArray(group?.sources) ? group.sources : []) {
       addCandidateSource(sourceMap, {
         id: sourceIdFromAuditSource(groupName, source),
@@ -1926,7 +2047,7 @@ function addSourcesFromAudit(sourceMap, audit, generatedAt) {
 
 function sourceIdFromAuditSource(groupName, source) {
   const platform = platformForAuditGroup(groupName);
-  const prefix = platform || (groupName === "github_trending" ? "github" : groupName === "builder_sources" ? "builder" : groupName === "search_sources" ? "search" : "content");
+  const prefix = platform || (groupName === "github_trending" ? "github" : groupName === "huggingface_trending" ? "huggingface" : groupName === "china_ai_sources" ? "china-ai" : groupName === "builder_sources" ? "builder" : groupName === "search_sources" ? "search" : "content");
   return `${prefix}-${slugId(source?.name || source?.url || groupName) || "source"}`;
 }
 
@@ -1990,6 +2111,11 @@ function normalizeCandidate(rawCandidate, context) {
     ...(Array.isArray(rawCandidate.image_urls) ? { image_urls: rawCandidate.image_urls.filter(isHttpUrl).slice(0, 4) } : {}),
     ...(rawCandidate.image_alt ? { image_alt: rawCandidate.image_alt } : {}),
     ...(rawCandidate.image_source ? { image_source: rawCandidate.image_source } : {}),
+    ...(Number.isInteger(Number(rawCandidate.rank)) ? { rank: Number(rawCandidate.rank) } : {}),
+    ...(Number.isInteger(Number(rawCandidate.downloads)) ? { downloads: Number(rawCandidate.downloads) } : {}),
+    ...(Number.isInteger(Number(rawCandidate.likes)) ? { likes: Number(rawCandidate.likes) } : {}),
+    ...(rawCandidate.task ? { task: trimText(rawCandidate.task, 80) } : {}),
+    ...(Array.isArray(rawCandidate.tags) ? { tags: rawCandidate.tags.map((tag) => String(tag || "").trim()).filter(Boolean).slice(0, 8) } : {}),
     ...(rawCandidate.notes ? { notes: trimText(rawCandidate.notes, 400) } : {}),
     ...(rawCandidate.intermediary_url ? { intermediary_url: rawCandidate.intermediary_url } : {}),
     ...(rawCandidate.primary_url ? { primary_url: rawCandidate.primary_url } : {}),
@@ -2081,7 +2207,7 @@ function isOfficialBlogMainlineCandidate(candidate) {
   if (sourceLevel !== "official") return false;
   if (!isBlogLikeCandidate(candidate)) return false;
   if (!hasPlainReaderSignal(candidate)) return false;
-  if (!hasConcreteHotBlogMaterial(candidate)) return false;
+  if (!hasConcreteHotBlogMaterial(candidate) && !chinaAiHotBlog) return false;
   if (isLowValueMainCandidate(candidate)) return false;
   if (isMinorConsumerAiFeatureCandidate(candidate)) return false;
   if (isLowSignalVendorPartnership(candidate)) return false;
@@ -2130,6 +2256,18 @@ function canFallbackToSingleMain(candidate) {
   if (!isReaderRelevantCandidate(candidate)) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
   return sourceLevelForCandidate(candidate) === "primary";
+}
+
+function canFallbackToChinaAiHotBlog(candidate, reportDate = "") {
+  if (!isChinaAiSourceLaneCandidate(candidate)) return false;
+  if (!isChineseHotBlogCandidate(candidate)) return false;
+  if (candidate.category !== "hot_blog" && !isBlogLikeCandidate(candidate)) return false;
+  if (isFutureDatedCandidate(candidate, reportDate)) return false;
+  if (isStatuspageCandidate(candidate)) return false;
+  if (isSearchShadowCandidate(candidate)) return false;
+  if (isLowSignalVendorPartnership(candidate)) return false;
+  if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) return false;
+  return TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevelForCandidate(candidate));
 }
 
 function candidateScore(candidate) {
@@ -2478,12 +2616,13 @@ function canPromoteToHotBlog(candidate, reportDate = "") {
   const sourceLevel = sourceLevelForCandidate(candidate);
   const isPrimaryLike = TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel);
   const isDisclosedThirdParty = isPublicThirdPartySignalCandidate(candidate);
+  const chinaAiHotBlog = isChinaAiSourceLaneCandidate(candidate) && isChineseHotBlogCandidate(candidate);
   if (!isPrimaryLike && !isDisclosedThirdParty) return false;
   if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status) && !isDisclosedThirdParty) return false;
-  if (!isAiRelevantCandidate(candidate)) return false;
+  if (!isAiRelevantCandidate(candidate) && !chinaAiHotBlog) return false;
   if (!isBlogLikeCandidate(candidate)) return false;
   if (!hasConcreteHotBlogMaterial(candidate)) return false;
-  if (!hasReaderVisibleTitle(candidate)) return false;
+  if (!hasReaderVisibleTitle(candidate) && !chinaAiHotBlog) return false;
   if (isFutureDatedCandidate(candidate, reportDate)) return false;
   if (isStatuspageCandidate(candidate)) return false;
   if (isSearchShadowCandidate(candidate)) return false;
@@ -3800,7 +3939,7 @@ function stripSentenceEnding(value) {
 }
 
 function normalizedCandidateCategory(category) {
-  return ["main_item", "github_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", ...Object.keys(PLATFORM_CATEGORY_TO_SECTION)].includes(category)
+  return ["main_item", "github_trending", "huggingface_trending", "model_release", "hot_blog", "project", "builder_observation", "community_lead", ...Object.keys(PLATFORM_CATEGORY_TO_SECTION)].includes(category)
     ? category
     : category === "blog"
       ? "hot_blog"
@@ -3808,7 +3947,7 @@ function normalizedCandidateCategory(category) {
 }
 
 function candidateSourceCategory(category) {
-  return ["official_release", "github_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"].includes(category)
+  return ["official_release", "github_trending", "huggingface_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"].includes(category)
     ? category
     : category === "intermediary" || category === "x_hotspot"
       ? "community"

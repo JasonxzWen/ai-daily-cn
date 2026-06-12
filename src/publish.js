@@ -1632,24 +1632,28 @@ function toPrepareBlocker(error) {
 }
 
 async function resolveGitHubToken(options, repoRoot, git) {
+  const env = options.env || process.env;
   if (options.token) {
     return options.token;
   }
-  if (process.env.GH_TOKEN) {
-    return process.env.GH_TOKEN;
+  const ghToken = envValue(env, "GH_TOKEN");
+  if (ghToken) {
+    return ghToken;
   }
-  if (process.env.GITHUB_TOKEN) {
-    return process.env.GITHUB_TOKEN;
+  const githubToken = envValue(env, "GITHUB_TOKEN");
+  if (githubToken) {
+    return githubToken;
   }
   if (typeof options.tokenResolver === "function") {
     return String((await options.tokenResolver()) || "").trim();
   }
 
   const run = options.commandRunner || runExternalCommand;
+  const authCommandEnv = mergeCommandEnv(NON_INTERACTIVE_GIT_ENV, { baseEnv: env });
   try {
     const stdout = await run("gh", ["auth", "token"], {
       cwd: repoRoot,
-      env: NON_INTERACTIVE_GIT_ENV,
+      env: authCommandEnv,
       timeoutMs: GIT_AUTH_COMMAND_TIMEOUT_MS
     });
     const token = String(stdout || "").trim();
@@ -1664,10 +1668,21 @@ async function resolveGitHubToken(options, repoRoot, git) {
   const remoteUrl =
     options.remoteUrl ||
     (typeof git?.remoteUrl === "function" ? await git.remoteUrl().catch(() => "") : "");
-  return resolveGitCredentialToken({ repoRoot, remoteUrl, run });
+  return resolveGitCredentialToken({ repoRoot, remoteUrl, run, env: authCommandEnv });
 }
 
-async function resolveGitCredentialToken({ repoRoot, remoteUrl, run }) {
+function envValue(env, key) {
+  if (!env) {
+    return "";
+  }
+  if (Object.prototype.hasOwnProperty.call(env, key)) {
+    return String(env[key] || "").trim();
+  }
+  const matchingKey = Object.keys(env).find((candidate) => candidate.toLowerCase() === key.toLowerCase());
+  return matchingKey ? String(env[matchingKey] || "").trim() : "";
+}
+
+async function resolveGitCredentialToken({ repoRoot, remoteUrl, run, env }) {
   if (!isGitHubRemoteUrl(remoteUrl)) {
     return "";
   }
@@ -1675,7 +1690,7 @@ async function resolveGitCredentialToken({ repoRoot, remoteUrl, run }) {
   try {
     const stdout = await run("git", ["credential", "fill"], {
       cwd: repoRoot,
-      env: NON_INTERACTIVE_GIT_ENV,
+      env,
       input: "protocol=https\nhost=github.com\n\n",
       timeoutMs: GIT_AUTH_COMMAND_TIMEOUT_MS,
       trim: false

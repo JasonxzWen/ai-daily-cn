@@ -375,7 +375,9 @@ function buildInitialWorkflowStages({ reportDate }) {
   const tmp = (name) => `.tmp/${name}-${reportDate}.json`;
   const discoveryInputs = [
     tmp("github-trending"),
+    tmp("huggingface-trending"),
     tmp("builders"),
+    tmp("china-ai"),
     tmp("content-sources"),
     tmp("statuspage-incidents"),
     tmp("search-news"),
@@ -398,6 +400,15 @@ function buildInitialWorkflowStages({ reportDate }) {
       "--output",
       tmp("github-trending")
     ]),
+    nodeCliStage("discover_huggingface_trending", [
+      "discover:huggingface-trending",
+      "--date",
+      reportDate,
+      "--limit",
+      "20",
+      "--output",
+      tmp("huggingface-trending")
+    ]),
     nodeCliStage("discover_builders", [
       "discover:builders",
       "--date",
@@ -406,6 +417,17 @@ function buildInitialWorkflowStages({ reportDate }) {
       "20",
       "--output",
       tmp("builders")
+    ]),
+    nodeCliStage("discover_china_ai", [
+      "discover:china-ai",
+      "--date",
+      reportDate,
+      "--limit",
+      "30",
+      "--per-source-limit",
+      "3",
+      "--output",
+      tmp("china-ai")
     ]),
     nodeCliStage("discover_content_sources", [
       "discover:content-sources",

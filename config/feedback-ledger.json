@@ -283,6 +283,165 @@
       }
     },
     {
+      "id": "feedback/p1-semantic-evidence-images",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Require semantic public evidence images",
+      "problem": "Daily reports could publish decorative article images, hero art, generic stock-like pictures, logos, favicons, avatars, or generic computer pictures as正文 evidence even when the source article contained meaningful benchmark tables, charts, architecture diagrams, or product screenshots.",
+      "expected_behavior": "Public evidence assets are allowed only when they carry article-specific information such as benchmark, leaderboard, table, chart, diagram, architecture, or product screenshot content. Decorative image candidates are filtered before caching and rejected by strict publish quality if they remain in the report JSON.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "schemas/report.schema.json",
+        "src/media-policy.js",
+        "src/evidence-cache.js",
+        "src/draft.js",
+        "src/quality-status.js",
+        "src/site.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "semantic evidence asset gate rejects decorative article images",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-china-ai-hard-gate",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Run China AI source lane before publish",
+      "problem": "Domestic Chinese AI sources could be absent because daily discovery did not have an explicit China AI lane and successful publish quality did not distinguish an executed-but-empty China lane from a lane that never ran.",
+      "expected_behavior": "For reports dated 2026-06-11 or later, strict publish requires `source_audit.china_ai_sources` with checked source proof from the configured China AI official source lane. Missing lane execution is blocking; an executed lane with no recent qualified signal is degraded and publicly disclosed.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "config/search-queries.json",
+        "config/sources/china-ai-sources.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "package.json",
+        "schemas/report.schema.json",
+        "schemas/candidates.schema.json",
+        "src/cli.js",
+        "src/daily-runner.js",
+        "src/discovery.js",
+        "src/draft.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "china ai hard gate blocks strict publish when China lane is missing",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-tracking-visual-tables",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Render tracking sources as structured visual tables",
+      "problem": "OpenRouter, Artificial Analysis, and similar ranking sources could appear as plain text icons or screenshots instead of source-like ranked tables that preserve model, provider, score, usage, cost, and change signals.",
+      "expected_behavior": "Tracking sources with structured rows render as compact public tables or leaderboard components. Full-page screenshots are not accepted as the primary public carrier; screenshots may only be cropped table evidence and remain lower priority than parsed DOM, JSON, or text data.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/interaction-report.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "tracking visual tables render OpenRouter and Artificial Analysis without screenshots",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-chinese-hot-blog-slot",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Reserve a Chinese AI hot-blog lane",
+      "problem": "The `hot_blogs` section could be entirely overseas and English even when qualified Chinese or China AI technical blog candidates were available.",
+      "expected_behavior": "When qualified Chinese or China AI blog candidates exist, report selection reserves visible `hot_blogs` coverage for at least one such candidate or records an explicit exclusion/degradation reason. This does not weaken factual gates for main news.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "config/sources/china-ai-sources.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/draft.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "report:draft reserves Chinese hot blog slot when qualified",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-huggingface-trending-section",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Add Hugging Face Trending discovery and public section",
+      "problem": "The report had GitHub Trending but no equivalent Hugging Face Trending lane, so model, dataset, and Space trend signals were not independently discovered or displayed.",
+      "expected_behavior": "Daily discovery runs Hugging Face Trending, stores an auditable `source_audit.huggingface_trending` group, drafts a `huggingface_trending` Top 10 section, validates the schema, and renders it as a public section separate from ordinary Hugging Face organization pages.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "package.json",
+        "schemas/report.schema.json",
+        "schemas/candidates.schema.json",
+        "schemas/sources.schema.json",
+        "src/cli.js",
+        "src/daily-runner.js",
+        "src/discovery.js",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "src/quality-status.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "huggingface trending discovery and public section",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-compact-builder-discussion",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep X/Twitter discussion cards compact",
+      "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace or render long raw original posts by default, making the public discussion section hard to scan.",
+      "expected_behavior": "Public Builder/X cards show author, handle, date, source trust, a concise Chinese translation/summary, and a collapsed or truncated original excerpt. Internal fields and full raw thread dumps are not exposed in the public card body.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/interaction-report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "compact builder discussion truncates original posts",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-source-coverage-visualization",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Show source coverage as visual tags with collapsed details",
+      "problem": "The public `source coverage and gaps` section regressed into a dense text list, hiding the actual visit status, gaps, and source-lane health from readers.",
+      "expected_behavior": "Public source coverage renders a compact visual summary with colored status tags and collapsed per-source details for GitHub Trending, Hugging Face Trending, China AI, blogs, Builder/X, OpenRouter/Artificial Analysis, WeChat, Zhihu, Reddit, search, and health lanes without exposing candidate pools or internal scoring.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/interaction-report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public source coverage visualization uses tags and collapsed details",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-public-internal-report-separation",
       "severity": "P1",
       "status": "implemented",

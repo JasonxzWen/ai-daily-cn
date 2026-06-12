@@ -13,6 +13,7 @@ import {
 const REQUIRED_SECTIONS = {
   main_items: "main_item",
   github_trending: "github_trending",
+  huggingface_trending: "huggingface_trending",
   model_releases: "model_release",
   hot_blogs: "hot_blog",
   projects: "project",
@@ -21,7 +22,7 @@ const REQUIRED_SECTIONS = {
 };
 const FACT_SECTION_NAMES = new Set(["main_items", "model_releases"]);
 const NON_PRIMARY_DISCLOSURE_SECTIONS = new Set(["hot_blogs", "projects", "builder_observations"]);
-const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source"]);
+const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
 const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
 
 export async function readCandidatePool(options = {}) {
