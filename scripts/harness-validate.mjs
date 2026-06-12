@@ -8,16 +8,22 @@ const requiredFiles = [
   'feature_list.json',
   'config/feedback-ledger.json',
   'docs/feedback-buglist-quick-reference.md',
-  'progress.md',
-  'session-handoff.md',
+  'progress.example.md',
+  'session-handoff.example.md',
   'clean-state-checklist.md',
   'definition-of-done.md',
-  'tasks/current-task.md',
+  'tasks/current-task.example.md',
   'tasks/daily-publish-runbook.md',
   'tasks/templates/daily-publish-task.md',
   'tasks/templates/sdd-tdd-task.md',
   'prompts/ai-daily/modules/editorial-authority.md',
+  'scripts/harness-init.mjs',
   'scripts/harness-validate.mjs',
+];
+const requiredLocalStateFiles = [
+  'progress.md',
+  'session-handoff.md',
+  'tasks/current-task.md',
 ];
 const forbiddenPaths = [
   { path: 'CLAUDE.md', reason: 'non-Codex platform instruction file is present' },
@@ -44,6 +50,16 @@ const requiredMarkers = {
     'Regression Self-Check',
   ],
   'tasks/current-task.md': [
+    'Task Class',
+    'Spec',
+    'Acceptance Criteria',
+    'Allowed Paths',
+    'Forbidden Paths',
+    'Validation Commands',
+    'Parallel Writes',
+    'Handoff Requirements',
+  ],
+  'tasks/current-task.example.md': [
     'Task Class',
     'Spec',
     'Acceptance Criteria',
@@ -103,8 +119,9 @@ const requiredPackageScripts = {
   build: ['src/cli.js', 'build', '--out docs'],
   test: ['node --test'],
   'test:e2e': ['scripts/run-e2e.mjs'],
+  'harness:init': ['scripts/harness-init.mjs'],
   'harness:validate': ['scripts/harness-validate.mjs'],
-  validate: ['npm run harness:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
+  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
   'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],
@@ -132,6 +149,13 @@ for (const file of requiredFiles) {
   const filePath = path.join(root, file);
   if (!fs.existsSync(filePath)) {
     failures.push(`${file}: missing required harness file`);
+  }
+}
+
+for (const file of requiredLocalStateFiles) {
+  const filePath = path.join(root, file);
+  if (!fs.existsSync(filePath)) {
+    failures.push(`${file}: missing local harness state; run npm run harness:init`);
   }
 }
 

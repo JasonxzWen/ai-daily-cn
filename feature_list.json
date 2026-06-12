@@ -166,20 +166,22 @@
       "status": "active",
       "summary": "Keep Codex task state, runbook, and validation gates aligned with the daily publishing workflow.",
       "commands": [
+        "npm run harness:init",
         "node scripts/harness-validate.mjs",
         "npm run validate"
       ],
       "artifacts": [
-        "tasks/current-task.md",
+        "tasks/current-task.example.md",
         "tasks/daily-publish-runbook.md",
         "tasks/templates/daily-publish-task.md",
-        "progress.md",
-        "session-handoff.md"
+        "progress.example.md",
+        "session-handoff.example.md"
       ],
       "acceptance": [
-        "`tasks/current-task.md` defines scope before implementation or publish work starts.",
+        "`npm run harness:init` seeds per-worktree local state files before implementation or publish work starts.",
+        "`tasks/current-task.md` defines scope locally before implementation or publish work starts.",
         "`tasks/daily-publish-runbook.md` remains the operating sequence for daily publish runs.",
-        "`session-handoff.md` records validation, publish status, residual risk, and next action."
+        "`session-handoff.md` records validation, publish status, residual risk, and next action locally."
       ],
       "stop_conditions": [
         "Harness files no longer match the daily publishing scripts.",

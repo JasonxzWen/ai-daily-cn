@@ -3,7 +3,9 @@
 ## Codex Harness
 
 - Treat this repository as the active Codex worktree for AI daily publishing work.
+- After creating or switching to a fresh worktree, run `npm run harness:init` to seed local task-state files.
 - Keep task state in `tasks/current-task.md`, `progress.md`, and `session-handoff.md` when work is non-trivial.
+- These task-state files are per-worktree local state seeded from `*.example.md` files and are ignored by Git to avoid merge conflicts.
 - Run `node scripts/harness-validate.mjs` before handoff when harness files change.
 - For daily publish runs, follow `tasks/daily-publish-runbook.md`; capture `publish:dry-run` before any real publish.
 
