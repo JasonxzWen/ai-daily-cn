@@ -378,14 +378,17 @@ function requireExpandedMainItemFormat(report) {
 function requireHeroHighlightsContract(report) {
   const referenceItems = heroHighlightReferenceItems(report);
   const eligibleReferenceItems = referenceItems.filter((item) => heroHighlightReferenceItemReady(item));
-  if (report.report_status === "empty_due_to_network_outage" || eligibleReferenceItems.length < 3) {
+  if (report.report_status === "empty_due_to_network_outage" || eligibleReferenceItems.length < 1) {
     return;
   }
 
   const highlights = Array.isArray(report.hero_highlights) ? report.hero_highlights : [];
+  if (highlights.length === 0) {
+    return;
+  }
   const errors = [];
-  if (highlights.length !== 3) {
-    errors.push(`hero_highlights must contain exactly 3 items; found ${highlights.length}`);
+  if (highlights.length < 1 || highlights.length > 3) {
+    errors.push(`hero_highlights must contain 1 to 3 reader-facing items; found ${highlights.length}`);
   }
 
   const allowedRefs = new Set();

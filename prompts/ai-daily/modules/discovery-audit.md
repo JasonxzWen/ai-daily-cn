@@ -10,7 +10,7 @@
    - 对 AI 工程常用语言补扫 Python、TypeScript、Rust、Go 的 daily/weekly trending。
    - 至少补看一个趋势交叉源：OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories，或等价可访问来源。
    - GitHub Trending 必须单独生成 `github_trending` 板块，默认展示 Top 10 仓库，保留 `rank`、`previous_rank`、`rank_delta`、`trend`（`new`、`up`、`down`、`same`）和 star velocity 证据。展示文案用“GitHub Trending”，不要再写成“GitHub Trending 趋势”；`description` 必须翻译或改写成中文，不要直接复制英文 README/GitHub 描述。
-   - 候选项目只有在具备 release、明确 trending 记录、star velocity、notable PR、近期 commit 或可运行 README 时，才能额外进入 `projects`；公开页面只会把匹配 GitHub Trending Top 10 的 `projects` 渲染为对应条目的 `项目 highlight` tag 和行内说明，否则只进入结构化 JSON、`github_trending`、`community_leads` 或丢弃。
+   - 候选项目只有在具备 release、明确 trending 记录、star velocity、notable PR、近期 commit 或可运行 README 时，才能额外进入 `projects`；公开页面只会把匹配 GitHub Trending Top 10 的 `projects` 渲染为对应条目的行内领域、用途和信号说明，不生成 `项目 highlight` 标签，否则只进入结构化 JSON、`github_trending`、`community_leads` 或丢弃。
    - GitHub trending 来源的 `projects` 必须尽量填写 `event_date`、`source`、`signal`、`evidence`，其中 `signal` 使用 `release`、`star_velocity`、`trending`、`notable_pr`、`ecosystem` 或 `official_update`。
 
 2. Builder 原始源面：
@@ -118,7 +118,7 @@
 
 ### 内容扩容验收
 
-- 目标公开内容单元为 55-75 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`；`main_items` 继续只收严格事实，其他板块用来源可信度 tag 承载第三方报道、社区线索和原始社交动态。
+- 目标公开内容单元为 55-75 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`；`main_items` 继续只收严格事实，其他板块在结构化数据中保留 `source_level` / `verification_status` 供审计，公开页面不要把“第三方报道”“社区线索”“原始社交动态”等通用来源桶反复渲染成 chip 或详情格。
 - `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写候选事实、数据、图表、限制和影响，不写“为什么重要/启示/入选条件/日报跟踪/报道边界/后续建议”类元评论。
 - 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，或在 `self_check.notes` 明确说明低信号、网络阻塞、回源失败或人工未选入。
 - 每日候选池应至少尝试覆盖：AIGC/内容产业 6 条、大厂动作/平台政策/监管/算力/商业化 8 条、产品/融资 8 条、博客/播客 5 条、Builder/X 原始观察 10-20 条、泛 X/社区讨论 4 个事件。候选不足时记录 `no_signal`，不要伪造。

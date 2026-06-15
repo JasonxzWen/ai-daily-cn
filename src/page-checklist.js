@@ -64,7 +64,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         sectionOrder[0] < sectionOrder[1] &&
         sectionOrder[0] < sectionOrder[2] &&
         sectionOrder[0] < sectionOrder[3],
-      "Daily report should put exactly three 今日必看 cards before stats, navigation, and the full list.",
+      false
+        ? "Daily report should put reader-facing 今日必看 cards before the main list."
+        : "Daily report should put exactly three 今日必看 cards before stats, navigation, and the full list.",
       {
         order: sectionOrder,
         must_read_cards: mustReadSection?.querySelectorAll(".interactive-card").length || 0
@@ -128,10 +130,24 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "落点：",
       "为什么重要：",
       "判断点：",
+      "来源 第三方报道",
+      "第三方报道",
+      "项目 highlight",
+      "这条动态主要围绕",
+      "今天进入 GitHub Trending Top 10",
+      "序号 1",
+      "序号 2",
+      "序号 3",
       "watch_next",
       "候选 / 入选",
       "入选原因",
-      "source_audit"
+      "source_audit",
+      "self_check",
+      "candidate_id",
+      "quality_status",
+      "degraded_sections",
+      "remediation",
+      "parsed_count"
     ].filter((item) => bodyText.includes(item));
     addCheck(
       "legacy_public_copy_absent",
@@ -336,7 +352,11 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
         const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
         const originalAttached = originalText.length >= 10;
-        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun && originalAttached;
+        const ok = bodyText.length > 0 &&
+          chineseChars >= 10 &&
+          chineseRatio >= 0.35 &&
+          !longEnglishRun &&
+          originalAttached;
         return ok
           ? null
           : {
@@ -492,7 +512,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       { weak_cards: weakBlogCards }
     );
     const internalDebugPattern =
-      /信源审计|自检与产物|发布质量说明|Source status|候选\s*\/\s*入选|source_audit|self_check|candidate_pool|feedback-ledger|config\/feedback-ledger\.json|Feedback Ledger Review|Regression Self-Check|降级项/;
+      /信源审计|自检与产物|发布质量说明|Source status|候选\s*\/\s*入选|source_audit|self_check|candidate_pool|candidate_id|quality_status|degraded_sections|remediation|parsed_count|feedback-ledger|config\/feedback-ledger\.json|Feedback Ledger Review|Regression Self-Check|降级项/;
     const publicDebugSections = Array.from(document.querySelectorAll("section, details, nav a"))
       .map((node) => node.textContent?.replace(/\s+/g, " ").trim() || "")
       .filter((text) => internalDebugPattern.test(text));

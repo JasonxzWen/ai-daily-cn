@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-15",
   "title": "AI 日报 2026-06-15",
-  "summary": "今天的主线集中在企业采用和平台底座：OpenAI 推出合作伙伴网络，给企业部署 OpenAI 产品提供生态入口；阿里云发布 2026 年 5 月安全功能更新；英伟达用 nvCOMP 示例演示训练检查点成本优化，并报告智能体编码基准表现。开源侧保留 GitHub Trending Top 10，Builder 侧收录 9 条原始动态。",
+  "summary": "今天最值得看的主线有 阿里云汇总 2026 年 5 月安全产品新功能；阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件；英伟达用压缩库和约 30 行代码降低训练检查点成本。",
   "source_window": {
     "date_from": "2026-06-15",
     "date_to": "2026-06-15",
@@ -11,31 +11,31 @@
   },
   "hero_highlights": [
     {
-      "title": "法国数字主权论文讨论 Microsoft 365 依赖问题",
-      "url": "https://aisel.aisnet.org/treos_ecis2026/69",
-      "reason": "这条线索把云办公平台采购、供应商依赖和数字主权放在同一框架下，适合关注企业平台治理的人跟进。",
-      "what_happened": "OpenAlex 收录一篇 ECIS 2026 TREO 论文，讨论法国在采用 Microsoft 365 时面对的数字主权和供应商依赖问题。",
-      "why_watch": "企业采用云办公和 AI 平台时，主权、合规和供应链依赖会影响采购与治理判断。",
-      "category": "model_platform",
-      "source_item_ref": "search-openalex-big-tech-company-watch-resisting-through-dependence-microsoft-36"
-    },
-    {
-      "title": "OpenAI 推出合作伙伴网络",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "reason": "OpenAI 将服务、咨询和技术伙伴集中成一个入口，企业采用 ChatGPT 和 API 时可以从这里寻找集成支持。",
-      "what_happened": "OpenAI 发布 Partner Network，用来汇总帮助企业规划、部署和扩展 OpenAI 产品的合作伙伴。",
-      "why_watch": "它把企业采用路径从单一产品说明扩展到生态合作入口，会影响采购、集成和交付评估。",
+      "title": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
+      "reason": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "what_happened": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "why_watch": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
       "category": "product_tool",
-      "source_item_ref": "main-content-openai-news-introducing-the-openai-partner-network"
+      "source_item_ref": "main-content-nvidia-developer-blog-cut-checkpoint-costs-with-about-30-lines-of-python"
     },
     {
-      "title": "阿里云汇总 2026 年 5 月安全新功能",
+      "title": "阿里云汇总 2026 年 5 月安全产品新功能",
       "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "reason": "阿里云把 5 月安全能力更新集中发布，云上 AI 和企业工作负载团队可以据此对照配置变化。",
-      "what_happened": "Alibaba Cloud Blog 发布 2026 年 5 月安全新功能汇总，覆盖云安全产品和能力更新。",
-      "why_watch": "月度安全更新会影响云平台治理、权限、防护和合规配置，是生产环境采用 AI 与云服务前的安全底座之一。",
+      "reason": "阿里云汇总 2026 年 5 月安全产品新功能",
+      "what_happened": "阿里云汇总 2026 年 5 月安全产品新功能",
+      "why_watch": "阿里云汇总 2026 年 5 月安全产品新功能",
       "category": "china_open_source_community",
       "source_item_ref": "main-content-alibaba-cloud-blog-security-new-features-in-may-2026"
+    },
+    {
+      "title": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "url": "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
+      "reason": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "what_happened": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "why_watch": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "category": "china_open_source_community",
+      "source_item_ref": "main-content-alibaba-cloud-blog-automating-daily-outlook-email-summarization-with-her"
     }
   ],
   "source_audit": {
@@ -115,7 +115,7 @@
       ],
       "candidates_found": 150,
       "included": 20,
-      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 5 个日期、116 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
+      "notes": "GitHub Trending 是每日必查路径；daily/weekly 与语言榜前列项目都必须进入候选审计。 Candidates require release, star velocity, notable PR, recent commit, or runnable artifact review before inclusion. 近 7 天本地 reports-data 对比已运行，覆盖 6 个日期、141 个 GitHub 仓库记录；有历史 rank 时会生成 previous_rank、rank_delta 和 trend。"
     },
     "huggingface_trending": {
       "checked": true,
@@ -175,9 +175,9 @@
         }
       ],
       "candidates_found": 26,
-      "included": 9,
+      "included": 3,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-15T02:41:01.520Z",
+      "last_successful_feed_at": "2026-06-15T05:21:37.535Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -687,7 +687,7 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "no_signal",
+          "status": "blocked",
           "id": "content-baidu-press-releases",
           "source_kind": "html_index",
           "tier": "T0",
@@ -695,8 +695,7 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -1226,8 +1225,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent blog/interview entries parsed"
+          "parsed_count": 3,
+          "notes": "3 recent blog/interview entries parsed"
         },
         {
           "name": "Moonshot AI Kimi Platform Blog",
@@ -1465,7 +1464,7 @@
           "verification_policy": "primary_required",
           "requires_original_url": false,
           "parsed_count": 50,
-          "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed"
+          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
         },
         {
           "name": "Product Hunt Developer Tools Feed",
@@ -1520,8 +1519,8 @@
           "enablement": "optional",
           "verification_policy": "community_only",
           "requires_original_url": false,
-          "parsed_count": 9,
-          "notes": "9 recent intermediary lead entries parsed"
+          "parsed_count": 10,
+          "notes": "10 recent intermediary lead entries parsed"
         },
         {
           "name": "Hugging Face Daily Papers",
@@ -1684,7 +1683,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-15T02:41:09.887Z",
+            "snapshot_as_of": "2026-06-15T05:21:37.518Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -1765,16 +1764,209 @@
         {
           "name": "Artificial Analysis Intelligence Index",
           "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "status": "blocked",
-          "notes": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\", waiting until \"networkidle\"\u001b[22m\n; name=TimeoutError",
+          "status": "checked",
+          "notes": "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
           "snapshot": {
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
-            "snapshot_status": "blocked",
-            "snapshot_as_of": "2026-06-15T02:41:09.887Z",
+            "snapshot_status": "complete",
+            "snapshot_as_of": "2026-06-15T05:21:37.518Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-            "top_entries": [],
-            "notes": "page.goto:_Timeout_15000ms_exceeded._Call_log:_\u001b[2m_-_navigating_to_\"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\",_waiting_",
+            "top_entries": [
+              {
+                "rank": 1,
+                "model": "Claude Fable 5 (with fallback)",
+                "provider": "anthropic",
+                "tokens": "65 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 2,
+                "model": "Claude Opus 4.8 (max)",
+                "provider": "anthropic",
+                "tokens": "61 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 3,
+                "model": "GPT-5.5 (xhigh)",
+                "provider": "openai",
+                "tokens": "60 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 4,
+                "model": "GPT-5.5 (high)",
+                "provider": "openai",
+                "tokens": "59 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 5,
+                "model": "Claude Opus 4.7 (max)",
+                "provider": "anthropic",
+                "tokens": "57 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 6,
+                "model": "Gemini 3.1 Pro Preview",
+                "provider": "google",
+                "tokens": "57 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 7,
+                "model": "Qwen3.7 Max",
+                "provider": "alibaba",
+                "tokens": "57 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 8,
+                "model": "Gemini 3.5 Flash",
+                "provider": "google",
+                "tokens": "55 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 9,
+                "model": "MiniMax-M3",
+                "provider": "minimax",
+                "tokens": "55 分",
+                "change": "AA Index"
+              },
+              {
+                "rank": 10,
+                "model": "Kimi K2.6",
+                "provider": "moonshot",
+                "tokens": "54 分",
+                "change": "AA Index"
+              }
+            ],
+            "component_tabs": {
+              "score": {
+                "rows": [
+                  {
+                    "rank": 1,
+                    "model": "Claude Fable 5 (with fallback)",
+                    "provider": "anthropic",
+                    "value": 65,
+                    "value_label": "65 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 2,
+                    "model": "Claude Opus 4.8 (max)",
+                    "provider": "anthropic",
+                    "value": 61,
+                    "value_label": "61 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 3,
+                    "model": "GPT-5.5 (xhigh)",
+                    "provider": "openai",
+                    "value": 60,
+                    "value_label": "60 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 4,
+                    "model": "GPT-5.5 (high)",
+                    "provider": "openai",
+                    "value": 59,
+                    "value_label": "59 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 5,
+                    "model": "Claude Opus 4.7 (max)",
+                    "provider": "anthropic",
+                    "value": 57,
+                    "value_label": "57 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 6,
+                    "model": "Gemini 3.1 Pro Preview",
+                    "provider": "google",
+                    "value": 57,
+                    "value_label": "57 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 7,
+                    "model": "Qwen3.7 Max",
+                    "provider": "alibaba",
+                    "value": 57,
+                    "value_label": "57 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 8,
+                    "model": "Gemini 3.5 Flash",
+                    "provider": "google",
+                    "value": 55,
+                    "value_label": "55 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 9,
+                    "model": "MiniMax-M3",
+                    "provider": "minimax",
+                    "value": 55,
+                    "value_label": "55 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  },
+                  {
+                    "rank": 10,
+                    "model": "Kimi K2.6",
+                    "provider": "moonshot",
+                    "value": 54,
+                    "value_label": "54 分",
+                    "change": "AA Index",
+                    "metric": "Score"
+                  }
+                ]
+              },
+              "token_usage": {
+                "rows": [
+                  {
+                    "rank": 1,
+                    "model": "gpt-oss-120b (high)",
+                    "provider": "openai",
+                    "value": 191,
+                    "value_label": "191M",
+                    "change": "",
+                    "metric": "Token Usage"
+                  }
+                ]
+              },
+              "cost": {
+                "rows": [
+                  {
+                    "rank": 1,
+                    "model": "Grok 4.3 (high)",
+                    "provider": "xai",
+                    "value": 987,
+                    "value_label": "$987",
+                    "change": "",
+                    "metric": "Cost"
+                  }
+                ]
+              }
+            },
+            "notes": "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof.",
             "history_entries": []
           }
         },
@@ -1802,8 +1994,8 @@
           "enablement": "optional",
           "verification_policy": "community_only",
           "requires_original_url": false,
-          "parsed_count": 20,
-          "notes": "20 recent intermediary lead entries parsed; retry_succeeded_after_1"
+          "parsed_count": 19,
+          "notes": "19 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AI RSS",
@@ -1830,8 +2022,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 24,
-          "notes": "24 recent intermediary lead entries parsed"
+          "parsed_count": 28,
+          "notes": "28 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -1844,8 +2036,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 48,
-          "notes": "48 recent intermediary lead entries parsed"
+          "parsed_count": 47,
+          "notes": "47 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -1878,7 +2070,7 @@
         {
           "name": "Google News China Big Tech Company Watch RSS",
           "url": "https://news.google.com/rss/search?q=(Tencent%20OR%20ByteDance%20OR%20Alibaba%20OR%20Meituan%20OR%20Baidu%20OR%20DeepSeek%20OR%20MiniMax%20OR%20Moonshot%20OR%20Kimi%20OR%20Zhipu%20OR%20Qwen)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20GitHub%20OR%20%22open%20source%22%20OR%20%22Hugging%20Face%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
-          "status": "no_signal",
+          "status": "checked",
           "id": "general-news-google-china-big-tech-company-watch",
           "source_kind": "rss",
           "tier": "T3",
@@ -1886,8 +2078,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "parsed_count": 1,
+          "notes": "1 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Official Open Source Watch RSS",
@@ -1900,8 +2092,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 17,
-          "notes": "17 recent intermediary lead entries parsed"
+          "parsed_count": 16,
+          "notes": "16 recent intermediary lead entries parsed"
         },
         {
           "name": "36Kr",
@@ -1928,8 +2120,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 4,
-          "notes": "4 recent intermediary lead entries parsed"
+          "parsed_count": 6,
+          "notes": "6 recent intermediary lead entries parsed"
         },
         {
           "name": "Jiqizhixin",
@@ -1956,8 +2148,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 2,
-          "notes": "2 recent intermediary lead entries parsed"
+          "parsed_count": 4,
+          "notes": "4 recent intermediary lead entries parsed"
         },
         {
           "name": "InfoQ CN",
@@ -1970,8 +2162,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 13,
-          "notes": "13 recent intermediary lead entries parsed"
+          "parsed_count": 14,
+          "notes": "14 recent intermediary lead entries parsed"
         },
         {
           "name": "SSPAI",
@@ -1984,8 +2176,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 3,
-          "notes": "3 recent intermediary lead entries parsed"
+          "parsed_count": 4,
+          "notes": "4 recent intermediary lead entries parsed"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -2390,11 +2582,11 @@
           "enablement": "optional",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 107,
+      "candidates_found": 115,
       "included": 24,
       "sources_checked": 142,
       "enablement_counts": {
@@ -2416,7 +2608,7 @@
         "artificial_analysis_index_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-15T02:41:09.887Z",
+      "last_successful_feed_at": "2026-06-15T05:21:37.518Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2445,12 +2637,12 @@
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 48907,
-        "openalex": 55364,
-        "arxiv": 930
+        "gdelt": 55432,
+        "openalex": 15613,
+        "arxiv": 9669
       },
       "provider_cost_units": {
-        "gdelt": 5,
+        "gdelt": 3,
         "openalex": 15,
         "arxiv": 15
       },
@@ -2869,7 +3061,7 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "checked",
+          "status": "blocked",
           "id": "content-baidu-press-releases",
           "source_kind": "html_index",
           "tier": "T0",
@@ -2877,11 +3069,10 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": 200,
+          "http_status": null,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "html_index source is reachable; feed_like=false"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -3119,7 +3310,7 @@
           "feed_like": true,
           "recent_48h_entries": 0,
           "original_url_count": null,
-          "notes": "798 feed entries parsed; 0 within 48h"
+          "notes": "797 feed entries parsed; 0 within 48h"
         },
         {
           "name": "GitHub Changelog",
@@ -4133,9 +4324,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 19,
+          "recent_48h_entries": 17,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 19 within 48h"
+          "notes": "20 feed entries parsed; 17 within 48h"
         },
         {
           "name": "Google News AI RSS",
@@ -4167,9 +4358,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 11,
+          "recent_48h_entries": 15,
           "original_url_count": null,
-          "notes": "25 feed entries parsed; 11 within 48h"
+          "notes": "28 feed entries parsed; 15 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4184,9 +4375,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 27,
+          "recent_48h_entries": 29,
           "original_url_count": null,
-          "notes": "48 feed entries parsed; 27 within 48h"
+          "notes": "47 feed entries parsed; 29 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -4201,9 +4392,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 25,
+          "recent_48h_entries": 29,
           "original_url_count": null,
-          "notes": "51 feed entries parsed; 25 within 48h"
+          "notes": "51 feed entries parsed; 29 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -4225,7 +4416,7 @@
         {
           "name": "Google News China Big Tech Company Watch RSS",
           "url": "https://news.google.com/rss/search?q=(Tencent%20OR%20ByteDance%20OR%20Alibaba%20OR%20Meituan%20OR%20Baidu%20OR%20DeepSeek%20OR%20MiniMax%20OR%20Moonshot%20OR%20Kimi%20OR%20Zhipu%20OR%20Qwen)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20GitHub%20OR%20%22open%20source%22%20OR%20%22Hugging%20Face%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
-          "status": "no_signal",
+          "status": "checked",
           "id": "general-news-google-china-big-tech-company-watch",
           "source_kind": "rss",
           "tier": "T3",
@@ -4235,9 +4426,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 0,
+          "recent_48h_entries": 1,
           "original_url_count": null,
-          "notes": "33 feed entries parsed; 0 within 48h"
+          "notes": "100 feed entries parsed; 1 within 48h"
         },
         {
           "name": "Google News Official Open Source Watch RSS",
@@ -4252,9 +4443,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 9,
+          "recent_48h_entries": 11,
           "original_url_count": null,
-          "notes": "16 feed entries parsed; 9 within 48h"
+          "notes": "16 feed entries parsed; 11 within 48h"
         },
         {
           "name": "36Kr",
@@ -4276,7 +4467,7 @@
         {
           "name": "QbitAI",
           "url": "https://www.qbitai.com/feed",
-          "status": "no_signal",
+          "status": "checked",
           "id": "intermediary-qbitai",
           "source_kind": "rss",
           "tier": "T3",
@@ -4286,9 +4477,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 0,
+          "recent_48h_entries": 2,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 0 within 48h"
+          "notes": "10 feed entries parsed; 2 within 48h"
         },
         {
           "name": "Jiqizhixin",
@@ -4310,7 +4501,7 @@
         {
           "name": "Leiphone",
           "url": "https://www.leiphone.com/feed",
-          "status": "no_signal",
+          "status": "checked",
           "id": "intermediary-leiphone",
           "source_kind": "rss",
           "tier": "T3",
@@ -4320,9 +4511,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 0,
+          "recent_48h_entries": 2,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 0 within 48h"
+          "notes": "20 feed entries parsed; 2 within 48h"
         },
         {
           "name": "InfoQ CN",
@@ -4337,9 +4528,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 10,
+          "recent_48h_entries": 11,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 10 within 48h"
+          "notes": "20 feed entries parsed; 11 within 48h"
         },
         {
           "name": "SSPAI",
@@ -4354,9 +4545,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 2,
+          "recent_48h_entries": 3,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 2 within 48h"
+          "notes": "10 feed entries parsed; 3 within 48h"
         },
         {
           "name": "iFanr",
@@ -4371,9 +4562,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 2,
+          "recent_48h_entries": 3,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 2 within 48h"
+          "notes": "20 feed entries parsed; 3 within 48h"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -5076,29 +5267,7 @@
   },
   "main_items": [
     {
-      "title": "OpenAI 推出合作伙伴网络",
-      "candidate_id": "main-content-openai-news-introducing-the-openai-partner-network",
-      "editorial_category": "product_radar",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-14",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "source": "OpenAI News RSS",
-      "tier": "T0",
-      "entities": [
-        "OpenAI News RSS"
-      ],
-      "summary": "OpenAI 发布 Partner Network，把服务、咨询和技术合作伙伴集中成企业采用 OpenAI 产品的入口。",
-      "bullets": [
-        "==合作伙伴入口==：OpenAI 将服务、咨询和技术合作伙伴集中到 Partner Network，企业在部署 ChatGPT、API 或行业方案时，可以沿着这个入口寻找集成、迁移和扩展支持。"
-      ],
-      "why_it_matters": "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
-      "reader_relevance": "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图",
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "阿里云汇总 2026 年 5 月安全新功能",
+      "title": "阿里云汇总 2026 年 5 月安全产品新功能",
       "candidate_id": "main-content-alibaba-cloud-blog-security-new-features-in-may-2026",
       "editorial_category": "product_radar",
       "source_level": "official",
@@ -5110,9 +5279,9 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云博客发布 2026 年 5 月安全新功能汇总，列出近期云安全产品和能力更新。",
+      "summary": "阿里云汇总 2026 年 5 月安全产品新功能。",
       "bullets": [
-        "==安全能力更新==：阿里云把 2026 年 5 月新增的安全功能集中成清单，覆盖云安全产品和能力变化，便于云上工作负载团队对照防护、权限和合规配置。"
+        "**阿里云汇总 2026 年 5 月安全产品新功能**：阿里云汇总 2026 年 5 月安全产品新功能。"
       ],
       "why_it_matters": "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
       "reader_relevance": "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图",
@@ -5120,7 +5289,29 @@
       "image_urls": []
     },
     {
-      "title": "英伟达演示用 nvCOMP 降低训练检查点成本",
+      "title": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "candidate_id": "main-content-alibaba-cloud-blog-automating-daily-outlook-email-summarization-with-her",
+      "editorial_category": "engineering_toolchain",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-13",
+      "url": "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件。",
+      "bullets": [
+        "**阿里云示例用 HermesAgent 在 ECS 上自**：阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件。"
+      ],
+      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
+      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
       "candidate_id": "main-content-nvidia-developer-blog-cut-checkpoint-costs-with-about-30-lines-of-python",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -5132,31 +5323,9 @@
       "entities": [
         "NVIDIA Developer Blog"
       ],
-      "summary": "英伟达开发者博客给出一个约 30 行 Python 的 nvCOMP 示例，说明如何压缩训练检查点并降低存储和传输成本。",
+      "summary": "英伟达用压缩库和约 30 行代码降低训练检查点成本。",
       "bullets": [
-        "==检查点压缩==：英伟达用 nvCOMP 和约 30 行 Python 示例展示训练检查点压缩路径，目标是减少保存、传输和存储成本，为大模型训练流程提供一个可复现的工程做法。"
-      ],
-      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
-      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "英伟达报告智能体编码基准表现",
-      "candidate_id": "main-content-nvidia-developer-blog-nvidia-achieves-leading-agentic-coding-performance",
-      "editorial_category": "ai_industry",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-13",
-      "url": "https://developer.nvidia.com/blog/nvidia-achieves-leading-agentic-coding-performance-on-first-agentic-ai-benchmark/",
-      "source": "NVIDIA Developer Blog",
-      "tier": "T0",
-      "entities": [
-        "NVIDIA Developer Blog"
-      ],
-      "summary": "英伟达开发者博客发布一篇关于首个智能体 AI 编码基准的文章，称其系统在该评测中取得领先表现。",
-      "bullets": [
-        "==智能体编码评测==：英伟达把更新聚焦在首个智能体 AI 编码基准，说明其系统在该评测中取得领先表现，也提供了观察复杂编码任务评测口径的新样本。"
+        "**英伟达用压缩库和约 30 行代码降低训练检查点成本**：英伟达用压缩库和约 30 行代码降低训练检查点成本。"
       ],
       "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
       "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
@@ -5169,177 +5338,212 @@
       "name": "iptv-org/iptv",
       "repo": "iptv-org/iptv",
       "candidate_id": "trend-project-iptv-org-iptv",
-      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "iptv-org/iptv 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/iptv-org/iptv",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 1,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "iptv-org/iptv appeared on GitHub Trending daily with 1,528 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "importance": "notable"
+      "previous_rank": 1,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "iptv-org/iptv appeared on GitHub Trending daily with 1,528 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
     },
     {
       "name": "freeCodeCamp/freeCodeCamp",
       "repo": "freeCodeCamp/freeCodeCamp",
       "candidate_id": "trend-project-freecodecamp-freecodecamp",
-      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "freeCodeCamp/freeCodeCamp 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/freeCodeCamp/freeCodeCamp",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 2,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "freeCodeCamp/freeCodeCamp appeared on GitHub Trending daily with 146 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "importance": "notable"
+      "previous_rank": 2,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "freeCodeCamp/freeCodeCamp appeared on GitHub Trending daily with 146 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
     },
     {
       "name": "pytest-dev/pytest",
       "repo": "pytest-dev/pytest",
       "candidate_id": "trend-project-pytest-dev-pytest",
-      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "description": "pytest-dev/pytest 可作为模型评测和质量验证方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/pytest-dev/pytest",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 3,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "pytest-dev/pytest appeared on GitHub Trending daily with 14 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "importance": "notable"
+      "previous_rank": 3,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "pytest-dev/pytest appeared on GitHub Trending daily with 14 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "importance": "general"
     },
     {
       "name": "swc-project/swc",
       "repo": "swc-project/swc",
       "candidate_id": "trend-project-swc-project-swc",
-      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "swc-project/swc 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/swc-project/swc",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 4,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "swc-project/swc appeared on GitHub Trending daily with 163 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "previous_rank": 4,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "swc-project/swc appeared on GitHub Trending daily with 163 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "chatwoot/chatwoot",
       "repo": "chatwoot/chatwoot",
       "candidate_id": "trend-project-chatwoot-chatwoot",
-      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "chatwoot/chatwoot 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/chatwoot/chatwoot",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 5,
-      "previous_rank": 13,
-      "rank_delta": 8,
-      "trend": "up",
-      "evidence": "chatwoot/chatwoot appeared on GitHub Trending daily with 400 stars today. 近 7 天本地记录曾在 2026-06-12 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "previous_rank": 5,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "chatwoot/chatwoot appeared on GitHub Trending daily with 400 stars today. 近 7 天本地记录曾在 2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "NVIDIA/SkillSpector",
       "repo": "NVIDIA/SkillSpector",
       "candidate_id": "trend-project-nvidia-skillspector",
-      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "description": "NVIDIA/SkillSpector 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/NVIDIA/SkillSpector",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 6,
-      "previous_rank": 5,
-      "rank_delta": -1,
-      "trend": "down",
-      "evidence": "NVIDIA/SkillSpector appeared on GitHub Trending daily with 964 stars today. 近 7 天本地记录曾在 2026-06-10、2026-06-12 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "previous_rank": 6,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "NVIDIA/SkillSpector appeared on GitHub Trending daily with 964 stars today. 近 7 天本地记录曾在 2026-06-10、2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "meshery/meshery",
       "repo": "meshery/meshery",
       "candidate_id": "trend-project-meshery-meshery",
-      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "meshery/meshery 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/meshery/meshery",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 7,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "meshery/meshery appeared on GitHub Trending daily with 20 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "previous_rank": 7,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "meshery/meshery appeared on GitHub Trending daily with 20 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "cypress-io/cypress",
       "repo": "cypress-io/cypress",
       "candidate_id": "trend-project-cypress-io-cypress",
-      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "description": "cypress-io/cypress 可作为模型评测和质量验证方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/cypress-io/cypress",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 8,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "cypress-io/cypress appeared on GitHub Trending daily with 39 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "previous_rank": 8,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "cypress-io/cypress appeared on GitHub Trending daily with 39 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "GorvGoyl/Clone-Wars",
       "repo": "GorvGoyl/Clone-Wars",
       "candidate_id": "trend-project-gorvgoyl-clone-wars",
-      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "GorvGoyl/Clone-Wars 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/GorvGoyl/Clone-Wars",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 9,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "GorvGoyl/Clone-Wars appeared on GitHub Trending daily with 269 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "previous_rank": 9,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "GorvGoyl/Clone-Wars appeared on GitHub Trending daily with 269 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
       "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "repo": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "candidate_id": "trend-project-introduction-to-autonomous-robots-introduction-to-autonomous-robots",
-      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "language": "all",
       "window": "daily",
       "rank": 10,
-      "previous_rank": null,
-      "rank_delta": null,
-      "trend": "new",
-      "evidence": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots appeared on GitHub Trending daily with 293 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "previous_rank": 10,
+      "rank_delta": 0,
+      "trend": "same",
+      "evidence": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots appeared on GitHub Trending daily with 293 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     }
   ],
   "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [],
-  "chinese_media_dynamics": [],
+  "chinese_media_dynamics": [
+    {
+      "candidate_id": "intermediary-qbitai-agent",
+      "title": "Agent时代，华为云开始重新造地基了",
+      "url": "https://www.qbitai.com/2026/06/435531.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-15",
+      "topic": "中文 AI 媒体动态",
+      "summary": "Agent时代，华为云开始重新造地基了：Agentic新基建。",
+      "key_points": [
+        "Agent时代，华为云开始重新造地基了：Agentic新基建"
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-qbitai-ai-matrix-game-3-5",
+      "title": "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破",
+      "url": "https://www.qbitai.com/2026/06/435520.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-15",
+      "topic": "中文 AI 媒体动态",
+      "summary": "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破：昆仑万维将持续深耕，步履不停。",
+      "key_points": [
+        "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破：昆仑万维将持续深耕，步履不停"
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    }
+  ],
   "daily_tracking": [
     {
       "id": "openrouter-rankings",
@@ -5428,7 +5632,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-15T02:41:09.887Z",
+        "snapshot_as_of": "2026-06-15T05:21:37.518Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -5509,10 +5713,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-15T02:41:09.887Z",
+        "collected_at": "2026-06-15T05:21:37.518Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:87476b9a0675be3b8f6092b63fbf9ec5d220b94a9dfffba770f0948b69597e74",
-        "data_hash": "sha256:506c85faf0dc9160b15e75de6391a3075c7425c4cb0178b2e9a0bfec102650e5",
+        "data_hash": "sha256:294ea27c81d4364f472eaaed2eb61e5ec85182271d073dea4d30f47d0d8b36af",
         "tabs": [
           {
             "id": "top-models",
@@ -5813,9 +6017,9 @@
         "fallback_reason": "",
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-15T02:41:09.887Z",
+          "collected_at": "2026-06-15T05:21:37.518Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:506c85faf0dc9160b15e75de6391a3075c7425c4cb0178b2e9a0bfec102650e5",
+          "data_hash": "sha256:294ea27c81d4364f472eaaed2eb61e5ec85182271d073dea4d30f47d0d8b36af",
           "top_rows": [
             {
               "rank": 1,
@@ -5919,30 +6123,706 @@
       "category": "model_benchmark",
       "importance": "notable",
       "source_level": "primary",
-      "verification_status": "unverified",
-      "change_status": "blocked",
-      "change_summary": "本轮官方入口抓取受阻，不能确认榜单是否变化。",
-      "publish_to_public": false,
-      "summary": "关注独立基准里模型能力、速度、价格和 token 使用的相对位置；它适合做模型 shortlist，不能单独决定生产选型。 本轮自动抓取未取得可解析快照，读者需要点开官方页人工核对最新榜单。",
+      "verification_status": "primary_confirmed",
+      "change_status": "changed",
+      "change_summary": "Artificial Analysis Intelligence Index Top 10 已解析：#1 Claude Fable 5 (with fallback) 65 分，#2 Claude Opus 4.8 (max) 61 分，#3 GPT-5.5 (xhigh) 60 分。",
+      "publish_to_public": true,
+      "summary": "Artificial Analysis 公开榜单显示，当前 Intelligence Index 第一是 Claude Fable 5 (with fallback)（anthropic，65 分）。 前三名为 Claude Fable 5 (with fallback) 65 分、Claude Opus 4.8 (max) 61 分、GPT-5.5 (xhigh) 60 分，Top 10 供应商分布为 anthropic 3、google 2、openai 2、alibaba 1、minimax 1、moonshot 1。 这个榜单适合做模型 shortlist 和能力变化监测，但生产选型仍要结合延迟、价格、上下文长度和自有任务复测。",
       "watch_points": [
-        "榜首和 Top 10 是否发生换位，尤其是新模型是否进入综合能力前列。",
-        "分数、成本和 token 用量是否出现明显 trade-off。",
-        "把 Intelligence Index 与具体任务基准分开看，避免被单一综合分误导。"
+        "榜首 Claude Fable 5 (with fallback) 的综合分为 65 分，需要继续看它在代码、长上下文和 agentic task 分项上的表现。",
+        "Top 10 内部竞争接近：57 分有 3 个模型，55 分有 2 个模型，不要只按一个名次做选型。",
+        "把 Intelligence Index 与价格、延迟、吞吐和可用地区一起看，避免用综合分替代真实 workload 复测。"
       ],
       "metrics": [
         {
-          "label": "核心指标",
-          "value": "Intelligence Index / cost / token usage",
+          "label": "榜单范围",
+          "value": "Intelligence Index Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 3、google 2、openai 2、alibaba 1、minimax 1、moonshot 1",
           "trend": "unknown"
         },
         {
-          "label": "适用问题",
-          "value": "能力、价格和性能之间的模型取舍",
-          "trend": "same"
+          "label": "#1",
+          "value": "Claude Fable 5 (with fallback)（anthropic）：65 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#2",
+          "value": "Claude Opus 4.8 (max)（anthropic）：61 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#3",
+          "value": "GPT-5.5 (xhigh)（openai）：60 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#4",
+          "value": "GPT-5.5 (high)（openai）：59 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#5",
+          "value": "Claude Opus 4.7 (max)（anthropic）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#6",
+          "value": "Gemini 3.1 Pro Preview（google）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#7",
+          "value": "Qwen3.7 Max（alibaba）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#8",
+          "value": "Gemini 3.5 Flash（google）：55 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#9",
+          "value": "MiniMax-M3（minimax）：55 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#10",
+          "value": "Kimi K2.6（moonshot）：54 分",
+          "trend": "unknown"
         }
       ],
-      "evidence": "Artificial Analysis 官方说明 Intelligence Index 聚合十项数学、科学、代码和推理评测，并由 Artificial Analysis 独立运行。 source_audit status=blocked; notes=page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\", waiting until \"networkidle\"\u001b[22m\n; name=TimeoutError",
-      "watch_next": "若新模型进入前列，补查该模型在 coding、long context、agentic task 和价格页上的分项表现。"
+      "evidence": "Artificial Analysis 官方说明 Intelligence Index 聚合十项数学、科学、代码和推理评测，并由 Artificial Analysis 独立运行。 source_audit status=checked; 10 Artificial Analysis top models parsed from public_page_snapshot",
+      "watch_next": "若榜首或 Top 10 构成变化，继续核对分项 benchmark、价格、延迟和自有 workload 复测结果。",
+      "snapshot": {
+        "type": "artificial_analysis_intelligence_index_public_page",
+        "collection_method": "public_page_playwright",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-15T05:21:37.518Z",
+        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "Claude Fable 5 (with fallback)",
+            "provider": "anthropic",
+            "tokens": "65 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 2,
+            "model": "Claude Opus 4.8 (max)",
+            "provider": "anthropic",
+            "tokens": "61 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 3,
+            "model": "GPT-5.5 (xhigh)",
+            "provider": "openai",
+            "tokens": "60 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 4,
+            "model": "GPT-5.5 (high)",
+            "provider": "openai",
+            "tokens": "59 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 5,
+            "model": "Claude Opus 4.7 (max)",
+            "provider": "anthropic",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 6,
+            "model": "Gemini 3.1 Pro Preview",
+            "provider": "google",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 7,
+            "model": "Qwen3.7 Max",
+            "provider": "alibaba",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 8,
+            "model": "Gemini 3.5 Flash",
+            "provider": "google",
+            "tokens": "55 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 9,
+            "model": "MiniMax-M3",
+            "provider": "minimax",
+            "tokens": "55 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 10,
+            "model": "Kimi K2.6",
+            "provider": "moonshot",
+            "tokens": "54 分",
+            "change": "AA Index"
+          }
+        ],
+        "component_tabs": {
+          "score": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Claude Fable 5 (with fallback)",
+                "provider": "anthropic",
+                "value": 65,
+                "value_label": "65 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 2,
+                "model": "Claude Opus 4.8 (max)",
+                "provider": "anthropic",
+                "value": 61,
+                "value_label": "61 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 3,
+                "model": "GPT-5.5 (xhigh)",
+                "provider": "openai",
+                "value": 60,
+                "value_label": "60 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 4,
+                "model": "GPT-5.5 (high)",
+                "provider": "openai",
+                "value": 59,
+                "value_label": "59 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 5,
+                "model": "Claude Opus 4.7 (max)",
+                "provider": "anthropic",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 6,
+                "model": "Gemini 3.1 Pro Preview",
+                "provider": "google",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 7,
+                "model": "Qwen3.7 Max",
+                "provider": "alibaba",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 8,
+                "model": "Gemini 3.5 Flash",
+                "provider": "google",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 9,
+                "model": "MiniMax-M3",
+                "provider": "minimax",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 10,
+                "model": "Kimi K2.6",
+                "provider": "moonshot",
+                "value": 54,
+                "value_label": "54 分",
+                "change": "AA Index",
+                "metric": "Score"
+              }
+            ]
+          },
+          "token_usage": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "gpt-oss-120b (high)",
+                "provider": "openai",
+                "value": 191,
+                "value_label": "191M",
+                "change": "",
+                "metric": "Token Usage"
+              }
+            ]
+          },
+          "cost": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Grok 4.3 (high)",
+                "provider": "xai",
+                "value": 987,
+                "value_label": "$987",
+                "change": "",
+                "metric": "Cost"
+              }
+            ]
+          }
+        },
+        "notes": "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof.",
+        "history_entries": []
+      },
+      "tracking_component_snapshot": {
+        "source": "Artificial Analysis",
+        "component_kind": "artificial_analysis_index",
+        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "collected_at": "2026-06-15T05:21:37.518Z",
+        "selector_version": "artificial-analysis-index-v1",
+        "raw_dom_hash": "sha256:c6eb574acd069064a8c4ee710ae9929e3b9ba7ebe24a04eec9580c372e03e09d",
+        "data_hash": "sha256:a8279cc022da6483f8d54f6126656d89ea15d2fe5169becad7287414dd825a65",
+        "tabs": [
+          {
+            "id": "score",
+            "label": "Score",
+            "view": "score_table",
+            "status": "complete",
+            "fallback_reason": ""
+          },
+          {
+            "id": "token-usage",
+            "label": "Token Usage",
+            "view": "stacked_bar",
+            "status": "complete",
+            "fallback_reason": ""
+          },
+          {
+            "id": "cost",
+            "label": "Cost",
+            "view": "stacked_bar",
+            "status": "complete",
+            "fallback_reason": ""
+          },
+          {
+            "id": "score-vs-token-usage",
+            "label": "Score vs. Token Usage",
+            "view": "scatter",
+            "status": "fallback",
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "score-vs-cost",
+            "label": "Score vs. Cost",
+            "view": "scatter",
+            "status": "fallback",
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "score-vs-compute",
+            "label": "Score vs. Compute",
+            "view": "scatter",
+            "status": "fallback",
+            "fallback_reason": "source_tab_not_collected"
+          }
+        ],
+        "series": [
+          {
+            "id": "artificial-analysis-score",
+            "tab_id": "score",
+            "label": "Score",
+            "chart": "score_table",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Claude Fable 5 (with fallback)",
+                "provider": "anthropic",
+                "value": 65,
+                "value_label": "65 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 2,
+                "model": "Claude Opus 4.8 (max)",
+                "provider": "anthropic",
+                "value": 61,
+                "value_label": "61 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 3,
+                "model": "GPT-5.5 (xhigh)",
+                "provider": "openai",
+                "value": 60,
+                "value_label": "60 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 4,
+                "model": "GPT-5.5 (high)",
+                "provider": "openai",
+                "value": 59,
+                "value_label": "59 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 5,
+                "model": "Claude Opus 4.7 (max)",
+                "provider": "anthropic",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 6,
+                "model": "Gemini 3.1 Pro Preview",
+                "provider": "google",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 7,
+                "model": "Qwen3.7 Max",
+                "provider": "alibaba",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 8,
+                "model": "Gemini 3.5 Flash",
+                "provider": "google",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 9,
+                "model": "MiniMax-M3",
+                "provider": "minimax",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 10,
+                "model": "Kimi K2.6",
+                "provider": "moonshot",
+                "value": 54,
+                "value_label": "54 分",
+                "change": "AA Index",
+                "metric": "Score"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-token-usage",
+            "tab_id": "token-usage",
+            "label": "Token Usage",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "gpt-oss-120b (high)",
+                "provider": "openai",
+                "value": 191,
+                "value_label": "191M",
+                "change": "",
+                "metric": "Token Usage"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-cost",
+            "tab_id": "cost",
+            "label": "Cost",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Grok 4.3 (high)",
+                "provider": "xai",
+                "value": 987,
+                "value_label": "$987",
+                "change": "",
+                "metric": "Cost"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-score-vs-token-usage",
+            "tab_id": "score-vs-token-usage",
+            "label": "Score vs. Token Usage",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "artificial-analysis-score-vs-cost",
+            "tab_id": "score-vs-cost",
+            "label": "Score vs. Cost",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "artificial-analysis-score-vs-compute",
+            "tab_id": "score-vs-compute",
+            "label": "Score vs. Compute",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          }
+        ],
+        "rows": [
+          {
+            "rank": 1,
+            "model": "Claude Fable 5 (with fallback)",
+            "provider": "anthropic",
+            "value": 65,
+            "value_label": "65 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 2,
+            "model": "Claude Opus 4.8 (max)",
+            "provider": "anthropic",
+            "value": 61,
+            "value_label": "61 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 3,
+            "model": "GPT-5.5 (xhigh)",
+            "provider": "openai",
+            "value": 60,
+            "value_label": "60 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 4,
+            "model": "GPT-5.5 (high)",
+            "provider": "openai",
+            "value": 59,
+            "value_label": "59 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 5,
+            "model": "Claude Opus 4.7 (max)",
+            "provider": "anthropic",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 6,
+            "model": "Gemini 3.1 Pro Preview",
+            "provider": "google",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 7,
+            "model": "Qwen3.7 Max",
+            "provider": "alibaba",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 8,
+            "model": "Gemini 3.5 Flash",
+            "provider": "google",
+            "value": 55,
+            "value_label": "55 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 9,
+            "model": "MiniMax-M3",
+            "provider": "minimax",
+            "value": 55,
+            "value_label": "55 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 10,
+            "model": "Kimi K2.6",
+            "provider": "moonshot",
+            "value": 54,
+            "value_label": "54 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          }
+        ],
+        "previous_snapshot": null,
+        "diff": {
+          "status": "first_snapshot",
+          "summary": "No previous component snapshot was available for comparison.",
+          "changed_rows": [],
+          "new_entries": [
+            "Claude Fable 5 (with fallback)",
+            "Claude Opus 4.8 (max)",
+            "GPT-5.5 (xhigh)",
+            "GPT-5.5 (high)",
+            "Claude Opus 4.7 (max)",
+            "Gemini 3.1 Pro Preview",
+            "Qwen3.7 Max",
+            "Gemini 3.5 Flash",
+            "MiniMax-M3",
+            "Kimi K2.6"
+          ]
+        },
+        "cache_path": "",
+        "fallback_reason": "",
+        "public_trace": {
+          "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          "collected_at": "2026-06-15T05:21:37.518Z",
+          "selector_version": "artificial-analysis-index-v1",
+          "data_hash": "sha256:a8279cc022da6483f8d54f6126656d89ea15d2fe5169becad7287414dd825a65",
+          "top_rows": [
+            {
+              "rank": 1,
+              "model": "Claude Fable 5 (with fallback)",
+              "provider": "anthropic",
+              "value_label": "65 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 2,
+              "model": "Claude Opus 4.8 (max)",
+              "provider": "anthropic",
+              "value_label": "61 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 3,
+              "model": "GPT-5.5 (xhigh)",
+              "provider": "openai",
+              "value_label": "60 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 4,
+              "model": "GPT-5.5 (high)",
+              "provider": "openai",
+              "value_label": "59 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 5,
+              "model": "Claude Opus 4.7 (max)",
+              "provider": "anthropic",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 6,
+              "model": "Gemini 3.1 Pro Preview",
+              "provider": "google",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 7,
+              "model": "Qwen3.7 Max",
+              "provider": "alibaba",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 8,
+              "model": "Gemini 3.5 Flash",
+              "provider": "google",
+              "value_label": "55 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 9,
+              "model": "MiniMax-M3",
+              "provider": "minimax",
+              "value_label": "55 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 10,
+              "model": "Kimi K2.6",
+              "provider": "moonshot",
+              "value_label": "54 分",
+              "change": "AA Index"
+            }
+          ],
+          "diff": {
+            "status": "first_snapshot",
+            "summary": "No previous component snapshot was available for comparison.",
+            "changed_rows": [],
+            "new_entries": [
+              "Claude Fable 5 (with fallback)",
+              "Claude Opus 4.8 (max)",
+              "GPT-5.5 (xhigh)",
+              "GPT-5.5 (high)",
+              "Claude Opus 4.7 (max)",
+              "Gemini 3.1 Pro Preview",
+              "Qwen3.7 Max",
+              "Gemini 3.5 Flash",
+              "MiniMax-M3",
+              "Kimi K2.6"
+            ]
+          },
+          "cache_status": "live",
+          "fallback_reason": ""
+        }
+      }
     },
     {
       "id": "swe-bench-pro-public",
@@ -5986,7 +6866,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "iptv-org/iptv 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -5995,7 +6875,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "iptv-org/iptv appeared on GitHub Trending daily with 1,528 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "iptv-org/iptv appeared on GitHub Trending daily with 1,528 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6004,7 +6884,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "freeCodeCamp/freeCodeCamp 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6013,7 +6893,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "freeCodeCamp/freeCodeCamp appeared on GitHub Trending daily with 146 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "freeCodeCamp/freeCodeCamp appeared on GitHub Trending daily with 146 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6022,7 +6902,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "description": "pytest-dev/pytest 可作为模型评测和质量验证方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "eval"
       ],
@@ -6031,7 +6911,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "pytest-dev/pytest appeared on GitHub Trending daily with 14 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "pytest-dev/pytest appeared on GitHub Trending daily with 14 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6040,7 +6920,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "swc-project/swc 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6049,7 +6929,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "swc-project/swc appeared on GitHub Trending daily with 163 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "swc-project/swc appeared on GitHub Trending daily with 163 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6058,7 +6938,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "chatwoot/chatwoot 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6067,7 +6947,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "chatwoot/chatwoot appeared on GitHub Trending daily with 400 stars today. 近 7 天本地记录曾在 2026-06-12 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "chatwoot/chatwoot appeared on GitHub Trending daily with 400 stars today. 近 7 天本地记录曾在 2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6076,7 +6956,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "description": "NVIDIA/SkillSpector 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "agent"
       ],
@@ -6085,7 +6965,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "NVIDIA/SkillSpector appeared on GitHub Trending daily with 964 stars today. 近 7 天本地记录曾在 2026-06-10、2026-06-12 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "NVIDIA/SkillSpector appeared on GitHub Trending daily with 964 stars today. 近 7 天本地记录曾在 2026-06-10、2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6094,7 +6974,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "meshery/meshery 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6103,7 +6983,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "meshery/meshery appeared on GitHub Trending daily with 20 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "meshery/meshery appeared on GitHub Trending daily with 20 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6112,7 +6992,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "description": "cypress-io/cypress 可作为模型评测和质量验证方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "eval"
       ],
@@ -6121,7 +7001,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "cypress-io/cypress appeared on GitHub Trending daily with 39 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "cypress-io/cypress appeared on GitHub Trending daily with 39 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6130,7 +7010,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "description": "GorvGoyl/Clone-Wars 可作为AI 工程工具方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6139,7 +7019,7 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "GorvGoyl/Clone-Wars appeared on GitHub Trending daily with 269 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "GorvGoyl/Clone-Wars appeared on GitHub Trending daily with 269 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6148,7 +7028,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
       "domains": [
         "AI tooling"
       ],
@@ -6157,30 +7037,11 @@
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
       "signal": "trending",
-      "evidence": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots appeared on GitHub Trending daily with 293 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots appeared on GitHub Trending daily with 293 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     }
   ],
   "builder_observations": [
-    {
-      "author": "Swyx",
-      "handle": "swyx",
-      "candidate_id": "follow-builders-x-swyx-last-chance-to-fill-out-the-annual-ai-engineering-survey",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈AI 生态变化，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "Last chance to fill out the annual AI Engineering Survey this weekend and win great Vercel + Notion + AIE tix! link below we had @devinai analyze registered attendee list and output a live chart of the people coming to the conference. it ended up being the single best data driven storytelling i've ever seen on what kind of community we are gathering in two weeks. survey link here! https://t.co/2oilc5lCDm no lurking, fill it out pls",
-      "translation": "这条帖子在谈AI 生态变化，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/swyx",
-      "url": "https://x.com/swyx/status/2065909887025168887",
-      "role": "builder",
-      "event_date": "2026-06-13",
-      "source": "follow-builders X feed",
-      "evidence": "Last chance to fill out the annual AI Engineering Survey this weekend and win great Vercel + Notion + AIE tix! link below we had @devinai analyze registered attendee list and output a live chart of the people coming to the conference. it en",
-      "importance": "notable",
-      "image_urls": []
-    },
     {
       "author": "Madhu Guru",
       "handle": "realmadhuguru",
@@ -6188,9 +7049,9 @@
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "这条帖子在谈AI 工具和 agent 实践，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "content": "Madhu Guru 说，发布 LLM 不像发布传统软件：团队要在近乎无限的使用场景和失败模式里做取舍，通过 eval、red-team 和候选 checkpoint 评审降低不确定性。",
       "original_text": "Having been through many frontier model launch reviews, I have empathy for everyone involved. Launching an LLM isn't like shipping traditional software - you're making a decision about a black box with effectively infinite use cases and infinite failure modes. The tradeoffs are hard - every increase in capability expands the space of both valuable use cases and potential misuse. As a lab, you build extensive evals, you red-team, you iterate on the model. You debate tradeoffs across candidate ch...",
-      "translation": "这条帖子在谈AI 工具和 agent 实践，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "translation": "Madhu Guru 说，发布 LLM 不像发布传统软件：团队要在近乎无限的使用场景和失败模式里做取舍，通过 eval、red-team 和候选 checkpoint 评审降低不确定性。",
       "avatar_url": "https://unavatar.io/x/realmadhuguru",
       "url": "https://x.com/realmadhuguru/status/2065911676000752122",
       "role": "builder",
@@ -6207,9 +7068,9 @@
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "content": "Aaron Levie 把 Fable 出口管制事件看作模型层监管的早期样本：如果每次模型发布都要和政府反复确认风险，发布节奏和市场进展都会被拖慢。",
       "original_text": "This whole Fable export control situation is actually net positive to regulation discourse. It’s an early peek into what AI regulation would end up looking like at scale when enacted at the model layer instead of the specific application of the AI. The government would have sole discretion over when a model can be released to the to public, based on a bunch of factors that they inherently control. In this case, based on the available reporting, the risk is that the model can be jailbroken to de...",
-      "translation": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "translation": "Aaron Levie 把 Fable 出口管制事件看作模型层监管的早期样本：如果每次模型发布都要和政府反复确认风险，发布节奏和市场进展都会被拖慢。",
       "avatar_url": "https://unavatar.io/x/levie",
       "url": "https://x.com/levie/status/2065842361834651996",
       "role": "builder",
@@ -6222,70 +7083,13 @@
     {
       "author": "Aaron Levie",
       "handle": "levie",
-      "candidate_id": "follow-builders-x-aaron-levie-everyone-thinks-this-is-some-kind-of-4d-chess-or-c",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "Everyone thinks this is some kind of 4D chess or conspiracy. But it’s quite standard to try and jailbreak AI models, and by definition they would share that research with the government given that’s whole point. I don’t think Amazon assumed this would be the next move. https://t.co/DizjwNcaLG",
-      "translation": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/levie",
-      "url": "https://x.com/levie/status/2065964446489710939",
-      "role": "builder",
-      "event_date": "2026-06-14",
-      "source": "follow-builders X feed",
-      "evidence": "Everyone thinks this is some kind of 4D chess or conspiracy. But it’s quite standard to try and jailbreak AI models, and by definition they would share that research with the government given that’s whole point. I don’t think Amazon assumed",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Peter Steinberger",
-      "handle": "steipete",
-      "candidate_id": "follow-builders-x-peter-steinberger-got-a-paypal-verification-text-and-thought-i",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈AI 工具和 agent 实践，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "Got a PayPal verification text and thought I been hacked, but it was just codex signing up for a web service it needed.",
-      "translation": "这条帖子在谈AI 工具和 agent 实践，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/steipete",
-      "url": "https://x.com/steipete/status/2065997212015067508",
-      "role": "builder",
-      "event_date": "2026-06-14",
-      "source": "follow-builders X feed",
-      "evidence": "Got a PayPal verification text and thought I been hacked, but it was just codex signing up for a web service it needed.",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Thibault Sottiaux",
-      "handle": "thsottiaux",
-      "candidate_id": "follow-builders-x-thibault-sottiaux-hi-i-m-tibo-and-i-just-discovered-codex-ama",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈AI 工具和 agent 实践，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "Hi, I'm Tibo and I just discovered Codex. AMA",
-      "translation": "这条帖子在谈AI 工具和 agent 实践，重点落在文件入口、版本历史，以及它怎样接进现有 AI 工具链。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/thsottiaux",
-      "url": "https://x.com/thsottiaux/status/2066022651760721931",
-      "role": "builder",
-      "event_date": "2026-06-14",
-      "source": "follow-builders X feed",
-      "evidence": "Hi, I'm Tibo and I just discovered Codex. AMA",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Aaron Levie",
-      "handle": "levie",
       "candidate_id": "follow-builders-x-aaron-levie-the-layer-that-can-route-to-the-best-ai-model-for",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "这条帖子在谈模型产品和能力变化，重点落在成本、容灾、可观测性和网关这一层到底能替团队省多少事。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "content": "Aaron Levie 认为应用层的==模型路由==会更有价值，因为团队需要同时处理成本优化、能力最大化和风险缓解，而不是把所有任务固定到一个模型上。",
       "original_text": "The layer that can route to the best AI model for the particular job is going to increase in value substantially. There are at least 3 big reasons: * Cost optimization: there are plenty of use cases where you need frontier intelligence for some tasks and something far cheaper for others. Even in the same task you may use frontier intelligence for planning and review of the work, but an OSS or cheaper model for the bulk of the workload. This is going to be standard across large buckets of work g...",
-      "translation": "这条帖子在谈模型产品和能力变化，重点落在成本、容灾、可观测性和网关这一层到底能替团队省多少事。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
+      "translation": "Aaron Levie 认为应用层的==模型路由==会更有价值，因为团队需要同时处理成本优化、能力最大化和风险缓解，而不是把所有任务固定到一个模型上。",
       "avatar_url": "https://unavatar.io/x/levie",
       "url": "https://x.com/levie/status/2065989559905812973",
       "role": "builder",
@@ -6294,84 +7098,9 @@
       "evidence": "The layer that can route to the best AI model for the particular job is going to increase in value substantially. There are at least 3 big reasons: * Cost optimization: there are plenty of use cases where you need frontier intelligence for",
       "importance": "notable",
       "image_urls": []
-    },
-    {
-      "author": "Garry Tan",
-      "handle": "garrytan",
-      "candidate_id": "follow-builders-x-garry-tan-in-ai-most-people-are-still-trying-to-use-old-maps-o",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈AI 生态变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "In AI most people are still trying to use old maps on a new territory. Throw the maps away. It's time to draw new ones. The only way you can do it is walking the land.",
-      "translation": "这条帖子在谈AI 生态变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/garrytan",
-      "url": "https://x.com/garrytan/status/2065877443874038203",
-      "role": "builder",
-      "event_date": "2026-06-13",
-      "source": "follow-builders X feed",
-      "evidence": "In AI most people are still trying to use old maps on a new territory. Throw the maps away. It's time to draw new ones. The only way you can do it is walking the land.",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Garry Tan",
-      "handle": "garrytan",
-      "candidate_id": "follow-builders-x-garry-tan-i-wish-the-significance-of-the-model-came-from-more",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "original_text": "I wish the significance of the model came from more people actually using it and coming to their own conclusions But yes most people in the world learn about it through signifiers and not through interacting with that which is signified https://t.co/TcbmeHuXGQ",
-      "translation": "这条帖子在谈模型产品和能力变化，重点落在真实场景、落地边界和哪些做法可以直接复用。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。",
-      "avatar_url": "https://unavatar.io/x/garrytan",
-      "url": "https://x.com/garrytan/status/2065791421362352476",
-      "role": "builder",
-      "event_date": "2026-06-13",
-      "source": "follow-builders X feed",
-      "evidence": "I wish the significance of the model came from more people actually using it and coming to their own conclusions But yes most people in the world learn about it through signifiers and not through interacting with that which is signified htt",
-      "importance": "notable",
-      "image_urls": []
     }
   ],
-  "official_org_updates": [
-    {
-      "candidate_id": "content-alibaba-cloud-blog-security-new-features-in-may-2026",
-      "organization": "Qwen",
-      "title": "Security New Features in May 2026",
-      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "source": "Alibaba Cloud Blog",
-      "event_date": "2026-06-15",
-      "summary": "Qwen 的官方动态「Security New Features in May 2026」显示，这条更新围绕 AI 诈骗防护、安全能力和立法协作展开，说明平台如何把安全治理落到产品和政策动作中。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "importance": "notable"
-    },
-    {
-      "candidate_id": "search-gdelt-ai-infra-business-cloudflare-and-openai-launch-agent-cloud-for-ente",
-      "organization": "OpenAI",
-      "title": "Cloudflare And OpenAI Launch Agent Cloud For Enterprises",
-      "url": "https://www.forbes.com/sites/janakirammsv/2026/04/16/cloudflare-and-openai-launch-agent-cloud-for-enterprises/",
-      "source": "GDELT",
-      "event_date": "2026-06-15",
-      "summary": "OpenAI 的官方动态「Cloudflare And OpenAI Launch Agent Cloud For Enterprises」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
-      "source_level": "official",
-      "verification_status": "intermediary_only",
-      "importance": "notable"
-    },
-    {
-      "candidate_id": "search-openalex-big-tech-company-watch-resisting-through-dependence-microsoft-36",
-      "organization": "Microsoft",
-      "title": "Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France",
-      "url": "https://aisel.aisnet.org/treos_ecis2026/69",
-      "source": "OpenAlex",
-      "event_date": "2026-06-15",
-      "summary": "Microsoft 的官方动态「Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
-      "source_level": "primary",
-      "verification_status": "intermediary_only",
-      "importance": "notable"
-    }
-  ],
+  "official_org_updates": [],
   "community_leads": [
     {
       "candidate_id": "content-openai-company-news-introducing-the-openai-partner-network",
@@ -6380,52 +7109,10 @@
       "url": "https://openai.com/index/introducing-openai-partner-network",
       "event_date": "2026-06-14",
       "source": "OpenAI Company News RSS",
-      "evidence": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation. Treat this as a community lead unless it is backed by a primary source.",
+      "evidence": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation.",
       "editorial_category": "community_signal",
       "source_level": "official",
       "verification_status": "primary_confirmed",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-sspai-ai-ios-27",
-      "title": "具透 | 除了 AI，iOS 27 首个开发者测试版中你不能错过的新功能",
-      "content": "少数派在体验了新版系统之后，帮你整理了 iOS 27 中值得关注的新功能和新特性，希望帮你能了解新版系统的方方面面。 查看全文。",
-      "url": "https://sspai.com/post/110973",
-      "event_date": "2026-06-13",
-      "source": "SSPAI",
-      "evidence": "少数派在体验了新版系统之后，帮你整理了 iOS 27 中值得关注的新功能和新特性，希望帮你能了解新版系统的方方面面。 查看全文。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-leiphone-2026",
-      "title": "2026北京智源大会开幕 | 从“悟道”到“悟界”，智源研究院推动人工智能、物理世界和生命科学“三体互动”",
-      "content": "2026年6月12日，第八届“北京智源大会”在中关村国际创新中心开幕。 北京智源大会是智源研究院主办的“AI内行学术盛会”，以“技术前沿、国际视野、青年人才”为特色，汇聚海内外研究者分享研究成果、探寻前沿知识、交流实践经验。本届大会，现代数字安全体系奠基者Whitfield Diffie线下参会，聚焦Agent时代的安全与可信挑战；强化...",
-      "url": "https://www.leiphone.com/category/academic/PRkJuKQSDv4Q1le5.html",
-      "event_date": "2026-06-13",
-      "source": "Leiphone",
-      "evidence": "2026年6月12日，第八届“北京智源大会”在中关村国际创新中心开幕。 北京智源大会是智源研究院主办的“AI内行学术盛会”，以“技术前沿、国际视野、青年人才”为特色，汇聚海内外研究者分享研究成果、探寻前沿知识、交流实践经验。本届大会，现代数字安全体系奠基者Whitfield Diffie线下参会，聚焦Agent时代的安全与可信挑战；强化学习奠基人Andrew Barto追问“交互驱动智能”对于下一代AI系统的意义。30余位30岁以下青年科学家，40余位AI企业CEO、创始人与。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-big-tech-company-watch-microsoft-s-github-repos-were-hacked",
-      "title": "Microsoft's GitHub Repos Were Hacked to Steal AI Developer Passwords - Memeburn",
-      "content": "Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNNFhMemNTMlVyRGpaRGg4V055OXdUVzFzdEp5dTBwMzhKNE5ydU4teFdlQ2k3TWJNV196bzFmVVU2b0ZwQWM1RVBBc1RJOTE4c0kyUjQ4Ukl3U3RYdWVyN2wzYllIZkhIdHlVVk9ZS1FFNnBCTXk5NEdhY21LZGFkdEoxa1ZPNmdtUk5pSm9jOFZDVnc?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News Big Tech Company Watch RSS",
-      "evidence": "Microsoft's GitHub Repos Were Hacked to Steal AI Developer Passwords Memeburn。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
     },
@@ -6436,7 +7123,7 @@
       "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ0Z0NGdwVWkzOUZZZDdreS1XSDJJd253SXN4dm9FWXVjSHotdmVvR1ozUEVkRTgxaGhPSHVCdEtQNVZvODhkNTI2N2hOeC1mbkhBQW5RZEk4R2YtZU1nSTV3QXNwNnBWNmFoajhmaXhmNGRaUjNpNXJNYVRzLXdSLVZoNGpBS1FrTjBlazlha05IRkxPajM0?oc=5",
       "event_date": "2026-06-14",
       "source": "Google News Official Open Source Watch RSS",
-      "evidence": "The AI Issue America and China Can Cooperate On Now The Wire China。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "The AI Issue America and China Can Cooperate On Now The Wire China。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6444,27 +7131,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-official-open-source-watch-kimi-k2-7-code-moonshot-ai-releas",
-      "title": "Kimi K2.7-Code: Moonshot AI Releases 1T Parameter Open-Source Model, Claims to ...",
-      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNUmVrd1pEbFNNY2szM2gzYmNOc0FMR2hBMDNWaWZKZ3Ewb3ppb0NnVEtLREVkRXdaNTFXUDlXOGJxeXRxYTh3SkVwQm5uVFBjdGU3UWlWS1ZZcnZJYVZqeXFwT1ItUGxsV0h1NGF4YkVPZWFSd1g2U05pWUlmZGRyaFY0dExQOEZ3YklIOFZoQzBDR2hhajBSUDFFeWlBU2dX?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News Official Open Source Watch RSS",
-      "evidence": "Kimi K2.7-Code: Moonshot AI Releases 1T Parameter Open-Source Model, Claims to Beat Claude Opus on Tool Use abhs.in。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-official-open-source-watch-the-u-s-government-has-banned-for",
-      "title": "The U.S. government has banned foreigners from using the latest AI models of ar...",
+      "candidate_id": "general-news-google-official-open-source-watch-xiaomi-mimo-is-now-15x-faster-tha",
+      "title": "Xiaomi MiMo Is Now 15x Faster Than ChatGPT: Here's What That Actually Means - M...",
       "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE16SVNQelRIY0FlQlNfaTB2WUZXNDN4QUFYd2tBRDZuNDR4X25SSWFSd29QZ2E4bmNyMUF3NnJjNjhrdTh2Z3FBZ1BRTmVmQlE?oc=5",
-      "event_date": "2026-06-14",
+      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTFBqY3J6U0dpOWhfSENOR28yS0ZSVnBhT3NyYVNoVnRYMXRIWEQ0dWhwV2xPc0Fva2hRSDBJQWtjNmxYeG1pb2RnYy1vamdLdDZmUVdXRmNYX2dwbWRrY2oxeVVLb0RxbE1WRGEyMlFpbjh2Zw?oc=5",
+      "event_date": "2026-06-15",
       "source": "Google News Official Open Source Watch RSS",
-      "evidence": "The U.S. government has banned foreigners from using the latest AI models of artificial intelligence.. 매일경제。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "Xiaomi MiMo Is Now 15x Faster Than ChatGPT: Here's What That Actually Means Memeburn。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6472,41 +7145,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-official-open-source-watch-moonshot-ai-releases-kimi-k2-7-co",
-      "title": "Moonshot AI Releases Kimi K2.7-Code: a Coding Model Reporting +21.8% on Kimi Co...",
-      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQOEVPaVQ2TFY4Ym9pbFdhSFRjd08yRVlsNUhPMmxTLWJsRmdlSE9XekJsdjBCaTZzZk1yMENQTXoxSkkyM1NIbnF5S1huWVI5UzBqR3prSk5IMU9xbi0xVlhadWpVRHFHNnJpY3hRMFFUenBWZ193MWNoT1NVZFcyN2JOQkdwZHdiLUxJU3JHdTFqVWJwbE5RTUdkYkh3ODg0YjVuZ1ZlYXRvRWFNeE5IdTdGY21vbF9GZi1yeTBhYXc4Qk9UbWVvekh5Y2xlQk1zT0szUw?oc=5",
-      "event_date": "2026-06-13",
-      "source": "Google News Official Open Source Watch RSS",
-      "evidence": "Moonshot AI Releases Kimi K2.7-Code: a Coding Model Reporting +21.8% on Kimi Code Bench v2 Over K2.6 MarkTechPost。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-official-open-source-watch-open-model-kimi-k2-7-code-undercu",
-      "title": "Open model Kimi K2.7 Code undercuts GPT-5.5 and Claude by up to 12x on price pe...",
-      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPZGNTWnRpZEI3WWl2S1pOS3F1N3NEQ1Nxd3dPR0xUVVU5QTVOVDBob0cyYmt6aVlveWo0dlJnVWVuUkI5MHFBOXVHRUVGT2VOU0wwUVRQMlFSMXZsQWJsU2w3T1JKVTZQQ3ZfN1JoenhCRG1UbFRIaHdfSmNrLUFpOWpwTG1Rby1UNXhtNEFUUEJaNXdKbURLVVM5Ti1Mbmo5UE0yVlQ3aFZGdU5rM2xJcU5MODZReG5aZ1VmSjlR?oc=5",
-      "event_date": "2026-06-13",
-      "source": "Google News Official Open Source Watch RSS",
-      "evidence": "Open model Kimi K2.7 Code undercuts GPT-5.5 and Claude by up to 12x on price per token the-decoder.com。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-qbitai-2026-ai",
-      "title": "2026智源大会开幕：推动AI、物理世界和生命科学“三体互动”",
-      "content": "2026智源大会开幕：推动AI、物理世界和生命科学“三体互动”。",
-      "url": "https://www.qbitai.com/2026/06/435394.html",
-      "event_date": "2026-06-13",
+      "candidate_id": "intermediary-qbitai-ai-matrix-game-3-5",
+      "title": "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破",
+      "content": "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破。",
+      "url": "https://www.qbitai.com/2026/06/435520.html",
+      "event_date": "2026-06-15",
       "source": "QbitAI",
-      "evidence": "QbitAI published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "昆仑万维将持续深耕，步履不停。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6514,14 +7159,28 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-aigc-video-image-game-core-ai-holdings-launches-homegpt-ai-h",
-      "title": "Core AI Holdings Launches HomeGPT AI Home Design Platform - Pulse 2.0",
-      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQSElvYVU4d2pFQ1A1U1pvdGZwZUFLU0g5WC1tNXJpT2tDUVJHVmdZX3VZWGx2VFhUaFVRakphamFqTG1lQmVFREphdXJ5Y1kxTE9rSnJ4aHZhMW5SQ25pS3JCQlZsZk12dVRidTZiNjZHX3VhYmQ5TngtRzlBRVJYT3BuZXl2Zi1M0gGIAUFVX3lxTFBISW9hVTh3akVDUDVTWm90ZnBlQUtTSDlYLW01cmlPa0NRUkdWZ1lfdVlYbHZUWFRoVVFqSmFqYWpMbWVCZUVESmF1cnljWTFMT2tKcnhodmExblJDbmlLckJCVmxmTXZ1VGJ1NmI2NkdfdWFiZDlOeC1HOUFFUlhPcG5leXZmLUw?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "Core AI Holdings Launches HomeGPT AI Home Design Platform Pulse 2.0。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
+      "candidate_id": "general-news-google-china-big-tech-company-watch-tencent-upgrades-cloud-product",
+      "title": "Tencent upgrades cloud product portfolio for AI agent deployment - Telecompaper",
+      "content": "Google News China Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOZnhScnpWZVRKZUJDT2dqNlFkWUZ4TGpNanBtU0NkY0paYWZFQkNRb0k2QUlGS2pzWHU4WTJCMWs4V1dBMHU4cUpjUVAxMFFOd0hWQnZOQ2R2bVZ6TVNoeHNVNHdsYk8wc1BVcHZEZ2N3dHZBcWhnbVo0UHBzdDNtZFlCT1VoenlKNU9YbDJKY3lfSEc3Sll1V0kzb04wd2pIUGQxZVZmQk9WQTA?oc=5",
+      "event_date": "2026-06-15",
+      "source": "Google News China Big Tech Company Watch RSS",
+      "evidence": "Tencent upgrades cloud product portfolio for AI agent deployment Telecompaper。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "general-news-google-ai-scaling-ai-driven-customer-service-without-losing-custome",
+      "title": "Scaling AI-Driven Customer Service Without Losing Customer Trust - Emerj Artifi...",
+      "content": "Google News AI RSS 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNQlN4ODhMNTU5WTdRQV9tcmNidXd1Q29tNTQxZU5rMGhjcGxSQzdMdld6R3poV3hDU0dsSXc4WWdaUWRvUlVtRnpUWk5JSWlnREMzRmdub1EzcFlaNlRCMnpPNnJkRlljUmk4eGJVYnJqMHZJNEJ4SEZHYjBDTVhXQmRmX2VqX3Z4STAw?oc=5",
+      "event_date": "2026-06-15",
+      "source": "Google News AI RSS",
+      "evidence": "Scaling AI-Driven Customer Service Without Losing Customer Trust Emerj Artificial Intelligence Research。",
+      "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
       "importance": "general",
@@ -6534,9 +7193,23 @@
       "url": "https://mp.weixin.qq.com/s/TM9lv6b-9AH8O9ZiApgTBA",
       "event_date": "2026-06-15",
       "source": "RuanYF Weekly",
-      "evidence": "（中文）。RuanYF Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "（中文）。",
       "editorial_category": "community_signal",
       "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-qbitai-agent",
+      "title": "Agent时代，华为云开始重新造地基了",
+      "content": "Agent时代，华为云开始重新造地基了。",
+      "url": "https://www.qbitai.com/2026/06/435531.html",
+      "event_date": "2026-06-15",
+      "source": "QbitAI",
+      "evidence": "Agentic新基建。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
       "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
@@ -6548,49 +7221,7 @@
       "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPSktaeVlXRENPLUEyTkplRnVtUXNzeHlGQ1hNeTFoNldDcmljM2VrZVRWcHI5NXNGdlFDTEp1UnJKdW9NMzEyT2swZ09kQkxhT1k2VzlmMVBIWkQ3Qm1IVk5LQzBIbUZvRV8yQ2g0Yzg4ZEl5eHp0b3B4VW1CeDNtRkhYWWdmVUFGOEh2R21EVk4weXlXdEJOb0pJTQ?oc=5",
       "event_date": "2026-06-15",
       "source": "Google News AI RSS",
-      "evidence": "New artificial intelligence minor launches this fall Virginia Tech News。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-as-artificial-intelligence-ai-stocks-drive-the-market-hig",
-      "title": "As Artificial Intelligence (AI) Stocks Drive the Market Higher, Is Now the Time...",
-      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQNUpxby1ESGlKaDd1dEMtbVkwbC01bVN4OEtUYVBPU01hSUlsUXl2UmVhTEFnbm9TOEhDdjk3M0d3RGljTDVlYU9YaThVQmV6WHMyMEdQSks4LV9seWVMaWdXdlloR0FCNlNad2p1TmNYc2JHSE5FUUZ2S1lQQ3BibkpUZXEtejZtTDJMeEh0REU3d0twdnB0S0k0TEg0LU4tb29jenl5SQ?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AI RSS",
-      "evidence": "As Artificial Intelligence (AI) Stocks Drive the Market Higher, Is Now the Time to Buy? These 9 Words From Warren Buffett Might Change Your Mind. Yahoo Finance。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-52-of-organizations-already-using-generative-ai-have-impl",
-      "title": "“52% of organizations already using generative AI have implemented AI agents in...",
-      "content": "Google News AI RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5sU0szbEF6ZERwZmt6UUoxWEZvZDFEVGJPZ1JQamRUa2hqVGk5QlRlNFktZVdfd3dxM1N6NlVrRFFjaEl2d2t4U1lRRjYwUm1mbUtlcDhtVEJYNGxYZzBmQ1B3YjEtQVA5?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AI RSS",
-      "evidence": "“52% of organizations already using generative AI have implemented AI agents in their day-to-day operations” CTech。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-inside-the-race-to-protect-children-from-ai-broadband-bre",
-      "title": "Inside the Race to Protect Children from AI - Broadband Breakfast",
-      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxORzJROG9BaXc0aF8yMWV1MnJJQ3Zaa09idi0zdDdyUnVYVVNhUTRtbFF3bV9nWmVUVFJYc1lCcVdqSm9mWTBScG9RTmlkMDlMWWd3dVptSGFQSUxydE1NbHZNVUpHNUk0ZC10QnNVUGQ2blJ5QzZ0SmlDLXM5ZUVJdw?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AI RSS",
-      "evidence": "Inside the Race to Protect Children from AI Broadband Breakfast。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "New artificial intelligence minor launches this fall Virginia Tech News。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6604,63 +7235,7 @@
       "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQVnRMNUxXZXhlSXBNNDd2WmZlMEl4VnpwT284SllBQlZhNnFVSHJJckhnbWhsb1YzZWYxMHd0UlZ5RzRlcjVuNHUxMHprenBqaURZTHl2TVdBeVFtWFVPdllhMlZsQzJ5Zy1fT3d1X19CQm4zTHdoak1zQ3dpZmNGNXJqU0ZES0xyZmhj?oc=5",
       "event_date": "2026-06-14",
       "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Limelight HQ: The All-in-One Creator Economy Operating System. quasa.io。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-forbes-2026-ai-50-list-top-artificial-intellige",
-      "title": "Forbes 2026 AI 50 List | Top Artificial Intelligence Companies - Forbes",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiSkFVX3lxTE5uUGIzcFRTdFZwdkxZTnpHdUpfVmhCQ21iczlSQjJrMnlSa19sYzB4S2JuVC1wSWo1UFhRWnlpVWtrb0NIN1RmS2Nn?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Forbes 2026 AI 50 List | Top Artificial Intelligence Companies Forbes。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-art-of-the-frame-podcast-the-alan-smithee-round",
-      "title": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI B...",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQTW90VXhMbE5vUXJFSFBjODJCVkJfUHFlZ2dYMkhISUhtOUF3QW1UYlkwQUdSRHRfbjFnb2t3WVZhcVloMHB2bnRKeWNVcXh5UUhaUHdlREptMFJCanhCNXVTcGNHbV9PV3Ywa2ZHanI4UG90cTRnajNZSkIyeUhwdWZGRVoxb281TGJhVDY2dGVXemYzc2pOS3V1azQ3UnB5S2N6S3Baanl1a19qUXNhTGRURGhmNEJs0gG4AUFVX3lxTFBNb3RVeExsTm9RckVIUGM4MkJWQl9QcWVnZ1gySEhJSG05QXdBbVRiWTBBR1JEdF9uMWdva3dZVmFxWWgwcHZudEp5Y1VxeHlRSFpQd2VESm0wUkJqeEI1dVNwY0dtX09XdjBrZkdqcjhQb3RxNGdqM1lKQjJ5SHB1ZkZFWjFvbzVMYmFUNjZ0ZVd6ZjNzak5LdXVrNDdScHlLY3pLcFpqeXVrX2pRc2FMZFREaGY0Qmw?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI Boom? by Art of the Frame - ProVideo Coalition。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-amazon-bolsters-ai-production-with-3-animated-s",
-      "title": "Amazon Bolsters AI Production With 3 Animated Series Orders, Launches GenAI Cre...",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE14dXlaMmltSnJEQzQzZWFWVzBQZDA5OEluMWxTUElJazZ0STJDOWNhRmhrdmlCdG40YWFlLTVNU3JLb1lSR2hLZVFqVklmczlPS3lGR1BVVXI2V1NIMkJ5NF9NQU56QQ?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Amazon Bolsters AI Production With 3 Animated Series Orders, Launches GenAI Creators’ Fund IMDb。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-mozilla-data-collective-seeks-to-build-ai-s-dat",
-      "title": "Mozilla Data Collective seeks to build AI’s data economy around trust - Silicon...",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPTGVOOUhBc1dZd2ozNUxRejY4dnotOXpkUndQV25zNjJPREFNVS1JSkdZWHFLY211Zkdvb0pWWHZIZ2NSU3plcWlsdGNJeTdhRjdqTkxQX1pveFBibW50am1qdUk4ODJxbFJJbUNFV0YyVXZfRFY2X0daQWlodmJyUF80UmpQVUZCeFpmLVRQOXlGRGZrNDJkTlVZTGtxTi05dUVtcg?oc=5",
-      "event_date": "2026-06-13",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Mozilla Data Collective seeks to build AI’s data economy around trust SiliconANGLE。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "Limelight HQ: The All-in-One Creator Economy Operating System. quasa.io。",
       "editorial_category": "content_aigc",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6674,7 +7249,7 @@
       "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQMWRRSXd0UUhNeXJteXdKNkwwcS0wNHREa2xvNEtmN1ZYcmptX2ZwenB1aWJpZ0dtSW0zT2hSWlphbk03X2RyQnIwNjIxNDBWbjRHWHZEV2pRX3dFb043a2pmdHFGOGdLc3J0MWpTSHRDLVd4YjY5ZEJVYnlXRUtXektnMEF6TDlNVUtxLUdhR2YzVi11eVpnX29ZTzV6Y000ZGFRSFlMM20zSFlRa3poQWdUX3FiaGVCU1FmYTN2b2s3QXFMRHh6SGZfNl93ZGJMd1pJYXllaHN4S3YtNGdN?oc=5",
       "event_date": "2026-06-14",
       "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "Crazy Taxi creator explains use of 'generative AI support tools' in response to criticism MSN。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "Crazy Taxi creator explains use of 'generative AI support tools' in response to criticism MSN。",
       "editorial_category": "content_aigc",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6682,13 +7257,41 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-aigc-video-image-game-every-macbook-getting-macos-27-is-your",
-      "title": "Every MacBook getting macOS 27: Is yours on the list? - Mashable",
-      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOX0hobHg1TkJYakIxNXJtWXNHdWkzcllLcC1INWRrQ2RLVlQ3ZkstNnNWM3h3MFdlcVRCX21pbF9RaHczQi1IRkt3dVpGV3J5QzhfSk9XTU4tZHRyZzJjdWFJSDMxNklTVHJyTHZrWnZHQ21RZ040VG9SZWJtbkdwUFZWUQ?oc=5",
+      "candidate_id": "general-news-google-big-tech-company-watch-introducing-the-openai-partner-networ",
+      "title": "Introducing the OpenAI Partner Network - OpenAI",
+      "content": "Google News Big Tech Company Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9uMkJtTlNBalBxNWxuLVlzbHlsaTFGdXdmUks2Z1pqZ0IyZkNyYmZUU1JkYlc4emNMclpXUWo1aEpyRVJRX3VKQnlScl93bkdrN1pBeWlaVVNSeWk2cmh5dlpWRF9ZTkY2LW9qMw?oc=5",
+      "event_date": "2026-06-15",
+      "source": "Google News Big Tech Company Watch RSS",
+      "evidence": "Introducing the OpenAI Partner Network OpenAI。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "general-news-google-aigc-content-art-of-the-frame-podcast-the-alan-smithee-round",
+      "title": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI B...",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQTW90VXhMbE5vUXJFSFBjODJCVkJfUHFlZ2dYMkhISUhtOUF3QW1UYlkwQUdSRHRfbjFnb2t3WVZhcVloMHB2bnRKeWNVcXh5UUhaUHdlREptMFJCanhCNXVTcGNHbV9PV3Ywa2ZHanI4UG90cTRnajNZSkIyeUhwdWZGRVoxb281TGJhVDY2dGVXemYzc2pOS3V1azQ3UnB5S2N6S3Baanl1a19qUXNhTGRURGhmNEJs0gG4AUFVX3lxTFBNb3RVeExsTm9RckVIUGM4MkJWQl9QcWVnZ1gySEhJSG05QXdBbVRiWTBBR1JEdF9uMWdva3dZVmFxWWgwcHZudEp5Y1VxeHlRSFpQd2VESm0wUkJqeEI1dVNwY0dtX09XdjBrZkdqcjhQb3RxNGdqM1lKQjJ5SHB1ZkZFWjFvbzVMYmFUNjZ0ZVd6ZjNzak5LdXVrNDdScHlLY3pLcFpqeXVrX2pRc2FMZFREaGY0Qmw?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Content Industry RSS",
+      "evidence": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI Boom? by Art of the Frame - ProVideo Coalition。",
+      "editorial_category": "content_aigc",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "general-news-google-aigc-video-image-game-google-exec-most-games-secretly-use-ai",
+      "title": "游戏开发使用 AI 工具的透明度争议升温",
+      "content": "游戏开发使用 AI 工具的透明度争议升温。",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBaSEpQZHI0dGk0UmFlN0pCdmxjYWJsaFRVU1ZOTWtjTFp1S3IzNTE2OWlkQk5pQTluNzVvbmt4Z3F1M1BQMk5BTktweTl4MklR?oc=5",
       "event_date": "2026-06-15",
       "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "Every MacBook getting macOS 27: Is yours on the list? Mashable。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "evidence": "Google Exec: Most Games Secretly Use AI in Development, Players Unaware — Igniting Industry Transparency Debate 玩具人 TOY PEOPLE。",
       "editorial_category": "content_aigc",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -6696,14 +7299,143 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-aigc-video-image-game-white-house-stirs-console-war-debate-w",
-      "title": "White House Stirs Console War Debate with AI-Generated \"Trump as Master Chief\" ...",
-      "content": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击。",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1iZ3RuOFRvZWxVQzJDVkJiUXlKQmcwRExxYUVvWmFpSlVwNkxKeHg1NXlZUkNqS2prd1lrSEZsc3VRT01VaW1rOXp3RVA2MjBQ?oc=5",
+      "candidate_id": "general-news-google-big-tech-company-watch-introducing-omnigent-a-meta-harness-t",
+      "title": "Introducing Omnigent: A Meta-Harness to Combine, Control and Share Your Agents ...",
+      "content": "Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPVUNMSnB0SlJDOE56WGpRdkJBZ0JSY0h5Nl90OFpGT3ZvTS1oWUVqclIzWUozRVNhWlVaN25uNDQ5NEo3dkJkQ25nU2pmc19GZ2VuRDBSQWRzRmRrTXZ0cDJlMGF6R0t2WkRPb0NWbGV1RnVYRVVMNVctRGdJVjFHR2pycDNPN2RGV2R5aHBzem5vU3RiWEMzMkQwclE3VzZzMzgtaDJB?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News Big Tech Company Watch RSS",
+      "evidence": "Introducing Omnigent: A Meta-Harness to Combine, Control and Share Your Agents Databricks。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-the-verge-ai-china-may-have-accessed-mythos",
+      "title": "China may have accessed Mythos",
+      "content": "The Verge AI 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/949644/china-white-house-anthropic-mythos",
       "event_date": "2026-06-14",
-      "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "White House Stirs Console War Debate with AI-Generated \"Trump as Master Chief\" Image, Flag Error Sparks Controversy 玩具人 TOY PEOPLE。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "editorial_category": "content_aigc",
+      "source": "The Verge AI",
+      "evidence": "According to a new report from Semafor, the White House's decision to impose export restrictions on Anthropic's Mythos was driven in part by fears that it had been accessed by a group linked to China. If the Chinese government actually had。..",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-infoq-cn-swiggy",
+      "title": "Swiggy通过实时机器学习排序提升搜索自动补全效果",
+      "content": "Swiggy通过实时机器学习排序提升搜索自动补全效果。",
+      "url": "https://www.infoq.cn/article/WeSfARjdEkQpMaFYOb3s?utm_source=rss&utm_medium=article",
+      "event_date": "2026-06-15",
+      "source": "InfoQ CN",
+      "evidence": "点击查看原文>。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-interconnects-welcome-to-the-agi-era-of-ai-governance",
+      "title": "Welcome to the AGI era of AI governance",
+      "content": "Interconnects 记录了一条安全治理公开条目，详情需回到原文链接核对。",
+      "image_url": "https://substack-post-media.s3.amazonaws.com/public/images/74e1df37-06b8-444e-a5a4-fbc1ead00360_3182x1790.png",
+      "image_alt": "Welcome to the AGI era of AI governance",
+      "image_source": "feed",
+      "url": "https://www.interconnects.ai/p/welcome-to-the-agi-era-of-ai-governance",
+      "event_date": "2026-06-14",
+      "source": "Interconnects",
+      "evidence": "It's a one-way door and we weren't ready for it.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-leiphone-ai-ai",
+      "title": "健康AI阿福测试“医生把关”新功能：提供AI+医生协作观察样本",
+      "content": "6月15日，健康AI应用\"蚂蚁阿福\"宣布“拍皮肤”功能升级：可识别皮肤病种类从50种增至100多种，覆盖99%的线上就医常见皮肤问题。同时，阿福还上线了“医生把关”这一新服务：用户获得阿福的解答后，可选择邀请三甲医院的医生对阿福的分析结果进行复核并补充意见。这也是国内首个落地\"AI问答+医生把关\"协作模式的AI应用，为AI与医生的合作提...",
+      "url": "https://www.leiphone.com/category/industrynews/d1EqrpsXBW4c1JjR.html",
+      "event_date": "2026-06-15",
+      "source": "Leiphone",
+      "evidence": "6月15日，健康AI应用\"蚂蚁阿福\"宣布“拍皮肤”功能升级：可识别皮肤病种类从50种增至100多种，覆盖99%的线上就医常见皮肤问题。同时，阿福还上线了“医生把关”这一新服务：用户获得阿福的解答后，可选择邀请三甲医院的医生对阿福的分析结果进行复核并补充意见。这也是国内首个落地\"AI问答+医生把关\"协作模式的AI应用，为AI与医生的合作提供了可行路径，提供了可继续观察的落地样本。 阿福的测试数据显示，15%的用户会选择“医生把关”，阿福分析结果与医生把关的一致率超过90。..",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-sspai-fable-5-mythos-5",
+      "title": "派早报：Fable 5 和 Mythos 5 模型因美国商务部禁令下线",
+      "content": "Fable 5 和 Mythos 5 模型因美国商务部禁令下线 SpaceX 挂牌，市值达 2.1 万亿美元 《广告引证内容执法指南》出台 华为推出 HarmonyOS 7 英伟达开始接受中国客户下单 Vera CPU 大疆与影石在美互诉专利侵权 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文。",
+      "url": "https://sspai.com/post/111045",
+      "event_date": "2026-06-14",
+      "source": "SSPAI",
+      "evidence": "Fable 5 和 Mythos 5 模型因美国商务部禁令下线 SpaceX 挂牌，市值达 2.1 万亿美元 《广告引证内容执法指南》出台 华为推出 HarmonyOS 7 英伟达开始接受中国客户下单 Vera CPU 大疆与影石在美互诉专利侵权 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文。",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-nature-machine-learning-decision-processes-in-3d-structural-mri-schizoph",
+      "title": "Decision processes in 3D structural MRI schizophrenia classification evaluated ...",
+      "content": "Nature Machine Learning 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
+      "url": "https://www.nature.com/articles/s41598-026-57667-z",
+      "event_date": "2026-06-13",
+      "source": "Nature Machine Learning",
+      "evidence": "Nature Machine Learning published this intermediary lead entry.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-ml-papers-week-self-revising-discovery-systems",
+      "title": "Self-Revising Discovery Systems",
+      "content": "ML Papers of the Week 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
+      "url": "https://arxiv.org/abs/2606.01444",
+      "event_date": "2026-06-07",
+      "source": "ML Papers of the Week",
+      "evidence": "From MIT, this paper argues that genuine scientific discovery is not answer generation but a change in the search space itself, and that an AI scientist must perceive that shift without being told. It develops a category-theoretic framework。..",
+      "editorial_category": "community_signal",
+      "source_level": "paper",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "general-news-google-ai-policy-trump-tried-to-block-state-ai-regulations-but-some",
+      "title": "Trump tried to block state AI regulations, but some states are forging ahead - ...",
+      "content": "Google News AI Policy RSS 记录了一条安全治理公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRnFPYkdrUkUyc0JXNzRLWk5NWjE0WDB2cmVsZ1hJT2FReGk2YVBvTUs5M2xBM0UzVVBqci1zTG1iT2dpWmtVRzhaLWVrV250MjEyQXZwN2NldGVLQmE1S1lnSjBjUUdlZjJLdXN6NDMybU9oV0Z2T3drbnJkemJMQnEyWFZuVTM5cTZBZHdYVjJPcHZSRHdLX3ZsbjPSAaIBQVVfeXFMTldudEF1VzQzVFhSTk42cnlGSFZkSFBzQUh1cjhuRTJwTXJGalhXb09FeDVOaldZLTlaUmEzR3ZBMlB4dExDSW5Da1E4N0lSUy1HWUVmaEhfTm1CZzhoQ1hmZGFueEROZWE4eE9XOW1JVFNMRzN0X1pDNGRjUmpRdy0tZmV4R1JKZW1uRjNDVGVJWGVzV0x4WEpqUjY3QU1hY3FR?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AI Policy RSS",
+      "evidence": "Trump tried to block state AI regulations, but some states are forging ahead ABC News - Breaking News, Latest News and Videos。",
+      "editorial_category": "community_signal",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "general-news-google-ai-policy-inside-the-race-to-protect-children-from-ai-broadb",
+      "title": "Inside the Race to Protect Children from AI - Broadband Breakfast",
+      "content": "Google News AI Policy RSS 记录了一条安全治理公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxORzJROG9BaXc0aF8yMWV1MnJJQ3Zaa09idi0zdDdyUnVYVVNhUTRtbFF3bV9nWmVUVFJYc1lCcVdqSm9mWTBScG9RTmlkMDlMWWd3dVptSGFQSUxydE1NbHZNVUpHNUk0ZC10QnNVUGQ2blJ5QzZ0SmlDLXM5ZUVJdw?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AI Policy RSS",
+      "evidence": "Inside the Race to Protect Children from AI Broadband Breakfast。",
+      "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
       "importance": "general",
@@ -6716,15 +7448,15 @@
   "evidence_assets": [],
   "self_check": {
     "report_date": "2026-06-15",
-    "main_items": 4,
-    "builder_observations": 9,
+    "main_items": 3,
+    "builder_observations": 3,
     "builder_skill_used": [
       "candidate-pool-autodraft"
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 7,
-        "selected": 4
+        "eligible_candidates": 3,
+        "selected": 3
       },
       "github_trending": {
         "eligible_candidates": 10,
@@ -6735,24 +7467,24 @@
         "selected": 0
       },
       "hot_blogs": {
-        "eligible_candidates": 1,
+        "eligible_candidates": 0,
         "selected": 0
       },
       "chinese_media_dynamics": {
-        "eligible_candidates": 0,
-        "selected": 0
+        "eligible_candidates": 2,
+        "selected": 2
       },
       "projects": {
         "eligible_candidates": 10,
         "selected": 10
       },
       "builder_observations": {
-        "eligible_candidates": 9,
-        "selected": 9
-      },
-      "official_org_updates": {
         "eligible_candidates": 3,
         "selected": 3
+      },
+      "official_org_updates": {
+        "eligible_candidates": 0,
+        "selected": 0
       },
       "wechat_items": {
         "eligible_candidates": 0,
@@ -6776,17 +7508,17 @@
     "source_status_history": {
       "path": "source-status-history.json",
       "tracked_sources": 309,
-      "no_signal_or_blocked": 168,
+      "no_signal_or_blocked": 164,
       "stale_sources": 0,
       "window_days": 10
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "374eb2ec02b6d1e38e556d04cae0ba7dab71d0c0",
-      "git_commit_short": "374eb2ec02b6",
-      "git_branch": "main",
-      "origin_main_sha": "374eb2ec02b6d1e38e556d04cae0ba7dab71d0c0",
-      "origin_main_short": "374eb2ec02b6",
+      "git_commit": "01fe5bab4697b27207f637f6ffd328a762071648",
+      "git_commit_short": "01fe5bab4697",
+      "git_branch": "codex/public-daily-v2",
+      "origin_main_sha": "01fe5bab4697b27207f637f6ffd328a762071648",
+      "origin_main_short": "01fe5bab4697",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -6820,7 +7552,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-15T02:47:35.771Z",
+  "generated_at": "2026-06-15T07:16:08.809Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-15.html",
   "html_path": "reports/2026/06/2026-06-15.html",
@@ -6842,6 +7574,8 @@
       "wechat_sources_blocked",
       "zhihu_sources_blocked",
       "reddit_sources_blocked",
+      "hot_blogs_selection_degraded",
+      "builder_observations_selection_degraded",
       "china_ai_no_recent_signal"
     ],
     "affected_sections": [
@@ -6850,7 +7584,8 @@
       "daily_tracking",
       "wechat_items",
       "zhihu_items",
-      "reddit_items"
+      "reddit_items",
+      "builder_observations"
     ],
     "degraded_sections": [
       {
@@ -6893,6 +7628,13 @@
         "error_code": "quality_degraded",
         "section": "reddit_items",
         "message": "reddit_items coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      },
+      {
+        "code": "builder_observations_selection_degraded",
+        "error_code": "quality_degraded",
+        "section": "builder_observations",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
         "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
       },
       {

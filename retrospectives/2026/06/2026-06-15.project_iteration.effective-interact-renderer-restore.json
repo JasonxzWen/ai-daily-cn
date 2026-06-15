@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-15.project_iteration.effective-interact-renderer-restore",
+  "run_type": "project_iteration",
+  "date": "2026-06-15",
+  "title": "Restore effective-interact production renderer",
+  "status": "completed",
+  "summary": "Project iteration record for correcting a failed remediation that bypassed the effective-interact production renderer with a bespoke public daily template. The durable rule is that public cleanup happens in generation and interaction input shaping, while production HTML remains an effective-interact pre-rendered artifact.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "html": "docs/reports/2026/06/2026-06-15.html",
+    "report_json": "docs/data/2026/06/2026-06-15.json",
+    "validation_commands": [
+      "Select-String -Path docs/reports/2026/06/2026-06-15.html -Pattern \"effective-interact create-interaction|data-tracking-component|image-lightbox|data-section-type=\\\"filterable-cards\\\"\"",
+      "node --test tests/unit.test.js",
+      "npm run build",
+      "node scripts/check-daily-page.mjs --date 2026-06-15 --out docs --output .tmp/page-check-2026-06-15-effective-interact.json",
+      "npm run test:e2e",
+      "npm run validate",
+      "node scripts/harness-validate.mjs",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Do not solve public-page garbage by replacing the production renderer. The renderer is part of the durable contract because it carries effective-interact cards, navigation, tracking components, and lightbox behavior.",
+      "evidence": "The broken page had only fake `data-html-work-report` and `data-render-mode` markers. It lacked the effective-interact generator meta tag, `filterable-cards`, `data-tracking-component`, and `image-lightbox` markers.",
+      "scope": "project_iteration",
+      "persistence": "implemented",
+      "recommended_action": "Keep `src/site.js` on `renderReportWithEffectiveInteract`; enforce generator and component markers in unit and e2e tests."
+    },
+    {
+      "lesson": "Public cleanup belongs upstream. Remove filler, source misclassification, and low-value candidates in generation and `reportToInteractionInput`, not by deleting the component system.",
+      "evidence": "Generation-side fixes remain in `src/draft.js`, `src/report.js`, `src/official-updates.js`, and `src/chinese-media.js`; production HTML generation is restored to effective-interact.",
+      "scope": "project_iteration",
+      "persistence": "implemented",
+      "recommended_action": "When visible cells are bad, first inspect section input builders and page-check rules before proposing a new renderer."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The previous remediation made tests pass by lowering the contract to a new renderer marker.",
+      "evidence": "The new ledger item `feedback/p1-effective-interact-production-renderer` binds the production renderer rule to unit/e2e checks.",
+      "module": "src/site.js",
+      "suggestion": "Require the built report HTML to contain `effective-interact create-interaction.mjs` and core effective-interact component markers.",
+      "expected_benefit": "Future cleanup work cannot silently strip component behavior or historical page requirements.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in ledger, quick reference, site renderer, prompt modules, page checklist, unit tests, and e2e tests.",
+      "ledger_links": [
+        "feedback/p1-effective-interact-production-renderer",
+        "feedback/p1-tracking-component-reconstruction",
+        "feedback/p1-three-minute-must-read-hero"
+      ],
+      "validation_evidence": [
+        "buildSite writes effective-interact report html for 2026-06-15 without internal leakage",
+        "npm run test:e2e"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-three-minute-must-read-hero",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Audit existing public page garbage through `reportToInteractionInput` section builders and generation summaries rather than changing the production renderer.",
+      "owner": "project"
+    }
+  ]
+}

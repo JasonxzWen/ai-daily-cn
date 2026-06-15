@@ -1,10 +1,10 @@
 const OFFICIAL_SOURCE_LEVELS = new Set([
   "official_company_news",
   "official_open_source_account",
-  "official_model_host_account",
-  "primary",
-  "official"
+  "official_model_host_account"
 ]);
+
+const NON_OFFICIAL_VERIFICATION_RE = /intermediary|unverified|platform_exempt|original_social/i;
 
 const ORGANIZATION_RULES = [
   ["OpenAI", /openai/i],
@@ -54,6 +54,10 @@ export function selectOfficialOrgUpdates(candidates = [], options = {}) {
 export function isOfficialOrganizationCandidate(candidate = {}) {
   const sourceLevel = String(candidate.source_level || "").trim();
   if (!OFFICIAL_SOURCE_LEVELS.has(sourceLevel)) {
+    return false;
+  }
+  const verificationStatus = String(candidate.verification_status || "").trim();
+  if (verificationStatus && NON_OFFICIAL_VERIFICATION_RE.test(verificationStatus)) {
     return false;
   }
   const text = [

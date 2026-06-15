@@ -3,9 +3,9 @@
   "id": "2026-06-15.project_iteration.must-read-fallback-contract",
   "run_type": "project_iteration",
   "date": "2026-06-15",
-  "title": "Must-read fallback contract hardening",
+  "title": "Must-read fallback contract correction",
   "status": "completed",
-  "summary": "Project iteration record for preventing sparse main_items reports from reaching page-check without exactly three reader-facing must-read cards when other public sourced sections can fill the surface.",
+  "summary": "Project iteration record for moving must-read strictness back into generation: ranking rows and generic public sections must not be used to fill 今日必看, and report-write should not block otherwise valid drafts just because hero_highlights are absent or fewer than three.",
   "evidence": {
     "summary_path": "tasks/current-task.md",
     "validation_commands": [
@@ -19,31 +19,32 @@
   "degraded_sections": [],
   "lessons": [
     {
-      "lesson": "Report-write validation must evaluate the same public reference pool that the renderer and page-check expect.",
-      "evidence": "The blocked daily run had fewer than three main_items but enough public sourced sections for must-read fallback, so a main_items-only validation bypass let an invalid public surface proceed.",
+      "lesson": "Must-read fallback should prefer fewer high-signal cards over filling the surface with ranking metadata or low-value public sections.",
+      "evidence": "The 2026-06-15 regeneration initially promoted a GitHub Trending row and a non-AI Chinese media activity into reader-facing surfaces; quality improved only after generation stopped using GitHub/SSPAI filler for hero cards.",
       "scope": "daily_publish",
       "persistence": "implemented",
-      "recommended_action": "Keep hero_highlights enforcement tied to eligible public reference items rather than only main_items count."
+      "recommended_action": "Keep selectHeroHighlights scoped to high-signal report sections and keep report-write hero validation conditional on hero_highlights actually being present."
     }
   ],
   "suggestions": [
     {
       "status": "implemented",
-      "issue": "A sparse report could pass report-write with only two hero_highlights when the third public reference lived outside main_items.",
-      "evidence": "The new regression test fails without the report-write contract change and passes once eligible public reference items trigger the exactly-three hero_highlights requirement.",
-      "module": "src/report.js",
-      "suggestion": "Require exactly three hero_highlights whenever at least three public reference items with title and URL are available across all rendered daily sections.",
-      "expected_benefit": "The daily runner blocks early with a repairable data contract error instead of producing a page that fails visual page-check after build.",
+      "issue": "A sparse or low-signal report could be forced to manufacture a third must-read card from GitHub Trending or other public filler sections.",
+      "evidence": "Regression tests now fail if report:draft backfills must-read from GitHub ranking cells, if summary text reintroduces GitHub Top 10 meta-copy, or if Chinese media dynamics admit CiGA/Game Jam activity posts.",
+      "module": "src/draft.js, src/report.js, src/chinese-media.js",
+      "suggestion": "Allow 1-3 hero_highlights when they are present, do not block drafts that omit hero_highlights, and keep generation from using ranking cells as must-read filler.",
+      "expected_benefit": "Daily generation remains tolerant of degraded source coverage while the public hero stays reader-facing and free of filler.",
       "requires_user_confirmation": false,
-      "promotion_path": "Implemented in report-write normalization and covered by unit tests plus the full repository validation gate.",
+      "promotion_path": "Implemented in report-write normalization, report:draft hero selection, Chinese media filtering, prompt tests, page-check, screenshots, and the full repository validation gate.",
       "ledger_links": [
         "feedback/p1-three-minute-must-read-hero",
         "feedback/p1-ai-quality-review-loop",
         "feedback/p1-public-daily-content-contract"
       ],
       "validation_evidence": [
-        "report write requires must read backfill when public references can fill three cards",
-        "report:draft backfills must read highlights from public sections when main items are sparse",
+        "report write does not force must read backfill from GitHub ranking cells",
+        "report:draft does not backfill must read highlights from GitHub ranking cells",
+        "Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries",
         "interaction input puts must read first and compact main list",
         "npm run validate"
       ]

@@ -24,6 +24,7 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_pool_path",
   "source_audit",
   "self_check",
+  "quality_status",
   "source_window",
   "publish_status",
   "markdown_path",
@@ -149,6 +150,7 @@ export async function buildSite(options = {}) {
       reportNavigation: reportNavigationByDate.get(record.report.report_date),
       dateIndexItem: dateIndex.items.find((item) => item.date === record.report.report_date),
       fetchImpl: options.fetchImpl,
+      siteUrl,
       includeInternalData: Boolean(options.includeInternalData)
     });
   }
@@ -701,7 +703,6 @@ function withDefaultImportanceForReport(report) {
 
 function publicReportData(report) {
   const result = sanitizePublicValue(report);
-  result.quality_status = publicQualityStatus(report?.quality_status);
   result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false);
