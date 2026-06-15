@@ -1,0 +1,1773 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-06-14",
+  "title": "AI 日报 2026-06-14",
+  "summary": "今天主线集中在平台生态、无障碍硬件、云数据库高可用和智能体工程：OpenAI 发布合作伙伴网络，Meta 推出面向失明退伍军人的免费 AI 眼镜计划，阿里云介绍 PolarDB-X Proxy 支撑百万级 QPS 与秒级故障恢复；同时收录 Anthropic 公共记录、Claude 合作与访问限制、Google Research 低碳计算和医疗理解研究，以及 agent 与开发工具博客动向。",
+  "hero_highlights": [
+    {
+      "title": "Anthropic 发布首份 Public Record 结果",
+      "url": "https://www.anthropic.com/news/anthropic-public-record",
+      "reason": "Anthropic 把首份 Public Record 结果公开，给外部观察其模型治理、公共反馈和机构透明度提供了新材料。",
+      "what_happened": "Anthropic 发布首份 Public Record 结果，公开这一记录机制下收集和整理出的首批结果。",
+      "why_watch": "这类公开记录会影响企业和研究团队理解 Anthropic 如何回应公共反馈、监管期待和模型治理问题。",
+      "category": "model_platform",
+      "source_item_ref": "https://www.anthropic.com/news/anthropic-public-record"
+    },
+    {
+      "title": "OpenAI 推出合作伙伴网络，扩展企业服务生态",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "reason": "OpenAI 把合作伙伴作为企业采用产品与行业解决方案的外部交付网络，采购、集成和服务交付路径会多一个官方入口。",
+      "what_happened": "OpenAI 发布 Partner Network，围绕企业采用、解决方案实施和服务伙伴协作建立官方合作伙伴入口。",
+      "why_watch": "企业客户寻找实施方、集成服务或行业方案时，OpenAI 官方伙伴网络会改变供应商筛选和交付协作方式。",
+      "category": "product_tool",
+      "source_item_ref": "https://openai.com/index/introducing-openai-partner-network"
+    },
+    {
+      "title": "阿里云介绍 PolarDB-X Proxy 的高吞吐与秒级恢复能力",
+      "url": "https://www.alibabacloud.com/blog/millions-of-queries-per-second-qps-and-second-level-fault-recovery-how-polardb-x-proxy-empowers-mysql-clusters_603245",
+      "reason": "阿里云用 PolarDB-X Proxy 说明 MySQL 集群在百万级 QPS 和秒级故障恢复场景下的架构能力。",
+      "what_happened": "Alibaba Cloud Blog 介绍 PolarDB-X Proxy 如何支撑 MySQL 集群实现百万级 QPS 与秒级故障恢复。",
+      "why_watch": "高吞吐代理层和快速故障恢复会直接影响云上数据库承载 AI 应用、检索服务和高并发业务时的架构选型。",
+      "category": "china_open_source_community",
+      "source_item_ref": "https://www.alibabacloud.com/blog/millions-of-queries-per-second-qps-and-second-level-fault-recovery-how-polardb-x-proxy-empowers-mysql-clusters_603245"
+    }
+  ],
+  "main_items": [
+    {
+      "title": "OpenAI 发布合作伙伴网络，扩大企业服务生态",
+      "editorial_category": "product_radar",
+      "event_date": "2026-06-14",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI 在新闻源中发布 Partner Network，强调通过外部服务伙伴帮助企业采用 OpenAI 产品与行业解决方案。",
+      "bullets": [
+        "**服务入口**：企业采购、集成和交付 OpenAI 能力时，官方合作伙伴网络会成为新的服务入口。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Meta 将为失明退伍军人免费提供 AI 眼镜",
+      "editorial_category": "product_radar",
+      "event_date": "2026-06-12",
+      "url": "https://about.fb.com/news/2026/06/free-ai-glasses-for-every-blind-veteran/",
+      "source": "Meta Newsroom",
+      "tier": "T0",
+      "entities": [
+        "Meta Newsroom"
+      ],
+      "summary": "Meta Newsroom 发布免费 AI 眼镜计划，面向失明退伍军人提供无障碍硬件和 AI 辅助能力。",
+      "bullets": [
+        "**无障碍硬件**：这条更新把 AI 眼镜放到视障退伍军人的日常辅助场景中，体现消费硬件与可及性服务的结合。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "阿里云介绍 PolarDB-X Proxy 的百万级 QPS 与秒级恢复",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://www.alibabacloud.com/blog/millions-of-queries-per-second-qps-and-second-level-fault-recovery-how-polardb-x-proxy-empowers-mysql-clusters_603245",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Alibaba Cloud Blog 介绍 PolarDB-X Proxy 如何让 MySQL 集群在高并发查询和故障恢复场景下提升可用性。",
+      "bullets": [
+        "**数据库高可用**：百万级 QPS 与秒级故障恢复会影响云上 AI 应用、检索服务和业务系统的数据库代理层选型。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI Academy 推出面向下一阶段工作的 AI 课程",
+      "editorial_category": "engineering_toolchain",
+      "event_date": "2026-06-12",
+      "url": "https://openai.com/index/academy-courses-applying-ai-at-work",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI News RSS 发布 OpenAI Academy 新课程，主题聚焦在工作场景中应用 AI 的下一阶段能力。",
+      "bullets": [
+        "**工作教育**：OpenAI Academy 的课程更新把 AI 使用能力放进组织培训和工作流转型语境。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Anthropic 发布首份 Public Record 结果",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://www.anthropic.com/news/anthropic-public-record",
+      "source": "Anthropic News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic News"
+      ],
+      "summary": "Anthropic News 发布首份 Public Record 结果，公开这一记录机制下的首批整理结果。",
+      "bullets": [
+        "**治理透明度**：Public Record 为外界观察 Anthropic 的公共反馈和模型治理实践提供了新的公开材料。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Anthropic 回应美国政府关于暂停 Fable 5 访问的指令",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://www.anthropic.com/news/fable-mythos-access",
+      "source": "Anthropic News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic News"
+      ],
+      "summary": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。",
+      "bullets": [
+        "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
+        "**安全机制**：Fable 5 在网络、生物、化学和模型蒸馏等敏感场景由分类器接管，并切换到 Claude Opus 4.8；官方称平均少于 5% 的会话会触发。",
+        "**可用性/价格**：Fable 5 面向公开产品和 API 可用；Mythos 5 仅限 Project Glasswing/可信访问，两者标价都是 $10/M input、$50/M output。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "TCS 与 Anthropic 合作，将 Claude 带入受监管行业",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://www.anthropic.com/news/tcs-anthropic-partnership",
+      "source": "Anthropic News",
+      "tier": "T0",
+      "entities": [
+        "Anthropic News"
+      ],
+      "summary": "Anthropic News 发布与 TCS 的合作，重点是把 Claude 引入受监管行业的企业采用场景。",
+      "bullets": [
+        "**行业采用**：TCS 与 Anthropic 的合作把 Claude 的企业采用重点放在受监管行业和服务交付能力上。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Google Research 探索用退役手机构建低碳计算平台",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://research.google/blog/a-low-carbon-computing-platform-from-your-retired-phones/",
+      "source": "Google Research Blog",
+      "tier": "T0",
+      "entities": [
+        "Google Research Blog"
+      ],
+      "summary": "Google Research Blog 发布低碳计算平台研究，主题是利用退役手机组成新的计算资源。",
+      "bullets": [
+        "**低碳计算**：退役手机计算平台把硬件再利用、能耗和边缘计算资源组织放到同一个研究问题中。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Google Research 研究 AI 如何帮助用户理解皮肤状况",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://research.google/blog/research-into-how-ai-can-help-users-understand-skin-conditions/",
+      "source": "Google Research Blog",
+      "tier": "T0",
+      "entities": [
+        "Google Research Blog"
+      ],
+      "summary": "Google Research Blog 发布 AI 辅助用户理解皮肤状况的研究，关注医疗健康信息理解场景。",
+      "bullets": [
+        "**健康理解**：这项研究把 AI 放在皮肤状况解释和用户理解场景中，相关能力需要同时关注准确性、适用范围和用户沟通方式。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 展示在加速基础设施上部署 MiniMax M3 长上下文推理和 agent 工作流",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-12",
+      "url": "https://developer.nvidia.com/blog/deploy-long-context-reasoning-and-agentic-workflows-with-minimax-m3-on-nvidia-accelerated-infrastructure/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "NVIDIA Developer Blog 介绍在 NVIDIA 加速基础设施上部署 MiniMax M3，用于长上下文推理和 agent 工作流。",
+      "bullets": [
+        "**部署路径**：MiniMax M3 的长上下文推理和 agent 工作流部署示例，为关注推理基础设施的团队提供了参考。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    }
+  ],
+  "github_trending": [
+    {
+      "name": "iptv-org/iptv",
+      "repo": "iptv-org/iptv",
+      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/iptv-org/iptv",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "freeCodeCamp/freeCodeCamp",
+      "repo": "freeCodeCamp/freeCodeCamp",
+      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/freeCodeCamp/freeCodeCamp",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "pytest-dev/pytest",
+      "repo": "pytest-dev/pytest",
+      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/pytest-dev/pytest",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "swc-project/swc",
+      "repo": "swc-project/swc",
+      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/swc-project/swc",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "chatwoot/chatwoot",
+      "repo": "chatwoot/chatwoot",
+      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/chatwoot/chatwoot",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": 13,
+      "rank_delta": 8,
+      "trend": "up",
+      "importance": "general"
+    },
+    {
+      "name": "NVIDIA/SkillSpector",
+      "repo": "NVIDIA/SkillSpector",
+      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/NVIDIA/SkillSpector",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": 5,
+      "rank_delta": -1,
+      "trend": "down",
+      "importance": "general"
+    },
+    {
+      "name": "meshery/meshery",
+      "repo": "meshery/meshery",
+      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/meshery/meshery",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "cypress-io/cypress",
+      "repo": "cypress-io/cypress",
+      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/cypress-io/cypress",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "GorvGoyl/Clone-Wars",
+      "repo": "GorvGoyl/Clone-Wars",
+      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/GorvGoyl/Clone-Wars",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "repo": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    }
+  ],
+  "huggingface_trending": [],
+  "model_releases": [],
+  "hot_blogs": [
+    {
+      "title": "AWS 讲解用生成式 AI 服务构建智能文档处理管线",
+      "editorial_category": "content_aigc",
+      "url": "https://aws.amazon.com/blogs/machine-learning/from-pdfs-to-insights-architecting-an-intelligent-document-processing-pipeline-with-aws-generative-ai-services/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "AWS Machine Learning Blog",
+      "event_date": "2026-06-12",
+      "topic": "AIGC / content generation",
+      "summary": "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助内容团队判断这类工具该不该进入试用、采购或正式生产流程。",
+      "key_points": [
+        "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
+        "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
+        "它能帮助内容团队判断这类工具该不该进入试用、采购或正式生产流程。",
+        "文章真正有用的部分，在于它讲清了它怎样改变内容生产、素材生成或创作者工作流里的成本和质量判断，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。",
+        "对读者的价值，在于快速判断这条技术观点是否会影响产品路线、工具选型或风险预案。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "GitHub Copilot 代码评审新增配置和控制项",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://github.blog/changelog/2026-06-12-copilot-code-review-new-configurations-and-controls",
+      "publisher": "GitHub Changelog",
+      "author": "GitHub Changelog",
+      "event_date": "2026-06-12",
+      "topic": "AI industry",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
+        "它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
+        "对读者的价值，在于快速判断这条技术观点是否会影响产品路线、工具选型或风险预案。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 在首个 agent 编程基准中取得领先表现",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://developer.nvidia.com/blog/nvidia-achieves-leading-agentic-coding-performance-on-first-agentic-ai-benchmark/",
+      "publisher": "NVIDIA Developer Blog",
+      "author": "NVIDIA Developer Blog",
+      "event_date": "2026-06-13",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正有用的是实验设置、数据来源、对比基线、可复现代码和作者承认的限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "真正有用的是实验设置、数据来源、对比基线、可复现代码和作者承认的限制。",
+        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避实验设置、数据来源、对比基线和作者承认的限制。",
+        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA JetPack 7.2 面向边缘端部署具备 agent 能力的 AI",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://developer.nvidia.com/blog/deploy-agentic-ready-ai-at-the-edge-with-memory-efficiency-in-nvidia-jetpack-7-2/",
+      "publisher": "NVIDIA Developer Blog",
+      "author": "NVIDIA Developer Blog",
+      "event_date": "2026-06-12",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
+        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。",
+        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "GitHub 解释如何让 Copilot CLI 更谨慎地委派任务",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://github.blog/ai-and-ml/how-we-made-github-copilot-cli-more-selective-about-delegation/",
+      "publisher": "GitHub Blog Feed",
+      "author": "GitHub Blog Feed",
+      "event_date": "2026-06-12",
+      "topic": "AI industry",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
+        "它能帮助读者判断这条变化是否会影响产品路线、工具选型或内部风险预案。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
+        "对读者的价值，在于快速判断这条技术观点是否会影响产品路线、工具选型或风险预案。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "AWS 案例：Rocket Close 用 agent AI 优化产权业务",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://aws.amazon.com/blogs/machine-learning/building-supercharger-how-rocket-close-optimized-title-operations-with-agentic-ai/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "AWS Machine Learning Blog",
+      "event_date": "2026-06-12",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
+        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
+        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "AWS 构建会议准备与跟进助手",
+      "editorial_category": "viewpoint_analysis",
+      "url": "https://aws.amazon.com/blogs/machine-learning/build-a-meeting-prep-and-follow-up-assistant-with-amazon-quick-and-cisco-webex-mcp-servers/",
+      "publisher": "AWS Machine Learning Blog",
+      "author": "AWS Machine Learning Blog",
+      "event_date": "2026-06-12",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
+        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
+        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA Blackwell 在首个 agent AI 基础设施基准中领先",
+      "editorial_category": "viewpoint_analysis",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/331a6b01d6d4ced671054e8cd02405df/6a2c76413d633296f41c8c64_dgx-social-gb300-2048x2048-1-1-842x450/dgx-social-gb300-2048x2048-1-1-842x450_thmb.jpg",
+      "image_alt": "NVIDIA Blackwell Leads on First Agentic AI Infrastructure Benchmark",
+      "image_source": "feed",
+      "url": "https://blogs.nvidia.com/blog/nvidia-blackwell-agentperf-artificial-analysis/",
+      "publisher": "NVIDIA Newsroom RSS",
+      "author": "NVIDIA Newsroom RSS",
+      "event_date": "2026-06-12",
+      "topic": "AI engineering tools",
+      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正有用的是实验设置、数据来源、对比基线、可复现代码和作者承认的限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "key_points": [
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "真正有用的是实验设置、数据来源、对比基线、可复现代码和作者承认的限制。",
+        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避实验设置、数据来源、对比基线和作者承认的限制。",
+        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+      ],
+      "content_type": "blog",
+      "importance": "notable",
+      "image_urls": []
+    }
+  ],
+  "chinese_media_dynamics": [
+    {
+      "title": "派早报：Fable 5 和 Mythos 5 模型因美国商务部禁令下线",
+      "url": "https://sspai.com/post/111045",
+      "publisher": "SSPAI",
+      "author": "SSPAI",
+      "event_date": "2026-06-14",
+      "topic": "中文 AI 媒体动态",
+      "summary": "SSPAI 今天更新「派早报：Fable 5 和 Mythos 5 模型因美国商务部禁令下线」。这条动态主要围绕Fable 5 和 Mythos 5 模型因美国商务部禁令下线 SpaceX 挂牌，市值达 2.1 万亿美元 《广告引证内容执法指南》出台 华为推出 HarmonyOS 7 英伟达开始接受中国客户下单 Vera CPU 大疆与影石在美互诉专利侵权 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文。This is an intermediary/self-media lead; trace。",
+      "key_points": [
+        "SSPAI 今天更新「派早报：Fable 5 和 Mythos 5 模型因美国商务部禁令下线」",
+        "这条动态主要围绕Fable 5 和 Mythos 5 模型因美国商务部禁令下线 SpaceX 挂牌，市值达 2.1 万亿美元 《广告引证内容执法指南》出台 华为推出 HarmonyOS 7 英伟达开始接受中国客户下单 Vera CPU 大疆与影石在美互诉专利侵权 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文",
+        "This is an intermediary/self-media lead; trace"
+      ],
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "title": "TDS REVIEW｜韶音 OpenDots 2 / Air 耳夹式开放真无线耳机体验",
+      "url": "https://sspai.com/post/110761",
+      "publisher": "SSPAI",
+      "author": "SSPAI",
+      "event_date": "2026-06-14",
+      "topic": "中文 AI 媒体动态",
+      "summary": "SSPAI 今天更新「TDS REVIEW｜韶音 OpenDots 2 / Air 耳夹式开放真无线耳机体验」。这条动态主要围绕一代上的好几处优势这次依然保持得不错。 查看全文。 日报把它放在中文媒体动态中，是为了保留国内二手媒体对技术落地、产品体验、产业反馈和工程实践的观察；读者若要引用事实或数字。",
+      "key_points": [
+        "SSPAI 今天更新「TDS REVIEW｜韶音 OpenDots 2 / Air 耳夹式开放真无线耳机体验」",
+        "这条动态主要围绕一代上的好几处优势这次依然保持得不错",
+        "查看全文"
+      ],
+      "importance": "notable",
+      "image_urls": []
+    }
+  ],
+  "daily_tracking": [
+    {
+      "id": "openrouter-rankings",
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai/rankings",
+      "event_date": "2026-06-14",
+      "source": "OpenRouter Rankings",
+      "category": "model_usage",
+      "importance": "notable",
+      "change_status": "changed",
+      "change_summary": "OpenRouter 本周 Top 10 已解析：#1 DeepSeek V4 Flash 4.41T tokens；#2 MiniMax M3 4.32T tokens；#3 Hy3 preview 4.14T tokens；MiniMax M3 周变化 73%。",
+      "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，4.41T tokens，周变化 20%）。 Top 10 供应商分布为 anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
+      "watch_points": [
+        "MiniMax M3 的周变化为 73%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。",
+        "若没有新进榜，重点看榜首和供应商份额是否迁移。",
+        "OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。"
+      ],
+      "metrics": [
+        {
+          "label": "榜单范围",
+          "value": "This Week Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1",
+          "trend": "unknown"
+        },
+        {
+          "label": "#1",
+          "value": "DeepSeek V4 Flash（deepseek）：4.41T tokens，周变化 20%",
+          "trend": "up"
+        },
+        {
+          "label": "#2",
+          "value": "MiniMax M3（minimax）：4.32T tokens，周变化 73%",
+          "trend": "up"
+        },
+        {
+          "label": "#3",
+          "value": "Hy3 preview（tencent）：4.14T tokens，周变化 41%",
+          "trend": "up"
+        },
+        {
+          "label": "#4",
+          "value": "MiMo-V2.5（xiaomi）：3.59T tokens，周变化 64%",
+          "trend": "up"
+        },
+        {
+          "label": "#5",
+          "value": "Owl Alpha（openrouter）：2.47T tokens，周变化 27%",
+          "trend": "up"
+        },
+        {
+          "label": "#6",
+          "value": "Claude Opus 4.7（anthropic）：2.34T tokens，周变化 62%",
+          "trend": "up"
+        },
+        {
+          "label": "#7",
+          "value": "Claude Sonnet 4.6（anthropic）：2.13T tokens，周变化 21%",
+          "trend": "up"
+        },
+        {
+          "label": "#8",
+          "value": "DeepSeek V4 Pro（deepseek）：1.96T tokens，周变化 15%",
+          "trend": "up"
+        },
+        {
+          "label": "#9",
+          "value": "Claude Opus 4.8（anthropic）：1.25T tokens，周变化 8%",
+          "trend": "up"
+        },
+        {
+          "label": "#10",
+          "value": "DeepSeek V3.2（deepseek）：1.15T tokens，周变化 2%",
+          "trend": "up"
+        }
+      ],
+      "snapshot": {
+        "type": "openrouter_rankings_public_page",
+        "collection_method": "public_page_playwright",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-15T03:00:52.918Z",
+        "source_url": "https://openrouter.ai/rankings",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "DeepSeek V4 Flash",
+            "provider": "deepseek",
+            "tokens": "4.41T tokens",
+            "change": "20%"
+          },
+          {
+            "rank": 2,
+            "model": "MiniMax M3",
+            "provider": "minimax",
+            "tokens": "4.32T tokens",
+            "change": "73%"
+          },
+          {
+            "rank": 3,
+            "model": "Hy3 preview",
+            "provider": "tencent",
+            "tokens": "4.14T tokens",
+            "change": "41%"
+          },
+          {
+            "rank": 4,
+            "model": "MiMo-V2.5",
+            "provider": "xiaomi",
+            "tokens": "3.59T tokens",
+            "change": "64%"
+          },
+          {
+            "rank": 5,
+            "model": "Owl Alpha",
+            "provider": "openrouter",
+            "tokens": "2.47T tokens",
+            "change": "27%"
+          },
+          {
+            "rank": 6,
+            "model": "Claude Opus 4.7",
+            "provider": "anthropic",
+            "tokens": "2.34T tokens",
+            "change": "62%"
+          },
+          {
+            "rank": 7,
+            "model": "Claude Sonnet 4.6",
+            "provider": "anthropic",
+            "tokens": "2.13T tokens",
+            "change": "21%"
+          },
+          {
+            "rank": 8,
+            "model": "DeepSeek V4 Pro",
+            "provider": "deepseek",
+            "tokens": "1.96T tokens",
+            "change": "15%"
+          },
+          {
+            "rank": 9,
+            "model": "Claude Opus 4.8",
+            "provider": "anthropic",
+            "tokens": "1.25T tokens",
+            "change": "8%"
+          },
+          {
+            "rank": 10,
+            "model": "DeepSeek V3.2",
+            "provider": "deepseek",
+            "tokens": "1.15T tokens",
+            "change": "2%"
+          }
+        ],
+        "history_entries": []
+      },
+      "tracking_component_snapshot": {
+        "source": "OpenRouter",
+        "component_kind": "openrouter_rankings",
+        "source_url": "https://openrouter.ai/rankings",
+        "collected_at": "2026-06-15T03:00:52.918Z",
+        "selector_version": "openrouter-rankings-v1",
+        "raw_dom_hash": "sha256:87476b9a0675be3b8f6092b63fbf9ec5d220b94a9dfffba770f0948b69597e74",
+        "data_hash": "sha256:398dc9c7f32042a204b6b71d5af383a8a424001ed6d16a9a7a786164b4aedd97",
+        "tabs": [
+          {
+            "id": "top-models",
+            "label": "Top Models",
+            "view": "stacked_bar",
+            "fallback_reason": ""
+          },
+          {
+            "id": "leaderboard",
+            "label": "LLM Leaderboard",
+            "view": "leaderboard",
+            "fallback_reason": ""
+          }
+        ],
+        "series": [
+          {
+            "id": "openrouter-top-models-weekly-usage",
+            "tab_id": "top-models",
+            "label": "Weekly usage across OpenRouter",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "DeepSeek V4 Flash",
+                "provider": "deepseek",
+                "value": 4410000000000,
+                "value_label": "4.41T tokens",
+                "change": "20%"
+              },
+              {
+                "rank": 2,
+                "model": "MiniMax M3",
+                "provider": "minimax",
+                "value": 4320000000000.0005,
+                "value_label": "4.32T tokens",
+                "change": "73%"
+              },
+              {
+                "rank": 3,
+                "model": "Hy3 preview",
+                "provider": "tencent",
+                "value": 4139999999999.9995,
+                "value_label": "4.14T tokens",
+                "change": "41%"
+              },
+              {
+                "rank": 4,
+                "model": "MiMo-V2.5",
+                "provider": "xiaomi",
+                "value": 3590000000000,
+                "value_label": "3.59T tokens",
+                "change": "64%"
+              },
+              {
+                "rank": 5,
+                "model": "Owl Alpha",
+                "provider": "openrouter",
+                "value": 2470000000000,
+                "value_label": "2.47T tokens",
+                "change": "27%"
+              },
+              {
+                "rank": 6,
+                "model": "Claude Opus 4.7",
+                "provider": "anthropic",
+                "value": 2340000000000,
+                "value_label": "2.34T tokens",
+                "change": "62%"
+              },
+              {
+                "rank": 7,
+                "model": "Claude Sonnet 4.6",
+                "provider": "anthropic",
+                "value": 2130000000000,
+                "value_label": "2.13T tokens",
+                "change": "21%"
+              },
+              {
+                "rank": 8,
+                "model": "DeepSeek V4 Pro",
+                "provider": "deepseek",
+                "value": 1960000000000,
+                "value_label": "1.96T tokens",
+                "change": "15%"
+              },
+              {
+                "rank": 9,
+                "model": "Claude Opus 4.8",
+                "provider": "anthropic",
+                "value": 1250000000000,
+                "value_label": "1.25T tokens",
+                "change": "8%"
+              },
+              {
+                "rank": 10,
+                "model": "DeepSeek V3.2",
+                "provider": "deepseek",
+                "value": 1150000000000,
+                "value_label": "1.15T tokens",
+                "change": "2%"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "openrouter-llm-leaderboard",
+            "tab_id": "leaderboard",
+            "label": "LLM Leaderboard",
+            "chart": "leaderboard",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "DeepSeek V4 Flash",
+                "provider": "deepseek",
+                "value": 4410000000000,
+                "value_label": "4.41T tokens",
+                "change": "20%"
+              },
+              {
+                "rank": 2,
+                "model": "MiniMax M3",
+                "provider": "minimax",
+                "value": 4320000000000.0005,
+                "value_label": "4.32T tokens",
+                "change": "73%"
+              },
+              {
+                "rank": 3,
+                "model": "Hy3 preview",
+                "provider": "tencent",
+                "value": 4139999999999.9995,
+                "value_label": "4.14T tokens",
+                "change": "41%"
+              },
+              {
+                "rank": 4,
+                "model": "MiMo-V2.5",
+                "provider": "xiaomi",
+                "value": 3590000000000,
+                "value_label": "3.59T tokens",
+                "change": "64%"
+              },
+              {
+                "rank": 5,
+                "model": "Owl Alpha",
+                "provider": "openrouter",
+                "value": 2470000000000,
+                "value_label": "2.47T tokens",
+                "change": "27%"
+              },
+              {
+                "rank": 6,
+                "model": "Claude Opus 4.7",
+                "provider": "anthropic",
+                "value": 2340000000000,
+                "value_label": "2.34T tokens",
+                "change": "62%"
+              },
+              {
+                "rank": 7,
+                "model": "Claude Sonnet 4.6",
+                "provider": "anthropic",
+                "value": 2130000000000,
+                "value_label": "2.13T tokens",
+                "change": "21%"
+              },
+              {
+                "rank": 8,
+                "model": "DeepSeek V4 Pro",
+                "provider": "deepseek",
+                "value": 1960000000000,
+                "value_label": "1.96T tokens",
+                "change": "15%"
+              },
+              {
+                "rank": 9,
+                "model": "Claude Opus 4.8",
+                "provider": "anthropic",
+                "value": 1250000000000,
+                "value_label": "1.25T tokens",
+                "change": "8%"
+              },
+              {
+                "rank": 10,
+                "model": "DeepSeek V3.2",
+                "provider": "deepseek",
+                "value": 1150000000000,
+                "value_label": "1.15T tokens",
+                "change": "2%"
+              }
+            ],
+            "fallback_reason": ""
+          }
+        ],
+        "rows": [
+          {
+            "rank": 1,
+            "model": "DeepSeek V4 Flash",
+            "provider": "deepseek",
+            "value": 4410000000000,
+            "value_label": "4.41T tokens",
+            "change": "20%"
+          },
+          {
+            "rank": 2,
+            "model": "MiniMax M3",
+            "provider": "minimax",
+            "value": 4320000000000.0005,
+            "value_label": "4.32T tokens",
+            "change": "73%"
+          },
+          {
+            "rank": 3,
+            "model": "Hy3 preview",
+            "provider": "tencent",
+            "value": 4139999999999.9995,
+            "value_label": "4.14T tokens",
+            "change": "41%"
+          },
+          {
+            "rank": 4,
+            "model": "MiMo-V2.5",
+            "provider": "xiaomi",
+            "value": 3590000000000,
+            "value_label": "3.59T tokens",
+            "change": "64%"
+          },
+          {
+            "rank": 5,
+            "model": "Owl Alpha",
+            "provider": "openrouter",
+            "value": 2470000000000,
+            "value_label": "2.47T tokens",
+            "change": "27%"
+          },
+          {
+            "rank": 6,
+            "model": "Claude Opus 4.7",
+            "provider": "anthropic",
+            "value": 2340000000000,
+            "value_label": "2.34T tokens",
+            "change": "62%"
+          },
+          {
+            "rank": 7,
+            "model": "Claude Sonnet 4.6",
+            "provider": "anthropic",
+            "value": 2130000000000,
+            "value_label": "2.13T tokens",
+            "change": "21%"
+          },
+          {
+            "rank": 8,
+            "model": "DeepSeek V4 Pro",
+            "provider": "deepseek",
+            "value": 1960000000000,
+            "value_label": "1.96T tokens",
+            "change": "15%"
+          },
+          {
+            "rank": 9,
+            "model": "Claude Opus 4.8",
+            "provider": "anthropic",
+            "value": 1250000000000,
+            "value_label": "1.25T tokens",
+            "change": "8%"
+          },
+          {
+            "rank": 10,
+            "model": "DeepSeek V3.2",
+            "provider": "deepseek",
+            "value": 1150000000000,
+            "value_label": "1.15T tokens",
+            "change": "2%"
+          }
+        ],
+        "previous_snapshot": null,
+        "diff": {
+          "summary": "No previous component snapshot was available for comparison.",
+          "changed_rows": [],
+          "new_entries": [
+            "DeepSeek V4 Flash",
+            "MiniMax M3",
+            "Hy3 preview",
+            "MiMo-V2.5",
+            "Owl Alpha",
+            "Claude Opus 4.7",
+            "Claude Sonnet 4.6",
+            "DeepSeek V4 Pro",
+            "Claude Opus 4.8",
+            "DeepSeek V3.2"
+          ]
+        },
+        "cache_path": "",
+        "fallback_reason": "",
+        "public_trace": {
+          "source_url": "https://openrouter.ai/rankings",
+          "collected_at": "2026-06-15T03:00:52.918Z",
+          "selector_version": "openrouter-rankings-v1",
+          "data_hash": "sha256:398dc9c7f32042a204b6b71d5af383a8a424001ed6d16a9a7a786164b4aedd97",
+          "top_rows": [
+            {
+              "rank": 1,
+              "model": "DeepSeek V4 Flash",
+              "provider": "deepseek",
+              "value_label": "4.41T tokens",
+              "change": "20%"
+            },
+            {
+              "rank": 2,
+              "model": "MiniMax M3",
+              "provider": "minimax",
+              "value_label": "4.32T tokens",
+              "change": "73%"
+            },
+            {
+              "rank": 3,
+              "model": "Hy3 preview",
+              "provider": "tencent",
+              "value_label": "4.14T tokens",
+              "change": "41%"
+            },
+            {
+              "rank": 4,
+              "model": "MiMo-V2.5",
+              "provider": "xiaomi",
+              "value_label": "3.59T tokens",
+              "change": "64%"
+            },
+            {
+              "rank": 5,
+              "model": "Owl Alpha",
+              "provider": "openrouter",
+              "value_label": "2.47T tokens",
+              "change": "27%"
+            },
+            {
+              "rank": 6,
+              "model": "Claude Opus 4.7",
+              "provider": "anthropic",
+              "value_label": "2.34T tokens",
+              "change": "62%"
+            },
+            {
+              "rank": 7,
+              "model": "Claude Sonnet 4.6",
+              "provider": "anthropic",
+              "value_label": "2.13T tokens",
+              "change": "21%"
+            },
+            {
+              "rank": 8,
+              "model": "DeepSeek V4 Pro",
+              "provider": "deepseek",
+              "value_label": "1.96T tokens",
+              "change": "15%"
+            },
+            {
+              "rank": 9,
+              "model": "Claude Opus 4.8",
+              "provider": "anthropic",
+              "value_label": "1.25T tokens",
+              "change": "8%"
+            },
+            {
+              "rank": 10,
+              "model": "DeepSeek V3.2",
+              "provider": "deepseek",
+              "value_label": "1.15T tokens",
+              "change": "2%"
+            }
+          ],
+          "diff": {
+            "summary": "No previous component snapshot was available for comparison.",
+            "changed_rows": [],
+            "new_entries": [
+              "DeepSeek V4 Flash",
+              "MiniMax M3",
+              "Hy3 preview",
+              "MiMo-V2.5",
+              "Owl Alpha",
+              "Claude Opus 4.7",
+              "Claude Sonnet 4.6",
+              "DeepSeek V4 Pro",
+              "Claude Opus 4.8",
+              "DeepSeek V3.2"
+            ]
+          },
+          "cache_status": "live",
+          "fallback_reason": ""
+        }
+      }
+    }
+  ],
+  "projects": [
+    {
+      "name": "iptv-org/iptv",
+      "editorial_category": "open_source",
+      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/iptv-org/iptv",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "freeCodeCamp/freeCodeCamp",
+      "editorial_category": "open_source",
+      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/freeCodeCamp/freeCodeCamp",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "pytest-dev/pytest",
+      "editorial_category": "open_source",
+      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "eval"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/pytest-dev/pytest",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "swc-project/swc",
+      "editorial_category": "open_source",
+      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/swc-project/swc",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "chatwoot/chatwoot",
+      "editorial_category": "open_source",
+      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/chatwoot/chatwoot",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "NVIDIA/SkillSpector",
+      "editorial_category": "open_source",
+      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "agent"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/NVIDIA/SkillSpector",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "meshery/meshery",
+      "editorial_category": "open_source",
+      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/meshery/meshery",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "cypress-io/cypress",
+      "editorial_category": "open_source",
+      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "eval"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/cypress-io/cypress",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "GorvGoyl/Clone-Wars",
+      "editorial_category": "open_source",
+      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/GorvGoyl/Clone-Wars",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "editorial_category": "open_source",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "event_date": "2026-06-14",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    }
+  ],
+  "builder_observations": [
+    {
+      "author": "Swyx",
+      "handle": "swyx",
+      "editorial_category": "x_discussion",
+      "content": "这个周末是填写年度 AI Engineering Survey 的最后机会，填写后有机会赢得 Vercel、Notion 和 AIE 门票。我们让 @devinai 分析已注册参会者名单，并输出一张展示参会人群的实时图表；它成了我见过最好的数据驱动叙事，展示两周后我们会聚集起怎样的社区。问卷链接在这里：https://t.co/2oilc5lCDm。别潜水，请填一下。",
+      "original_text": "Last chance to fill out the annual AI Engineering Survey this weekend and win great Vercel + Notion + AIE tix! link below we had @devinai analyze registered attendee list and output a live chart of the people coming to the conference. it ended up being the single best data driven storytelling i've ever seen on what kind of community we are gathering in two weeks. survey link here! https://t.co/2oilc5lCDm no lurking, fill it out pls",
+      "translation": "这个周末是填写年度 AI Engineering Survey 的最后机会，填写后有机会赢得 Vercel、Notion 和 AIE 门票。我们让 @devinai 分析已注册参会者名单，并输出一张展示参会人群的实时图表；它成了我见过最好的数据驱动叙事，展示两周后我们会聚集起怎样的社区。问卷链接在这里：https://t.co/2oilc5lCDm。别潜水，请填一下。",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2065909887025168887",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-swyx.png"
+    },
+    {
+      "author": "Madhu Guru",
+      "handle": "realmadhuguru",
+      "editorial_category": "x_discussion",
+      "content": "经历过很多前沿模型发布评审后，我能理解参与其中的每个人。发布 LLM 不像发布传统软件：你是在围绕一个具有近乎无限用例和无限失效模式的黑箱做决策。取舍很难，每一次能力提升都会同时扩大有价值用例和潜在误用的空间。作为实验室，你会建立大量评测、做红队、迭代模型，并围绕候选版本之间的取舍反复讨论...",
+      "original_text": "Having been through many frontier model launch reviews, I have empathy for everyone involved. Launching an LLM isn't like shipping traditional software - you're making a decision about a black box with effectively infinite use cases and infinite failure modes. The tradeoffs are hard - every increase in capability expands the space of both valuable use cases and potential misuse. As a lab, you build extensive evals, you red-team, you iterate on the model. You debate tradeoffs across candidate ch...",
+      "translation": "经历过很多前沿模型发布评审后，我能理解参与其中的每个人。发布 LLM 不像发布传统软件：你是在围绕一个具有近乎无限用例和无限失效模式的黑箱做决策。取舍很难，每一次能力提升都会同时扩大有价值用例和潜在误用的空间。作为实验室，你会建立大量评测、做红队、迭代模型，并围绕候选版本之间的取舍反复讨论...",
+      "avatar_url": "https://unavatar.io/x/realmadhuguru",
+      "url": "https://x.com/realmadhuguru/status/2065911676000752122",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-realmadhuguru.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "整个 Fable 出口管制事件对监管讨论其实是净正面。它让人提前看到，当 AI 监管在模型层而不是具体应用层实施时，规模化后会是什么样子。政府将完全决定模型何时能面向公众发布，依据的是一组政府本身控制的因素。就这次而言，根据已有报道，风险在于模型可能被越狱以...",
+      "original_text": "This whole Fable export control situation is actually net positive to regulation discourse. It’s an early peek into what AI regulation would end up looking like at scale when enacted at the model layer instead of the specific application of the AI. The government would have sole discretion over when a model can be released to the to public, based on a bunch of factors that they inherently control. In this case, based on the available reporting, the risk is that the model can be jailbroken to de...",
+      "translation": "整个 Fable 出口管制事件对监管讨论其实是净正面。它让人提前看到，当 AI 监管在模型层而不是具体应用层实施时，规模化后会是什么样子。政府将完全决定模型何时能面向公众发布，依据的是一组政府本身控制的因素。就这次而言，根据已有报道，风险在于模型可能被越狱以...",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065842361834651996",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-levie.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "每个人都觉得这是某种四维棋局或阴谋。但尝试越狱 AI 模型是很标准的做法，按定义他们会把这类研究分享给政府，因为这正是研究目的。我不认为 Amazon 预料到了接下来的动作。https://t.co/DizjwNcaLG",
+      "original_text": "Everyone thinks this is some kind of 4D chess or conspiracy. But it’s quite standard to try and jailbreak AI models, and by definition they would share that research with the government given that’s whole point. I don’t think Amazon assumed this would be the next move. https://t.co/DizjwNcaLG",
+      "translation": "每个人都觉得这是某种四维棋局或阴谋。但尝试越狱 AI 模型是很标准的做法，按定义他们会把这类研究分享给政府，因为这正是研究目的。我不认为 Amazon 预料到了接下来的动作。https://t.co/DizjwNcaLG",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065964446489710939",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-levie.png"
+    },
+    {
+      "author": "Peter Steinberger",
+      "handle": "steipete",
+      "editorial_category": "x_discussion",
+      "content": "收到一条 PayPal 验证短信，我还以为自己被黑了，结果只是 Codex 在注册它需要的一个网络服务。",
+      "original_text": "Got a PayPal verification text and thought I been hacked, but it was just codex signing up for a web service it needed.",
+      "translation": "收到一条 PayPal 验证短信，我还以为自己被黑了，结果只是 Codex 在注册它需要的一个网络服务。",
+      "avatar_url": "https://unavatar.io/x/steipete",
+      "url": "https://x.com/steipete/status/2065997212015067508",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-steipete.png"
+    },
+    {
+      "author": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "editorial_category": "x_discussion",
+      "content": "嗨，我是 Tibo，我刚发现 Codex。欢迎问我任何问题。",
+      "original_text": "Hi, I'm Tibo and I just discovered Codex. AMA",
+      "translation": "嗨，我是 Tibo，我刚发现 Codex。欢迎问我任何问题。",
+      "avatar_url": "https://unavatar.io/x/thsottiaux",
+      "url": "https://x.com/thsottiaux/status/2066022651760721931",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-thsottiaux.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "能够为特定任务路由到最佳 AI 模型的那一层，价值会大幅上升。至少有三大原因：成本优化是其中之一，很多用例中，一些任务需要前沿智能，另一些任务用便宜得多的模型就够了。即使在同一个任务里，也可能用前沿智能做规划和审查，而把大部分工作负载交给开源或更便宜的模型。这会在大类工作中成为标准做法...",
+      "original_text": "The layer that can route to the best AI model for the particular job is going to increase in value substantially. There are at least 3 big reasons: * Cost optimization: there are plenty of use cases where you need frontier intelligence for some tasks and something far cheaper for others. Even in the same task you may use frontier intelligence for planning and review of the work, but an OSS or cheaper model for the bulk of the workload. This is going to be standard across large buckets of work g...",
+      "translation": "能够为特定任务路由到最佳 AI 模型的那一层，价值会大幅上升。至少有三大原因：成本优化是其中之一，很多用例中，一些任务需要前沿智能，另一些任务用便宜得多的模型就够了。即使在同一个任务里，也可能用前沿智能做规划和审查，而把大部分工作负载交给开源或更便宜的模型。这会在大类工作中成为标准做法...",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065989559905812973",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-levie.png"
+    },
+    {
+      "author": "Garry Tan",
+      "handle": "garrytan",
+      "editorial_category": "x_discussion",
+      "content": "在 AI 领域，大多数人仍在用旧地图看新领地。把地图扔掉。现在该画新的地图了。唯一的方法是亲自走过那片土地。",
+      "original_text": "In AI most people are still trying to use old maps on a new territory. Throw the maps away. It's time to draw new ones. The only way you can do it is walking the land.",
+      "translation": "在 AI 领域，大多数人仍在用旧地图看新领地。把地图扔掉。现在该画新的地图了。唯一的方法是亲自走过那片土地。",
+      "avatar_url": "https://unavatar.io/x/garrytan",
+      "url": "https://x.com/garrytan/status/2065877443874038203",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-garrytan.png"
+    },
+    {
+      "author": "Garry Tan",
+      "handle": "garrytan",
+      "editorial_category": "x_discussion",
+      "content": "我希望一个模型的重要性来自更多人真正使用它并得出自己的结论。但确实，世界上大多数人是通过符号来了解它，而不是通过与那个被符号指向的东西互动来了解它。https://t.co/TcbmeHuXGQ",
+      "original_text": "I wish the significance of the model came from more people actually using it and coming to their own conclusions But yes most people in the world learn about it through signifiers and not through interacting with that which is signified https://t.co/TcbmeHuXGQ",
+      "translation": "我希望一个模型的重要性来自更多人真正使用它并得出自己的结论。但确实，世界上大多数人是通过符号来了解它，而不是通过与那个被符号指向的东西互动来了解它。https://t.co/TcbmeHuXGQ",
+      "avatar_url": "https://unavatar.io/x/garrytan",
+      "url": "https://x.com/garrytan/status/2065791421362352476",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-14-garrytan.png"
+    }
+  ],
+  "official_org_updates": [
+    {
+      "organization": "Google DeepMind",
+      "title": "Read Sundar Pichai’s 2026 Commencement Address at Stanford University",
+      "url": "https://blog.google/company-news/inside-google/message-ceo/stanford-commencement-speech-2026/",
+      "source": "Google Keyword Blog",
+      "event_date": "2026-06-14",
+      "summary": "Google DeepMind 的官方动态「Read Sundar Pichai’s 2026 Commencement Address at Stanford University」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "OpenAI",
+      "title": "Introducing the OpenAI Partner Network",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "source": "OpenAI Company News RSS",
+      "event_date": "2026-06-14",
+      "summary": "OpenAI 的官方动态「Introducing the OpenAI Partner Network」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "Meta AI",
+      "title": "Meta Platforms Rises on Release of New AI Model",
+      "url": "https://www.marketscreener.com/news/meta-platforms-rises-on-release-of-new-ai-model-ce7e50dbd88cf62c",
+      "source": "GDELT",
+      "event_date": "2026-06-14",
+      "summary": "Meta AI 的官方动态「Meta Platforms Rises on Release of New AI Model」显示，这条更新涉及官方开源、模型、数据集或开发者生态变化，适合和产品发布及工程采用节奏一起跟踪。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "Anthropic",
+      "title": "Fortune Tech : Microsoft revamps Copilot with Anthropic ; Sora post - mortem ; Mistral datacenter",
+      "url": "https://fortune.com/2026/03/31/microsoft-revamps-copilot-with-anthropic/",
+      "source": "GDELT",
+      "event_date": "2026-06-14",
+      "summary": "Anthropic 的官方动态「Fortune Tech : Microsoft revamps Copilot with Anthropic ; Sora post - mortem ; Mistral datacenter」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "Zhipu AI",
+      "title": "China Zhipu posts 132 % rise in annual revenue on AI boom",
+      "url": "https://www.businesstimes.com.sg/companies-markets/chinas-zhipu-posts-132-rise-annual-revenue-ai-boom",
+      "source": "GDELT",
+      "event_date": "2026-06-14",
+      "summary": "Zhipu AI 的官方动态「China Zhipu posts 132 % rise in annual revenue on AI boom」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    }
+  ],
+  "community_leads": [
+    {
+      "title": "Introducing the OpenAI Partner Network",
+      "content": "OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "event_date": "2026-06-14",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "How Preply combines AI and human tutors to personalize learning",
+      "content": "OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/preply",
+      "event_date": "2026-06-12",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "How we're combatting AI scams with security, legislation and more",
+      "content": "Google Keyword Blog 记录了一条安全治理公开条目，详情需回到原文链接核对。",
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Combat_AI_Scams_hero.max-600x600.format-webp.webp",
+      "image_alt": "How we're combatting AI scams with security, legislation and more",
+      "image_source": "feed",
+      "url": "https://blog.google/innovation-and-ai/technology/safety-security/combatting-ai-scams/",
+      "event_date": "2026-06-12",
+      "source": "Google Keyword Blog",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Results from the first Anthropic Public Record",
+      "content": "Anthropic Company News 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://www.anthropic.com/news/anthropic-public-record",
+      "event_date": "2026-06-12",
+      "source": "Anthropic Company News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "TCS and Anthropic partner to bring Claude to regulated industries",
+      "content": "Anthropic Company News 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://www.anthropic.com/news/tcs-anthropic-partnership",
+      "event_date": "2026-06-12",
+      "source": "Anthropic Company News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "New OpenAI Academy courses for the next era of work",
+      "content": "OpenAI Company News RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/academy-courses-applying-ai-at-work",
+      "event_date": "2026-06-12",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Statement on the US government directive to suspend access to Fable 5 and Mytho...",
+      "content": "Anthropic Company News 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://www.anthropic.com/news/fable-mythos-access",
+      "event_date": "2026-06-12",
+      "source": "Anthropic Company News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "WWDC 26 发布会上，Apple 没告诉你的那些事",
+      "content": "除了大谈特谈的 AI，今年的 WWDC 开幕式上还有这些有趣的细节值得注意。 查看全文。",
+      "url": "https://sspai.com/post/110967",
+      "event_date": "2026-06-12",
+      "source": "SSPAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "图像技术",
+      "content": "图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，...",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=68",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "文字识别",
+      "content": "文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用。",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=2",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "人脸与人体识别",
+      "content": "人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【。",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=27",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "内容审核",
+      "content": "内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【重磅上线】「通用卡证票...",
+      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=85",
+      "event_date": "2026-06-12",
+      "source": "Baidu AI News",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "具透 | 除了 AI，iOS 27 首个开发者测试版中你不能错过的新功能",
+      "content": "少数派在体验了新版系统之后，帮你整理了 iOS 27 中值得关注的新功能和新特性，希望帮你能了解新版系统的方方面面。 查看全文。",
+      "url": "https://sspai.com/post/110973",
+      "event_date": "2026-06-13",
+      "source": "SSPAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "派早报：五电商平台因「百亿补贴」问题被约谈、Xbox 启动业务重置计划等",
+      "content": "文石发布第二代 BOOX Go 6，小米发布 AI 编程助手 MiMo Code 等。 查看全文。",
+      "url": "https://sspai.com/post/110975",
+      "event_date": "2026-06-12",
+      "source": "SSPAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "2026北京智源大会开幕 | 从“悟道”到“悟界”，智源研究院推动人工智能、物理世界和生命科学“三体互动”",
+      "content": "2026年6月12日，第八届“北京智源大会”在中关村国际创新中心开幕。 北京智源大会是智源研究院主办的“AI内行学术盛会”，以“技术前沿、国际视野、青年人才”为特色，汇聚海内外研究者分享研究成果、探寻前沿知识、交流实践经验。本届大会，现代数字安全体系奠基者Whitfield Diffie线下参会，聚焦Agent时代的安全与可信挑战；强化...",
+      "url": "https://www.leiphone.com/category/academic/PRkJuKQSDv4Q1le5.html",
+      "event_date": "2026-06-13",
+      "source": "Leiphone",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Microsoft's GitHub Repos Were Hacked to Steal AI Developer Passwords - Memeburn",
+      "content": "Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNNFhMemNTMlVyRGpaRGg4V055OXdUVzFzdEp5dTBwMzhKNE5ydU4teFdlQ2k3TWJNV196bzFmVVU2b0ZwQWM1RVBBc1RJOTE4c0kyUjQ4Ukl3U3RYdWVyN2wzYllIZkhIdHlVVk9ZS1FFNnBCTXk5NEdhY21LZGFkdEoxa1ZPNmdtUk5pSm9jOFZDVnc?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Big Tech Company Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "The AI Issue America and China Can Cooperate On Now - The Wire China",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ0Z0NGdwVWkzOUZZZDdreS1XSDJJd253SXN4dm9FWXVjSHotdmVvR1ozUEVkRTgxaGhPSHVCdEtQNVZvODhkNTI2N2hOeC1mbkhBQW5RZEk4R2YtZU1nSTV3QXNwNnBWNmFoajhmaXhmNGRaUjNpNXJNYVRzLXdSLVZoNGpBS1FrTjBlazlha05IRkxPajM0?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Kimi K2.7-Code: Moonshot AI Releases 1T Parameter Open-Source Model, Claims to ...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNUmVrd1pEbFNNY2szM2gzYmNOc0FMR2hBMDNWaWZKZ3Ewb3ppb0NnVEtLREVkRXdaNTFXUDlXOGJxeXRxYTh3SkVwQm5uVFBjdGU3UWlWS1ZZcnZJYVZqeXFwT1ItUGxsV0h1NGF4YkVPZWFSd1g2U05pWUlmZGRyaFY0dExQOEZ3YklIOFZoQzBDR2hhajBSUDFFeWlBU2dX?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "The U.S. government has banned foreigners from using the latest AI models of ar...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE16SVNQelRIY0FlQlNfaTB2WUZXNDN4QUFYd2tBRDZuNDR4X25SSWFSd29QZ2E4bmNyMUF3NnJjNjhrdTh2Z3FBZ1BRTmVmQlE?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Moonshot AI Releases Kimi K2.7-Code: a Coding Model Reporting +21.8% on Kimi Co...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQOEVPaVQ2TFY4Ym9pbFdhSFRjd08yRVlsNUhPMmxTLWJsRmdlSE9XekJsdjBCaTZzZk1yMENQTXoxSkkyM1NIbnF5S1huWVI5UzBqR3prSk5IMU9xbi0xVlhadWpVRHFHNnJpY3hRMFFUenBWZ193MWNoT1NVZFcyN2JOQkdwZHdiLUxJU3JHdTFqVWJwbE5RTUdkYkh3ODg0YjVuZ1ZlYXRvRWFNeE5IdTdGY21vbF9GZi1yeTBhYXc4Qk9UbWVvekh5Y2xlQk1zT0szUw?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Open model Kimi K2.7 Code undercuts GPT-5.5 and Claude by up to 12x on price pe...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPZGNTWnRpZEI3WWl2S1pOS3F1N3NEQ1Nxd3dPR0xUVVU5QTVOVDBob0cyYmt6aVlveWo0dlJnVWVuUkI5MHFBOXVHRUVGT2VOU0wwUVRQMlFSMXZsQWJsU2w3T1JKVTZQQ3ZfN1JoenhCRG1UbFRIaHdfSmNrLUFpOWpwTG1Rby1UNXhtNEFUUEJaNXdKbURLVVM5Ti1Mbmo5UE0yVlQ3aFZGdU5rM2xJcU5MODZReG5aZ1VmSjlR?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "4DO-DETR for otitis media detection",
+      "content": "Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://www.nature.com/articles/s41598-026-44468-7",
+      "event_date": "2026-06-12",
+      "source": "Nature Machine Learning",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "2026奇点智能产品大会首批嘉宾官宣：在 AI 的“可交付的时代”，看一线专家如何拆解真实落地闭环！",
+      "content": "2026奇点智能产品大会首批嘉宾官宣：在 AI 的“可交付的时代”，看一线专家如何拆解真实落地闭环。",
+      "url": "https://www.qbitai.com/2026/06/435105.html",
+      "event_date": "2026-06-12",
+      "source": "QbitAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "面壁智能开源社区负责人井晨哲将在AICon上海站，分享高效端侧大模型的技术趋势与产业应用观察",
+      "content": "面壁智能开源社区负责人井晨哲将在AICon上海站，分享高效端侧大模型的技术趋势与产业应用观察。",
+      "url": "https://www.infoq.cn/article/sMxf71RUtLYgI0BsQhKw?utm_source=rss&utm_medium=article",
+      "event_date": "2026-06-13",
+      "source": "InfoQ CN",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    }
+  ],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": [
+    {
+      "platform": "reddit",
+      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Qwen 3.6 35B-A3B @ Q4 or Gemma 4 12B @ Q8?”",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u5xd7x/qwen_36_35ba3b_q4_or_gemma_4_12b_q8/",
+      "event_date": "2026-06-14",
+      "source": "Reddit LocalLLaMA Platform Feed",
+      "claim_text": "Wondering how much model quantization matters here. Daily driver on my 32gb unified memory setup is the qwen model outputting ~15 tokens a second. Heard good things about the 12B Gemma 4 model so interested in trying it against my codebase. Given its size I can very comfortably fit the Q8 in. Hell, I could probably run it at BF16 lol submitted by /u/mailto_devnull [link] [comments]",
+      "disclosure": "平台内扩散发现，未做一手回源核验。",
+      "summary": "Wondering how much model quantization matters here. Daily driver on my 32gb unified memory setup is the qwen model outputting ~15 tokens a second. Heard good things about the 12B Gemma 4 model so interested in trying it against my codebase.",
+      "risk_label": "medium",
+      "importance": "general"
+    },
+    {
+      "platform": "reddit",
+      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“z.ai Poll on X: MIT-licensed open weights are losing”",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u5wous/zai_poll_on_x_mitlicensed_open_weights_are_losing/",
+      "event_date": "2026-06-14",
+      "source": "Reddit LocalLLaMA Platform Feed",
+      "claim_text": "You can cast your vote here: https://x.com/ZixuanLi_/status/2065646648777416770#m Just to be clear: I am not urging or brigading anyone to vote specifically for MIT-licensed open weights. Please choose the option you genuinely prefer. I previously shared this in another post, but since it wasn't the main topic there, many people missed it. There are only 7 hours remaining in the poll, with 1,800 votes cast so far. submitted by /u/MadPelmewka [link] [comments]",
+      "disclosure": "平台内扩散发现，未做一手回源核验。",
+      "summary": "You can cast your vote here: https://x.com/ZixuanLi_/status/2065646648777416770#m Just to be clear: I am not urging or brigading anyone to vote specifically for MIT-licensed open weights. Please choose the option you genuinely prefer. I pre",
+      "risk_label": "medium",
+      "importance": "general"
+    },
+    {
+      "platform": "reddit",
+      "title": "Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新，原文标题为“Nex claims Rio 3.5 is Nex 2.5 PRO in trench coat”",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u5pkg1/nex_claims_rio_35_is_nex_25_pro_in_trench_coat/",
+      "event_date": "2026-06-14",
+      "source": "Reddit LocalLLaMA Platform Feed",
+      "claim_text": "submitted by /u/Specter_Origin [link] [comments]",
+      "disclosure": "平台内扩散发现，未做一手回源核验。",
+      "summary": "submitted by /u/Specter_Origin [link] [comments]",
+      "risk_label": "medium",
+      "importance": "general"
+    }
+  ],
+  "evidence_assets": [
+    {
+      "type": "figure",
+      "title": "NVIDIA Blackwell Leads on First Agentic AI Infrastructure Benchmark",
+      "source_url": "https://blogs.nvidia.com/blog/nvidia-blackwell-agentperf-artificial-analysis/",
+      "local_path": "assets/evidence/nvidia-blackwell-leads-on-first-agentic-ai-infrastructure-benchmark-2026-06-14.jpg",
+      "caption": "图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。",
+      "extraction_status": "source_image",
+      "width": 600,
+      "height": 337,
+      "byte_size": 78331,
+      "asset_role": "content",
+      "asset_kind": "semantic",
+      "capture_kind": "source_asset"
+    }
+  ],
+  "generated_at": "2026-06-15T03:10:05.905Z",
+  "report_status": "normal",
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-14.html",
+  "html_path": "reports/2026/06/2026-06-14.html",
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。",
+    "affected_sections": [
+      "huggingface_trending",
+      "daily_tracking",
+      "wechat_items",
+      "zhihu_items"
+    ]
+  }
+}
