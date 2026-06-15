@@ -156,10 +156,15 @@ test("report:write validation gate requires must read fields for full reports", 
   report.huggingface_trending = [];
   report.model_releases = [];
   report.hot_blogs = [];
+  report.chinese_media_dynamics = [];
+  report.daily_tracking = [];
   report.projects = [];
   report.builder_observations = [];
   report.official_org_updates = [];
   report.community_leads = [];
+  report.wechat_items = [];
+  report.zhihu_items = [];
+  report.reddit_items = [];
   report.hero_highlights = report.hero_highlights.map(({ title, url, reason }) => ({ title, url, reason }));
   const candidatePool = {
     report_date: report.report_date,
@@ -178,6 +183,82 @@ test("report:write validation gate requires must read fields for full reports", 
       verification_status: item.verification_status,
       verification_sources: [item.url]
     }))
+  };
+
+  assert.throws(
+    () => normalizeReportDraft(report, { reportDate: report.report_date, candidatePool }),
+    (error) => error instanceof PublisherError && error.code === "hero_highlights_contract_failed"
+  );
+});
+
+test("report write requires must read backfill when public references can fill three cards", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+  report.source_audit = sourceAuditFixture();
+  report.main_items = report.main_items.slice(0, 2);
+  report.github_trending = [{
+    rank: 1,
+    name: "example/sparse-agent-project",
+    repo: "example/sparse-agent-project",
+    url: "https://github.com/example/sparse-agent-project",
+    source: "GitHub Trending daily",
+    event_date: report.report_date,
+    description: "一个面向本地 AI 工程工作流的 agent 工具箱。",
+    evidence: "GitHub Trending daily rank #1 with recent stars today.",
+    trend: "new",
+    source_level: "github",
+    verification_status: "primary_confirmed",
+    candidate_id: "github-sparse-agent-project"
+  }];
+  report.huggingface_trending = [];
+  report.model_releases = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.official_org_updates = [];
+  report.community_leads = [];
+  report.hero_highlights = report.hero_highlights.slice(0, 2);
+  report.self_check = {
+    ...report.self_check,
+    main_items: report.main_items.length,
+    selection_snapshot: {
+      ...report.self_check.selection_snapshot,
+      github_trending: { eligible_candidates: 1, selected: 1 }
+    }
+  };
+
+  const candidatePool = {
+    report_date: report.report_date,
+    sources: [],
+    candidates: [
+      ...report.main_items.map((item) => ({
+        id: item.candidate_id,
+        source_id: "unit-test",
+        category: "main_item",
+        status: "included",
+        included_in: "main_items",
+        title: item.title,
+        url: item.url,
+        source: item.source,
+        event_date: item.event_date,
+        source_level: item.source_level,
+        verification_status: item.verification_status,
+        verification_sources: [item.url]
+      })),
+      {
+        id: "github-sparse-agent-project",
+        source_id: "github-github-trending-daily",
+        category: "github_trending",
+        status: "included",
+        included_in: "github_trending",
+        title: "example/sparse-agent-project",
+        url: "https://github.com/example/sparse-agent-project",
+        source: "GitHub Trending daily",
+        event_date: report.report_date,
+        source_level: "github",
+        verification_status: "primary_confirmed",
+        verification_sources: ["https://github.com/example/sparse-agent-project"]
+      }
+    ]
   };
 
   assert.throws(
@@ -7215,6 +7296,35 @@ test("report:write 允许热门博客和社区线索携带公开图片字段", a
       event_date: "2026-05-16"
     }
   );
+  draft.hero_highlights = [
+    {
+      title: draft.main_items[0].title,
+      url: draft.main_items[0].url,
+      reason: "Report writers need this contract because public daily pages depend on a visible must-read entry.",
+      what_happened: "The structured report write path preserved the main daily item as a reader-facing signal.",
+      why_watch: "It keeps the main report card visible while secondary sections add image-rich context.",
+      category: "product_tool",
+      source_item_ref: draft.main_items[0].candidate_id
+    },
+    {
+      title: "Visible blog card",
+      url: "https://example.com/blog-post",
+      reason: "The blog card shows that image metadata can travel through report normalization without losing source context.",
+      what_happened: "A public blog entry supplied a cover image, alt text, and source details for the daily report.",
+      why_watch: "Readers can scan the card quickly and still open the original post for verification.",
+      category: "model_platform",
+      source_item_ref: "hot-blog-with-image"
+    },
+    {
+      title: "Community lead with image",
+      url: "https://example.com/community-lead",
+      reason: "The community lead proves that non-main public sections can support the must-read surface when they are sourced.",
+      what_happened: "A community item carried a public image and verification note into the normalized report.",
+      why_watch: "It keeps the page layout complete when useful reader-facing evidence lives outside main_items.",
+      category: "china_open_source_community",
+      source_item_ref: "community-lead-with-image"
+    }
+  ];
 
   const normalized = normalizeReportDraft(draft, {
     siteUrl,

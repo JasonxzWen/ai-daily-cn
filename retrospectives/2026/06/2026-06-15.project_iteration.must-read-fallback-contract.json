@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-15.project_iteration.must-read-fallback-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-15",
+  "title": "Must-read fallback contract hardening",
+  "status": "completed",
+  "summary": "Project iteration record for preventing sparse main_items reports from reaching page-check without exactly three reader-facing must-read cards when other public sourced sections can fill the surface.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Report-write validation must evaluate the same public reference pool that the renderer and page-check expect.",
+      "evidence": "The blocked daily run had fewer than three main_items but enough public sourced sections for must-read fallback, so a main_items-only validation bypass let an invalid public surface proceed.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Keep hero_highlights enforcement tied to eligible public reference items rather than only main_items count."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "A sparse report could pass report-write with only two hero_highlights when the third public reference lived outside main_items.",
+      "evidence": "The new regression test fails without the report-write contract change and passes once eligible public reference items trigger the exactly-three hero_highlights requirement.",
+      "module": "src/report.js",
+      "suggestion": "Require exactly three hero_highlights whenever at least three public reference items with title and URL are available across all rendered daily sections.",
+      "expected_benefit": "The daily runner blocks early with a repairable data contract error instead of producing a page that fails visual page-check after build.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in report-write normalization and covered by unit tests plus the full repository validation gate.",
+      "ledger_links": [
+        "feedback/p1-three-minute-must-read-hero",
+        "feedback/p1-ai-quality-review-loop",
+        "feedback/p1-public-daily-content-contract"
+      ],
+      "validation_evidence": [
+        "report write requires must read backfill when public references can fill three cards",
+        "report:draft backfills must read highlights from public sections when main items are sparse",
+        "interaction input puts must read first and compact main list",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-three-minute-must-read-hero",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Run the fixed Codex-native daily publish flow from latest main after the PR is merged.",
+      "owner": "project"
+    }
+  ]
+}

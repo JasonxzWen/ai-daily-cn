@@ -376,8 +376,9 @@ function requireExpandedMainItemFormat(report) {
 }
 
 function requireHeroHighlightsContract(report) {
-  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
-  if (report.report_status === "empty_due_to_network_outage" || mainItems.length < 3) {
+  const referenceItems = heroHighlightReferenceItems(report);
+  const eligibleReferenceItems = referenceItems.filter((item) => heroHighlightReferenceItemReady(item));
+  if (report.report_status === "empty_due_to_network_outage" || eligibleReferenceItems.length < 3) {
     return;
   }
 
@@ -424,6 +425,14 @@ function requireHeroHighlightsContract(report) {
       { errors }
     );
   }
+}
+
+function heroHighlightReferenceItemReady(item) {
+  return Boolean(heroHighlightReferenceTitle(item) && normalizeUrlForEvidenceGate(item?.url));
+}
+
+function heroHighlightReferenceTitle(item) {
+  return String(item?.title || item?.name || item?.repo || item?.organization || "").trim();
 }
 
 function heroHighlightReferenceItems(report) {
