@@ -441,13 +441,29 @@ function formatDailyNavigationSection({ dataHref, indexHref, report, reportNavig
 function sourceItemForHighlight(report, highlight) {
   const ref = String(highlight?.source_item_ref || "").trim();
   const normalizedRef = normalizeEvidenceUrl(ref);
-  return (Array.isArray(report?.main_items) ? report.main_items : []).find((item) => {
+  return heroHighlightReferenceItems(report).find((item) => {
     if (ref && item?.candidate_id === ref) {
       return true;
     }
     const itemUrl = normalizeEvidenceUrl(item?.url);
     return normalizedRef && itemUrl && normalizedRef === itemUrl;
   }) || null;
+}
+
+function heroHighlightReferenceItems(report) {
+  return [
+    "main_items",
+    "github_trending",
+    "huggingface_trending",
+    "hot_blogs",
+    "chinese_media_dynamics",
+    "daily_tracking",
+    "projects",
+    "builder_observations",
+    "official_org_updates",
+    "community_leads",
+    ...PLATFORM_SECTIONS
+  ].flatMap((sectionName) => Array.isArray(report?.[sectionName]) ? report[sectionName] : []);
 }
 
 function mustReadCategoryLabel(value) {

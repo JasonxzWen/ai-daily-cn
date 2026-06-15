@@ -249,6 +249,88 @@ test("report:draft selects must read highlights with category balance", async ()
   );
 });
 
+test("report:draft backfills must read highlights from public sections when main items are sparse", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-must-read-backfill-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const githubCandidates = Array.from({ length: 10 }, (_unused, index) => ({
+    id: `github-sparse-project-${index + 1}`,
+    source_id: "github-github-trending-daily",
+    category: "project",
+    title: `example/sparse-agent-project-${index + 1}`,
+    repo: `example/sparse-agent-project-${index + 1}`,
+    url: `https://github.com/example/sparse-agent-project-${index + 1}`,
+    source: "GitHub Trending daily",
+    event_date: reportDate,
+    status: "excluded",
+    rank: index + 1,
+    trend: "new",
+    language: "TypeScript",
+    window: "daily",
+    description: "Agent workflow toolkit for local AI engineering.",
+    evidence: `GitHub Trending daily rank #${index + 1} with recent stars today.`,
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: `https://github.com/example/sparse-agent-project-${index + 1}`,
+    verification_sources: [`https://github.com/example/sparse-agent-project-${index + 1}`]
+  }));
+  const discovery = discoveryEnvelope({
+    sourceNames: ["OpenAI News RSS", "GitHub Trending daily"],
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "official-main-one",
+        title: "OpenAI ships a practical agent platform update",
+        url: "https://openai.com/news/practical-agent-platform-update",
+        source: "OpenAI News RSS",
+        evidence: "Official source describes a concrete agent platform update for engineering teams.",
+        editorialCategory: "product_radar"
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "official-main-two",
+        title: "Anthropic expands developer workflow controls",
+        url: "https://www.anthropic.com/news/developer-workflow-controls",
+        source: "Anthropic News",
+        evidence: "Official source describes developer workflow controls, API availability, and team rollout details.",
+        editorialCategory: "engineering_toolchain"
+      }),
+      ...githubCandidates
+    ]
+  });
+  discovery.source_audit.github_trending = {
+    checked: true,
+    sources: [{
+      name: "GitHub Trending daily",
+      url: "https://github.com/trending?since=daily",
+      status: "checked",
+      notes: "10 repositories parsed"
+    }],
+    candidates_found: githubCandidates.length,
+    included: 0,
+    notes: "GitHub Trending fixed source checked."
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.main_items.length, 2);
+  assert.equal(drafted.report.github_trending.length, 10);
+  assert.equal(drafted.report.hero_highlights.length, 3);
+  const mainRefs = new Set(drafted.report.main_items.map((item) => item.candidate_id || item.url));
+  assert(drafted.report.hero_highlights.some((item) => !mainRefs.has(item.source_item_ref)));
+  assert(drafted.report.hero_highlights.every((item) =>
+    item.what_happened &&
+    item.why_watch &&
+    item.category &&
+    item.source_item_ref
+  ));
+});
+
 test("interaction input puts must read first and compact main list", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 

@@ -721,7 +721,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
       fallback_window_used: false,
       notes: "report:draft 自动从固定发现候选池选取；一手/可信候选进入主体，中介线索仅作社区观察。"
     },
-    hero_highlights: selectHeroHighlights(selection.main_items),
+    hero_highlights: selectHeroHighlights(selection),
     source_audit: sourceAudit,
     main_items: selection.main_items,
     github_trending: selection.github_trending,
@@ -802,8 +802,8 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
   return report;
 }
 
-function selectHeroHighlights(mainItems = []) {
-  const eligible = mainItems.filter((item) => item?.title && item?.url);
+function selectHeroHighlights(selectionOrMainItems = []) {
+  const eligible = heroHighlightSourceItems(selectionOrMainItems).filter((item) => heroItemTitle(item) && item?.url);
   if (eligible.length === 0) {
     return [];
   }
@@ -855,7 +855,23 @@ function selectHeroHighlights(mainItems = []) {
     seenUrls.add(key);
   }
 
-  return picked.slice(0, 3).map(heroHighlightForMainItem);
+  return picked.slice(0, 3).map(heroHighlightForItem);
+}
+
+function heroHighlightSourceItems(selectionOrMainItems = []) {
+  if (Array.isArray(selectionOrMainItems)) {
+    return selectionOrMainItems;
+  }
+  const selection = selectionOrMainItems && typeof selectionOrMainItems === "object" ? selectionOrMainItems : {};
+  return [
+    ...(Array.isArray(selection.main_items) ? selection.main_items : []),
+    ...(Array.isArray(selection.hot_blogs) ? selection.hot_blogs : []),
+    ...(Array.isArray(selection.chinese_media_dynamics) ? selection.chinese_media_dynamics : []),
+    ...(Array.isArray(selection.github_trending) ? selection.github_trending : []),
+    ...(Array.isArray(selection.huggingface_trending) ? selection.huggingface_trending : []),
+    ...(Array.isArray(selection.official_org_updates) ? selection.official_org_updates : []),
+    ...(Array.isArray(selection.community_leads) ? selection.community_leads : [])
+  ];
 }
 
 function canPickHeroHighlight(item, state) {
@@ -878,11 +894,11 @@ function rememberHeroHighlight(item, state) {
   }
 }
 
-function heroHighlightForMainItem(item) {
+function heroHighlightForItem(item) {
   const whatHappened = heroWhatHappened(item);
   const whyWatch = heroWhyWatch(item);
   return {
-    title: item.title,
+    title: heroItemTitle(item),
     url: item.url,
     reason: whyWatch,
     what_happened: whatHappened,
@@ -893,7 +909,7 @@ function heroHighlightForMainItem(item) {
 }
 
 function heroWhatHappened(item) {
-  return trimText(firstUsefulPublicFact(item) || item.title, 150);
+  return trimText(firstUsefulPublicFact(item) || heroItemTitle(item), 150);
 }
 
 function heroWhyWatch(item) {
@@ -916,6 +932,8 @@ function firstUsefulPublicFact(item) {
 function mainItemPublicFactsForHero(item) {
   return [
     item?.summary,
+    item?.description,
+    item?.content,
     ...(Array.isArray(item?.bullets) ? item.bullets : [])
   ]
     .map((value) => stripDraftPublicBodyNoise(value, item))
@@ -955,7 +973,7 @@ function heroHighlightCategory(item) {
   const category = String(item?.editorial_category || "").trim();
   const sourceLevel = String(item?.source_level || "").trim();
   const text = candidateText(item);
-  if (category === "open_source" || sourceLevel === "github" || isChinaAiCandidate(item)) {
+  if (category === "open_source" || sourceLevel === "github" || isGitHubPublicItem(item) || isChinaAiCandidate(item)) {
     return "china_open_source_community";
   }
   if (category === "product_radar" || category === "engineering_toolchain" || category === "content_aigc" || /tool|workflow|developer|coding|gateway|agent|product|app|api|sdk/i.test(text)) {
@@ -968,6 +986,14 @@ function heroHighlightCategory(item) {
     return "research_safety";
   }
   return "model_platform";
+}
+
+function heroItemTitle(item) {
+  return String(item?.title || item?.name || item?.repo || item?.organization || "").trim();
+}
+
+function isGitHubPublicItem(item) {
+  return /github/i.test(String(item?.source || "")) || /^https:\/\/github\.com\//i.test(String(item?.url || ""));
 }
 
 function heroEntityKey(item) {
@@ -2488,6 +2514,7 @@ function canPromoteToMain(candidate, reportDate = "") {
 
 function isOfficialBlogMainlineCandidate(candidate) {
   const sourceLevel = sourceLevelForCandidate(candidate);
+  const chinaAiHotBlog = isChinaAiSourceLaneCandidate(candidate) && isChineseHotBlogCandidate(candidate);
   if (sourceLevel !== "official") return false;
   if (!isBlogLikeCandidate(candidate)) return false;
   if (!hasPlainReaderSignal(candidate)) return false;
@@ -4178,7 +4205,10 @@ function emptyAuditGroup(groupName) {
 function candidateText(candidate) {
   return [
     candidate.title,
+    candidate.name,
+    candidate.repo,
     candidate.source,
+    candidate.description,
     candidate.evidence,
     candidate.notes,
     candidate.summary,

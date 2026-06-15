@@ -388,7 +388,7 @@ function requireHeroHighlightsContract(report) {
   }
 
   const allowedRefs = new Set();
-  for (const item of mainItems) {
+  for (const item of heroHighlightReferenceItems(report)) {
     if (item?.candidate_id) {
       allowedRefs.add(String(item.candidate_id));
     }
@@ -424,6 +424,24 @@ function requireHeroHighlightsContract(report) {
       { errors }
     );
   }
+}
+
+function heroHighlightReferenceItems(report) {
+  return [
+    "main_items",
+    "github_trending",
+    "huggingface_trending",
+    "hot_blogs",
+    "chinese_media_dynamics",
+    "daily_tracking",
+    "projects",
+    "builder_observations",
+    "official_org_updates",
+    "community_leads",
+    "wechat_items",
+    "zhihu_items",
+    "reddit_items"
+  ].flatMap((sectionName) => Array.isArray(report?.[sectionName]) ? report[sectionName] : []);
 }
 
 function isWeakHeroHighlightText(value) {
