@@ -57,7 +57,7 @@ const INTERMEDIARY_SOURCE_RE = /techcrunch|the verge|verge ai|ars technica|ventu
 const AI_RELEVANCE_RE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|large language model|model|models|agent|agents|agentic|chatgpt|codex|claude|gemini|gpt|grok|openai|anthropic|deepmind|xai|x\.ai|mistral|qwen|nemotron|reasoning|inference|eval|benchmark|rag|embedding|vector|transformer|diffusion|copilot|cursor|mcp)\b|人工智能|机器学习|深度学习|神经网络|大模型|模型|智能体|推理|评测|向量|多模态|代码助手/i;
 const BUILDER_RELEVANCE_RE = /\b(ai|agi|llm|model|agent|agents|openai|anthropic|claude|gemini|deepmind|google labs|gpt|codex|cursor|copilot|mcp|eval|benchmark|rag|inference|training|fine[-\s]?tuning|prompt|token|transformer|diffusion|sora|veo|runway)\b|人工智能|大模型|模型|智能体|代理|评测|推理|训练|微调|提示词|多模态|生成式|文生图|文生视频|代码助手/i;
 const BUILDER_IRRELEVANT_RE = /\bnot anything ai related\b|nothing to do with ai|unrelated to ai|off[-\s]?topic/i;
-const BUILDER_LOW_SIGNAL_RE = /\bgood night\b|touch sand|favorite of plato|favorite.*dialogues?|vibecon\b|my absolute favorite/i;
+const BUILDER_LOW_SIGNAL_RE = /\bgood night\b|touch sand|favorite of plato|favorite.*dialogues?|vibecon\b|my absolute favorite|last chance to fill out|annual ai engineering survey|\bama\b|\byolo\b|martial arts movies|foggiest|sunniest/i;
 const COMPANY_ACTION_RE = /\b(earnings|quarterly results?|financial results?|revenue|profit|guidance|layoffs?|job cuts?|hiring|reorganization|reorganisation|restructuring|organization changes?|leadership|management|board|conference|summit|keynote|product conference|launch event|partnership|investment|pricing|availability|policy|regulation|open[-\s]?source|github|hugging face|model weights?)\b|财报|业绩|营收|利润|指引|裁员|招聘|组织架构|组织调整|重组|管理层|董事会|大会|峰会|发布会|合作|投资|价格|定价|可用性|政策|监管|开源|模型权重/i;
 const PRODUCT_PLATFORM_RE = /\b(product|platform|app|service|cloud|enterprise|developer|api|sdk|release|launch|availability|pricing|quota|github|hugging face|open[-\s]?source|repo|repository)\b|产品|平台|应用|服务|云|企业|开发者|接口|发布|上线|可用|价格|配额|开源|仓库/i;
 const HARDCORE_RESEARCH_RE = /\b(arxiv|paper|benchmark|evaluation|eval|reasoning traces?|transformer inference|inference benchmark|ablation|dataset|pre[-\s]?train|post[-\s]?training|fine[-\s]?tuning|rlvr|loss|gradient|tokenizer|architecture|throughput|latency|context window)\b|论文|基准|评测|推理轨迹|消融|数据集|训练|微调|架构|吞吐|延迟/i;
@@ -866,11 +866,7 @@ function heroHighlightSourceItems(selectionOrMainItems = []) {
   return [
     ...(Array.isArray(selection.main_items) ? selection.main_items : []),
     ...(Array.isArray(selection.hot_blogs) ? selection.hot_blogs : []),
-    ...(Array.isArray(selection.chinese_media_dynamics) ? selection.chinese_media_dynamics : []),
-    ...(Array.isArray(selection.github_trending) ? selection.github_trending : []),
-    ...(Array.isArray(selection.huggingface_trending) ? selection.huggingface_trending : []),
-    ...(Array.isArray(selection.official_org_updates) ? selection.official_org_updates : []),
-    ...(Array.isArray(selection.community_leads) ? selection.community_leads : [])
+    ...(Array.isArray(selection.official_org_updates) ? selection.official_org_updates : [])
   ];
 }
 
@@ -914,15 +910,19 @@ function heroWhatHappened(item) {
 
 function heroWhyWatch(item) {
   const explicit = stripDraftPublicBodyNoise(item?.why_it_matters || item?.reader_relevance || "", item);
-  if (explicit) {
+  if (explicit && !isGenericHeroWhyText(explicit)) {
     return trimText(stripSentenceEnding(explicit), 150);
   }
   const facts = mainItemPublicFactsForHero(item);
   const impact = facts.find((fact) => /impact|影响|判断|优先级|adopt|choice|decision|workflow|cost|risk|上线|采购|试用/i.test(fact));
-  if (impact) {
+  if (impact && !isGenericHeroWhyText(impact)) {
     return trimText(stripSentenceEnding(impact), 150);
   }
-  return trimText(heroFallbackWhyWatch(item), 150);
+  return trimText(stripSentenceEnding(firstUsefulPublicFact(item) || heroItemTitle(item) || heroFallbackWhyWatch(item)), 150);
+}
+
+function isGenericHeroWhyText(value) {
+  return /它会影响|它提示|可用它判断|看是否|重点看|判断是否需要|接入优先级|可采购|可试用/u.test(String(value || ""));
 }
 
 function firstUsefulPublicFact(item) {
@@ -1021,6 +1021,15 @@ function normalizeAutodraftPublicText(report) {
     item.summary = stripDraftPublicBodyNoise(item.summary, item);
     item.bullets = (item.bullets || []).map((bullet) => stripDraftPublicBodyNoise(bullet, item));
   }
+  for (const item of report.hot_blogs || []) {
+    item.summary = stripDraftPublicBodyNoise(item.summary, item);
+    item.key_points = (item.key_points || [])
+      .map((point) => stripDraftPublicBodyNoise(point, item))
+      .filter(Boolean);
+  }
+  for (const item of report.github_trending || []) {
+    item.description = stripDraftPublicBodyNoise(item.description, item);
+  }
   for (const item of report.community_leads || []) {
     item.content = stripDraftPublicBodyNoise(item.content, item);
   }
@@ -1049,12 +1058,24 @@ function stripDraftPublicBodyNoise(value, item = {}) {
     .replace(/\s*事实来自可回看的原始链接[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*不得仅凭该线索写入主体[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/。?\s*可先关注适用对象、落地边界和后续变化[。]?/g, "")
+    .replace(/这条动态主要围绕/g, "")
     .replace(/；\s*目前最需要补看的信息是/g, "，公开信息主要涉及")
     .replace(/[，,]?\s*(?:不进入|未进入)\s*AI\s*主体事实[。；;]?/gi, "")
     .replace(/\s{2,}/g, " ")
     .trim();
+  text = rewritePublicStockPhrases(text);
   text = stripDraftSourcePrefixes(text, item);
   return text.trim();
+}
+
+function rewritePublicStockPhrases(value) {
+  return String(value || "")
+    .replace(/打开[“"]?([^”"\n。；;]{0,30})[”"]?协作想象空间/g, "提供$1协作观察样本")
+    .replace(/打开了?[^。；;\n]{0,48}想象空间/g, "提供了可继续观察的落地样本")
+    .replace(/想象空间/g, "落地样本")
+    .replace(/赛道/g, "方向")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 function stripDraftSourcePrefixes(value, item = {}) {
@@ -1095,11 +1116,6 @@ function summaryForSelection(selection, aigcCount) {
   const hotBlogCue = hotBlogSummaryCue(selection.hot_blogs);
   if (hotBlogCue) {
     parts.push(`热门博客这轮主要看 ${hotBlogCue}`);
-  } else if (aigcCount > 0) {
-    parts.push("内容和创作者工具这条线今天也有值得看的新动作");
-  }
-  if (selection.github_trending.length > 0) {
-    parts.push("GitHub Trending 继续保留完整 Top 10，方便对照开源侧动向");
   }
   const cleanParts = parts
     .map((part) => String(part || "").replace(/[。；\s]+$/u, "").trim())
@@ -1624,7 +1640,7 @@ function communityLeadItem(candidate) {
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source,
-    evidence: candidate.evidence || candidate.title,
+    evidence: stripDraftPublicBodyNoise(candidate.evidence || candidate.title, candidate),
     editorial_category: inferredEditorialCategory(candidate) === "content_aigc" ? "content_aigc" : "community_signal",
     ...fields
   };
@@ -1654,12 +1670,16 @@ function communityLeadPublicSummary(candidate) {
 }
 
 function communityLeadTitleForCandidate(candidate) {
-  const rawTitle = stripDraftPublicBodyNoise(candidate.title || "", candidate);
+  const rawTitle = rewritePublicStockPhrases(stripDraftPublicBodyNoise(candidate.title || "", candidate));
   const lead = chineseLeadForCandidate(candidate);
   if (lead && (/^(the download|newsletter|daily brief|daily digest)\s*:/i.test(rawTitle) || (!hasChineseText(rawTitle) && rawTitle.length > 36))) {
     return trimText(lead, 80);
   }
-  if (rawTitle) {
+  const genericHeadline = genericChineseHeadline(candidate);
+  if (genericHeadline && (!hasReaderChineseText(rawTitle) || rawTitle.length > 72)) {
+    return trimText(genericHeadline, 80);
+  }
+  if (rawTitle && (hasReaderChineseText(rawTitle) || !/[A-Za-z]{18,}/.test(rawTitle))) {
     return trimText(rawTitle, 80);
   }
   const source = String(candidate.source || "").trim();
@@ -2920,7 +2940,9 @@ function canPromoteToBuilderObservation(candidate) {
   if (!text || BUILDER_IRRELEVANT_RE.test(text)) return false;
   if (BUILDER_LOW_SIGNAL_RE.test(text)) return false;
   if (!candidate.url && !candidate.original_url) return false;
-  return BUILDER_RELEVANCE_RE.test(text);
+  if (!BUILDER_RELEVANCE_RE.test(text)) return false;
+  const originalText = sanitizeBuilderOriginalText(candidate);
+  return hasChineseText(originalText) || Boolean(builderReadableSummary(originalText));
 }
 
 function canPromoteToHotBlog(candidate, reportDate = "") {
@@ -3195,10 +3217,10 @@ function chineseGithubDescription(description, repo) {
   const cleanDescription = stripDraftPublicBodyNoise(String(description || "").replace(/\s+/g, " ").trim());
   const repoLabel = String(repo || "").trim() || "这个仓库";
   if (hasChineseText(cleanDescription) && cleanDescription.length >= 12) {
-    return trimText(`${repoLabel} 今天进入 GitHub Trending Top 10，仓库简介写的是：${cleanDescription.replace(/[。；;]+$/u, "")}。`, 120);
+    return trimText(`${repoLabel}：${cleanDescription.replace(/[。；;]+$/u, "")}。`, 120);
   }
   const pitch = githubPitchFromDescription(cleanDescription, repoLabel);
-  return trimText(`${repoLabel} 今天进入 GitHub Trending Top 10，公开描述把它定位在${pitch}，仓库首页当前围绕这条能力展开。`, 120);
+  return trimText(`${repoLabel} 可作为${pitch}方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。`, 120);
 }
 
 function githubDomainUseCase(domains) {
@@ -3450,7 +3472,7 @@ function candidateReaderDigest(candidate) {
   }
   for (const field of [candidate.summary, candidate.evidence, candidate.title]) {
     const raw = stripDraftPublicBodyNoise(field, candidate);
-    if (hasChineseText(raw) && raw.length >= 18) {
+    if (hasReaderChineseText(raw) && raw.length >= 18) {
       return trimText(raw, 180);
     }
   }
@@ -3473,6 +3495,8 @@ function genericChineseHeadline(candidate) {
   const raw = decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim();
   const lower = raw.toLowerCase();
   if (!raw) return "";
+  const titleTranslation = englishTitleToChineseHeadline(raw, candidate);
+  if (titleTranslation) return titleTranslation;
   if (/tested 19 llm api workloads|cut costs 79/.test(lower)) {
     return "实测 19 类 LLM API 调用后，作者给出 79% 成本压缩数据";
   }
@@ -3515,9 +3539,47 @@ function genericChineseFact(candidate, original) {
     return stripSentenceEnding(trimText(title, 120));
   }
   if (title) {
-    return `${entity} 发布了一条 AI 相关更新，原文标题为“${trimText(title, 72)}”`;
+    const category = inferredEditorialCategory(candidate);
+    const theme = genericFactTheme({ category, sourceLevel: sourceLevelForCandidate(candidate), text: candidateText(candidate) });
+    return `${entity} 更新了${theme}相关内容`;
   }
-  return `${entity} 发布了一条 AI 相关更新`;
+  return `${entity} 更新了 AI 产品、模型或平台相关内容`;
+}
+
+function englishTitleToChineseHeadline(rawTitle, candidate = {}) {
+  const lower = String(rawTitle || "").toLowerCase();
+  if (/security new features in may 2026/.test(lower)) {
+    return "阿里云汇总 2026 年 5 月安全产品新功能";
+  }
+  if (/automating daily outlook email summarization with hermesagent on alibaba cloud ecs/.test(lower)) {
+    return "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件";
+  }
+  if (/cut checkpoint costs with about 30 lines of python and nvidia nvcomp/.test(lower)) {
+    return "英伟达用压缩库和约 30 行代码降低训练检查点成本";
+  }
+  if (/most games secretly use ai in development|players unaware|industry transparency debate/.test(lower)) {
+    return "游戏开发使用 AI 工具的透明度争议升温";
+  }
+  if (/i shipped a concrete eval workflow for coding agents|ai agents need eval loops before unattended production use/.test(lower)) {
+    return "Builder 分享 coding agent 评测工作流";
+  }
+  if (/ai agents need production eval loops/.test(lower)) {
+    return "Builder 讨论 agent 生产评测、工具轨迹和回滚计划";
+  }
+  if (/the layer that can route to the best ai model/.test(lower)) {
+    return "Aaron Levie 讨论模型路由层的价值";
+  }
+  if (/frontier model launch reviews|launching an llm isn't like shipping traditional software/.test(lower)) {
+    return "Madhu Guru 讨论前沿模型发布评审的难点";
+  }
+  const source = String(candidate.source || "").toLowerCase();
+  if (/nvidia developer blog/.test(source) && /checkpoint|nvcomp/.test(lower)) {
+    return "英伟达讨论训练检查点成本压缩";
+  }
+  if (/alibaba cloud blog/.test(source) && /hermesagent|outlook/.test(lower)) {
+    return "阿里云展示 HermesAgent 邮件汇总示例";
+  }
+  return "";
 }
 
 function genericFactTheme({ category, sourceLevel, text }) {
@@ -4108,7 +4170,10 @@ function builderReadableSummary(originalText) {
     return "Madhu Guru 反驳了“训练数据只是低技能脏活”的看法。他的核心观点是，前沿模型真正缺的是高经济价值任务的数据，而这类知识往往分散在旧工具、专家经验和难标准化的工作流里，所以知识工作 agent 迟迟没有像 SWE agent 那样成熟。";
   }
   if (/routing to models|model routing|router/.test(lower)) {
-    return "把请求路由到合适模型确实很难：成本、延迟、质量和可用性都会变化，不能只按单一排行榜或默认模型做决定。";
+    return "Aaron Levie 认为应用层的==模型路由==会更有价值：不同任务需要在成本优化、能力最大化和风险缓解之间切换，不能只按一个默认模型或单一排行榜做决定。";
+  }
+  if (/route to the best ai model|cost optimization.*capability maximization.*risk mitigation/.test(lower)) {
+    return "Aaron Levie 认为应用层的==模型路由==会更有价值，因为团队需要同时处理成本优化、能力最大化和风险缓解，而不是把所有任务固定到一个模型上。";
   }
   if (/token costs?|tokens? cost|pricing|costs? are becoming/.test(lower)) {
     return "Token 成本正在成为模型选择里的真实约束：同一个工作流要同时看价格、上下文长度、延迟和失败率，而不是只看能力榜。";
@@ -4137,7 +4202,22 @@ function builderReadableSummary(originalText) {
   if (/new kind of big button.*codex|10x usage limits for a month|select one person per day/.test(lower)) {
     return "OpenAI 的 Thibault Sottiaux 说接下来 100 天会每天挑一个高价值 Codex 用例，给 1 个月 10 倍 usage limit，本质上是在用真实案例拉动社区展示更成熟的 Codex 工作流。";
   }
-  return `这条帖子在谈${builderTopicName(lower)}，重点落在${builderFocusPoints(lower)}。如果要继续跟进，先看它有没有给出真实场景、约束条件和可复用做法。`;
+  if (/i shipped a concrete eval workflow for coding agents/.test(lower)) {
+    return "原帖作者说自己发布了一个面向 coding agent 的具体评测工作流，重点是把 agent 输出放到可验证的流程里，而不是只看一次补全是否成功。";
+  }
+  if (/ai agents need eval loops before unattended production use/.test(lower)) {
+    return "原帖强调，AI agent 在无人值守进入生产前需要先有 eval loops；这把关注点从单次能力展示移到持续评测和上线边界。";
+  }
+  if (/ai agents need production eval loops, tool traces, and rollback plans before unattended workflow use/.test(lower)) {
+    return "原帖强调，AI agent 在无人值守工作流前需要==生产 eval loops==、工具调用轨迹和回滚计划，重点是把自动化从演示推到可审计运行。";
+  }
+  if (/launching an llm isn't like shipping traditional software|frontier model launch reviews/.test(lower)) {
+    return "Madhu Guru 说，发布 LLM 不像发布传统软件：团队要在近乎无限的使用场景和失败模式里做取舍，通过 eval、red-team 和候选 checkpoint 评审降低不确定性。";
+  }
+  if (/fable export control situation|regulation discourse/.test(lower)) {
+    return "Aaron Levie 把 Fable 出口管制事件看作模型层监管的早期样本：如果每次模型发布都要和政府反复确认风险，发布节奏和市场进展都会被拖慢。";
+  }
+  return "";
 }
 
 function builderTopicName(text) {
@@ -4327,6 +4407,15 @@ function repoFromUrl(value) {
 
 function hasChineseText(value) {
   return /\p{Script=Han}/u.test(String(value || ""));
+}
+
+function hasReaderChineseText(value) {
+  const text = String(value || "").replace(/\s+/g, "");
+  const chinese = (text.match(/\p{Script=Han}/gu) || []).length;
+  if (chinese === 0) return false;
+  const latin = (text.match(/[A-Za-z]/g) || []).length;
+  if (chinese >= 24) return true;
+  return chinese >= 10 && chinese / Math.max(1, chinese + latin) >= 0.35;
 }
 
 function isHttpUrl(value) {

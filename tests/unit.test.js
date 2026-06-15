@@ -191,7 +191,7 @@ test("report:write validation gate requires must read fields for full reports", 
   );
 });
 
-test("report write requires must read backfill when public references can fill three cards", async () => {
+test("report write does not force must read backfill from GitHub ranking cells", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
   report.source_audit = sourceAuditFixture();
   report.main_items = report.main_items.slice(0, 2);
@@ -261,10 +261,7 @@ test("report write requires must read backfill when public references can fill t
     ]
   };
 
-  assert.throws(
-    () => normalizeReportDraft(report, { reportDate: report.report_date, candidatePool }),
-    (error) => error instanceof PublisherError && error.code === "hero_highlights_contract_failed"
-  );
+  assert.doesNotThrow(() => normalizeReportDraft(report, { reportDate: report.report_date, candidatePool }));
 });
 
 test("report:draft selects must read highlights with category balance", async () => {
@@ -330,7 +327,7 @@ test("report:draft selects must read highlights with category balance", async ()
   );
 });
 
-test("report:draft backfills must read highlights from public sections when main items are sparse", async () => {
+test("report:draft does not backfill must read highlights from GitHub ranking cells", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-must-read-backfill-"));
   const reportDate = "2026-06-15";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -401,9 +398,12 @@ test("report:draft backfills must read highlights from public sections when main
 
   assert.equal(drafted.report.main_items.length, 2);
   assert.equal(drafted.report.github_trending.length, 10);
-  assert.equal(drafted.report.hero_highlights.length, 3);
+  assert(!drafted.report.summary.includes("GitHub Trending"));
+  assert(!drafted.report.summary.includes("Top 10"));
+  assert.equal(drafted.report.hero_highlights.length, 2);
   const mainRefs = new Set(drafted.report.main_items.map((item) => item.candidate_id || item.url));
-  assert(drafted.report.hero_highlights.some((item) => !mainRefs.has(item.source_item_ref)));
+  assert(drafted.report.hero_highlights.every((item) => mainRefs.has(item.source_item_ref)));
+  assert(!JSON.stringify(drafted.report.hero_highlights).includes("GitHub Trending Top 10"));
   assert(drafted.report.hero_highlights.every((item) =>
     item.what_happened &&
     item.why_watch &&
@@ -1240,7 +1240,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(trendingSection.content.includes("==trend-new|NEW=="));
   assert(trendingSection.content.includes("==tag-stars|本周 +456 stars=="));
   assert.equal((trendingSection.content.match(/==tag-stars\|/g) || []).length, 1);
-  assert(trendingSection.content.includes("==tag-highlight|项目 highlight=="));
+  assert(!trendingSection.content.includes("项目 highlight"));
   assert(trendingSection.content.includes("领域：coding_agent、agent_memory") || trendingSection.content.includes("给 coding agent 提供跨会话持久记忆"));
   assert(!trendingSection.content.includes("\n  - "));
   assert(!trendingSection.content.includes(" | "));
@@ -1382,10 +1382,10 @@ test("project interaction content is only shown as GitHub Trending item tags", a
   assert.equal(section.type, "markdown");
   assert(!input.sections.some((item) => item.cardClass === "project-card"));
   assert(!section.content.includes("项目 highlights"));
+  assert(!section.content.includes("项目 highlight"));
   assert(section.content.includes("example/project-alpha"));
   assert(section.content.includes("agent workflows"));
   assert(section.content.includes("领域：agent、workflow"));
-  assert(section.content.includes("==tag-highlight|项目 highlight=="));
   assert(!section.content.includes("Project Beta"));
   assert(!section.content.includes("eval dashboards"));
 });
@@ -1430,7 +1430,7 @@ test("GitHub Trending project highlights deduplicate overlapping project text", 
   const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
   assert(section.content.includes("压缩工具输出、日志、文件和 RAG chunks"));
   assert(section.content.includes("领域：LLM 工具链、RAG、MCP"));
-  assert(section.content.includes("==tag-highlight|项目 highlight=="));
+  assert(!section.content.includes("项目 highlight"));
   assert(!section.content.includes("目标是减少 token 同时保持回答质量"));
   assert(!section.content.includes("把长日志、工具输出或检索片段"));
 
@@ -1461,7 +1461,7 @@ test("interaction input rewrites generation-log summaries into editorial summari
   assert(input.summary.includes("工程团队需要"));
 });
 
-test("interaction input discloses non-primary viewpoint sources without polluting factual sections", async () => {
+test("interaction input keeps non-primary viewpoint audit notes out of reader-facing cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs[0] = {
     ...report.hot_blogs[0],
@@ -1476,15 +1476,15 @@ test("interaction input discloses non-primary viewpoint sources without pollutin
   const hotBlogsSection = input.sections.find((section) => section.title === "精选博客更新");
   const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
 
-  assert(pointsText.includes("行业媒体/播客整理"));
-  assert(pointsText.includes("仅供跟进"));
+  assert(!pointsText.includes("行业媒体/播客整理"));
+  assert(!pointsText.includes("仅供跟进"));
   assert(!pointsText.includes("普通工程师"));
   assert(!pointsText.includes("看点"));
   assert(!pointsText.includes("风险"));
   assert(!mainMarkdownContent(input).includes("行业媒体/播客整理"));
 });
 
-test("interaction input renders source trust tags on public daily items", async () => {
+test("interaction input keeps source audit fields out of reader-facing signal cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
     ...report.main_items[0],
@@ -1514,7 +1514,7 @@ test("interaction input renders source trust tags on public daily items", async 
   report.community_leads = [
     {
       title: "AI agent 市场线索",
-      content: "第三方报道提到 AI agent 平台的企业采用信号。",
+      content: "媒体报道提到 AI agent 平台的企业采用信号。",
       url: "https://techcrunch.com/example-ai-agent-signal",
       event_date: "2026-05-15",
       source: "TechCrunch AI",
@@ -1526,9 +1526,13 @@ test("interaction input renders source trust tags on public daily items", async 
   const input = reportToInteractionInput(report);
   const rendered = JSON.stringify(input);
 
-  assert(rendered.includes("官方一手来源"));
-  assert(rendered.includes("第三方报道"));
-  assert(rendered.includes("原始社交动态"));
+  assert.equal(report.hot_blogs[0].source_level, "intermediary");
+  assert.equal(report.community_leads[0].verification_status, "intermediary_only");
+  assert(!rendered.includes("官方一手来源"));
+  assert(!rendered.includes("第三方报道"));
+  assert(!rendered.includes("原始社交动态"));
+  assert(!rendered.includes("source_level"));
+  assert(!rendered.includes("verification_status"));
 });
 
 test("builder interaction section renders translated Twitter-style cards and omits explicit evidence bullets", async () => {
@@ -6534,7 +6538,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
   assert(html.includes("今日 +321 stars"));
-  assert(html.includes("项目 highlight"));
+  assert(!html.includes("项目 highlight"));
   assert(!html.includes("备注："));
   assert(!html.includes("信号：trending"));
   assert(!html.includes("证据：GitHub Trending daily 显示 321 stars today"));
@@ -6546,11 +6550,12 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("Markdown 原文"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
+  assert.equal(data.kind, undefined);
+  assert.equal(data.schema_version, 1);
   assert.equal(data.main_items[0].importance, "major");
-  assert.equal(data.model_releases[0].importance, "major");
   assert.equal(data.hot_blogs[0].importance, "notable");
   assert.equal(data.model_releases.length, 1);
-  assert.equal(data.hot_blogs.length, 1);
+  assert.equal(data.model_releases[0].name, "ExampleModel 2");
 
   const feed = JSON.parse(await fs.readFile(path.join(outDir, "feed.json"), "utf8"));
   assert.equal(feed.reports[0].markdown_url, undefined);
@@ -6739,6 +6744,45 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
 
+test("buildSite writes effective-interact report html for 2026-06-15 without internal leakage", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-build-"));
+  const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data/2026/06/2026-06-15.json"), "utf8"));
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.writeFile(path.join(dataInputDir, "2026-06-15.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert(result.writtenFiles.includes("reports/2026/06/2026-06-15.html"));
+  assert(result.writtenFiles.includes("data/2026/06/2026-06-15.json"));
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/06/2026-06-15.json"), "utf8"));
+  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
+  assert.equal(publicData.schema_version, 1);
+  assert.equal(publicData.report_date, "2026-06-15");
+  assert.equal(publicData.kind, undefined);
+  assert.match(html, /effective-interact create-interaction\.mjs/);
+  assert.match(html, /data-render-mode="pre-rendered"/);
+  assert.match(html, /data-section-type="filterable-cards"/);
+  assert.match(html, /id="section-today-must-read"/);
+  assert.match(html, /image-lightbox/);
+  for (const key of ["source_audit", "self_check", "candidate_id", "quality_status", "degraded_sections", "remediation"]) {
+    assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
+    assert(!html.includes(key), `${key} must not appear in public HTML`);
+  }
+  for (const forbidden of forbiddenPublicDailyText()) {
+    assert(!html.includes(forbidden), `public HTML must not include ${forbidden}`);
+  }
+});
+
 test("buildSite writes trend index and injects scoped trend tags without mutating report data", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-trend-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
@@ -6788,6 +6832,7 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
 
   const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-29.html"), "utf8");
   assert(html.includes("coding agent: 7d"));
+  assert(html.includes("effective-interact create-interaction.mjs"));
   assert(html.includes("日报导航"));
 
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
@@ -7186,8 +7231,10 @@ test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build",
   assert.deepEqual(result.reports[0].hot_blogs, []);
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
-  assert.deepEqual(data.model_releases, []);
-  assert.deepEqual(data.hot_blogs, []);
+  assert.equal(data.kind, undefined);
+  assert.equal(data.schema_version, 1);
+  assert.deepEqual(data.model_releases || [], []);
+  assert.deepEqual(data.hot_blogs || [], []);
 
   const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
   assert(!html.includes('id="model-releases"'));
@@ -8029,6 +8076,136 @@ test("report:draft keeps repository-style GitHub entries out of 热门博客", a
   assert(drafted.report.hot_blogs.some((item) => item.url === "https://huggingface.co/blog/build-small-hackathon/building-pakistan-notice-helper"));
 });
 
+test("report:draft rewrites public autodraft text instead of shipping templates", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-autodraft-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = discoveryEnvelope({
+    sourceNames: ["Alibaba Cloud Blog", "NVIDIA Developer Blog", "follow-builders X feed", "Leiphone"],
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "main-content-alibaba-security",
+        source: "Alibaba Cloud Blog",
+        url: "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+        title: "Security New Features in May 2026",
+        evidence: "Alibaba Cloud Blog describes Security New Features in May 2026 for cloud security products.",
+        sourceLevel: "primary"
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "main-content-alibaba-hermesagent",
+        source: "Alibaba Cloud Blog",
+        url: "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
+        title: "Automating Daily Outlook Email Summarization with HermesAgent on Alibaba Cloud ECS",
+        evidence: "Alibaba Cloud Blog describes automating daily Outlook email summarization with HermesAgent on Alibaba Cloud ECS.",
+        sourceLevel: "primary"
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "main-content-nvidia-nvcomp",
+        source: "NVIDIA Developer Blog",
+        url: "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
+        title: "Cut Checkpoint Costs with About 30 Lines of Python and NVIDIA nvCOMP",
+        evidence: "NVIDIA Developer Blog explains reducing checkpoint costs with about 30 lines of Python and NVIDIA nvCOMP.",
+        sourceLevel: "primary"
+      }),
+      {
+        id: "search-openalex-microsoft-sovereignty",
+        source_id: "search-openalex",
+        category: "community_lead",
+        title: "Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France",
+        url: "https://aisel.aisnet.org/treos_ecis2026/69",
+        source: "OpenAlex",
+        event_date: reportDate,
+        status: "excluded",
+        evidence: "Journal of the Association for Information Systems",
+        notes: "search_query=big-tech-company-watch; provider=openalex; shadow=true",
+        verification_status: "intermediary_only",
+        source_level: "primary",
+        editorial_category: "engineering_toolchain"
+      },
+      {
+        id: "builder-low-signal-survey",
+        source_id: "builder-follow-builders-x-feed",
+        category: "builder_observation",
+        title: "Swyx: Last chance to fill out the annual AI Engineering Survey",
+        url: "https://x.com/swyx/status/2065909887025168887",
+        source: "follow-builders X feed",
+        event_date: reportDate,
+        status: "excluded",
+        author: "Swyx",
+        handle: "swyx",
+        original_text: "Last chance to fill out the annual AI Engineering Survey this weekend and win great Vercel + Notion + AIE tix!",
+        verification_status: "original_social_only",
+        source_level: "original_social",
+        original_url: "https://x.com/swyx/status/2065909887025168887"
+      },
+      {
+        id: "builder-model-routing",
+        source_id: "builder-follow-builders-x-feed",
+        category: "builder_observation",
+        title: "Aaron Levie: The layer that can route to the best AI model",
+        url: "https://x.com/levie/status/2065989559905812973",
+        source: "follow-builders X feed",
+        event_date: reportDate,
+        status: "excluded",
+        author: "Aaron Levie",
+        handle: "levie",
+        original_text: "The layer that can route to the best AI model for the particular job is going to increase in value substantially. There are at least 3 big reasons: cost optimization, capability maximization, and risk mitigation.",
+        verification_status: "original_social_only",
+        source_level: "original_social",
+        original_url: "https://x.com/levie/status/2065989559905812973"
+      },
+      {
+        id: "intermediary-leiphone-afuw",
+        source_id: "intermediary-leiphone",
+        category: "community_lead",
+        title: "健康AI阿福测试“医生把关”新功能：打开“AI+医生”协作想象空间",
+        url: "https://www.leiphone.com/category/industrynews/d1EqrpsXBW4c1JjR.html",
+        source: "Leiphone",
+        event_date: reportDate,
+        status: "excluded",
+        evidence: "这也是国内首个落地\"AI问答+医生把关\"协作模式的AI应用，为AI与医生的合作提供了可行路径，打开了“AI+医生”赛道的想象空间。",
+        verification_status: "intermediary_only",
+        source_level: "intermediary"
+      }
+    ]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const publicText = JSON.stringify({
+    summary: drafted.report.summary,
+    hero_highlights: drafted.report.hero_highlights,
+    main_items: drafted.report.main_items,
+    builder_observations: drafted.report.builder_observations,
+    community_leads: drafted.report.community_leads
+  });
+  assert(!publicText.includes("发布了一条 AI 相关更新"));
+  assert(!publicText.includes("原文标题为"));
+  assert(!publicText.includes("这条帖子在谈"));
+  assert(!publicText.includes("如果要继续跟进"));
+  assert(!publicText.includes("想象空间"));
+  assert(!publicText.includes("赛道"));
+  assert(!drafted.report.builder_observations.some((item) => item.candidate_id === "builder-low-signal-survey"));
+  assert(!drafted.report.official_org_updates.some((item) => item.candidate_id === "search-openalex-microsoft-sovereignty"));
+  assert(!drafted.report.hero_highlights.some((item) => item.source_item_ref === "search-openalex-microsoft-sovereignty"));
+  const routing = drafted.report.builder_observations.find((item) => item.candidate_id === "builder-model-routing");
+  assert(routing);
+  assert.match(routing.translation, /模型路由|成本优化|风险缓解/u);
+
+  const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  const issueCodes = review.issues.map((issue) => issue.code);
+  assert(!issueCodes.includes("public_text_untranslated"));
+  assert(!issueCodes.includes("public_template_body"));
+  assert(!issueCodes.includes("plain_language_stock_phrase"));
+  assert(!issueCodes.includes("builder_translation_template"));
+});
+
 test("report:draft prefers specific hot blog evidence over generic feed announcements", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hot-blog-specific-"));
   const reportDate = "2026-06-08";
@@ -8827,7 +9004,7 @@ test("report:draft favors plain-reader utility over hardcore research details", 
   );
   assert(drafted.report.github_trending.length > 0);
   for (const item of drafted.report.github_trending) {
-    assert.match(item.description, /(?:进入|进了) GitHub Trending Top 10/);
+    assert.doesNotMatch(item.description, /(?:进入|进了) GitHub Trending Top 10/);
     assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
   }
 });
@@ -11362,6 +11539,16 @@ test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Hear
         evidence: "报道比较了连续批处理、KV cache 管理、显存占用和多卡调度的工程差异。"
       },
       {
+        id: "sspai-game-jam",
+        source_id: "intermediary-sspai",
+        source: "SSPAI",
+        title: "线下活动｜CiGA Game Jam 2026 广州荔湾少数派站召集令",
+        url: "https://sspai.com/post/110989",
+        event_date: reportDate,
+        category: "community_lead",
+        evidence: "本次活动定位为小型 GameJam，没有评比环节，只有公园、音乐、猫咪、饮品、讨论交流和分享。"
+      },
+      {
         id: "old-qbitai",
         source_id: "intermediary-qbitai",
         source: "QbitAI",
@@ -11391,9 +11578,12 @@ test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Hear
 
   assert.equal(result.items.length, 3);
   assert.deepEqual(result.items.map((item) => item.candidate_id), ["qbitai-1", "sspai-1", "jiqizhixin-1"]);
+  assert(!result.items.some((item) => item.candidate_id === "sspai-game-jam"));
   for (const item of result.items) {
-    assert(item.summary.length >= 120, item.summary);
-    assert(item.summary.length <= 260, item.summary);
+    assert(item.summary.length >= 40, item.summary);
+    assert(item.summary.length <= 180, item.summary);
+    assert(!item.summary.includes("日报把"), item.summary);
+    assert(!item.summary.includes("今天更新"), item.summary);
     assert.equal(item.source_level, "intermediary");
     assert.equal(item.verification_status, "intermediary_only");
   }
@@ -11478,6 +11668,28 @@ test("official organization updates render separately from Builder observations"
         url: "https://x.com/example/status/1",
         event_date: "2026-06-12",
         evidence: "A builder comments on enterprise AI adoption."
+      },
+      {
+        id: "alibaba-blog-generic-official",
+        source_id: "content-alibaba-cloud-blog",
+        source: "Alibaba Cloud Blog",
+        source_level: "official",
+        verification_status: "primary_confirmed",
+        title: "Security New Features in May 2026",
+        url: "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+        event_date: "2026-06-12",
+        evidence: "Alibaba Cloud Blog describes cloud product updates."
+      },
+      {
+        id: "openalex-microsoft-paper",
+        source_id: "search-openalex",
+        source: "OpenAlex",
+        source_level: "primary",
+        verification_status: "intermediary_only",
+        title: "Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France",
+        url: "https://aisel.aisnet.org/treos_ecis2026/69",
+        event_date: "2026-06-12",
+        evidence: "Journal of the Association for Information Systems"
       }
     ],
     { reportDate: "2026-06-12" }
@@ -12112,7 +12324,9 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
 
   assert(prompt.includes("最终发布产物是自包含、可读性好的静态 HTML，不是 Markdown"));
   assert(prompt.includes(".codex/skills/effective-interact"));
-  assert(prompt.includes('renderMode: "pre-rendered"'));
+  assert(!prompt.includes("public_daily_v2"));
+  assert(!prompt.includes("src/public-daily-renderer.js"));
+  assert(prompt.includes("pre-rendered"));
   assert(prompt.includes("定时任务和长程发布任务必须从 launcher worktree 启动"));
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD"));
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD --publish"));
@@ -12157,11 +12371,12 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("3-5 个分点式要点"));
   assert(prompt.includes("key_points"));
   assert(prompt.includes("点开放大"));
-  assert(prompt.includes("项目 highlight"));
+  assert(prompt.includes("不生成 `项目 highlight` 标签"));
   assert(prompt.includes("覆盖时间范围"));
   assert(prompt.includes("不渲染公开“模型发布”"));
   assert(prompt.includes("不渲染公开“今日值得关注的项目”"));
   assert(prompt.includes("项目 highlights"));
+  assert(!prompt.includes("作为对应条目的 `项目 highlight` tag"));
   assert(prompt.includes("额外项目列表"));
   assert(prompt.includes("star 变化"));
   assert(prompt.includes("加粗变色文字"));
@@ -12173,7 +12388,9 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("Artificial Analysis"));
   assert(prompt.includes("无图日报可以通过"));
   assert(prompt.includes("公开页不渲染 `why_it_matters`"));
-  assert(prompt.includes("公开日报默认隐藏 source audit"));
+  assert(prompt.includes("source_audit"));
+  assert(prompt.includes("self_check"));
+  assert(prompt.includes("remediation"));
   assert(!prompt.includes("`main_items` 每条必须填写 `why_it_matters` 或 `reader_relevance`"));
   assert(!prompt.includes("`main_items` 必须至少填写其一"));
   assert(!prompt.includes("每条用 3-5 个短 bullet"));
@@ -12928,6 +13145,25 @@ function collectJsonKeys(value, keys = new Set()) {
     collectJsonKeys(entryValue, keys);
   }
   return keys;
+}
+
+function forbiddenPublicDailyText() {
+  return [
+    "来源 第三方报道",
+    "信源审计",
+    "这条动态主要围绕",
+    "今天进入 GitHub Trending Top 10",
+    "序号 1",
+    "序号  1",
+    "parsed_count",
+    "included",
+    "remediation",
+    "candidate_id",
+    "source_audit",
+    "self_check",
+    "quality_status",
+    "degraded_sections"
+  ];
 }
 
 async function runHarnessValidate(cwd) {

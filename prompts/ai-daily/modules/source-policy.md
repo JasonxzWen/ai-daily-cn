@@ -3,7 +3,7 @@
 - T0：官方博客、论文、模型卡、GitHub Release、官方 benchmark。
 - T1：builder、研究者、founder、maintainer 的原始帖子或视频。
 - T2：GitHub、Hugging Face、arXiv、HN、Reddit、Product Hunt、播客原始单集页、可追溯社区讨论。
-- T3：媒体报道、普通微信公众号、自媒体、华尔街见闻、行业资讯站和聚合摘要，默认不作为事实主线来源；可作为 `hot_blogs`、`community_leads`、AIGC/产业线索或交叉验证，并在公开页标成“第三方报道”或“社区线索”。用户确认的公众号白名单可按 `wechat_primary_like` 或 `wechat_industry_whitelist` 单独标注。
+- T3：媒体报道、普通微信公众号、自媒体、华尔街见闻、行业资讯站和聚合摘要，默认不作为事实主线来源；可作为 `hot_blogs`、`community_leads`、AIGC/产业线索或交叉验证，并在结构化数据中保留来源层级。公开页使用真实来源名、原文链接和日期，不把“第三方报道”或“社区线索”作为重复 chip 或详情格。用户确认的公众号白名单可按 `wechat_primary_like` 或 `wechat_industry_whitelist` 单独标注。
 
 优先扩展信源：
 
@@ -16,7 +16,7 @@
 - AI 开发工具商业化：固定检查 coding agent、IDE、API gateway、云平台、评测/观测工具的价格页、changelog、Service Quotas、usage dashboard、rate limit 和 credit/seat/usage-based billing 变化。
 - AIGC 与内容产业：Runway、Pika、Luma、Kling、Adobe Firefly、Unity Muse、RCTV、The Magnifier AI、Fast Company Creator Economy、Crunchbase News AI，以及中文内容产业媒体、平台公告、活动页面和公司公告可作为候选源。覆盖图片生成、视频生成、短剧/漫剧、音乐/配音、广告创意、创作者工具、AI 辅助游戏创作、内容平台政策和商业化，但事实性入选必须回到官方、产品页、监管文件、投资方公告或多源确认。
 - 播客平台：小宇宙、喜马拉雅等只作为具体节目或单集发现入口；最终需要单集页、RSS episode、原始音频或可信 transcript。小宇宙可通过 RSSHub `/xiaoyuzhou/podcast/:id`；喜马拉雅可通过 RSSHub `/ximalaya/:type/:id/:all/:shownote?`，但通常需要 `XIMALAYA_TOKEN` 且默认不输出 ShowNote，缺少授权或单集证据时必须说明不可用。
-- 公众号与中介媒体：普通微信公众号、自媒体和行业媒体是重要线索源，但不是事实主线的最终报道实体；必须先尝试拿到其引用的一手信源。`wechat_primary_like` 可作为半一手，`wechat_industry_whitelist` 可用于低风险行业动态和观点分析进入主体信息；无法回源且不在白名单时可进入 `community_leads`，高质量长文/访谈/播客可进入 `hot_blogs`，但公开页必须显示“第三方报道”或“社区线索”tag。
+- 公众号与中介媒体：普通微信公众号、自媒体和行业媒体是重要线索源，但不是事实主线的最终报道实体；必须先尝试拿到其引用的一手信源。`wechat_primary_like` 可作为半一手，`wechat_industry_whitelist` 可用于低风险行业动态和观点分析进入主体信息；无法回源且不在白名单时可进入 `community_leads`，高质量长文/访谈/播客可进入 `hot_blogs`，但公开页不得用“第三方报道”或“社区线索”tag 刷屏，来源层级留在结构化数据。
 - 公众号文章链接输入：优先使用日期级输入 `$CODEX_HOME/automations/ai-daily/inputs/wechat/YYYY-MM-DD.json` 或 `--wechat-input <json>`；每条必须保留原始 `mp.weixin.qq.com` URL、账号名、发布时间、风险等级、验证备注和可选一手回源 URL。候选池和公开页面只能展示清洗后的公众号 URL、账号与验证状态，不能暴露本机路径、输入文件路径、私有 feed URL、cookie、token 或自动化目录。
 - 公众号 RSS/聚合器：RSSHub NewRank、Wechat2RSS、RSS-Bridge、Miniflux/FreshRSS 等只能作为用户显式配置的私有发现源；未配置时记录 `skipped_missing_base_url` / `skipped_missing_token`，不阻断日报。聚合器内容不提升事实等级，高风险事实仍需 T0/T1/T2 或多源确认。
 - 聚合站：Planet AI、RSS 索引仓库等只作发现和交叉验证，最终链接尽量回到原文。

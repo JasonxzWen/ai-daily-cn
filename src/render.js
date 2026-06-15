@@ -2268,7 +2268,7 @@ function renderGithubTrending(items, projects = []) {
     .slice(0, 10)
     .map((item) => {
       const project = projectForTrendRender(item, projectIndex);
-      return `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item), githubStarsTag(item), ...(project ? projectHeatTags(project) : []), project ? "项目 highlight" : ""].filter(Boolean))}</td><td>${renderGithubTrendDetails(item, project)}</td></tr>`;
+      return `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item), githubStarsTag(item), ...(project ? projectHeatTags(project) : [])].filter(Boolean))}</td><td>${renderGithubTrendDetails(item, project)}</td></tr>`;
     })
     .join("\n");
   return `<table class="project-table">

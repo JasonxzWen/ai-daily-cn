@@ -120,7 +120,12 @@ export function cleanProjectDescription(value) {
 export function cleanGithubTrendDescription(item) {
   const repo = typeof item === "object" ? item?.repo : "";
   const raw = typeof item === "object" ? item?.description : item;
-  const withoutRepoPrefix = removeRepoPrefix(String(raw || ""), repo);
+  const withoutRepoPrefix = removeRepoPrefix(String(raw || ""), repo)
+    .replace(/^今天进入 GitHub Trending Top 10，仓库简介写的是：/u, "")
+    .replace(/^今天进入 GitHub Trending Top 10，公开描述把它定位在/u, "可作为")
+    .replace(/今天进入 GitHub Trending Top 10，仓库简介写的是：/u, "：")
+    .replace(/今天进入 GitHub Trending Top 10，公开描述把它定位在/u, "可作为")
+    .replace(/，仓库首页当前围绕这条能力展开。?$/u, "观察。");
   return cleanProjectDescription(translateKnownGithubDescription(withoutRepoPrefix, repo));
 }
 

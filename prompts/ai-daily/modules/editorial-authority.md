@@ -45,11 +45,12 @@
 ### 覆盖与保留
 
 - 必保留：GitHub Trending Top 10 完整榜单。
-- 必保留：coverage window、自检、`quality_status` 和 `source_audit` 的结构化记录。
+- 内部报告必保留：coverage window、自检、`quality_status` 和 `source_audit` 的结构化记录；公开页只显示读者可理解的短缺口说明，不公开内部审计字段。
 - 不再单独公开：`model_releases`、`今日值得关注的项目`、`项目 highlights`、`国内动态`空栏目。
 - 国内/中文内容要并入现有栏目，保证可见，但不为了“国内”再单开一个空导航。
 - 图片不是 KPI；无图日报可以通过。公开正文只展示尺寸、语义、可读性合格的原文内部图片资产或结构化表格；tiny icon、favicon、logo、头像、装饰图、整页截图和不可读截图不得作为主内容展示。
 - 公开日报与内部报告严格分离：公开页默认隐藏 source audit、self-check、ledger、degradation、candidate diagnostics、执行命令和失败案例；这些只保留在 JSON、质量报告或交接材料中。
+- 公开日报渲染固定走 `.codex/skills/effective-interact` 的 `pre-rendered` 模式；`reports-data` 保留完整内部报告，`docs/data` 只保留读者安全字段。
 
 ### 本轮已生效的迭代
 
@@ -65,6 +66,7 @@
 10. 图片允许为空；只有原文内部资产在尺寸、语义和可读性合格时才展示。
 11. 公开页默认隐藏审计、自检、ledger、降级诊断、候选池和执行过程。
 12. GitHub、博客、Builder、社区、国内/平台等板块都保留为重要内容面，不因主体短新闻化被裁掉。
+13. 公开日报继续使用 effective-interact 组件体系；清洗和分层发生在结构化生成与 interaction input 阶段，旧的内部审计/自检/发布质量 cell 不再进入公开页。
 
 ### 本轮修改清单
 
@@ -85,6 +87,7 @@
 15. 图片展示改为质量门控制：可无图，禁止 tiny icon、logo、头像、整页截图和不可读图片。
 16. 公开日报隐藏内部审计和执行诊断，只在内部 JSON / 质量报告 / 交接中保留。
 17. GitHub Trending、热门博客、Builder、社区线索、国内/平台内容都视为重要板块，不能被短新闻流替代。
+18. 公开页模板固定为 effective-interact `pre-rendered` 产物：允许源覆盖降级，但降级只能以短的读者说明出现，不能以 source audit、candidate、self-check 或 remediation 字段出现。
 
 ### 当前优先级
 
@@ -112,6 +115,7 @@
 - 主体只有少数几条新闻，或把每条写成“为什么重要 / 启示 / 读者应该关注”的泛化说明，真正事实概括很短。
 - 把 OpenRouter、Artificial Analysis 或类似网页整页截图直接放进正文，导致手机端不可读。
 - 为了凑图展示 favicon、logo、头像、小图标、装饰图或不可读截图。
+- 把 `source_audit`、`self_check`、`candidate_id`、`quality_status`、`remediation`、`parsed_count` 或“来源 第三方报道 / 今天进入 GitHub Trending Top 10 / 这条动态主要围绕 / 序号 1”这类生成痕迹写入公开页。
 
 ### Forbidden Case
 
@@ -127,6 +131,7 @@
 
 - `2026-06-08`：把分散的 ROI、质量索引、旧 prompt 口径和用户最新反馈收口到这份唯一权威资产；补上 `迭代维护机制`、`本轮修改清单`、`Good Case`、`Bad Case`、`Forbidden Case` 和 `迭代历史`，后续同类迭代统一在这里后写覆盖前写。
 - `2026-06-09`：根据用户回归反馈固定公开日报新合同：8-12 条短新闻流、公共 AI 重要性排序、公开页不展示解释模板、榜单结构化表格优先、禁止整页截图主内容、图片质量门和公开/内部报告分离；其它 prompt 模块若冲突，以本记录覆盖。
+- `2026-06-15`：明确不能绕过 effective-interact 组件体系；严格点前移到生成和 interaction input 边界，公开页用 effective-interact 展示干净读者内容，事后校验只挡事故级泄漏和视觉破损。
 
 ### 工作流约束
 

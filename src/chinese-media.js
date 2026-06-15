@@ -34,6 +34,9 @@ export function selectChineseMediaDynamics(candidates = [], options = {}) {
     if (reportDate && String(candidate?.event_date || "").slice(0, 10) !== reportDate) {
       continue;
     }
+    if (!isUsefulChineseMediaCandidate(candidate)) {
+      continue;
+    }
     const urlKey = stableUrl(candidate?.url || candidate?.id || candidate?.title);
     if (seen.has(urlKey)) {
       continue;
@@ -71,10 +74,9 @@ export function chineseMediaItem(candidate, source) {
 export function summarizeChineseMediaCandidate(candidate, source) {
   const title = cleanText(candidate?.title || candidate?.name || "");
   const evidence = cleanText(candidate?.summary || candidate?.evidence || candidate?.description || candidate?.content || "");
-  const publisher = source?.display_name || cleanText(candidate?.source || "中文媒体");
-  const detail = evidence || "当前条目提供了中文语境下的 AI 行业、产品或工程动态，可作为今天继续点开阅读和交叉核对的线索。";
-  const base = `${publisher} 今天更新「${title}」。这条动态主要围绕${detail} 日报把它放在中文媒体动态中，是为了保留国内二手媒体对技术落地、产品体验、产业反馈和工程实践的观察；读者若要引用事实或数字，仍应点开原文并继续追溯一手来源。`;
-  return boundedText(base, 200, 120, 260);
+  const detail = evidence || "该条目提供中文语境下的 AI 行业、产品或工程动态。";
+  const base = title && !detail.includes(title) ? `${title}：${detail}` : detail || title;
+  return boundedText(base, 140, 40, 180);
 }
 
 export function chineseMediaSourceForCandidate(candidate = {}) {
@@ -86,6 +88,28 @@ export function chineseMediaSourceForCandidate(candidate = {}) {
     source.names.some((pattern) => pattern.test(sourceName)) ||
     source.hosts.some((host) => urlHost === host || urlHost.endsWith(`.${host}`))
   ) || null;
+}
+
+function isUsefulChineseMediaCandidate(candidate = {}) {
+  const text = cleanText([
+    candidate.title,
+    candidate.name,
+    candidate.summary,
+    candidate.evidence,
+    candidate.description,
+    candidate.content
+  ].filter(Boolean).join(" "));
+  if (!text) {
+    return false;
+  }
+  if (isLowValueChineseMediaEvent(text)) {
+    return false;
+  }
+  return /AI|AIGC|agent|LLM|RAG|GPU|Copilot|OpenAI|Claude|Gemini|Qwen|DeepSeek|模型|大模型|智能体|机器学习|深度学习|推理|训练|算力|云|知识库|语义|助手|机器人|世界模型|开源|工程/i.test(text);
+}
+
+function isLowValueChineseMediaEvent(text) {
+  return /ciga|cg[jJ]\d*|game\s*jam|线下活动|召集令|少数派站|活动定位|没有评比|公园|猫咪|饮品|做人呐|最重要是开心/i.test(text);
 }
 
 function sourceStatus(source, sourceAudit) {

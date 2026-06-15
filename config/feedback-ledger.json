@@ -429,7 +429,7 @@
       "status": "implemented",
       "title": "Keep X/Twitter discussion cards compact",
       "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace or render long raw original posts by default, making the public discussion section hard to scan.",
-      "expected_behavior": "Public Builder/X cards show author, handle, date, source trust, a concise Chinese translation/summary, and a collapsed or truncated original excerpt. Internal fields and full raw thread dumps are not exposed in the public card body.",
+      "expected_behavior": "Public Builder/X cards show author, handle, date, a concise Chinese translation/summary, and a collapsed or truncated original excerpt. Internal fields, generic source-bucket labels, and full raw thread dumps are not exposed in the public card body.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -616,9 +616,9 @@
       "id": "feedback/p1-public-signal-layering",
       "severity": "P1",
       "status": "implemented",
-      "title": "Show qualified signals with source trust tags",
-      "problem": "Daily report safety gates could be too strict: qualified third-party reports, builder posts, blogs, and community leads were blocked instead of being shown with clear source trust labels, leaving the public daily thin and low value.",
-      "expected_behavior": "The factual main stream stays strict, but qualified non-primary content is published in hot blogs, builder observations, GitHub/project highlights, and community leads with visible trust tags such as 已核查事实, 官方一手来源, 第三方报道, 社区线索, or 原始社交动态.",
+      "title": "Publish qualified signals without generic source-label clutter",
+      "problem": "Daily report safety gates could be too strict, then the attempted fix made qualified third-party reports, builder posts, blogs, and community leads readable only through repetitive generic labels such as 来源/第三方报道/社区线索.",
+      "expected_behavior": "The factual main stream stays strict, but qualified non-primary content is published in hot blogs, builder observations, GitHub trends, and community leads. Keep source_level and verification_status in structured data for audit, but the public interaction page must not render generic source buckets or implementation labels as repeated chips or detail cells.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -632,7 +632,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "report:draft expands public signal coverage beyond strict factual sections",
+        "test_name": "interaction input keeps source audit fields out of reader-facing signal cards",
         "gate": "npm run validate"
       }
     },
@@ -822,6 +822,32 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "interaction input puts must read first and compact main list",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-effective-interact-production-renderer",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep production daily HTML on effective-interact",
+      "problem": "A remediation attempted to remove public-page garbage by replacing the production daily report renderer with a bespoke public template that carried fake `data-html-work-report` and `data-render-mode` markers, losing effective-interact components and historical validation requirements.",
+      "expected_behavior": "Production single-report HTML is generated through `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode. Public cleanup happens in generation and interaction-input shaping, not by bypassing effective-interact. The built HTML includes the effective-interact generator marker and component affordances such as filterable cards, tracking components, grouped navigation, and lightbox support.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/plain-language.md",
+        "src/site.js",
+        "src/page-checklist.js",
+        "src/interaction-report.js",
+        "tests/unit.test.js",
+        "tests/e2e/site.e2e.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "buildSite writes effective-interact report html for 2026-06-15 without internal leakage",
         "gate": "npm run validate"
       }
     },

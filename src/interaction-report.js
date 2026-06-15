@@ -353,7 +353,7 @@ export function reportToInteractionInput(report, options = {}) {
       successCriteria: [
         "主体信息不强行凑数",
         "模型发布合入主体信息",
-        "项目 highlight 仅作为 tag 出现在 GitHub Trending 条目上",
+        "项目补充信息只合并到 GitHub Trending 条目内",
         "信源审计可展开",
         "结构化 JSON 可追溯"
       ],
@@ -878,10 +878,7 @@ function formatCompactMainItemCard(item, index, context = {}) {
     titleIcon: siteIconForUrl(item.url, item.source || item.title),
     tags,
     body: facts[0] || item.summary || "",
-    points: [
-      { label: "来源", value: item.source || hostnameLabel(item.url) },
-      { label: "序号", value: String(index + 1) }
-    ].filter((point) => point.value)
+    points: []
   };
 }
 
@@ -974,7 +971,6 @@ function formatGithubTrending(items, context = {}) {
         tag,
         githubStarsTag(item),
         ...(project ? projectHeatTags(project) : []),
-        project ? "项目 highlight" : "",
         ...trendTagsFor(context.trendAnnotations, "github_trending", index)
       ].filter(Boolean));
       const details = githubTrendDetails(item, project).join("；");
@@ -1631,8 +1627,9 @@ function builderAvatarIcon(report, item) {
 function hotBlogPointTexts(itemOrSummary) {
   const keyPoints = Array.isArray(itemOrSummary?.key_points)
     ? itemOrSummary.key_points
-      .map((point) => String(point || "").replace(/\s+/g, " ").trim())
+      .map((point) => stripPublicBodySourcePrefix(point, itemOrSummary).replace(/\s+/g, " ").trim())
       .filter(Boolean)
+      .filter((point) => !isPublicBoilerplatePoint(point))
       .slice(0, 5)
     : [];
   if (keyPoints.length > 0) {
@@ -1647,6 +1644,11 @@ function hotBlogPointTexts(itemOrSummary) {
     .map((part) => part.trim())
     .filter(Boolean);
   return parts.length >= 2 ? parts.slice(0, 5) : [text];
+}
+
+function isPublicBoilerplatePoint(value) {
+  const text = String(value || "").trim();
+  return /(?:intermediary\/self-media lead|trace it to a primary source|backed by a primary source|discovery lead|verify with the original source)/i.test(text);
 }
 
 function editorialBullets(item) {
@@ -1666,17 +1668,6 @@ function editorialCardPoints(item, options = {}) {
   }
   if (includeWatchNext && item?.watch_next) {
     points.push({ label: "后续", value: item.watch_next });
-  }
-  if (hasNonPrimarySourceSignal(item)) {
-    if (item?.source_level) {
-      points.push({ label: "来源", value: sourceLevelLabel(item.source_level) });
-    }
-    if (item?.verification_note) {
-      points.push({ label: "说明", value: item.verification_note });
-    }
-    if (item?.risk_note) {
-      points.push({ label: "上下文", value: item.risk_note });
-    }
   }
   return points;
 }
@@ -1756,13 +1747,11 @@ function sourceTrustKind(item = {}) {
 }
 
 function sourceTrustCardTag(item = {}) {
-  const label = sourceTrustLabel(item);
-  return label ? cardTag(label, sourceTrustKind(item)) : "";
+  return "";
 }
 
 function sourceTrustHighlightTag(item = {}) {
-  const label = sourceTrustLabel(item);
-  return label ? `tag-${sourceTrustKind(item)}|${label}` : "";
+  return "";
 }
 
 function formatCardMedia(report, assets, options = {}) {
@@ -2029,6 +2018,8 @@ function stripPublicBodySourcePrefix(value, item = {}) {
   }
   return text
     .replace(/\s*。?\s*Treat this as a community lead unless it is backed by a primary source\.?/gi, "")
+    .replace(/\s*This is an intermediary\/self-media lead; trace it to a primary source before[^。.;\n]*(?:[。.;]|$)/gi, "")
+    .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,60}\s+latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion\.?/gi, "")
     .replace(/\s*(?:待确认|边界)\s*[：:][^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*(?:该来源|中介来源|事实性结论|事实来自|官方文档)[^。；;\n]*(?:仅作为?线索|仅作(?:发现|社区)?线索|需要一手|多源确认|原始链接|不得仅凭该线索写入主体)[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/[；;]?\s*当前作为[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:确认|。|$)/g, "")
@@ -2230,7 +2221,6 @@ function formatPlatformExemptCards(items, sectionName, context = {}) {
       tags: [
         cardTag(importanceTagFor(sectionName, item)),
         cardTag(platformItemLabel(platform), "topic"),
-        sourceTrustCardTag(item) || cardTag("平台线索", "risk"),
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
       points: [
