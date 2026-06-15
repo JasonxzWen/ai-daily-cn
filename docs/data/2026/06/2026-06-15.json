@@ -1,0 +1,2097 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-06-15",
+  "title": "AI 日报 2026-06-15",
+  "summary": "今天主线集中在三类变化：OpenAI 用 Partner Network 扩大企业集成和服务伙伴入口；阿里云 5 月安全功能更新补强云上防护能力；NVIDIA 分别把检查点压缩和智能体编码基准结果推到开发者工作流。GitHub Trending 继续保留 Top 10，供读者对照开源侧动向。",
+  "hero_highlights": [
+    {
+      "title": "Microsoft 365 在法国数字主权讨论中成为依赖案例",
+      "url": "https://aisel.aisnet.org/treos_ecis2026/69",
+      "reason": "它会影响模型、平台入口或能力边界的判断",
+      "what_happened": "OpenAlex 收录的论文讨论法国数字主权语境下对 Microsoft 365 的依赖关系，适合作为企业平台治理和云服务选型的背景材料。",
+      "why_watch": "它会影响模型、平台入口或能力边界的判断",
+      "category": "model_platform",
+      "source_item_ref": "https://aisel.aisnet.org/treos_ecis2026/69"
+    },
+    {
+      "title": "OpenAI 推出 Partner Network 扩大企业落地渠道",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "reason": "OpenAI 正在把企业采用路径交给认证服务、技术和咨询伙伴，读者可关注其对集成、采购和交付生态的影响。",
+      "what_happened": "OpenAI 发布 Partner Network，围绕企业客户接入、实施和服务支持组织合作伙伴体系。",
+      "why_watch": "OpenAI 正在把企业采用路径交给认证服务、技术和咨询伙伴，读者可关注其对集成、采购和交付生态的影响。",
+      "category": "product_tool",
+      "source_item_ref": "https://openai.com/index/introducing-openai-partner-network"
+    },
+    {
+      "title": "阿里云 5 月安全功能更新补强云上防护",
+      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+      "reason": "这类安全功能更新会影响云上工作负载的权限、防护和合规配置，适合纳入平台运维检查清单。",
+      "what_happened": "阿里云博客汇总 2026 年 5 月安全新功能，面向云上安全能力和服务配置更新。",
+      "why_watch": "这类安全功能更新会影响云上工作负载的权限、防护和合规配置，适合纳入平台运维检查清单。",
+      "category": "china_open_source_community",
+      "source_item_ref": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251"
+    }
+  ],
+  "main_items": [
+    {
+      "title": "OpenAI 推出 Partner Network 扩大企业落地渠道",
+      "editorial_category": "product_radar",
+      "event_date": "2026-06-14",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "source": "OpenAI News RSS",
+      "tier": "T0",
+      "entities": [
+        "OpenAI News RSS"
+      ],
+      "summary": "OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“Introducing the OpenAI Partner Network”。",
+      "bullets": [
+        "**OpenAI News RSS 发布了一条 AI 相关**：OpenAI News RSS 发布了一条 AI 相关更新，原文标题为“Introducing the OpenAI Partner Network”。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "阿里云 5 月安全功能更新补强云上防护",
+      "editorial_category": "product_radar",
+      "event_date": "2026-06-15",
+      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Security New Features in May 2026”。",
+      "bullets": [
+        "**Alibaba Cloud Blog 发布了一条 AI**：Alibaba Cloud Blog 发布了一条 AI 相关更新，原文标题为“Security New Features in May 2026”。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 用 nvCOMP 降低模型检查点成本",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-15",
+      "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "NVIDIA Developer Blog 发布了一条 AI 相关更新，原文标题为“Cut Checkpoint Costs with About 30 Lines of Python and NVIDIA nvCOMP”。",
+      "bullets": [
+        "**检查点压缩**：NVIDIA Developer Blog 介绍用约 30 行 Python 和 nvCOMP 压缩训练检查点，目标是降低大模型训练中的存储和传输成本。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA 报告智能体编码基准领先表现",
+      "editorial_category": "ai_industry",
+      "event_date": "2026-06-13",
+      "url": "https://developer.nvidia.com/blog/nvidia-achieves-leading-agentic-coding-performance-on-first-agentic-ai-benchmark/",
+      "source": "NVIDIA Developer Blog",
+      "tier": "T0",
+      "entities": [
+        "NVIDIA Developer Blog"
+      ],
+      "summary": "NVIDIA Developer Blog 介绍其在首个智能体 AI 编码基准中的表现，并把结果放在开发工具和自动化工作流的语境中。",
+      "bullets": [
+        "**编码基准**：NVIDIA Developer Blog 报告其在智能体 AI 编码基准中的领先表现，重点指向开发者工具、评测和自动化编码工作流。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    }
+  ],
+  "github_trending": [
+    {
+      "name": "iptv-org/iptv",
+      "repo": "iptv-org/iptv",
+      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/iptv-org/iptv",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 1,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "freeCodeCamp/freeCodeCamp",
+      "repo": "freeCodeCamp/freeCodeCamp",
+      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/freeCodeCamp/freeCodeCamp",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 2,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "pytest-dev/pytest",
+      "repo": "pytest-dev/pytest",
+      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/pytest-dev/pytest",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 3,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "notable"
+    },
+    {
+      "name": "swc-project/swc",
+      "repo": "swc-project/swc",
+      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/swc-project/swc",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 4,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "chatwoot/chatwoot",
+      "repo": "chatwoot/chatwoot",
+      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/chatwoot/chatwoot",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 5,
+      "previous_rank": 13,
+      "rank_delta": 8,
+      "trend": "up",
+      "importance": "general"
+    },
+    {
+      "name": "NVIDIA/SkillSpector",
+      "repo": "NVIDIA/SkillSpector",
+      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/NVIDIA/SkillSpector",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 6,
+      "previous_rank": 5,
+      "rank_delta": -1,
+      "trend": "down",
+      "importance": "general"
+    },
+    {
+      "name": "meshery/meshery",
+      "repo": "meshery/meshery",
+      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/meshery/meshery",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 7,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "cypress-io/cypress",
+      "repo": "cypress-io/cypress",
+      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/cypress-io/cypress",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 8,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "GorvGoyl/Clone-Wars",
+      "repo": "GorvGoyl/Clone-Wars",
+      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "url": "https://github.com/GorvGoyl/Clone-Wars",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 9,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    },
+    {
+      "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "repo": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "language": "all",
+      "window": "daily",
+      "rank": 10,
+      "previous_rank": null,
+      "rank_delta": null,
+      "trend": "new",
+      "importance": "general"
+    }
+  ],
+  "huggingface_trending": [],
+  "model_releases": [],
+  "hot_blogs": [],
+  "chinese_media_dynamics": [],
+  "daily_tracking": [
+    {
+      "id": "openrouter-rankings",
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai/rankings",
+      "event_date": "2026-06-15",
+      "source": "OpenRouter Rankings",
+      "category": "model_usage",
+      "importance": "notable",
+      "change_status": "changed",
+      "change_summary": "OpenRouter 本周 Top 10 已解析：#1 DeepSeek V4 Flash 4.41T tokens；#2 MiniMax M3 4.32T tokens；#3 Hy3 preview 4.14T tokens；MiniMax M3 周变化 73%。",
+      "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，4.41T tokens，周变化 20%）。 Top 10 供应商分布为 anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
+      "watch_points": [
+        "MiniMax M3 的周变化为 73%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。",
+        "若没有新进榜，重点看榜首和供应商份额是否迁移。",
+        "OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。"
+      ],
+      "metrics": [
+        {
+          "label": "榜单范围",
+          "value": "This Week Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 3、deepseek 3、minimax 1、openrouter 1、tencent 1、xiaomi 1",
+          "trend": "unknown"
+        },
+        {
+          "label": "#1",
+          "value": "DeepSeek V4 Flash（deepseek）：4.41T tokens，周变化 20%",
+          "trend": "up"
+        },
+        {
+          "label": "#2",
+          "value": "MiniMax M3（minimax）：4.32T tokens，周变化 73%",
+          "trend": "up"
+        },
+        {
+          "label": "#3",
+          "value": "Hy3 preview（tencent）：4.14T tokens，周变化 41%",
+          "trend": "up"
+        },
+        {
+          "label": "#4",
+          "value": "MiMo-V2.5（xiaomi）：3.59T tokens，周变化 64%",
+          "trend": "up"
+        },
+        {
+          "label": "#5",
+          "value": "Owl Alpha（openrouter）：2.47T tokens，周变化 27%",
+          "trend": "up"
+        },
+        {
+          "label": "#6",
+          "value": "Claude Opus 4.7（anthropic）：2.34T tokens，周变化 62%",
+          "trend": "up"
+        },
+        {
+          "label": "#7",
+          "value": "Claude Sonnet 4.6（anthropic）：2.13T tokens，周变化 21%",
+          "trend": "up"
+        },
+        {
+          "label": "#8",
+          "value": "DeepSeek V4 Pro（deepseek）：1.96T tokens，周变化 15%",
+          "trend": "up"
+        },
+        {
+          "label": "#9",
+          "value": "Claude Opus 4.8（anthropic）：1.25T tokens，周变化 8%",
+          "trend": "up"
+        },
+        {
+          "label": "#10",
+          "value": "DeepSeek V3.2（deepseek）：1.15T tokens，周变化 2%",
+          "trend": "up"
+        }
+      ],
+      "snapshot": {
+        "type": "openrouter_rankings_public_page",
+        "collection_method": "public_page_playwright",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-15T02:22:56.400Z",
+        "source_url": "https://openrouter.ai/rankings",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "DeepSeek V4 Flash",
+            "provider": "deepseek",
+            "tokens": "4.41T tokens",
+            "change": "20%"
+          },
+          {
+            "rank": 2,
+            "model": "MiniMax M3",
+            "provider": "minimax",
+            "tokens": "4.32T tokens",
+            "change": "73%"
+          },
+          {
+            "rank": 3,
+            "model": "Hy3 preview",
+            "provider": "tencent",
+            "tokens": "4.14T tokens",
+            "change": "41%"
+          },
+          {
+            "rank": 4,
+            "model": "MiMo-V2.5",
+            "provider": "xiaomi",
+            "tokens": "3.59T tokens",
+            "change": "64%"
+          },
+          {
+            "rank": 5,
+            "model": "Owl Alpha",
+            "provider": "openrouter",
+            "tokens": "2.47T tokens",
+            "change": "27%"
+          },
+          {
+            "rank": 6,
+            "model": "Claude Opus 4.7",
+            "provider": "anthropic",
+            "tokens": "2.34T tokens",
+            "change": "62%"
+          },
+          {
+            "rank": 7,
+            "model": "Claude Sonnet 4.6",
+            "provider": "anthropic",
+            "tokens": "2.13T tokens",
+            "change": "21%"
+          },
+          {
+            "rank": 8,
+            "model": "DeepSeek V4 Pro",
+            "provider": "deepseek",
+            "tokens": "1.96T tokens",
+            "change": "15%"
+          },
+          {
+            "rank": 9,
+            "model": "Claude Opus 4.8",
+            "provider": "anthropic",
+            "tokens": "1.25T tokens",
+            "change": "8%"
+          },
+          {
+            "rank": 10,
+            "model": "DeepSeek V3.2",
+            "provider": "deepseek",
+            "tokens": "1.15T tokens",
+            "change": "2%"
+          }
+        ],
+        "history_entries": []
+      },
+      "tracking_component_snapshot": {
+        "source": "OpenRouter",
+        "component_kind": "openrouter_rankings",
+        "source_url": "https://openrouter.ai/rankings",
+        "collected_at": "2026-06-15T02:22:56.400Z",
+        "selector_version": "openrouter-rankings-v1",
+        "raw_dom_hash": "sha256:87476b9a0675be3b8f6092b63fbf9ec5d220b94a9dfffba770f0948b69597e74",
+        "data_hash": "sha256:3948d5a4edec5d99f0d557fe626e6878aaec027b77158e9c00445629da2c18aa",
+        "tabs": [
+          {
+            "id": "top-models",
+            "label": "Top Models",
+            "view": "stacked_bar",
+            "fallback_reason": ""
+          },
+          {
+            "id": "leaderboard",
+            "label": "LLM Leaderboard",
+            "view": "leaderboard",
+            "fallback_reason": ""
+          }
+        ],
+        "series": [
+          {
+            "id": "openrouter-top-models-weekly-usage",
+            "tab_id": "top-models",
+            "label": "Weekly usage across OpenRouter",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "DeepSeek V4 Flash",
+                "provider": "deepseek",
+                "value": 4410000000000,
+                "value_label": "4.41T tokens",
+                "change": "20%"
+              },
+              {
+                "rank": 2,
+                "model": "MiniMax M3",
+                "provider": "minimax",
+                "value": 4320000000000.0005,
+                "value_label": "4.32T tokens",
+                "change": "73%"
+              },
+              {
+                "rank": 3,
+                "model": "Hy3 preview",
+                "provider": "tencent",
+                "value": 4139999999999.9995,
+                "value_label": "4.14T tokens",
+                "change": "41%"
+              },
+              {
+                "rank": 4,
+                "model": "MiMo-V2.5",
+                "provider": "xiaomi",
+                "value": 3590000000000,
+                "value_label": "3.59T tokens",
+                "change": "64%"
+              },
+              {
+                "rank": 5,
+                "model": "Owl Alpha",
+                "provider": "openrouter",
+                "value": 2470000000000,
+                "value_label": "2.47T tokens",
+                "change": "27%"
+              },
+              {
+                "rank": 6,
+                "model": "Claude Opus 4.7",
+                "provider": "anthropic",
+                "value": 2340000000000,
+                "value_label": "2.34T tokens",
+                "change": "62%"
+              },
+              {
+                "rank": 7,
+                "model": "Claude Sonnet 4.6",
+                "provider": "anthropic",
+                "value": 2130000000000,
+                "value_label": "2.13T tokens",
+                "change": "21%"
+              },
+              {
+                "rank": 8,
+                "model": "DeepSeek V4 Pro",
+                "provider": "deepseek",
+                "value": 1960000000000,
+                "value_label": "1.96T tokens",
+                "change": "15%"
+              },
+              {
+                "rank": 9,
+                "model": "Claude Opus 4.8",
+                "provider": "anthropic",
+                "value": 1250000000000,
+                "value_label": "1.25T tokens",
+                "change": "8%"
+              },
+              {
+                "rank": 10,
+                "model": "DeepSeek V3.2",
+                "provider": "deepseek",
+                "value": 1150000000000,
+                "value_label": "1.15T tokens",
+                "change": "2%"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "openrouter-llm-leaderboard",
+            "tab_id": "leaderboard",
+            "label": "LLM Leaderboard",
+            "chart": "leaderboard",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "DeepSeek V4 Flash",
+                "provider": "deepseek",
+                "value": 4410000000000,
+                "value_label": "4.41T tokens",
+                "change": "20%"
+              },
+              {
+                "rank": 2,
+                "model": "MiniMax M3",
+                "provider": "minimax",
+                "value": 4320000000000.0005,
+                "value_label": "4.32T tokens",
+                "change": "73%"
+              },
+              {
+                "rank": 3,
+                "model": "Hy3 preview",
+                "provider": "tencent",
+                "value": 4139999999999.9995,
+                "value_label": "4.14T tokens",
+                "change": "41%"
+              },
+              {
+                "rank": 4,
+                "model": "MiMo-V2.5",
+                "provider": "xiaomi",
+                "value": 3590000000000,
+                "value_label": "3.59T tokens",
+                "change": "64%"
+              },
+              {
+                "rank": 5,
+                "model": "Owl Alpha",
+                "provider": "openrouter",
+                "value": 2470000000000,
+                "value_label": "2.47T tokens",
+                "change": "27%"
+              },
+              {
+                "rank": 6,
+                "model": "Claude Opus 4.7",
+                "provider": "anthropic",
+                "value": 2340000000000,
+                "value_label": "2.34T tokens",
+                "change": "62%"
+              },
+              {
+                "rank": 7,
+                "model": "Claude Sonnet 4.6",
+                "provider": "anthropic",
+                "value": 2130000000000,
+                "value_label": "2.13T tokens",
+                "change": "21%"
+              },
+              {
+                "rank": 8,
+                "model": "DeepSeek V4 Pro",
+                "provider": "deepseek",
+                "value": 1960000000000,
+                "value_label": "1.96T tokens",
+                "change": "15%"
+              },
+              {
+                "rank": 9,
+                "model": "Claude Opus 4.8",
+                "provider": "anthropic",
+                "value": 1250000000000,
+                "value_label": "1.25T tokens",
+                "change": "8%"
+              },
+              {
+                "rank": 10,
+                "model": "DeepSeek V3.2",
+                "provider": "deepseek",
+                "value": 1150000000000,
+                "value_label": "1.15T tokens",
+                "change": "2%"
+              }
+            ],
+            "fallback_reason": ""
+          }
+        ],
+        "rows": [
+          {
+            "rank": 1,
+            "model": "DeepSeek V4 Flash",
+            "provider": "deepseek",
+            "value": 4410000000000,
+            "value_label": "4.41T tokens",
+            "change": "20%"
+          },
+          {
+            "rank": 2,
+            "model": "MiniMax M3",
+            "provider": "minimax",
+            "value": 4320000000000.0005,
+            "value_label": "4.32T tokens",
+            "change": "73%"
+          },
+          {
+            "rank": 3,
+            "model": "Hy3 preview",
+            "provider": "tencent",
+            "value": 4139999999999.9995,
+            "value_label": "4.14T tokens",
+            "change": "41%"
+          },
+          {
+            "rank": 4,
+            "model": "MiMo-V2.5",
+            "provider": "xiaomi",
+            "value": 3590000000000,
+            "value_label": "3.59T tokens",
+            "change": "64%"
+          },
+          {
+            "rank": 5,
+            "model": "Owl Alpha",
+            "provider": "openrouter",
+            "value": 2470000000000,
+            "value_label": "2.47T tokens",
+            "change": "27%"
+          },
+          {
+            "rank": 6,
+            "model": "Claude Opus 4.7",
+            "provider": "anthropic",
+            "value": 2340000000000,
+            "value_label": "2.34T tokens",
+            "change": "62%"
+          },
+          {
+            "rank": 7,
+            "model": "Claude Sonnet 4.6",
+            "provider": "anthropic",
+            "value": 2130000000000,
+            "value_label": "2.13T tokens",
+            "change": "21%"
+          },
+          {
+            "rank": 8,
+            "model": "DeepSeek V4 Pro",
+            "provider": "deepseek",
+            "value": 1960000000000,
+            "value_label": "1.96T tokens",
+            "change": "15%"
+          },
+          {
+            "rank": 9,
+            "model": "Claude Opus 4.8",
+            "provider": "anthropic",
+            "value": 1250000000000,
+            "value_label": "1.25T tokens",
+            "change": "8%"
+          },
+          {
+            "rank": 10,
+            "model": "DeepSeek V3.2",
+            "provider": "deepseek",
+            "value": 1150000000000,
+            "value_label": "1.15T tokens",
+            "change": "2%"
+          }
+        ],
+        "previous_snapshot": null,
+        "diff": {
+          "summary": "No previous component snapshot was available for comparison.",
+          "changed_rows": [],
+          "new_entries": [
+            "DeepSeek V4 Flash",
+            "MiniMax M3",
+            "Hy3 preview",
+            "MiMo-V2.5",
+            "Owl Alpha",
+            "Claude Opus 4.7",
+            "Claude Sonnet 4.6",
+            "DeepSeek V4 Pro",
+            "Claude Opus 4.8",
+            "DeepSeek V3.2"
+          ]
+        },
+        "cache_path": "",
+        "fallback_reason": "",
+        "public_trace": {
+          "source_url": "https://openrouter.ai/rankings",
+          "collected_at": "2026-06-15T02:22:56.400Z",
+          "selector_version": "openrouter-rankings-v1",
+          "data_hash": "sha256:3948d5a4edec5d99f0d557fe626e6878aaec027b77158e9c00445629da2c18aa",
+          "top_rows": [
+            {
+              "rank": 1,
+              "model": "DeepSeek V4 Flash",
+              "provider": "deepseek",
+              "value_label": "4.41T tokens",
+              "change": "20%"
+            },
+            {
+              "rank": 2,
+              "model": "MiniMax M3",
+              "provider": "minimax",
+              "value_label": "4.32T tokens",
+              "change": "73%"
+            },
+            {
+              "rank": 3,
+              "model": "Hy3 preview",
+              "provider": "tencent",
+              "value_label": "4.14T tokens",
+              "change": "41%"
+            },
+            {
+              "rank": 4,
+              "model": "MiMo-V2.5",
+              "provider": "xiaomi",
+              "value_label": "3.59T tokens",
+              "change": "64%"
+            },
+            {
+              "rank": 5,
+              "model": "Owl Alpha",
+              "provider": "openrouter",
+              "value_label": "2.47T tokens",
+              "change": "27%"
+            },
+            {
+              "rank": 6,
+              "model": "Claude Opus 4.7",
+              "provider": "anthropic",
+              "value_label": "2.34T tokens",
+              "change": "62%"
+            },
+            {
+              "rank": 7,
+              "model": "Claude Sonnet 4.6",
+              "provider": "anthropic",
+              "value_label": "2.13T tokens",
+              "change": "21%"
+            },
+            {
+              "rank": 8,
+              "model": "DeepSeek V4 Pro",
+              "provider": "deepseek",
+              "value_label": "1.96T tokens",
+              "change": "15%"
+            },
+            {
+              "rank": 9,
+              "model": "Claude Opus 4.8",
+              "provider": "anthropic",
+              "value_label": "1.25T tokens",
+              "change": "8%"
+            },
+            {
+              "rank": 10,
+              "model": "DeepSeek V3.2",
+              "provider": "deepseek",
+              "value_label": "1.15T tokens",
+              "change": "2%"
+            }
+          ],
+          "diff": {
+            "summary": "No previous component snapshot was available for comparison.",
+            "changed_rows": [],
+            "new_entries": [
+              "DeepSeek V4 Flash",
+              "MiniMax M3",
+              "Hy3 preview",
+              "MiMo-V2.5",
+              "Owl Alpha",
+              "Claude Opus 4.7",
+              "Claude Sonnet 4.6",
+              "DeepSeek V4 Pro",
+              "Claude Opus 4.8",
+              "DeepSeek V3.2"
+            ]
+          },
+          "cache_status": "live",
+          "fallback_reason": ""
+        }
+      }
+    },
+    {
+      "id": "artificial-analysis-intelligence-index",
+      "name": "Artificial Analysis",
+      "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      "event_date": "2026-06-15",
+      "source": "Artificial Analysis Intelligence Index",
+      "category": "model_benchmark",
+      "importance": "notable",
+      "change_status": "changed",
+      "change_summary": "Artificial Analysis Intelligence Index Top 10 已解析：#1 Claude Fable 5 (with fallback) 65 分，#2 Claude Opus 4.8 (max) 61 分，#3 GPT-5.5 (xhigh) 60 分。",
+      "summary": "Artificial Analysis 公开榜单显示，当前 Intelligence Index 第一是 Claude Fable 5 (with fallback)（anthropic，65 分）。 前三名为 Claude Fable 5 (with fallback) 65 分、Claude Opus 4.8 (max) 61 分、GPT-5.5 (xhigh) 60 分，Top 10 供应商分布为 anthropic 3、google 2、openai 2、alibaba 1、minimax 1、moonshot 1。 这个榜单适合做模型 shortlist 和能力变化监测，但生产选型仍要结合延迟、价格、上下文长度和自有任务复测。",
+      "watch_points": [
+        "榜首 Claude Fable 5 (with fallback) 的综合分为 65 分，需要继续看它在代码、长上下文和 agentic task 分项上的表现。",
+        "Top 10 内部竞争接近：57 分有 3 个模型，55 分有 2 个模型，不要只按一个名次做选型。",
+        "把 Intelligence Index 与价格、延迟、吞吐和可用地区一起看，避免用综合分替代真实 workload 复测。"
+      ],
+      "metrics": [
+        {
+          "label": "榜单范围",
+          "value": "Intelligence Index Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 3、google 2、openai 2、alibaba 1、minimax 1、moonshot 1",
+          "trend": "unknown"
+        },
+        {
+          "label": "#1",
+          "value": "Claude Fable 5 (with fallback)（anthropic）：65 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#2",
+          "value": "Claude Opus 4.8 (max)（anthropic）：61 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#3",
+          "value": "GPT-5.5 (xhigh)（openai）：60 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#4",
+          "value": "GPT-5.5 (high)（openai）：59 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#5",
+          "value": "Claude Opus 4.7 (max)（anthropic）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#6",
+          "value": "Gemini 3.1 Pro Preview（google）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#7",
+          "value": "Qwen3.7 Max（alibaba）：57 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#8",
+          "value": "Gemini 3.5 Flash（google）：55 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#9",
+          "value": "MiniMax-M3（minimax）：55 分",
+          "trend": "unknown"
+        },
+        {
+          "label": "#10",
+          "value": "Kimi K2.6（moonshot）：54 分",
+          "trend": "unknown"
+        }
+      ],
+      "snapshot": {
+        "type": "artificial_analysis_intelligence_index_public_page",
+        "collection_method": "public_page_playwright",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-15T02:22:56.400Z",
+        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "Claude Fable 5 (with fallback)",
+            "provider": "anthropic",
+            "tokens": "65 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 2,
+            "model": "Claude Opus 4.8 (max)",
+            "provider": "anthropic",
+            "tokens": "61 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 3,
+            "model": "GPT-5.5 (xhigh)",
+            "provider": "openai",
+            "tokens": "60 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 4,
+            "model": "GPT-5.5 (high)",
+            "provider": "openai",
+            "tokens": "59 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 5,
+            "model": "Claude Opus 4.7 (max)",
+            "provider": "anthropic",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 6,
+            "model": "Gemini 3.1 Pro Preview",
+            "provider": "google",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 7,
+            "model": "Qwen3.7 Max",
+            "provider": "alibaba",
+            "tokens": "57 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 8,
+            "model": "Gemini 3.5 Flash",
+            "provider": "google",
+            "tokens": "55 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 9,
+            "model": "MiniMax-M3",
+            "provider": "minimax",
+            "tokens": "55 分",
+            "change": "AA Index"
+          },
+          {
+            "rank": 10,
+            "model": "Kimi K2.6",
+            "provider": "moonshot",
+            "tokens": "54 分",
+            "change": "AA Index"
+          }
+        ],
+        "component_tabs": {
+          "score": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Claude Fable 5 (with fallback)",
+                "provider": "anthropic",
+                "value": 65,
+                "value_label": "65 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 2,
+                "model": "Claude Opus 4.8 (max)",
+                "provider": "anthropic",
+                "value": 61,
+                "value_label": "61 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 3,
+                "model": "GPT-5.5 (xhigh)",
+                "provider": "openai",
+                "value": 60,
+                "value_label": "60 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 4,
+                "model": "GPT-5.5 (high)",
+                "provider": "openai",
+                "value": 59,
+                "value_label": "59 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 5,
+                "model": "Claude Opus 4.7 (max)",
+                "provider": "anthropic",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 6,
+                "model": "Gemini 3.1 Pro Preview",
+                "provider": "google",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 7,
+                "model": "Qwen3.7 Max",
+                "provider": "alibaba",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 8,
+                "model": "Gemini 3.5 Flash",
+                "provider": "google",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 9,
+                "model": "MiniMax-M3",
+                "provider": "minimax",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 10,
+                "model": "Kimi K2.6",
+                "provider": "moonshot",
+                "value": 54,
+                "value_label": "54 分",
+                "change": "AA Index",
+                "metric": "Score"
+              }
+            ]
+          },
+          "token_usage": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "gpt-oss-120b (high)",
+                "provider": "openai",
+                "value": 191,
+                "value_label": "191M",
+                "change": "",
+                "metric": "Token Usage"
+              }
+            ]
+          },
+          "cost": {
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Grok 4.3 (high)",
+                "provider": "xai",
+                "value": 987,
+                "value_label": "$987",
+                "change": "",
+                "metric": "Cost"
+              }
+            ]
+          }
+        },
+        "history_entries": []
+      },
+      "tracking_component_snapshot": {
+        "source": "Artificial Analysis",
+        "component_kind": "artificial_analysis_index",
+        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        "collected_at": "2026-06-15T02:22:56.400Z",
+        "selector_version": "artificial-analysis-index-v1",
+        "raw_dom_hash": "sha256:c6eb574acd069064a8c4ee710ae9929e3b9ba7ebe24a04eec9580c372e03e09d",
+        "data_hash": "sha256:d982a3467f33c37ca90deade811b1e68cf8f53c8eb46e3699201937fd371b1f8",
+        "tabs": [
+          {
+            "id": "score",
+            "label": "Score",
+            "view": "score_table",
+            "fallback_reason": ""
+          },
+          {
+            "id": "token-usage",
+            "label": "Token Usage",
+            "view": "stacked_bar",
+            "fallback_reason": ""
+          },
+          {
+            "id": "cost",
+            "label": "Cost",
+            "view": "stacked_bar",
+            "fallback_reason": ""
+          },
+          {
+            "id": "score-vs-token-usage",
+            "label": "Score vs. Token Usage",
+            "view": "scatter",
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "score-vs-cost",
+            "label": "Score vs. Cost",
+            "view": "scatter",
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "score-vs-compute",
+            "label": "Score vs. Compute",
+            "view": "scatter",
+            "fallback_reason": "source_tab_not_collected"
+          }
+        ],
+        "series": [
+          {
+            "id": "artificial-analysis-score",
+            "tab_id": "score",
+            "label": "Score",
+            "chart": "score_table",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Claude Fable 5 (with fallback)",
+                "provider": "anthropic",
+                "value": 65,
+                "value_label": "65 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 2,
+                "model": "Claude Opus 4.8 (max)",
+                "provider": "anthropic",
+                "value": 61,
+                "value_label": "61 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 3,
+                "model": "GPT-5.5 (xhigh)",
+                "provider": "openai",
+                "value": 60,
+                "value_label": "60 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 4,
+                "model": "GPT-5.5 (high)",
+                "provider": "openai",
+                "value": 59,
+                "value_label": "59 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 5,
+                "model": "Claude Opus 4.7 (max)",
+                "provider": "anthropic",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 6,
+                "model": "Gemini 3.1 Pro Preview",
+                "provider": "google",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 7,
+                "model": "Qwen3.7 Max",
+                "provider": "alibaba",
+                "value": 57,
+                "value_label": "57 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 8,
+                "model": "Gemini 3.5 Flash",
+                "provider": "google",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 9,
+                "model": "MiniMax-M3",
+                "provider": "minimax",
+                "value": 55,
+                "value_label": "55 分",
+                "change": "AA Index",
+                "metric": "Score"
+              },
+              {
+                "rank": 10,
+                "model": "Kimi K2.6",
+                "provider": "moonshot",
+                "value": 54,
+                "value_label": "54 分",
+                "change": "AA Index",
+                "metric": "Score"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-token-usage",
+            "tab_id": "token-usage",
+            "label": "Token Usage",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "gpt-oss-120b (high)",
+                "provider": "openai",
+                "value": 191,
+                "value_label": "191M",
+                "change": "",
+                "metric": "Token Usage"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-cost",
+            "tab_id": "cost",
+            "label": "Cost",
+            "chart": "stacked_bar",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "Grok 4.3 (high)",
+                "provider": "xai",
+                "value": 987,
+                "value_label": "$987",
+                "change": "",
+                "metric": "Cost"
+              }
+            ],
+            "fallback_reason": ""
+          },
+          {
+            "id": "artificial-analysis-score-vs-token-usage",
+            "tab_id": "score-vs-token-usage",
+            "label": "Score vs. Token Usage",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "artificial-analysis-score-vs-cost",
+            "tab_id": "score-vs-cost",
+            "label": "Score vs. Cost",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          },
+          {
+            "id": "artificial-analysis-score-vs-compute",
+            "tab_id": "score-vs-compute",
+            "label": "Score vs. Compute",
+            "chart": "scatter",
+            "rows": [],
+            "fallback_reason": "source_tab_not_collected"
+          }
+        ],
+        "rows": [
+          {
+            "rank": 1,
+            "model": "Claude Fable 5 (with fallback)",
+            "provider": "anthropic",
+            "value": 65,
+            "value_label": "65 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 2,
+            "model": "Claude Opus 4.8 (max)",
+            "provider": "anthropic",
+            "value": 61,
+            "value_label": "61 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 3,
+            "model": "GPT-5.5 (xhigh)",
+            "provider": "openai",
+            "value": 60,
+            "value_label": "60 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 4,
+            "model": "GPT-5.5 (high)",
+            "provider": "openai",
+            "value": 59,
+            "value_label": "59 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 5,
+            "model": "Claude Opus 4.7 (max)",
+            "provider": "anthropic",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 6,
+            "model": "Gemini 3.1 Pro Preview",
+            "provider": "google",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 7,
+            "model": "Qwen3.7 Max",
+            "provider": "alibaba",
+            "value": 57,
+            "value_label": "57 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 8,
+            "model": "Gemini 3.5 Flash",
+            "provider": "google",
+            "value": 55,
+            "value_label": "55 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 9,
+            "model": "MiniMax-M3",
+            "provider": "minimax",
+            "value": 55,
+            "value_label": "55 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          },
+          {
+            "rank": 10,
+            "model": "Kimi K2.6",
+            "provider": "moonshot",
+            "value": 54,
+            "value_label": "54 分",
+            "change": "AA Index",
+            "metric": "AA Index"
+          }
+        ],
+        "previous_snapshot": null,
+        "diff": {
+          "summary": "No previous component snapshot was available for comparison.",
+          "changed_rows": [],
+          "new_entries": [
+            "Claude Fable 5 (with fallback)",
+            "Claude Opus 4.8 (max)",
+            "GPT-5.5 (xhigh)",
+            "GPT-5.5 (high)",
+            "Claude Opus 4.7 (max)",
+            "Gemini 3.1 Pro Preview",
+            "Qwen3.7 Max",
+            "Gemini 3.5 Flash",
+            "MiniMax-M3",
+            "Kimi K2.6"
+          ]
+        },
+        "cache_path": "",
+        "fallback_reason": "",
+        "public_trace": {
+          "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          "collected_at": "2026-06-15T02:22:56.400Z",
+          "selector_version": "artificial-analysis-index-v1",
+          "data_hash": "sha256:d982a3467f33c37ca90deade811b1e68cf8f53c8eb46e3699201937fd371b1f8",
+          "top_rows": [
+            {
+              "rank": 1,
+              "model": "Claude Fable 5 (with fallback)",
+              "provider": "anthropic",
+              "value_label": "65 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 2,
+              "model": "Claude Opus 4.8 (max)",
+              "provider": "anthropic",
+              "value_label": "61 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 3,
+              "model": "GPT-5.5 (xhigh)",
+              "provider": "openai",
+              "value_label": "60 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 4,
+              "model": "GPT-5.5 (high)",
+              "provider": "openai",
+              "value_label": "59 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 5,
+              "model": "Claude Opus 4.7 (max)",
+              "provider": "anthropic",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 6,
+              "model": "Gemini 3.1 Pro Preview",
+              "provider": "google",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 7,
+              "model": "Qwen3.7 Max",
+              "provider": "alibaba",
+              "value_label": "57 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 8,
+              "model": "Gemini 3.5 Flash",
+              "provider": "google",
+              "value_label": "55 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 9,
+              "model": "MiniMax-M3",
+              "provider": "minimax",
+              "value_label": "55 分",
+              "change": "AA Index"
+            },
+            {
+              "rank": 10,
+              "model": "Kimi K2.6",
+              "provider": "moonshot",
+              "value_label": "54 分",
+              "change": "AA Index"
+            }
+          ],
+          "diff": {
+            "summary": "No previous component snapshot was available for comparison.",
+            "changed_rows": [],
+            "new_entries": [
+              "Claude Fable 5 (with fallback)",
+              "Claude Opus 4.8 (max)",
+              "GPT-5.5 (xhigh)",
+              "GPT-5.5 (high)",
+              "Claude Opus 4.7 (max)",
+              "Gemini 3.1 Pro Preview",
+              "Qwen3.7 Max",
+              "Gemini 3.5 Flash",
+              "MiniMax-M3",
+              "Kimi K2.6"
+            ]
+          },
+          "cache_status": "live",
+          "fallback_reason": ""
+        }
+      }
+    }
+  ],
+  "projects": [
+    {
+      "name": "iptv-org/iptv",
+      "editorial_category": "open_source",
+      "description": "iptv-org/iptv 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/iptv-org/iptv",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "freeCodeCamp/freeCodeCamp",
+      "editorial_category": "open_source",
+      "description": "freeCodeCamp/freeCodeCamp 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/freeCodeCamp/freeCodeCamp",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "pytest-dev/pytest",
+      "editorial_category": "open_source",
+      "description": "pytest-dev/pytest 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "eval"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/pytest-dev/pytest",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "swc-project/swc",
+      "editorial_category": "open_source",
+      "description": "swc-project/swc 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/swc-project/swc",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "chatwoot/chatwoot",
+      "editorial_category": "open_source",
+      "description": "chatwoot/chatwoot 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/chatwoot/chatwoot",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "NVIDIA/SkillSpector",
+      "editorial_category": "open_source",
+      "description": "NVIDIA/SkillSpector 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "agent"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/NVIDIA/SkillSpector",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "meshery/meshery",
+      "editorial_category": "open_source",
+      "description": "meshery/meshery 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/meshery/meshery",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "cypress-io/cypress",
+      "editorial_category": "open_source",
+      "description": "cypress-io/cypress 今天进入 GitHub Trending Top 10，公开描述把它定位在模型评测和质量验证，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "eval"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/cypress-io/cypress",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "GorvGoyl/Clone-Wars",
+      "editorial_category": "open_source",
+      "description": "GorvGoyl/Clone-Wars 今天进入 GitHub Trending Top 10，公开描述把它定位在AI 工程工具，仓库首页当前围绕这条能力展开。",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/GorvGoyl/Clone-Wars",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    },
+    {
+      "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "editorial_category": "open_source",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 今天进入 GitHub Trending Top 10，公开描述把它定位在agent 工作流和任务编排...",
+      "domains": [
+        "AI tooling"
+      ],
+      "use_case": "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+      "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
+      "event_date": "2026-06-15",
+      "source": "GitHub Trending daily",
+      "signal": "trending",
+      "importance": "notable"
+    }
+  ],
+  "builder_observations": [
+    {
+      "author": "Swyx",
+      "handle": "swyx",
+      "editorial_category": "x_discussion",
+      "content": "Swyx 提醒读者周末前填写年度 AI Engineering Survey，并提到团队让 Devin 分析注册参会者名单、生成现场图表，用数据讲清两周后大会会聚集怎样的社区。",
+      "original_text": "Last chance to fill out the annual AI Engineering Survey this weekend and win great Vercel + Notion + AIE tix! link below we had @devinai analyze registered attendee list and output a live chart of the people coming to the conference. it ended up being the single best data driven storytelling i've ever seen on what kind of community we are gathering in two weeks. survey link here! https://t.co/2oilc5lCDm no lurking, fill it out pls",
+      "translation": "Swyx 提醒读者周末前填写年度 AI Engineering Survey，并提到团队让 Devin 分析注册参会者名单、生成现场图表，用数据讲清两周后大会会聚集怎样的社区。",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2065909887025168887",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-swyx.png"
+    },
+    {
+      "author": "Madhu Guru",
+      "handle": "realmadhuguru",
+      "editorial_category": "x_discussion",
+      "content": "Madhu Guru 说，经历过多次前沿模型发布评审后，他理解参与者的压力：发布 LLM 不是传统软件上线，而是在无限用例和失败模式的黑箱上做权衡，需要评测、红队和多轮候选模型讨论。",
+      "original_text": "Having been through many frontier model launch reviews, I have empathy for everyone involved. Launching an LLM isn't like shipping traditional software - you're making a decision about a black box with effectively infinite use cases and infinite failure modes. The tradeoffs are hard - every increase in capability expands the space of both valuable use cases and potential misuse. As a lab, you build extensive evals, you red-team, you iterate on the model. You debate tradeoffs across candidate ch...",
+      "translation": "Madhu Guru 说，经历过多次前沿模型发布评审后，他理解参与者的压力：发布 LLM 不是传统软件上线，而是在无限用例和失败模式的黑箱上做权衡，需要评测、红队和多轮候选模型讨论。",
+      "avatar_url": "https://unavatar.io/x/realmadhuguru",
+      "url": "https://x.com/realmadhuguru/status/2065911676000752122",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-realmadhuguru.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "Aaron Levie 认为 Fable 出口管制争议反而让 AI 监管讨论更具体：如果监管落在模型层而不是应用层，政府将能按自身掌握的因素决定模型何时向公众发布。",
+      "original_text": "This whole Fable export control situation is actually net positive to regulation discourse. It’s an early peek into what AI regulation would end up looking like at scale when enacted at the model layer instead of the specific application of the AI. The government would have sole discretion over when a model can be released to the to public, based on a bunch of factors that they inherently control. In this case, based on the available reporting, the risk is that the model can be jailbroken to de...",
+      "translation": "Aaron Levie 认为 Fable 出口管制争议反而让 AI 监管讨论更具体：如果监管落在模型层而不是应用层，政府将能按自身掌握的因素决定模型何时向公众发布。",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065842361834651996",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-levie.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "Aaron Levie 说，这不必被理解成复杂阴谋；对 AI 模型做 jailbreak 研究很常见，而且这类研究本来就会分享给政府。他也不认为 Amazon 预设了这样的后续动作。",
+      "original_text": "Everyone thinks this is some kind of 4D chess or conspiracy. But it’s quite standard to try and jailbreak AI models, and by definition they would share that research with the government given that’s whole point. I don’t think Amazon assumed this would be the next move. https://t.co/DizjwNcaLG",
+      "translation": "Aaron Levie 说，这不必被理解成复杂阴谋；对 AI 模型做 jailbreak 研究很常见，而且这类研究本来就会分享给政府。他也不认为 Amazon 预设了这样的后续动作。",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065964446489710939",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-levie.png"
+    },
+    {
+      "author": "Peter Steinberger",
+      "handle": "steipete",
+      "editorial_category": "x_discussion",
+      "content": "Peter Steinberger 说自己收到 PayPal 验证短信时以为账号被盗，结果只是 Codex 为了完成任务在注册所需的网络服务。",
+      "original_text": "Got a PayPal verification text and thought I been hacked, but it was just codex signing up for a web service it needed.",
+      "translation": "Peter Steinberger 说自己收到 PayPal 验证短信时以为账号被盗，结果只是 Codex 为了完成任务在注册所需的网络服务。",
+      "avatar_url": "https://unavatar.io/x/steipete",
+      "url": "https://x.com/steipete/status/2065997212015067508",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-steipete.png"
+    },
+    {
+      "author": "Thibault Sottiaux",
+      "handle": "thsottiaux",
+      "editorial_category": "x_discussion",
+      "content": "Thibault Sottiaux 用一句 AMA 表示自己刚刚发现 Codex，准备回答大家关于体验和用法的问题。",
+      "original_text": "Hi, I'm Tibo and I just discovered Codex. AMA",
+      "translation": "Thibault Sottiaux 用一句 AMA 表示自己刚刚发现 Codex，准备回答大家关于体验和用法的问题。",
+      "avatar_url": "https://unavatar.io/x/thsottiaux",
+      "url": "https://x.com/thsottiaux/status/2066022651760721931",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-thsottiaux.png"
+    },
+    {
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "editorial_category": "x_discussion",
+      "content": "Aaron Levie 认为，能按任务把请求路由到最合适 AI 模型的层会变得更有价值：同一工作流里可能用前沿模型做规划和审查，再用开源或低价模型处理大量执行环节。",
+      "original_text": "The layer that can route to the best AI model for the particular job is going to increase in value substantially. There are at least 3 big reasons: * Cost optimization: there are plenty of use cases where you need frontier intelligence for some tasks and something far cheaper for others. Even in the same task you may use frontier intelligence for planning and review of the work, but an OSS or cheaper model for the bulk of the workload. This is going to be standard across large buckets of work g...",
+      "translation": "Aaron Levie 认为，能按任务把请求路由到最合适 AI 模型的层会变得更有价值：同一工作流里可能用前沿模型做规划和审查，再用开源或低价模型处理大量执行环节。",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2065989559905812973",
+      "role": "builder",
+      "event_date": "2026-06-14",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-levie.png"
+    },
+    {
+      "author": "Garry Tan",
+      "handle": "garrytan",
+      "editorial_category": "x_discussion",
+      "content": "Garry Tan 说，AI 领域很多人还在拿旧地图理解新地形；他主张扔掉旧地图，边走边重新绘制。",
+      "original_text": "In AI most people are still trying to use old maps on a new territory. Throw the maps away. It's time to draw new ones. The only way you can do it is walking the land.",
+      "translation": "Garry Tan 说，AI 领域很多人还在拿旧地图理解新地形；他主张扔掉旧地图，边走边重新绘制。",
+      "avatar_url": "https://unavatar.io/x/garrytan",
+      "url": "https://x.com/garrytan/status/2065877443874038203",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-garrytan.png"
+    },
+    {
+      "author": "Garry Tan",
+      "handle": "garrytan",
+      "editorial_category": "x_discussion",
+      "content": "Garry Tan 希望一个模型的重要性来自更多人亲自使用后的判断；但他也承认，多数人是通过符号和外部评价认识模型，而不是直接与模型互动。",
+      "original_text": "I wish the significance of the model came from more people actually using it and coming to their own conclusions But yes most people in the world learn about it through signifiers and not through interacting with that which is signified https://t.co/TcbmeHuXGQ",
+      "translation": "Garry Tan 希望一个模型的重要性来自更多人亲自使用后的判断；但他也承认，多数人是通过符号和外部评价认识模型，而不是直接与模型互动。",
+      "avatar_url": "https://unavatar.io/x/garrytan",
+      "url": "https://x.com/garrytan/status/2065791421362352476",
+      "role": "builder",
+      "event_date": "2026-06-13",
+      "source": "follow-builders X feed",
+      "importance": "notable",
+      "image_urls": [],
+      "avatar_local_path": "assets/avatars/2026/06/2026-06-15-garrytan.png"
+    }
+  ],
+  "official_org_updates": [
+    {
+      "organization": "Qwen",
+      "title": "Security New Features in May 2026",
+      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+      "source": "Alibaba Cloud Blog",
+      "event_date": "2026-06-15",
+      "summary": "Qwen 的官方动态「Security New Features in May 2026」显示，这条更新围绕 AI 诈骗防护、安全能力和立法协作展开，说明平台如何把安全治理落到产品和政策动作中。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "Zhipu AI",
+      "title": "China Zhipu posts 132 % rise in annual revenue on AI boom",
+      "url": "https://www.businesstimes.com.sg/companies-markets/chinas-zhipu-posts-132-rise-annual-revenue-ai-boom",
+      "source": "GDELT",
+      "event_date": "2026-06-15",
+      "summary": "Zhipu AI 的官方动态「China Zhipu posts 132 % rise in annual revenue on AI boom」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    },
+    {
+      "organization": "Microsoft",
+      "title": "Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France",
+      "url": "https://aisel.aisnet.org/treos_ecis2026/69",
+      "source": "OpenAlex",
+      "event_date": "2026-06-15",
+      "summary": "Microsoft 的官方动态「Resisting Through Dependence: Microsoft 365 And Digital Sovereignty In France」显示，官方来源发布了与 AI 产品、模型、平台、开发者生态或企业采用相关的更新。 该条目单独放入官方组织动态，便于和个人讨论、社区线索区分；读者可通过原始 URL 继续核对发布时间、适用范围和后续行动。",
+      "importance": "notable"
+    }
+  ],
+  "community_leads": [
+    {
+      "title": "Introducing the OpenAI Partner Network",
+      "content": "OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "url": "https://openai.com/index/introducing-openai-partner-network",
+      "event_date": "2026-06-14",
+      "source": "OpenAI Company News RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "具透 | 除了 AI，iOS 27 首个开发者测试版中你不能错过的新功能",
+      "content": "少数派在体验了新版系统之后，帮你整理了 iOS 27 中值得关注的新功能和新特性，希望帮你能了解新版系统的方方面面。 查看全文。",
+      "url": "https://sspai.com/post/110973",
+      "event_date": "2026-06-13",
+      "source": "SSPAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "2026北京智源大会开幕 | 从“悟道”到“悟界”，智源研究院推动人工智能、物理世界和生命科学“三体互动”",
+      "content": "2026年6月12日，第八届“北京智源大会”在中关村国际创新中心开幕。 北京智源大会是智源研究院主办的“AI内行学术盛会”，以“技术前沿、国际视野、青年人才”为特色，汇聚海内外研究者分享研究成果、探寻前沿知识、交流实践经验。本届大会，现代数字安全体系奠基者Whitfield Diffie线下参会，聚焦Agent时代的安全与可信挑战；强化...",
+      "url": "https://www.leiphone.com/category/academic/PRkJuKQSDv4Q1le5.html",
+      "event_date": "2026-06-13",
+      "source": "Leiphone",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Microsoft's GitHub Repos Were Hacked to Steal AI Developer Passwords - Memeburn",
+      "content": "Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNNFhMemNTMlVyRGpaRGg4V055OXdUVzFzdEp5dTBwMzhKNE5ydU4teFdlQ2k3TWJNV196bzFmVVU2b0ZwQWM1RVBBc1RJOTE4c0kyUjQ4Ukl3U3RYdWVyN2wzYllIZkhIdHlVVk9ZS1FFNnBCTXk5NEdhY21LZGFkdEoxa1ZPNmdtUk5pSm9jOFZDVnc?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Big Tech Company Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "The AI Issue America and China Can Cooperate On Now - The Wire China",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ0Z0NGdwVWkzOUZZZDdreS1XSDJJd253SXN4dm9FWXVjSHotdmVvR1ozUEVkRTgxaGhPSHVCdEtQNVZvODhkNTI2N2hOeC1mbkhBQW5RZEk4R2YtZU1nSTV3QXNwNnBWNmFoajhmaXhmNGRaUjNpNXJNYVRzLXdSLVZoNGpBS1FrTjBlazlha05IRkxPajM0?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Kimi K2.7-Code: Moonshot AI Releases 1T Parameter Open-Source Model, Claims to ...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNUmVrd1pEbFNNY2szM2gzYmNOc0FMR2hBMDNWaWZKZ3Ewb3ppb0NnVEtLREVkRXdaNTFXUDlXOGJxeXRxYTh3SkVwQm5uVFBjdGU3UWlWS1ZZcnZJYVZqeXFwT1ItUGxsV0h1NGF4YkVPZWFSd1g2U05pWUlmZGRyaFY0dExQOEZ3YklIOFZoQzBDR2hhajBSUDFFeWlBU2dX?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "The U.S. government has banned foreigners from using the latest AI models of ar...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE16SVNQelRIY0FlQlNfaTB2WUZXNDN4QUFYd2tBRDZuNDR4X25SSWFSd29QZ2E4bmNyMUF3NnJjNjhrdTh2Z3FBZ1BRTmVmQlE?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Moonshot AI Releases Kimi K2.7-Code: a Coding Model Reporting +21.8% on Kimi Co...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQOEVPaVQ2TFY4Ym9pbFdhSFRjd08yRVlsNUhPMmxTLWJsRmdlSE9XekJsdjBCaTZzZk1yMENQTXoxSkkyM1NIbnF5S1huWVI5UzBqR3prSk5IMU9xbi0xVlhadWpVRHFHNnJpY3hRMFFUenBWZ193MWNoT1NVZFcyN2JOQkdwZHdiLUxJU3JHdTFqVWJwbE5RTUdkYkh3ODg0YjVuZ1ZlYXRvRWFNeE5IdTdGY21vbF9GZi1yeTBhYXc4Qk9UbWVvekh5Y2xlQk1zT0szUw?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Open model Kimi K2.7 Code undercuts GPT-5.5 and Claude by up to 12x on price pe...",
+      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPZGNTWnRpZEI3WWl2S1pOS3F1N3NEQ1Nxd3dPR0xUVVU5QTVOVDBob0cyYmt6aVlveWo0dlJnVWVuUkI5MHFBOXVHRUVGT2VOU0wwUVRQMlFSMXZsQWJsU2w3T1JKVTZQQ3ZfN1JoenhCRG1UbFRIaHdfSmNrLUFpOWpwTG1Rby1UNXhtNEFUUEJaNXdKbURLVVM5Ti1Mbmo5UE0yVlQ3aFZGdU5rM2xJcU5MODZReG5aZ1VmSjlR?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News Official Open Source Watch RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "2026智源大会开幕：推动AI、物理世界和生命科学“三体互动”",
+      "content": "2026智源大会开幕：推动AI、物理世界和生命科学“三体互动”。",
+      "url": "https://www.qbitai.com/2026/06/435394.html",
+      "event_date": "2026-06-13",
+      "source": "QbitAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "As Calls for AI Regulation Grow, Media Faces a Defining Moment - NAB Show",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOMjc1NUoxVEdzMFpNZXVmRWc4NlByaGR3TjlHTU83ZG5YLU9CRkZodW5TNHBLWTdQdFlyWlZSazljTENMMDIzdlBMa3lKV2xwc3VraEpvOWsxVEZVdDVLOWJnaGFHeUsyNDEzc2tRYU83MjZMYldDX2gzOVdfTTB0cGMwYllCUmpPa3lWLVpiVEU1by1nTnhZTzF3?oc=5",
+      "event_date": "2026-06-13",
+      "source": "Google News AIGC Content Industry RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Core AI Holdings Launches HomeGPT AI Home Design Platform - Pulse 2.0",
+      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQSElvYVU4d2pFQ1A1U1pvdGZwZUFLU0g5WC1tNXJpT2tDUVJHVmdZX3VZWGx2VFhUaFVRakphamFqTG1lQmVFREphdXJ5Y1kxTE9rSnJ4aHZhMW5SQ25pS3JCQlZsZk12dVRidTZiNjZHX3VhYmQ5TngtRzlBRVJYT3BuZXl2Zi1M0gGIAUFVX3lxTFBISW9hVTh3akVDUDVTWm90ZnBlQUtTSDlYLW01cmlPa0NRUkdWZ1lfdVlYbHZUWFRoVVFqSmFqYWpMbWVCZUVESmF1cnljWTFMT2tKcnhodmExblJDbmlLckJCVmxmTXZ1VGJ1NmI2NkdfdWFiZDlOeC1HOUFFUlhPcG5leXZmLUw?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Video Image Game RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "大模型权重是什么",
+      "content": "RuanYF Weekly 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://mp.weixin.qq.com/s/TM9lv6b-9AH8O9ZiApgTBA",
+      "event_date": "2026-06-15",
+      "source": "RuanYF Weekly",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "New artificial intelligence minor launches this fall - Virginia Tech News",
+      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPSktaeVlXRENPLUEyTkplRnVtUXNzeHlGQ1hNeTFoNldDcmljM2VrZVRWcHI5NXNGdlFDTEp1UnJKdW9NMzEyT2swZ09kQkxhT1k2VzlmMVBIWkQ3Qm1IVk5LQzBIbUZvRV8yQ2g0Yzg4ZEl5eHp0b3B4VW1CeDNtRkhYWWdmVUFGOEh2R21EVk4weXlXdEJOb0pJTQ?oc=5",
+      "event_date": "2026-06-15",
+      "source": "Google News AI RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "As Artificial Intelligence (AI) Stocks Drive the Market Higher, Is Now the Time...",
+      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQNUpxby1ESGlKaDd1dEMtbVkwbC01bVN4OEtUYVBPU01hSUlsUXl2UmVhTEFnbm9TOEhDdjk3M0d3RGljTDVlYU9YaThVQmV6WHMyMEdQSks4LV9seWVMaWdXdlloR0FCNlNad2p1TmNYc2JHSE5FUUZ2S1lQQ3BibkpUZXEtejZtTDJMeEh0REU3d0twdnB0S0k0TEg0LU4tb29jenl5SQ?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AI RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "“52% of organizations already using generative AI have implemented AI agents in...",
+      "content": "Google News AI RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5sU0szbEF6ZERwZmt6UUoxWEZvZDFEVGJPZ1JQamRUa2hqVGk5QlRlNFktZVdfd3dxM1N6NlVrRFFjaEl2d2t4U1lRRjYwUm1mbUtlcDhtVEJYNGxYZzBmQ1B3YjEtQVA5?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AI RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Inside the Race to Protect Children from AI - Broadband Breakfast",
+      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxORzJROG9BaXc0aF8yMWV1MnJJQ3Zaa09idi0zdDdyUnVYVVNhUTRtbFF3bV9nWmVUVFJYc1lCcVdqSm9mWTBScG9RTmlkMDlMWWd3dVptSGFQSUxydE1NbHZNVUpHNUk0ZC10QnNVUGQ2blJ5QzZ0SmlDLXM5ZUVJdw?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AI RSS",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Limelight HQ: The All-in-One Creator Economy Operating System. - quasa.io",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQVnRMNUxXZXhlSXBNNDd2WmZlMEl4VnpwT284SllBQlZhNnFVSHJJckhnbWhsb1YzZWYxMHd0UlZ5RzRlcjVuNHUxMHprenBqaURZTHl2TVdBeVFtWFVPdllhMlZsQzJ5Zy1fT3d1X19CQm4zTHdoak1zQ3dpZmNGNXJqU0ZES0xyZmhj?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Content Industry RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Crazy Taxi creator explains use of 'generative AI support tools' in response to...",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQMWRRSXd0UUhNeXJteXdKNkwwcS0wNHREa2xvNEtmN1ZYcmptX2ZwenB1aWJpZ0dtSW0zT2hSWlphbk03X2RyQnIwNjIxNDBWbjRHWHZEV2pRX3dFb043a2pmdHFGOGdLc3J0MWpTSHRDLVd4YjY5ZEJVYnlXRUtXektnMEF6TDlNVUtxLUdhR2YzVi11eVpnX29ZTzV6Y000ZGFRSFlMM20zSFlRa3poQWdUX3FiaGVCU1FmYTN2b2s3QXFMRHh6SGZfNl93ZGJMd1pJYXllaHN4S3YtNGdN?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Content Industry RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI B...",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQTW90VXhMbE5vUXJFSFBjODJCVkJfUHFlZ2dYMkhISUhtOUF3QW1UYlkwQUdSRHRfbjFnb2t3WVZhcVloMHB2bnRKeWNVcXh5UUhaUHdlREptMFJCanhCNXVTcGNHbV9PV3Ywa2ZHanI4UG90cTRnajNZSkIyeUhwdWZGRVoxb281TGJhVDY2dGVXemYzc2pOS3V1azQ3UnB5S2N6S3Baanl1a19qUXNhTGRURGhmNEJs0gG4AUFVX3lxTFBNb3RVeExsTm9RckVIUGM4MkJWQl9QcWVnZ1gySEhJSG05QXdBbVRiWTBBR1JEdF9uMWdva3dZVmFxWWgwcHZudEp5Y1VxeHlRSFpQd2VESm0wUkJqeEI1dVNwY0dtX09XdjBrZkdqcjhQb3RxNGdqM1lKQjJ5SHB1ZkZFWjFvbzVMYmFUNjZ0ZVd6ZjNzak5LdXVrNDdScHlLY3pLcFpqeXVrX2pRc2FMZFREaGY0Qmw?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Content Industry RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Amazon Bolsters AI Production With 3 Animated Series Orders, Launches GenAI Cre...",
+      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE14dXlaMmltSnJEQzQzZWFWVzBQZDA5OEluMWxTUElJazZ0STJDOWNhRmhrdmlCdG40YWFlLTVNU3JLb1lSR2hLZVFqVklmczlPS3lGR1BVVXI2V1NIMkJ5NF9NQU56QQ?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Content Industry RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Apple unveils AI-powered accessibility tools in iOS 27 - MSN",
+      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxNc1oxVURkcXN3b0QwQlA3U0hOYU00MDhsREo4TnJRUzZNZVpnZHNfSS1NQlNpZVlKYmJvYWx2WGpyTmVudE5NbmtqYXFTUHB4Mm9MZHZDTWRmVWNacEVxMk82S2lJNVFPU0VKSTBFTW9BNmV3VkhfNEU5aDloa1IySGxNdXowRF9ManZ4LVNZT2JJaTd2aFcwWlJUb2ltWFBTZ0FKSVkxSTV5WXN2cHJaekZiWkxLaTNpTXpEUWJHQlVTWmxvVGxfQW5TMS1BV2pSak9GOWpSbVRMRFpLY3B4VHZiSkRYRGxHb1hLdQ?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Video Image Game RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Every MacBook getting macOS 27: Is yours on the list? - Mashable",
+      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOX0hobHg1TkJYakIxNXJtWXNHdWkzcllLcC1INWRrQ2RLVlQ3ZkstNnNWM3h3MFdlcVRCX21pbF9RaHczQi1IRkt3dVpGV3J5QzhfSk9XTU4tZHRyZzJjdWFJSDMxNklTVHJyTHZrWnZHQ21RZ040VG9SZWJtbkdwUFZWUQ?oc=5",
+      "event_date": "2026-06-15",
+      "source": "Google News AIGC Video Image Game RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "White House Stirs Console War Debate with AI-Generated \"Trump as Master Chief\" ...",
+      "content": "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击。",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1iZ3RuOFRvZWxVQzJDVkJiUXlKQmcwRExxYUVvWmFpSlVwNkxKeHg1NXlZUkNqS2prd1lrSEZsc3VRT01VaW1rOXp3RVA2MjBQ?oc=5",
+      "event_date": "2026-06-14",
+      "source": "Google News AIGC Video Image Game RSS",
+      "editorial_category": "content_aigc",
+      "importance": "general",
+      "image_urls": []
+    }
+  ],
+  "wechat_items": [],
+  "zhihu_items": [],
+  "reddit_items": [],
+  "evidence_assets": [],
+  "generated_at": "2026-06-15T02:28:34.158Z",
+  "report_status": "normal",
+  "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-15.html",
+  "html_path": "reports/2026/06/2026-06-15.html",
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
+    "affected_sections": [
+      "huggingface_trending",
+      "hot_blogs",
+      "daily_tracking",
+      "wechat_items",
+      "zhihu_items",
+      "reddit_items"
+    ]
+  }
+}
