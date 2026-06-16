@@ -721,22 +721,12 @@ function formatCompactMainItemSections(items, context = {}) {
 
   return [
     {
-      type: "filterable-cards",
-      title: "完整列表",
-      richId: "compact-main-list",
-      group: "main",
-      cardClass: "main-compact-card",
-      showFilters: false,
-      summary: "默认只展示标题、来源和一句事实摘要，适合快速扫读。",
-      items: items.map((item, index) => formatCompactMainItemCard(item, index, context))
-    },
-    {
       type: "markdown",
-      title: "主体细节",
+      title: "重点详情",
       richId: "main-item-details",
       group: "main",
-      collapsed: true,
-      summary: "展开查看完整 bullets、证据图片和更细的技术上下文。",
+      collapsed: false,
+      summary: "主体条目的事实摘要、关键 bullets 和证据图片默认展开，避免与快速列表重复。",
       content: detailContent
     }
   ];
@@ -884,6 +874,11 @@ function githubTrendDetails(item, project) {
   const description = trimText(cleanGithubTrendDescription(item), 120);
   if (description) {
     bullets.push(description);
+  } else {
+    const fallbackDescription = githubTrendFallbackDescription(item);
+    if (fallbackDescription) {
+      bullets.push(fallbackDescription);
+    }
   }
 
   const projectDetail = projectHighlightDetail(project, description);
@@ -897,6 +892,28 @@ function githubTrendDetails(item, project) {
   }
 
   return [...new Set(bullets.map((bullet) => trimText(bullet, 130)).filter(Boolean))].slice(0, 4);
+}
+
+function githubTrendFallbackDescription(item) {
+  const repo = String(item?.repo || item?.name || repoFromUrl(item?.url) || "").trim();
+  const language = String(item?.language || "").trim();
+  const topic = githubRepoNameTopic(repo);
+  const parts = [
+    topic ? `仓库名指向${topic}` : "",
+    `${language ? `${language} 项目，` : ""}公开描述不足，本轮只记录排名和星标变化`
+  ].filter(Boolean);
+  return parts.length > 0 ? `${parts.join("；")}。` : "";
+}
+
+function githubRepoNameTopic(repo) {
+  const text = String(repo || "").toLowerCase();
+  if (/agent|workflow|mcp/.test(text)) return "agent 工具或工作流";
+  if (/memory|rag|retrieval|knowledge/.test(text)) return "记忆、检索或知识库能力";
+  if (/eval|bench|test/.test(text)) return "评测或回归测试";
+  if (/browser|web|playwright/.test(text)) return "浏览器自动化";
+  if (/video|image|vision|audio|speech/.test(text)) return "多模态处理";
+  if (/model|llm|inference/.test(text)) return "模型调用或推理工程";
+  return "";
 }
 
 function githubRankMove(item) {
@@ -1414,10 +1431,11 @@ function formatBuilderObservationCards(items, report, context = {}) {
     const handle = builderHandle(item);
     const originalText = compactBuilderOriginalText(builderOriginalText(item));
     const media = formatBuilderMedia(report, item, context.mediaOptions || {});
+    const displayName = builderDisplayName(item, handle);
 
     return {
       group: "X/Twitter",
-      title: item.author,
+      title: displayName,
       href: item.url,
       subtitle: handle ? `@${handle}` : "",
       titleIcon: builderAvatarIcon(report, item),
@@ -1436,7 +1454,49 @@ function formatBuilderObservationCards(items, report, context = {}) {
 }
 
 function builderTranslationText(item) {
-  return String(item?.translation || item?.translated_text || item?.content || "").trim();
+  const direct = String(item?.translation || item?.translated_text || item?.content || "").trim();
+  if (direct) {
+    return direct;
+  }
+  const original = builderOriginalText(item);
+  if (containsChineseText(original)) {
+    return original;
+  }
+  return builderOriginalFallbackSummary(original);
+}
+
+function builderDisplayName(item, handle = "") {
+  const author = String(item?.author || item?.name || "").trim();
+  if (author) {
+    return author;
+  }
+  if (handle) {
+    return handle;
+  }
+  try {
+    return new URL(String(item?.url || "")).hostname.replace(/^www\./, "") || "X/Twitter 讨论";
+  } catch {
+    return "X/Twitter 讨论";
+  }
+}
+
+function builderOriginalFallbackSummary(value) {
+  const text = String(value || "").trim();
+  const lower = text.toLowerCase();
+  if (!text) {
+    return "这条 X/Twitter 讨论缺少可发布的正文摘要，已保留原帖入口供回看。";
+  }
+  const topics = [];
+  if (/agent|agentic|autonomous/.test(lower)) topics.push("agent 工作流");
+  if (/eval|benchmark|test|quality/.test(lower)) topics.push("评测和质量验证");
+  if (/browser|playwright|web/.test(lower)) topics.push("浏览器自动化");
+  if (/replay|screenshot|trace|log|observability/.test(lower)) topics.push("回放、截图或可观测性");
+  if (/permission|security|sandbox|policy/.test(lower)) topics.push("权限和安全边界");
+  if (/cost|token|routing|model/.test(lower)) topics.push("模型路由和成本控制");
+  if (topics.length > 0) {
+    return `原帖讨论${topics.slice(0, 3).join("、")}，已保留原文摘录，适合结合原帖上下文判断是否需要跟进。`;
+  }
+  return "原帖讨论 AI 产品或工程实践，已保留原文摘录，适合结合原帖上下文判断是否需要跟进。";
 }
 
 function builderOriginalText(item) {
@@ -2198,15 +2258,41 @@ function communityLeadBody(item) {
   }
   const title = stripSentenceEnding(stripPublicBodySourcePrefix(communityLeadTitle(item), item));
   const summarizedPrimaryBody = summarizeCommunityLeadBody(primaryBody, title);
-  if (isReaderFacingChineseBody(summarizedPrimaryBody)) {
-    return summarizedPrimaryBody;
+  const expandedPrimaryBody = expandCommunityLeadBody(summarizedPrimaryBody, item, title);
+  if (isReaderFacingChineseBody(expandedPrimaryBody)) {
+    return expandedPrimaryBody;
   }
   const fallbackBody = stripCommunityLeadFallbackBoilerplate(rawBody, item);
   const summarizedFallbackBody = summarizeCommunityLeadBody(fallbackBody, title);
-  if (summarizedFallbackBody) {
-    return summarizedFallbackBody;
+  const expandedFallbackBody = expandCommunityLeadBody(summarizedFallbackBody, item, title);
+  if (expandedFallbackBody) {
+    return expandedFallbackBody;
   }
-  return summarizedPrimaryBody || trimText(primaryBody || rawBody, 160);
+  return expandCommunityLeadBody(summarizedPrimaryBody || trimText(primaryBody || rawBody, 160), item, title);
+}
+
+function expandCommunityLeadBody(value, item = {}, title = "") {
+  const initial = stripCommunityLeadFallbackBoilerplate(value, item).replace(/\s+/g, " ").trim();
+  if (!initial) {
+    return "";
+  }
+  const fragments = [stripSentenceEnding(initial)];
+  const source = String(item?.source || item?.publisher || "").trim();
+  const eventDate = String(item?.event_date || "").trim();
+  const cleanTitle = stripSentenceEnding(stripPublicBodySourcePrefix(title || item?.title || "", item));
+  if (cleanTitle && !isNearDuplicateText(cleanTitle, initial)) {
+    fragments.push(`标题指向 ${cleanTitle}`);
+  }
+  if (source || eventDate) {
+    fragments.push(`${source || "公开来源"}${eventDate ? `在 ${eventDate}` : ""}记录了这条讨论`);
+  }
+  const relevance = stripCommunityLeadFallbackBoilerplate(item?.reader_relevance || "", item);
+  if (relevance && !isNearDuplicateText(relevance, fragments.join(" "))) {
+    fragments.push(stripSentenceEnding(relevance));
+  } else {
+    fragments.push("适合和同类产品、官方入口、后续报道放在一起比较，不把单条社区讨论当作最终事实");
+  }
+  return trimText(`${uniqueTextFragments(fragments).join("；")}。`, 220);
 }
 
 function isReaderFacingChineseBody(value) {

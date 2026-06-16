@@ -9,7 +9,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - Start from the launcher worktree with `npm run daily:run -- --date YYYY-MM-DD`.
 - Use `npm run daily:run -- --date YYYY-MM-DD --publish` only when real publish is explicitly allowed.
 - Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status` and `next_action`.
-- If `next_action.kind` is `codex_ai_repair_contract`, write the requested contract and resume with the same `daily:run` command.
+- If `next_action.kind` is `codex_ai_repair_contract`, write the requested contract with `status:"ready"` and non-empty `edits`, then resume with the same `daily:run` command. If the runner provided a `status:"template"` file, fill edits in that new attempt file instead of overwriting prior attempts.
 - Use `--restart` only when intentionally discarding same-date runner state.
 - Scheduled dry-run uses `publish:dry-run:daily`.
 - 21:30 status self-check uses `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.

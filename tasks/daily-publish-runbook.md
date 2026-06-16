@@ -10,7 +10,7 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 - Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:run -- --date YYYY-MM-DD`.
 - Dry-run-only mode is the default. It stops after `publish:dry-run:daily`, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
 - Real publish requires `npm run daily:run -- --date YYYY-MM-DD --publish`. Publish mode may run the final `publish` stage and uses max 5 review -> AI repair contract -> repair -> review loops.
-- The runner owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Codex owns semantic AI repair when `next_action.kind` is `codex_ai_repair_contract`; save the contract as `.tmp/quality-ai-repair-YYYY-MM-DD.json` before resuming with the same `daily:run` command.
+- The runner owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Codex owns semantic AI repair when `next_action.kind` is `codex_ai_repair_contract`; save the requested contract path with `schema_version`, `report_date`, `status:"ready"`, and non-empty `edits` before resuming with the same `daily:run` command. If runner created a `status:"template"` contract, fill only the necessary public-text edits and then change the status to `ready`; do not overwrite prior attempt files.
 - Use `--restart` only when you intentionally discard the same-date `.tmp/run-summary-YYYY-MM-DD.json` state and start over.
 - Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
 - A separate 21:30 status self-check runs `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
@@ -125,7 +125,7 @@ npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.jso
 npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/quality-ai-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
-- AI repair contracts may edit only public text fields. They must not change URLs, dates, source names, `candidate_id`, `source_audit`, `quality_status`, evidence paths, or publish metadata. If the optimized draft still has blocking review issues after the runner's mode budget is exhausted, stop and report `.tmp/run-summary-YYYY-MM-DD.json`, `.tmp/quality-review-YYYY-MM-DD.json`, and `.tmp/quality-repair-YYYY-MM-DD.json`; dry-run defaults to 1 review/repair loop, publish mode defaults to max 5.
+- AI repair contracts may edit only public text fields. They must include `status:"ready"` and non-empty `edits` before runner execution; `status:"template"` files are placeholders and the runner will keep `final_status:"needs_ai_repair"` without applying them. They must not change URLs, dates, source names, `candidate_id`, `source_audit`, `quality_status`, evidence paths, or publish metadata. If the optimized draft still has blocking review issues after the runner's mode budget is exhausted, stop and report `.tmp/run-summary-YYYY-MM-DD.json`, `.tmp/quality-review-YYYY-MM-DD.json`, and `.tmp/quality-repair-YYYY-MM-DD.json`; dry-run defaults to 1 review/repair loop, publish mode defaults to max 5.
 - Use `.tmp/daily-report.optimized.json` as the input to `report:write` when repairs were applied.
 
 ## Report Write
