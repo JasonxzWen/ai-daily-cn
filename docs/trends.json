@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-15T07:16:19.255Z",
+  "generated_at": "2026-06-16T04:13:12.437Z",
   "window_days": 7,
   "source": {
     "report_count": 32,
@@ -32,8 +32,8 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 20,
-      "active_days": 5,
+      "occurrences": 21,
+      "active_days": 6,
       "sections": [
         "builder_observations",
         "main_items"
@@ -49,14 +49,16 @@
         "2026-06-10",
         "2026-06-11",
         "2026-06-12",
-        "2026-06-14"
+        "2026-06-14",
+        "2026-06-15"
       ],
       "related_reports": [
         "2026-06-09",
         "2026-06-10",
         "2026-06-11",
         "2026-06-12",
-        "2026-06-14"
+        "2026-06-14",
+        "2026-06-15"
       ]
     }
   ],
@@ -1604,7 +1606,28 @@
       "github_trending": []
     },
     "2026-06-15": {
-      "main_items": [],
+      "main_items": [
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 21x/6d",
+              "window_days": 7,
+              "occurrences": 21,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "Google",
+                "OpenAI"
+              ]
+            }
+          ]
+        }
+      ],
       "github_trending": []
     }
   }

@@ -267,9 +267,10 @@ function renderLatestBriefing(latestItem, fallbackReport) {
   const report = fallbackReport || {};
   const quality = item.quality || {};
   const strength = item.strength || {};
+  const mainStream = normalizeMainStream(item.main_stream, item.metrics);
   const highlights = Array.isArray(item.highlights) ? item.highlights.filter((entry) => entry?.title && entry?.url).slice(0, 3) : [];
   const highlightHtml = highlights.length > 0
-    ? `<ol class="compact-list latest-highlights">${highlights.map((entry) => `<li><a href="${escapeAttribute(entry.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(entry.title)}</a>${entry.reason ? `：${escapeHtml(firstSentence(entry.reason))}` : ""}</li>`).join("")}</ol>`
+    ? `<ul class="compact-list latest-highlights">${highlights.map((entry) => `<li><a href="${escapeAttribute(entry.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(entry.title)}</a>${entry.reason ? `：${escapeHtml(firstSentence(entry.reason))}` : ""}</li>`).join("")}</ul>`
     : `<p class="muted">暂无可展示的 highlights。</p>`;
   return `<section class="panel latest-briefing" id="latest-briefing" aria-labelledby="latest-briefing-title" data-section-type="summary">
       <div class="section-heading split-row">
@@ -277,7 +278,10 @@ function renderLatestBriefing(latestItem, fallbackReport) {
           <p class="eyebrow">最新主线</p>
           <h2 id="latest-briefing-title">${escapeHtml(item.date || report.report_date || "最新日报")}</h2>
         </div>
-        <span class="chip ${escapeAttribute(statusClassForQuality(quality.status || "ok"))} quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || qualityStatusLabel(quality.status || "ok"))}</span>
+        <span class="date-detail-badges">
+          ${renderMainStreamChip(mainStream)}
+          <span class="chip ${escapeAttribute(statusClassForQuality(quality.status || "ok"))} quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || qualityStatusLabel(quality.status || "ok"))}</span>
+        </span>
       </div>
       <p><strong>${escapeHtml(strength.label || "信号")}</strong>：${escapeHtml(firstSentence(item.summary || report.summary) || "暂无摘要")}</p>
       ${highlightHtml}
@@ -311,6 +315,7 @@ function renderSignalHeatStrip(dateIndex) {
 function renderSignalHeatDay(item) {
   const strength = item.strength || {};
   const quality = item.quality || {};
+  const mainStream = normalizeMainStream(item.main_stream, item.metrics);
   const visual = item.visual || {};
   const intensity = Number.isFinite(Number(visual.intensity || strength.intensity)) ? Number(visual.intensity || strength.intensity) : 1;
   const height = `${Math.max(18, Math.min(72, intensity * 14))}px`;
@@ -318,8 +323,9 @@ function renderSignalHeatDay(item) {
       data-signal-day="${escapeAttribute(item.date)}"
       data-strength-level="${escapeAttribute(strength.level || "quiet")}"
       data-quality-channel="${escapeAttribute(quality.status || "ok")}"
+      data-main-stream-status="${escapeAttribute(mainStream.status)}"
       href="${escapeAttribute(item.url || "#date-research-index")}"
-      aria-label="${escapeAttribute(`${item.date} ${strength.label || ""} ${quality.label || quality.status || ""}`)}">
+      aria-label="${escapeAttribute(`${item.date} ${strength.label || ""} ${mainStream.label || ""} ${quality.label || quality.status || ""}`)}">
       <span class="signal-day-bar" style="--signal-day-height:${escapeAttribute(height)}"></span>
       <span class="signal-day-date">${escapeHtml(item.date?.slice(5) || item.date || "")}</span>
       <span class="signal-day-quality chip ${escapeAttribute(statusClassForQuality(quality.status || "ok"))}">${escapeHtml(qualityStatusLabel(quality.status || "ok"))}</span>
@@ -538,6 +544,7 @@ function renderDateCard(item, selected = false) {
   const metrics = item.metrics || {};
   const quality = item.quality || {};
   const strength = item.strength || {};
+  const mainStream = normalizeMainStream(item.main_stream, metrics);
   const visual = item.visual || {};
   const flags = item.flags || {};
   const signalIntensity = Number.isFinite(Number(visual.intensity || strength.intensity))
@@ -553,6 +560,8 @@ function renderDateCard(item, selected = false) {
       data-strength-level="${escapeAttribute(strength.level || "quiet")}"
       data-quality-status="${escapeAttribute(quality.status || "ok")}"
       data-quality-channel="${escapeAttribute(visual.quality_channel || quality.status || "ok")}"
+      data-main-stream-status="${escapeAttribute(mainStream.status)}"
+      data-main-stream-target="${mainStream.status === "target" ? "true" : "false"}"
       data-has-github="${flags.has_github ? "true" : "false"}"
       data-has-builder="${flags.has_builder ? "true" : "false"}"
       data-has-tracking="${flags.has_tracking ? "true" : "false"}"
@@ -574,7 +583,10 @@ function renderDateCard(item, selected = false) {
           ${renderMetricPill("覆盖", metrics.section_coverage_count)}
         </span>
         <span class="date-card-footer">
-          <span class="strength-label">${escapeHtml(strength.label || strength.level || "quiet")}</span>${topTopicChip}
+          <span class="date-card-labels">
+            <span class="strength-label">${escapeHtml(strength.label || strength.level || "quiet")}</span>
+            ${renderMainStreamChip(mainStream)}
+          </span>${topTopicChip}
         </span>
       </button>
     </article>`;
@@ -584,13 +596,17 @@ function renderDateDetail(item, hidden = false) {
   const metrics = item.metrics || {};
   const strength = item.strength || {};
   const quality = item.quality || {};
+  const mainStream = normalizeMainStream(item.main_stream, metrics);
   return `<article class="date-detail" data-date-detail="${escapeAttribute(item.date)}"${hidden ? " hidden" : ""}>
       <header class="date-detail-header">
         <div>
           <p class="eyebrow">${escapeHtml(item.weekday || "")}</p>
           <h3>${escapeHtml(item.date)}</h3>
         </div>
-        <span class="quality-badge quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || quality.status || "ok")}</span>
+        <span class="date-detail-badges">
+          ${renderMainStreamChip(mainStream)}
+          <span class="quality-badge quality-${escapeAttribute(quality.status || "ok")}">${escapeHtml(quality.label || quality.status || "ok")}</span>
+        </span>
       </header>
       <p><strong>主线：</strong>${escapeHtml(firstSentence(item.summary) || item.title || "暂无摘要")}</p>
       <div class="date-detail-metrics" aria-label="透明统计">
@@ -622,6 +638,34 @@ function renderMetricPill(label, value) {
   return `<span class="metric-pill"><b>${escapeHtml(Number(value || 0))}</b>${escapeHtml(label)}</span>`;
 }
 
+function renderMainStreamChip(mainStream) {
+  return `<span class="chip main-stream-chip ${escapeAttribute(statusClassForMainStream(mainStream.status))}" data-main-stream-chip="${escapeAttribute(mainStream.status)}">${escapeHtml(mainStream.label)}</span>`;
+}
+
+function normalizeMainStream(mainStream = {}, metrics = {}) {
+  const count = Number(mainStream.count ?? metrics.main_items_count ?? 0);
+  const status = String(mainStream.status || mainStreamStatusFromCount(count));
+  return {
+    status,
+    label: mainStream.label || mainStreamLabel(status),
+    count
+  };
+}
+
+function mainStreamStatusFromCount(count) {
+  if (count >= 5 && count <= 30) return "target";
+  if (count > 30) return "oversized";
+  if (count > 0) return "sparse";
+  return "empty";
+}
+
+function mainStreamLabel(status) {
+  if (status === "target") return "主体达标";
+  if (status === "oversized") return "主体过量";
+  if (status === "empty") return "主体为空";
+  return "主体偏少";
+}
+
 function renderStrengthReasons(strength = {}) {
   const reasons = Array.isArray(strength.reasons) ? strength.reasons : [];
   if (reasons.length === 0) {
@@ -647,7 +691,7 @@ function renderDateHighlights(highlights) {
   }
   return `<div class="date-detail-block">
         <h4>Top highlights</h4>
-        <ol class="compact-list">${items.map((item) => `<li><a href="${escapeAttribute(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>${item.reason ? `：${escapeHtml(firstSentence(item.reason))}` : ""}</li>`).join("")}</ol>
+        <ul class="compact-list">${items.map((item) => `<li><a href="${escapeAttribute(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>${item.reason ? `：${escapeHtml(firstSentence(item.reason))}` : ""}</li>`).join("")}</ul>
       </div>`;
 }
 
@@ -722,6 +766,12 @@ function statusClassForQuality(status) {
   if (status === "blocked") return "status-danger";
   if (status === "degraded") return "status-warn";
   return "status-ok";
+}
+
+function statusClassForMainStream(status) {
+  if (status === "target") return "status-ok";
+  if (status === "empty") return "status-danger";
+  return "status-warn";
 }
 
 function firstSentence(value) {
@@ -1604,6 +1654,18 @@ h3 {
   align-items: center;
 }
 
+.date-card-labels,
+.date-detail-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.date-card-labels {
+  min-width: 0;
+}
+
 .date-card-topline small {
   color: var(--muted);
 }
@@ -1704,6 +1766,12 @@ h3 {
   max-width: 48%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-stream-chip {
+  min-height: 24px;
+  padding: 2px 7px;
   white-space: nowrap;
 }
 

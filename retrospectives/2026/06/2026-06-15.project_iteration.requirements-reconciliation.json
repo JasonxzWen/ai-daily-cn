@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-15.project_iteration.requirements-reconciliation",
+  "run_type": "project_iteration",
+  "date": "2026-06-15",
+  "title": "Daily requirements reconciliation",
+  "status": "completed",
+  "summary": "Project iteration record for replacing the obsolete required must-read public layout with the user's calibrated 5-30 short-news-stream contract, mapping current long-term daily-report requirements to ledger/tests/runtime evidence boundaries, and locking the main-stream blacklist/refill implementation entry gate plus evidence matrix. This record documents a file-contract pass, not completed generator repair.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node -e \"const fs=require('fs'); const s=fs.readFileSync('docs/ai-daily-main-stream-generation-repair-spec.md','utf8'); if(!s.includes('Phase 1.5：实现入口门')||!s.includes('### Evidence Matrix')) process.exit(1);\"",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-feedback-contract.mjs",
+      "node -e \"JSON.parse(require('fs').readFileSync('config/feedback-ledger.json','utf8')); JSON.parse(require('fs').readFileSync('retrospectives/index.json','utf8')); JSON.parse(require('fs').readFileSync('prompts/ai-daily/modules.json','utf8'));\"",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "source-lanes-not-proven-stable",
+      "section": "requirements-reconciliation",
+      "message": "Official sources, GitHub README enrichment, Builder/X, hot blogs, weak-signal platforms, and tracking extraction are mapped as partial or missing until generated reports and runtime evidence prove stable behavior."
+    },
+    {
+      "code": "full-validation-not-green",
+      "section": "file-contract",
+      "message": "Full npm run validate is not current evidence for this pass; the dirty implementation/test state still contains a red test for main item summaries repeating titles. The file contract records this as implementation work pending."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "A user-facing layout contract can become harmful when the user's goal changes; old tests and quick references must be closed or they will recreate the old design.",
+      "evidence": "The repository still had quick-reference and test assertions requiring three must-read cards after the user clarified that the target is a 5-20 short news stream without a required first-screen hero.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Keep superseded feedback items explicitly closed and bind the replacement contract to unit, E2E, page-check, index behavior, and real generated report evidence."
+    },
+    {
+      "lesson": "Requirement memory must distinguish implemented contracts from partial source-lane work.",
+      "evidence": "REQ-001 and REQ-012 are codified in this pass, while Builder/X, hot blogs, platform weak signals, and tracking extraction remain partial or missing until runtime evidence exists.",
+      "scope": "project_iteration",
+      "persistence": "implemented",
+      "recommended_action": "Use the reconciliation matrix during every future daily-generation change and update statuses only with generated artifact evidence."
+    },
+    {
+      "lesson": "Implementation must not start from a file-only task without a new entry gate.",
+      "evidence": "The main-stream repair spec now contains Phase 1.5：实现入口门 and an Evidence Matrix tying blacklist refill, 72-hour sparse-day fill, no-filler writing, candidate audit, source health, effective-interact, and index behavior to explicit proof requirements.",
+      "scope": "project_iteration",
+      "persistence": "implemented",
+      "recommended_action": "Before editing src or tests, rewrite tasks/current-task.md to implementation scope, preserve red evidence, record real 2026-06-15 baseline counts, and then validate with real-date artifacts, page-check, browser screenshots, and full npm run validate."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The repository could continue to enforce obsolete must-read hero behavior or primary-only main-stream admission and lose the user's current daily-report requirements between sessions.",
+      "evidence": "The reconciliation matrix maps REQ-001 through REQ-012 to ledger items, tests or gates, runtime evidence boundaries, and current status; the main-stream repair spec records the blacklist/refill plan, 72-hour sparse-day boundary, implementation entry gate, evidence matrix, runtime evidence boundary, and no-overclaim rule.",
+      "module": "config/feedback-ledger.json, docs/ai-daily-requirements-reconciliation.md, docs/ai-daily-main-stream-generation-repair-spec.md, docs/feedback-buglist-quick-reference.md, tasks/current-task.md",
+      "suggestion": "Use the 5-30 compact news-stream contract as the public-page default, keep hero_highlights optional, move main-stream admission to blacklist/refill semantics, and require future stability claims to cite ledger, tests, real report artifacts, page-check, and screenshots.",
+      "expected_benefit": "Future iterations start from the user's real target shape and preserve missing/partial requirements instead of silently dropping them.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Requirement locked through ledger, quick reference, reconciliation doc, main-stream repair spec, task state, and planned regression tests. Generator stability remains pending until real runtime evidence exists.",
+      "ledger_links": [
+        "feedback/p1-ai-daily-requirements-reconciliation",
+        "feedback/p1-public-daily-content-contract",
+        "feedback/p1-main-stream-blacklist-refill",
+        "feedback/p1-three-minute-must-read-hero",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "spec entry gate and evidence matrix presence check",
+        "node scripts/harness-validate.mjs",
+        "node scripts/validate-feedback-contract.mjs",
+        "node scripts/validate-retrospectives.mjs",
+        "JSON parse for config/feedback-ledger.json, retrospectives/index.json, prompts/ai-daily/modules.json",
+        "git diff --check"
+      ]
+    },
+    {
+      "status": "recommended",
+      "issue": "Many source lanes remain partial even after the contract correction.",
+      "evidence": "The reconciliation matrix marks official source coverage, GitHub README enrichment, Builder/X, hot blogs, WeChat/Zhihu/Reddit, OpenRouter/Artificial Analysis, and semantic media as partial or missing.",
+      "module": "daily generation and discovery pipeline",
+      "suggestion": "Next implementation pass should add generator-side source-lane productivity tests and draft-stage no-filler tests before tightening any post-generation gate.",
+      "expected_benefit": "The daily report improves at the source selection and writing stage instead of becoming more fragile at final validation.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Track as follow-up until source-lane runtime evidence exists."
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-three-minute-must-read-hero",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-github-readme-enrichment",
+    "feedback/p1-compact-builder-discussion",
+    "feedback/p1-platform-exempt-discovery-wiring",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-public-media-contract"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement draft-stage source-lane and no-filler tests for the requirements that remain partial in the reconciliation matrix.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Run a clean daily generation after these contracts merge and update the reconciliation matrix only with generated HTML/JSON evidence.",
+      "owner": "project"
+    }
+  ]
+}

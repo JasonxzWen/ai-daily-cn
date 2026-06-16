@@ -307,6 +307,7 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
       const report = reportByDate.get(feedReport.report_date) || {};
       const metrics = dateSignalMetrics(feedReport, report);
       const strength = deriveDateSignalStrength(metrics);
+      const mainStream = publicMainStreamStatus(metrics);
       const quality = publicDateQuality(report.quality_status);
       const topTopic = topicByDate.get(feedReport.report_date) || null;
       return {
@@ -319,10 +320,12 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
         data_url: feedReport.data_url,
         metrics,
         strength,
+        main_stream: mainStream,
         quality,
         top_topic: topTopic,
         highlights: dateHighlights(report, feedReport),
         flags: {
+          main_stream_target_met: mainStream.status === "target",
           has_github: metrics.github_trending_count > 0,
           has_builder: metrics.builder_observations_count > 0,
           has_tracking: metrics.daily_tracking_count > 0,
@@ -371,6 +374,46 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
   };
 }
 
+function publicMainStreamStatus(metrics = {}) {
+  const count = Number(metrics.main_items_count || 0);
+  const targetMin = 5;
+  const targetMax = 30;
+  if (count >= targetMin && count <= targetMax) {
+    return {
+      status: "target",
+      label: "主体达标",
+      count,
+      target_min: targetMin,
+      target_max: targetMax
+    };
+  }
+  if (count > targetMax) {
+    return {
+      status: "oversized",
+      label: "主体过量",
+      count,
+      target_min: targetMin,
+      target_max: targetMax
+    };
+  }
+  if (count > 0) {
+    return {
+      status: "sparse",
+      label: "主体偏少",
+      count,
+      target_min: targetMin,
+      target_max: targetMax
+    };
+  }
+  return {
+    status: "empty",
+    label: "主体为空",
+    count,
+    target_min: targetMin,
+    target_max: targetMax
+  };
+}
+
 export function deriveDateSignalStrength(metrics = {}) {
   const reasons = [];
   let score = 0;
@@ -380,9 +423,9 @@ export function deriveDateSignalStrength(metrics = {}) {
     reasons.push({ id, label, value });
   };
 
-  addReason(metrics.main_items_count >= 8, 3, "main_items_high", "主体信号密集", metrics.main_items_count);
-  addReason(metrics.main_items_count >= 4 && metrics.main_items_count < 8, 2, "main_items_medium", "主体信号稳定", metrics.main_items_count);
-  addReason(metrics.main_items_count > 0 && metrics.main_items_count < 4, 1, "main_items_present", "主体信号存在", metrics.main_items_count);
+  addReason(metrics.main_items_count >= 5, 3, "main_items_target", "主体信号达到目标", metrics.main_items_count);
+  addReason(metrics.main_items_count >= 3 && metrics.main_items_count < 5, 2, "main_items_sparse", "主体信号偏少", metrics.main_items_count);
+  addReason(metrics.main_items_count > 0 && metrics.main_items_count < 3, 1, "main_items_present", "主体信号存在", metrics.main_items_count);
   addReason(metrics.major_count >= 3, 3, "major_items_high", "重大/高亮信号较多", metrics.major_count);
   addReason(metrics.major_count > 0 && metrics.major_count < 3, 1, "major_items_present", "存在高亮信号", metrics.major_count);
   addReason(metrics.github_trending_count >= 10, 2, "github_full", "GitHub Top 10 完整", metrics.github_trending_count);
@@ -512,17 +555,6 @@ function publicDateQuality(status = {}) {
 }
 
 function dateHighlights(report = {}, feedReport = {}) {
-  const heroHighlights = arrayValue(report.hero_highlights)
-    .filter((item) => item?.title && item?.url)
-    .slice(0, 3)
-    .map((item) => ({
-      title: String(item.title || ""),
-      url: String(item.url || ""),
-      reason: String(item.reason || "").trim()
-    }));
-  if (heroHighlights.length > 0) {
-    return heroHighlights;
-  }
   const mainHighlights = arrayValue(report.main_items)
     .filter((item) => item?.title && item?.url)
     .slice(0, 3)
@@ -533,6 +565,17 @@ function dateHighlights(report = {}, feedReport = {}) {
     }));
   if (mainHighlights.length > 0) {
     return mainHighlights;
+  }
+  const heroHighlights = arrayValue(report.hero_highlights)
+    .filter((item) => item?.title && item?.url)
+    .slice(0, 3)
+    .map((item) => ({
+      title: String(item.title || ""),
+      url: String(item.url || ""),
+      reason: String(item.reason || "").trim()
+    }));
+  if (heroHighlights.length > 0) {
+    return heroHighlights;
   }
   return [{
     title: String(feedReport.title || feedReport.report_date || ""),

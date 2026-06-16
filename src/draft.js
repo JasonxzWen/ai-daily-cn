@@ -97,7 +97,22 @@ const MAIN_ITEM_RECENT_HISTORY_SECTIONS = [
   "projects",
   "builder_observations"
 ];
+const MAIN_STREAM_SOURCE_IMPACT_GROUPS = [
+  "github_trending",
+  "huggingface_trending",
+  "builder_sources",
+  "china_ai_sources",
+  "content_sources",
+  "search_sources",
+  "wechat_sources",
+  "zhihu_sources",
+  "reddit_sources",
+  "sources_health"
+];
+const MAIN_TARGET_MIN = 5;
 const MAIN_TARGET = 10;
+const MAIN_TARGET_MAX = 30;
+const MAIN_REFILL_WINDOW_DAYS = 3;
 const GITHUB_TRENDING_TARGET = 10;
 const HUGGINGFACE_TRENDING_TARGET = 10;
 const PROJECT_TARGET = 10;
@@ -288,20 +303,41 @@ function selectReportItems(merged, options = {}) {
     return huggingFaceTrendingItem(selected, index);
   });
 
-  const mainPool = candidates
-    .filter((candidate) => !selectedIds.has(candidate.id))
-    .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
-    .filter((candidate) => canPromoteToMain(candidate, reportDate))
+  const mainEvaluations = evaluateMainCandidates(candidates, {
+    reportDate,
+    recentMainUrlHistory,
+    metaById
+  });
+  const strictMainPool = mainEvaluations
+    .filter((entry) => entry.eligible && entry.stage === "strict")
+    .map((entry) => entry.candidate)
     .sort(compareMainCandidates);
-  let mainSeeds = pickMainCandidates(mainPool, MAIN_TARGET);
-  if (mainSeeds.length === 0) {
-    mainSeeds = candidates
-      .filter((candidate) => !selectedIds.has(candidate.id))
-      .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
-      .filter((candidate) => canFallbackToSingleMain(candidate))
-      .sort((left, right) => candidateScore(right) - candidateScore(left))
-      .slice(0, 1);
+  const refillMainPool = mainEvaluations
+    .filter((entry) => entry.eligible && entry.stage !== "strict")
+    .map((entry) => entry.candidate)
+    .sort(compareMainCandidates);
+  const mainPool = mainEvaluations
+    .filter((entry) => entry.eligible)
+    .map((entry) => entry.candidate)
+    .sort(compareMainCandidates);
+  let mainSeeds = pickMainCandidates(strictMainPool, Math.min(MAIN_TARGET, MAIN_TARGET_MAX));
+  if (mainSeeds.length < MAIN_TARGET_MIN) {
+    const strictSeedIds = new Set(mainSeeds.map((candidate) => candidate.id));
+    mainSeeds = pickMainCandidates([
+      ...mainSeeds,
+      ...refillMainPool.filter((candidate) => !strictSeedIds.has(candidate.id))
+    ], MAIN_TARGET_MIN);
   }
+  const mainSeedIds = new Set(mainSeeds.map((candidate) => candidate.id));
+  for (const entry of mainEvaluations) {
+    if (!entry.eligible || mainSeedIds.has(entry.candidate.id)) {
+      continue;
+    }
+    entry.candidate.main_reject_reason = entry.candidate.main_reject_reason || "not_selected_lower_priority";
+  }
+  const mainSelectionSnapshot = mainSelectionSnapshotFor(mainEvaluations, mainSeeds, {
+    sourceAudit: merged.sourceAudit
+  });
   const mainItems = mainSeeds.map((candidate) => {
     const mainCandidate = derivedCandidate(candidate, {
       idPrefix: "main",
@@ -311,6 +347,7 @@ function selectReportItems(merged, options = {}) {
     });
     derived.push(mainCandidate);
     selectedIds.add(candidate.id);
+    selectedIds.add(`project:${candidate.id}`);
     return mainItem(mainCandidate, candidate);
   });
 
@@ -415,7 +452,7 @@ function selectReportItems(merged, options = {}) {
   const platformSelections = selectPlatformExemptItems(candidates, selectedIds);
 
   return {
-    candidates: [...includedCandidates, ...derived],
+    candidates: finalizeMainAudit([...includedCandidates, ...derived]),
     main_items: mainItems,
     github_trending: githubTrending,
     huggingface_trending: huggingFaceTrending,
@@ -437,8 +474,23 @@ function selectReportItems(merged, options = {}) {
       builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
       official_org_updates: officialOrgUpdates.length,
       ...platformSelections.eligibleCounts
+    },
+    selection_snapshot: {
+      main_items: mainSelectionSnapshot
     }
   };
+}
+
+function finalizeMainAudit(candidates) {
+  for (const candidate of candidates) {
+    if (candidate.main_selection_stage || candidate.main_reject_reason) {
+      continue;
+    }
+    candidate.main_reject_reason = candidate.included_in === "main_items"
+      ? "selected_main_item"
+      : "not_evaluated_section_item";
+  }
+  return candidates;
 }
 
 function selectPlatformExemptItems(candidates, selectedIds) {
@@ -716,10 +768,10 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     title: `AI 日报 ${reportDate}`,
     summary: summaryForSelection(selection, aigcCount),
     source_window: {
-      date_from: reportDate,
+      date_from: shiftDateOnly(reportDate, -2),
       date_to: reportDate,
-      fallback_window_used: false,
-      notes: "report:draft 自动从固定发现候选池选取；一手/可信候选进入主体，中介线索仅作社区观察。"
+      fallback_window_used: true,
+      notes: "report:draft uses a 72-hour candidate window; main_items admission is blacklist-based, while source authority affects ranking and high-risk fact handling."
     },
     hero_highlights: selectHeroHighlights(selection),
     source_audit: sourceAudit,
@@ -744,9 +796,14 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
       builder_observations: selection.builder_observations.length,
       builder_skill_used: ["candidate-pool-autodraft"],
       selection_snapshot: {
-        main_items: {
+        main_items: selection.selection_snapshot?.main_items || {
           eligible_candidates: selection.eligible_counts?.main_items || 0,
-          selected: selection.main_items.length
+          selected: selection.main_items.length,
+          target_min: MAIN_TARGET_MIN,
+          target: MAIN_TARGET,
+          target_max: MAIN_TARGET_MAX,
+          shortfall: selection.main_items.length < MAIN_TARGET_MIN,
+          rejection_counts: {}
         },
         github_trending: {
           eligible_candidates: selection.eligible_counts?.github_trending || 0,
@@ -793,7 +850,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
       primary_links: selection.main_items.every((item) => PRIMARY_STATUSES.has(item.verification_status)),
       no_banned_words: true,
       no_unsourced_numbers: true,
-      notes: "自动挑选已完成；高风险或中介事实未进入主体。",
+      notes: "Automatic selection completed with blacklist admission; high-risk non-primary facts remain excluded, while low-risk refill candidates can enter main_items.",
       optimization_suggestions: []
     },
     generated_at: generatedAt
@@ -1010,8 +1067,8 @@ function isTemplateHeroText(value) {
 }
 
 function normalizeAutodraftPublicText(report) {
-  report.source_window.notes = "覆盖当日固定信源；正文只采用已回到一手、官方、论文、GitHub 或多源确认的事实，未确认线索留在观察区。";
-  report.self_check.notes = "主体事实只保留可回溯来源；高风险和中介线索留在社区观察。";
+  report.source_window.notes = "覆盖 72 小时固定信源候选；主体采用黑名单准入，来源权威性用于排序，高风险事实仍要求更强核验。";
+  report.self_check.notes = "主体选择已在生成期完成黑名单过滤、优先级排序、补位和短缺记录。";
   for (const item of report.hero_highlights || []) {
     item.reason = stripDraftPublicBodyNoise(item.reason, item);
     item.what_happened = stripDraftPublicBodyNoise(item.what_happened, item);
@@ -1051,7 +1108,14 @@ function stripDraftPublicBodyNoise(value, item = {}) {
     .replace(/\s*This is a community lead unless it is backed by a primary source\.?/gi, "")
     .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,60}\s+latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion\.?/gi, "")
     .replace(/\s*This is an intermediary\/self-media lead; trace it to a primary source before[^。.;\n]*(?:[。.;]|$)/gi, "")
+    .replace(/\bintermediary_url=\S+/gi, "")
+    .replace(/\bsource_report_url=\S+/gi, "")
+    .replace(/\bprimary_url=\S+/gi, "")
+    .replace(/\bprimary_verification_required\s*=\s*true\b/gi, "")
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/^\s*作者\s*[|｜]\s*[^。；;\n]{1,40}\s+编辑\s*[|｜]\s*[^。；;\n]{1,40}\s*/u, "")
     .replace(/^[（(]英文[)）][。.]?\s*/u, "")
+    .replace(/^[（(]中文[)）][。.]?\s*/u, "")
     .replace(/\s*待确认\s*[:：]\s*[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*边界\s*[:：]\s*[^。；;\n]*(?:[。；;]|$)/g, "")
     .replace(/\s*事实性结论[^。；;\n]*(?:一手来源|多源确认|原始链接|主体)[^。；;\n]*(?:[。；;]|$)/g, "")
@@ -1183,6 +1247,11 @@ function mainItemBullets(candidate, original, category) {
   const specificBullets = mainItemSpecificBullets(candidate);
   if (specificBullets.length > 0) {
     return uniqueEditorialSentences(specificBullets).slice(0, 3);
+  }
+  const evidenceDetail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemEvidenceDetail(candidate), candidate));
+  if (evidenceDetail) {
+    const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
+    return [`**${label}**：${evidenceDetail}。`];
   }
   const detail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemDetail(candidate, category), candidate));
   if (detail) {
@@ -1377,6 +1446,36 @@ function highlightMainItemFact(candidate, fact) {
 
 function mainItemSpecificBullets(candidate) {
   const text = candidateText(candidate).toLowerCase();
+  if (/security new features in may 2026|alibaba cloud security products targeting international markets/.test(text)) {
+    return [
+      "**阿里云安全产品**：原文按产品线汇总 2026 年 5 月功能变化，重点是国际站安全能力、控制台入口和防护范围。"
+    ];
+  }
+  if (/automating daily outlook email summarization with hermesagent|outlook email.*hermesagent|hermesagent.*outlook email/.test(text)) {
+    return [
+      "**HermesAgent 工作流**：文章演示在 Alibaba Cloud ECS 上自动汇总 Outlook 邮件，把邮箱处理接入云端 agent 任务链。"
+    ];
+  }
+  if (/cut checkpoint costs.*nvidia nvcomp|periodic checkpoints|model weights.*optimizer states.*gradients|optimizer states.*gradients/.test(text)) {
+    return [
+      "**训练检查点成本**：NVIDIA 把 nvCOMP 压缩库接到 checkpoint 流程里，关注权重、优化器状态和梯度快照的存储开销。"
+    ];
+  }
+  if (/claude code guide 2026|25 features.*examples.*demo|claude\.md|subagents|hooks.*mcp|mcp.*auto mode/.test(text)) {
+    return [
+      "**Claude Code 用法**：指南把 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能拆成示例与场景。"
+    ];
+  }
+  if (/agent evaluation practices|tool traces|replayable failures|release gates|human rollback|deployment checklists?/.test(text)) {
+    return [
+      "**Agent 评测流程**：文章把 tool traces、可复现失败、release gates、人工回滚和部署检查清单放进同一条上线流程。"
+    ];
+  }
+  if (/vla.*世界模型|世界模型.*vla|智源研究院院长王仲远|world model.*embodied|embodied.*world model/.test(text)) {
+    return [
+      "**具身智能路线**：专访把 VLA、世界模型和机器人对物理因果的理解放在一起，重点是当前系统仍缺少稳定的物理预测能力。"
+    ];
+  }
   if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
     return [
       "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
@@ -1647,26 +1746,33 @@ function communityLeadItem(candidate) {
 }
 
 function communityLeadPublicSummary(candidate) {
+  const summary = communityLeadReaderMaterial(candidate);
+  return summary ? trimText(stripDraftPublicBodyNoise(summary, candidate), 170) : "";
+}
+
+function hasCommunityLeadReaderMaterial(candidate) {
+  return Boolean(communityLeadReaderMaterial(candidate));
+}
+
+function communityLeadReaderMaterial(candidate) {
   const summary = joinReaderSentences([
     candidateReaderDigest(candidate),
     communityLeadDetailSentence(candidate)
   ]);
   if (summary) {
-    return trimText(stripDraftPublicBodyNoise(summary, candidate), 170);
+    return stripDraftPublicBodyNoise(summary, candidate);
   }
   const lead = chineseLeadForCandidate(candidate);
   if (lead) {
-    return trimText(stripDraftPublicBodyNoise(lead, candidate), 170);
+    return stripDraftPublicBodyNoise(lead, candidate);
   }
   for (const field of [candidate.summary, candidate.evidence, candidate.title]) {
     const raw = stripDraftPublicBodyNoise(field, candidate);
     if (hasChineseText(raw) && raw.length >= 18) {
-      return trimText(raw, 170);
+      return raw;
     }
   }
-  const category = inferredEditorialCategory(candidate);
-  const source = candidate.source || "公开来源";
-  return `${source} 记录了一条${themeLabelForCandidate(candidate)}公开条目，详情需回到原文链接核对。`;
+  return "";
 }
 
 function communityLeadTitleForCandidate(candidate) {
@@ -2500,7 +2606,518 @@ function cloneCandidates(candidates) {
   return candidates.map((candidate) => ({ ...candidate }));
 }
 
-function canPromoteToMain(candidate, reportDate = "") {
+function evaluateMainCandidates(candidates, options = {}) {
+  return candidates.map((candidate) => {
+    const meta = options.metaById?.get(candidate.id) || {};
+    const rejectReason = mainRejectReason(candidate, {
+      reportDate: options.reportDate,
+      recentMainUrlHistory: options.recentMainUrlHistory,
+      meta
+    });
+    if (rejectReason) {
+      candidate.main_reject_reason = rejectReason;
+      return {
+        candidate,
+        meta,
+        eligible: false,
+        reject_reason: rejectReason
+      };
+    }
+    const stage = canPromoteToMainStrict(candidate, options.reportDate) ? "strict" : "refill";
+    if (stage === "refill" && !canPromoteToMainRefill(candidate, meta, options.reportDate)) {
+      candidate.main_reject_reason = "not_main_refill_material";
+      return {
+        candidate,
+        meta,
+        eligible: false,
+        reject_reason: "not_main_refill_material"
+      };
+    }
+    candidate.main_selection_stage = stage;
+    return {
+      candidate,
+      meta,
+      eligible: true,
+      stage
+    };
+  });
+}
+
+function mainSelectionSnapshotFor(evaluations, selectedCandidates, options = {}) {
+  const rejectionCounts = {};
+  for (const entry of evaluations) {
+    if (!entry.eligible) {
+      incrementCount(rejectionCounts, entry.reject_reason || "rejected");
+    }
+  }
+  const selected = selectedCandidates.length;
+  const strictSelected = selectedCandidates.filter((candidate) => candidate.main_selection_stage === "strict").length;
+  const refillSelected = selected - strictSelected;
+  const shortfall = selected < MAIN_TARGET_MIN;
+  const snapshot = {
+    eligible_candidates: evaluations.filter((entry) => entry.eligible).length,
+    selected,
+    strict_selected: strictSelected,
+    refill_selected: refillSelected,
+    target_min: MAIN_TARGET_MIN,
+    target: MAIN_TARGET,
+    target_max: MAIN_TARGET_MAX,
+    shortfall,
+    rejection_counts: rejectionCounts
+  };
+  if (shortfall) {
+    snapshot.shortfall_event = {
+      type: "main_stream_shortfall",
+      selected,
+      target_min: MAIN_TARGET_MIN,
+      target_max: MAIN_TARGET_MAX,
+      remaining_shortfall: MAIN_TARGET_MIN - selected,
+      eligible_candidates: snapshot.eligible_candidates,
+      rejection_counts: rejectionCounts,
+      source_impacts: sourceImpactsForMainShortfall(options.sourceAudit)
+    };
+  }
+  return snapshot;
+}
+
+function sourceImpactsForMainShortfall(sourceAudit = {}) {
+  if (!sourceAudit || typeof sourceAudit !== "object") {
+    return [];
+  }
+  return MAIN_STREAM_SOURCE_IMPACT_GROUPS
+    .map((groupName) => sourceImpactForAuditGroup(groupName, sourceAudit[groupName]))
+    .filter(Boolean)
+    .sort(compareSourceImpacts)
+    .slice(0, 12);
+}
+
+function sourceImpactForAuditGroup(groupName, group) {
+  if (!group || typeof group !== "object") {
+    return null;
+  }
+  const sources = Array.isArray(group.sources) ? group.sources : [];
+  const statuses = sources
+    .map((source) => String(source?.status || "").trim().toLowerCase())
+    .filter(Boolean);
+  const blockedReason = String(group.blocked_reason || "").trim();
+  const notes = String(group.notes || "").trim();
+  const candidateCount = countValue(group.candidates_found);
+  const includedCount = countValue(group.included);
+  const status = sourceImpactStatus({ statuses, blockedReason, candidateCount });
+  if (!status) {
+    return null;
+  }
+  return {
+    source_group: groupName,
+    status,
+    reason: sourceImpactReason({ blockedReason, notes, sources, status, candidateCount }),
+    candidate_count: candidateCount,
+    included_count: includedCount,
+    source_count: sources.length,
+    source_names: sources.map((source) => String(source?.name || "").trim()).filter(Boolean).slice(0, 3),
+    affects_main_stream: true
+  };
+}
+
+function sourceImpactStatus({ statuses, blockedReason, candidateCount }) {
+  const reason = String(blockedReason || "").toLowerCase();
+  if (reason.includes("unconfigured") || statuses.includes("unconfigured")) {
+    return "unconfigured";
+  }
+  if (blockedReason || statuses.some((status) => /blocked|failed|error|timeout|http_\d+/.test(status))) {
+    return "blocked";
+  }
+  if (statuses.includes("degraded")) {
+    return "degraded";
+  }
+  if (candidateCount === 0 || statuses.some((status) => status === "no_signal")) {
+    return "no_signal";
+  }
+  return "";
+}
+
+function sourceImpactReason({ blockedReason, notes, sources, status, candidateCount }) {
+  if (blockedReason) {
+    return blockedReason;
+  }
+  const sourceNote = sources
+    .map((source) => String(source?.notes || "").trim())
+    .find(Boolean);
+  if (sourceNote) {
+    return sourceNote;
+  }
+  if (notes) {
+    return notes;
+  }
+  if (candidateCount === 0) {
+    return "no_candidates_found";
+  }
+  return status;
+}
+
+function countValue(value) {
+  const count = Number(value);
+  return Number.isFinite(count) && count >= 0 ? count : 0;
+}
+
+function compareSourceImpacts(left, right) {
+  const order = {
+    blocked: 0,
+    unconfigured: 1,
+    degraded: 2,
+    no_signal: 3
+  };
+  const statusDiff = (order[left.status] ?? 9) - (order[right.status] ?? 9);
+  if (statusDiff !== 0) return statusDiff;
+  const candidateDiff = left.candidate_count - right.candidate_count;
+  if (candidateDiff !== 0) return candidateDiff;
+  return left.source_group.localeCompare(right.source_group);
+}
+
+function incrementCount(counts, key) {
+  counts[key] = (counts[key] || 0) + 1;
+}
+
+function canPromoteToMain(candidate, reportDate = "", context = {}) {
+  return !mainRejectReason(candidate, { ...context, reportDate });
+}
+
+function canPromoteToMainRefill(candidate, meta = {}, reportDate = "") {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (candidate.category === "builder_observation") {
+    return hasMainRefillOperationalSignal(candidate, meta) && hasSubstantialMainRefillEvidence(candidate, meta);
+  }
+  if (candidate.category === "project") {
+    return hasMainRefillOperationalSignal(candidate, meta);
+  }
+  if (candidate.category === "hot_blog") {
+    return canPromoteToHotBlog(candidate, reportDate) ||
+      canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta) ||
+      hasMainRefillOperationalSignal(candidate, meta);
+  }
+  if (sourceLevel === "paper" || sourceLevel === "paper_api") {
+    return canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta) ||
+      hasEvidenceBackedPaperMainRefill(candidate, meta);
+  }
+  if (canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta)) {
+    return true;
+  }
+  if (isChineseInterviewMainRefill(candidate)) {
+    return true;
+  }
+  if (candidate.category === "community_lead") {
+    return hasMainRefillOperationalSignal(candidate, meta) && hasSubstantialMainRefillEvidence(candidate, meta);
+  }
+  return hasMainRefillOperationalSignal(candidate, meta) && hasSubstantialMainRefillEvidence(candidate, meta);
+}
+
+function hasEvidenceBackedPaperMainRefill(candidate, meta = {}) {
+  const text = mainRefillText(candidate, meta);
+  if (!hasSubstantialMainRefillEvidence(candidate, meta)) {
+    return false;
+  }
+  return /\b(ai scientist|scientific discovery|discovery systems?|agent workflow|agents?|workflow|evaluation|eval|tool|tools?|developer|architecture|framework|search space|model|llm|benchmark|dataset|inference|training|reasoning)\b|科学发现|智能体|工作流|评测|模型|推理|训练|数据集/u.test(text);
+}
+
+function isChineseInterviewMainRefill(candidate) {
+  const text = mainRefillText(candidate);
+  return /VLA不会死|世界模型是未来|智源研究院院长王仲远|世界模型.*具身智能|VLA.*世界模型|世界模型.*VLA/u.test(text);
+}
+
+function hasMainRefillOperationalSignal(candidate, meta = {}) {
+  const text = mainRefillText(candidate, meta);
+  return /\b(agent|agents|workflow|workflows|tool|tools|tooling|developer|developers|engineering|architecture|integration|sdk|api|mcp|hook|hooks|skill|skills|subagent|subagents|eval|evaluation|observability|trace|traces|rollback|release gate|release gates|terminal|guide|practice|practices|example|examples|productivity|deployment|model weights?|usage limits?|enterprise|platform|launch|rollout|availability)\b|智能体|工作流|工具|开发者|工程|架构|集成|评测|观测|链路|回滚|发布门|终端|指南|实践|示例|部署|模型权重|企业|平台|上线|可用/u.test(text);
+}
+
+function hasSubstantialMainRefillEvidence(candidate, meta = {}) {
+  const detail = [
+    candidate?.evidence,
+    candidate?.summary,
+    candidate?.original_text,
+    meta?.description,
+    meta?.readme_summary
+  ].map((value) => String(value || "").trim()).filter(Boolean).join(" ");
+  return stripDraftPublicBodyNoise(detail, candidate).length >= 80;
+}
+
+function mainRefillText(candidate, meta = {}) {
+  return [
+    candidateText(candidate),
+    meta?.description,
+    meta?.readme_summary
+  ].map((value) => String(value || "")).join(" ");
+}
+
+function mainRejectReason(candidate, options = {}) {
+  const reportDate = options.reportDate || "";
+  const recentMainUrlHistory = options.recentMainUrlHistory || new Map();
+  const meta = options.meta || {};
+  if (!candidate || typeof candidate !== "object") return "invalid_candidate";
+  if (!candidate.url) return "missing_url";
+  if (!hasReaderVisibleTitle(candidate)) return "missing_reader_visible_title";
+  if (isFutureDatedCandidate(candidate, reportDate)) return "future_dated";
+  if (isOutsideMainWindowCandidate(candidate, reportDate)) return "outside_main_window";
+  if (!isFreshForMainItems(candidate, recentMainUrlHistory)) return "recent_duplicate";
+  if (isStatuspageCandidate(candidate)) return "statuspage";
+  if (isSearchShadowCandidate(candidate)) return "search_shadow";
+  if (isUnresolvedAggregatorMainCandidate(candidate)) return "unverified_aggregator_lead";
+  if (isPrimaryRequiredIntermediaryMainCandidate(candidate) && !canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta)) return "primary_required_intermediary_lead";
+  if (isGenericGithubTrendingTextCandidate(candidate, meta)) return "generic_github_trending_text";
+  if (isGenericHotBlogAnnouncementCandidate(candidate)) return "generic_hot_blog_announcement";
+  if (isPublicFillerMainCandidate(candidate, meta)) return "public_filler_text";
+  if (isLowValueProductHuntMainCandidate(candidate)) return "low_value_product_hunt_project";
+  if (isLowValueMainCandidate(candidate)) return "low_value";
+  if (isLowValueEventGuideCandidate(candidate)) return "low_value_event_guide";
+  if (isLowValueProfileCandidate(candidate)) return "low_value_profile";
+  if (isMinorConsumerAiFeatureCandidate(candidate)) return "minor_consumer_ai_feature";
+  if (isLowSignalVendorPartnership(candidate)) return "low_signal_vendor_partnership";
+  if (candidate.category === "builder_observation" && isLowSignalBuilderMainCandidate(candidate)) return "builder_low_signal";
+  if (isHardcoreResearchOnly(candidate)) return "hardcore_research_only";
+  if (!hasMainStreamSignal(candidate, meta, reportDate)) return "not_ai_relevant";
+  if (isThinMainStreamCandidate(candidate, meta)) return "thin_candidate_detail";
+  if (isUnverifiedHighRiskMainCandidate(candidate)) return "unverified_high_risk_claim";
+  return "";
+}
+
+function hasMainStreamSignal(candidate, meta = {}, reportDate = "") {
+  const text = `${candidateText(candidate)} ${meta.description || ""} ${meta.readme_summary || ""}`;
+  return isAiRelevantCandidate(candidate) ||
+    isAigcCandidate(candidate) ||
+    isReaderRelevantCandidate(candidate) ||
+    isMajorMainNewsCandidate(candidate) ||
+    isOfficialBlogMainlineCandidate(candidate) ||
+    isPublicAiImportantCandidate(candidate) ||
+    canPromoteToBuilderObservation(candidate) ||
+    canPromoteToCommunityLead(candidate, reportDate) ||
+    (PRODUCT_PLATFORM_RE.test(text) && AI_RELEVANCE_RE.test(text));
+}
+
+function isPublicFillerMainCandidate(candidate, meta = {}) {
+  const text = [
+    candidate.title,
+    candidate.evidence,
+    candidate.notes,
+    candidate.summary,
+    candidate.original_text,
+    meta.description,
+    meta.readme_summary
+  ].map((value) => String(value || "")).join(" ");
+  const hasFiller = /published this blog\/interview entry|latest report listed this entry|use it as a discovery lead|this is an intermediary\/self-media lead|source:\s*third-party report|这条动态主要围绕|来源\s*第三方报道|原文标题为|想象空间|赛道|序号\s*\d+/i.test(text);
+  if (!hasFiller) {
+    return false;
+  }
+  const detailText = [
+    candidate.evidence,
+    candidate.notes,
+    candidate.summary,
+    candidate.original_text,
+    meta.description,
+    meta.readme_summary
+  ].map((value) => String(value || "")).join(" ");
+  const cleaned = stripDraftPublicBodyNoise(detailText, candidate)
+    .replace(/\b(?:published this blog\/interview entry|latest report listed this entry|use it as a discovery lead)\b/gi, "")
+    .replace(/\bsource:\s*third-party report\b/gi, "")
+    .replace(/\bthis is an intermediary\/self-media lead\b/gi, "")
+    .replace(/\btrace it to a primary source before treating it as a reported fact\b/gi, "")
+    .replace(/\bintermediary_url=\S+/gi, "")
+    .replace(/\bsource_report_url=\S+/gi, "")
+    .replace(/\bprimary_url=\S+/gi, "")
+    .replace(/\bprimary_verification_required\s*=\s*true\b/gi, "")
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/[（(](?:中文|英文)[)）][。.]?/gu, "")
+    .replace(/这条动态主要围绕|来源\s*第三方报道|原文标题为|想象空间|赛道|序号\s*\d+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const title = String(candidate.title || "").replace(/\s+/g, " ").trim();
+  const source = String(candidate.source || "").replace(/\s+/g, " ").trim();
+  const cleanedWithoutTitle = [title, source]
+    .filter(Boolean)
+    .reduce((value, part) => value.replace(new RegExp(escapeRegex(part), "gi"), ""), cleaned)
+    .replace(/\s+/g, " ")
+    .trim();
+  if (cleanedWithoutTitle.length < 40) {
+    return true;
+  }
+  if (/published this blog\/interview entry|latest report listed this entry|use it as a discovery lead|primary_verification_required=true|intermediary_url=/i.test(detailText) && cleanedWithoutTitle.length < 80) {
+    return true;
+  }
+  if (cleanedWithoutTitle.length >= 80) {
+    return false;
+  }
+  const cleanedSignalText = `${candidate.title || ""} ${cleanedWithoutTitle}`;
+  return !(
+    AI_RELEVANCE_RE.test(cleanedSignalText) &&
+    (PRODUCT_PLATFORM_RE.test(cleanedSignalText) || PLAIN_READER_SIGNAL_RE.test(cleanedSignalText) || BUILDER_RELEVANCE_RE.test(cleanedSignalText))
+  );
+}
+
+function isGenericHotBlogAnnouncementCandidate(candidate) {
+  if (!candidate || candidate.category !== "hot_blog") {
+    return false;
+  }
+  return !hasConcreteHotBlogMaterial(candidate);
+}
+
+function isUnresolvedAggregatorMainCandidate(candidate) {
+  const sourceUrlText = [
+    candidate?.source,
+    candidate?.source_id,
+    candidate?.url,
+    candidate?.intermediary_url
+  ].filter(Boolean).join(" ");
+  if (!/(google news|news\.google\.com)/i.test(sourceUrlText)) {
+    return false;
+  }
+  if (candidate.verification_status && candidate.verification_status !== "intermediary_only") {
+    return false;
+  }
+  const verificationUrls = [
+    candidate.primary_url,
+    ...(Array.isArray(candidate.verification_sources) ? candidate.verification_sources : [])
+  ].filter(Boolean);
+  return !verificationUrls.some((value) => !/(google news|news\.google\.com)/i.test(String(value)));
+}
+
+function isPrimaryRequiredIntermediaryMainCandidate(candidate) {
+  const verificationStatus = String(candidate?.verification_status || "").toLowerCase();
+  if (verificationStatus && verificationStatus !== "intermediary_only") {
+    return false;
+  }
+  const text = [
+    candidate?.evidence,
+    candidate?.notes,
+    candidate?.verification_note,
+    candidate?.risk_note
+  ].filter(Boolean).join(" ");
+  if (!/primary_verification_required\s*=\s*true|trace it to a primary source|trace to a primary source|requires primary verification/i.test(text)) {
+    return false;
+  }
+  const primaryUrls = [
+    candidate?.primary_url,
+    ...(Array.isArray(candidate?.verification_sources) ? candidate.verification_sources : [])
+  ].filter(Boolean);
+  const intermediaryUrl = String(candidate?.intermediary_url || candidate?.url || "");
+  const hasNonIntermediaryPrimaryUrl = primaryUrls.some((value) => {
+    const url = String(value || "");
+    return url && normalizeUrlIdentity(url) !== normalizeUrlIdentity(intermediaryUrl);
+  });
+  return !hasNonIntermediaryPrimaryUrl;
+}
+
+function canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta = {}) {
+  if (!candidate || typeof candidate !== "object") {
+    return false;
+  }
+  if (isUnverifiedHighRiskMainCandidate(candidate)) {
+    return false;
+  }
+  if (isPublicFillerMainCandidate(candidate, meta) || isGenericHotBlogAnnouncementCandidate(candidate)) {
+    return false;
+  }
+  if (isLowValueMainCandidate(candidate) || isLowValueEventGuideCandidate(candidate) || isLowValueProfileCandidate(candidate)) {
+    return false;
+  }
+  if (candidate.category === "builder_observation" && isLowSignalBuilderMainCandidate(candidate)) {
+    return false;
+  }
+
+  const text = [
+    candidateText(candidate),
+    meta.description,
+    meta.readme_summary
+  ].map((value) => String(value || "")).join(" ");
+  const hasAiSurface = AI_RELEVANCE_RE.test(text) || PRODUCT_PLATFORM_RE.test(text) || BUILDER_RELEVANCE_RE.test(text);
+  if (!hasAiSurface) {
+    return false;
+  }
+  const hasConcreteLowRiskSurface = /\b(agent|agents|workflow|workflows|tool|tools|tooling|developer|developers|engineering|architecture|integration|sdk|api|mcp|hook|hooks|skill|skills|subagent|subagents|eval|evaluation|observability|trace|traces|rollback|release gate|release gates|terminal|guide|practice|practices|example|examples|productivity|deployment|docs?|tutorial)\b|智能体|工作流|工具|开发者|工程|架构|集成|评测|观测|链路|回滚|发布门禁|终端|指南|实践|示例|部署/u.test(text);
+  if (!hasConcreteLowRiskSurface) {
+    return false;
+  }
+  return true;
+}
+
+function isLowValueProductHuntMainCandidate(candidate) {
+  const sourceText = `${candidate?.source || ""} ${candidate?.source_id || ""} ${candidate?.url || ""} ${candidate?.notes || ""}`;
+  if (!/product\s*hunt|product-hunt/i.test(sourceText)) {
+    return false;
+  }
+  const text = candidateText(candidate);
+  if (isAigcCandidate(candidate) || AI_RELEVANCE_RE.test(text)) {
+    return false;
+  }
+  return true;
+}
+
+function isLowSignalBuilderMainCandidate(candidate) {
+  const text = candidateText(candidate);
+  if (!text || BUILDER_IRRELEVANT_RE.test(text)) return true;
+  if (BUILDER_LOW_SIGNAL_RE.test(text)) return true;
+  if (!candidate.url && !candidate.original_url) return true;
+  return !BUILDER_RELEVANCE_RE.test(text);
+}
+
+function isGenericGithubTrendingTextCandidate(candidate, meta = {}) {
+  const githubLike = /github/i.test(`${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`);
+  if (!githubLike) {
+    return false;
+  }
+  const candidateTextOnly = [
+    candidate.title,
+    candidate.evidence,
+    candidate.notes,
+    candidate.summary
+  ].map((value) => String(value || "")).join(" ");
+  const auditOnlyCandidateText =
+    /today entered github trending top 10|entered github trending top 10|appeared on github trending(?:\s+[a-z0-9+#.-]+)?\s+(?:daily|weekly).*?(?:stars?|this week|today)|github_trending_history=seen_|source:\s*third-party report|sequence\s+\d+|今天进入\s*GitHub Trending Top 10|近\s*7\s*天本地记录|需要复核它是否仍在\s*GitHub Trending|是否有\s*release\/commit\s*或\s*star velocity|来源\s*第三方报道|这条动态主要围绕|序号\s*\d+/i.test(candidateTextOnly);
+  if (auditOnlyCandidateText) {
+    return true;
+  }
+  const text = [
+    candidate.title,
+    candidate.evidence,
+    candidate.notes,
+    candidate.summary,
+    meta.description,
+    meta.readme_summary
+  ].map((value) => String(value || "")).join(" ");
+  const genericRankText = /today entered github trending top 10|entered github trending top 10|appeared on github trending(?:\s+[a-z0-9+#.-]+)?\s+(?:daily|weekly)|github trending top 10|github_trending_history=seen_|source:\s*third-party report|sequence\s+\d+|今天进入\s*GitHub Trending Top 10|近\s*7\s*天本地记录|需要复核它是否仍在\s*GitHub Trending|是否有\s*release\/commit\s*或\s*star velocity|来源\s*第三方报道|这条动态主要围绕|序号\s*\d+/i.test(text);
+  if (!genericRankText) {
+    return false;
+  }
+  const meaningfulText = `${candidate.evidence || ""} ${candidate.summary || ""} ${meta.description || ""} ${meta.readme_summary || ""}`;
+  return !/(readme|\bagent\b|\bmodel\b|\brag\b|\beval\b|\bworkflow\b|\btool\b|\bmcp\b|\binference\b|\bdeployment\b|\bexample\b|\bsdk\b|\bapi\b|\bframework\b|\bruntime\b|\bdataset\b|\bretrieval\b|\borchestration\b|\bobservability\b|\bbenchmark\b|\bvideo\b|\bimage\b|\baudio\b|\bgenerative\b|生成|模型|智能体|工作流|工具|评测|检索|部署)/i.test(meaningfulText);
+}
+
+function isThinMainStreamCandidate(candidate, meta = {}) {
+  const detail = [
+    candidate.evidence,
+    candidate.summary,
+    candidate.original_text,
+    meta.description,
+    meta.readme_summary
+  ].map((value) => String(value || "").trim()).filter(Boolean).join(" ");
+  if (detail.length >= 40) {
+    return false;
+  }
+  const text = `${candidate.title || ""} ${detail}`;
+  if (AI_RELEVANCE_RE.test(text) && (PRODUCT_PLATFORM_RE.test(text) || PLAIN_READER_SIGNAL_RE.test(text))) {
+    return false;
+  }
+  return true;
+}
+
+function isUnverifiedHighRiskMainCandidate(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const primaryVerified = PRIMARY_STATUSES.has(candidate.verification_status) && TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel);
+  if (primaryVerified) {
+    return false;
+  }
+  const text = candidateText(candidate);
+  return /\b(funding|raised|valuation|ipo|go public|acquisition|revenue|earnings|profit|pricing|price|benchmark|outperform|faster than|slower than|accuracy|leaderboard|safety|regulation|policy|lawsuit|ban|security|vulnerability|attack|government|minister|capability|capabilities|suspend(?:s|ed)? access|model access|access to new models|new model capabilities)\b|\b\d+(?:\.\d+)?x\s+faster\b|\$[\d,.]+\s*(?:m|b|million|billion)?|融资|估值|上市|收购|营收|财报|定价|价格|基准|跑分|安全|监管|政策|诉讼|禁令|漏洞|攻击|政府/u.test(text);
+}
+
+function canPromoteToMainStrict(candidate, reportDate = "") {
   if (candidate.category === "builder_observation") return false;
   if (candidate.category === "project") return false;
   if (isStatuspageCandidate(candidate)) return false;
@@ -2976,11 +3593,13 @@ function canPromoteToCommunityLead(candidate, reportDate = "") {
   if (!hasReaderVisibleTitle(candidate)) return false;
   if (isFutureDatedCandidate(candidate, reportDate)) return false;
   if (isSearchShadowCandidate(candidate)) return false;
+  if (isGoogleNewsAggregatorCandidate(candidate) && !hasResolvedNonGoogleNewsUrl(candidate)) return false;
   if (isResolvedStatusCandidate(candidate)) return false;
   if (isLowValueResearchLead(candidate, reportDate)) return false;
   if ((sourceLevel === "paper" || sourceLevel === "paper_api") && !hasPlainReaderSignal(candidate)) return false;
   if (isLowValueEventGuideCandidate(candidate)) return false;
   if (isLowValueProfileCandidate(candidate)) return false;
+  if (!hasCommunityLeadReaderMaterial(candidate)) return false;
   return true;
 }
 
@@ -3015,6 +3634,32 @@ function isLowValueProfileCandidate(candidate) {
     return true;
   }
   return /crunchbase news ai/.test(text) && /\belon musk\b/.test(text);
+}
+
+function isGoogleNewsAggregatorCandidate(candidate) {
+  return /(?:^|[\s-])general-news-google(?:[\s-]|$)|google news|news\.google\.com/i.test(
+    `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""}`
+  );
+}
+
+function hasResolvedNonGoogleNewsUrl(candidate) {
+  const urls = [
+    candidate.url,
+    candidate.original_url,
+    candidate.primary_url,
+    candidate.canonical_url,
+    ...(Array.isArray(candidate.verification_sources) ? candidate.verification_sources : [])
+  ];
+  return urls.some((url) => isHttpUrl(url) && !isGoogleNewsUrl(url));
+}
+
+function isGoogleNewsUrl(value) {
+  try {
+    const hostname = new URL(String(value || "")).hostname.toLowerCase();
+    return hostname === "news.google.com" || hostname.endsWith(".news.google.com");
+  } catch {
+    return false;
+  }
 }
 
 function isMinorConsumerAiFeatureCandidate(candidate) {
@@ -3175,6 +3820,15 @@ function isFutureDatedCandidate(candidate, reportDate = "", toleranceDays = 0) {
   return candidateDate > shiftDateOnly(baseline, toleranceDays);
 }
 
+function isOutsideMainWindowCandidate(candidate, reportDate = "", windowDays = MAIN_REFILL_WINDOW_DAYS) {
+  const candidateDate = dateOnly(candidate?.event_date);
+  const baseline = dateOnly(reportDate);
+  if (!candidateDate || !baseline) {
+    return false;
+  }
+  return candidateDate < shiftDateOnly(baseline, -windowDays);
+}
+
 function shiftDateOnly(value, offsetDays) {
   const date = new Date(`${value}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) {
@@ -3197,8 +3851,16 @@ function chineseSummary(candidate, category) {
   if (specific) {
     return specific;
   }
+  const evidenceSummary = mainItemEvidenceSummary(candidate);
+  if (evidenceSummary) {
+    return ensureChineseSentence(evidenceSummary);
+  }
   const lead = chineseLeadForCandidate(candidate);
-  const fact = stripDraftPublicBodyNoise(lead || genericChineseHeadline(candidate) || genericChineseFact(candidate, null), candidate);
+  const title = displayTitleForCandidate(candidate);
+  let fact = stripDraftPublicBodyNoise(lead || genericChineseHeadline(candidate) || genericChineseFact(candidate, null), candidate);
+  if (samePublicCopy(fact, title)) {
+    fact = mainItemEvidenceDetail(candidate) || mainItemDetail(candidate, category) || genericChineseFact(candidate, null);
+  }
   return ensureChineseSentence(fact);
 }
 
@@ -3211,6 +3873,143 @@ function mainItemSpecificSummary(candidate) {
     return "WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击，公开信息主要集中在攻击归因、拦截动作和受影响范围说明。";
   }
   return "";
+}
+
+function mainItemEvidenceSummary(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/security new features in may 2026|alibaba cloud security products targeting international markets/.test(text)) {
+    return "这篇阿里云博客按产品线汇总 2026 年 5 月安全产品更新，重点是面向国际市场的安全能力变化";
+  }
+  if (/automating daily outlook email summarization with hermesagent|outlook email.*hermesagent|hermesagent.*outlook email/.test(text)) {
+    return "文章演示在 Alibaba Cloud ECS 上用 HermesAgent 自动汇总 Outlook 邮件，把邮件处理接入云端 agent 工作流";
+  }
+  if (/cut checkpoint costs.*nvidia nvcomp|periodic checkpoints|model weights.*optimizer states.*gradients|optimizer states.*gradients/.test(text)) {
+    return "NVIDIA 文章把训练检查点成本压缩落到 nvCOMP 和约 30 行 Python 代码，关注权重、优化器状态和梯度快照的存储开销";
+  }
+  if (/claude code guide 2026|25 features.*examples.*demo|claude\.md|subagents|hooks.*mcp|mcp.*auto mode/.test(text)) {
+    return "这篇指南把 Claude Code 拆成 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能，并配示例和演示";
+  }
+  if (/agent evaluation practices|tool traces|replayable failures|release gates|human rollback|deployment checklists?/.test(text)) {
+    return "文章比较 agent 评测实践，把 tool traces、可复现失败、release gates、人工回滚和部署检查清单放在同一条上线流程里";
+  }
+  if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
+    return "这篇论文把科学发现定义为搜索空间本身的改变，讨论 AI scientist 如何在无人提示时识别这种转变";
+  }
+  if (/vla.*世界模型|世界模型.*vla|智源研究院院长王仲远|world model.*embodied|embodied.*world model/.test(text)) {
+    return "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力";
+  }
+  const chinese = firstReaderChineseEvidence(candidate);
+  if (chinese && !samePublicCopy(chinese, comparableTitleForCandidate(candidate))) {
+    return stripSentenceEnding(trimText(chinese, 160));
+  }
+  const english = firstReaderEnglishEvidence(candidate);
+  const englishSummary = englishEvidenceSummary(candidate, english);
+  if (englishSummary && !samePublicCopy(englishSummary, comparableTitleForCandidate(candidate))) {
+    return stripSentenceEnding(trimText(englishSummary, 160));
+  }
+  return "";
+}
+
+function mainItemEvidenceDetail(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/security new features in may 2026|alibaba cloud security products targeting international markets/.test(text)) {
+    return "原文按产品线列出 5 月功能变化，适合安全团队核对国际站控制台、检测和防护能力";
+  }
+  if (/automating daily outlook email summarization with hermesagent|outlook email.*hermesagent|hermesagent.*outlook email/.test(text)) {
+    return "流程把邮件读取、摘要和云端执行环境连起来，适合评估企业邮箱 agent 的权限和部署边界";
+  }
+  if (/cut checkpoint costs.*nvidia nvcomp|periodic checkpoints|model weights.*optimizer states.*gradients|optimizer states.*gradients/.test(text)) {
+    return "它把问题落到训练中断恢复需要保存的权重、优化器状态和梯度快照，关注存储成本而不是单纯压缩口号";
+  }
+  if (/claude code guide 2026|25 features.*examples.*demo|claude\.md|subagents|hooks.*mcp|mcp.*auto mode/.test(text)) {
+    return "内容覆盖项目记忆、技能、子代理、hooks、MCP 和自动模式，适合开发团队评估 Claude Code 的工程化配置面";
+  }
+  if (/agent evaluation practices|tool traces|replayable failures|release gates|human rollback|deployment checklists?/.test(text)) {
+    return "重点是把工具轨迹、可复现失败、发布门禁和人工回滚串起来，避免 agent 直接进入无人值守生产环境";
+  }
+  if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
+    return "原文把重点放在 AI scientist 能否察觉问题空间已经变化，并用 category-theoretic framework 描述自修正发现系统";
+  }
+  if (/vla.*世界模型|世界模型.*vla|智源研究院院长王仲远|world model.*embodied|embodied.*world model/.test(text)) {
+    return "文章把行业焦虑落到具身智能的物理世界理解能力，讨论世界模型是否能成为补足 VLA 路线短板的方向";
+  }
+  const chinese = firstReaderChineseEvidence(candidate);
+  if (chinese && !samePublicCopy(chinese, comparableTitleForCandidate(candidate))) {
+    return stripSentenceEnding(trimText(chinese, 180));
+  }
+  const english = firstReaderEnglishEvidence(candidate);
+  const englishDetail = englishEvidenceDetail(candidate, english);
+  if (englishDetail && !samePublicCopy(englishDetail, comparableTitleForCandidate(candidate))) {
+    return stripSentenceEnding(trimText(englishDetail, 180));
+  }
+  return "";
+}
+
+function firstReaderChineseEvidence(candidate) {
+  for (const field of [candidate.evidence, candidate.summary, candidate.content, candidate.original_text]) {
+    const clean = stripDraftPublicBodyNoise(field, candidate);
+    if (hasReaderChineseText(clean) && clean.length >= 18) {
+      return clean;
+    }
+  }
+  return "";
+}
+
+function firstReaderEnglishEvidence(candidate) {
+  for (const field of [candidate.evidence, candidate.summary, candidate.content, candidate.original_text]) {
+    const clean = stripDraftPublicBodyNoise(field, candidate);
+    if (hasReaderEnglishText(clean)) {
+      return clean;
+    }
+  }
+  return "";
+}
+
+function hasReaderEnglishText(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (text.length < 80 || hasReaderChineseText(text)) {
+    return false;
+  }
+  const words = text.match(/\b[A-Za-z][A-Za-z-]{2,}\b/g) || [];
+  if (words.length < 12) {
+    return false;
+  }
+  return !/^(?:intermediary_url|source_report_url|primary_verification_required|https?:\/\/)/i.test(text);
+}
+
+function englishEvidenceSummary(candidate, evidence) {
+  const text = `${candidateText(candidate)} ${evidence || ""}`.toLowerCase();
+  if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
+    return "这篇论文把科学发现定义为搜索空间本身的改变，讨论 AI scientist 如何在无人提示时识别这种转变";
+  }
+  return "";
+}
+
+function englishEvidenceDetail(candidate, evidence) {
+  const text = `${candidateText(candidate)} ${evidence || ""}`.toLowerCase();
+  if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
+    return "原文把重点放在 AI scientist 能否察觉问题空间已经变化，并用 category-theoretic framework 描述自修正发现系统";
+  }
+  return "";
+}
+
+function samePublicCopy(left, right) {
+  const normalize = (value) => String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/[：:，,。；;、｜|\s]+/g, "")
+    .trim()
+    .toLowerCase();
+  const a = normalize(left);
+  const b = normalize(right);
+  return Boolean(a && b && a === b);
+}
+
+function comparableTitleForCandidate(candidate) {
+  const rawTitle = stripDraftPublicBodyNoise(
+    decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(),
+    candidate
+  );
+  return chineseLeadForCandidate(candidate) || genericChineseHeadline(candidate) || rawTitle || candidate.title || "";
 }
 
 function chineseGithubDescription(description, repo) {
@@ -3462,7 +4261,18 @@ function chineseLeadForCandidate(candidate) {
 }
 
 function displayTitleForCandidate(candidate) {
-  return trimText(chineseLeadForCandidate(candidate) || genericChineseHeadline(candidate) || genericChineseFact(candidate, null) || candidate.title, 120);
+  const rawTitle = stripDraftPublicBodyNoise(
+    decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(),
+    candidate
+  );
+  const title = chineseLeadForCandidate(candidate) || genericChineseHeadline(candidate);
+  if (title) {
+    return trimText(title, 120);
+  }
+  if (hasChineseText(rawTitle) && rawTitle.length >= 10) {
+    return trimText(stripSentenceEnding(rawTitle), 120);
+  }
+  return trimText(rawTitle || genericChineseFact(candidate, null) || candidate.title, 120);
 }
 
 function candidateReaderDigest(candidate) {
@@ -3495,6 +4305,9 @@ function genericChineseHeadline(candidate) {
   const raw = decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim();
   const lower = raw.toLowerCase();
   if (!raw) return "";
+  if (/VLA不会死|世界模型是未来|智源研究院院长王仲远|世界模型.*具身智能/u.test(raw)) {
+    return "智源王仲远谈 VLA 与世界模型路线";
+  }
   const titleTranslation = englishTitleToChineseHeadline(raw, candidate);
   if (titleTranslation) return titleTranslation;
   if (/tested 19 llm api workloads|cut costs 79/.test(lower)) {
@@ -3521,6 +4334,9 @@ function genericChineseHeadline(candidate) {
   if (/runway updates ai video creation workflow for game worlds/.test(lower)) {
     return "Runway 更新 AI 视频创作工作流";
   }
+  if (/introducing the openai partner network/.test(lower)) {
+    return "OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口";
+  }
   const officialPlatformMatch = lower.match(/^official ai platform update\s+(\d+)$/);
   if (officialPlatformMatch) {
     return `官方 AI 平台更新 ${officialPlatformMatch[1]}`;
@@ -3533,17 +4349,22 @@ function genericChineseHeadline(candidate) {
 
 function genericChineseFact(candidate, original) {
   void original;
-  const entity = mainEntity(candidate) || candidate.source || "相关来源";
+  const evidenceSummary = mainItemEvidenceSummary(candidate);
+  if (evidenceSummary) {
+    return stripSentenceEnding(trimText(evidenceSummary, 140));
+  }
+  const evidenceDetail = mainItemEvidenceDetail(candidate);
+  if (evidenceDetail) {
+    return stripSentenceEnding(trimText(evidenceDetail, 140));
+  }
   const title = stripDraftPublicBodyNoise(decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(), candidate);
   if (hasChineseText(title) && title.length >= 10) {
     return stripSentenceEnding(trimText(title, 120));
   }
   if (title) {
-    const category = inferredEditorialCategory(candidate);
-    const theme = genericFactTheme({ category, sourceLevel: sourceLevelForCandidate(candidate), text: candidateText(candidate) });
-    return `${entity} 更新了${theme}相关内容`;
+    return stripSentenceEnding(trimText(genericChineseHeadline(candidate) || title, 120));
   }
-  return `${entity} 更新了 AI 产品、模型或平台相关内容`;
+  return "";
 }
 
 function englishTitleToChineseHeadline(rawTitle, candidate = {}) {
@@ -3556,6 +4377,15 @@ function englishTitleToChineseHeadline(rawTitle, candidate = {}) {
   }
   if (/cut checkpoint costs with about 30 lines of python and nvidia nvcomp/.test(lower)) {
     return "英伟达用压缩库和约 30 行代码降低训练检查点成本";
+  }
+  if (/claude code guide 2026|25 features.*examples.*demo/.test(lower)) {
+    return "Claude Code 2026 指南梳理 25 个功能点";
+  }
+  if (/agent evaluation practices|tool traces|release gates|human rollback|deployment checklists?/.test(lower)) {
+    return "Agent 生产评测、发布门禁和回滚清单被重新整理";
+  }
+  if (/self-revising discovery systems/.test(lower)) {
+    return "论文讨论自修正科学发现系统";
   }
   if (/most games secretly use ai in development|players unaware|industry transparency debate/.test(lower)) {
     return "游戏开发使用 AI 工具的透明度争议升温";
@@ -3676,27 +4506,27 @@ function genericFactScope({ category, text }) {
 function readerImpactForCandidate(candidate, category) {
   const text = candidateText(candidate);
   if (category === "company_business") {
-    return "它能帮助读者判断大厂的资源投入、组织重心和商业优先级是否正在改变";
+    return "信号集中在大厂资源投入、组织重心和商业优先级变化";
   }
   if (category === "product_radar") {
-    return "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估";
+    return "信号集中在产品入口、采购时机和路线图影响";
   }
   if (category === "open_source") {
-    return "它影响开发者和产品团队能否直接复用官方代码、模型权重、示例或社区生态";
+    return "工程价值集中在代码、权重、示例和生态复用条件";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "它可能改变内容生产、素材生成或创作者工具链的成本与交付方式";
+    return "内容侧价值集中在素材生成、创作者工具链成本和交付方式";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "它会影响 agent、开发工具或自动化工作流的选型和接入优先级";
+    return "工程侧价值集中在 agent、开发工具和自动化工作流接入";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "它提供了评测、研究或能力边界的新参照，适合更新内部判断标准";
+    return "研究价值集中在评测设置、能力边界和内部实验参照";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "它会影响合规、安全或平台治理口径，适合进入风险观察清单";
+    return "风险价值集中在合规、安全和平台治理口径变化";
   }
-  return "它反映了 AI 产品、模型或平台策略的实际变化，适合判断是否影响产品路线、架构选择或风险预案";
+  return "信号集中在 AI 产品、模型或平台策略的实际变化";
 }
 
 function readerWatchForCandidate(candidate, category) {
@@ -3833,27 +4663,27 @@ function ensureChineseSentence(value) {
 function audienceRelevanceForCandidate(candidate, category) {
   const text = candidateText(candidate);
   if (category === "company_business") {
-    return "不直接做 AI 的读者也可用它判断行业风向、就业与供应商策略、合作和采购风险";
+    return "适合业务、采购和组织管理团队复盘行业风向、供应商策略和合作风险";
   }
   if (category === "product_radar") {
-    return "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图";
+    return "适合产品、运营和业务团队安排试用、替换工具或路线图复盘";
   }
   if (category === "open_source") {
-    return "技术和产品团队可用它判断是否值得跟进仓库、模型权重或生态工具";
+    return "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "内容、设计和产品团队可用它判断生成式工具是否值得进入试用或采购清单";
+    return "适合内容、设计和产品团队评估生成式工具的试用或采购边界";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机";
+    return "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "算法、平台和评测团队可用它更新能力边界和内部实验设计";
+    return "适合算法、平台和评测团队更新能力边界和内部实验设计";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "安全、合规和平台团队可用它更新风险登记、上线检查和治理口径";
+    return "适合安全、合规和平台团队更新风险登记、上线检查和治理口径";
   }
-  return "产品和工程团队可用它判断是否需要调整选型、试点范围或内部风险提示";
+  return "适合产品和工程团队复盘选型、试点范围和内部风险提示";
 }
 
 function themeLabelForCandidate(candidate) {
@@ -4257,6 +5087,12 @@ function topicForCandidate(candidate) {
 }
 
 function mainEntity(candidate) {
+  if (isRepositoryLikeUrl(candidate?.url)) {
+    const repo = repoFromUrl(candidate.url);
+    if (repo) {
+      return repo;
+    }
+  }
   try {
     const host = new URL(candidate.url).hostname.replace(/^www\./, "");
     return candidate.source || host;

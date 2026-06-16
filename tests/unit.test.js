@@ -396,11 +396,13 @@ test("report:draft does not backfill must read highlights from GitHub ranking ce
     cacheEvidence: false
   });
 
-  assert.equal(drafted.report.main_items.length, 2);
+  assert(drafted.report.main_items.length >= 5);
+  assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 3);
   assert.equal(drafted.report.github_trending.length, 10);
   assert(!drafted.report.summary.includes("GitHub Trending"));
   assert(!drafted.report.summary.includes("Top 10"));
-  assert.equal(drafted.report.hero_highlights.length, 2);
+  assert(drafted.report.hero_highlights.length >= 2);
+  assert(drafted.report.hero_highlights.length <= 3);
   const mainRefs = new Set(drafted.report.main_items.map((item) => item.candidate_id || item.url));
   assert(drafted.report.hero_highlights.every((item) => mainRefs.has(item.source_item_ref)));
   assert(!JSON.stringify(drafted.report.hero_highlights).includes("GitHub Trending Top 10"));
@@ -412,20 +414,20 @@ test("report:draft does not backfill must read highlights from GitHub ranking ce
   ));
 });
 
-test("interaction input puts must read first and compact main list", async () => {
+test("interaction input renders compact main news stream without must-read section", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
   const input = reportToInteractionInput(report);
   const firstSection = input.sections[0];
   const mainContent = mainMarkdownContent(input);
 
-  assert.equal(input.hideNavigation, true);
-  assert.deepEqual(input.heroStats, []);
-  assert.deepEqual(input.heroLinks, []);
-  assert.equal(firstSection.richId, "today-must-read");
+  assert.equal(input.hideNavigation, false);
+  assert.notDeepEqual(input.heroStats, []);
+  assert(input.heroLinks.length >= 2);
+  assert.equal(input.sections.some((section) => section.richId === "today-must-read"), false);
+  assert.equal(firstSection.richId, "compact-main-list");
   assert.equal(firstSection.type, "filterable-cards");
   assert.equal(firstSection.items.length, 3);
-  assert(input.sections.findIndex((section) => section.richId === "daily-overview") > 0);
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
   const detailSection = input.sections.find((section) => section.richId === "main-item-details");
   assert.equal(compactList.type, "filterable-cards");
@@ -1184,7 +1186,13 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!input.sections.some((section) => section.title === "主体信息"));
   assert(!JSON.stringify(input.sections).includes("主体信息"));
   assert(JSON.stringify(input.sections).includes("主线条目："));
-  assert(input.sections.some((section) => section.title === "AI 行业动态"));
+  const compactMainList = input.sections.find((section) => section.richId === "compact-main-list");
+  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  assert.equal(compactMainList?.type, "filterable-cards");
+  assert.equal(compactMainList?.title, "完整列表");
+  assert.equal(compactMainList?.items.length, report.main_items.length);
+  assert.equal(detailSection?.collapsed, true);
+  assert(detailSection?.content.includes("### AI 行业动态"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
@@ -1247,7 +1255,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
   assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
-  assert(input.sections.some((section) => section.title === "AI 行业动态"));
+  assert(detailSection.content.includes("### AI 行业动态"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -4985,6 +4993,51 @@ test("feedback memory self-check ledger item is bound to harness validation", as
   assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
+test("ai daily requirements reconciliation maps user requirements to ledger tests and runtime evidence", async () => {
+  const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
+  const quickReference = await fs.readFile(path.join(rootDir, "docs", "feedback-buglist-quick-reference.md"), "utf8");
+  const reconciliation = await fs.readFile(path.join(rootDir, "docs", "ai-daily-requirements-reconciliation.md"), "utf8");
+  const item = ledger.items.find((entry) => entry.id === "feedback/p1-ai-daily-requirements-reconciliation");
+
+  assert(item, "feedback/p1-ai-daily-requirements-reconciliation must be recorded in the feedback ledger");
+  assert.equal(item.severity, "P1");
+  assert.equal(item.status, "implemented");
+  assert(item.scope.includes("docs/ai-daily-requirements-reconciliation.md"));
+  assert.equal(item.validation.command, "node --test tests/unit.test.js");
+  assert.equal(item.validation.test_name, "ai daily requirements reconciliation maps user requirements to ledger tests and runtime evidence");
+  assert(quickReference.includes("feedback/p1-ai-daily-requirements-reconciliation"));
+
+  const rows = reconciliation.split(/\r?\n/).filter((line) => /^\| REQ-\d{3} \|/.test(line));
+  assert.equal(rows.length, 12);
+  for (let index = 1; index <= 12; index += 1) {
+    const id = `REQ-${String(index).padStart(3, "0")}`;
+    const row = rows.find((line) => line.includes(`| ${id} |`));
+    assert(row, `${id} must be listed`);
+    assert.match(row, /feedback\/p1-/);
+    assert.match(row, /\| (implemented|partial|missing) \|$/);
+  }
+
+  for (const phrase of [
+    "5-30 item short news stream",
+    "public AI/tech importance",
+    "post-generation gates only catch regressions",
+    "OpenAI, Anthropic, Google/DeepMind, Meta, Microsoft, Hugging Face",
+    "GitHub Trending",
+    "README-level Chinese explanation",
+    "Builder/X observations",
+    "Hot blogs include Chinese and English sources",
+    "WeChat, Zhihu, and Reddit",
+    "OpenRouter and Artificial Analysis",
+    "semantic assets",
+    "Runtime Evidence Boundary"
+  ]) {
+    assert(reconciliation.includes(phrase), `reconciliation must include ${phrase}`);
+  }
+  assert(reconciliation.includes("| partial |"));
+  assert(reconciliation.includes("| missing |"));
+  assert(reconciliation.includes("Do not write \"fixed\", \"stable\", or \"implemented\""));
+});
+
 test("feedback memory self-check rejects quick reference missing ledger item", async () => {
   const tmp = await createHarnessFixture({
     feedbackLedger: {
@@ -5976,6 +6029,13 @@ test("quality review rejects templated impact and watch prose in public body", a
       "==留意==：看仓库活跃度、README、许可证、模型卡、下载限制和是否有真实案例。"
     ]
   };
+  report.community_leads = [
+    {
+      title: "Google News AI RSS",
+      url: "https://news.google.com/rss/articles/example",
+      content: "Google News AI RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。"
+    }
+  ];
 
   const review = reviewReportQuality(report);
   const issuePaths = review.issues.filter((issue) => issue.code === "public_template_body").map((issue) => issue.path);
@@ -5983,6 +6043,7 @@ test("quality review rejects templated impact and watch prose in public body", a
   assert.equal(review.ok, false);
   assert(issuePaths.includes("main_items[0].bullets[1]"));
   assert(issuePaths.includes("main_items[0].bullets[2]"));
+  assert(issuePaths.includes("community_leads[0].content"));
   assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
@@ -6772,7 +6833,8 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
   assert.match(html, /data-section-type="filterable-cards"/);
-  assert.match(html, /id="section-today-must-read"/);
+  assert.doesNotMatch(html, /id="section-today-must-read"/);
+  assert.match(html, /id="section-compact-main-list"/);
   assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "quality_status", "degraded_sections", "remediation"]) {
     assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
@@ -6881,6 +6943,11 @@ test("date index view model keeps chronological order and transparent signal str
   strongDegradedReport.self_check = {
     notes: "Internal self-check must not appear in the date index."
   };
+  strongDegradedReport.hero_highlights = [{
+    title: "Obsolete hero highlight",
+    url: "https://example.com/obsolete-hero",
+    reason: "Date index must prefer current main_items over optional hero compatibility data."
+  }];
   const feed = {
     schema_version: 1,
     site_title: "AI 日报",
@@ -6912,8 +6979,15 @@ test("date index view model keeps chronological order and transparent signal str
   assert.equal(dateIndex.totals.strong_days, 1);
   assert.equal(dateIndex.items[0].strength.level, "quiet");
   assert.equal(dateIndex.items[1].strength.level, "strong");
-  assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "main_items_high"));
+  assert.equal(dateIndex.items[0].main_stream.status, "sparse");
+  assert.equal(dateIndex.items[0].main_stream.count, 1);
+  assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
+  assert.equal(dateIndex.items[1].main_stream.status, "target");
+  assert.equal(dateIndex.items[1].main_stream.count, 10);
+  assert.equal(dateIndex.items[1].flags.main_stream_target_met, true);
+  assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "main_items_target"));
   assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "github_full"));
+  assert.equal(dateIndex.items[1].highlights[0].title, "Main signal 1");
   assert.equal(dateIndex.items[1].quality.status, "degraded");
   assert.deepEqual(dateIndex.items[1].quality.affected_sections, ["builder_observations", "source_coverage"]);
   assert.equal(dateIndex.items[1].flags.has_degraded, true);
@@ -6939,6 +7013,36 @@ test("date index view model keeps chronological order and transparent signal str
     section_coverage_count: 3,
     evidence_assets_count: 0
   }).level, "medium");
+});
+
+test("date index treats 21 to 30 main items as acceptable high-signal days", async () => {
+  const report = minimalDateIndexReport("2026-06-15", {
+    mainItems: 25,
+    majorItems: 5,
+    github: 10,
+    builder: 8,
+    hotBlogs: 4,
+    tracking: 1,
+    qualityStatus: { status: "ok" }
+  });
+  const feed = {
+    schema_version: 1,
+    site_title: "AI Daily",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(report)]
+  };
+
+  const dateIndex = buildDateIndex(feed, [report], null);
+  const html = renderIndexHtml(feed, null, dateIndex);
+
+  assert.equal(dateIndex.items[0].main_stream.status, "target");
+  assert.equal(dateIndex.items[0].main_stream.count, 25);
+  assert.equal(dateIndex.items[0].main_stream.target_min, 5);
+  assert.equal(dateIndex.items[0].main_stream.target_max, 30);
+  assert.equal(dateIndex.items[0].flags.main_stream_target_met, true);
+  assert(html.includes('data-main-stream-status="target"'));
+  assert(!html.includes('data-main-stream-status="oversized"'));
 });
 
 test("calendar index homepage renders controls and independent quality channel", async () => {
@@ -6982,6 +7086,10 @@ test("calendar index homepage renders controls and independent quality channel",
   assert(html.includes('data-strength-level="strong"'));
   assert(html.includes('data-quality-status="degraded"'));
   assert(html.includes('data-quality-channel="degraded"'));
+  assert(html.includes('data-main-stream-status="sparse"'));
+  assert(html.includes('data-main-stream-status="target"'));
+  assert(html.includes("主体偏少"));
+  assert(html.includes("主体达标"));
   assert(html.includes('id="date-filter-strength"'));
   assert(html.includes('id="date-filter-quality"'));
   assert(html.includes('id="date-filter-github"'));
@@ -7054,6 +7162,9 @@ test("index rewrite renders signal console from stored data", async () => {
   assert(html.includes('data-source-lane="builder_observations"'));
   assert(html.includes('data-topic-id="coding-agent"'));
   assert(html.includes('data-quality-channel="blocked"'));
+  assert(html.includes('<ul class="compact-list latest-highlights"'));
+  assert(!html.includes('<ol class="compact-list latest-highlights"'));
+  assert(!html.includes("<ol class=\"compact-list\">"));
   assert(!html.includes("GitHub Pages 静态归档"));
   assert(!html.includes('id="date-navigation"'));
   assert(!html.includes("<h2>历史日报</h2>"));
@@ -7917,8 +8028,12 @@ test("interaction input renders AI industry, content track, and selected blog se
 
   const input = reportToInteractionInput(report);
   const titles = input.sections.map((section) => section.title);
-  assert(titles.includes("AI 行业动态"));
-  assert(titles.includes("内容赛道动态"));
+  const compactList = input.sections.find((section) => section.richId === "compact-main-list");
+  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  assert.equal(compactList.type, "filterable-cards");
+  assert.deepEqual(compactList.items.map((item) => item.group), ["主线", "AIGC"]);
+  assert(detailSection.content.includes("### AI 行业动态"));
+  assert(detailSection.content.includes("### 内容赛道动态"));
   assert(titles.includes("精选博客更新"));
   assert(!titles.includes("AI 资讯"));
   assert(!titles.includes("热门博客"));
@@ -8166,6 +8281,34 @@ test("report:draft rewrites public autodraft text instead of shipping templates"
         evidence: "这也是国内首个落地\"AI问答+医生把关\"协作模式的AI应用，为AI与医生的合作提供了可行路径，打开了“AI+医生”赛道的想象空间。",
         verification_status: "intermediary_only",
         source_level: "intermediary"
+      },
+      {
+        id: "google-news-low-info-community",
+        source_id: "general-news-google-ai-rss",
+        category: "community_lead",
+        title: "Startup says its AI workflow is changing customer support - Example Daily",
+        url: "https://news.google.com/rss/articles/example-low-info?oc=5",
+        source: "Google News AI RSS",
+        event_date: reportDate,
+        status: "excluded",
+        evidence: "Google News AI RSS records a public item. Details must be checked through the original article.",
+        verification_status: "intermediary_only",
+        source_level: "intermediary",
+        editorial_category: "product_radar"
+      },
+      {
+        id: "google-news-translated-community",
+        source_id: "general-news-google-aigc-video-image-game",
+        category: "community_lead",
+        title: "游戏开发使用 AI 工具的透明度争议升温",
+        url: "https://news.google.com/rss/articles/example-translated?oc=5",
+        source: "Google News AIGC Video Image Game RSS",
+        event_date: reportDate,
+        status: "excluded",
+        evidence: "这条 Google News 聚合器线索已有中文标题，但仍未解析到原始媒体 URL。",
+        verification_status: "intermediary_only",
+        source_level: "intermediary",
+        editorial_category: "content_aigc"
       }
     ]
   });
@@ -8189,9 +8332,14 @@ test("report:draft rewrites public autodraft text instead of shipping templates"
   assert(!publicText.includes("原文标题为"));
   assert(!publicText.includes("这条帖子在谈"));
   assert(!publicText.includes("如果要继续跟进"));
+  assert(!publicText.includes("Google News"));
+  assert(!publicText.includes("记录了一条"));
+  assert(!publicText.includes("详情需回到原文链接核对"));
   assert(!publicText.includes("想象空间"));
   assert(!publicText.includes("赛道"));
   assert(!drafted.report.builder_observations.some((item) => item.candidate_id === "builder-low-signal-survey"));
+  assert(!drafted.report.community_leads.some((item) => item.candidate_id === "google-news-low-info-community"));
+  assert(!drafted.report.community_leads.some((item) => item.candidate_id === "google-news-translated-community"));
   assert(!drafted.report.official_org_updates.some((item) => item.candidate_id === "search-openalex-microsoft-sovereignty"));
   assert(!drafted.report.hero_highlights.some((item) => item.source_item_ref === "search-openalex-microsoft-sovereignty"));
   const routing = drafted.report.builder_observations.find((item) => item.candidate_id === "builder-model-routing");
@@ -8634,12 +8782,12 @@ test("report:draft expands public signal coverage beyond strict factual sections
     id: `community-expanded-${index + 1}`,
     source_id: `content-techcrunch-ai-expanded-${index + 1}`,
     category: "community_lead",
-    title: `AI agent market signal ${index + 1}`,
+    title: `AI agent 市场信号 ${index + 1}：企业工作流进入产品化阶段`,
     url: `https://techcrunch.com/2026/06/08/ai-agent-market-signal-${index + 1}/`,
     source: "TechCrunch AI",
     event_date: reportDate,
     status: "excluded",
-    evidence: `Third-party reporting describes AI agent market signal ${index + 1}, including product rollout, enterprise workflow adoption, pricing implications, and developer platform context.`,
+    evidence: `第三方报道描述 AI agent 市场信号 ${index + 1}，重点包括产品发布、企业工作流采用、定价影响和开发者平台上下文。`,
     verification_status: "intermediary_only",
     source_level: "intermediary"
   }));
@@ -9007,6 +9155,1227 @@ test("report:draft favors plain-reader utility over hardcore research details", 
     assert.doesNotMatch(item.description, /(?:进入|进了) GitHub Trending Top 10/);
     assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
   }
+});
+
+test("report:draft admits main stream candidates by blacklist instead of primary-only whitelist", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-blacklist-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const lowRiskCandidates = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "tc-openai-workspace-admin",
+      source: "TechCrunch AI",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "TechCrunch tracks OpenAI workspace admin workflow rollout",
+      url: "https://techcrunch.com/example/openai-workspace-admin-rollout",
+      evidence: "The report summarizes an AI product workflow rollout for ChatGPT workspace admins and stays at visible interface and adoption impact."
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "verge-google-ai-search-ui",
+      source: "The Verge AI",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "The Verge tracks Google AI search interface changes",
+      url: "https://www.theverge.com/example/google-ai-search-interface",
+      evidence: "The report describes a visible AI search interface change and reader workflow impact for everyday product usage."
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "venturebeat-agentops-platform",
+      source: "VentureBeat AI",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "VentureBeat covers an agent observability platform update",
+      url: "https://venturebeat.com/example/agent-observability-platform",
+      evidence: "The report describes an AI agent observability workflow update for enterprise developers and adoption planning."
+    })
+  ];
+  const highRiskCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "tc-anthropic-unverified-valuation",
+    source: "TechCrunch AI",
+    sourceLevel: "intermediary",
+    verificationStatus: "intermediary_only",
+    title: "TechCrunch says Anthropic raises funding at a new valuation",
+    url: "https://techcrunch.com/example/anthropic-unverified-valuation",
+    evidence: "A third-party report claims Anthropic raised funding at a $50B valuation without a primary filing or company confirmation.",
+    editorialCategory: "funding"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-api-workflow",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-api-workflow",
+        title: "OpenAI ships an API workflow update for enterprise developers",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, developer migration guidance, and availability details."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-console",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-admin-console",
+        title: "Anthropic updates Claude admin console for enterprise teams",
+        evidence: "Anthropic describes a Claude admin console update, enterprise controls, team rollout, and developer workflow impact."
+      }),
+      ...lowRiskCandidates,
+      highRiskCandidate
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "TechCrunch AI", "The Verge AI", "VentureBeat AI"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert(drafted.report.main_items.length >= 5);
+  for (const candidate of lowRiskCandidates) {
+    assert(mainUrls.has(candidate.url), `low-risk third-party candidate should refill main_items: ${candidate.id}`);
+  }
+  assert.equal(mainUrls.has(highRiskCandidate.url), false);
+});
+
+test("report:draft fills sparse main stream from unified candidate roles", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-unified-refill-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const projectCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "github-agent-runtime",
+    category: "project",
+    source: "GitHub",
+    sourceId: "content-github-agent-runtime",
+    sourceLevel: "github",
+    verificationStatus: "primary_confirmed",
+    title: "example/agent-runtime adds persistent AI task orchestration",
+    url: "https://github.com/example/agent-runtime",
+    evidence: "README explains persistent AI task orchestration, tool permissions, deployment mode, and examples for coding agents."
+  });
+  const builderCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "builder-agent-eval-loop",
+    category: "builder_observation",
+    source: "follow-builders X feed",
+    sourceId: "builder-follow-builders-x-feed",
+    sourceLevel: "original_social",
+    verificationStatus: "original_social_only",
+    title: "@builder: AI agents need production eval loops",
+    url: "https://x.com/builder/status/1811111111111111111",
+    evidence: "Original X status says AI agents need production eval loops, tool traces, rollback plans, and release gates.",
+    originalText: "AI agents need production eval loops, tool traces, rollback plans, and release gates before unattended production use."
+  });
+  const hotBlogCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "latent-space-agent-memory",
+    category: "hot_blog",
+    source: "Latent.Space",
+    sourceId: "content-latent-space",
+    sourceLevel: "primary",
+    verificationStatus: "primary_confirmed",
+    title: "Latent.Space explains memory architecture for AI agents",
+    url: "https://www.latent.space/p/example-agent-memory",
+    evidence: "The post explains memory architecture, retrieval boundaries, session persistence, and deployment tradeoffs for AI agents."
+  });
+  const communityCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "reddit-agent-tooling-discussion",
+    category: "community_lead",
+    source: "Reddit r/MachineLearning",
+    sourceId: "content-reddit-machinelearning",
+    sourceLevel: "community",
+    verificationStatus: "intermediary_only",
+    title: "Developers discuss an AI agent tooling pattern for local evaluation",
+    url: "https://www.reddit.com/r/MachineLearning/comments/example_agent_tooling/",
+    evidence: "Community discussion compares AI agent local evaluation workflows, tool-call logging, and failure reproduction practices."
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-shortlist",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-shortlist",
+        title: "OpenAI ships a developer platform workflow update",
+        evidence: "OpenAI describes a developer platform workflow update with API availability and enterprise controls."
+      }),
+      projectCandidate,
+      builderCandidate,
+      hotBlogCandidate,
+      communityCandidate
+    ],
+    sourceNames: ["OpenAI News RSS", "GitHub", "follow-builders X feed", "Latent.Space", "Reddit r/MachineLearning"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert(drafted.report.main_items.length >= 5);
+  for (const candidate of [projectCandidate, builderCandidate, hotBlogCandidate, communityCandidate]) {
+    assert(mainUrls.has(candidate.url), `candidate role should be eligible for sparse main stream refill: ${candidate.id}`);
+  }
+  const lowerPriorityUrls = new Set([
+    ...drafted.report.hot_blogs,
+    ...drafted.report.projects,
+    ...drafted.report.builder_observations,
+    ...drafted.report.community_leads
+  ].map((item) => item.url).filter(Boolean));
+  for (const item of drafted.report.main_items) {
+    assert.equal(
+      lowerPriorityUrls.has(item.url),
+      false,
+      `main stream item must not repeat in lower-priority sections: ${item.url}`
+    );
+  }
+  assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 4);
+});
+
+test("report:draft does not fill main stream with generic GitHub trending text", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-generic-github-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const genericGithubCandidates = Array.from({ length: 6 }, (_unused, index) => mainStreamRepairCandidate(reportDate, {
+    id: `generic-github-trending-${index + 1}`,
+    category: "project",
+    source: "GitHub Trending daily",
+    sourceId: "github-github-trending-daily",
+    sourceLevel: "github",
+    verificationStatus: "primary_confirmed",
+    title: `example/generic-project-${index + 1}`,
+    url: `https://github.com/example/generic-project-${index + 1}`,
+    evidence: `Today entered GitHub Trending Top 10. Source: third-party report. Sequence ${index + 1}.`,
+    rank: index + 1
+  }));
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-generic-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-generic-control",
+        title: "OpenAI ships a concrete API workflow update",
+        evidence: "OpenAI describes a concrete API workflow update with enterprise controls and developer migration details."
+      }),
+      ...genericGithubCandidates
+    ],
+    sourceNames: ["OpenAI News RSS", "GitHub Trending daily"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of genericGithubCandidates) {
+    assert.equal(mainUrls.has(candidate.url), false, `generic GitHub rank text must not enter main_items: ${candidate.id}`);
+  }
+  assert(drafted.report.self_check.selection_snapshot.main_items.rejection_counts.generic_github_trending_text >= 6);
+});
+
+test("report:draft rejects repeated GitHub trending candidates that only ask for verification", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-github-repeat-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const repeatedGithubCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "project-microsoft-markitdown-repeat",
+    category: "project",
+    source: "GitHub Trending weekly",
+    sourceId: "github-github-trending-weekly",
+    sourceLevel: "github",
+    verificationStatus: "primary_confirmed",
+    title: "microsoft/markitdown",
+    url: "https://github.com/microsoft/markitdown",
+    evidence: "microsoft/markitdown appeared on GitHub Trending weekly with 6,280 stars this week. 近 7 天本地记录曾在 2026-06-08、2026-06-09、2026-06-10、2026-06-11、2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+    notes: "github_trending_history=seen_6_days_in_7d; trend=same; dates=2026-06-08,2026-06-09,2026-06-10,2026-06-11,2026-06-12,2026-06-14"
+  });
+  const goodProjectCandidate = mainStreamRepairCandidate(reportDate, {
+    id: "project-agent-runtime-readme",
+    category: "project",
+    source: "GitHub Trending daily",
+    sourceId: "github-github-trending-daily",
+    sourceLevel: "github",
+    verificationStatus: "primary_confirmed",
+    title: "example/agent-runtime",
+    url: "https://github.com/example/agent-runtime",
+    evidence: "README explains an AI agent runtime with task orchestration, tool permissions, deployment modes, and examples for coding agents.",
+    notes: "trend=new; readme_summary=agent runtime for coding agent orchestration"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-github-repeat-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-github-repeat-control",
+        title: "OpenAI ships an API workflow update for repeat control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      repeatedGithubCandidate,
+      goodProjectCandidate
+    ],
+    sourceNames: ["OpenAI News RSS", "GitHub Trending weekly", "GitHub Trending daily"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert.equal(mainUrls.has(repeatedGithubCandidate.url), false);
+  assert(mainUrls.has(goodProjectCandidate.url));
+  assert(drafted.report.self_check.selection_snapshot.main_items.rejection_counts.generic_github_trending_text >= 1);
+});
+
+test("report:draft rejects GitHub audit-only refill even when metadata contains AI keywords", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-github-audit-only-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const auditOnlyGithubCandidates = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "project-microsoft-markitdown-audit-only",
+      category: "project",
+      source: "GitHub Trending weekly",
+      sourceId: "github-github-trending-weekly",
+      sourceLevel: "github",
+      verificationStatus: "primary_confirmed",
+      title: "microsoft/markitdown",
+      url: "https://github.com/microsoft/markitdown",
+      evidence: "microsoft/markitdown appeared on GitHub Trending weekly with 6,280 stars this week. 近 7 天本地记录曾在 2026-06-08、2026-06-09、2026-06-10、2026-06-11、2026-06-12、2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      notes: "github_trending_history=seen_6_days_in_7d; trend=same; dates=2026-06-08,2026-06-09,2026-06-10,2026-06-11,2026-06-12,2026-06-14",
+      description: "Python tool that converts files for LLM and agent workflows.",
+      readmeSummary: "README mentions AI model, SDK, tool, API, and workflow use cases."
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "project-andrewyng-aisuite-audit-only",
+      category: "project",
+      source: "GitHub Trending daily",
+      sourceId: "github-github-trending-daily",
+      sourceLevel: "github",
+      verificationStatus: "primary_confirmed",
+      title: "andrewyng/aisuite",
+      url: "https://github.com/andrewyng/aisuite",
+      evidence: "andrewyng/aisuite appeared on GitHub Trending daily with 291 stars today. 近 7 天本地记录曾在 2026-06-14 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      notes: "github_trending_history=seen_1_days_in_7d; trend=same; dates=2026-06-14",
+      description: "AI model provider router with SDK examples.",
+      readmeSummary: "README mentions model routing, API, framework, and inference workflows."
+    })
+  ];
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-audit-only-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-audit-only-control",
+        title: "OpenAI ships an API workflow update for audit-only control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-audit-only-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-audit-only-control",
+        title: "Anthropic updates Claude workflow controls",
+        evidence: "Anthropic describes Claude workflow controls, deployment guidance, and enterprise availability."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-audit-only-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-audit-only-control/",
+        title: "Google updates an AI developer workflow",
+        evidence: "Google describes an AI developer workflow update, availability details, and product behavior."
+      }),
+      ...auditOnlyGithubCandidates
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "GitHub Trending weekly", "GitHub Trending daily"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of auditOnlyGithubCandidates) {
+    assert.equal(mainUrls.has(candidate.url), false, `audit-only GitHub candidate must not refill main_items: ${candidate.id}`);
+  }
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.generic_github_trending_text >= 2);
+});
+
+test("report:draft rejects unresolved Google News aggregator leads from main_items", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-google-news-aggregator-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const aggregatorLeads = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "general-news-google-ai-minor",
+      category: "community_lead",
+      source: "Google News AI RSS",
+      sourceId: "general-news-google-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "New artificial intelligence minor launches this fall - Virginia Tech News",
+      url: "https://news.google.com/rss/articles/example-ai-minor?oc=5",
+      evidence: "New artificial intelligence minor launches this fall Virginia Tech News. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      verificationNote: "intermediary_url=https://news.google.com/rss/articles/example-ai-minor?oc=5; primary_verification_required=true"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "general-news-google-open-source-speed",
+      category: "community_lead",
+      source: "Google News Official Open Source Watch RSS",
+      sourceId: "general-news-google-official-open-source-watch",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Xiaomi MiMo Is Now 15x Faster Than ChatGPT - Memeburn",
+      url: "https://news.google.com/rss/articles/example-mimo?oc=5",
+      evidence: "Xiaomi MiMo Is Now 15x Faster Than ChatGPT Memeburn. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      verificationNote: "intermediary_url=https://news.google.com/rss/articles/example-mimo?oc=5; primary_verification_required=true"
+    })
+  ].map((candidate) => ({
+    ...candidate,
+    verification_sources: [],
+    primary_url: "",
+    intermediary_url: candidate.url,
+    notes: "intermediary_url=https://news.google.com/rss/articles/example?oc=5; primary_verification_required=true"
+  }));
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-google-news-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-google-news-control",
+        title: "OpenAI ships an API workflow update for aggregator control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      ...aggregatorLeads
+    ],
+    sourceNames: ["OpenAI News RSS", "Google News AI RSS", "Google News Official Open Source Watch RSS"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of aggregatorLeads) {
+    assert.equal(mainUrls.has(candidate.url), false, `unresolved Google News aggregator lead must not enter main_items: ${candidate.id}`);
+  }
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.unverified_aggregator_lead >= 2);
+});
+
+test("report:draft refills sparse main stream with low-risk primary-required intermediary leads", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-low-risk-primary-required-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const lowRiskLeads = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "planet-ai-agent-tooling-guide-low-risk",
+      category: "community_lead",
+      source: "Planet AI",
+      sourceId: "content-planet-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Planet AI explains a Claude Code agent tooling workflow",
+      url: "https://www.marktechpost.com/example/claude-code-agent-tooling-guide",
+      evidence: "The guide explains low-risk AI agent workflow practices: skills, subagents, hooks, MCP examples, terminal usage, and developer productivity tradeoffs.",
+      editorialCategory: "engineering_toolchain"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "tech-blog-agent-eval-practices-low-risk",
+      category: "hot_blog",
+      source: "Engineering Blog Watch",
+      sourceId: "content-engineering-blog-watch",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Engineering blog summarizes AI agent evaluation practices",
+      url: "https://example.com/blog/agent-evaluation-practices",
+      evidence: "The article compares low-risk AI agent evaluation practices: tool traces, replayable failures, release gates, and human rollback workflows.",
+      editorialCategory: "engineering_toolchain"
+    })
+  ].map((candidate) => ({
+    ...candidate,
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: candidate.url,
+    notes: `intermediary_url=${candidate.url}; primary_verification_required=true`,
+    verification_note: `intermediary_url=${candidate.url}; primary_verification_required=true`
+  }));
+  const highRiskLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "techcrunch-unverified-ai-valuation-primary-required",
+      category: "community_lead",
+      source: "TechCrunch AI",
+      sourceId: "content-techcrunch-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "TechCrunch reports an AI lab funding round at a new valuation",
+      url: "https://techcrunch.com/example/unverified-ai-valuation",
+      evidence: "A third-party report claims an AI lab raised funding at a $50B valuation without a company announcement, filing, or primary confirmation.",
+      editorialCategory: "funding"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://techcrunch.com/example/unverified-ai-valuation",
+    notes: "intermediary_url=https://techcrunch.com/example/unverified-ai-valuation; primary_verification_required=true",
+    verification_note: "intermediary_url=https://techcrunch.com/example/unverified-ai-valuation; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-low-risk-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-low-risk-control",
+        title: "OpenAI ships an API workflow update for low-risk refill control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-low-risk-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-low-risk-control",
+        title: "Anthropic updates Claude deployment controls",
+        evidence: "Anthropic describes Claude deployment controls, enterprise availability, admin settings, and developer workflow impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-low-risk-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-low-risk-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      }),
+      ...lowRiskLeads,
+      highRiskLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Planet AI", "Engineering Blog Watch", "TechCrunch AI"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert(drafted.report.main_items.length >= 5);
+  for (const candidate of lowRiskLeads) {
+    assert(mainUrls.has(candidate.url), `low-risk primary-required lead should refill sparse main_items: ${candidate.id}`);
+  }
+  assert.equal(mainUrls.has(highRiskLead.url), false, "unverified high-risk valuation lead must stay out of main_items");
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert(snapshot.refill_selected >= 2);
+  assert.equal(snapshot.shortfall, false);
+});
+
+test("report:draft rewrites main item titles summaries and bullets without generic template filler", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-public-copy-quality-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const lowRiskClaudeGuide = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "planet-ai-claude-code-guide-copy-quality",
+      category: "community_lead",
+      source: "Planet AI",
+      sourceId: "content-planet-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Claude Code Guide 2026: 25 Features with Examples + Demo",
+      url: "https://www.marktechpost.com/example/claude-code-guide-2026-25-features-with-examples-demo/",
+      evidence: "Claude Code is a layered agentic coding tool, not a single chat prompt. This guide breaks down 25 features, from CLAUDE.md, skills, subagents, and hooks to MCP and Auto Mode. It includes a comparison table, working code examples, and real use cases.",
+      editorialCategory: "engineering_toolchain"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://www.marktechpost.com/example/claude-code-guide-2026-25-features-with-examples-demo/",
+    notes: "intermediary_url=https://www.marktechpost.com/example/claude-code-guide-2026-25-features-with-examples-demo/; primary_verification_required=true",
+    verification_note: "intermediary_url=https://www.marktechpost.com/example/claude-code-guide-2026-25-features-with-examples-demo/; primary_verification_required=true"
+  };
+  const lowRiskAgentEval = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "engineering-blog-agent-eval-copy-quality",
+      category: "hot_blog",
+      source: "Engineering Blog Watch",
+      sourceId: "content-engineering-blog-watch",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Engineering blog summarizes AI agent evaluation practices",
+      url: "https://example.com/blog/agent-evaluation-practices-copy-quality",
+      evidence: "The article compares low-risk AI agent evaluation practices: tool traces, replayable failures, release gates, human rollback workflows, and deployment checklists.",
+      editorialCategory: "engineering_toolchain"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://example.com/blog/agent-evaluation-practices-copy-quality",
+    notes: "intermediary_url=https://example.com/blog/agent-evaluation-practices-copy-quality; primary_verification_required=true",
+    verification_note: "intermediary_url=https://example.com/blog/agent-evaluation-practices-copy-quality; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "alibaba-security-copy-quality",
+        source: "Alibaba Cloud Blog",
+        url: "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+        title: "Security New Features in May 2026",
+        evidence: "This blog post summarizes the feature updates for Alibaba Cloud Security Products targeting international markets in May 2026."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "alibaba-hermes-copy-quality",
+        source: "Alibaba Cloud Blog",
+        url: "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
+        title: "Automating Daily Outlook Email Summarization with HermesAgent on Alibaba Cloud ECS",
+        evidence: "This article explains how to automate summarization of daily outlook email by HermesAgent which build on top of Alibaba Cloud ECS."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "nvidia-checkpoint-copy-quality",
+        source: "NVIDIA Developer Blog",
+        url: "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
+        title: "Cut Checkpoint Costs with About 30 Lines of Python and NVIDIA nvCOMP",
+        evidence: "Training LLMs requires periodic checkpoints. These full snapshots of model weights, optimizer states, and gradients are saved to storage so training can resume."
+      }),
+      lowRiskClaudeGuide,
+      lowRiskAgentEval
+    ],
+    sourceNames: ["Alibaba Cloud Blog", "NVIDIA Developer Blog", "Planet AI", "Engineering Blog Watch"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.main_items.length, 5);
+  for (const item of drafted.report.main_items) {
+    const publicText = [item.title, item.summary, ...(item.bullets || [])].join("\n");
+    assert(!/更新了.*相关内容/.test(publicText), `main item copy must not use generic update filler: ${item.title}`);
+    assert(!/这条动态主要围绕|来源\s*第三方报道|序号\s*\d+|后续继续跟进|读者应重点核对/.test(publicText));
+    assert.notEqual(normalizePublicCopyForComparison(item.summary), normalizePublicCopyForComparison(item.title), `summary must add detail beyond title: ${item.title}`);
+    assert((item.bullets || []).some((bullet) =>
+      normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.title) &&
+      normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.summary)
+    ), `at least one bullet must add detail beyond title/summary: ${item.title}`);
+  }
+});
+
+test("report:draft rejects title-only self-media discovery leads from main stream refill", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-title-only-self-media-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const titleOnlyLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "ruanyf-title-only-main-refill",
+      category: "community_lead",
+      source: "RuanYF Weekly",
+      sourceId: "content-ruanyf-weekly",
+      sourceLevel: "primary",
+      verificationStatus: "intermediary_only",
+      title: "大模型权重是什么",
+      url: "https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md",
+      evidence: "（中文）。RuanYF Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      editorialCategory: "model_infrastructure"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md",
+    notes: "intermediary_url=https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md; primary_verification_required=true",
+    verification_note: "intermediary_url=https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-title-only-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-title-only-control",
+        title: "OpenAI updates an API workflow control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-title-only-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-title-only-control",
+        title: "Anthropic updates Claude deployment controls",
+        evidence: "Anthropic describes Claude deployment controls, enterprise availability, admin settings, and developer workflow impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-title-only-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-title-only-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-official-title-only-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-title-only-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      }),
+      titleOnlyLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "RuanYF Weekly"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert.equal(mainUrls.has(titleOnlyLead.url), false, "title-only discovery lead must not refill main_items");
+  assert.equal(drafted.report.main_items.length, 4);
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(
+    (snapshot.rejection_counts.primary_required_intermediary_lead || 0) +
+    (snapshot.rejection_counts.public_filler_text || 0) >= 1
+  );
+});
+
+test("report:draft rewrites evidence-backed paper refill instead of repeating English title", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-paper-evidence-copy-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const paperLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "self-revising-discovery-systems-paper-refill",
+      category: "community_lead",
+      source: "ML Papers of the Week",
+      sourceId: "content-ml-papers-week",
+      sourceLevel: "paper",
+      verificationStatus: "intermediary_only",
+      title: "Self-Revising Discovery Systems",
+      url: "https://arxiv.org/abs/2606.01444",
+      evidence: "From MIT, this paper argues that genuine scientific discovery is not answer generation but a change in the search space itself, and that an AI scientist must perceive that shift without being told. It develops a category-theoretic framework for self-revising discovery systems and affects AI scientist workflow design. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      editorialCategory: "research"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://arxiv.org/abs/2606.01444",
+    notes: "intermediary_url=https://arxiv.org/abs/2606.01444; primary_verification_required=true",
+    verification_note: "intermediary_url=https://arxiv.org/abs/2606.01444; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-paper-copy-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-paper-copy-control",
+        title: "OpenAI updates an API workflow control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-paper-copy-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-paper-copy-control",
+        title: "Anthropic updates Claude deployment controls",
+        evidence: "Anthropic describes Claude deployment controls, enterprise availability, admin settings, and developer workflow impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-paper-copy-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-paper-copy-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-official-paper-copy-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-paper-copy-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      }),
+      paperLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "ML Papers of the Week"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const item = drafted.report.main_items.find((entry) => entry.url === paperLead.url);
+  assert(item, "evidence-backed paper lead should be eligible as sparse main stream refill");
+  assert.notEqual(normalizePublicCopyForComparison(item.summary), normalizePublicCopyForComparison(item.title));
+  assert((item.bullets || []).some((bullet) =>
+    normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.title) &&
+    normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.summary)
+  ), "paper refill bullet must add detail beyond title/summary");
+  assert(!/This is an intermediary|trace it to a primary source|primary_verification_required/i.test([item.summary, ...(item.bullets || [])].join("\n")));
+});
+
+test("report:draft rejects refill candidates outside the 72 hour main stream window", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-refill-window-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const oldLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "old-agent-workflow-refill",
+      category: "community_lead",
+      source: "Engineering Blog Watch",
+      sourceId: "content-engineering-blog-watch",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Engineering blog summarizes AI agent workflow reliability practices",
+      url: "https://example.com/blog/old-agent-workflow-reliability",
+      evidence: "The article compares low-risk AI agent workflow reliability practices: tool traces, replayable failures, release gates, human rollback workflows, and deployment checklists.",
+      editorialCategory: "engineering_toolchain"
+    }),
+    event_date: "2026-06-11",
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://example.com/blog/old-agent-workflow-reliability",
+    notes: "intermediary_url=https://example.com/blog/old-agent-workflow-reliability; primary_verification_required=true",
+    verification_note: "intermediary_url=https://example.com/blog/old-agent-workflow-reliability; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-window-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-window-control",
+        title: "OpenAI updates an API workflow control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-window-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-window-control",
+        title: "Anthropic updates Claude deployment controls",
+        evidence: "Anthropic describes Claude deployment controls, enterprise availability, admin settings, and developer workflow impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-window-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-window-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-official-window-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-window-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      }),
+      oldLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "Engineering Blog Watch"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert.equal(mainUrls.has(oldLead.url), false, "72h outside refill lead must not enter main_items");
+  assert.equal(drafted.report.main_items.length, 4);
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.outside_main_window >= 1);
+});
+
+test("report:draft rewrites Chinese interview refill without byline boilerplate", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-chinese-interview-copy-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const interviewLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "36kr-vla-world-model-interview",
+      category: "community_lead",
+      source: "36Kr",
+      sourceId: "intermediary-36kr",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "硬氪专访 | 智源研究院院长王仲远：VLA不会死，但世界模型是未来",
+      url: "https://www.36kr.com/p/example-vla-world-model",
+      evidence: "作者 | 邱晓芬 编辑 | 袁斯来 过去几个月，“世界模型”（World Model）从学术黑话迅速膨胀成AI和机器人行业里的关键词。行业的目光转向背后是切实的焦虑：具身智能暴露了当前AI在物理世界中的短板，世界模型试图补上物理规律和因果预测能力。",
+      editorialCategory: "ai_industry"
+    }),
+    primary_url: "",
+    verification_sources: [],
+    intermediary_url: "https://www.36kr.com/p/example-vla-world-model",
+    notes: "intermediary_url=https://www.36kr.com/p/example-vla-world-model; primary_verification_required=true",
+    verification_note: "intermediary_url=https://www.36kr.com/p/example-vla-world-model; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-interview-copy-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-interview-copy-control",
+        title: "OpenAI updates an API workflow control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-official-interview-copy-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-interview-copy-control",
+        title: "Anthropic updates Claude deployment controls",
+        evidence: "Anthropic describes Claude deployment controls, enterprise availability, admin settings, and developer workflow impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-official-interview-copy-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-interview-copy-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-official-interview-copy-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-interview-copy-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      }),
+      interviewLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "36Kr"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const item = drafted.report.main_items.find((entry) => entry.url === interviewLead.url);
+  assert(item, "Chinese interview lead should be eligible as sparse low-risk refill");
+  const publicText = [item.title, item.summary, ...(item.bullets || [])].join("\n");
+  assert(!/作者\s*[|｜]|编辑\s*[|｜]/.test(publicText), "main item copy must strip byline boilerplate");
+  assert(!/过去几个月/.test(item.summary), "summary should be rewritten, not a raw article lead");
+  assert.match(item.summary, /具身智能|世界模型|VLA/);
+});
+
+test("report:draft rejects high-risk primary-required intermediary leads from main stream refill", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-primary-required-intermediary-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const intermediaryLeads = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "techcrunch-anthropic-india-primary-required",
+      category: "community_lead",
+      source: "TechCrunch AI",
+      sourceId: "content-techcrunch-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "TechCrunch says Anthropic suspends model access as India weighs AI policy",
+      url: "https://techcrunch.com/example/anthropic-india-ai-future",
+      evidence: "A third-party report claims Anthropic suspended access to new model capabilities in India and frames it as a government policy issue without company confirmation. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      editorialCategory: "policy",
+      notes: "intermediary_url=https://techcrunch.com/example/anthropic-india-ai-future; primary_verification_required=true",
+      intermediaryUrl: "https://techcrunch.com/example/anthropic-india-ai-future"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "planet-ai-xiaomi-benchmark-primary-required",
+      category: "community_lead",
+      source: "Planet AI",
+      sourceId: "content-planet-ai",
+      sourceLevel: "intermediary",
+      verificationStatus: "intermediary_only",
+      title: "Xiaomi MiMo is claimed to be 15x faster than ChatGPT",
+      url: "https://www.marktechpost.com/example/xiaomi-mimo-15x-faster",
+      evidence: "A third-party report claims Xiaomi MiMo is 15x faster than ChatGPT on model benchmark capability without a primary model card or benchmark source. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      editorialCategory: "model_benchmark",
+      notes: "intermediary_url=https://www.marktechpost.com/example/xiaomi-mimo-15x-faster; primary_verification_required=true",
+      intermediaryUrl: "https://www.marktechpost.com/example/xiaomi-mimo-15x-faster"
+    })
+  ].map((candidate) => ({
+    ...candidate,
+    verification_sources: [],
+    primary_url: ""
+  }));
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-primary-required-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-primary-required-control",
+        title: "OpenAI ships an API workflow update for primary-required control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      ...intermediaryLeads
+    ],
+    sourceNames: ["OpenAI News RSS", "TechCrunch AI", "Planet AI"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of intermediaryLeads) {
+    assert.equal(mainUrls.has(candidate.url), false, `primary-required intermediary lead must not refill main_items: ${candidate.id}`);
+  }
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.primary_required_intermediary_lead >= 2);
+});
+
+test("report:draft rejects non-AI Product Hunt directory projects from main stream refill", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-product-hunt-non-ai-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const productHuntProject = mainStreamRepairCandidate(reportDate, {
+    id: "product-hunt-cloudback-linear",
+    category: "project",
+    source: "Product Hunt Developer Tools Feed",
+    sourceId: "content-product-hunt-devtools",
+    sourceLevel: "intermediary",
+    verificationStatus: "primary_confirmed",
+    title: "Cloudback for Linear",
+    url: "https://cloudback.it/linear?ref=producthunt",
+    evidence: "Automated backup and restore for Linear workspaces. 已打开 官网 确认用途：Back up Linear workspaces, issues, projects, cycles, documents, initiatives, templates, and embedded files across 23 categories.",
+    notes: "product_hunt_url=https://www.producthunt.com/products/cloudback; product_cross_check=confirmed; confirmation_url=https://cloudback.it/linear?ref=producthunt; confirmation_type=homepage",
+    editorialCategory: "open_source"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-product-hunt-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-product-hunt-control",
+        title: "OpenAI ships an API workflow update for Product Hunt control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      productHuntProject
+    ],
+    sourceNames: ["OpenAI News RSS", "Product Hunt Developer Tools Feed"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  assert.equal(mainUrls.has(productHuntProject.url), false, "generic Product Hunt devtool must not refill main_items");
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.low_value_product_hunt_project >= 1);
+});
+
+test("report:draft records main stream rejection reason counts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-reject-reasons-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const rejected = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "generic-github-reject-reason",
+      category: "project",
+      source: "GitHub Trending daily",
+      sourceId: "github-github-trending-daily",
+      sourceLevel: "github",
+      verificationStatus: "primary_confirmed",
+      title: "example/generic-main-reject",
+      url: "https://github.com/example/generic-main-reject",
+      evidence: "Today entered GitHub Trending Top 10. Source: third-party report. Sequence 1.",
+      rank: 1
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "future-main-reject-reason",
+      source: "OpenAI News RSS",
+      sourceLevel: "official",
+      verificationStatus: "primary_confirmed",
+      title: "OpenAI schedules a future AI developer platform update",
+      url: "https://openai.com/news/example-future-platform",
+      eventDate: "2026-06-20",
+      evidence: "OpenAI describes a future AI developer platform update with availability planned after the report date."
+    })
+  ];
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-reject-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-reject-control",
+        title: "OpenAI ships an API workflow update for reject control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, and developer migration guidance."
+      }),
+      ...rejected
+    ],
+    sourceNames: ["OpenAI News RSS", "GitHub Trending daily"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert(snapshot.rejection_counts.generic_github_trending_text >= 1);
+  assert(snapshot.rejection_counts.future_dated >= 1);
+  for (const candidate of rejected) {
+    const poolEntry = drafted.candidatePool.candidates.find((entry) => entry.id === candidate.id);
+    assert(poolEntry?.main_reject_reason, `candidate should record why it did not enter main_items: ${candidate.id}`);
+  }
+  const unaudited = drafted.candidatePool.candidates.filter((candidate) => !candidate.main_selection_stage && !candidate.main_reject_reason);
+  assert.deepEqual(unaudited.map((candidate) => candidate.id), [], "every candidate should record main stream selection or rejection audit");
+});
+
+test("report:draft records main stream shortfall as generation quality event", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-shortfall-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-shortfall-one",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-shortfall-one",
+        title: "OpenAI ships one sparse API workflow update",
+        evidence: "OpenAI describes one API workflow update with enterprise controls and developer migration guidance."
+      }),
+      mainStreamRepairCandidate(reportDate, {
+        id: "generic-github-shortfall",
+        category: "project",
+        source: "GitHub Trending daily",
+        sourceId: "github-github-trending-daily",
+        sourceLevel: "github",
+        verificationStatus: "primary_confirmed",
+        title: "example/generic-shortfall-project",
+        url: "https://github.com/example/generic-shortfall-project",
+        evidence: "Today entered GitHub Trending Top 10. Source: third-party report. Sequence 1.",
+        rank: 1
+      })
+    ],
+    sourceNames: ["OpenAI News RSS", "GitHub Trending daily"]
+  });
+  discovery.source_audit.huggingface_trending = {
+    checked: true,
+    sources: [
+      {
+        name: "Hugging Face Trending Models",
+        url: "https://huggingface.co/models?sort=trending",
+        status: "blocked",
+        notes: "HTTP 400"
+      }
+    ],
+    candidates_found: 0,
+    included: 0,
+    blocked_reason: "http_400",
+    notes: "Hugging Face Trending failed before selection."
+  };
+  discovery.source_audit.builder_sources = {
+    checked: true,
+    sources: [
+      {
+        name: "follow-builders X feed",
+        url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+        status: "no_signal",
+        notes: "0 recent original X status parsed"
+      }
+    ],
+    candidates_found: 0,
+    included: 0,
+    notes: "Builder source checked but no usable signal."
+  };
+  discovery.source_audit.wechat_sources = {
+    checked: true,
+    sources: [
+      {
+        name: "WeChat whitelist input",
+        url: "https://example.com/wechat",
+        status: "unconfigured",
+        notes: "kill switch enabled"
+      }
+    ],
+    candidates_found: 0,
+    included: 0,
+    blocked_reason: "unconfigured",
+    notes: "WeChat source not configured."
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const snapshot = drafted.report.self_check.selection_snapshot.main_items;
+  assert.equal(snapshot.target_min, 5);
+  assert.equal(snapshot.target_max, 30);
+  assert.equal(snapshot.shortfall, true);
+  assert.equal(snapshot.shortfall_event.type, "main_stream_shortfall");
+  assert.equal(snapshot.shortfall_event.selected, drafted.report.main_items.length);
+  assert(snapshot.shortfall_event.remaining_shortfall > 0);
+  assert(Array.isArray(snapshot.shortfall_event.source_impacts));
+  assert(snapshot.shortfall_event.source_impacts.some((impact) =>
+    impact.source_group === "huggingface_trending" &&
+    impact.status === "blocked" &&
+    impact.reason === "http_400" &&
+    impact.affects_main_stream === true
+  ));
+  assert(snapshot.shortfall_event.source_impacts.some((impact) =>
+    impact.source_group === "builder_sources" &&
+    impact.status === "no_signal" &&
+    impact.affects_main_stream === true
+  ));
+  assert(snapshot.shortfall_event.source_impacts.some((impact) =>
+    impact.source_group === "wechat_sources" &&
+    impact.status === "unconfigured" &&
+    impact.affects_main_stream === true
+  ));
 });
 
 test("report:draft promotes official product and platform deep dives into main_items", async () => {
@@ -10067,8 +11436,10 @@ test("publish quality accepts strict daily reports without explanation metadata"
   assert(!classification.degraded_sections.some((issue) => issue.code === "main_items_editorial_context_missing"));
 });
 
-test("publish quality blocks strict daily reports when intermediary sources enter mainline facts", () => {
+test("publish quality blocks strict daily reports when intermediary sources carry high-risk mainline facts", () => {
   const report = strictPublishReportFixture();
+  report.main_items[0].title = "Intermediary report says Anthropic raised funding at a new valuation";
+  report.main_items[0].summary = "A third-party report claims Anthropic raised funding at a $50B valuation.";
   report.main_items[0].source_level = "intermediary";
   report.main_items[0].verification_status = "intermediary_only";
   report.main_items[0].verification_note = "Only an intermediary report was found.";
@@ -10828,10 +12199,17 @@ test("public daily contract renders main items as industry and content-track str
 
   const input = reportToInteractionInput(report);
   const mainSections = input.sections.filter((section) => section.group === "main" && section.type === "markdown");
+  const compactList = input.sections.find((section) => section.richId === "compact-main-list");
   const content = mainSections.map((section) => section.content || "").join("\n");
 
-  assert.equal(mainSections.length, 2);
-  assert.deepEqual(mainSections.map((section) => section.title), ["AI 行业动态", "内容赛道动态"]);
+  assert.equal(mainSections.length, 1);
+  assert.equal(compactList.type, "filterable-cards");
+  assert.equal(compactList.items.length, report.main_items.length);
+  assert.deepEqual(compactList.items.slice(0, 5).map((item) => item.group), ["主线", "业务/政策", "产品/工具", "开源", "AIGC"]);
+  assert.equal(mainSections[0].title, "主体细节");
+  assert.equal(mainSections[0].collapsed, true);
+  assert(content.includes("### AI 行业动态"));
+  assert(content.includes("### 内容赛道动态"));
   assert(content.includes("1. **["));
   assert(content.includes(`${report.main_items.length}. **[`));
   for (const item of report.main_items) {
@@ -11375,6 +12753,49 @@ test("report:write 拒绝未回到一手来源的中介候选进入事实栏目"
     candidatePool
   });
   assert.equal(report.main_items[0].candidate_id, candidatePool.candidates[0].id);
+});
+
+test("report:write allows disclosed low-risk refill candidates in main_items", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const item = draft.main_items[0];
+  const candidate = candidatePool.candidates.find((entry) => entry.id === item.candidate_id);
+  assert(candidate);
+
+  Object.assign(item, {
+    title: "Claude Code 2026 指南梳理 25 个功能点",
+    summary: "这篇指南把 Claude Code 拆成 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能，并配示例和演示。",
+    bullets: [
+      "**Claude Code 用法**：指南把 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能拆成示例与场景。"
+    ],
+    source: "Planet AI",
+    source_level: "intermediary",
+    verification_status: "intermediary_only",
+    verification_note: "低风险工具用法线索，作为主体不足时的补位观察收录。",
+    risk_note: "产品事实和能力边界仍应回到官方文档或原始仓库核验。",
+    editorial_category: "engineering_toolchain"
+  });
+  Object.assign(candidate, {
+    title: "Claude Code Guide 2026: 25 Features with Examples + Demo",
+    source: "Planet AI",
+    source_level: "intermediary",
+    verification_status: "intermediary_only",
+    intermediary_url: item.url,
+    verification_sources: [],
+    main_selection_stage: "refill",
+    main_reject_reason: "",
+    evidence: "Claude Code is a layered agentic coding tool. This guide breaks down features from CLAUDE.md, skills, subagents, hooks, MCP and Auto Mode.",
+    editorial_category: "engineering_toolchain"
+  });
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.main_items[0].candidate_id, item.candidate_id);
+  assert.equal(report.main_items[0].verification_status, "intermediary_only");
 });
 
 test("report:write allows disclosed intermediary leads in viewpoint sections", async () => {
@@ -12235,7 +13656,7 @@ test("report:write 拒绝最近 7 天已出现 URL 再进主体信息", async ()
   );
 });
 
-test("report:write 拒绝 48 小时外条目进入主体信息或摘要", async () => {
+test("report:write 拒绝 72 小时外条目进入主体信息或摘要", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   draft.summary = "这条 2026-05-10 旧内容不能进入摘要。";
@@ -12252,7 +13673,7 @@ test("report:write 拒绝 48 小时外条目进入主体信息或摘要", async 
   assert(codes.includes("old_date_in_summary"));
 });
 
-test("report:write 限制 48 小时外补充内容数量", async () => {
+test("report:write 限制 72 小时外补充内容数量", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   candidatePool.candidates.push(
@@ -12380,7 +13801,8 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("额外项目列表"));
   assert(prompt.includes("star 变化"));
   assert(prompt.includes("加粗变色文字"));
-  assert(prompt.includes("8-12 条短新闻流"));
+  assert(prompt.includes("5-30 条短新闻流"));
+  assert(prompt.includes("`hero_highlights` 是可选亮点数据"));
   assert(prompt.includes("公共 AI 重要性"));
   assert(prompt.includes("不按用户个人工作直接相关性"));
   assert(prompt.includes("结构化表格"));
@@ -13042,7 +14464,7 @@ function strictAutomationRevisionFixture() {
     source_registry_count: 68,
     source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
-      "main_items_min_8_when_candidates_available",
+      "main_stream_blacklist_refill_5_to_30",
       "content_units_min_45_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",
@@ -14409,6 +15831,30 @@ function strategicOfficialCandidate(reportDate, options = {}) {
   };
 }
 
+function mainStreamRepairCandidate(reportDate, options = {}) {
+  return {
+    id: options.id,
+    source_id: options.sourceId || `content-${slugId(options.source || options.id || "main-stream-repair")}`,
+    category: options.category || "community_lead",
+    title: options.title,
+    url: options.url,
+    source: options.source || "Example Source",
+    event_date: options.eventDate || reportDate,
+    status: "excluded",
+    evidence: options.evidence,
+    verification_status: options.verificationStatus || "primary_confirmed",
+    source_level: options.sourceLevel || "primary",
+    verification_note: options.verificationNote || "fixture candidate",
+    verification_sources: [options.url],
+    primary_url: options.url,
+    editorial_category: options.editorialCategory || "product_radar",
+    ...(options.originalText ? { original_text: options.originalText } : {}),
+    ...(options.description ? { description: options.description } : {}),
+    ...(options.readmeSummary ? { readme_summary: options.readmeSummary } : {}),
+    ...(Number.isInteger(Number(options.rank)) ? { rank: Number(options.rank) } : {})
+  };
+}
+
 function discoveryEnvelope({ candidates, sourceNames = [] } = {}) {
   return {
     source_audit: {
@@ -14570,6 +16016,14 @@ function normalizedSourceUrl(value) {
   } catch {
     return text.toLowerCase().replace(/^http:/, "https:").replace(/\/$/, "");
   }
+}
+
+function normalizePublicCopyForComparison(value) {
+  return String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/[：:，,。；;、｜|\s]+/g, "")
+    .trim()
+    .toLowerCase();
 }
 
 async function writeSelfCheckReportFixture(root, reportDate, overrides = {}) {

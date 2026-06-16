@@ -21,7 +21,7 @@
    - 如果 X/YouTube/feed 无法访问，`builder_observations` 保持空数组，但 `source_audit.builder_sources` 必须记录 `checked:true`、检查过的来源、阻塞状态和原因，并填写 `blocked_reason` 与 `last_successful_feed_at`。
    - 如果 `discover:builders` 解析出候选但最终未入选，必须在 `source_audit.builder_sources.notes` 或 `self_check.notes` 写明过滤口径；不要只把 Builder 计数写成 0。
    - 如果 `discover:builders` 或候选池提供至少 5 条合格 Builder 候选，最终 `builder_observations` 必须入选 5-20 条；少于 5 条属于 Builder 覆盖不足，应写入 `quality_status.degraded_sections`。
-   - Builder 条目必须尽量填写 `role`、`event_date`、`source`、`evidence`；不要把 Builder 条目计入 `main_items`。
+   - Builder 条目必须尽量填写 `role`、`event_date`、`source`、`evidence`。Builder 默认进入 `builder_observations`，但符合黑名单过滤、低风险边界和信息密度要求的 Builder/X 候选可以另带 `main_stream_candidate` 角色参与主体补位；不得把原帖搬运流直接伪装成事实主新闻。
 
 3. 热门博客、访谈、新产品和广义科技发现面：
    - 至少检查 OpenAI、Anthropic Engineering/News、GitHub Changelog、Google DeepMind/Research、Meta AI、Microsoft Research、Hugging Face Blog 中可访问的官方或工程博客源。
@@ -118,8 +118,8 @@
 
 ### 内容扩容验收
 
-- 目标公开内容单元为 55-75 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`；`main_items` 继续只收严格事实，其他板块在结构化数据中保留 `source_level` / `verification_status` 供审计，公开页面不要把“第三方报道”“社区线索”“原始社交动态”等通用来源桶反复渲染成 chip 或详情格。
-- `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写候选事实、数据、图表、限制和影响，不写“为什么重要/启示/入选条件/日报跟踪/报道边界/后续建议”类元评论。
+- 目标公开内容单元为 55-75 个，计算口径为 `main_items + hot_blogs + projects + builder_observations + community_leads + github_trending`；`main_items` 从统一候选池中按黑名单过滤、排序和去重生成。其他板块在结构化数据中保留 `source_level` / `verification_status` 供审计，公开页面不要把“第三方报道”“社区线索”“原始社交动态”等通用来源桶反复渲染成 chip 或详情格。
+- `main_items` 目标为 5-30 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接，并包含 `**...**` 或 `==...==` 重点标注。bullet 只写候选事实、数据、图表、限制和影响，不写“为什么重要/启示/入选条件/日报跟踪/报道边界/后续建议”类元评论。
 - 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，或在 `self_check.notes` 明确说明低信号、网络阻塞、回源失败或人工未选入。
 - 每日候选池应至少尝试覆盖：AIGC/内容产业 6 条、大厂动作/平台政策/监管/算力/商业化 8 条、产品/融资 8 条、博客/播客 5 条、Builder/X 原始观察 10-20 条、泛 X/社区讨论 4 个事件。候选不足时记录 `no_signal`，不要伪造。
 - 参考用户给定的飞书日报板块结构做发现面覆盖：内容赛道动态、AI 行业动态、观点与分析、值得关注的产品、精选播客更新、Twitter 讨论都必须在候选池中有对应检查记录；没有候选时写 `no_signal` 或阻塞原因。

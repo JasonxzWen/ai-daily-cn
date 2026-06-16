@@ -146,7 +146,7 @@
 
 - 当 central feed 可用且含近日报文时，`builder_observations` 不应因为固定 RSS 失败而为空。
 - `source_audit.builder_sources` 记录 central feed、fallback、候选数、入选数、失败原因和最近成功时间。
-- Builder 观察不计入 `main_items`。
+- Builder 观察优先独立展示，但不再是隔离水池；符合黑名单过滤、信息密度和低风险边界的 Builder/X 候选可作为 sparse-day `main_items` 补位来源。
 - 新日报的每条 `builder_observations` 都必须有 `original_text` 和 `translation`，且 `content` 等于完整中文翻译；缺失或概括会被发布质量门阻断。
 - HTML 中 Builder 观察使用类似 Twitter/X 预览的卡片：头像、作者、handle、标签、完整中文翻译正文和可展开原文，不展示 evidence 摘要作为正文替代品。
 
@@ -272,7 +272,7 @@
 7. 卡片重点标注：让热门博客、项目等卡片 body 使用安全 inline Markdown 渲染 `**加粗**` 与 `==高亮==`，同时保持 HTML 转义。
 8. Builder 质量门：`report:write` 和发布质量检查必须阻断缺 `original_text`、缺 `translation` 或 `content` 不等于完整翻译的新日报。
 9. 测试：添加 unit/golden/browser 断言覆盖本规格。
-10. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。
+10. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。这里的 48 小时仅是源活跃度指标，不是 `main_items` 准入窗口；主体不足时仍按 72 小时 sparse-day 补位和 7 天历史去重合同执行。
 11. 审计合并：把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON，而不是只保留临时命令输出。
 12. 发布前验证：运行 `npm run validate`；连续运行验收另跑 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
 

@@ -822,6 +822,18 @@ h3 {
   align-items: center;
 }
 
+.date-card-labels,
+.date-detail-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.date-card-labels {
+  min-width: 0;
+}
+
 .date-card-topline small {
   color: var(--muted);
 }
@@ -922,6 +934,12 @@ h3 {
   max-width: 48%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-stream-chip {
+  min-height: 24px;
+  padding: 2px 7px;
   white-space: nowrap;
 }
 

@@ -159,21 +159,13 @@ export function reportToInteractionInput(report, options = {}) {
       communityLeads
     })
   ];
-  const mustReadMode = hasMustReadHighlights(report);
   const sections = [];
-  if (mustReadMode) {
-    sections.push(
-      formatMustReadSection(report),
-      formatDailyOverviewSection(dailyOverviewStats),
-      formatDailyNavigationSection({ dataHref, indexHref, report, reportNavigation })
-    );
-  }
   sections.push(...formatMainItemSections(mainItems, {
     report,
     evidenceByUrl,
     trendAnnotations,
     mediaOptions,
-    compactMainItems: mustReadMode
+    compactMainItems: true
   }));
 
   if (publicDailyTracking.length > 0) {
@@ -332,14 +324,14 @@ export function reportToInteractionInput(report, options = {}) {
     heroMode: "daily-report",
     heroTitle: report.report_date,
     heroEyebrow: dailyHeroEyebrow(report),
-    heroStats: mustReadMode ? [] : dailyOverviewStats,
-    heroLinks: mustReadMode ? [] : [
+    heroStats: dailyOverviewStats,
+    heroLinks: [
       { label: "日报导航", href: indexHref, icon: AI_DAILY_ICON },
       { label: "结构化 JSON", href: dataHref, icon: siteIconForUrl(dataHref, "JSON") }
       , ...dailyAdjacentHeroLinks(report, { reportNavigation })
     ],
-    hideNavigation: mustReadMode,
-    hideHeroSummary: mustReadMode,
+    hideNavigation: false,
+    hideHeroSummary: false,
     status: "complete",
     template: "research-explainer",
     renderMode: "pre-rendered",
@@ -362,119 +354,6 @@ export function reportToInteractionInput(report, options = {}) {
     sections,
     nextActions: []
   };
-}
-
-function hasMustReadHighlights(report) {
-  const highlights = Array.isArray(report?.hero_highlights) ? report.hero_highlights : [];
-  return highlights.length === 3 && highlights.every((item) =>
-    item?.title &&
-    item?.url &&
-    item?.what_happened &&
-    item?.why_watch &&
-    item?.category &&
-    item?.source_item_ref
-  );
-}
-
-function formatMustReadSection(report) {
-  return {
-    type: "filterable-cards",
-    title: "今日必看",
-    richId: "today-must-read",
-    group: "must-read",
-    cardClass: "must-read-card",
-    showFilters: false,
-    summary: "3 分钟先看结果和影响，技术细节在完整列表里展开。",
-    items: report.hero_highlights.slice(0, 3).map((highlight, index) => {
-      const sourceItem = sourceItemForHighlight(report, highlight);
-      return {
-        group: mustReadCategoryLabel(highlight.category),
-        title: highlight.title,
-        subtitle: sourceItem?.source || "",
-        url: highlight.url,
-        titleIcon: siteIconForUrl(highlight.url, sourceItem?.source || highlight.title),
-        tags: [mustReadCategoryLabel(highlight.category), sourceTrustHighlightTag(sourceItem || {})].filter(Boolean),
-        body: highlight.what_happened,
-        points: [
-          { label: "影响", value: highlight.why_watch },
-          { label: "来源", value: sourceItem?.source || hostnameLabel(highlight.url) || `#${index + 1}` }
-        ]
-      };
-    })
-  };
-}
-
-function formatDailyOverviewSection(stats) {
-  return {
-    type: "summary-cards",
-    title: "日报概览",
-    richId: "daily-overview",
-    group: "overview",
-    summary: "统计信息下沉到必看之后，供需要完整上下文的读者快速校准覆盖面。",
-    cards: stats.map((item) => ({
-      label: item.label,
-      value: item.detail ? `${item.value} · ${item.detail}` : item.value
-    }))
-  };
-}
-
-function formatDailyNavigationSection({ dataHref, indexHref, report, reportNavigation }) {
-  const links = [
-    ["今日必看", "#section-today-must-read"],
-    ["日报概览", "#section-daily-overview"],
-    ["完整列表", "#section-compact-main-list"],
-    ["结构化 JSON", dataHref],
-    ["日报索引", indexHref],
-    ...(reportNavigation?.previous?.url ? [["上一日", publicAssetUrl(report, reportNavigation.previous.url)]] : []),
-    ...(reportNavigation?.next?.url ? [["下一日", publicAssetUrl(report, reportNavigation.next.url)]] : [])
-  ];
-  return {
-    type: "markdown",
-    title: "完整导航",
-    richId: "full-navigation",
-    group: "overview",
-    summary: "完整入口放在今日必看之后，避免首屏挤占阅读重点。",
-    content: links.map(([label, href]) => `- ${markdownLink(href, label)}`).join("\n")
-  };
-}
-
-function sourceItemForHighlight(report, highlight) {
-  const ref = String(highlight?.source_item_ref || "").trim();
-  const normalizedRef = normalizeEvidenceUrl(ref);
-  return heroHighlightReferenceItems(report).find((item) => {
-    if (ref && item?.candidate_id === ref) {
-      return true;
-    }
-    const itemUrl = normalizeEvidenceUrl(item?.url);
-    return normalizedRef && itemUrl && normalizedRef === itemUrl;
-  }) || null;
-}
-
-function heroHighlightReferenceItems(report) {
-  return [
-    "main_items",
-    "github_trending",
-    "huggingface_trending",
-    "hot_blogs",
-    "chinese_media_dynamics",
-    "daily_tracking",
-    "projects",
-    "builder_observations",
-    "official_org_updates",
-    "community_leads",
-    ...PLATFORM_SECTIONS
-  ].flatMap((sectionName) => Array.isArray(report?.[sectionName]) ? report[sectionName] : []);
-}
-
-function mustReadCategoryLabel(value) {
-  const labels = {
-    model_platform: "模型/平台",
-    product_tool: "产品/工具",
-    china_open_source_community: "国内/开源",
-    business_policy: "业务/政策",
-    research_safety: "研究/安全"
-  };
-  return labels[value] || "必看";
 }
 
 function hostnameLabel(value) {

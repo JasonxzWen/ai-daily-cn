@@ -364,6 +364,8 @@ try {
   assert.equal(await page.locator("#date-research-index").count(), 1);
   const desktopIndexChecklist = await evaluateIndexPageChecklist(page, { expectedMinReports: 4 });
   assert.equal(desktopIndexChecklist.ok, true, JSON.stringify(desktopIndexChecklist.issues, null, 2));
+  assert.equal(await page.locator('[data-date-card="2026-05-15"][data-main-stream-status="target"]').count(), 1);
+  assert.equal(await page.locator("[data-main-stream-chip]").count() >= 4, true);
   assert.deepEqual(await dateCardOrder(page), ["2026-05-13", "2026-05-15", "2026-05-16", "2026-05-17"]);
   await page.locator('[data-select-date="2026-05-15"]').click();
   assert.match(await page.locator('#selected-date-panel [data-date-detail="2026-05-15"]').textContent(), /2026-05-15/);
@@ -400,7 +402,8 @@ try {
   const reportBody = await page.locator("body").textContent();
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
-  assert.equal(await page.locator("#section-today-must-read .interactive-card").count(), 3);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "compact_main_list_default")?.details.compact_before_details, true);
+  assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list .interactive-card").count() > 0, true);
   assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.tagName), "DETAILS");
   assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.hasAttribute("open")), false);
