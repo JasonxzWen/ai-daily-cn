@@ -1674,7 +1674,7 @@ function projectItem(candidate, meta) {
     description: readmeSummary || chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
     ...(readmeSummary ? { readme_summary: readmeSummary } : {}),
     domains: projectDomains(meta.description || candidate.title || ""),
-    use_case: "作为开源雷达线索，优先检查 README、release、recent commits 和是否能在本地复现。",
+    use_case: githubProjectUseCase(candidate, meta, repo),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "GitHub Trending",
@@ -4015,11 +4015,43 @@ function comparableTitleForCandidate(candidate) {
 function chineseGithubDescription(description, repo) {
   const cleanDescription = stripDraftPublicBodyNoise(String(description || "").replace(/\s+/g, " ").trim());
   const repoLabel = String(repo || "").trim() || "这个仓库";
-  if (hasChineseText(cleanDescription) && cleanDescription.length >= 12) {
+  if (hasChineseText(cleanDescription) && cleanDescription.length >= 12 && !isGenericGithubTrendDraftDescription(cleanDescription)) {
     return trimText(`${repoLabel}：${cleanDescription.replace(/[。；;]+$/u, "")}。`, 120);
   }
-  const pitch = githubPitchFromDescription(cleanDescription, repoLabel);
-  return trimText(`${repoLabel} 可作为${pitch}方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。`, 120);
+  const concrete = concreteGithubDescription(cleanDescription, repoLabel);
+  if (concrete) {
+    return trimText(`${repoLabel}：${concrete}`, 140);
+  }
+  return trimText(`${repoLabel}：公开描述暂未给出足够功能细节，本轮只记录排名、语言和星标变化，不补写用途判断。`, 120);
+}
+
+function isGenericGithubTrendDraftDescription(value) {
+  return /进入 GitHub Trending Top 10|优先核对 README|重点看 README|可作为[^。；;]*?(?:实现线索|观察)|AI 工程工具方向的开源项目观察/u.test(String(value || ""));
+}
+
+function concreteGithubDescription(description, repo) {
+  const text = `${repo} ${description}`.toLowerCase();
+  const keywordPhrase = githubDescriptionKeywordPhrase(description);
+  const pitch = githubPitchFromDescription(description, repo);
+  if (keywordPhrase && pitch !== "AI 工程工具") {
+    return `公开描述指向${pitch}，关键词包括 ${keywordPhrase}。`;
+  }
+  if (keywordPhrase) {
+    return `公开描述提到 ${keywordPhrase}，需要结合仓库页面确认具体能力。`;
+  }
+  if (/agent|mcp|rag|eval|benchmark|browser|workflow|llm|model|inference|audio|video|image|vision|dataset|deploy|docker|kubernetes|frontend|component/i.test(text)) {
+    return `公开描述指向${pitch}，但本轮没有足够 README 摘要支撑更细用途判断。`;
+  }
+  return "";
+}
+
+function githubDescriptionKeywordPhrase(value) {
+  const words = String(value || "")
+    .split(/[^A-Za-z0-9+#._-]+/)
+    .map((word) => word.trim())
+    .filter((word) => /^[A-Za-z][A-Za-z0-9+#._-]{2,}$/.test(word))
+    .filter((word) => !/^(?:github|trending|daily|weekly|today|stars?|repo|repository|open|source)$/i.test(word));
+  return [...new Set(words)].slice(0, 8).join("、");
 }
 
 function githubDomainUseCase(domains) {
@@ -4485,6 +4517,18 @@ function githubPitchFromDescription(description, repo) {
     return "模型调用和推理工程";
   }
   return "AI 工程工具";
+}
+
+function githubProjectUseCase(candidate, meta, repo) {
+  const basis = [meta?.readme_summary, meta?.description, candidate?.summary, candidate?.evidence, candidate?.title, repo]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+  const pitch = githubPitchFromDescription(basis, repo);
+  if (pitch && pitch !== "AI 工程工具") {
+    return `适合评估${pitch}相关能力是否能复用到现有工具链。`;
+  }
+  return "适合先查看公开示例、最近提交和 issue 讨论，再决定是否进入技术雷达。";
 }
 
 function genericFactScope({ category, text }) {

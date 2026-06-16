@@ -17,6 +17,12 @@ const DEFAULT_REPORT_PATH = ".tmp/daily-report.json";
 const OPTIMIZED_REPORT_PATH = ".tmp/daily-report.optimized.json";
 const CONTENT_SOURCE_DISCOVERY_LIMIT = 240;
 const CONTENT_SOURCE_PER_SOURCE_LIMIT = 3;
+const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
+  "public_editorial_rewrite",
+  "main_item_editorial_rewrite",
+  "hot_blog_editorial_rewrite",
+  "builder_translation_rewrite"
+]);
 
 export async function runDailyWorkflow(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
@@ -204,6 +210,22 @@ async function resumeDailyWorkflowFromAiRepair({
     return { summary, summaryPath };
   }
 
+  const contract = await readJsonIfExists(contractPath);
+  const contractReadiness = classifyAiRepairContractReadiness(contract);
+  if (!contractReadiness.ready) {
+    summary.final_status = "needs_ai_repair";
+    summary.next_action = {
+      ...previousNextAction,
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: summaryPath,
+      contract_status: contractReadiness.status,
+      message: contractReadiness.message
+    };
+    await writeSummary(summaryPath, summary);
+    return { summary, summaryPath };
+  }
+
   if (!summary.clean_repo_root) {
     summary.final_status = "blocked";
     summary.next_action = {
@@ -259,12 +281,23 @@ async function resumeDailyWorkflowFromAiRepair({
 
     if (stage.id === "quality_ai_repair") {
       if (!outcome.normalized.ok) {
-        summary.final_status = "blocked";
-        summary.next_action = {
-          kind: "inspect_stage_failure",
-          stage_id: stage.id,
-          summary_path: summaryPath
-        };
+        const repairReviewDecision = await classifyAiRepairReviewFailure(outcome.normalized, {
+          summary,
+          reportDate,
+          maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
+          reportPath: OPTIMIZED_REPORT_PATH
+        });
+        if (repairReviewDecision) {
+          summary.final_status = repairReviewDecision.final_status;
+          summary.next_action = repairReviewDecision.next_action;
+        } else {
+          summary.final_status = "blocked";
+          summary.next_action = {
+            kind: "inspect_stage_failure",
+            stage_id: stage.id,
+            summary_path: summaryPath
+          };
+        }
         await writeSummary(summaryPath, summary);
         return { summary, summaryPath };
       }
@@ -897,7 +930,10 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
         quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
         max_review_repair_loops: maxReviewRepairLoops,
         remaining_review_repair_loops: maxReviewRepairLoops - reviewRepairAttempt,
-        ai_review_tasks: aiTasks
+        ai_review_tasks: aiTasks,
+        required_contract_status: "ready",
+        required_contract_fields: ["schema_version", "report_date", "status", "edits"],
+        message: "Write the AI repair contract with status:\"ready\" and non-empty edits before resuming daily:run."
       }
     };
   }
@@ -912,6 +948,169 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
       remaining_review_repair_loops: Math.max(0, maxReviewRepairLoops - reviewRepairAttempt)
     }
   };
+}
+
+function classifyAiRepairContractReadiness(contract) {
+  if (!contract || typeof contract !== "object") {
+    return {
+      ready: false,
+      status: "invalid",
+      message: "AI repair contract must be a JSON object."
+    };
+  }
+  const status = String(contract.status || "missing").trim() || "missing";
+  const edits = Array.isArray(contract.edits) ? contract.edits : [];
+  if (status === "ready" && edits.length > 0) {
+    return { ready: true, status };
+  }
+  return {
+    ready: false,
+    status,
+    message: "AI repair contract template is waiting for status:\"ready\" and at least one edit."
+  };
+}
+
+async function classifyAiRepairReviewFailure(stageResult, {
+  summary,
+  reportDate,
+  maxReviewRepairLoops,
+  reportPath
+}) {
+  const output = stageResult.output || {};
+  const contractRejected = Array.isArray(output.contract_rejected) ? output.contract_rejected : null;
+  const contractApplied = Array.isArray(output.contract_applied) ? output.contract_applied : null;
+  if (!contractRejected || contractRejected.length > 0 || !contractApplied || contractApplied.length === 0) {
+    return null;
+  }
+
+  const review = output.review && typeof output.review === "object" ? output.review : null;
+  const aiTasks = Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : [];
+  if (!review || review.ok === true || aiTasks.length === 0 || !aiTasks.every(isPublicEditorialRepairTask)) {
+    return null;
+  }
+
+  const nextAttempt = await nextAiRepairAttempt({
+    launcherRoot: summary.launcher_root,
+    reportDate,
+    startAttempt: Number(summary.review_repair_attempts || 0) + 1,
+    maxReviewRepairLoops
+  });
+  if (!nextAttempt) {
+    return {
+      final_status: "blocked",
+      next_action: {
+        kind: "report_quality_blocked",
+        summary_path: summary.summary_path,
+        quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
+        max_review_repair_loops: maxReviewRepairLoops,
+        remaining_review_repair_loops: 0
+      }
+    };
+  }
+
+  summary.review_repair_attempts = nextAttempt.attempt;
+  summary.current_report_path = reportPath;
+  await writeAiRepairContractTemplate(nextAttempt.contractPath, {
+    reportDate,
+    review,
+    aiTasks
+  });
+
+  return {
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: nextAttempt.contractPath,
+      summary_path: summary.summary_path,
+      source_report_path: absoluteCleanPath(summary.clean_repo_root, reportPath),
+      candidate_pool_path: absoluteCleanPath(summary.clean_repo_root, summary.candidate_pool_path || candidatePoolPath(reportDate)),
+      quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
+      max_review_repair_loops: maxReviewRepairLoops,
+      remaining_review_repair_loops: maxReviewRepairLoops - nextAttempt.attempt,
+      ai_review_tasks: aiTasks,
+      contract_status: "template",
+      required_contract_status: "ready",
+      required_contract_fields: ["schema_version", "report_date", "status", "edits"],
+      message: "Fill this template with public-text edits, set status:\"ready\", and resume daily:run."
+    }
+  };
+}
+
+function isPublicEditorialRepairTask(task) {
+  return task && PUBLIC_EDITORIAL_REPAIR_TASK_KINDS.has(String(task.kind || ""));
+}
+
+async function nextAiRepairAttempt({ launcherRoot, reportDate, startAttempt, maxReviewRepairLoops }) {
+  for (let attempt = Math.max(1, startAttempt); attempt <= maxReviewRepairLoops; attempt += 1) {
+    const contractPath = aiRepairContractPath(launcherRoot, reportDate, attempt);
+    if (!(await fileExists(contractPath))) {
+      return { attempt, contractPath };
+    }
+  }
+  return null;
+}
+
+async function writeAiRepairContractTemplate(contractPath, { reportDate, review, aiTasks }) {
+  const template = {
+    schema_version: 1,
+    report_date: reportDate,
+    status: "template",
+    edits: [],
+    review_issues: summarizeAiRepairReviewIssues(review, aiTasks),
+    bad_examples: [
+      {
+        value: "它的价值在于……",
+        comment: "泛化价值判断；改为来源中的具体机制、证据、边界或适用条件。"
+      },
+      {
+        value: "读者应关注……",
+        comment: "泛化建议；改为这条来源实际披露了什么，以及能被验证的变化。"
+      },
+      {
+        value: "它的工程意义是……",
+        comment: "库存短语；改为具体影响对象、限制条件和可观察结果。"
+      },
+      {
+        value: "落地前需要评估……",
+        comment: "空泛风险提醒；只有来源给出限制、成本、许可或风险时才写具体条件。"
+      }
+    ]
+  };
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, `${JSON.stringify(template, null, 2)}\n`, {
+    encoding: "utf8",
+    flag: "wx"
+  });
+}
+
+function summarizeAiRepairReviewIssues(review, aiTasks) {
+  const taskByPath = new Map(
+    aiTasks
+      .filter((task) => task?.path)
+      .map((task) => [task.path, task])
+  );
+  const issues = Array.isArray(review?.issues) ? review.issues : [];
+  if (issues.length > 0) {
+    return issues.map((issue) => {
+      const task = taskByPath.get(issue?.path);
+      return {
+        code: String(issue?.code || ""),
+        severity: String(issue?.severity || ""),
+        path: String(issue?.path || ""),
+        message: String(issue?.message || ""),
+        task_kind: String(task?.kind || ""),
+        instruction: String(task?.instruction || "")
+      };
+    });
+  }
+  return aiTasks.map((task) => ({
+    code: "",
+    severity: "",
+    path: String(task?.path || ""),
+    message: "",
+    task_kind: String(task?.kind || ""),
+    instruction: String(task?.instruction || "")
+  }));
 }
 
 function normalizeStageResult(stageResult) {

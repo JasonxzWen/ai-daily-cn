@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-16.project_iteration.public-reader-section-quality",
+  "run_type": "project_iteration",
+  "date": "2026-06-16",
+  "title": "Public reader section quality correction",
+  "status": "completed",
+  "summary": "Project iteration record for fixing public AI daily reader-section regressions: the page no longer duplicates main stories through a `完整列表`, the retained main details are renamed and expanded, GitHub Trending descriptions prefer concrete README/project context, Builder/X cards tolerate missing optional fields, and community leads are expanded into reader-useful summaries.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"public daily renders one expanded renamed main detail section without compact full list|GitHub Trending descriptions prefer concrete README or project context over ranking boilerplate|builder discussion renders with missing optional Twitter fields|community lead cards expand short summaries to reader-useful context\"",
+      "node --test tests/unit.test.js",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Reader-facing layout fixes should remove old competing surfaces, not add a new layer beside them.",
+      "evidence": "The previous must-read improvement kept a duplicate `完整列表` plus collapsed `主体细节`, so the public page had two main-story streams and hid the richer one.",
+      "scope": "public_daily_rendering",
+      "persistence": "implemented",
+      "recommended_action": "Bind public layout changes to page checklist and e2e assertions that check both the desired section and the absence of deprecated sections."
+    },
+    {
+      "lesson": "Safe-sounding fallback copy can become worse than an empty field when it repeats across GitHub Trending rows.",
+      "evidence": "Generic text such as `进入 GitHub Trending Top 10` and README/license reminders passed as Chinese prose but did not explain the repository capability.",
+      "scope": "github_trending",
+      "persistence": "implemented",
+      "recommended_action": "Prefer README/project summaries; when no concrete summary exists, publish only transparent minimal context such as language/rank/star movement instead of inventing usefulness."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Public reader sections could regress in four places at once: duplicate main lists, generic GitHub copy, blank Builder cards, and thin community summaries.",
+      "evidence": "Unit tests now cover the layout, GitHub boilerplate filtering, Builder/X fallback rendering, and community lead density; the e2e checklist checks the built HTML.",
+      "module": "src/interaction-report.js",
+      "suggestion": "Keep `重点详情` as the single main-detail stream, filter GitHub boilerplate before rendering, make Builder cards title/body safe, and expand community leads to around 100 Chinese characters.",
+      "expected_benefit": "Future daily reports remain scan-friendly without hiding useful context or filling public sections with repeated low-information prose.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in interaction shaping, draft fallback text, page checklist, unit/e2e tests, feedback ledger, and quick-reference documentation.",
+      "ledger_links": [
+        "feedback/p1-public-reader-section-quality",
+        "feedback/p1-three-minute-must-read-hero",
+        "feedback/p1-github-readme-enrichment",
+        "feedback/p1-compact-builder-discussion",
+        "feedback/p1-public-signal-layering"
+      ],
+      "validation_evidence": [
+        "public daily renders one expanded renamed main detail section without compact full list",
+        "GitHub Trending descriptions prefer concrete README or project context over ranking boilerplate",
+        "builder discussion renders with missing optional Twitter fields",
+        "community lead cards expand short summaries to reader-useful context",
+        "npm run test:e2e"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-three-minute-must-read-hero",
+    "feedback/p1-github-readme-enrichment",
+    "feedback/p1-compact-builder-discussion",
+    "feedback/p1-public-signal-layering",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Add durable ledger and page checklist coverage for the four public daily feedback items.",
+      "owner": "project"
+    }
+  ]
+}

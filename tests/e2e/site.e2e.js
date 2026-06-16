@@ -86,10 +86,10 @@ structuredReport.model_releases.push({
 structuredReport.projects = [
   {
     name: "Example Agent Memory",
-    description: "Agent memory engine for validating horizontal project cards.",
+    description: "面向 agent 应用的跨会话记忆和检索引擎，用于验证项目详情能以中文并入 GitHub Trending 行。",
     url: "https://github.com/example/agent-memory",
-    domains: ["agent_memory", "developer_api"],
-    use_case: "Provide cross-session memory and retrieval for agent apps.",
+    domains: ["agent 记忆", "开发者 API"],
+    use_case: "给 agent 应用提供跨会话记忆、检索和偏好复用能力，适合评估自动化任务的上下文连续性。",
     event_date: "2026-05-15",
     source: "GitHub Trending daily",
     signal: "trending",
@@ -97,10 +97,10 @@ structuredReport.projects = [
   },
   {
     name: "Example Eval Harness",
-    description: "Coding-agent eval harness for validating even project card heights.",
+    description: "面向 coding agent 的评测 harness，用于回放任务、记录输出并比较回归。",
     url: "https://github.com/example/eval-harness",
-    domains: ["eval_harness", "coding_agent"],
-    use_case: "Replay agent tasks, record outputs, and compare regressions.",
+    domains: ["评测 harness", "coding agent"],
+    use_case: "适合把 agent 任务回放、输出记录和回归比较纳入发布前质量检查。",
     event_date: "2026-05-15",
     source: "GitHub Trending daily",
     signal: "trending",
@@ -402,17 +402,17 @@ try {
   const reportBody = await page.locator("body").textContent();
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
-  assert.equal(desktopChecklist.checks.find((check) => check.id === "compact_main_list_default")?.details.compact_before_details, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "main_detail_expanded_default")?.ok, true);
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
-  assert.equal(await page.locator("#section-compact-main-list .interactive-card").count() > 0, true);
-  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.tagName), "DETAILS");
-  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.hasAttribute("open")), false);
+  assert.equal(await page.locator("#section-compact-main-list").count(), 0);
+  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.tagName), "SECTION");
+  assert.match(await page.locator("#section-main-item-details").textContent(), /重点详情/);
   assert.equal(await page.locator('section[data-section-type="filterable-cards"]').count() > 0, true);
   assert.doesNotMatch(reportBody, /模型发布|ExampleModel 2|信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id|quality_status|degraded_sections|remediation/);
   assert.match(reportBody, /精选博客更新/);
   assert.match(reportBody, /Harness Engineering for Long Running Agents/);
   assert.match(reportBody, /GitHub Trending/);
-  assert.doesNotMatch(reportBody, /项目 highlight|项目 highlights|技不止术|热门技术博客|来源\s*第三方报道|第三方报道|这条动态主要围绕|今天进入 GitHub Trending Top 10|序号\s*1/);
+  assert.doesNotMatch(reportBody, /项目 highlight|项目 highlights|技不止术|热门技术博客|来源\s*第三方报道|第三方报道|这条动态主要围绕|完整列表|优先核对 README|进入 GitHub Trending Top 10|序号\s*1/);
   assert.equal(await allImagesLoaded(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
   assert.equal(await page.locator(".interactive-card.blog-card:not(.chinese-media-card)").count(), 2);

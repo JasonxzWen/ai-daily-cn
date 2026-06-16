@@ -52,11 +52,6 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const mustReadSection = document.querySelector("#section-today-must-read");
     const compactMainList = document.querySelector("#section-compact-main-list");
     const mainDetails = document.querySelector("#section-main-item-details");
-    const pageBlocks = Array.from(document.querySelectorAll("main section, main details"));
-    const sectionOrder = [compactMainList, mainDetails]
-      .map((node) => node ? pageBlocks.indexOf(node) : -1);
-    const compactBeforeDetails = Boolean(compactMainList && mainDetails) &&
-      Boolean(compactMainList.compareDocumentPosition(mainDetails) & Node.DOCUMENT_POSITION_FOLLOWING);
     addCheck(
       "today_must_read_not_required",
       !mustReadSection,
@@ -66,21 +61,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       }
     );
     addCheck(
-      "compact_main_list_default",
-      Boolean(compactMainList) &&
-        compactMainList.querySelectorAll(".interactive-card").length >= 1 &&
-        compactMainList.querySelectorAll(".interactive-card").length <= 30 &&
-        compactBeforeDetails &&
-        mainDetails?.tagName === "DETAILS" &&
-        !mainDetails.open,
-      "Public pages should render the compact news stream and collapsed details; 5-30 items is a generation target, while this page check only guards malformed or oversized output.",
+      "main_detail_expanded_default",
+      !compactMainList &&
+        Boolean(mainDetails) &&
+        /重点详情/.test(mainDetails.textContent || "") &&
+        (mainDetails.tagName !== "DETAILS" || mainDetails.open),
+      "The public page should remove the duplicate 完整列表 section and keep the renamed main detail section expanded by default.",
       {
-        order: sectionOrder,
-        compact_before_details: compactBeforeDetails,
-        compact_cards: compactMainList?.querySelectorAll(".interactive-card").length || 0,
-        generation_target_met: (compactMainList?.querySelectorAll(".interactive-card").length || 0) >= 5,
+        compact_list_present: Boolean(compactMainList),
         details_tag: mainDetails?.tagName || "",
-        details_open: Boolean(mainDetails?.open)
+        details_open: mainDetails?.tagName === "DETAILS" ? Boolean(mainDetails?.open) : true
       }
     );
     addCheck(
@@ -116,7 +106,12 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "第三方报道",
       "项目 highlight",
       "这条动态主要围绕",
+      "完整列表",
+      "优先核对 README",
+      "可作为 agent 工具方向",
+      "AI 工程工具方向的开源项目观察",
       "今天进入 GitHub Trending Top 10",
+      "进入 GitHub Trending Top 10",
       "序号 1",
       "序号 2",
       "序号 3",
@@ -386,7 +381,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const ratioBase = chineseChars + latinChars;
         const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
         const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
-        const ok = bodyText.length > 0 && chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
+        const ok = bodyText.length >= 100 && chineseChars >= 50 && chineseRatio >= 0.35 && !longEnglishRun;
         return ok
           ? null
           : {

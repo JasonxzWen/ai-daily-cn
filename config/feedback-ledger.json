@@ -865,7 +865,7 @@
       "status": "closed",
       "title": "Superseded must-read hero requirement",
       "problem": "The former three-card must-read contract is no longer the public daily target and would now force an obsolete first-screen layout.",
-      "expected_behavior": "Superseded on 2026-06-15: the current daily target is a 5-30 item short news stream, with 5-20 normal and 21-30 accepted for high-signal days. `hero_highlights` may remain as optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, or first-screen stats sinking.",
+      "expected_behavior": "Superseded on 2026-06-15: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract keeps the renamed `重点详情` section expanded by default.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -879,11 +879,34 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "interaction input renders compact main news stream without must-read section",
+        "test_name": "interaction input renders expanded main detail without compact full list",
         "gate": "npm run validate"
       }
     },
     {
+      "id": "feedback/p1-public-reader-section-quality",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep public reader sections concrete and dense",
+      "problem": "Public AI daily pages could duplicate the main stream with a `完整列表`, leave main details collapsed, show GitHub Trending rows with generic ranking/README boilerplate, render blank or broken X/Twitter cards when optional fields were missing, and reduce community leads to one-line blurbs.",
+      "expected_behavior": "Public interaction input removes `完整列表`, keeps a renamed expanded main-detail section, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and expands community lead bodies to around 100 Chinese characters or more without internal review notes.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/draft.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "src/presentation.js",
+        "src/quality-loop.js",
+        "tests/e2e/site.e2e.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily renders one expanded renamed main detail section without compact full list",
+        "gate": "npm run validate"
+      }
+    },    {
       "id": "feedback/p1-effective-interact-production-renderer",
       "severity": "P1",
       "status": "implemented",
@@ -906,6 +929,30 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "buildSite writes effective-interact report html for 2026-06-15 without internal leakage",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-editorial-repair-template",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Recover public editorial repair failures with ready-gated templates",
+      "problem": "A quality repair contract could apply every edit but still fail the post-repair review on public-copy wording, leaving the runner blocked at `quality_ai_repair` even though the failure was recoverable with a second editorial pass.",
+      "expected_behavior": "Only post-repair failures limited to public editorial AI review tasks and zero rejected edits may return to `needs_ai_repair`; the runner writes a new empty contract template with `status:\"template\"`, `edits:[]`, review issue summaries, and bad-example comments, and it never executes that template until it is changed to `status:\"ready\"` with at least one edit. Schema, fact, path, freshness, page, build, publish, or non-allowlisted repair failures remain blocked.",
+      "scope": [
+        "config/daily-workflow-contract.json",
+        "config/feedback-ledger.json",
+        "docs/codex-automation-setup.md",
+        "docs/feedback-buglist-quick-reference.md",
+        "prompts/ai-daily/modules/publish-workflow.md",
+        "src/daily-runner.js",
+        "tasks/daily-publish-runbook.md",
+        "tasks/templates/daily-publish-task.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "daily runner creates a new empty AI repair template for public editorial repair failures",
         "gate": "npm run validate"
       }
     },

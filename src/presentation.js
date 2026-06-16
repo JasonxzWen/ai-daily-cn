@@ -119,14 +119,35 @@ export function cleanProjectDescription(value) {
 
 export function cleanGithubTrendDescription(item) {
   const repo = typeof item === "object" ? item?.repo : "";
-  const raw = typeof item === "object" ? item?.description : item;
+  const raw = typeof item === "object" ? githubTrendDescriptionSource(item) : item;
   const withoutRepoPrefix = removeRepoPrefix(String(raw || ""), repo)
+    .replace(new RegExp(`^${escapeRegex(repo || "")}\\s*[：:]\\s*`, "i"), "")
     .replace(/^今天进入 GitHub Trending Top 10，仓库简介写的是：/u, "")
     .replace(/^今天进入 GitHub Trending Top 10，公开描述把它定位在/u, "可作为")
     .replace(/今天进入 GitHub Trending Top 10，仓库简介写的是：/u, "：")
     .replace(/今天进入 GitHub Trending Top 10，公开描述把它定位在/u, "可作为")
+    .replace(/(?:今天)?进入 GitHub Trending Top 10[，,]?\s*/giu, "")
+    .replace(/可作为[^。；;]*?(?:实现线索|观察)[。；;]?/gu, "")
+    .replace(/优先核对 README 示例、许可证、近期维护和本地复现门槛[。；;]?/gu, "")
+    .replace(/重点看 README、许可证、近期维护和可复现门槛[。；;]?/gu, "")
     .replace(/，仓库首页当前围绕这条能力展开。?$/u, "观察。");
   return cleanProjectDescription(translateKnownGithubDescription(withoutRepoPrefix, repo));
+}
+
+function githubTrendDescriptionSource(item = {}) {
+  const readmeSummary = String(item.readme_summary || item.github_readme_summary || "").trim();
+  if (readmeSummary) {
+    return readmeSummary;
+  }
+  const description = String(item.description || "").trim();
+  if (isGenericGithubTrendDescription(description)) {
+    return "";
+  }
+  return description;
+}
+
+function isGenericGithubTrendDescription(value) {
+  return /进入 GitHub Trending Top 10|优先核对 README|重点看 README|可作为[^。；;]*?(?:实现线索|观察)|AI 工程工具方向的开源项目观察/u.test(String(value || ""));
 }
 
 function translateKnownGithubDescription(value, repo) {

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-16.project_iteration.public-editorial-repair-template",
+  "run_type": "project_iteration",
+  "date": "2026-06-16",
+  "title": "Public editorial repair template recovery",
+  "status": "completed",
+  "summary": "Project iteration record for limiting automatic AI repair recovery to public editorial wording failures: when every contract edit applied but the post-repair review still finds allowlisted public-copy issues, the runner now creates a fresh empty ready-gated contract template instead of blocking or inventing repair values.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"daily runner creates a new empty AI repair template for public editorial repair failures\"",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A failed repair pass is not always a hard blocker, but automatic recovery must be narrower than the general quality review loop.",
+      "evidence": "The 2026-06-16 daily run needed a second public-copy edit after all first-pass contract edits applied; the failure was hot-blog editorial wording, not schema, path, source freshness, page, build, publish, or Pages verification.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Keep repair-review recovery limited to zero rejected edits and allowlisted public editorial task kinds, then hand Codex a new empty contract template instead of writing repair values automatically."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Runner resumed from AI repair and blocked immediately when `quality_ai_repair` returned ok=false, even if the only remaining issue was recoverable public-copy quality.",
+      "evidence": "Regression tests now cover template creation for public editorial failures, template readiness gating, and continued blocking for non-allowlisted repair-review failures.",
+      "module": "src/daily-runner.js",
+      "suggestion": "Create a fresh empty `quality-ai-repair-YYYY-MM-DD-attempt-N.json` template with review summaries and bad-example comments; execute it only after a human/Codex fills edits and marks `status:\"ready\"`.",
+      "expected_benefit": "Scheduled daily publishing can continue through recoverable editorial repair loops without hiding real schema, factual, page, build, publish, or verification blockers.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in daily runner state transitions, unit tests, feedback ledger, and quick-reference documentation.",
+      "ledger_links": [
+        "feedback/p1-public-editorial-repair-template",
+        "feedback/p1-ai-quality-review-loop",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "daily runner creates a new empty AI repair template for public editorial repair failures",
+        "daily runner does not execute AI repair template contracts until marked ready",
+        "daily runner blocks non-public-editorial AI repair review failures",
+        "node --test tests/unit.test.js"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-editorial-repair-template",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Add the durable feedback ledger item and regression tests before handing off the runner change.",
+      "owner": "project"
+    }
+  ]
+}

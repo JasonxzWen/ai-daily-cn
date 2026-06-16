@@ -414,7 +414,7 @@ test("report:draft does not backfill must read highlights from GitHub ranking ce
   ));
 });
 
-test("interaction input renders compact main news stream without must-read section", async () => {
+test("interaction input renders expanded main detail without compact full list", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
   const input = reportToInteractionInput(report);
@@ -425,15 +425,28 @@ test("interaction input renders compact main news stream without must-read secti
   assert.notDeepEqual(input.heroStats, []);
   assert(input.heroLinks.length >= 2);
   assert.equal(input.sections.some((section) => section.richId === "today-must-read"), false);
-  assert.equal(firstSection.richId, "compact-main-list");
-  assert.equal(firstSection.type, "filterable-cards");
-  assert.equal(firstSection.items.length, 3);
-  const compactList = input.sections.find((section) => section.richId === "compact-main-list");
+  assert.equal(input.sections.some((section) => section.richId === "compact-main-list"), false);
   const detailSection = input.sections.find((section) => section.richId === "main-item-details");
-  assert.equal(compactList.type, "filterable-cards");
-  assert.equal(compactList.items.length, 3);
-  assert.equal(detailSection.collapsed, true);
+  assert.equal(firstSection.richId, "main-item-details");
+  assert.equal(detailSection.title, "重点详情");
+  assert.equal(detailSection.type, "markdown");
+  assert.equal(detailSection.collapsed, false);
   assert(mainContent.includes("Signal 1 changes the visible product or project surface today"));
+});
+test("public daily renders one expanded renamed main detail section without compact full list", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+
+  const input = reportToInteractionInput(report);
+  const titles = input.sections.map((section) => section.title);
+  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+
+  assert(!titles.includes("完整列表"));
+  assert(!titles.includes("主体细节"));
+  assert.equal(input.sections.filter((section) => section.richId === "main-item-details").length, 1);
+  assert.equal(detailSection.title, "重点详情");
+  assert.equal(detailSection.type, "markdown");
+  assert.equal(detailSection.collapsed, false);
+  assert(detailSection.content.includes("AI 行业动态"));
 });
 
 function openRouterRankingsSampleText(rows = 10) {
@@ -1188,10 +1201,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(JSON.stringify(input.sections).includes("主线条目："));
   const compactMainList = input.sections.find((section) => section.richId === "compact-main-list");
   const detailSection = input.sections.find((section) => section.richId === "main-item-details");
-  assert.equal(compactMainList?.type, "filterable-cards");
-  assert.equal(compactMainList?.title, "完整列表");
-  assert.equal(compactMainList?.items.length, report.main_items.length);
-  assert.equal(detailSection?.collapsed, true);
+  assert.equal(compactMainList, undefined);
+  assert.equal(detailSection?.title, "重点详情");
+  assert.equal(detailSection?.type, "markdown");
+  assert.equal(detailSection?.collapsed, false);
   assert(detailSection?.content.includes("### AI 行业动态"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
@@ -1450,6 +1463,47 @@ test("GitHub Trending project highlights deduplicate overlapping project text", 
   assert(!githubSection.includes("把长日志、工具输出或检索片段"));
 });
 
+test("GitHub Trending descriptions prefer concrete README or project context over ranking boilerplate", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      name: "example/browser-agent",
+      repo: "example/browser-agent",
+      description: "example/browser-agent：进入 GitHub Trending Top 10，可作为 agent 工具方向的实现线索。优先核对 README 示例、许可证、近期维护和本地复现门槛。",
+      readme_summary: "Browser Agent 是面向浏览器自动化和 Web 任务执行的开源项目，README 展示了 Playwright 驱动、任务回放、失败截图和本地调试入口，适合先复现实例再评估接入。",
+      url: "https://github.com/example/browser-agent",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 1,
+      previous_rank: null,
+      rank_delta: null,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #1 with 1,265 stars today."
+    }
+  ];
+  report.projects = [
+    {
+      name: "example/browser-agent",
+      description: "这个项目把 Playwright 浏览器控制、任务回放和失败截图组织成 agent 可复用的调试工作流。",
+      url: "https://github.com/example/browser-agent",
+      domains: ["浏览器自动化", "agent 调试"],
+      use_case: "适合把网页操作任务做成可回放、可截图、可审计的自动化流程。"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+
+  assert(section.content.includes("Browser Agent"));
+  assert(section.content.includes("浏览器自动化"));
+  assert(section.content.includes("任务回放"));
+  assert(!section.content.includes("进入 GitHub Trending Top 10"));
+  assert(!section.content.includes("优先核对 README"));
+  assert(!section.content.includes("实现线索"));
+});
+
 test("interaction input rewrites generation-log summaries into editorial summaries", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.summary = "今天用最新 main 重新生成，扩展为 10 条主体信息和 26 个内容单元。";
@@ -1588,6 +1642,31 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert(!section.items[0].points.some((point) => point.label === "账号"));
   assert(!JSON.stringify(section).includes("Original X URL was collected"));
   assert(!JSON.stringify(section).includes("证据："));
+});
+
+test("builder discussion renders with missing optional Twitter fields", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      handle: "browserbuilder",
+      content: "这条讨论强调浏览器 agent 不能只看成功路径，还要把失败截图、回放记录和权限边界纳入评测。",
+      original_text: "Browser agents need failure screenshots, replay logs, and permission boundaries before unattended runs.",
+      url: "https://x.com/browserbuilder/status/1800000000000000000",
+      event_date: "2026-06-16",
+      source: "follow-builders X feed"
+    }
+  ];
+  report.self_check.builder_observations = 1;
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.cardClass === "builder-card");
+  const card = section.items[0];
+
+  assert.equal(section.title, "X/Twitter 讨论");
+  assert.equal(card.title, "browserbuilder");
+  assert.equal(card.subtitle, "@browserbuilder");
+  assert(card.body.includes("浏览器 agent"));
+  assert(card.points.some((point) => point.label === "原文" && point.value.includes("Browser agents need failure screenshots")));
 });
 
 test("compact builder discussion truncates original posts", () => {
@@ -1731,6 +1810,35 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   assert.match(section.items[0].body, /这些入口会不会继续往同一个应用里收/);
   assert.equal(section.items[0].media.length, 1);
   assert(section.items[0].media[0].src.endsWith("assets/evidence/openai-super-app.png"));
+});
+
+test("community lead cards expand short summaries to reader-useful context", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [];
+  report.self_check.builder_observations = 0;
+  report.community_leads = [
+    {
+      title: "OpenAI super app 讨论",
+      content: "TechCrunch 报道 OpenAI 继续推进 super app。",
+      url: "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      source: "TechCrunch AI",
+      event_date: "2026-06-16",
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      verification_note: "中介来源仅作发现线索，事实性结论需要一手或多源确认。"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.title === "社区线索");
+  const body = section.items[0].body;
+
+  assert(body.length >= 100);
+  assert(body.includes("OpenAI"));
+  assert(body.includes("super app"));
+  assert(!body.includes("中介来源"));
+  assert(!body.includes("发现线索"));
+  assert(!body.includes("事实性结论"));
 });
 
 test("public card media prefers local evidence assets and drops remote fallbacks", async () => {
@@ -5554,6 +5662,7 @@ test("daily runner hands AI repair back to Codex with publish review budget", as
   assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
   assert.equal(result.summary.next_action.max_review_repair_loops, 5);
   assert.equal(result.summary.next_action.remaining_review_repair_loops, 4);
+  assert.equal(result.summary.next_action.required_contract_status, "ready");
   assert.match(result.summary.next_action.contract_path, /quality-ai-repair-2026-06-04\.json$/);
   assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
 });
@@ -5629,6 +5738,7 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   await fs.writeFile(contractPath, JSON.stringify({
     schema_version: 1,
     report_date: "2026-06-04",
+    status: "ready",
     edits: [
       {
         path: "builder_observations[0].translation",
@@ -5674,6 +5784,251 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   assert(repairStage.command.args.includes(contractPath));
   const reportWriteStage = calls.find((stage) => stage.id === "report_write");
   assert(reportWriteStage.command.args.includes(".tmp/daily-report.optimized.json"));
+});
+
+test("daily runner creates a new empty AI repair template for public editorial repair failures", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-repair-template-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const first = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "4545454545454545454545454545454545454545"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" }],
+              issues: [
+                {
+                  code: "hot_blog_summary_template",
+                  severity: "error",
+                  path: "hot_blogs[1].summary",
+                  message: "Avoid generic public-copy phrases."
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  const firstContractPath = first.summary.next_action.contract_path;
+  await fs.mkdir(path.dirname(firstContractPath), { recursive: true });
+  await fs.writeFile(firstContractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    status: "ready",
+    edits: [
+      {
+        path: "hot_blogs[1].summary",
+        value: "第一次修复后的热文摘要。",
+        reason: "Replace generic public copy."
+      }
+    ]
+  }, null, 2), "utf8");
+
+  const calls = [];
+  const resumed = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      throw new Error("prepare should not run during repair resume");
+    },
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "quality_ai_repair") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            contract_applied: [{ path: "hot_blogs[1].summary" }],
+            contract_rejected: [],
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" }],
+              issues: [
+                {
+                  code: "hot_blog_summary_template",
+                  severity: "error",
+                  path: "hot_blogs[1].summary",
+                  message: "仍包含“价值在于”这类泛化表达。"
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(resumed.summary.final_status, "needs_ai_repair");
+  assert.equal(resumed.summary.current_report_path, ".tmp/daily-report.optimized.json");
+  assert.equal(resumed.summary.next_action.kind, "codex_ai_repair_contract");
+  assert.match(resumed.summary.next_action.contract_path, /quality-ai-repair-2026-06-04-attempt-2\.json$/);
+  assert.equal(resumed.summary.next_action.contract_status, "template");
+  assert.equal(resumed.summary.next_action.required_contract_status, "ready");
+  assert.deepEqual(calls, ["quality_ai_repair"]);
+
+  const template = JSON.parse(await fs.readFile(resumed.summary.next_action.contract_path, "utf8"));
+  assert.equal(template.schema_version, 1);
+  assert.equal(template.report_date, "2026-06-04");
+  assert.equal(template.status, "template");
+  assert.deepEqual(template.edits, []);
+  assert.equal(template.review_issues[0].path, "hot_blogs[1].summary");
+  assert.equal(template.review_issues[0].task_kind, "hot_blog_editorial_rewrite");
+  assert(template.bad_examples.some((example) => example.value.includes("价值在于")));
+});
+
+test("daily runner does not execute AI repair template contracts until marked ready", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-template-gate-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-06-04-attempt-2.json");
+  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    status: "template",
+    edits: [],
+    review_issues: [
+      {
+        path: "hot_blogs[1].summary",
+        task_kind: "hot_blog_editorial_rewrite",
+        message: "Needs a human-authored replacement."
+      }
+    ],
+    bad_examples: []
+  }, null, 2), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 2,
+    current_report_path: ".tmp/daily-report.optimized.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-06-04.json",
+    quality_review_path: ".tmp/quality-review-2026-06-04.json",
+    quality_repair_path: ".tmp/quality-repair-2026-06-04.json",
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: summaryPath
+    }
+  }, null, 2), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      throw new Error("prepare should not run for template contracts");
+    },
+    runStage: async () => {
+      throw new Error("template contracts must not execute");
+    }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.contract_path, contractPath);
+  assert.equal(result.summary.next_action.contract_status, "template");
+  assert.equal(result.summary.stages.length, 0);
+});
+
+test("daily runner blocks non-public-editorial AI repair review failures", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-non-editorial-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-06-04.json");
+  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    status: "ready",
+    edits: [
+      {
+        path: "main_items[0].bullets[0]",
+        value: "修复后的要点。",
+        reason: "Remove template prose."
+      }
+    ]
+  }, null, 2), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-06-04",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-06-04.json",
+    quality_review_path: ".tmp/quality-review-2026-06-04.json",
+    quality_repair_path: ".tmp/quality-repair-2026-06-04.json",
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: summaryPath
+    }
+  }, null, 2), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      throw new Error("prepare should not run during repair resume");
+    },
+    runStage: async (stage) => {
+      if (stage.id === "quality_ai_repair") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            contract_applied: [{ path: "main_items[0].bullets[0]" }],
+            contract_rejected: [],
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }],
+              issues: [
+                {
+                  code: "autodraft_template_phrase",
+                  severity: "error",
+                  path: "main_items[0].bullets[0]",
+                  message: "Main item copy is outside the narrow public editorial retry allowlist."
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
+  assert.equal(result.summary.next_action.stage_id, "quality_ai_repair");
 });
 
 test("daily runner falls back to GitHub API when real publish fails", async () => {
@@ -6834,7 +7189,9 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.match(html, /data-render-mode="pre-rendered"/);
   assert.match(html, /data-section-type="filterable-cards"/);
   assert.doesNotMatch(html, /id="section-today-must-read"/);
-  assert.match(html, /id="section-compact-main-list"/);
+  assert.doesNotMatch(html, /id="section-compact-main-list"/);
+  assert.match(html, /id="section-main-item-details"/);
+  assert.match(html, /重点详情/);
   assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "quality_status", "degraded_sections", "remediation"]) {
     assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
@@ -8030,8 +8387,9 @@ test("interaction input renders AI industry, content track, and selected blog se
   const titles = input.sections.map((section) => section.title);
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
   const detailSection = input.sections.find((section) => section.richId === "main-item-details");
-  assert.equal(compactList.type, "filterable-cards");
-  assert.deepEqual(compactList.items.map((item) => item.group), ["主线", "AIGC"]);
+  assert.equal(compactList, undefined);
+  assert.equal(detailSection.title, "重点详情");
+  assert.equal(detailSection.collapsed, false);
   assert(detailSection.content.includes("### AI 行业动态"));
   assert(detailSection.content.includes("### 内容赛道动态"));
   assert(titles.includes("精选博客更新"));
@@ -12203,11 +12561,9 @@ test("public daily contract renders main items as industry and content-track str
   const content = mainSections.map((section) => section.content || "").join("\n");
 
   assert.equal(mainSections.length, 1);
-  assert.equal(compactList.type, "filterable-cards");
-  assert.equal(compactList.items.length, report.main_items.length);
-  assert.deepEqual(compactList.items.slice(0, 5).map((item) => item.group), ["主线", "业务/政策", "产品/工具", "开源", "AIGC"]);
-  assert.equal(mainSections[0].title, "主体细节");
-  assert.equal(mainSections[0].collapsed, true);
+  assert.equal(compactList, undefined);
+  assert.equal(mainSections[0].title, "重点详情");
+  assert.equal(mainSections[0].collapsed, false);
   assert(content.includes("### AI 行业动态"));
   assert(content.includes("### 内容赛道动态"));
   assert(content.includes("1. **["));
