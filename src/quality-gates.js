@@ -6,6 +6,7 @@ import { normalizeUrlIdentity } from "./url.js";
 const CURRENT_SECTIONS = ["main_items", "model_releases", "hot_blogs"];
 const MODEL_MAIN_DUPLICATE_SECTIONS = new Set(["main_items", "model_releases"]);
 const HISTORY_SECTIONS = ["main_items", "github_trending", "model_releases", "hot_blogs", "projects", "builder_observations"];
+const MAIN_ITEM_FRESHNESS_WINDOW_DAYS = 3;
 
 export async function requireFreshReport(report, options = {}) {
   const errors = [
@@ -125,7 +126,7 @@ function findRecentMainItemDuplicates(report, history) {
 }
 
 function findOldMainItems(report) {
-  const cutoff = dateToDayNumber(report.report_date) - 2;
+  const cutoff = dateToDayNumber(report.report_date) - MAIN_ITEM_FRESHNESS_WINDOW_DAYS;
   const errors = [];
   for (const [index, item] of (report.main_items || []).entries()) {
     if (dateToDayNumber(item.event_date) < cutoff) {
@@ -133,7 +134,7 @@ function findOldMainItems(report) {
         code: "old_main_item",
         path: `main_items[${index}].event_date`,
         event_date: item.event_date,
-        message: "48 小时外条目不能进入主体信息；只能降级为补充或背景。"
+        message: "72 小时外条目不能进入主体信息；只能降级为补充或背景。"
       });
     }
   }
@@ -141,7 +142,7 @@ function findOldMainItems(report) {
 }
 
 function findOldDatesInSummary(report) {
-  const cutoff = dateToDayNumber(report.report_date) - 2;
+  const cutoff = dateToDayNumber(report.report_date) - MAIN_ITEM_FRESHNESS_WINDOW_DAYS;
   const dates = [...String(report.summary || "").matchAll(/\b\d{4}-\d{2}-\d{2}\b/g)].map((match) => match[0]);
   return dates
     .filter((date) => dateToDayNumber(date) < cutoff)
@@ -149,7 +150,7 @@ function findOldDatesInSummary(report) {
       code: "old_date_in_summary",
       path: "summary",
       event_date: date,
-      message: "摘要不能强调 48 小时外旧日期；旧内容应放在补充或背景。"
+      message: "摘要不能强调 72 小时外旧日期；旧内容应放在补充或背景。"
     }));
 }
 
@@ -158,7 +159,7 @@ function findOldBackgroundCandidates(report, candidatePool) {
     return [];
   }
 
-  const cutoff = dateToDayNumber(report.report_date) - 2;
+  const cutoff = dateToDayNumber(report.report_date) - MAIN_ITEM_FRESHNESS_WINDOW_DAYS;
   const oldBackground = candidatePool.candidates.filter(
     (candidate) =>
       candidate.status === "included" &&
@@ -175,7 +176,7 @@ function findOldBackgroundCandidates(report, candidatePool) {
       code: "too_many_old_background_items",
       path: "community_leads",
       count: oldBackground.length,
-      message: "48 小时外补充或背景条目每天最多 1 条。"
+      message: "72 小时外补充或背景条目每天最多 1 条。"
     }
   ];
 }

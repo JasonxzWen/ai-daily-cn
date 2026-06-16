@@ -238,6 +238,13 @@
         "exclusion_reason": {
           "type": "string"
         },
+        "main_reject_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "main_selection_stage": {
+          "enum": ["strict", "refill"]
+        },
         "evidence": {
           "type": "string"
         },

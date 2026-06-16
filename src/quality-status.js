@@ -13,7 +13,7 @@ const SOURCE_AUDIT_PROOF_STATUSES = new Set([...SOURCE_AVAILABLE_STATUSES, "bloc
 export const STRICT_COVERAGE_EFFECTIVE_DATE = "2026-06-02";
 
 export const SECTION_MINIMUMS = {
-  main_items: 8,
+  main_items: 5,
   github_trending: 10,
   huggingface_trending: 10,
   hot_blogs: 6,
@@ -50,8 +50,18 @@ const CANDIDATE_SECTION_MAP = {
   builder_observation: "builder_observations"
 };
 const MAINLINE_FACT_SECTIONS = ["main_items", "model_releases"];
-const NON_PRIMARY_ALLOWED_SECTIONS = ["hot_blogs", "projects", "builder_observations", "community_leads"];
-const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source"]);
+const NON_PRIMARY_ALLOWED_SECTIONS = ["main_items", "hot_blogs", "projects", "builder_observations", "community_leads"];
+const PRIMARY_SOURCE_LEVELS = new Set([
+  "primary",
+  "official",
+  "paper",
+  "github",
+  "multi_source",
+  "official_company_news",
+  "official_open_source_account",
+  "official_model_host_account",
+  "model_registry"
+]);
 const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified", "platform_exempt_unverified"]);
 
 const FIXED_SOURCE_REQUIREMENTS = [
@@ -255,7 +265,7 @@ export function classifyPublishQuality(report, options = {}) {
       section: "main_items",
       count: mainItemCount,
       minimum: mainItemMinimum,
-      remediation: "Use the candidate pool to include 8-12 high-signal main_items, or mark weak candidates as excluded so the selection degradation reason disappears."
+      remediation: "Use blacklist-based refill to include 5-30 readable main_items when qualified candidates exist, or keep the sparse day degraded with rejection and shortfall evidence."
     });
   }
 
@@ -482,7 +492,7 @@ function strictEditorialIssues(report) {
     const items = Array.isArray(report?.[section]) ? report[section] : [];
     return items
       .map((item, index) => ({ section, index, item }))
-      .filter(({ item }) => hasNonPrimarySourceSignal(item));
+      .filter(({ item }) => hasNonPrimarySourceSignal(item) && isHighRiskMainlineClaim(item));
   });
   if (mainlineLeaks.length > 0) {
     const first = mainlineLeaks[0];
@@ -493,8 +503,8 @@ function strictEditorialIssues(report) {
       count: mainlineLeaks.length,
       minimum: 0,
       leaked_items: mainlineLeaks.map(({ section, item }) => `${section}:${item?.title || item?.name || item?.url || "item"}`).slice(0, 8),
-      message: "Factual mainline sections must not rely on intermediary/community/original-social-only sources.",
-      remediation: "Move the item to a viewpoint/community/product-radar section with disclosure, or replace it with an official, primary, paper, GitHub, or multi-source-confirmed URL."
+      message: "High-risk mainline facts must not rely on intermediary/community/original-social-only sources.",
+      remediation: "Replace high-risk facts with official, primary, paper, GitHub, or multi-source-confirmed URLs; low-risk refill items may stay disclosed and degraded."
     });
   }
 
@@ -1085,6 +1095,17 @@ function hasNonPrimarySourceSignal(item = {}) {
     NON_PRIMARY_VERIFICATION_STATUSES.has(verificationStatus) ||
     (sourceLevel && !PRIMARY_SOURCE_LEVELS.has(sourceLevel))
   );
+}
+
+function isHighRiskMainlineClaim(item = {}) {
+  const text = [
+    item?.title,
+    item?.summary,
+    ...(Array.isArray(item?.bullets) ? item.bullets : []),
+    item?.why_it_matters,
+    item?.reader_relevance
+  ].map((value) => String(value || "")).join(" ");
+  return /\b(funding|raised|valuation|ipo|acquisition|revenue|earnings|profit|pricing|price|benchmark|outperform|accuracy|leaderboard|safety|regulation|policy|lawsuit|ban|security|vulnerability|attack|government|minister|capability|capabilities)\b|\$[\d,.]+\s*(?:m|b|million|billion)?|融资|估值|上市|收购|营收|财报|定价|价格|基准|跑分|安全|监管|政策|诉讼|禁令|漏洞|攻击|政府/u.test(text);
 }
 
 function hasNonPrimaryDisclosure(item = {}) {

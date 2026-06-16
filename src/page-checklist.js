@@ -50,53 +50,35 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Production daily report should use pre-rendered mode."
     );
     const mustReadSection = document.querySelector("#section-today-must-read");
-    const overviewSection = document.querySelector("#section-daily-overview");
-    const fullNavigationSection = document.querySelector("#section-full-navigation");
     const compactMainList = document.querySelector("#section-compact-main-list");
     const mainDetails = document.querySelector("#section-main-item-details");
-    const sectionOrder = [mustReadSection, overviewSection, fullNavigationSection, compactMainList, mainDetails]
-      .map((node) => node ? Array.from(document.querySelectorAll("main section")).indexOf(node) : -1);
+    const pageBlocks = Array.from(document.querySelectorAll("main section, main details"));
+    const sectionOrder = [compactMainList, mainDetails]
+      .map((node) => node ? pageBlocks.indexOf(node) : -1);
+    const compactBeforeDetails = Boolean(compactMainList && mainDetails) &&
+      Boolean(compactMainList.compareDocumentPosition(mainDetails) & Node.DOCUMENT_POSITION_FOLLOWING);
     addCheck(
-      "today_must_read_first",
-      Boolean(mustReadSection) &&
-        mustReadSection.querySelectorAll(".interactive-card").length === 3 &&
-        sectionOrder[0] >= 0 &&
-        sectionOrder[0] < sectionOrder[1] &&
-        sectionOrder[0] < sectionOrder[2] &&
-        sectionOrder[0] < sectionOrder[3],
-      false
-        ? "Daily report should put reader-facing 今日必看 cards before the main list."
-        : "Daily report should put exactly three 今日必看 cards before stats, navigation, and the full list.",
+      "today_must_read_not_required",
+      !mustReadSection,
+      "Daily report should not require or render a must-read section as the primary page contract.",
       {
-        order: sectionOrder,
         must_read_cards: mustReadSection?.querySelectorAll(".interactive-card").length || 0
-      }
-    );
-    addCheck(
-      "stats_and_navigation_sunk",
-      Boolean(overviewSection) &&
-        Boolean(fullNavigationSection) &&
-        sectionOrder[1] > sectionOrder[0] &&
-        sectionOrder[2] > sectionOrder[0] &&
-        !document.querySelector("#report-top .hero-stat-grid") &&
-        !document.querySelector("#report-top .hero-link"),
-      "Stats, full navigation, and JSON links should be below 今日必看, not in the hero toolbar.",
-      {
-        overview_order: sectionOrder[1],
-        navigation_order: sectionOrder[2],
-        hero_stats: Boolean(document.querySelector("#report-top .hero-stat-grid")),
-        hero_links: Boolean(document.querySelector("#report-top .hero-link"))
       }
     );
     addCheck(
       "compact_main_list_default",
       Boolean(compactMainList) &&
-        compactMainList.querySelectorAll(".interactive-card").length >= 3 &&
+        compactMainList.querySelectorAll(".interactive-card").length >= 1 &&
+        compactMainList.querySelectorAll(".interactive-card").length <= 30 &&
+        compactBeforeDetails &&
         mainDetails?.tagName === "DETAILS" &&
         !mainDetails.open,
-      "The complete main list should default to compact cards, with full bullets in a collapsed details section.",
+      "Public pages should render the compact news stream and collapsed details; 5-30 items is a generation target, while this page check only guards malformed or oversized output.",
       {
+        order: sectionOrder,
+        compact_before_details: compactBeforeDetails,
         compact_cards: compactMainList?.querySelectorAll(".interactive-card").length || 0,
+        generation_target_met: (compactMainList?.querySelectorAll(".interactive-card").length || 0) >= 5,
         details_tag: mainDetails?.tagName || "",
         details_open: Boolean(mainDetails?.open)
       }
@@ -423,6 +405,27 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Community cards should render Chinese reader-facing summaries, not raw English excerpts.",
       { weak_cards: weakCommunityCards }
     );
+    const communityAggregatorFillerHits = Array.from(document.querySelectorAll(".community-card"))
+      .map((card, index) => {
+        const title = card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const body = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const text = `${title} ${body}`;
+        const filler = /(?:Google News|RSS\s*记录了一条|记录了一条[^。；;\n]*(?:公开条目|公开动态)|详情需回到原文链接核对)/u.test(text);
+        return filler
+          ? {
+              index,
+              title,
+              body: body.slice(0, 180)
+            }
+          : null;
+      })
+      .filter(Boolean);
+    addCheck(
+      "community_aggregator_filler_absent",
+      communityAggregatorFillerHits.length === 0,
+      "Community cards should not expose aggregator labels or low-information feed fallback wording.",
+      { hits: communityAggregatorFillerHits }
+    );
     const communityGrid = document.querySelector(".community-card-grid");
     const communityCards = Array.from(document.querySelectorAll(".community-card"));
     const communityGridColumns = communityGrid ? getComputedStyle(communityGrid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean) : [];
@@ -651,9 +654,10 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
         metric_count: card.querySelectorAll(".metric-pill").length,
         strength: card.getAttribute("data-strength-level") || "",
         quality: card.getAttribute("data-quality-status") || "",
-        quality_channel: card.getAttribute("data-quality-channel") || ""
+        quality_channel: card.getAttribute("data-quality-channel") || "",
+        main_stream_status: card.getAttribute("data-main-stream-status") || ""
       }))
-      .filter((card) => card.metric_count < 6 || !card.strength || !card.quality || !card.quality_channel);
+      .filter((card) => card.metric_count < 6 || !card.strength || !card.quality || !card.quality_channel || !card.main_stream_status);
     const degradedCards = cards.filter((card) => {
       const status = card.getAttribute("data-quality-status");
       return status === "degraded" || status === "blocked";
@@ -747,8 +751,21 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
     addCheck(
       "date_cards_transparent_metrics",
       cards.length > 0 && cardsWithoutMetrics.length === 0,
-      "Every date card should expose transparent metrics plus strength and quality channels.",
+      "Every date card should expose transparent metrics plus strength, quality, and main-stream channels.",
       { weak_cards: cardsWithoutMetrics }
+    );
+    const cardsWithoutMainStreamChip = cards
+      .map((card) => ({
+        date: card.getAttribute("data-date-card") || "",
+        status: card.getAttribute("data-main-stream-status") || "",
+        has_chip: Boolean(card.querySelector("[data-main-stream-chip]"))
+      }))
+      .filter((card) => !["target", "sparse", "empty", "oversized"].includes(card.status) || !card.has_chip);
+    addCheck(
+      "date_cards_main_stream_status",
+      cards.length > 0 && cardsWithoutMainStreamChip.length === 0,
+      "Every date card should separately expose whether the 5-30 main news stream target is met.",
+      { weak_cards: cardsWithoutMainStreamChip }
     );
     addCheck(
       "date_filters_present",

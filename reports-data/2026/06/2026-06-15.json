@@ -4,38 +4,38 @@
   "title": "AI 日报 2026-06-15",
   "summary": "今天最值得看的主线有 阿里云汇总 2026 年 5 月安全产品新功能；阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件；英伟达用压缩库和约 30 行代码降低训练检查点成本。",
   "source_window": {
-    "date_from": "2026-06-15",
+    "date_from": "2026-06-13",
     "date_to": "2026-06-15",
-    "fallback_window_used": false,
-    "notes": "覆盖当日固定信源；正文只采用已回到一手、官方、论文、GitHub 或多源确认的事实，未确认线索留在观察区。"
+    "fallback_window_used": true,
+    "notes": "覆盖 72 小时固定信源候选；主体采用黑名单准入，来源权威性用于排序，高风险事实仍要求更强核验。"
   },
   "hero_highlights": [
     {
+      "title": "智源王仲远谈 VLA 与世界模型路线",
+      "url": "https://36kr.com/p/3853016586359817?f=rss",
+      "reason": "信号集中在 AI 产品、模型或平台策略的实际变化",
+      "what_happened": "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力",
+      "why_watch": "信号集中在 AI 产品、模型或平台策略的实际变化",
+      "category": "model_platform",
+      "source_item_ref": "main-intermediary-36kr-vla"
+    },
+    {
       "title": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
       "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
-      "reason": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
-      "what_happened": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
-      "why_watch": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "reason": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "what_happened": "NVIDIA 文章把训练检查点成本压缩落到 nvCOMP 和约 30 行 Python 代码，关注权重、优化器状态和梯度快照的存储开销",
+      "why_watch": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "category": "product_tool",
       "source_item_ref": "main-content-nvidia-developer-blog-cut-checkpoint-costs-with-about-30-lines-of-python"
     },
     {
       "title": "阿里云汇总 2026 年 5 月安全产品新功能",
       "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "reason": "阿里云汇总 2026 年 5 月安全产品新功能",
-      "what_happened": "阿里云汇总 2026 年 5 月安全产品新功能",
-      "why_watch": "阿里云汇总 2026 年 5 月安全产品新功能",
+      "reason": "信号集中在产品入口、采购时机和路线图影响",
+      "what_happened": "这篇阿里云博客按产品线汇总 2026 年 5 月安全产品更新，重点是面向国际市场的安全能力变化",
+      "why_watch": "信号集中在产品入口、采购时机和路线图影响",
       "category": "china_open_source_community",
       "source_item_ref": "main-content-alibaba-cloud-blog-security-new-features-in-may-2026"
-    },
-    {
-      "title": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
-      "url": "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
-      "reason": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
-      "what_happened": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
-      "why_watch": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
-      "category": "china_open_source_community",
-      "source_item_ref": "main-content-alibaba-cloud-blog-automating-daily-outlook-email-summarization-with-her"
     }
   ],
   "source_audit": {
@@ -2587,7 +2587,7 @@
         }
       ],
       "candidates_found": 115,
-      "included": 24,
+      "included": 10,
       "sources_checked": 142,
       "enablement_counts": {
         "core": 65,
@@ -5279,12 +5279,12 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云汇总 2026 年 5 月安全产品新功能。",
+      "summary": "这篇阿里云博客按产品线汇总 2026 年 5 月安全产品更新，重点是面向国际市场的安全能力变化。",
       "bullets": [
-        "**阿里云汇总 2026 年 5 月安全产品新功能**：阿里云汇总 2026 年 5 月安全产品新功能。"
+        "**阿里云安全产品**：原文按产品线汇总 2026 年 5 月功能变化，重点是国际站安全能力、控制台入口和防护范围。"
       ],
-      "why_it_matters": "它提示某个产品、平台或服务是否接近可试用、可采购或需要重新评估",
-      "reader_relevance": "产品、运营和业务团队可用它判断是否需要试用、替换工具或调整路线图",
+      "why_it_matters": "信号集中在产品入口、采购时机和路线图影响",
+      "reader_relevance": "适合产品、运营和业务团队安排试用、替换工具或路线图复盘",
       "importance": "major",
       "image_urls": []
     },
@@ -5301,12 +5301,12 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件。",
+      "summary": "文章演示在 Alibaba Cloud ECS 上用 HermesAgent 自动汇总 Outlook 邮件，把邮件处理接入云端 agent 工作流。",
       "bullets": [
-        "**阿里云示例用 HermesAgent 在 ECS 上自**：阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件。"
+        "**HermesAgent 工作流**：文章演示在 Alibaba Cloud ECS 上自动汇总 Outlook 邮件，把邮箱处理接入云端 agent 任务链。"
       ],
-      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
-      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
       "importance": "major",
       "image_urls": []
     },
@@ -5323,13 +5323,57 @@
       "entities": [
         "NVIDIA Developer Blog"
       ],
-      "summary": "英伟达用压缩库和约 30 行代码降低训练检查点成本。",
+      "summary": "NVIDIA 文章把训练检查点成本压缩落到 nvCOMP 和约 30 行 Python 代码，关注权重、优化器状态和梯度快照的存储开销。",
       "bullets": [
-        "**英伟达用压缩库和约 30 行代码降低训练检查点成本**：英伟达用压缩库和约 30 行代码降低训练检查点成本。"
+        "**训练检查点成本**：NVIDIA 把 nvCOMP 压缩库接到 checkpoint 流程里，关注权重、优化器状态和梯度快照的存储开销。"
       ],
-      "why_it_matters": "它会影响 agent、开发工具或自动化工作流的选型和接入优先级",
-      "reader_relevance": "研发团队可用它评估 agent 平台、开发工具和自动化流程的迁移时机",
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
       "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "Claude Code 2026 指南梳理 25 个功能点",
+      "candidate_id": "main-content-planet-ai-claude-code-guide-2026-25-features-with-examples-demo",
+      "editorial_category": "ai_industry",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "event_date": "2026-06-15",
+      "url": "https://www.marktechpost.com/2026/06/14/claude-code-guide-2026-25-features-with-examples-demo/",
+      "source": "Planet AI",
+      "tier": "T3",
+      "entities": [
+        "Planet AI"
+      ],
+      "summary": "这篇指南把 Claude Code 拆成 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能，并配示例和演示。",
+      "bullets": [
+        "**Claude Code 用法**：指南把 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能拆成示例与场景。"
+      ],
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "智源王仲远谈 VLA 与世界模型路线",
+      "candidate_id": "main-intermediary-36kr-vla",
+      "editorial_category": "ai_industry",
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "event_date": "2026-06-15",
+      "url": "https://36kr.com/p/3853016586359817?f=rss",
+      "source": "36Kr",
+      "tier": "T3",
+      "entities": [
+        "36Kr"
+      ],
+      "summary": "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力。",
+      "bullets": [
+        "**具身智能路线**：专访把 VLA、世界模型和机器人对物理因果的理解放在一起，重点是当前系统仍缺少稳定的物理预测能力。"
+      ],
+      "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
+      "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
+      "importance": "general",
       "image_urls": []
     }
   ],
@@ -5491,7 +5535,7 @@
       "name": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "repo": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "candidate_id": "trend-project-introduction-to-autonomous-robots-introduction-to-autonomous-robots",
-      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门...",
       "url": "https://github.com/Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots",
       "event_date": "2026-06-15",
       "source": "GitHub Trending daily",
@@ -5519,7 +5563,8 @@
       "topic": "中文 AI 媒体动态",
       "summary": "Agent时代，华为云开始重新造地基了：Agentic新基建。",
       "key_points": [
-        "Agent时代，华为云开始重新造地基了：Agentic新基建"
+        "Agent时代，华为云开始重新造地基了：Agentic新基建",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
       ],
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -5536,7 +5581,8 @@
       "topic": "中文 AI 媒体动态",
       "summary": "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破：昆仑万维将持续深耕，步履不停。",
       "key_points": [
-        "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破：昆仑万维将持续深耕，步履不停"
+        "智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破：昆仑万维将持续深耕，步履不停",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
       ],
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -7028,7 +7074,7 @@
       "editorial_category": "open_source",
       "source_level": "github",
       "verification_status": "primary_confirmed",
-      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门槛。",
+      "description": "Introduction-to-Autonomous-Robots/Introduction-to-Autonomous-Robots 可作为agent 工作流和任务编排方向的开源项目观察，重点看 README、许可证、近期维护和可复现门...",
       "domains": [
         "AI tooling"
       ],
@@ -7104,8 +7150,8 @@
   "community_leads": [
     {
       "candidate_id": "content-openai-company-news-introducing-the-openai-partner-network",
-      "title": "Introducing the OpenAI Partner Network",
-      "content": "OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。",
+      "title": "OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口",
+      "content": "OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口。",
       "url": "https://openai.com/index/introducing-openai-partner-network",
       "event_date": "2026-06-14",
       "source": "OpenAI Company News RSS",
@@ -7113,34 +7159,6 @@
       "editorial_category": "community_signal",
       "source_level": "official",
       "verification_status": "primary_confirmed",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-official-open-source-watch-the-ai-issue-america-and-china-ca",
-      "title": "The AI Issue America and China Can Cooperate On Now - The Wire China",
-      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ0Z0NGdwVWkzOUZZZDdreS1XSDJJd253SXN4dm9FWXVjSHotdmVvR1ozUEVkRTgxaGhPSHVCdEtQNVZvODhkNTI2N2hOeC1mbkhBQW5RZEk4R2YtZU1nSTV3QXNwNnBWNmFoajhmaXhmNGRaUjNpNXJNYVRzLXdSLVZoNGpBS1FrTjBlazlha05IRkxPajM0?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News Official Open Source Watch RSS",
-      "evidence": "The AI Issue America and China Can Cooperate On Now The Wire China。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-official-open-source-watch-xiaomi-mimo-is-now-15x-faster-tha",
-      "title": "Xiaomi MiMo Is Now 15x Faster Than ChatGPT: Here's What That Actually Means - M...",
-      "content": "Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTFBqY3J6U0dpOWhfSENOR28yS0ZSVnBhT3NyYVNoVnRYMXRIWEQ0dWhwV2xPc0Fva2hRSDBJQWtjNmxYeG1pb2RnYy1vamdLdDZmUVdXRmNYX2dwbWRrY2oxeVVLb0RxbE1WRGEyMlFpbjh2Zw?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News Official Open Source Watch RSS",
-      "evidence": "Xiaomi MiMo Is Now 15x Faster Than ChatGPT: Here's What That Actually Means Memeburn。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
     },
@@ -7154,48 +7172,6 @@
       "evidence": "昆仑万维将持续深耕，步履不停。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-china-big-tech-company-watch-tencent-upgrades-cloud-product",
-      "title": "Tencent upgrades cloud product portfolio for AI agent deployment - Telecompaper",
-      "content": "Google News China Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOZnhScnpWZVRKZUJDT2dqNlFkWUZ4TGpNanBtU0NkY0paYWZFQkNRb0k2QUlGS2pzWHU4WTJCMWs4V1dBMHU4cUpjUVAxMFFOd0hWQnZOQ2R2bVZ6TVNoeHNVNHdsYk8wc1BVcHZEZ2N3dHZBcWhnbVo0UHBzdDNtZFlCT1VoenlKNU9YbDJKY3lfSEc3Sll1V0kzb04wd2pIUGQxZVZmQk9WQTA?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News China Big Tech Company Watch RSS",
-      "evidence": "Tencent upgrades cloud product portfolio for AI agent deployment Telecompaper。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-scaling-ai-driven-customer-service-without-losing-custome",
-      "title": "Scaling AI-Driven Customer Service Without Losing Customer Trust - Emerj Artifi...",
-      "content": "Google News AI RSS 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNQlN4ODhMNTU5WTdRQV9tcmNidXd1Q29tNTQxZU5rMGhjcGxSQzdMdld6R3poV3hDU0dsSXc4WWdaUWRvUlVtRnpUWk5JSWlnREMzRmdub1EzcFlaNlRCMnpPNnJkRlljUmk4eGJVYnJqMHZJNEJ4SEZHYjBDTVhXQmRmX2VqX3Z4STAw?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News AI RSS",
-      "evidence": "Scaling AI-Driven Customer Service Without Losing Customer Trust Emerj Artificial Intelligence Research。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-ruanyf-weekly",
-      "title": "大模型权重是什么",
-      "content": "RuanYF Weekly 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://mp.weixin.qq.com/s/TM9lv6b-9AH8O9ZiApgTBA",
-      "event_date": "2026-06-15",
-      "source": "RuanYF Weekly",
-      "evidence": "（中文）。",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
       "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
@@ -7215,118 +7191,6 @@
       "image_urls": []
     },
     {
-      "candidate_id": "general-news-google-ai-new-artificial-intelligence-minor-launches-this-fall-virg",
-      "title": "New artificial intelligence minor launches this fall - Virginia Tech News",
-      "content": "Google News AI RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPSktaeVlXRENPLUEyTkplRnVtUXNzeHlGQ1hNeTFoNldDcmljM2VrZVRWcHI5NXNGdlFDTEp1UnJKdW9NMzEyT2swZ09kQkxhT1k2VzlmMVBIWkQ3Qm1IVk5LQzBIbUZvRV8yQ2g0Yzg4ZEl5eHp0b3B4VW1CeDNtRkhYWWdmVUFGOEh2R21EVk4weXlXdEJOb0pJTQ?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News AI RSS",
-      "evidence": "New artificial intelligence minor launches this fall Virginia Tech News。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-limelight-hq-the-all-in-one-creator-economy-ope",
-      "title": "Limelight HQ: The All-in-One Creator Economy Operating System. - quasa.io",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQVnRMNUxXZXhlSXBNNDd2WmZlMEl4VnpwT284SllBQlZhNnFVSHJJckhnbWhsb1YzZWYxMHd0UlZ5RzRlcjVuNHUxMHprenBqaURZTHl2TVdBeVFtWFVPdllhMlZsQzJ5Zy1fT3d1X19CQm4zTHdoak1zQ3dpZmNGNXJqU0ZES0xyZmhj?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Limelight HQ: The All-in-One Creator Economy Operating System. quasa.io。",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-video-image-game-crazy-taxi-creator-explains-use-of-gen",
-      "title": "Crazy Taxi creator explains use of 'generative AI support tools' in response to...",
-      "content": "Google News AIGC Video Image Game RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQMWRRSXd0UUhNeXJteXdKNkwwcS0wNHREa2xvNEtmN1ZYcmptX2ZwenB1aWJpZ0dtSW0zT2hSWlphbk03X2RyQnIwNjIxNDBWbjRHWHZEV2pRX3dFb043a2pmdHFGOGdLc3J0MWpTSHRDLVd4YjY5ZEJVYnlXRUtXektnMEF6TDlNVUtxLUdhR2YzVi11eVpnX29ZTzV6Y000ZGFRSFlMM20zSFlRa3poQWdUX3FiaGVCU1FmYTN2b2s3QXFMRHh6SGZfNl93ZGJMd1pJYXllaHN4S3YtNGdN?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "Crazy Taxi creator explains use of 'generative AI support tools' in response to criticism MSN。",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-big-tech-company-watch-introducing-the-openai-partner-networ",
-      "title": "Introducing the OpenAI Partner Network - OpenAI",
-      "content": "Google News Big Tech Company Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9uMkJtTlNBalBxNWxuLVlzbHlsaTFGdXdmUks2Z1pqZ0IyZkNyYmZUU1JkYlc4emNMclpXUWo1aEpyRVJRX3VKQnlScl93bkdrN1pBeWlaVVNSeWk2cmh5dlpWRF9ZTkY2LW9qMw?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News Big Tech Company Watch RSS",
-      "evidence": "Introducing the OpenAI Partner Network OpenAI。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-content-art-of-the-frame-podcast-the-alan-smithee-round",
-      "title": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI B...",
-      "content": "Google News AIGC Content Industry RSS 记录了一条内容生成公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQTW90VXhMbE5vUXJFSFBjODJCVkJfUHFlZ2dYMkhISUhtOUF3QW1UYlkwQUdSRHRfbjFnb2t3WVZhcVloMHB2bnRKeWNVcXh5UUhaUHdlREptMFJCanhCNXVTcGNHbV9PV3Ywa2ZHanI4UG90cTRnajNZSkIyeUhwdWZGRVoxb281TGJhVDY2dGVXemYzc2pOS3V1azQ3UnB5S2N6S3Baanl1a19qUXNhTGRURGhmNEJs0gG4AUFVX3lxTFBNb3RVeExsTm9RckVIUGM4MkJWQl9QcWVnZ1gySEhJSG05QXdBbVRiWTBBR1JEdF9uMWdva3dZVmFxWWgwcHZudEp5Y1VxeHlRSFpQd2VESm0wUkJqeEI1dVNwY0dtX09XdjBrZkdqcjhQb3RxNGdqM1lKQjJ5SHB1ZkZFWjFvbzVMYmFUNjZ0ZVd6ZjNzak5LdXVrNDdScHlLY3pLcFpqeXVrX2pRc2FMZFREaGY0Qmw?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AIGC Content Industry RSS",
-      "evidence": "Art of the Frame Podcast: The Alan Smithee Round Table – Who’s Winning the AI Boom? by Art of the Frame - ProVideo Coalition。",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-aigc-video-image-game-google-exec-most-games-secretly-use-ai",
-      "title": "游戏开发使用 AI 工具的透明度争议升温",
-      "content": "游戏开发使用 AI 工具的透明度争议升温。",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBaSEpQZHI0dGk0UmFlN0pCdmxjYWJsaFRVU1ZOTWtjTFp1S3IzNTE2OWlkQk5pQTluNzVvbmt4Z3F1M1BQMk5BTktweTl4MklR?oc=5",
-      "event_date": "2026-06-15",
-      "source": "Google News AIGC Video Image Game RSS",
-      "evidence": "Google Exec: Most Games Secretly Use AI in Development, Players Unaware — Igniting Industry Transparency Debate 玩具人 TOY PEOPLE。",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-big-tech-company-watch-introducing-omnigent-a-meta-harness-t",
-      "title": "Introducing Omnigent: A Meta-Harness to Combine, Control and Share Your Agents ...",
-      "content": "Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPVUNMSnB0SlJDOE56WGpRdkJBZ0JSY0h5Nl90OFpGT3ZvTS1oWUVqclIzWUozRVNhWlVaN25uNDQ5NEo3dkJkQ25nU2pmc19GZ2VuRDBSQWRzRmRrTXZ0cDJlMGF6R0t2WkRPb0NWbGV1RnVYRVVMNVctRGdJVjFHR2pycDNPN2RGV2R5aHBzem5vU3RiWEMzMkQwclE3VzZzMzgtaDJB?oc=5",
-      "event_date": "2026-06-13",
-      "source": "Google News Big Tech Company Watch RSS",
-      "evidence": "Introducing Omnigent: A Meta-Harness to Combine, Control and Share Your Agents Databricks。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-the-verge-ai-china-may-have-accessed-mythos",
-      "title": "China may have accessed Mythos",
-      "content": "The Verge AI 记录了一条开源项目公开条目，详情需回到原文链接核对。",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/949644/china-white-house-anthropic-mythos",
-      "event_date": "2026-06-14",
-      "source": "The Verge AI",
-      "evidence": "According to a new report from Semafor, the White House's decision to impose export restrictions on Anthropic's Mythos was driven in part by fears that it had been accessed by a group linked to China. If the Chinese government actually had。..",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "candidate_id": "intermediary-infoq-cn-swiggy",
       "title": "Swiggy通过实时机器学习排序提升搜索自动补全效果",
       "content": "Swiggy通过实时机器学习排序提升搜索自动补全效果。",
@@ -7336,23 +7200,6 @@
       "evidence": "点击查看原文>。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-interconnects-welcome-to-the-agi-era-of-ai-governance",
-      "title": "Welcome to the AGI era of AI governance",
-      "content": "Interconnects 记录了一条安全治理公开条目，详情需回到原文链接核对。",
-      "image_url": "https://substack-post-media.s3.amazonaws.com/public/images/74e1df37-06b8-444e-a5a4-fbc1ead00360_3182x1790.png",
-      "image_alt": "Welcome to the AGI era of AI governance",
-      "image_source": "feed",
-      "url": "https://www.interconnects.ai/p/welcome-to-the-agi-era-of-ai-governance",
-      "event_date": "2026-06-14",
-      "source": "Interconnects",
-      "evidence": "It's a one-way door and we weren't ready for it.",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
       "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
@@ -7386,57 +7233,15 @@
       "image_urls": []
     },
     {
-      "candidate_id": "content-nature-machine-learning-decision-processes-in-3d-structural-mri-schizoph",
-      "title": "Decision processes in 3D structural MRI schizophrenia classification evaluated ...",
-      "content": "Nature Machine Learning 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
-      "url": "https://www.nature.com/articles/s41598-026-57667-z",
-      "event_date": "2026-06-13",
-      "source": "Nature Machine Learning",
-      "evidence": "Nature Machine Learning published this intermediary lead entry.",
-      "editorial_category": "community_signal",
-      "source_level": "primary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "candidate_id": "content-ml-papers-week-self-revising-discovery-systems",
-      "title": "Self-Revising Discovery Systems",
-      "content": "ML Papers of the Week 记录了一条模型研究与评测公开条目，详情需回到原文链接核对。",
+      "title": "论文讨论自修正科学发现系统",
+      "content": "论文讨论自修正科学发现系统。",
       "url": "https://arxiv.org/abs/2606.01444",
       "event_date": "2026-06-07",
       "source": "ML Papers of the Week",
       "evidence": "From MIT, this paper argues that genuine scientific discovery is not answer generation but a change in the search space itself, and that an AI scientist must perceive that shift without being told. It develops a category-theoretic framework。..",
       "editorial_category": "community_signal",
       "source_level": "paper",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-policy-trump-tried-to-block-state-ai-regulations-but-some",
-      "title": "Trump tried to block state AI regulations, but some states are forging ahead - ...",
-      "content": "Google News AI Policy RSS 记录了一条安全治理公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRnFPYkdrUkUyc0JXNzRLWk5NWjE0WDB2cmVsZ1hJT2FReGk2YVBvTUs5M2xBM0UzVVBqci1zTG1iT2dpWmtVRzhaLWVrV250MjEyQXZwN2NldGVLQmE1S1lnSjBjUUdlZjJLdXN6NDMybU9oV0Z2T3drbnJkemJMQnEyWFZuVTM5cTZBZHdYVjJPcHZSRHdLX3ZsbjPSAaIBQVVfeXFMTldudEF1VzQzVFhSTk42cnlGSFZkSFBzQUh1cjhuRTJwTXJGalhXb09FeDVOaldZLTlaUmEzR3ZBMlB4dExDSW5Da1E4N0lSUy1HWUVmaEhfTm1CZzhoQ1hmZGFueEROZWE4eE9XOW1JVFNMRzN0X1pDNGRjUmpRdy0tZmV4R1JKZW1uRjNDVGVJWGVzV0x4WEpqUjY3QU1hY3FR?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AI Policy RSS",
-      "evidence": "Trump tried to block state AI regulations, but some states are forging ahead ABC News - Breaking News, Latest News and Videos。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "general-news-google-ai-policy-inside-the-race-to-protect-children-from-ai-broadb",
-      "title": "Inside the Race to Protect Children from AI - Broadband Breakfast",
-      "content": "Google News AI Policy RSS 记录了一条安全治理公开条目，详情需回到原文链接核对。",
-      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxORzJROG9BaXc0aF8yMWV1MnJJQ3Zaa09idi0zdDdyUnVYVVNhUTRtbFF3bV9nWmVUVFJYc1lCcVdqSm9mWTBScG9RTmlkMDlMWWd3dVptSGFQSUxydE1NbHZNVUpHNUk0ZC10QnNVUGQ2blJ5QzZ0SmlDLXM5ZUVJdw?oc=5",
-      "event_date": "2026-06-14",
-      "source": "Google News AI Policy RSS",
-      "evidence": "Inside the Race to Protect Children from AI Broadband Breakfast。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
       "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
@@ -7448,15 +7253,36 @@
   "evidence_assets": [],
   "self_check": {
     "report_date": "2026-06-15",
-    "main_items": 3,
+    "main_items": 5,
     "builder_observations": 3,
     "builder_skill_used": [
       "candidate-pool-autodraft"
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 3,
-        "selected": 3
+        "eligible_candidates": 8,
+        "selected": 5,
+        "strict_selected": 3,
+        "refill_selected": 2,
+        "target_min": 5,
+        "target": 10,
+        "target_max": 30,
+        "shortfall": false,
+        "rejection_counts": {
+          "recent_duplicate": 37,
+          "generic_github_trending_text": 26,
+          "builder_low_signal": 11,
+          "not_ai_relevant": 2,
+          "primary_required_intermediary_lead": 20,
+          "outside_main_window": 2,
+          "missing_reader_visible_title": 4,
+          "low_value_product_hunt_project": 2,
+          "low_value": 5,
+          "unverified_aggregator_lead": 13,
+          "statuspage": 2,
+          "search_shadow": 8,
+          "future_dated": 32
+        }
       },
       "github_trending": {
         "eligible_candidates": 10,
@@ -7500,10 +7326,10 @@
       }
     },
     "fallback_sources": [],
-    "primary_links": true,
+    "primary_links": false,
     "no_banned_words": true,
     "no_unsourced_numbers": true,
-    "notes": "主体事实只保留可回溯来源；高风险和中介线索留在社区观察。",
+    "notes": "主体选择已在生成期完成黑名单过滤、优先级排序、补位和短缺记录。",
     "optimization_suggestions": [],
     "source_status_history": {
       "path": "source-status-history.json",
@@ -7514,11 +7340,11 @@
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "01fe5bab4697b27207f637f6ffd328a762071648",
-      "git_commit_short": "01fe5bab4697",
-      "git_branch": "codex/public-daily-v2",
-      "origin_main_sha": "01fe5bab4697b27207f637f6ffd328a762071648",
-      "origin_main_short": "01fe5bab4697",
+      "git_commit": "7c2ad9cf4eee3c78ede0535e24c613470d0bacac",
+      "git_commit_short": "7c2ad9cf4eee",
+      "git_branch": "main",
+      "origin_main_sha": "7c2ad9cf4eee3c78ede0535e24c613470d0bacac",
+      "origin_main_short": "7c2ad9cf4eee",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -7544,7 +7370,7 @@
         "manual": 7
       },
       "rules": [
-        "main_items_min_8_when_candidates_available",
+        "main_stream_blacklist_refill_5_to_30",
         "content_units_min_45_when_candidates_available",
         "model_releases_must_mirror_main_items",
         "github_api_fallback_for_git_transport",
@@ -7552,7 +7378,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-15T07:16:08.809Z",
+  "generated_at": "2026-06-16T04:12:45.930Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-15.html",
   "html_path": "reports/2026/06/2026-06-15.html",
@@ -7576,6 +7402,7 @@
       "reddit_sources_blocked",
       "hot_blogs_selection_degraded",
       "builder_observations_selection_degraded",
+      "content_units_selection_degraded",
       "china_ai_no_recent_signal"
     ],
     "affected_sections": [
@@ -7585,7 +7412,8 @@
       "wechat_items",
       "zhihu_items",
       "reddit_items",
-      "builder_observations"
+      "builder_observations",
+      "content_units"
     ],
     "degraded_sections": [
       {
@@ -7635,6 +7463,13 @@
         "error_code": "quality_degraded",
         "section": "builder_observations",
         "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+      },
+      {
+        "code": "content_units_selection_degraded",
+        "error_code": "quality_degraded",
+        "section": "content_units",
+        "message": "content_units coverage is degraded and should be disclosed in the public report.",
         "remediation": "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
       },
       {

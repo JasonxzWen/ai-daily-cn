@@ -36,8 +36,8 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 各内容条目可选但强烈建议填写统一编辑/核验元数据：
 - `editorial_category`：如 `ai_industry`、`engineering_toolchain`、`model_release`、`product_radar`、`open_source`、`viewpoint_analysis`、`podcast`、`x_discussion`、`community_signal`。
-- `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；观点、播客、社区、产品雷达线索可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露。
-- `verification_status`：`main_items` 和 `model_releases` 只接受 `primary_confirmed` 或 `multi_source_confirmed`；`hot_blogs`、`projects`、`builder_observations`、`community_leads` 可保留 `intermediary_only` 或 `original_social_only`，但要写 `verification_note` 或 `risk_note`。
+- `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；低风险补位候选可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露边界并通过黑名单过滤。官方/一手/多源影响排序和保留优先级，不是唯一准入门票。
+- `verification_status`：`main_items` 优先使用 `primary_confirmed` 或 `multi_source_confirmed`；低风险补位候选可保留 `intermediary_only` 或 `original_social_only`，但必须写 `verification_note` 或 `risk_note`，且不得承载融资、估值、价格、benchmark、安全事故、监管或模型能力等高风险事实。`model_releases` 仍只接受 `primary_confirmed` 或 `multi_source_confirmed`。
 - `why_it_matters` / `reader_relevance`：历史兼容或内部元数据字段；新草稿不需要填写，公开 HTML 不得把它们渲染成“为什么重要 / 启示 / 读者相关性 / 入选条件”分点。
 - `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客的内部边界记录。公开 HTML 只展示必要的来源层级、待确认边界或具体风险事实；不要把读者画像、后续跟进、watch-next 或风险模板渲染成重复卡片分点。
 
@@ -61,7 +61,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 内容密度目标：
 
 - 新日报目标为 55-75 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
-- `main_items` 目标为 8-12 条，默认 10 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
+- `main_items` 目标为 5-30 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
 - 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
 - `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。
 - 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
@@ -135,19 +135,19 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 `github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects` 作为 highlight 元数据，但公开页面仍合并在 GitHub Trending 中展示。
 `github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在 80-140 个中文字符以内，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计、泛化热度判断或“本条保留标签”之类的实现说明。页面展示会隐藏来源、语言等审计字段，只保留榜位、变化、star 变化 tag 和中文简介。
 
-`hero_highlights` 是普通关注者 3 分钟扫读的“今日必看”。正常日报必须从 `main_items` 中选出恰好 3 条；只有 `report_status:"empty_due_to_network_outage"` 或主体不足 3 条时可以少于 3 条或为空。选择时做轻量品类平衡，优先覆盖模型/平台、产品/工具、国内开源/社区、商业/政策、研究/安全等不同视角；不要简单复制 `main_items` 前三条。
+`hero_highlights` 是可选亮点数据，不再是“今日必看”或首屏必需结构。可以为空；如果生成，数量为 1-3 条，并且必须来自已有公开条目的 `candidate_id` 或 URL，不能从 GitHub 排名格、信源审计或低价值 filler 中补数。
 
 每项包含：
 
 - `title`
 - `url`
 - `reason`：一句话说明为什么今天值得优先看，必须是具体影响，不能写模板句、来源审计或“原文标题为”
-- `what_happened`：只写结果事实，适合首屏展示；不要写技术细节
-- `why_watch`：只写对关注者的影响或后续观察价值，适合首屏展示
+- `what_happened`：只写结果事实；不要写技术细节
+- `why_watch`：只写对关注者的影响或后续观察价值
 - `category`：`model_platform`、`product_tool`、`china_open_source_community`、`business_policy`、`research_safety` 之一
 - `source_item_ref`：必须回指对应 `main_items[*].candidate_id`；没有 `candidate_id` 时才用对应条目的规范化 URL
 
-首屏只放结果和影响；实现机制、参数、价格、长背景、风险审计和验证说明下沉到完整列表。禁止写“其余条目见后文”或“本版只保留 N 条”。
+禁止写“其余条目见后文”或“本版只保留 N 条”。不要把 `hero_highlights` 当成日报目标形态，主目标始终是 5-30 条短新闻流。
 
 没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。空的 `model_releases` 或 `projects` 不应造成公开 HTML 出现空板块；`model_releases` 新草稿默认保持空数组。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。

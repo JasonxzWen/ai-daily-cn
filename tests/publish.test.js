@@ -392,7 +392,7 @@ test("publish dry-run stops when selected strict report was not generated from c
     source_registry_count: 68,
     source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
-      "main_items_min_8_when_candidates_available",
+      "main_stream_blacklist_refill_5_to_30",
       "content_units_min_45_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",

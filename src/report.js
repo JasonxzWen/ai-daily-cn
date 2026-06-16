@@ -424,7 +424,7 @@ function requireHeroHighlightsContract(report) {
   if (errors.length > 0) {
     throw new PublisherError(
       "hero_highlights_contract_failed",
-      "hero_highlights must be three reader-facing must-read cards with result, impact, and a source item reference.",
+      "Optional hero_highlights must be reader-facing highlight records with result, impact, and a source item reference.",
       { errors }
     );
   }

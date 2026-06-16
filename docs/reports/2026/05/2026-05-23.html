@@ -2991,23 +2991,93 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="report-nav-group" data-nav-group="reading-order">
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
-      <a href="#section-ai-1" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
-<a href="#section-html-work-report-2" title="精选博客更新" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>精选博客更新</span></a>
-<a href="#section-x-twitter-3" title="X/Twitter 讨论" data-nav-link data-nav-index="3" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-html-work-report-4" title="社区线索" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
-<a href="#section-html-work-report-5" title="信源覆盖与缺口" data-nav-link data-nav-index="5" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+      <a href="#section-compact-main-list" title="完整列表" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>完整列表</span></a>
+<a href="#section-main-item-details" title="主体细节" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>主体细节</span></a>
+<a href="#section-html-work-report-3" title="精选博客更新" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>精选博客更新</span></a>
+<a href="#section-x-twitter-4" title="X/Twitter 讨论" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-html-work-report-5" title="社区线索" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>社区线索</span></a>
+<a href="#section-html-work-report-6" title="信源覆盖与缺口" data-nav-link data-nav-index="6" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
-        <section class="panel rich-section" id="section-ai-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+        <section class="panel" id="section-compact-main-list" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
-      <h2>AI 行业动态</h2>
-
+      <h2>完整列表</h2>
+      <p class="section-summary">默认只展示标题、来源和一句事实摘要，适合快速扫读。</p>
     </div>
 
   </div>
-    <div class="rendered-markdown"><ol><li><strong><a href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Help Center" decoding="async"> OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 34x/7d</mark>（2026-05-21）</li></ol>
+
+    <div class="evidence-grid focus-field main-compact-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</span><span class="card-subtitle">OpenAI Help Center · 2026-05-21</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span><span class="chip">coding agent: 7d 34x/7d</span></div>
+
+
+    <p>OpenAI 在 ChatGPT Enterprise/Edu release notes 中集中更新 Codex：Goal mode 已覆盖 app、IDE extension 和 CLI，浏览器标注更细，锁屏后远程继续工作、管理员 Codex analytics 和插件共享也进入企业治理面。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://support.claude.com/en/articles/12138966-release-notes" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNSPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路</span><span class="card-subtitle">Claude Release Notes / Claude Blog · 2026-05-21</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span></div>
+
+
+    <p>Claude release notes 显示 Compliance API integrations 已接入更多安全与合规工具；同日 Claude Blog 发布 Opus 在 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等安全场景中的落地案例。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>发布 Fara1.5 计算机使用 agent 模型族</span><span class="card-subtitle">Microsoft Research · 2026-05-21</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span></div>
+
+
+    <p>Microsoft Research 介绍 Fara1.5-4B、9B、27B 三个浏览器计算机使用 agent 模型，并给出 WebVoyager、Online-Mind2Web、WebTailBench 和合成环境评测；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkRQPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台</span><span class="card-subtitle">Docusign Press Release · 2026-05-21</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span><span class="chip">MCP: 7d 24x/6d</span></div>
+
+
+    <p>Docusign 在 Momentum conference 发布 AI assistant、agents 和 Agent Studio，围绕协议审阅、审批、义务跟踪、风险标记和业务系统集成构建 agreement work 的 agent 层。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://modal.com/blog/modal-series-c" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1CPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施</span><span class="card-subtitle">Modal Blog · 2026-05-21</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span></div>
+
+
+    <p>Modal 宣布 3.55 亿美元 Series C，并把下一阶段重点放在低延迟推理、训练和推理闭环、agent 执行环境以及更细粒度 RBAC。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight main-compact-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="主线" data-search-target="html-work-report">
+    <div class="meta">主线</div>
+    <h3><a class="card-title-link" href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 模型给出离散几何单位距离问题的新反例</span><span class="card-subtitle">OpenAI Research · 2026-05-20</span></span></a></h3>
+    <div class="card-tags"><span class="chip chip-major">重大</span></div>
+
+
+    <p>OpenAI 称其内部通用推理模型给出单位距离问题长期猜想的反例，并由外部数学家检查证明；这是本轮 48 小时外补入的高信号研究里程碑。</p>
+
+  </article>
+    </div>
+  </section>
+<details class="panel rich-section collapsible-panel" id="section-main-item-details" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
+    <summary class="collapsible-summary">
+      <span class="collapsible-summary-main">
+        <span class="meta">正文</span>
+        <span class="collapsible-title">主体细节</span>
+        <span class="collapsible-subtitle">展开查看完整 bullets、证据图片和更细的技术上下文。</span>
+      </span>
+      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
+    </summary>
+    <div class="collapsible-content">
+    <div class="rendered-markdown"><h4>AI 行业动态</h4>
+<ol><li><strong><a href="https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Help Center" decoding="async"> OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 34x/7d</mark>（2026-05-21）</li></ol>
 <ul><li>OpenAI 在 ChatGPT Enterprise/Edu release notes 中集中更新 Codex：Goal mode 已覆盖 app、IDE extension 和 CLI，浏览器标注更细，锁屏后远程继续工作、管理员 Codex analytics 和插件共享也进入企业治理面。</li><li>这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。</li><li>OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。</li></ul>
 <ol start="2"><li><strong><a href="https://support.claude.com/en/articles/12138966-release-notes" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNSPC90ZXh0Pjwvc3ZnPg==" alt="Claude Release Notes / Claude Blog" decoding="async"> Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-21）</li></ol>
 <ul><li>Claude release notes 显示 Compliance API integrations 已接入更多安全与合规工具；同日 Claude Blog 发布 Opus 在 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等安全场景中的落地案例。</li><li>Compliance API 的重点是让 IT 和安全团队像治理其他企业应用一样治理 Claude 对话、文件和产品使用，而不是只依赖最终用户自觉。</li><li>Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。</li></ul>
@@ -3019,7 +3089,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <ul><li>Modal 宣布 3.55 亿美元 Series C，并把下一阶段重点放在低延迟推理、训练和推理闭环、agent 执行环境以及更细粒度 RBAC。</li><li>Modal 将 AI workloads 描述为低延迟弹性推理、动态 agent runtime、RL、批处理和大规模 sandbox 的组合，而不是单一 GPU 租赁问题。</li><li>文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。</li></ul>
 <ol start="6"><li><strong><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Research" decoding="async"> OpenAI 模型给出离散几何单位距离问题的新反例</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark>（2026-05-20）</li></ol>
 <ul><li>OpenAI 称其内部通用推理模型给出单位距离问题长期猜想的反例，并由外部数学家检查证明；这是本轮 48 小时外补入的高信号研究里程碑。</li><li>该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。</li><li>OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</li></ul></div>
-    <template data-rich-source data-source-fallback>1. **[![OpenAI Help Center](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享](https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf)** ==tag-major|重大== ==tag-topic|coding agent: 7d 34x/7d==（2026-05-21）
+    <template data-rich-source data-source-fallback>### AI 行业动态
+
+1. **[![OpenAI Help Center](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享](https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf)** ==tag-major|重大== ==tag-topic|coding agent: 7d 34x/7d==（2026-05-21）
   - OpenAI 在 ChatGPT Enterprise/Edu release notes 中集中更新 Codex：Goal mode 已覆盖 app、IDE extension 和 CLI，浏览器标注更细，锁屏后远程继续工作、管理员 Codex analytics 和插件共享也进入企业治理面。
   - 这次更新把 coding agent 从单次交互推进到可定义目标、可跨浏览器反馈、可远程持续运行、可由管理员审计使用情况的企业工作流。
   - OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。
@@ -3047,9 +3119,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 6. **[![OpenAI Research](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 模型给出离散几何单位距离问题的新反例](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)** ==tag-major|重大==（2026-05-20）
   - OpenAI 称其内部通用推理模型给出单位距离问题长期猜想的反例，并由外部数学家检查证明；这是本轮 48 小时外补入的高信号研究里程碑。
   - 该结果针对 Paul Erdős 1946 年提出的平面单位距离问题，构造出比传统 square grid 思路更强的无限族例子。
-  - OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</template>
-  </section>
-<section class="panel" id="section-html-work-report-2" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
+  - OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。</template></div>
+  </details>
+<section class="panel" id="section-html-work-report-3" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>精选博客更新</h2>
@@ -3097,7 +3169,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-x-twitter-3" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-x-twitter-4" data-section-type="markdown" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>X/Twitter 讨论</h2>
@@ -3109,7 +3181,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <template data-rich-source data-source-fallback>- **降级说明**：本轮已检查 X/Twitter 相关来源，但未形成可入选的原始 status 条目。原因：fetch_failed
 - **检查来源**：follow-builders prepare-digest:blocked（follow-builders prepare-digest 脚本返回 fetch failed，已隐藏本机脚本路径。）；follow-builders local X cache:no_signal（本地 feed-x.json generatedAt 为 2026-04-27T08:20:43.831Z，超过今日窗口，不收录为今日 Builder 观察。）；follow-builders local blog cache:no_signal（本地 feed-blogs.json generatedAt 为 2026-04-27T08:20:53.457Z，超过今日窗口。）</template>
   </section>
-<section class="panel" id="section-html-work-report-4" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-html-work-report-5" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>社区线索</h2>
@@ -3139,7 +3211,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-5" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-6" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>
