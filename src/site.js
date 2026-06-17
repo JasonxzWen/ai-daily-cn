@@ -14,6 +14,7 @@ import { deriveQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
+import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -748,7 +749,8 @@ function publicReportData(report) {
   const result = sanitizePublicValue(report);
   result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
-    .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false);
+    .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
+    .map(stripUnpublishableOfficialSnapshots);
   result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
   return result;
 }
@@ -796,6 +798,27 @@ function sanitizePublicValue(value, key = "") {
     result[entryKey] = sanitizePublicValue(entryValue, entryKey);
   }
   return result;
+}
+
+function stripUnpublishableOfficialSnapshots(item) {
+  if (!item || typeof item !== "object") {
+    return item;
+  }
+  const next = structuredClone(item);
+  stripOfficialSnapshotIfUnpublishable(next.snapshot);
+  stripOfficialSnapshotIfUnpublishable(next.tracking_component_snapshot);
+  return next;
+}
+
+function stripOfficialSnapshotIfUnpublishable(snapshot) {
+  const official = snapshot?.official_component_snapshot;
+  if (!official || isPublishableOfficialComponentFragment({
+    html: official.sanitized_html || official.html || official.sanitizedHtml,
+    sourceSelector: official.source_selector || official.sourceSelector
+  })) {
+    return;
+  }
+  delete snapshot.official_component_snapshot;
 }
 
 function publicQualityStatus(status = {}) {

@@ -1317,14 +1317,33 @@ body.lightbox-open {
 
 .official-tracking-snapshot {
   max-width: 100%;
-  overflow-x: auto;
+  max-height: min(420px, 68vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
   border: 1px solid rgba(209, 207, 197, 0.72);
   border-radius: 8px;
   background: #ffffff;
+  contain: content;
 }
 
 .official-tracking-snapshot > * {
   max-width: 100%;
+}
+
+.official-tracking-snapshot > nav,
+.official-tracking-snapshot > header,
+.official-tracking-snapshot > footer,
+.official-tracking-snapshot > aside {
+  display: none !important;
+}
+
+.official-tracking-snapshot :is(svg, img, canvas, video) {
+  max-width: 100% !important;
+  max-height: 160px !important;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .official-tracking-snapshot table {
@@ -2388,6 +2407,27 @@ summary:focus-visible {
 @media (max-width: 760px) {
   .report-nav {
     position: static;
+    flex-wrap: wrap;
+    align-items: stretch;
+    overflow-x: visible;
+    overflow-y: visible;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .report-nav-title {
+    flex: 1 1 100%;
+  }
+
+  .report-nav-group {
+    flex: 1 1 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .report-nav a {
+    max-width: 220px;
   }
 }
 

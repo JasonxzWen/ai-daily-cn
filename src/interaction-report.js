@@ -16,7 +16,10 @@ import { defaultImportanceForSection, importanceLabel, importanceTag, normalizeI
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "./source-icon-cache.js";
 import { platformForSection, platformItemLabel, PLATFORM_SECTIONS } from "./platform-exempt.js";
 import { resolveLinkIcon } from "./link-icons.js";
-import { trackingComponentForInteraction } from "./tracking-components.js";
+import {
+  hasInvalidOfficialTrackingSnapshot,
+  trackingComponentForInteraction
+} from "./tracking-components.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -1093,7 +1096,8 @@ function formatProjectCards(items) {
 function formatDailyTrackingCards(items, context = {}) {
   return items.map((item) => {
     const component = trackingComponentForInteraction(item);
-    const unavailable = isDailyTrackingSourceUnavailable(item);
+    const invalidOfficialSnapshot = hasInvalidOfficialTrackingSnapshot(item);
+    const unavailable = isDailyTrackingSourceUnavailable(item) || invalidOfficialSnapshot;
     const hasOfficialSnapshot = Boolean(component?.officialSnapshot?.html);
     const entries = unavailable ? [] : dailyTrackingLeaderboardEntries(item);
     const stats = unavailable || hasOfficialSnapshot ? [] : dailyTrackingStats(item, entries);
@@ -1108,7 +1112,7 @@ function formatDailyTrackingCards(items, context = {}) {
       title: item.name,
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || item.name),
-      body: unavailable ? item.source_unavailable_note : formatDailyTrackingBody(item, entries),
+      body: unavailable ? dailyTrackingUnavailableNote(item, invalidOfficialSnapshot) : formatDailyTrackingBody(item, entries),
       showGroup: true,
       tags: [
         cardTag(importanceTagFor("daily_tracking", item)),
@@ -1117,7 +1121,7 @@ function formatDailyTrackingCards(items, context = {}) {
       ].filter(Boolean),
       points: [],
       ...(media.length > 0 ? { media } : {}),
-      ...(component ? { component } : {}),
+      ...(component && !unavailable ? { component } : {}),
       ...(stats.length > 0 ? { stats } : {}),
       ...(bars.rows.length > 0 ? { bars } : {}),
       ...(table.rows.length > 0 ? { table } : {})
@@ -1358,6 +1362,17 @@ function isPublicDailyTrackingChange(item) {
 
 function isDailyTrackingSourceUnavailable(item) {
   return item?.publish_to_public === true && Boolean(String(item?.source_unavailable_note || "").trim());
+}
+
+function dailyTrackingUnavailableNote(item, invalidOfficialSnapshot = false) {
+  const note = String(item?.source_unavailable_note || "").trim();
+  if (note) {
+    return note;
+  }
+  if (invalidOfficialSnapshot) {
+    return "官方 web 组件 snapshot 本轮不可用：采集结果命中了整页级 DOM（如 main/body）或过大的页面片段。为避免渲染未核验的巨型页面组件，本卡只保留官方入口供读者手动核对。";
+  }
+  return "官方 web 组件 snapshot 本轮不可用，本卡只保留官方入口供读者手动核对。";
 }
 
 function dailyTrackingCategoryLabel(category) {

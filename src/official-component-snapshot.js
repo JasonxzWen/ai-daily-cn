@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 const MAX_HTML_LENGTH = 50000;
 const MAX_CSS_LENGTH = 25000;
 const SUPPORTED_COMPONENT_KINDS = new Set(["openrouter_rankings", "artificial_analysis_index"]);
+const BROAD_SOURCE_SELECTORS = new Set(["html", "body", "main", "#root", "#__next"]);
+const MAX_PUBLIC_HTML_LENGTH = 30000;
 
 export function createOfficialComponentSnapshot(input = {}) {
   const sanitizedHtml = sanitizeOfficialHtmlFragment(input.html || input.sanitized_html || input.sanitizedHtml);
@@ -13,7 +15,11 @@ export function createOfficialComponentSnapshot(input = {}) {
   const componentKind = String(input.componentKind || input.component_kind || "").trim();
   const sourceUrl = String(input.sourceUrl || input.source_url || "").trim();
   const selectorVersion = String(input.selectorVersion || input.selector_version || "").trim();
+  const sourceSelector = String(input.sourceSelector || input.source_selector || "").trim();
   if (!SUPPORTED_COMPONENT_KINDS.has(componentKind) || !isHttpUrl(sourceUrl) || !selectorVersion) {
+    return null;
+  }
+  if (!isPublishableOfficialComponentFragment({ html: sanitizedHtml, sourceSelector })) {
     return null;
   }
   return {
@@ -23,12 +29,31 @@ export function createOfficialComponentSnapshot(input = {}) {
     source_url: sourceUrl,
     captured_at: String(input.capturedAt || input.captured_at || new Date().toISOString()),
     selector_version: selectorVersion,
-    source_selector: String(input.sourceSelector || input.source_selector || "").trim(),
+    source_selector: sourceSelector,
     sanitized_html: sanitizedHtml,
     sanitized_css: sanitizedCss,
     dom_hash: sha256(sanitizedHtml),
     css_hash: sha256(sanitizedCss)
   };
+}
+
+export function isPublishableOfficialComponentFragment(input = {}) {
+  const html = String(input.html || input.sanitized_html || input.sanitizedHtml || "").trim();
+  const selector = normalizeSelector(input.sourceSelector || input.source_selector || "");
+  if (!html || html.length > MAX_PUBLIC_HTML_LENGTH) {
+    return false;
+  }
+  if (BROAD_SOURCE_SELECTORS.has(selector)) {
+    return false;
+  }
+  if (/^<\s*(html|body|main)(?:\s|>)/i.test(html)) {
+    return false;
+  }
+  const rowLikeCount = (html.match(/<\s*tr\b|role\s*=\s*["']row["']|<\s*li\b/gi) || []).length;
+  const hasComponentMarker = /data-[^=]*(openrouter|ranking|leaderboard|analysis|index|aa)|class\s*=\s*["'][^"']*(ranking|leaderboard|analysis|index|card)/i.test(html);
+  const hasStructuredSurface = /<\s*table\b|role\s*=\s*["']table["']/i.test(html) || rowLikeCount > 0;
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 20 && (hasStructuredSurface || hasComponentMarker);
 }
 
 export function normalizeOfficialComponentSnapshot(input = {}, defaults = {}) {
@@ -105,6 +130,10 @@ export function officialSnapshotForInteraction(input = {}) {
 
 function sha256(value) {
   return `sha256:${createHash("sha256").update(String(value || "")).digest("hex")}`;
+}
+
+function normalizeSelector(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 function isHttpUrl(value) {

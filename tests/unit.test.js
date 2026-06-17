@@ -787,6 +787,40 @@ test("official component snapshots require publishable metadata", () => {
   );
 });
 
+test("official component snapshots reject broad full-page fragments", () => {
+  const broadHtml = [
+    "<main class=\"tabular-nums\">",
+    "<nav>OpenRouter navigation</nav>",
+    "<section><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section>",
+    "</main>"
+  ].join("");
+
+  assert.equal(
+    createOfficialComponentSnapshot({
+      componentKind: "openrouter_rankings",
+      sourceUrl: "https://openrouter.ai/rankings",
+      capturedAt: fixedGeneratedAt,
+      selectorVersion: "openrouter-rankings-v1",
+      sourceSelector: "main",
+      html: broadHtml,
+      css: ".tabular-nums { display: block; }"
+    }),
+    null
+  );
+
+  assert(
+    createOfficialComponentSnapshot({
+      componentKind: "openrouter_rankings",
+      sourceUrl: "https://openrouter.ai/rankings",
+      capturedAt: fixedGeneratedAt,
+      selectorVersion: "openrouter-rankings-v1",
+      sourceSelector: "main [data-openrouter-rankings]",
+      html: "<section data-openrouter-rankings><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section>",
+      css: ".or-card { color: #111827; }"
+    })
+  );
+});
+
 function artificialAnalysisIndexSampleText(rows = 10) {
   const entries = [
     ["Claude Opus 4.8 (Adaptive Reasoning, Max Effort)", "61"],
@@ -7800,6 +7834,22 @@ test("buildSite writes reader-safe public data without internal fields or candid
       capture_kind: "full_page_screenshot"
     }
   ];
+  const broadOfficialSnapshot = {
+    status: "available",
+    source: "official_dom",
+    component_kind: "openrouter_rankings",
+    source_url: "https://openrouter.ai/rankings",
+    captured_at: fixedGeneratedAt,
+    selector_version: "openrouter-rankings-v1",
+    source_selector: "main",
+    sanitized_html: "<main class=\"tabular-nums\"><nav>OpenRouter navigation</nav><section><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section></main>",
+    sanitized_css: ".tabular-nums { min-height: 4000px; }",
+    dom_hash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    css_hash: "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  };
+  report.daily_tracking[0].snapshot.official_component_snapshot = broadOfficialSnapshot;
+  report.daily_tracking[0].tracking_component_snapshot = buildTrackingComponentSnapshot(report.daily_tracking[0]);
+  report.daily_tracking[0].tracking_component_snapshot.official_component_snapshot = broadOfficialSnapshot;
   await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   await fs.writeFile(path.join(reportDir, `${report.report_date}.candidates.json`), `${JSON.stringify({
     schema_version: 1,
@@ -7854,6 +7904,9 @@ test("buildSite writes reader-safe public data without internal fields or candid
   }
   assert.equal(publicData.daily_tracking.length, 1);
   assert.equal(publicData.daily_tracking[0].id, "openrouter-rankings");
+  assert.equal(publicData.daily_tracking[0].snapshot.official_component_snapshot, undefined);
+  assert.equal(publicData.daily_tracking[0].tracking_component_snapshot.official_component_snapshot, undefined);
+  assert(!JSON.stringify(publicData).includes("<main class=\"tabular-nums\""));
   assert.equal(publicData.hero_highlights[0].why_watch, "Public impact for the must-read card.");
   assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
@@ -13520,6 +13573,50 @@ test("tracking visual tables render OpenRouter and Artificial Analysis without s
   assert.equal(section.items.length, 2);
   assert(section.items.every((item) => item.table?.rows?.length === 10));
   assert(section.items.every((item) => item.media === undefined));
+});
+
+test("daily tracking broad official snapshots degrade instead of rendering full-page dumps", () => {
+  const report = strictPublishReportFixture();
+  const item = {
+    id: "openrouter-rankings",
+    name: "OpenRouter",
+    url: "https://openrouter.ai/rankings",
+    event_date: report.report_date,
+    source: "OpenRouter Rankings",
+    category: "model_usage",
+    importance: "notable",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    change_status: "changed",
+    publish_to_public: true,
+    summary: "OpenRouter parsed Top 10 model usage rows.",
+    metrics: [],
+    snapshot: openRouterSnapshotFixture()
+  };
+  item.tracking_component_snapshot = buildTrackingComponentSnapshot(item);
+  item.tracking_component_snapshot.official_component_snapshot = {
+    status: "available",
+    source: "official_dom",
+    component_kind: "openrouter_rankings",
+    source_url: "https://openrouter.ai/rankings",
+    captured_at: fixedGeneratedAt,
+    selector_version: "openrouter-rankings-v1",
+    source_selector: "main",
+    sanitized_html: "<main class=\"tabular-nums\"><nav>OpenRouter</nav><section><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section></main>",
+    sanitized_css: ".tabular-nums { display: block; }",
+    dom_hash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    css_hash: "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  };
+  report.daily_tracking = [item];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((current) => current.group === "signals" && current.cardClass === "tracking-card");
+  const card = section.items.find((current) => current.title === "OpenRouter");
+
+  assert.match(card.body, /整页级 DOM|snapshot 本轮不可用/);
+  assert.equal(card.component, undefined);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
 });
 
 test("tracking component snapshot exposes OpenRouter and Artificial Analysis trace data", async () => {

@@ -3520,8 +3520,9 @@ async function readOpenRouterRankingsPageSnapshot(sourceInfo, options = {}) {
       capturedAt: options.generatedAt,
       selectors: [
         "main [data-openrouter-rankings]",
-        "main",
-        "body"
+        "[data-openrouter-rankings]",
+        "[class*='ranking'] table",
+        "[class*='leaderboard'] table"
       ]
     });
     const evidence_assets = await captureDailyTrackingPageEvidence({
@@ -3758,8 +3759,9 @@ async function readArtificialAnalysisIndexPageSnapshot(sourceInfo, options = {})
       selectors: [
         "main [data-testid*='leaderboard']",
         "main [class*='leaderboard']",
-        "main",
-        "body"
+        "[data-testid*='leaderboard']",
+        "[class*='leaderboard'] table",
+        "table"
       ]
     });
     const evidence_assets = await captureDailyTrackingPageEvidence({
@@ -3792,7 +3794,7 @@ function buildOfficialComponentSnapshotFromOption(value, sourceInfo, defaults = 
 }
 
 async function captureOfficialComponentSnapshot(page, sourceInfo, options = {}) {
-  const selectors = Array.isArray(options.selectors) && options.selectors.length > 0 ? options.selectors : ["main", "body"];
+  const selectors = Array.isArray(options.selectors) && options.selectors.length > 0 ? options.selectors : [];
   const fragment = await page.evaluate(async ({ selectors: candidateSelectors }) => {
     const firstExistingSelector = candidateSelectors.find((selector) => {
       try {
@@ -3800,8 +3802,11 @@ async function captureOfficialComponentSnapshot(page, sourceInfo, options = {}) 
       } catch {
         return false;
       }
-    }) || "body";
-    const element = document.querySelector(firstExistingSelector) || document.body;
+    });
+    if (!firstExistingSelector) {
+      return null;
+    }
+    const element = document.querySelector(firstExistingSelector);
     const cssParts = [];
     for (const style of Array.from(document.querySelectorAll("style"))) {
       const text = style.textContent || "";
@@ -3825,6 +3830,9 @@ async function captureOfficialComponentSnapshot(page, sourceInfo, options = {}) 
       css: cssParts.join("\n")
     };
   }, { selectors });
+  if (!fragment) {
+    return null;
+  }
   return createOfficialComponentSnapshot({
     componentKind: options.componentKind,
     sourceUrl: sourceInfo.url,
