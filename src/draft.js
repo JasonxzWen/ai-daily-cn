@@ -3982,7 +3982,7 @@ function englishEvidenceSummary(candidate, evidence) {
   if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
     return "这篇论文把科学发现定义为搜索空间本身的改变，讨论 AI scientist 如何在无人提示时识别这种转变";
   }
-  return "";
+  return englishPublicSummary(candidate);
 }
 
 function englishEvidenceDetail(candidate, evidence) {
@@ -3990,7 +3990,229 @@ function englishEvidenceDetail(candidate, evidence) {
   if (/self-revising discovery systems|genuine scientific discovery is not answer generation|change in the search space/.test(text)) {
     return "原文把重点放在 AI scientist 能否察觉问题空间已经变化，并用 category-theoretic framework 描述自修正发现系统";
   }
-  return "";
+  return englishPublicDetail(candidate);
+}
+
+function englishPublicHeadline(candidate) {
+  const signal = englishPublicSignal(candidate);
+  return signal ? signal.headline : "";
+}
+
+function englishPublicSummary(candidate) {
+  const signal = englishPublicSignal(candidate);
+  return signal ? signal.summary : "";
+}
+
+function englishPublicDetail(candidate) {
+  const signal = englishPublicSignal(candidate);
+  return signal ? signal.detail : "";
+}
+
+function englishPublicPoint(candidate, rawPoint = "") {
+  const signal = englishPublicSignal(candidate);
+  if (!signal) {
+    return "";
+  }
+  const pointText = String(rawPoint || "").toLowerCase();
+  if (/latency|cold.?start|cost|cache|caching|loading/.test(pointText)) {
+    return signal.points.find((point) => /延迟|成本|缓存|加载/u.test(point)) || signal.points[0] || "";
+  }
+  if (/guardrail|policy|filter|control|safety|observability/.test(pointText)) {
+    return signal.points.find((point) => /策略|安全|过滤|观测|控制/u.test(point)) || signal.points[0] || "";
+  }
+  if (/fraud|transaction|sequence|feature|data/.test(pointText)) {
+    return signal.points.find((point) => /交易|数据|序列|特征|反欺诈/u.test(point)) || signal.points[0] || "";
+  }
+  return signal.points[0] || signal.detail || signal.summary;
+}
+
+function englishPublicSignal(candidate) {
+  const rawTitle = stripDraftPublicBodyNoise(decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(), candidate);
+  const rawEvidence = stripDraftPublicBodyNoise([candidate.evidence, candidate.summary, candidate.content, candidate.original_text]
+    .map((value) => String(value || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join(" "), candidate);
+  const joined = `${rawTitle} ${rawEvidence}`.replace(/\s+/g, " ").trim();
+  if (!joined || hasReaderChineseText(joined)) {
+    return null;
+  }
+  const words = joined.match(/\b[A-Za-z][A-Za-z-]{2,}\b/g) || [];
+  if (words.length < 8) {
+    return null;
+  }
+  const text = joined.toLowerCase();
+  const actor = publicActorLabel(candidate);
+  const profile = englishSignalProfile(text);
+  const headline = `${actor}${profile.verb}${profile.topic}`;
+  const summary = `${actor}${profile.verb}${profile.topic}，材料覆盖${profile.scope}，边界落在${profile.boundary}`;
+  const detail = `材料把${profile.topic}落到${profile.scope}，已披露事实集中在${profile.factFocus}`;
+  const points = [
+    `原文说明${profile.topic}的核心变化，范围包括${profile.scope}`,
+    `可核对的硬信息集中在${profile.factFocus}`,
+    `边界主要是${profile.boundary}`
+  ];
+  return { headline, summary, detail, points };
+}
+
+function publicActorLabel(candidate) {
+  const source = String(candidate.source || "").replace(/\s+/g, " ").trim();
+  const title = String(candidate.title || "").replace(/\s+/g, " ").trim();
+  const text = `${source} ${title}`.toLowerCase();
+  if (/github trending/.test(text) || candidate.source_level === "github" || candidate.repo) return "该开源项目";
+  if (/microsoft/.test(text)) return "微软研究院";
+  if (/google deepmind|deepmind/.test(text)) return "DeepMind";
+  if (/openai/.test(text)) return "OpenAI";
+  if (/\bqwen\b|qwenlm/.test(text)) return "Qwen 团队";
+  if (/\bqoder\b/.test(text)) return "Qoder";
+  if (/\bwarp\b/.test(text)) return "Warp";
+  if (/\breprorepo\b/.test(text)) return "ReproRepo";
+  if (/agent dashboard/.test(text)) return "Agent Dashboard";
+  if (/aws|sagemaker|bedrock/.test(text)) return "AWS";
+  if (/nvidia/.test(text)) return "NVIDIA";
+  const cleaned = source
+    .replace(/\b(?:News|RSS|Blog|Research|Developer|Machine Learning|Feed|Changelog)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (cleaned && cleaned.length <= 24) {
+    return cleaned;
+  }
+  return "相关团队";
+}
+
+function englishSignalProfile(text) {
+  if (/simulated conversations|model deployments?|pre-release|red-team|safety monitoring/.test(text)) {
+    return {
+      verb: "披露",
+      topic: "模拟对话评估与模型部署流程",
+      scope: "预发布评估、策略检查、红队审查和上线监控",
+      boundary: "模型发布不只依赖单次 benchmark，而是把安全评估接入部署链路",
+      factFocus: "模拟对话、发布分阶段、策略检查和线上监控"
+    };
+  }
+  if (/robot learning|multimodal|embodied|robotics/.test(text)) {
+    return {
+      verb: "介绍",
+      topic: "机器人学习与多模态推理实验",
+      scope: "具身任务规划、训练数据、多模态推理和评估工作流",
+      boundary: "研究信号仍需要看真实机器人任务、数据规模和评测设置",
+      factFocus: "机器人学习实验、多模态推理和任务规划评估"
+    };
+  }
+  if (/house-building|urban planning|planning constraints|public-sector|infrastructure tradeoffs/.test(text)) {
+    return {
+      verb: "展示",
+      topic: "住房建设约束规划项目",
+      scope: "选址约束、基础设施取舍、规划流程和公共部门决策支持",
+      boundary: "这类 AI 规划工具的价值取决于数据边界、审批流程和责任归属",
+      factFocus: "规划约束、选址模型、基础设施取舍和公共部门使用场景"
+    };
+  }
+  if (/easycopilot|enterprise agent|business process|task routing/.test(text)) {
+    return {
+      verb: "推出",
+      topic: "企业 agent 工作流系统",
+      scope: "任务路由、业务流程自动化、护栏和组织集成入口",
+      boundary: "企业采用时仍要处理权限、审计、流程接入和失败恢复",
+      factFocus: "任务路由、业务流程、组织护栏和系统集成点"
+    };
+  }
+  if (/qoder|coding agents?|repository context|ide integration|software teams?/.test(text)) {
+    return {
+      verb: "发布",
+      topic: "面向软件团队的 agent 平台",
+      scope: "代码仓库上下文、工作流编排、IDE 集成、企业控制和评估钩子",
+      boundary: "工程落地取决于仓库权限、上下文质量、评估回放和团队治理",
+      factFocus: "coding agent、仓库上下文、IDE 集成和评估钩子"
+    };
+  }
+  if (/agent dashboard|tool-call|incident|observability|rollback|release-health/.test(text)) {
+    return {
+      verb: "发布",
+      topic: "生产 agent 观测面板",
+      scope: "工具调用轨迹、事故时间线、成本归因、回滚状态和发布健康度",
+      boundary: "观测价值取决于能否把失败记录、成本和发布状态串进同一条链路",
+      factFocus: "tool-call traces、事故记录、成本归因和回滚状态"
+    };
+  }
+  if (/grok|warp terminal|command-line|terminal assistant/.test(text)) {
+    return {
+      verb: "接入",
+      topic: "终端助手里的模型选项",
+      scope: "代码帮助、命令解释、模型路由和开发者工作流自定义",
+      boundary: "终端内模型能力仍受权限、命令风险和团队默认配置约束",
+      factFocus: "Grok 模型入口、终端助手、命令解释和模型路由"
+    };
+  }
+  if (/reprorepo|reproducible|failure reports?|tool traces|repository snapshots|regression replay/.test(text)) {
+    return {
+      verb: "公开",
+      topic: "agent 失败复现报告流程",
+      scope: "提示词、工具轨迹、仓库快照、期望输出和回归回放元数据",
+      boundary: "复现质量取决于记录粒度、隐私处理和能否稳定重放失败",
+      factFocus: "prompt、工具轨迹、仓库快照和回归回放字段"
+    };
+  }
+  if (/sagemaker|container caching|model loading latency|cold-start|serving cost/.test(text)) {
+    return {
+      verb: "讲解",
+      topic: "SageMaker 推理容器缓存方案",
+      scope: "模型加载延迟、冷启动时间、发布风险和生产推理成本",
+      boundary: "收益取决于模型大小、镜像组织、缓存命中率和部署频率",
+      factFocus: "容器缓存、模型加载、冷启动延迟和部署成本"
+    };
+  }
+  if (/transaction foundation model|financial fraud|fraud detection|sequence modeling|feature pipelines/.test(text)) {
+    return {
+      verb: "拆解",
+      topic: "交易基础模型与反欺诈工作流",
+      scope: "交易序列建模、特征流水线、合成数据边界和部署取舍",
+      boundary: "金融场景还要处理数据偏差、可解释性、误报成本和合规要求",
+      factFocus: "交易数据、序列建模、特征流水线和反欺诈部署"
+    };
+  }
+  if (/bedrock guardrails|multi-agent|prompt filtering|response controls|policy checks/.test(text)) {
+    return {
+      verb: "说明",
+      topic: "Bedrock Guardrails 多 agent 管控方案",
+      scope: "策略检查、提示过滤、响应控制、企业应用和可观测性",
+      boundary: "多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底",
+      factFocus: "Guardrails、策略检查、提示过滤和响应控制"
+    };
+  }
+  if (/agent|workflow|developer|coding|software|repository|ide|tool|platform/.test(text)) {
+    return {
+      verb: "更新",
+      topic: "agent 工作流和开发工具能力",
+      scope: "任务编排、上下文、权限控制、工程集成和失败恢复",
+      boundary: "落地质量取决于权限模型、评估回放、团队流程和可观测性",
+      factFocus: "agent 工作流、开发工具入口、权限控制和工程集成"
+    };
+  }
+  if (/model|llm|reasoning|multimodal|benchmark|evaluation|research|planning/.test(text)) {
+    return {
+      verb: "披露",
+      topic: "模型能力和评估方法更新",
+      scope: "能力边界、评估设置、数据来源、使用场景和限制说明",
+      boundary: "结论仍要依赖可复现评测、真实任务和公开限制",
+      factFocus: "模型能力、评估设置、数据来源和限制说明"
+    };
+  }
+  if (/guardrail|safety|security|policy|governance|risk/.test(text)) {
+    return {
+      verb: "说明",
+      topic: "安全治理和平台控制更新",
+      scope: "策略检查、风险控制、上线约束、审计记录和组织执行",
+      boundary: "治理效果取决于误判率、日志留存、人工复核和系统接入范围",
+      factFocus: "策略检查、风险控制、审计记录和上线约束"
+    };
+  }
+  return {
+    verb: "更新",
+    topic: "AI 产品、平台或工程实践",
+    scope: "功能变化、使用场景、接入方式、限制条件和后续部署边界",
+    boundary: "公开材料仍需要回到原文核对入口、权限、价格和适用范围",
+    factFocus: "功能变化、适用场景、接入方式和限制条件"
+  };
 }
 
 function samePublicCopy(left, right) {
@@ -4441,7 +4663,7 @@ function englishTitleToChineseHeadline(rawTitle, candidate = {}) {
   if (/alibaba cloud blog/.test(source) && /hermesagent|outlook/.test(lower)) {
     return "阿里云展示 HermesAgent 邮件汇总示例";
   }
-  return "";
+  return englishPublicHeadline(candidate);
 }
 
 function genericFactTheme({ category, sourceLevel, text }) {
@@ -4867,9 +5089,12 @@ function splitHotBlogSummaryPoints(summary) {
 }
 
 function normalizeHotBlogPoint(value, candidate) {
-  const cleaned = stripDraftPublicBodyNoise(stripSentenceEnding(String(value || "")), candidate)
+  let cleaned = stripDraftPublicBodyNoise(stripSentenceEnding(String(value || "")), candidate)
     .replace(/\s+/g, " ")
     .trim();
+  if (cleaned && !hasReaderChineseText(cleaned) && hasReaderEnglishText(cleaned)) {
+    cleaned = englishPublicPoint(candidate, cleaned);
+  }
   if (!cleaned || cleaned.length < 12) return "";
   return ensureChineseSentence(trimText(cleaned, 150));
 }

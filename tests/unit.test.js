@@ -9744,6 +9744,179 @@ test("report:draft fills sparse main stream from unified candidate roles", async
   assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 4);
 });
 
+test("draft generator emits reader-facing Chinese sections without AI repair", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-generation-first-quality-"));
+  const reportDate = "2026-06-17";
+  const mainCandidates = [
+    {
+      id: "openai-simulated-conversations",
+      source: "OpenAI News RSS",
+      url: "https://openai.com/index/simulated-conversations",
+      title: "OpenAI details how simulated conversations support model deployments",
+      evidence: "OpenAI describes simulated conversations for staged model deployments, pre-release evaluation, policy checks, red-team review, and production safety monitoring.",
+      editorialCategory: "ai_industry"
+    },
+    {
+      id: "qwen-robot-learning",
+      source: "Qwen Blog",
+      url: "https://qwenlm.github.io/blog/qwen-robot-learning",
+      title: "Qwen researchers describe robot learning work with multimodal reasoning",
+      evidence: "The Qwen team explains robot learning experiments that connect multimodal reasoning, embodied task planning, training data, and evaluation workflows for robotics systems.",
+      editorialCategory: "research_product"
+    },
+    {
+      id: "qoder-agent-platform",
+      source: "Qoder Blog",
+      url: "https://qoder.com/blog/qoder-1-agent-platform",
+      title: "Qoder 1.0 launches an agent platform for software teams",
+      evidence: "Qoder 1.0 introduces coding agents, repository context, workflow orchestration, IDE integration, enterprise controls, and evaluation hooks for software engineering teams.",
+      editorialCategory: "developer_tools"
+    },
+    {
+      id: "deepmind-urban-planning",
+      source: "Google DeepMind Blog",
+      url: "https://deepmind.google/discover/blog/ai-for-house-building",
+      title: "Google DeepMind applies AI planning to UK house-building constraints",
+      evidence: "Google DeepMind describes an AI planning project for UK house-building that models planning constraints, location choices, infrastructure tradeoffs, and public-sector decision support.",
+      editorialCategory: "policy_society"
+    },
+    {
+      id: "microsoft-easy-copilot",
+      source: "Microsoft Research Blog",
+      url: "https://www.microsoft.com/en-us/research/blog/easy-copilot",
+      title: "Microsoft Research introduces EasyCopilot for enterprise agent workflows",
+      evidence: "Microsoft Research introduces EasyCopilot as an enterprise agent workflow system with task routing, business process automation, guardrails, and integration points for organizations.",
+      editorialCategory: "company_business"
+    },
+    {
+      id: "agent-dashboard-open-source",
+      source: "Agent Dashboard",
+      url: "https://agentdashboard.dev/blog/launch",
+      title: "Agent Dashboard tracks production AI agents across tool calls and incidents",
+      evidence: "Agent Dashboard explains observability for production AI agents, including tool-call traces, incident timelines, cost attribution, rollback status, and release-health views.",
+      editorialCategory: "developer_tools"
+    },
+    {
+      id: "warp-grok",
+      source: "Warp Blog",
+      url: "https://www.warp.dev/blog/use-grok-in-warp",
+      title: "Use Grok in Warp terminal for coding and command-line assistance",
+      evidence: "Warp adds Grok as a model option inside its terminal assistant, covering coding help, command-line explanations, model routing, and developer workflow customization.",
+      editorialCategory: "developer_tools"
+    },
+    {
+      id: "reprorepo-release",
+      source: "ReproRepo Blog",
+      url: "https://reprorepo.dev/blog/release",
+      title: "ReproRepo publishes reproducible AI agent failure reports for teams",
+      evidence: "ReproRepo publishes an AI agent failure-reporting workflow that records prompts, tool traces, repository snapshots, expected outputs, and regression replay metadata.",
+      editorialCategory: "developer_tools"
+    }
+  ].map((candidate) => mainStreamRepairCandidate(reportDate, {
+    ...candidate,
+    sourceLevel: "official_company_news",
+    editorialCategory: candidate.editorialCategory
+  }));
+  const hotBlogCandidates = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "sagemaker-container-cache",
+      category: "hot_blog",
+      source: "AWS Machine Learning Blog",
+      url: "https://aws.amazon.com/blogs/machine-learning/sagemaker-container-caching",
+      title: "Reduce model loading latency with SageMaker inference container caching",
+      evidence: "The AWS post explains how SageMaker inference container caching reduces model loading latency, cold-start time, rollout risk, and production serving cost for model deployments.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "nvidia-transaction-foundation-model",
+      category: "hot_blog",
+      source: "NVIDIA Developer Blog",
+      url: "https://developer.nvidia.com/blog/transaction-foundation-model",
+      title: "Build a transaction foundation model for financial fraud workflows",
+      evidence: "The NVIDIA article walks through a transaction foundation model for fraud detection, sequence modeling, feature pipelines, synthetic data boundaries, and deployment tradeoffs.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "bedrock-guardrails-agents",
+      category: "hot_blog",
+      source: "AWS Machine Learning Blog",
+      url: "https://aws.amazon.com/blogs/machine-learning/bedrock-guardrails-agents",
+      title: "Apply Bedrock Guardrails to multi-agent enterprise applications",
+      evidence: "The AWS post explains how Bedrock Guardrails are applied to multi-agent enterprise applications, policy checks, prompt filtering, response controls, and observability.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    })
+  ];
+  const discoveryPath = path.join(tmp, "discovery.json");
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discoveryEnvelope({
+    candidates: [...mainCandidates, ...hotBlogCandidates],
+    sourceNames: [
+      "OpenAI News RSS",
+      "Qwen Blog",
+      "Qoder Blog",
+      "Google DeepMind Blog",
+      "Microsoft Research Blog",
+      "Agent Dashboard",
+      "Warp Blog",
+      "ReproRepo Blog",
+      "AWS Machine Learning Blog",
+      "NVIDIA Developer Blog"
+    ]
+  }), null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(drafted.report.main_items.length >= 5);
+  assert(drafted.report.hero_highlights.length >= 2);
+  assert(drafted.report.hot_blogs.length >= 3);
+
+  const publicDraftText = JSON.stringify({
+    summary: drafted.report.summary,
+    hero_highlights: drafted.report.hero_highlights,
+    main_items: drafted.report.main_items,
+    hot_blogs: drafted.report.hot_blogs
+  });
+  for (const fragment of [
+    "OpenAI details how simulated conversations support model deployments",
+    "Qoder 1.0 launches an agent platform for software teams",
+    "Use Grok in Warp terminal for coding and command-line assistance",
+    "Reduce model loading latency with SageMaker inference container caching",
+    "Build a transaction foundation model for financial fraud workflows",
+    "Apply Bedrock Guardrails to multi-agent enterprise applications"
+  ]) {
+    assert(!publicDraftText.includes(fragment), `public draft leaked English source title: ${fragment}`);
+  }
+
+  for (const item of drafted.report.main_items) {
+    assert(/\p{Script=Han}/u.test(item.title), `main title should be Chinese: ${item.title}`);
+    assert(/\p{Script=Han}/u.test(item.summary), `main summary should be Chinese: ${item.summary}`);
+    assert(Array.isArray(item.bullets) && item.bullets.length >= 1);
+    assert(item.bullets.every((bullet) => /\p{Script=Han}/u.test(String(bullet || ""))));
+  }
+  for (const highlight of drafted.report.hero_highlights) {
+    assert(/\p{Script=Han}/u.test(highlight.title), `hero title should be Chinese: ${highlight.title}`);
+    assert(/\p{Script=Han}/u.test(highlight.what_happened || highlight.reason || ""), `hero detail should be Chinese: ${JSON.stringify(highlight)}`);
+  }
+  for (const blog of drafted.report.hot_blogs) {
+    assert(/\p{Script=Han}/u.test(blog.title), `hot blog title should be Chinese: ${blog.title}`);
+    assert(/\p{Script=Han}/u.test(blog.summary), `hot blog summary should be Chinese: ${blog.summary}`);
+    assert(Array.isArray(blog.key_points) && blog.key_points.length >= 3);
+    assert(blog.key_points.every((point) => /\p{Script=Han}/u.test(String(point || ""))));
+  }
+
+  const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
+  assert.deepEqual(review.ai_review_tasks, []);
+});
+
 test("report:draft does not fill main stream with generic GitHub trending text", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-generic-github-"));
   const reportDate = "2026-06-15";

@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-17.project_iteration.generation-first-daily-quality",
+  "run_type": "project_iteration",
+  "date": "2026-06-17",
+  "title": "Generation-first daily quality correction",
+  "status": "completed",
+  "summary": "Project iteration record for moving public AI daily prose quality back into report:draft generation. The repair contract remains a fallback: the generator now deterministically rewrites English source titles and evidence into Chinese reader-facing main items, hero highlights, and hot blog titles, summaries, and key points before quality review.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"draft generator emits reader-facing Chinese sections without AI repair\"",
+      "node --test tests/unit.test.js",
+      "npm run build",
+      "npm run quality:page-check -- --date 2026-06-17",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "AI repair should not become the normal daily publishing product surface.",
+      "evidence": "The 2026-06-17 run was publishable only after a codex_ai_repair_contract step rewrote English or thin public prose; the new unit fixture now requires report:draft plus reviewReportQuality to pass without AI repair tasks.",
+      "scope": "daily_generation_quality",
+      "persistence": "implemented",
+      "recommended_action": "Keep adding deterministic generation-side fixtures whenever a public prose repair is observed, and use repair only for exceptional unknown wording."
+    },
+    {
+      "lesson": "Generic English-to-Chinese fallback must not promote ranking source labels into public summary copy.",
+      "evidence": "The first implementation made a GitHub ranking-source regression visible; the actor-label guard now maps GitHub project candidates to a neutral project label instead of the ranking feed name.",
+      "scope": "main_items_and_github_refill",
+      "persistence": "implemented",
+      "recommended_action": "Treat ranking and aggregator labels as provenance, not reader-facing event actors, when generating fallback copy."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Main items, hero highlights, and hot blogs could receive English source titles and thin evidence-derived prose, causing the normal runner to enter AI repair.",
+      "evidence": "The red test failed on leaked title text such as `OpenAI details how simulated conversations support model deployments`; after the draft generator change, the same fixture passes reviewReportQuality with no ai_review_tasks.",
+      "module": "src/draft.js",
+      "suggestion": "Use deterministic English signal profiles to create Chinese headlines, summaries, details, and hot blog points from source title and evidence before public quality review.",
+      "expected_benefit": "Normal daily runs are more likely to publish directly from generation when source facts are sufficient, while low-signal cases can still be refused or repaired as fallback.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in draft generation and bound to the unit test `draft generator emits reader-facing Chinese sections without AI repair` plus existing page and publish quality gates.",
+      "ledger_links": [
+        "feedback/p1-ai-quality-review-loop",
+        "feedback/p1-public-daily-content-contract",
+        "feedback/p1-main-stream-blacklist-refill",
+        "feedback/p1-ai-daily-requirements-reconciliation",
+        "feedback/p1-public-reader-section-quality",
+        "feedback/p1-public-editorial-repair-template",
+        "feedback/p1-public-signal-layering",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-chinese-hot-blog-slot"
+      ],
+      "validation_evidence": [
+        "draft generator emits reader-facing Chinese sections without AI repair",
+        "report:draft does not backfill must read highlights from GitHub ranking cells",
+        "npm run quality:page-check -- --date 2026-06-17",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-public-editorial-repair-template",
+    "feedback/p1-public-signal-layering",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-chinese-hot-blog-slot",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Extend the same generation-first quality fixture pattern to Builder and community sections after the first main/hero/hot-blog pass is merged.",
+      "owner": "project"
+    }
+  ]
+}
