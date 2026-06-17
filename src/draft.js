@@ -897,6 +897,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
         },
         builder_observations: {
           eligible_candidates: selection.eligible_counts?.builder_observations || 0,
+          eligible_after_filter: selection.eligible_counts?.builder_observations || 0,
           selected: selection.builder_observations.length
         },
         official_org_updates: {
@@ -5581,6 +5582,9 @@ function builderReadableSummary(originalText) {
   if (/fable export control situation|regulation discourse/.test(lower)) {
     return "Aaron Levie 把 Fable 出口管制事件看作模型层监管的早期样本：如果每次模型发布都要和政府反复确认风险，发布节奏和市场进展都会被拖慢。";
   }
+  if (BUILDER_RELEVANCE_RE.test(text)) {
+    return builderGenericEnglishSummary(text);
+  }
   return "";
 }
 
@@ -5611,6 +5615,16 @@ function builderFocusPoints(text) {
     return "高价值训练数据为什么难拿，以及这会卡住哪些知识工作 agent";
   }
   return "真实场景、落地边界和哪些做法可以直接复用";
+}
+
+function builderGenericEnglishSummary(text) {
+  const normalized = String(text || "").replace(/\s+/g, " ").trim().toLowerCase();
+  const topic = builderTopicName(normalized);
+  const focus = builderFocusPoints(normalized);
+  const sourceSignal = /eval|benchmark|trace|rollback|permission|policy|routing|memory|workflow|production|agent|model/.test(normalized)
+    ? "工程落地"
+    : "产品判断";
+  return `原帖围绕${topic}给出一条${sourceSignal}线索，重点是${focus}；读者可把它作为 Builder/X 讨论信号，继续核对官方入口、可复现做法和失败边界。`;
 }
 
 function topicForCandidate(candidate) {
