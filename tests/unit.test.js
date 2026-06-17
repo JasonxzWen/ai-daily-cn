@@ -8949,6 +8949,82 @@ test("report:draft cleans Builder original_text shell metadata before publishing
   assert(!builderItem.original_text.includes("View post image"));
 });
 
+test("report:draft selects eligible English follow-builders X posts with deterministic Chinese summaries", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-english-generic-"));
+  const reportDate = "2026-06-17";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = discovery.candidates.filter((candidate) => candidate.category !== "builder_observation");
+  const englishBuilderPosts = [
+    {
+      id: "builder-agent-memory-traces",
+      author: "Example Builder",
+      handle: "builderone",
+      original_text: "AI agents need durable memory layers and tool traces across sessions so teams can debug production incidents instead of treating every run like a fresh chat."
+    },
+    {
+      id: "builder-eval-rollbacks",
+      author: "Eval Builder",
+      handle: "buildertwo",
+      original_text: "The next step for coding agents is not another demo. It is production evals, rollback plans, and permission boundaries that make unattended workflows auditable."
+    },
+    {
+      id: "builder-model-policy-controls",
+      author: "Infra Builder",
+      handle: "builderthree",
+      original_text: "AI model selection is becoming an application policy problem: teams need budgets, latency targets, eval results, and routing controls before switching models automatically."
+    }
+  ].map((item, index) => ({
+    ...item,
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: `${item.author}: ${item.original_text.slice(0, 60)}`,
+    url: `https://x.com/${item.handle}/status/206170000000000000${index + 1}`,
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: `https://x.com/${item.handle}/status/206170000000000000${index + 1}`
+  }));
+  discovery.candidates.push(...englishBuilderPosts);
+  discovery.source_audit.builder_sources = {
+    checked: true,
+    candidates_found: englishBuilderPosts.length,
+    included: 0,
+    notes: "follow-builders X feed checked; 3 eligible AI/tech candidates after filtering.",
+    sources: [
+      {
+        name: "follow-builders X feed",
+        url: "https://x.com/i/lists/follow-builders",
+        status: "checked",
+        notes: "3 eligible AI/tech candidates after filtering."
+      }
+    ]
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const selectedIds = new Set(drafted.report.builder_observations.map((item) => item.candidate_id));
+  for (const item of englishBuilderPosts) {
+    assert(selectedIds.has(item.id), `${item.id} should be selected`);
+  }
+  assert.equal(drafted.report.self_check.selection_snapshot.builder_observations.eligible_after_filter, 3);
+  assert.equal(drafted.report.self_check.selection_snapshot.builder_observations.selected, 3);
+  for (const item of drafted.report.builder_observations.filter((entry) => selectedIds.has(entry.candidate_id))) {
+    assert.match(item.translation, /\p{Script=Han}/u);
+    assert.doesNotMatch(item.translation, /durable memory layers|not another demo|application policy problem/i);
+  }
+});
+
 test("report:draft rewrites Builder English fallbacks and strips community intermediary boilerplate", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-rewrite-"));
   const reportDate = "2026-05-26";
