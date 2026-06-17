@@ -991,7 +991,7 @@
     "github_trending_item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "repo", "description", "url", "event_date", "source", "rank", "trend"],
+      "required": ["name", "repo", "url", "event_date", "source", "rank", "trend"],
       "properties": {
         "name": {
           "type": "string",
@@ -1044,6 +1044,14 @@
           "type": "string",
           "minLength": 1
         },
+        "readme_fetch_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readme_error": {
+          "type": "string",
+          "minLength": 1
+        },
         "readme_cache": {
           "$ref": "#/$defs/github_readme_cache"
         },
@@ -1067,6 +1075,22 @@
         "rank": {
           "type": "integer",
           "minimum": 1
+        },
+        "source_rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stars_today": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stars_this_week": {
+          "type": "integer",
+          "minimum": 0
         },
         "previous_rank": {
           "anyOf": [

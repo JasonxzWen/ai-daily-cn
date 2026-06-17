@@ -139,11 +139,7 @@ function githubTrendDescriptionSource(item = {}) {
   if (readmeSummary) {
     return readmeSummary;
   }
-  const description = String(item.description || "").trim();
-  if (isGenericGithubTrendDescription(description)) {
-    return "";
-  }
-  return description;
+  return "";
 }
 
 function isGenericGithubTrendDescription(value) {

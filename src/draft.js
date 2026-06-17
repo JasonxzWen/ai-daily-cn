@@ -113,7 +113,8 @@ const MAIN_TARGET_MIN = 5;
 const MAIN_TARGET = 10;
 const MAIN_TARGET_MAX = 30;
 const MAIN_REFILL_WINDOW_DAYS = 3;
-const GITHUB_TRENDING_TARGET = 10;
+const GITHUB_TRENDING_TARGET = 20;
+const GITHUB_TRENDING_LANGUAGE_SCOPES = ["python", "typescript", "rust", "go", "java"];
 const HUGGINGFACE_TRENDING_TARGET = 10;
 const PROJECT_TARGET = 10;
 const HOT_BLOG_TARGET = 8;
@@ -1152,7 +1153,12 @@ function normalizeAutodraftPublicText(report) {
     delete item.key_points;
   }
   for (const item of report.github_trending || []) {
-    item.description = stripDraftPublicBodyNoise(item.description, item);
+    const description = stripDraftPublicBodyNoise(item.description, item);
+    if (description) {
+      item.description = description;
+    } else {
+      delete item.description;
+    }
   }
   for (const item of report.community_leads || []) {
     item.content = stripDraftPublicBodyNoise(item.content, item);
@@ -1687,22 +1693,29 @@ function githubTrendingItem(candidate, meta, index) {
   const repo = meta.repo || repoFromUrl(candidate.url) || candidate.title;
   const readmeSummary = String(meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "").trim();
   const readmeCache = meta.readme_cache || candidate.readme_cache || null;
+  const readmeFetchStatus = String(meta.readme_fetch_status || candidate.readme_fetch_status || meta.readme_status || candidate.readme_status || "").trim();
+  const readmeError = String(meta.readme_error || candidate.readme_error || "").trim();
+  const description = readmeSummary;
   return {
     name: meta.name || repo,
     repo,
     candidate_id: candidate.id,
-    description: readmeSummary || chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
+    ...(description ? { description } : {}),
     ...(readmeSummary ? { readme_summary: readmeSummary } : {}),
     ...(readmeCache ? { readme_cache: readmeCache } : {}),
+    ...(readmeFetchStatus ? { readme_fetch_status: readmeFetchStatus } : {}),
+    ...(readmeError ? { readme_error: readmeError } : {}),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "GitHub Trending",
-    language: meta.language || "",
-    window: meta.window || "daily",
-    rank: rankOf(meta, index + 1),
+    language: meta.language || candidate.language || "",
+    window: meta.window || candidate.window || "weekly",
+    rank: index + 1,
+    source_rank: rankOf(meta, index + 1),
+    source_scope: githubTrendingSourceScope(candidate, meta),
     previous_rank: Number.isInteger(meta.previous_rank) ? meta.previous_rank : null,
     rank_delta: Number.isInteger(meta.rank_delta) ? meta.rank_delta : null,
-    trend: ["new", "up", "down", "same"].includes(meta.trend) ? meta.trend : "new",
+    trend: ["new", "up", "down", "same"].includes(meta.trend || candidate.trend) ? (meta.trend || candidate.trend) : "new",
     evidence: candidate.evidence || meta.evidence || `${repo} appeared in GitHub Trending.`
   };
 }
@@ -3447,36 +3460,82 @@ function isGitHubTrendingCandidate(candidate, meta = {}) {
 }
 
 function publicGithubTrendingCandidates(candidates) {
-  const dailyAllLanguage = candidates
-    .filter(({ candidate, meta }) => isDailyAllLanguageGithubTrending(candidate, meta))
-    .sort((left, right) => rankOf(left.meta, 999) - rankOf(right.meta, 999));
-  const ranked = dailyAllLanguage.length >= 10 ? dailyAllLanguage : candidates;
-  return dedupeRankedGithubCandidates(ranked);
+  const weeklyAllLanguage = candidates
+    .filter(({ candidate, meta }) => isWeeklyAllLanguageGithubTrending(candidate, meta))
+    .sort(compareGithubSourceRank)
+    .slice(0, 10);
+  const languagePools = GITHUB_TRENDING_LANGUAGE_SCOPES.map((language) => candidates
+    .filter(({ candidate, meta }) => isWeeklyLanguageGithubTrending(candidate, meta, language))
+    .sort(compareGithubSourceRank)
+    .slice(0, 10));
+  const weeklyRanked = [
+    ...weeklyAllLanguage,
+    ...roundRobinGithubLanguagePools(languagePools)
+  ];
+  if (weeklyRanked.length > 0) {
+    return dedupeRankedGithubCandidates(weeklyRanked, GITHUB_TRENDING_TARGET);
+  }
+  return dedupeRankedGithubCandidates(candidates.sort(compareGithubSourceRank), GITHUB_TRENDING_TARGET);
 }
 
-function isDailyAllLanguageGithubTrending(candidate, meta = {}) {
+function isWeeklyAllLanguageGithubTrending(candidate, meta = {}) {
   const source = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.source_url || ""} ${meta.source_url || ""} ${candidate.url || ""}`.toLowerCase();
   const window = String(meta.window || candidate.window || "").toLowerCase();
-  const sourceLooksDaily = source.includes("trending?since=daily") || source.includes("github trending daily") || source.includes("github-trending-daily");
-  const languageFilteredSource = /github\.com\/trending\/[^?\s]+/.test(source) || /github trending (python|typescript|javascript|go|rust|java|c\+\+|c#|php|ruby|swift|kotlin|scala) daily/.test(source);
-  return sourceLooksDaily && (window === "daily" || sourceLooksDaily) && !languageFilteredSource;
+  const sourceLooksWeekly = source.includes("trending?since=weekly") || source.includes("github trending weekly") || source.includes("github-trending-weekly");
+  const languageFilteredSource = /github\.com\/trending\/[^?\s]+/.test(source) || /github trending (python|typescript|javascript|go|rust|java|c\+\+|c#|php|ruby|swift|kotlin|scala) weekly/.test(source);
+  const language = String(meta.language || candidate.language || "").toLowerCase();
+  return sourceLooksWeekly && (window === "weekly" || sourceLooksWeekly) && !languageFilteredSource && (!language || language === "all");
 }
 
-function dedupeRankedGithubCandidates(candidates) {
+function isWeeklyLanguageGithubTrending(candidate, meta = {}, language) {
+  const source = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.source_url || ""} ${meta.source_url || ""}`.toLowerCase();
+  const window = String(meta.window || candidate.window || "").toLowerCase();
+  const itemLanguage = String(meta.language || candidate.language || "").toLowerCase();
+  const sourceMatches = source.includes(`github trending ${language} weekly`) ||
+    source.includes(`github-trending-${language}-weekly`) ||
+    source.includes(`github.com/trending/${language}?since=weekly`);
+  return (window === "weekly" || sourceMatches) && (itemLanguage === language || sourceMatches);
+}
+
+function compareGithubSourceRank(left, right) {
+  return rankOf(left.meta, rankOf(left.candidate, 999)) - rankOf(right.meta, rankOf(right.candidate, 999));
+}
+
+function roundRobinGithubLanguagePools(pools) {
+  const result = [];
+  const maxLength = Math.max(0, ...pools.map((pool) => pool.length));
+  for (let index = 0; index < maxLength; index += 1) {
+    for (const pool of pools) {
+      if (pool[index]) {
+        result.push(pool[index]);
+      }
+    }
+  }
+  return result;
+}
+
+function dedupeRankedGithubCandidates(candidates, limit = 10) {
   const seenRepos = new Set();
-  const seenRanks = new Set();
   const picked = [];
-  for (const entry of candidates.sort((left, right) => rankOf(left.meta, 999) - rankOf(right.meta, 999))) {
+  for (const entry of candidates) {
     const repo = (entry.meta.repo || repoFromUrl(entry.candidate.url) || entry.candidate.title || "").toLowerCase();
-    const rank = rankOf(entry.meta, picked.length + 1);
     if (repo && seenRepos.has(repo)) continue;
-    if (rank >= 1 && rank <= 10 && seenRanks.has(rank)) continue;
     if (repo) seenRepos.add(repo);
-    if (rank >= 1 && rank <= 10) seenRanks.add(rank);
     picked.push(entry);
-    if (picked.length >= 10) break;
+    if (picked.length >= limit) break;
   }
   return picked;
+}
+
+function githubTrendingSourceScope(candidate, meta = {}) {
+  const window = String(meta.window || candidate.window || "weekly").toLowerCase() || "weekly";
+  const language = String(meta.language || candidate.language || "").toLowerCase();
+  return language && language !== "all" ? `${window}:${language}` : `${window}:all`;
+}
+
+function isGithubReadmeFetchFailed(item = {}) {
+  const status = String(item.readme_fetch_status || item.readme_status || item.readme?.status || "").toLowerCase();
+  return /fail|failed|error|unavailable|blocked|timeout/.test(status) || Boolean(item.readme_error);
 }
 
 function isAigcCandidate(candidate) {
