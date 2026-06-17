@@ -957,6 +957,33 @@
       }
     },
     {
+      "id": "feedback/p1-daily-content-contract-hard-gate",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Gate daily content quality before publish",
+      "problem": "The 2026-06-17 run exposed weak generated content that structural checks did not reject: one-bullet main details, filler-heavy hot blog text, shallow GitHub Trending descriptions, zero Builder/X selections despite enough eligible X feed candidates, and fake simplified tracking components.",
+      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "docs/ai-daily-requirements-reconciliation.md",
+        "package.json",
+        "scripts/check-daily-content-contract.mjs",
+        "scripts/harness-validate.mjs",
+        "tasks/daily-publish-runbook.md",
+        "prompts/ai-daily/modules/editorial-authority.md",
+        "prompts/ai-daily/modules/structured-report-json.md",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "daily content contract rejects 2026-06-17 weak generated shape",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-prepublish-editorial-prune-gate",
       "severity": "P1",
       "status": "implemented",

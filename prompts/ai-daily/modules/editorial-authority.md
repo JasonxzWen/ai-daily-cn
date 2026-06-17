@@ -23,9 +23,9 @@
 - `summary` / hero：写成编辑导语，先讲今天主线，不写生产过程，不写“本次筛了多少条”。
 - `main_items`：目标为 5-30 条短新闻流；5 是低信号日最低值，5-20 是常规舒适区，21-30 是高信号日可接受区间。按公共 AI 重要性、科技新闻声量、大厂名气和泛 AI 热点排序，不按用户个人工作直接相关性排序，也不按抓取偶然性排序。每条只展示标题、2-3 句/行可追溯事实概括和来源链接。
 - `hot_blogs`：对外固定显示为“热门博客”，承载观点、产品拆解、平台策略、内容生态、组织方法、创作者工作流、高质量工程深读、访谈和播客。
-- GitHub Trending：保留完整 Top 10；要解释项目是什么、解决什么问题、为什么值得看，但它不再主导整份日报的主线。
+- GitHub Trending：保留 weekly all-language + Python/TypeScript/Rust/Go/Java 的 Top10 合并去重结果，最多 Top20；要解释 README 里的项目能力、解决什么问题、为什么值得看，但它不再主导整份日报的主线。README 拉取失败时只展示榜位/star/trend 并标注失败，不编造描述。
 - Builder / X / 社区线索：只保留争议、分歧和早期信号，不做帖子搬运流。
-- OpenRouter / Artificial Analysis / 榜单类板块：公开页优先展示从 DOM、JSON 或页面文本解析出的结构化表格，例如排名、模型、供应商、分数/token、周变化；整页截图、浏览器截图或 viewport 截图不得作为公开正文主内容。
+- OpenRouter / Artificial Analysis / 榜单类板块：公开页优先展示从 DOM、JSON、页面文本或 sanitized official DOM/CSS snapshot 解析出的结构化组件，例如排名、模型、供应商、分数/token、周变化；整页截图、浏览器截图或 viewport 截图不得作为公开正文主内容。Artificial Analysis 抓不到 snapshot 时隐藏数据卡并显示源不可用；fake/simple/toy component 阻塞发布。
 
 ### 选题升降级
 
@@ -44,7 +44,7 @@
 
 ### 覆盖与保留
 
-- 必保留：GitHub Trending Top 10 完整榜单。
+- 必保留：GitHub Trending weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重后的 Top20 覆盖面；宁可少写描述，也不能编造 README。
 - 内部报告必保留：coverage window、自检、`quality_status` 和 `source_audit` 的结构化记录；公开页只显示读者可理解的短缺口说明，不公开内部审计字段。
 - 不再单独公开：`model_releases`、`今日值得关注的项目`、`项目 highlights`、`国内动态`空栏目。
 - 国内/中文内容要并入现有栏目，保证可见，但不为了“国内”再单开一个空导航。
@@ -58,7 +58,7 @@
 2. 读者口径从工程师单一视角扩到内容 / 产品 / 平台 / 策略 / 工程混合读者。
 3. 低价值小新闻默认不过稿。
 4. 机器日志和模板判断句进入硬质量门。
-5. GitHub Trending Top 10 保留完整，但叙事权重下调。
+5. GitHub Trending weekly Top20 覆盖面保留完整，但叙事权重下调。
 6. 旧的分散文档只作归档参考，不再作为当前合同。
 7. `main_items` 固定为 5-30 条短新闻流，公开页不再展示入选理由、`why_it_matters`、`reader_relevance` 或 watch-next 模板字段。
 8. 主线选择按公共 AI 重要性、科技新闻声量、大厂名气和泛 AI 热点排序，不按个人工作相关性收窄。
@@ -77,7 +77,7 @@
 5. `main_items` 优先讲能力边界、真实工作流变化、价格/配额、分发和组织动作，而不是零碎 release。
 6. Builder / X / 社区线索只保留争议、分歧和早期信号，不做帖子搬运。
 7. 国内 / 中文内容要并入现有栏目提高可见度，但不再为了“国内动态”单开空导航。
-8. GitHub Trending 保留完整 Top 10，但只承担能力地图和项目解释，不再抢占日报主线。
+8. GitHub Trending 保留 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重后的 Top20，但只承担能力地图和项目解释，不再抢占日报主线。
 9. 公开正文禁止机器日志、source audit 过程、模板判断句、工作汇报腔和“后续继续跟进”空话。
 10. 后续同类迭代必须把修改清单、good case / bad case 和覆盖关系回写到这份资产。
 11. 主体信息改为 5-30 条短新闻流，每条只保留标题、事实概括和来源链接。
@@ -100,7 +100,7 @@
 
 - 主线新闻按公共 AI 重要性排序，覆盖大厂模型、产品、平台、算力、监管、资本、内容产业和开发者生态；每条用 2-3 句/行讲清事实和来源，不写入选理由。
 - “热门博客”收录的是高信息密度的深读、拆解、访谈或播客，不是普通技术博客堆叠；读完能带走观点、方法或能力地图。
-- GitHub Trending 条目不只翻译仓库描述，而是说明它解决什么问题、适合什么场景、为什么今天值得看。
+- GitHub Trending 条目不只翻译仓库描述，而是用 README/项目文档概括它解决什么问题、适合什么场景、为什么今天值得看；README 拉取失败时明确降级，不写描述。
 - 中文 / 国内内容来自一手公告、原文访谈、原始演讲或可回溯信源，能自然并入现有主线，而不是额外挂一个空栏目。
 - Builder / X / 社区线索只在存在明确争议、分歧或早期信号时出现，并且能指出争论点到底是什么。
 - 榜单页把 Top 10、供应商、分数/token、周变化等结构化数据展示成表格；图片只在能清晰增强理解时出现。
@@ -115,7 +115,7 @@
 - 主体只有少数几条新闻，或把每条写成“为什么重要 / 启示 / 读者应该关注”的泛化说明，真正事实概括很短。
 - 把 OpenRouter、Artificial Analysis 或类似网页整页截图直接放进正文，导致手机端不可读。
 - 为了凑图展示 favicon、logo、头像、小图标、装饰图或不可读截图。
-- 把 `source_audit`、`self_check`、`candidate_id`、`quality_status`、`remediation`、`parsed_count` 或“来源 第三方报道 / 今天进入 GitHub Trending Top 10 / 这条动态主要围绕 / 序号 1”这类生成痕迹写入公开页。
+- 把 `source_audit`、`self_check`、`candidate_id`、`quality_status`、`remediation`、`parsed_count` 或“来源 第三方报道 / 今天进入 GitHub Trending / 这条动态主要围绕 / 序号 1”这类生成痕迹写入公开页。
 
 ### Forbidden Case
 
@@ -134,6 +134,7 @@
 - `2026-06-15`：用户校准目标形态为 5-30 条短新闻流，不再需要“今日必看”或首屏优先；5-20 是常规舒适区，21-30 是高信号日可接受区间。后续改动必须同时检查 index 页是否仍按 `main_items` 与质量状态计算信号强度。
 - `2026-06-15`：明确不能绕过 effective-interact 组件体系；严格点前移到生成和 interaction input 边界，公开页用 effective-interact 展示干净读者内容，事后校验只挡事故级泄漏和视觉破损。
 - `2026-06-15`：主体准入从官方/一手白名单改为黑名单剔除；官方/一手/多源用于排序和保留优先级。GitHub、Builder/X、热门博客、社区弱信号和白名单公众号等候选可按低风险边界参与主体补位，但融资、估值、价格、benchmark、安全事故、监管和模型能力等高风险事实仍需官方/一手或多源确认。
+- `2026-06-17`：将用户反馈固化为发布前内容契约门。主线详情必须是新闻形态的事实/影响/相关性分点；GitHub Trending 范围固定为 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重到 Top20；热门博客公开页只展示 100-200 字文章概括和来源，不再渲染 key_points；follow-builders X feed 过滤后合格候选不少于 3 条时 Builder/X 不得为 0；OpenRouter / Artificial Analysis 必须使用 sanitized official snapshot 或解析数据，REQ-010 可 degraded 但不能渲染 fake component。
 
 ### 工作流约束
 

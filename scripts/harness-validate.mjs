@@ -18,6 +18,7 @@ const requiredFiles = [
   'tasks/templates/sdd-tdd-task.md',
   'schemas/retrospective.schema.json',
   'scripts/validate-retrospectives.mjs',
+  'scripts/check-daily-content-contract.mjs',
   'retrospectives/index.json',
   'prompts/ai-daily/modules/editorial-authority.md',
   'scripts/harness-init.mjs',
@@ -128,7 +129,9 @@ const requiredPackageScripts = {
   'harness:init': ['scripts/harness-init.mjs'],
   'harness:validate': ['scripts/harness-validate.mjs'],
   'retrospectives:validate': ['scripts/validate-retrospectives.mjs'],
-  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
+  'content:contract': ['scripts/check-daily-content-contract.mjs'],
+  'content:contract:self-test': ['scripts/check-daily-content-contract.mjs', '--self-test'],
+  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run content:contract:self-test', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
   'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],
@@ -375,6 +378,7 @@ function validateCurrentTask(failures) {
     failures.push('tasks/current-task.md: Deterministic Substitute must explain why a direct red test is not practical');
   }
   validateRetrospectivePlanSection(content, failures);
+  validateDailyContentContractTask(content, failures);
 }
 
 function validateFeedbackMemorySections(content, failures) {
@@ -403,6 +407,19 @@ function validateRetrospectivePlanSection(content, failures) {
   const retrospectivePlan = sectionText(content, 'Retrospective Plan').trim();
   if (!hasMeaningfulRetrospectivePlan(retrospectivePlan)) {
     failures.push('tasks/current-task.md: non-trivial tasks require a meaningful Retrospective Plan covering retrospective records, run_type, or index updates');
+  }
+}
+
+function validateDailyContentContractTask(content, failures) {
+  const normalized = normalizedSectionText(content);
+  const touchesDailyContentContract = /(daily content contract|REQ-00[1678]|REQ-010|GitHub Trending|Builder\/X|hot blogs|daily_tracking|daily tracking|每日追踪|重点详情|精选博客)/i.test(normalized);
+  if (!touchesDailyContentContract) {
+    return;
+  }
+
+  const validationCommands = sectionText(content, 'Validation Commands');
+  if (!/check-daily-content-contract\.mjs|content:contract/i.test(validationCommands)) {
+    failures.push('tasks/current-task.md: daily content contract work must list scripts/check-daily-content-contract.mjs or npm run content:contract in Validation Commands');
   }
 }
 

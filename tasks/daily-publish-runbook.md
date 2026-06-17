@@ -69,6 +69,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 - Treat WeChat/Zhihu/Reddit as low-threshold weak-signal lanes, not factual source shortcuts. Kill-switched or empty platform configs must produce auditable no-signal JSON rather than being silently skipped or backfilled with invented items.
 
 - Hugging Face Trending is a separate model/dataset/Space trend lane, not a substitute for GitHub Trending or ordinary Hugging Face organization pages.
+- GitHub Trending contract: collect weekly all-language Top10 plus Python, TypeScript, Rust, Go, and Java weekly Top10, then merge and dedupe to Top20. README fetch failure is allowed only when the item still shows rank/star/trend metadata, explicitly marks `README拉取失败`, and does not invent a project description.
 - `discover:china-ai` is a hard checked lane for reports dated `2026-06-11` or later. Missing `source_audit.china_ai_sources` blocks strict publish; an executed lane with no qualified recent signal is degraded and must be publicly disclosed.
 
 - Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
@@ -85,7 +86,7 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 - If all active fixed source lanes are blocked by network errors and no factual item can be verified, write `report_status:"empty_due_to_network_outage"` with `main_items: []`. The report is publishable only as degraded output: keep the blocked `source_audit`, disclose `empty_due_to_network_outage` in `quality_status.degraded_sections`, and do not add placeholder main items.
 - Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
 - Keep `main_items`, `github_trending`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
-- When `discover:builders` or the final candidate pool has at least five qualified Builder candidates, publish 5-20 `builder_observations`; fewer than five must be disclosed as degraded Builder coverage with the selection/filter reason.
+- When `discover:builders` or the final candidate pool has at least five qualified Builder candidates, publish 5-20 `builder_observations`; fewer than five must be disclosed as degraded Builder coverage with the selection/filter reason. For follow-builders X feed specifically, after low-signal and non-AI filtering, at least 3 eligible AI/tech candidates means `builder_observations` cannot be 0. English original X posts may be converted into deterministic Chinese summaries from the original text.
 - Do not bypass freshness, duplicate URL, or source-window gates.
 
 ## Public Report Contract
@@ -95,13 +96,14 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 - Main-item titles are larger links without underline. Body `==...==` markers are inline bold colored keywords, not tag UI.
 - Tags are reserved for importance, trend state, star velocity, topic, and project highlight; renderers must color these tag types differently and de-duplicate identical tags.
 - `model_releases` remains a structured JSON index only. Do not render a public `模型发布` section; model news must be written into `main_items`.
-- `projects` remains highlight metadata for GitHub Trending. Do not render a public `今日值得关注的项目` section, `项目 highlights` subheading, or extra project list; only add a `项目 highlight` tag plus compact domain/use-case text to matching GitHub Trending Top 10 entries.
+- `projects` remains highlight metadata for GitHub Trending. Do not render a public `今日值得关注的项目` section, `项目 highlights` subheading, or extra project list; only add a `项目 highlight` tag plus compact domain/use-case text to matching GitHub Trending Top20 entries.
 - Domestic / Chinese dynamics remain visible inside existing main groups, hot blogs, GitHub Trending, or the shared `社区线索` section. Do not render a separate public `国内动态` navigation item.
 - AIGC, image generation, video generation, creator tools, and AI-assisted game-creation signals should appear as the existing `AIGC 动态` main group when they pass primary/official/paper/GitHub/multi-source verification. Intermediary AIGC leads stay in community leads with verification notes.
-- Hot tech blog summaries should be roughly 100-160 Chinese characters split into 2-4 point-style takeaways. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
+- Hot blog public cards render only a 100-200 Chinese-character article summary plus source. Do not render `key_points` on the public page; if internal JSON keeps legacy `key_points`, interaction output must ignore them. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
 - Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
-- GitHub Trending displays Top 10 with rank/trend/star tags and a Chinese description that explains what the repo is, what it solves, and why it is worth watching.
+- GitHub Trending displays the merged weekly Top20 scope with rank/trend/star tags and README-grounded Chinese summaries that explain what the repo is, what it solves, and why it is worth watching. README failures stay visible as metadata-only rows with a `README拉取失败` marker.
 - Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`. The target public count is 5-20 when qualified candidates exist.
+- OpenRouter and Artificial Analysis cards must render from parsed data or sanitized official DOM/CSS snapshots. Missing official snapshots may degrade; Artificial Analysis should hide the data card and show source unavailable when no snapshot exists. Fake simplified components block publish.
 - WeChat/Zhihu/Reddit platform-exempt items must render as disclosed weak-signal cards, not confirmed facts. Public cards may show concise reader-facing title, compact summary, source link, platform tag, date, and disclosure; they must not show `source_id`, `rule_id`, `source_level`, `verification_status`, `matched_terms`, `why_watch`, collection notes, feed-style machine titles, or long raw English excerpts.
 
 ## AI Quality Review And Repair
@@ -155,6 +157,13 @@ npm run build
 ```powershell
 npm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
 ```
+- Run the deterministic content-contract gate before dry-run or real publish:
+
+```powershell
+node scripts/check-daily-content-contract.mjs --report reports-data/YYYY/MM/YYYY-MM-DD.json --html docs/reports/YYYY/MM/YYYY-MM-DD.html --json
+```
+
+- REQ-001, REQ-006, REQ-007, and REQ-008 failures are blocking. REQ-010 source unavailability can be degraded, but fake OpenRouter or Artificial Analysis components are blocking.
 - After build, inspect the affected daily HTML and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the lightbox on desktop and mobile.
 - If the affected page includes WeChat/Zhihu/Reddit sections, inspect the HTML or interaction input and confirm no platform card exposes `source_id`, `rule_id`, `source_level`, `verification_status`, `matched_terms`, `why_watch`, collection notes, or raw thread dumps.
 - Run the full gate before any real publish:

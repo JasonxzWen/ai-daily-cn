@@ -73,6 +73,7 @@ import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
+import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -108,6 +109,195 @@ function mainMarkdownContent(input) {
   return mainMarkdownSections(input)
     .map((section) => section.content)
     .join("\n\n");
+}
+
+function dailyContractReadmeSummary(repo) {
+  return `${repo} 把浏览器自动化、任务回放、失败截图和本地调试入口组织成可复现的 agent 工作流，README 展示了安装方式、示例命令、扩展点和权限边界，适合团队先跑通小任务，再评估是否接入内部研发自动化。它的价值不在榜单排名本身，而在把操作记录、观察日志和错误恢复都留给工程侧审计。`;
+}
+
+function dailyContractHotBlogSummary() {
+  return "这篇文章围绕长运行 agent 的工程化落地展开，先说明任务规划、上下文压缩、工具权限、失败重试和结果校验为什么必须拆成独立边界，再用真实自动化流程解释如何记录证据、回放决策和隔离高风险操作。对研发团队而言，它提供的不是概念宣传，而是一套可用于评估 Codex、Claude Code 或内部代理平台的架构清单。";
+}
+
+function dailyContentContractGithubEntries() {
+  const languages = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
+  return Array.from({ length: 20 }, (_, index) => {
+    const repo = `example/agent-workflow-${index + 1}`;
+    return {
+      candidate_id: `github-weekly-${index + 1}`,
+      name: repo,
+      repo,
+      description: dailyContractReadmeSummary(repo),
+      readme_summary: dailyContractReadmeSummary(repo),
+      readme_fetch_status: "ok",
+      url: `https://github.com/example/agent-workflow-${index + 1}`,
+      event_date: "2026-06-17",
+      source: `GitHub Trending ${languages[index % languages.length]} weekly`,
+      language: languages[index % languages.length],
+      window: "weekly",
+      rank: (index % 10) + 1,
+      weekly_stars: 1200 - index,
+      trend: "new",
+      evidence: `GitHub Trending weekly rank #${(index % 10) + 1}.`
+    };
+  });
+}
+
+function dailyContentContractWeakReport() {
+  return {
+    report_date: "2026-06-17",
+    main_items: [
+      {
+        title: "Threads 月活增长",
+        url: "https://example.com/threads",
+        source: "TechCrunch",
+        event_date: "2026-06-16",
+        bullets: ["材料覆盖 Threads 的新增功能，边界落在平台增长和后续观察。"]
+      }
+    ],
+    github_trending: Array.from({ length: 10 }, (_, index) => ({
+      name: `example/weak-project-${index + 1}`,
+      repo: `example/weak-project-${index + 1}`,
+      description: "公开描述提到这是一个值得关注的项目，需要结合仓库页面确认具体能力。",
+      url: `https://github.com/example/weak-project-${index + 1}`,
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: index + 1,
+      trend: "new"
+    })),
+    hot_blogs: [
+      {
+        title: "Agent blog",
+        url: "https://example.com/blog/agent",
+        publisher: "Example Blog",
+        summary: "原文说明近期更新，读者可核对原文继续留意。",
+        key_points: ["发布方是 Example Blog"]
+      }
+    ],
+    builder_observations: [],
+    daily_tracking: [
+      {
+        name: "OpenRouter",
+        url: "https://openrouter.ai/rankings",
+        publish_to_public: true,
+        component_snapshot: { kind: "local_simplified_bars", source: "generated" }
+      },
+      {
+        name: "Artificial Analysis",
+        url: "https://artificialanalysis.ai/",
+        publish_to_public: true,
+        component_snapshot: { kind: "local_simplified_metric", source: "generated" }
+      }
+    ],
+    source_audit: {
+      builder_sources: {
+        checked: true,
+        candidates_found: 25,
+        sources: [
+          {
+            name: "follow-builders X feed",
+            url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+            status: "checked",
+            notes: "25 recent original entries parsed; 5 eligible AI/tech candidates after filtering."
+          }
+        ]
+      }
+    },
+    self_check: {
+      selection_snapshot: {
+        builder_observations: {
+          eligible_after_filter: 5,
+          selected: 0
+        }
+      }
+    }
+  };
+}
+
+function dailyContentContractAlignedReport() {
+  return {
+    report_date: "2026-06-17",
+    main_items: [
+      {
+        title: "Threads 月活达 500M 并新增个性化功能",
+        url: "https://example.com/threads",
+        source: "TechCrunch",
+        event_date: "2026-06-16",
+        bullets: [
+          "Meta 旗下 Threads 新增 Your Algo 和社区功能，并披露月活用户突破 500M，说明它已经进入主流内容平台竞争序列。",
+          "个性化 feed 控制直接影响用户停留、创作者分发和广告库存，后续会和 TikTok、小红书、X 等平台争夺年轻用户注意力。",
+          "对 AI/内容平台团队来说，Threads 的功能节奏会改变社交内容入口和生成式内容分发策略，需要持续跟踪推荐权重变化。"
+        ]
+      }
+    ],
+    github_trending: dailyContentContractGithubEntries(),
+    hot_blogs: [
+      {
+        title: "Engineering long-running agents",
+        url: "https://example.com/blog/agent",
+        publisher: "Example Blog",
+        summary: dailyContractHotBlogSummary()
+      }
+    ],
+    builder_observations: [
+      {
+        author: "Example Builder",
+        handle: "examplebuilder",
+        original_text: "We shipped a deterministic eval harness for coding agents.",
+        translation: "作者分享了一套面向 coding agent 的确定性评估 harness，重点是把任务输入、工具调用、失败证据和回放日志放在同一条链路里，让团队能在自动化真正接管重复研发任务前先验证稳定性。",
+        content: "作者分享了一套面向 coding agent 的确定性评估 harness，重点是把任务输入、工具调用、失败证据和回放日志放在同一条链路里，让团队能在自动化真正接管重复研发任务前先验证稳定性。",
+        url: "https://x.com/examplebuilder/status/1800000000000000000",
+        source: "follow-builders X feed"
+      }
+    ],
+    daily_tracking: [
+      {
+        name: "OpenRouter",
+        url: "https://openrouter.ai/rankings",
+        publish_to_public: true,
+        component_snapshot: {
+          kind: "official_dom_snapshot",
+          source: "official_snapshot",
+          official_dom_snapshot: "<section data-openrouter-rankings><table><tr><td>model</td></tr></table></section>",
+          sanitized_dom_snapshot: "<section class=\"tracking-snapshot\"><table><tr><td>model</td></tr></table></section>"
+        }
+      },
+      {
+        name: "Artificial Analysis",
+        url: "https://artificialanalysis.ai/",
+        publish_to_public: false,
+        source_unavailable_note: "官方 snapshot 不可用，本轮隐藏数据卡。"
+      }
+    ],
+    source_audit: {
+      builder_sources: {
+        checked: true,
+        candidates_found: 5,
+        sources: [
+          {
+            name: "follow-builders X feed",
+            status: "checked",
+            notes: "5 eligible AI/tech candidates after filtering."
+          }
+        ]
+      }
+    },
+    self_check: {
+      github_trending_scope: {
+        window: "weekly",
+        languages: ["all", "Python", "TypeScript", "Rust", "Go", "Java"],
+        per_source_top_n: 10,
+        deduped_limit: 20
+      },
+      selection_snapshot: {
+        builder_observations: {
+          eligible_after_filter: 5,
+          selected: 1
+        }
+      }
+    }
+  };
 }
 
 function reportWithThreeMinuteMustRead(report) {
@@ -4990,6 +5180,29 @@ test("harness SDD TDD accepts task class followed by template guidance", async (
   assert.equal(result.code, 0, result.stderr);
 });
 
+test("harness requires content contract validation for daily content contract tasks", async () => {
+  const missingContractCommand = validDailyContentContractTask({
+    validationCommands: ["- `node scripts/harness-validate.mjs`"]
+  });
+  const rejectedRoot = await createHarnessFixture({ currentTask: missingContractCommand });
+  const rejected = await runHarnessValidate(rejectedRoot);
+
+  assert.notEqual(rejected.code, 0);
+  assert.match(rejected.stderr, /check-daily-content-contract/);
+
+  const acceptedRoot = await createHarnessFixture({
+    currentTask: validDailyContentContractTask({
+      validationCommands: [
+        "- `node scripts/check-daily-content-contract.mjs --self-test --json`",
+        "- `node scripts/harness-validate.mjs`"
+      ]
+    })
+  });
+  const accepted = await runHarnessValidate(acceptedRoot);
+
+  assert.equal(accepted.code, 0, accepted.stderr);
+});
+
 test("feedback memory self-check rejects non-trivial current task without feedback ledger review", async () => {
   const tmp = await createHarnessFixture({
     currentTask: [
@@ -5173,6 +5386,52 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   assert(reconciliation.includes("| partial |"));
   assert(reconciliation.includes("| missing |"));
   assert(reconciliation.includes("Do not write \"fixed\", \"stable\", or \"implemented\""));
+});
+
+test("daily content contract rejects 2026-06-17 weak generated shape", () => {
+  const weakReport = dailyContentContractWeakReport();
+  const renderedHtml = [
+    '<section id="hot-blogs">',
+    "<article>",
+    "<p>原文说明文章发布于近期，读者可核对原文继续留意。</p>",
+    "<ul><li>发布方是 Example Blog</li></ul>",
+    "</article>",
+    "</section>",
+    '<section id="daily-tracking">',
+    '<div class="openrouter-mini-card"><div class="bar"></div><div class="bar"></div></div>',
+    '<div class="artificial-analysis-mini-card"><div class="metric">fake benchmark</div></div>',
+    "</section>"
+  ].join("");
+
+  const result = evaluateDailyContentContract(weakReport, { html: renderedHtml });
+  const issueCodes = result.issues.map((issue) => issue.code);
+  const degradedCodes = result.degraded.map((issue) => issue.code);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.blocking, true);
+  for (const code of [
+    "main_news_bullet_contract_failed",
+    "github_trending_top20_missing",
+    "github_trending_readme_summary_missing",
+    "hot_blog_summary_contract_failed",
+    "hot_blog_public_key_points_rendered",
+    "builder_x_selection_empty",
+    "tracking_fake_component_rendered"
+  ]) {
+    assert(issueCodes.includes(code), `${code} should block weak generated content`);
+  }
+  assert(degradedCodes.includes("tracking_official_component_missing"));
+});
+
+test("daily content contract accepts aligned generated shape", () => {
+  const alignedReport = dailyContentContractAlignedReport();
+  const result = evaluateDailyContentContract(alignedReport, {
+    html: '<section id="hot-blogs"><article><p>合规摘要只展示文章概括和来源。</p></article></section>'
+  });
+
+  assert.equal(result.ok, true, JSON.stringify(result, null, 2));
+  assert.equal(result.blocking, false);
+  assert.deepEqual(result.issues, []);
 });
 
 test("feedback memory self-check rejects quick reference missing ledger item", async () => {
@@ -14530,7 +14789,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("content` 为兼容字段"));
   assert(prompt.includes("不得写成概括"));
   assert(prompt.includes("hero_highlights"));
-  assert(prompt.includes("3-5 个分点式要点"));
+  assert(prompt.includes("100-200 个中文字符的文章概括"));
   assert(prompt.includes("key_points"));
   assert(prompt.includes("点开放大"));
   assert(prompt.includes("不生成 `项目 highlight` 标签"));
@@ -15640,6 +15899,7 @@ async function createHarnessFixture(options = {}) {
   await fs.copyFile(path.join(rootDir, "scripts", "harness-init.mjs"), path.join(tmp, "scripts", "harness-init.mjs"));
   await fs.copyFile(path.join(rootDir, "scripts", "harness-validate.mjs"), path.join(tmp, "scripts", "harness-validate.mjs"));
   await fs.copyFile(path.join(rootDir, "scripts", "validate-retrospectives.mjs"), path.join(tmp, "scripts", "validate-retrospectives.mjs"));
+  await fs.copyFile(path.join(rootDir, "scripts", "check-daily-content-contract.mjs"), path.join(tmp, "scripts", "check-daily-content-contract.mjs"));
   await fs.copyFile(path.join(rootDir, "schemas", "retrospective.schema.json"), path.join(tmp, "schemas", "retrospective.schema.json"));
   const retrospectiveRecords = [
     retrospectiveRecordFixture({
@@ -15687,7 +15947,9 @@ async function createHarnessFixture(options = {}) {
         "harness:init": "node scripts/harness-init.mjs",
         "harness:validate": "node scripts/harness-validate.mjs",
         "retrospectives:validate": "node scripts/validate-retrospectives.mjs",
-        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run test && npm run build && npm run test:e2e && git diff --check",
+        "content:contract": "node scripts/check-daily-content-contract.mjs",
+        "content:contract:self-test": "node scripts/check-daily-content-contract.mjs --self-test --json",
+        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract:self-test && npm run test && npm run build && npm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
         "publish:preflight": "node src/cli.js publish:preflight",
@@ -15775,6 +16037,61 @@ function validNonTrivialCurrentTask() {
     "## Validation Commands",
     "",
     "- `node scripts/harness-validate.mjs`",
+    "",
+    "## Parallel Writes",
+    "",
+    "- No parallel writes.",
+    "",
+    "## Handoff Requirements",
+    "",
+    "- Report validation evidence.",
+    ""
+  ].join("\n");
+}
+
+function validDailyContentContractTask({ validationCommands }) {
+  return [
+    "# Current Task",
+    "",
+    "## Task Class",
+    "",
+    "non-trivial",
+    "",
+    "## Spec",
+    "",
+    "A fixture daily content contract task covers REQ-001, REQ-006, REQ-007, REQ-008, REQ-010, GitHub Trending, Builder/X, hot blogs, daily tracking, 每日追踪, 重点详情, and 精选博客.",
+    "",
+    "## Acceptance Criteria",
+    "",
+    "- Harness enforces the content contract checker for this task class.",
+    "",
+    "## Feedback Ledger Review",
+    "",
+    "- Reviewed config/feedback-ledger.json; this fixture confirms daily content feedback is bound to validation.",
+    "",
+    "## Regression Self-Check",
+    "",
+    "- Self-check verifies content contract tasks include their dedicated regression checker before handoff.",
+    "",
+    "## Retrospective Plan",
+    "",
+    "- This non-trivial fixture records a project_iteration retrospective record and keeps retrospectives/index.json aligned.",
+    "",
+    "## Red Test",
+    "",
+    "`node scripts/harness-validate.mjs` fails before the content contract command is listed.",
+    "",
+    "## Allowed Paths",
+    "",
+    "- `scripts/check-daily-content-contract.mjs`",
+    "",
+    "## Forbidden Paths",
+    "",
+    "- Do not modify generated reports.",
+    "",
+    "## Validation Commands",
+    "",
+    ...validationCommands,
     "",
     "## Parallel Writes",
     "",

@@ -17,11 +17,11 @@
 - `model_releases` 是历史兼容字段，新草稿默认空数组，不要用它生成公开栏目。新模型、新模型家族、新权重、官方 API 正式上线或实质模型卡更新，只有影响能力边界、工具选择、成本或上线节奏时才进入 `main_items`。第三方网关上架、产品内开放、preview access、区域/账号可用、状态页 incident/恢复和短时配额变化默认是轻量运营项，写入 `community_leads`；只有影响生产迁移、成本边界、企业采购路径或上线排期时才升格为 `main_items`。
 - 热门博客进入 `hot_blogs`，不计入主体信息数量；它不是新闻凑数池，而是承载观点、产品拆解、平台策略、内容生态、组织方法、创作者工作流以及高质量工程 / 研究 / agent / eval / design 文章、访谈和播客的深读区。
 - 单一厂商的区域合作、主权 AI 公关稿、轻量伙伴公告或缺少新能力边界/数据/产品入口的基础设施 PR，默认不进入 `hot_blogs`；即使是官方一手来源，也要按读者效用和新信息密度筛掉或降级。
-- GitHub Trending 进入独立 `github_trending` 板块，默认展示 Top 10 仓库并带排名变化和 star 变化 tag；它不是主体信息凑数池。只有经过额外 release、README、近期 commit 或工程影响核验的项目才再进入 `projects`，但公开页面只能在匹配的 GitHub Trending Top 10 条目上补充领域、用途和信号说明；不单独生成“今日值得关注的项目”板块、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表。
+- GitHub Trending 进入独立 `github_trending` 板块，固定采集 weekly all-language Top10 + Python/TypeScript/Rust/Go/Java weekly Top10，合并去重后最多展示 Top20，并带排名变化和 star 变化 tag；它不是主体信息凑数池。只有经过额外 release、README、近期 commit 或工程影响核验的项目才再进入 `projects`，但公开页面只能在匹配的 GitHub Trending Top20 条目上补充领域、用途和信号说明；不单独生成“今日值得关注的项目”板块、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表。README 拉取失败的仓库仍展示排名、star、trend，并标注 `README拉取失败`，不编造描述。
 - 访谈和播客只有在包含明确工程实践、技术路线、成本结构、模型/agent 经验或组织实践时才收录；泛泛宣传只作为社区线索。
-- Product Hunt 和新产品榜单只作为候选入口，入选 `projects` 前必须说明领域、作用和可验证信号；公开展示时只能作为匹配 GitHub Trending Top 10 条目的行内补充信息，而不是独立项目区或 `项目 highlight` 标签。
+- Product Hunt 和新产品榜单只作为候选入口，入选 `projects` 前必须说明领域、作用和可验证信号；公开展示时只能作为匹配 GitHub Trending Top20 条目的行内补充信息，而不是独立项目区或 `项目 highlight` 标签。
 - AI 开发工具的计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 和 credit 变化属于常规跟踪项；影响开发者工作流、团队预算、上线容量或采购口径时可进入 `main_items`，否则进入 `community_leads`。
-- Builder 观察和社区线索优先放在独立区域，但不再作为隔离水池：符合黑名单过滤、信息密度和低风险边界的 Builder/X、博客或社区候选，可以作为 `main_items` 补位来源。Builder 观察只选能拿到原帖/原文连续摘录的观点，必须写 `original_text` 和逐句忠实的 `translation`；候选足够时公开入选 5-20 条，不要只挑 2-3 条；不要把原帖改写成“我方观察”或观点摘要。
+- Builder 观察和社区线索优先放在独立区域，但不再作为隔离水池：符合黑名单过滤、信息密度和低风险边界的 Builder/X、博客或社区候选，可以作为 `main_items` 补位来源。Builder 观察只选能拿到原帖/原文连续摘录的观点，必须写 `original_text` 和逐句忠实的 `translation` 或确定性中文摘要；候选足够时公开入选 5-20 条，不要只挑 2-3 条。follow-builders X feed 抓到后，过滤低信号和非 AI/非科技内容，合格候选不少于 3 条时，`builder_observations` 不能为 0。
 - 国内/中文动态不能只停留在候选池或信源审计里：当中文科技媒体、公众号输入或国内厂商官方源合格候选不少于 3 条时，公开内容中至少保留 3 条国内相关内容，并优先分布到现有 `main_items` 分组（AI 资讯 / 大厂与政策 / 产品与开源 / AIGC 动态）、`hot_blogs`、`github_trending` 或 `community_leads`。未命中黑名单、具备低风险边界或已回到官方/一手来源的，优先进入 `main_items`；未回源且涉及融资、营收、估值、benchmark、监管、模型能力等高风险事实的，只能进入 `community_leads`，并标记待官方或多源验证。不要生成独立“国内动态”导航项。
 - 对没有一手来源的普通媒体消息、微信公众号、自媒体或聚合摘要，不要写成事实报道实体；可作为 `community_leads`，高质量长文/访谈/播客也可作为 `hot_blogs`，`source_level` / `verification_status` 只进入结构化数据，不在公开卡片里重复渲染“第三方报道”或“社区线索”。用户白名单公众号可用于低风险行业动态和观点分析，但必须标明 `source_level`、公众号名、发布时间和风险等级；融资、估值、价格、benchmark、安全事故、监管、模型能力仍需一手或多源确认。
 - X 热点只有保留原始 X status URL 时才进入候选；没有原始帖链接的热度摘要必须丢弃或保留在审计 notes 中。
