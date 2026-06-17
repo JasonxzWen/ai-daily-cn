@@ -60,6 +60,7 @@ export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending Java daily", "https://github.com/trending/java?since=daily", "java", "daily"),
   source("GitHub Trending Java weekly", "https://github.com/trending/java?since=weekly", "java", "weekly")
 ];
+const REQUIRED_GITHUB_TRENDING_WEEKLY_LANGUAGES = ["python", "typescript", "rust", "go", "java"];
 
 export const DEFAULT_BUILDER_FALLBACK_SOURCES = [
   {
@@ -630,8 +631,10 @@ export async function collectGitHubTrending(options = {}) {
       });
 
       for (const candidate of parsed) {
-        if (!byRepo.has(candidate.repo)) {
-          byRepo.set(candidate.repo, enrichProjectCandidate(candidate, currentSource, options.reportDate));
+        const enriched = enrichProjectCandidate(candidate, currentSource, options.reportDate);
+        const existing = byRepo.get(candidate.repo);
+        if (!existing || shouldPreferGithubTrendingCandidate(enriched, existing)) {
+          byRepo.set(candidate.repo, enriched);
         }
       }
     } catch (error) {
@@ -655,7 +658,8 @@ export async function collectGitHubTrending(options = {}) {
   }
 
   const history = await loadGitHubTrendingHistory(options);
-  const enrichedCandidates = await enrichGithubTrendingReadmes([...byRepo.values()].slice(0, limit), {
+  const limitedCandidates = prioritizeGithubTrendingCandidatesForLimit([...byRepo.values()], limit);
+  const enrichedCandidates = await enrichGithubTrendingReadmes(limitedCandidates, {
     fetchImpl,
     disabled: options.readmeEnrichment === false,
     maxCandidates: options.readmeLimit
@@ -950,14 +954,16 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
     });
 
     for (const candidate of parsed) {
-      if (!byRepo.has(candidate.repo)) {
-        byRepo.set(candidate.repo, enrichProjectCandidate(candidate, exportSource, options.reportDate));
+      const enriched = enrichProjectCandidate(candidate, exportSource, options.reportDate);
+      const existing = byRepo.get(candidate.repo);
+      if (!existing || shouldPreferGithubTrendingCandidate(enriched, existing)) {
+        byRepo.set(candidate.repo, enriched);
       }
     }
   }
 
   const history = await loadGitHubTrendingHistory(options);
-  const candidates = annotateGitHubTrendingCandidates([...byRepo.values()].slice(0, limit), history);
+  const candidates = annotateGitHubTrendingCandidates(prioritizeGithubTrendingCandidatesForLimit([...byRepo.values()], limit), history);
   return {
     source_audit: {
       github_trending: {
@@ -2471,6 +2477,113 @@ function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
     name: candidate.name || candidate.repo,
     trend: candidate.trend || "new"
   };
+}
+
+function prioritizeGithubTrendingCandidatesForLimit(candidates, limit) {
+  if (!Number.isInteger(limit) || limit <= 0 || candidates.length <= limit) {
+    return candidates;
+  }
+
+  const selected = [];
+  const seenRepos = new Set();
+  const addCandidate = (candidate) => {
+    const key = githubCandidateRepoKey(candidate);
+    if (key && seenRepos.has(key)) {
+      return false;
+    }
+    if (key) {
+      seenRepos.add(key);
+    }
+    selected.push(candidate);
+    return selected.length >= limit;
+  };
+
+  const weeklyAll = candidates
+    .filter((candidate) => isGithubTrendingWeeklyAllCandidate(candidate))
+    .sort(compareGithubTrendingCandidateRank)
+    .slice(0, 10);
+  for (const candidate of weeklyAll) {
+    if (addCandidate(candidate)) return selected;
+  }
+
+  const languagePools = REQUIRED_GITHUB_TRENDING_WEEKLY_LANGUAGES.map((language) => candidates
+    .filter((candidate) => isGithubTrendingWeeklyLanguageCandidate(candidate, language))
+    .sort(compareGithubTrendingCandidateRank)
+    .slice(0, 10));
+  const maxPoolLength = Math.max(0, ...languagePools.map((pool) => pool.length));
+  for (let index = 0; index < maxPoolLength; index += 1) {
+    for (const pool of languagePools) {
+      if (pool[index] && addCandidate(pool[index])) {
+        return selected;
+      }
+    }
+  }
+
+  for (const candidate of candidates) {
+    if (addCandidate(candidate)) {
+      return selected;
+    }
+  }
+  return selected;
+}
+
+function shouldPreferGithubTrendingCandidate(candidate, existing) {
+  return githubTrendingScopePriority(candidate) > githubTrendingScopePriority(existing);
+}
+
+function githubTrendingScopePriority(candidate) {
+  if (isGithubTrendingWeeklyAllCandidate(candidate)) return 3;
+  if (REQUIRED_GITHUB_TRENDING_WEEKLY_LANGUAGES.some((language) => isGithubTrendingWeeklyLanguageCandidate(candidate, language))) return 2;
+  if (isGithubTrendingWeeklyCandidate(candidate)) return 1;
+  return 0;
+}
+
+function isGithubTrendingWeeklyAllCandidate(candidate) {
+  const language = String(candidate?.language || "").toLowerCase();
+  const text = githubTrendingCandidateScopeText(candidate);
+  const languageFilteredSource = /github\.com\/trending\/(?:python|typescript|rust|go|java)\?since=weekly/i.test(text) ||
+    /github trending (?:python|typescript|rust|go|java) weekly/i.test(text);
+  return isGithubTrendingWeeklyCandidate(candidate) && !languageFilteredSource && (!language || language === "all");
+}
+
+function isGithubTrendingWeeklyLanguageCandidate(candidate, language) {
+  const normalizedLanguage = String(language || "").toLowerCase();
+  const itemLanguage = String(candidate?.language || "").toLowerCase();
+  const text = githubTrendingCandidateScopeText(candidate);
+  const sourceMatches = text.includes(`github trending ${normalizedLanguage} weekly`) ||
+    text.includes(`github-trending-${normalizedLanguage}-weekly`) ||
+    text.includes(`github.com/trending/${normalizedLanguage}?since=weekly`);
+  return isGithubTrendingWeeklyCandidate(candidate) && (itemLanguage === normalizedLanguage || sourceMatches);
+}
+
+function isGithubTrendingWeeklyCandidate(candidate) {
+  const text = githubTrendingCandidateScopeText(candidate);
+  const window = String(candidate?.window || "").toLowerCase();
+  return window === "weekly" || text.includes("github trending weekly") || text.includes("since=weekly");
+}
+
+function githubTrendingCandidateScopeText(candidate) {
+  return [
+    candidate?.source,
+    candidate?.source_id,
+    candidate?.source_url,
+    candidate?.url,
+    candidate?.window,
+    candidate?.language
+  ].map((value) => String(value || "").toLowerCase()).join(" ");
+}
+
+function compareGithubTrendingCandidateRank(left, right) {
+  return githubTrendingCandidateRank(left) - githubTrendingCandidateRank(right);
+}
+
+function githubTrendingCandidateRank(candidate) {
+  const rank = Number(candidate?.rank || candidate?.source_rank);
+  return Number.isInteger(rank) && rank > 0 ? rank : 999;
+}
+
+function githubCandidateRepoKey(candidate) {
+  return String(candidate?.repo || normalizeRepo(candidate?.url || "") || candidate?.title || "").toLowerCase();
 }
 
 async function loadGitHubTrendingHistory(options = {}) {

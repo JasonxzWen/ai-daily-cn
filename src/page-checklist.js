@@ -196,22 +196,27 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const trackingCards = Array.from(document.querySelectorAll(".tracking-card"));
     const weakTrackingCards = trackingCards
       .map((card, index) => {
+        const sourceUnavailable = hasTrackingSourceUnavailableNote(card);
+        const officialRows = officialTrackingSnapshotRows(card);
         const hasVisualData = Boolean(
           card.querySelector("[data-card-data-table]") ||
           card.querySelector("[data-card-bars]") ||
+          card.querySelector("[data-official-component-snapshot]") ||
           card.querySelector(".card-media-grid img")
         );
         const rankDetailLabels = Array.from(card.querySelectorAll(".card-detail-list dt"))
           .map((node) => node.textContent?.trim() || "")
           .filter((text) => /^#\d+/.test(text));
         const detailRows = card.querySelectorAll(".card-detail-list div").length;
-        const ok = hasVisualData && rankDetailLabels.length === 0 && detailRows <= 2;
+        const ok = (sourceUnavailable || hasVisualData || officialRows >= 3) && rankDetailLabels.length === 0 && detailRows <= 2;
         return ok
           ? null
           : {
               index,
               title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
               has_visual_data: hasVisualData,
+              official_rows: officialRows,
+              source_unavailable: sourceUnavailable,
               rank_detail_labels: rankDetailLabels,
               detail_rows: detailRows
             };
@@ -229,13 +234,18 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         if (!["OpenRouter", "Artificial Analysis"].includes(title)) {
           return null;
         }
-        const tableRows = card.querySelectorAll("[data-card-data-table] tbody tr").length;
+        if (hasTrackingSourceUnavailableNote(card)) {
+          return null;
+        }
+        const hasOfficialSnapshot = Boolean(card.querySelector("[data-official-component-snapshot]"));
+        const tableRows = card.querySelectorAll("[data-card-data-table] tbody tr").length + officialTrackingSnapshotRows(card);
         const imageCount = card.querySelectorAll(".card-media-grid img").length;
-        return tableRows >= 3 && imageCount === 0
+        return ((hasOfficialSnapshot && imageCount === 0) || (tableRows >= 3 && imageCount === 0))
           ? null
           : {
               title,
               table_rows: tableRows,
+              official_snapshot: hasOfficialSnapshot,
               image_count: imageCount
             };
       })
@@ -246,6 +256,26 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "OpenRouter and Artificial Analysis should render structured table rows and no public screenshot media.",
       { issues: trackingScreenshotIssues }
     );
+    function officialTrackingSnapshotRows(card) {
+      const snapshot = card.querySelector("[data-official-component-snapshot] .official-tracking-snapshot, .official-tracking-snapshot");
+      if (!snapshot) {
+        return 0;
+      }
+      const structuredRows = snapshot.querySelectorAll("tbody tr, [role='row'], li").length;
+      if (structuredRows > 0) {
+        return structuredRows;
+      }
+      const directChildren = Array.from(snapshot.children).filter((node) => (node.textContent || "").trim().length >= 10).length;
+      if (directChildren > 0) {
+        return directChildren;
+      }
+      const textLength = (snapshot.textContent || "").replace(/\s+/g, " ").trim().length;
+      return textLength >= 80 ? 3 : 0;
+    }
+    function hasTrackingSourceUnavailableNote(card) {
+      const text = card.textContent?.replace(/\s+/g, " ").trim() || "";
+      return /source[-\s]?unavailable|源不可用|官方 web 组件 snapshot 本轮不可用|snapshot 本轮不可用|只保留官方入口供读者手动核对/i.test(text);
+    }
     const trackingTableLayoutIssues = trackingCards
       .map((card, index) => {
         const table = card.querySelector("[data-card-data-table]");

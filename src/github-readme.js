@@ -11,7 +11,6 @@ export function summarizeGithubReadme(input = {}) {
   const repo = normalizeRepo(input.repo || input.name || "");
   const maxChars = Number.isFinite(input.maxChars) ? Math.max(80, Math.floor(input.maxChars)) : DEFAULT_MAX_CHARS;
   const readme = cleanReadmeText(input.readme || input.content || "");
-  const projectName = titleFromReadme(readme) || repo.split("/").at(-1) || "该项目";
   const sentences = readme
     .split(/(?<=[.!?。！？])\s+|\n+/)
     .map((item) => item.trim())
@@ -20,8 +19,7 @@ export function summarizeGithubReadme(input = {}) {
   const capability = pickCapability(source || readme);
   const maturity = pickMaturity(source || readme);
   const scenario = pickScenario(source || readme);
-  const englishContext = compactWords(source || readme, 18);
-  const base = `${projectName} 是面向 ${scenario} 的开源项目，核心能力包括${capability}。README 显示它已提供${maturity}，适合先评估架构、依赖和运行示例后再接入生产流程。${englishContext}`;
+  const base = `该仓库面向${scenario}，README 显示核心能力包括${capability}，并提供${maturity}。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。`;
   return clampChineseSummary(base, maxChars);
 }
 
@@ -72,11 +70,6 @@ function cleanReadmeText(value) {
     .trim();
 }
 
-function titleFromReadme(readme) {
-  const match = String(readme || "").match(/^([A-Z][A-Za-z0-9_. -]{2,80})\b/);
-  return match ? match[1].trim() : "";
-}
-
 function pickCapability(text) {
   const value = String(text || "").toLowerCase();
   const parts = [];
@@ -106,14 +99,6 @@ function pickScenario(text) {
   if (/browser|web/.test(value)) return "浏览器自动化";
   if (/data|rag|knowledge|retrieval/.test(value)) return "知识库和数据应用";
   return "AI 工程实践";
-}
-
-function compactWords(text, count) {
-  const words = String(text || "")
-    .split(/\s+/)
-    .map((word) => word.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, ""))
-    .filter((word) => /^[A-Za-z][A-Za-z0-9_.-]{2,}$/.test(word));
-  return unique(words).slice(0, count).join(" ");
 }
 
 function clampChineseSummary(text, maxChars) {
