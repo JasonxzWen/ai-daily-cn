@@ -6274,6 +6274,28 @@ test("quality review flags untranslated main item source excerpts", async () => 
   assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
 });
 
+test("quality review blocks expanded main items that would fail report write as too thin", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const base = report.main_items[0];
+  report.main_items = Array.from({ length: 8 }, (_unused, index) => ({
+    ...base,
+    title: `测试主条目 ${index + 1}`,
+    url: `https://example.com/main-thin-${index + 1}`,
+    summary: "微软讨论企业如何让 AI 项目从试点走向稳定成效。",
+    bullets: [
+      "**落地路径**：这条内容适合业务和组织管理团队复盘 AI 应用的推进方式。"
+    ]
+  }));
+
+  const review = reviewReportQuality(report);
+
+  assert.equal(review.ok, false);
+  assert(review.issues.some((issue) => issue.code === "main_item_report_write_too_thin"));
+  assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
 test("quality review flags mixed English changelog excerpts in main item body", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {

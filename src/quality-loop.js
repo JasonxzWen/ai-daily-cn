@@ -43,6 +43,7 @@ const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
 const HOT_BLOG_MIN_CHINESE_CHARS = 60;
 const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_MAX_LATIN_CHARS = 90;
+const MAIN_ITEM_REPORT_WRITE_MIN_CHARS = 70;
 const BUILDER_TRANSLATION_MIN_CHINESE_CHARS = 10;
 const BUILDER_TRANSLATION_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_GENERIC_TEMPLATE_RE = /(?:重点看|如果你在评估新工具|值不值得试|何时接入|风险放在哪|决策信号)/u;
@@ -513,9 +514,18 @@ function collectHighlightIssues(entry, issues, limits) {
 
 function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
   const items = Array.isArray(report?.main_items) ? report.main_items : [];
+  const expandedMainItems = items.length >= 8;
   items.forEach((item, index) => {
     const bullets = Array.isArray(item?.bullets) ? item.bullets : [];
+    const summary = String(item?.summary || "").trim();
     const text = bullets.join("\n").trim();
+    const factLines = [summary, ...bullets]
+      .map((line) => String(line || "").trim())
+      .filter(Boolean);
+    const plainFactLines = factLines
+      .map((line) => stripMarkup(line).replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+    const totalChars = factLines.reduce((sum, line) => sum + line.length, 0);
     if (bullets.length > 0 && !/==[^=\n]+==/.test(text)) {
       issues.push({
         code: "highlight_missing",
@@ -532,6 +542,24 @@ function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
         path: `main_items[${index}].bullets`,
         message: "Main item public bullets are thin; AI review should add concrete facts from existing evidence.",
         repairable: false
+      });
+    }
+    if (expandedMainItems && plainFactLines.length >= 2 && totalChars < MAIN_ITEM_REPORT_WRITE_MIN_CHARS) {
+      issues.push({
+        code: "main_item_report_write_too_thin",
+        severity: "error",
+        path: `main_items[${index}].summary`,
+        message: "Expanded main item summary and bullets are too thin for report:write; add compact source-backed facts before publishing.",
+        repairable: true,
+        details: {
+          total_chars: totalChars,
+          min_chars: MAIN_ITEM_REPORT_WRITE_MIN_CHARS
+        }
+      });
+      aiReviewTasks.push({
+        kind: "main_item_editorial_rewrite",
+        path: `main_items[${index}].summary`,
+        instruction: "Expand this main item summary in Chinese with compact source-backed facts so summary plus bullets meet the report:write density gate. Keep the same source fact and do not add unverified claims."
       });
     }
     collectMainItemLanguageIssues(item, index, issues, aiReviewTasks);
@@ -911,8 +939,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "main_item_editorial_quality",
-      ok: !failedCodes.has("main_item_untranslated") && !failedCodes.has("main_item_template_bullet"),
-      status: failedCodes.has("main_item_untranslated") || failedCodes.has("main_item_template_bullet") ? "failed" : "passed"
+      ok: !failedCodes.has("main_item_untranslated") && !failedCodes.has("main_item_template_bullet") && !failedCodes.has("main_item_report_write_too_thin"),
+      status: failedCodes.has("main_item_untranslated") || failedCodes.has("main_item_template_bullet") || failedCodes.has("main_item_report_write_too_thin") ? "failed" : "passed"
     },
     {
       id: "public_editorial_quality",
