@@ -4173,7 +4173,7 @@ function englishSignalProfile(text) {
   if (/bedrock guardrails|multi-agent|prompt filtering|response controls|policy checks/.test(text)) {
     return {
       verb: "说明",
-      topic: "Bedrock Guardrails 多 agent 管控方案",
+      topic: "多 agent 安全护栏方案",
       scope: "策略检查、提示过滤、响应控制、企业应用和可观测性",
       boundary: "多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底",
       factFocus: "Guardrails、策略检查、提示过滤和响应控制"

@@ -9897,16 +9897,19 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
 
   for (const item of drafted.report.main_items) {
     assert(/\p{Script=Han}/u.test(item.title), `main title should be Chinese: ${item.title}`);
+    assert((item.title.match(/[A-Za-z]/g) || []).length <= 24, `main title should stay under Latin limit: ${item.title}`);
     assert(/\p{Script=Han}/u.test(item.summary), `main summary should be Chinese: ${item.summary}`);
     assert(Array.isArray(item.bullets) && item.bullets.length >= 1);
     assert(item.bullets.every((bullet) => /\p{Script=Han}/u.test(String(bullet || ""))));
   }
   for (const highlight of drafted.report.hero_highlights) {
     assert(/\p{Script=Han}/u.test(highlight.title), `hero title should be Chinese: ${highlight.title}`);
+    assert((highlight.title.match(/[A-Za-z]/g) || []).length <= 24, `hero title should stay under Latin limit: ${highlight.title}`);
     assert(/\p{Script=Han}/u.test(highlight.what_happened || highlight.reason || ""), `hero detail should be Chinese: ${JSON.stringify(highlight)}`);
   }
   for (const blog of drafted.report.hot_blogs) {
     assert(/\p{Script=Han}/u.test(blog.title), `hot blog title should be Chinese: ${blog.title}`);
+    assert((blog.title.match(/[A-Za-z]/g) || []).length <= 24, `hot blog title should stay under Latin limit: ${blog.title}`);
     assert(/\p{Script=Han}/u.test(blog.summary), `hot blog summary should be Chinese: ${blog.summary}`);
     assert(Array.isArray(blog.key_points) && blog.key_points.length >= 3);
     assert(blog.key_points.every((point) => /\p{Script=Han}/u.test(String(point || ""))));
