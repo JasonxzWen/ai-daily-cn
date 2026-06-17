@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-16T05:24:43.279Z",
+  "generated_at": "2026-06-17T03:48:02.514Z",
   "window_days": 7,
   "source": {
-    "report_count": 33,
-    "date_from": "2026-06-10",
-    "date_to": "2026-06-16"
+    "report_count": 34,
+    "date_from": "2026-06-11",
+    "date_to": "2026-06-17"
   },
   "thresholds": {
     "watching": {
@@ -32,8 +32,8 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 18,
-      "active_days": 6,
+      "occurrences": 12,
+      "active_days": 5,
       "sections": [
         "builder_observations",
         "main_items"
@@ -44,7 +44,6 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-06-10",
         "2026-06-11",
         "2026-06-12",
         "2026-06-14",
@@ -52,7 +51,6 @@
         "2026-06-16"
       ],
       "related_reports": [
-        "2026-06-10",
         "2026-06-11",
         "2026-06-12",
         "2026-06-14",
@@ -63,14 +61,14 @@
   ],
   "candidate_topics": [
     {
-      "term": "with",
-      "occurrences": 134,
+      "term": "github",
+      "occurrences": 132,
       "active_days": 6,
       "display": false
     },
     {
-      "term": "github",
-      "occurrences": 131,
+      "term": "with",
+      "occurrences": 130,
       "active_days": 6,
       "display": false
     },
@@ -142,43 +140,43 @@
     },
     {
       "term": "release",
-      "occurrences": 104,
-      "active_days": 6,
-      "display": false
-    },
-    {
-      "term": "readme",
-      "occurrences": 88,
+      "occurrences": 100,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 84,
+      "occurrences": 82,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 84,
+      "occurrences": 82,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 84,
+      "occurrences": 82,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有 release",
-      "occurrences": 84,
+      "occurrences": 82,
       "active_days": 6,
       "display": false
     },
     {
       "term": "天本地记录曾在",
-      "occurrences": 84,
+      "occurrences": 82,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "天本地记录曾在 今日需要复核它是否仍在",
+      "occurrences": 82,
       "active_days": 6,
       "display": false
     }
@@ -1651,6 +1649,10 @@
           ]
         }
       ],
+      "github_trending": []
+    },
+    "2026-06-17": {
+      "main_items": [],
       "github_trending": []
     }
   }
