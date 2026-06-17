@@ -471,6 +471,25 @@ try {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.evaluate(() => {
     const section = document.createElement("section");
+    section.textContent = "OpenRouter 周变化：67%，榜单变化用于说明公开排名波动。";
+    document.body.append(section);
+  });
+  const legitimateChangeChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(legitimateChangeChecklist.ok, true, JSON.stringify(legitimateChangeChecklist.issues, null, 2));
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    const section = document.createElement("section");
+    section.textContent = "变化：这是旧模板标签。";
+    document.body.append(section);
+  });
+  const standaloneChangeChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(standaloneChangeChecklist.ok, false);
+  assert(standaloneChangeChecklist.issues.some((issue) => issue.id === "legacy_public_copy_absent"));
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    const section = document.createElement("section");
     section.textContent = "技不止术";
     document.body.append(section);
   });
