@@ -202,7 +202,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (githubTrending.length > 0) {
     sections.push({
       type: "markdown",
-      title: "GitHub Trending · Top 10",
+      title: "GitHub Trending · Top 20",
       group: "projects",
       content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
     });
@@ -830,7 +830,7 @@ function formatGithubTrending(items, context = {}) {
 
   const projectIndex = indexProjects(projects);
   const trendingLines = items
-    .slice(0, 10)
+    .slice(0, 20)
     .map((item, index) => {
       const project = projectForTrend(item, projectIndex);
       const tag = githubTrendStatusHighlightTag(item);
@@ -839,6 +839,7 @@ function formatGithubTrending(items, context = {}) {
         sourceTrustHighlightTag(item),
         tag,
         githubStarsTag(item),
+        githubReadmeStatusTag(item),
         ...(project ? projectHeatTags(project) : []),
         ...trendTagsFor(context.trendAnnotations, "github_trending", index)
       ].filter(Boolean));
@@ -871,17 +872,13 @@ function formatHuggingFaceTrending(items, context = {}) {
 
 function githubTrendDetails(item, project) {
   const bullets = [];
+  const hasReadmeSummary = Boolean(String(item?.readme_summary || item?.github_readme_summary || "").trim());
   const description = trimText(cleanGithubTrendDescription(item), 120);
   if (description) {
     bullets.push(description);
-  } else {
-    const fallbackDescription = githubTrendFallbackDescription(item);
-    if (fallbackDescription) {
-      bullets.push(fallbackDescription);
-    }
   }
 
-  const projectDetail = projectHighlightDetail(project, description);
+  const projectDetail = hasReadmeSummary ? projectHighlightDetail(project, description) : "";
   if (projectDetail) {
     bullets.push(projectDetail);
   }
@@ -894,26 +891,13 @@ function githubTrendDetails(item, project) {
   return [...new Set(bullets.map((bullet) => trimText(bullet, 130)).filter(Boolean))].slice(0, 4);
 }
 
-function githubTrendFallbackDescription(item) {
-  const repo = String(item?.repo || item?.name || repoFromUrl(item?.url) || "").trim();
-  const language = String(item?.language || "").trim();
-  const topic = githubRepoNameTopic(repo);
-  const parts = [
-    topic ? `仓库名指向${topic}` : "",
-    `${language ? `${language} 项目，` : ""}公开描述不足，本轮只记录排名和星标变化`
-  ].filter(Boolean);
-  return parts.length > 0 ? `${parts.join("；")}。` : "";
+function githubReadmeStatusTag(item) {
+  return isGithubReadmeFetchFailed(item) ? "README拉取失败" : "";
 }
 
-function githubRepoNameTopic(repo) {
-  const text = String(repo || "").toLowerCase();
-  if (/agent|workflow|mcp/.test(text)) return "agent 工具或工作流";
-  if (/memory|rag|retrieval|knowledge/.test(text)) return "记忆、检索或知识库能力";
-  if (/eval|bench|test/.test(text)) return "评测或回归测试";
-  if (/browser|web|playwright/.test(text)) return "浏览器自动化";
-  if (/video|image|vision|audio|speech/.test(text)) return "多模态处理";
-  if (/model|llm|inference/.test(text)) return "模型调用或推理工程";
-  return "";
+function isGithubReadmeFetchFailed(item = {}) {
+  const status = String(item.readme_fetch_status || item.readme_status || item.readme?.status || "").toLowerCase();
+  return /fail|failed|error|unavailable|blocked|timeout/.test(status) || Boolean(item.readme_error);
 }
 
 function githubRankMove(item) {

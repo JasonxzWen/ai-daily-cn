@@ -185,9 +185,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       })
       .filter(Boolean);
     addCheck(
-      "github_trending_reader_facing_top10",
-      githubTrendRows.length === 10 && weakGithubTrendRows.length === 0,
-      "GitHub Trending should render exactly Top 10 with Chinese reader-facing inline descriptions, not raw English repository excerpts.",
+      "github_trending_reader_facing_top20",
+      githubTrendRows.length === 20 && weakGithubTrendRows.length === 0,
+      "GitHub Trending should render exactly Top 20 with README-grounded Chinese reader-facing summaries when README fetch succeeds.",
       {
         count: githubTrendRows.length,
         weak_rows: weakGithubTrendRows

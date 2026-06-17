@@ -1,5 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  applyGithubReadmeSummary,
+  summarizeGithubReadme
+} from "./github-readme.js";
 import { loadSourceRegistry } from "./source-registry.js";
 import { loadWeChatArticleInput, WECHAT_ARTICLE_INPUT_SOURCE } from "./wechat-input.js";
 import {
@@ -51,7 +55,9 @@ export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending Rust daily", "https://github.com/trending/rust?since=daily", "rust", "daily"),
   source("GitHub Trending Rust weekly", "https://github.com/trending/rust?since=weekly", "rust", "weekly"),
   source("GitHub Trending Go daily", "https://github.com/trending/go?since=daily", "go", "daily"),
-  source("GitHub Trending Go weekly", "https://github.com/trending/go?since=weekly", "go", "weekly")
+  source("GitHub Trending Go weekly", "https://github.com/trending/go?since=weekly", "go", "weekly"),
+  source("GitHub Trending Java daily", "https://github.com/trending/java?since=daily", "java", "daily"),
+  source("GitHub Trending Java weekly", "https://github.com/trending/java?since=weekly", "java", "weekly")
 ];
 
 export const DEFAULT_BUILDER_FALLBACK_SOURCES = [
@@ -648,7 +654,12 @@ export async function collectGitHubTrending(options = {}) {
   }
 
   const history = await loadGitHubTrendingHistory(options);
-  const candidates = annotateGitHubTrendingCandidates([...byRepo.values()].slice(0, limit), history);
+  const enrichedCandidates = await enrichGithubTrendingReadmes([...byRepo.values()].slice(0, limit), {
+    fetchImpl,
+    disabled: options.readmeEnrichment === false,
+    maxCandidates: options.readmeLimit
+  });
+  const candidates = annotateGitHubTrendingCandidates(enrichedCandidates, history);
   return {
     source_audit: {
       github_trending: {
@@ -664,6 +675,92 @@ export async function collectGitHubTrending(options = {}) {
     },
     candidates
   };
+}
+
+async function enrichGithubTrendingReadmes(candidates, options = {}) {
+  if (options.disabled) {
+    return candidates;
+  }
+  const fetchImpl = options.fetchImpl;
+  if (typeof fetchImpl !== "function") {
+    return candidates;
+  }
+  const maxCandidates = Number.isInteger(options.maxCandidates) && options.maxCandidates > 0
+    ? options.maxCandidates
+    : candidates.length;
+  const enriched = [];
+  for (const candidate of candidates) {
+    if (enriched.length >= maxCandidates) {
+      enriched.push(candidate);
+      continue;
+    }
+    enriched.push(await enrichGithubTrendingReadme(candidate, fetchImpl));
+  }
+  return enriched;
+}
+
+async function enrichGithubTrendingReadme(candidate, fetchImpl) {
+  if (candidate.readme_summary || candidate.github_readme_summary || candidate.readme_fetch_status || candidate.readme_status) {
+    return candidate;
+  }
+  const repo = normalizeRepo(candidate.repo || candidate.name || candidate.url || "");
+  if (!repo || repo.split("/").length !== 2) {
+    return markGithubReadmeFetchFailed(candidate, "invalid_repo");
+  }
+  const branches = unique([candidate.default_branch, candidate.defaultBranch, "main", "master"].filter(Boolean));
+  const filenames = ["README.md", "readme.md"];
+  let lastError = "not_found";
+  for (const branch of branches) {
+    for (const filename of filenames) {
+      const sourceUrl = `https://raw.githubusercontent.com/${repo}/${encodeURIComponent(branch)}/${filename}`;
+      try {
+        const response = await fetchImpl(sourceUrl, {
+          headers: {
+            "user-agent": "ai-daily-cn-static-publisher"
+          }
+        });
+        if (!response?.ok) {
+          lastError = `HTTP ${response?.status || 0}`;
+          continue;
+        }
+        const readme = await response.text();
+        if (!String(readme || "").trim()) {
+          lastError = "empty_readme";
+          continue;
+        }
+        const summary = summarizeGithubReadme({
+          repo,
+          readme,
+          maxChars: 160
+        });
+        return {
+          ...applyGithubReadmeSummary(candidate, {
+            repo,
+            summary,
+            defaultBranch: branch,
+            sha: candidate.sha || candidate.commit_sha || "unknown",
+            sourceUrl
+          }),
+          readme_fetch_status: "ok"
+        };
+      } catch (error) {
+        lastError = formatDiscoveryErrorNote(error);
+      }
+    }
+  }
+  return markGithubReadmeFetchFailed(candidate, lastError);
+}
+
+function markGithubReadmeFetchFailed(candidate, error) {
+  return {
+    ...candidate,
+    readme_fetch_status: "failed",
+    readme_error: String(error || "readme_unavailable")
+  };
+}
+
+function unique(values) {
+  return [...new Set(values.filter(Boolean))];
 }
 
 export async function collectHuggingFaceTrending(options = {}) {

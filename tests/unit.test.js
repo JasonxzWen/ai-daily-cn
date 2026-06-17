@@ -1321,6 +1321,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
       name: "example/agent-memory",
       repo: "example/agent-memory",
       description: "面向 coding agents 的 persistent memory 项目。",
+      readme_summary: "面向 coding agents 的 persistent memory 项目，README 说明如何给自动化任务保留用户偏好、项目约束和历史决策，并提供跨会话检索入口。",
+      readme_fetch_status: "ok",
       url: "https://github.com/example/agent-memory",
       event_date: "2026-05-15",
       source: "GitHub Trending weekly",
@@ -1440,7 +1442,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
   assert(!input.sections.some((section) => section.title === "模型发布"));
   assert(!input.sections.some((section) => section.title === "今日值得关注的项目"));
-  const trendingSection = input.sections.find((section) => section.title === "GitHub Trending · Top 10");
+  const trendingSection = input.sections.find((section) => section.title.startsWith("GitHub Trending"));
   assert(!JSON.stringify(input.sections).includes("ExampleModel 2"));
   assert(!JSON.stringify(input.sections).includes("open_weights"));
   assert.equal(trendingSection.summary, undefined);
@@ -1549,6 +1551,8 @@ test("project interaction content is only shown as GitHub Trending item tags", a
       name: "example/project-alpha",
       repo: "example/project-alpha",
       description: "A reusable plugin set for agent workflows.",
+      readme_summary: "面向 agent workflows 的可复用插件集合，README 展示插件组织方式、复用边界和工作流打包入口。",
+      readme_fetch_status: "ok",
       url: "https://github.com/example/project-alpha",
       event_date: "2026-05-15",
       source: "GitHub Trending weekly",
@@ -1587,7 +1591,7 @@ test("project interaction content is only shown as GitHub Trending item tags", a
   ];
 
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+  const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
 
   assert.equal(section.type, "markdown");
   assert(!input.sections.some((item) => item.cardClass === "project-card"));
@@ -1607,6 +1611,8 @@ test("GitHub Trending project highlights deduplicate overlapping project text", 
       name: "example/headroom",
       repo: "example/headroom",
       description: "压缩工具输出、日志、文件和 RAG chunks，在进入 LLM 前减少 token。",
+      readme_summary: "压缩工具输出、日志、文件和 RAG chunks，在进入 LLM 前减少 token。",
+      readme_fetch_status: "ok",
       url: "https://github.com/example/headroom",
       event_date: "2026-05-15",
       source: "GitHub Trending daily",
@@ -1637,7 +1643,7 @@ test("GitHub Trending project highlights deduplicate overlapping project text", 
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 
   const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+  const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
   assert(section.content.includes("压缩工具输出、日志、文件和 RAG chunks"));
   assert(section.content.includes("领域：LLM 工具链、RAG、MCP"));
   assert(!section.content.includes("项目 highlight"));
@@ -1683,7 +1689,7 @@ test("GitHub Trending descriptions prefer concrete README or project context ove
   ];
 
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+  const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
 
   assert(section.content.includes("Browser Agent"));
   assert(section.content.includes("浏览器自动化"));
@@ -2242,7 +2248,7 @@ test("HTML renders GitHub Trending without noisy audit labels", async () => {
   assert(!section.includes("\u8bed\u8a00\uff1a"));
 
   const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const trendingSection = input.sections.find((item) => item.title === "GitHub Trending · Top 10");
+  const trendingSection = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
   assert(trendingSection);
   assert(trendingSection.content.includes("3. **[![hardikpandya/stop-slop]"));
   assert(trendingSection.content.includes("==trend-new|NEW=="));
@@ -2620,6 +2626,124 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
   assert.equal(collected.candidates[1].repo, "example/rag-eval");
 });
 
+test("GitHub trending fixed sources cover weekly all-language and selected language Top10", () => {
+  const weeklySources = DEFAULT_GITHUB_TRENDING_SOURCES.filter((source) => source.window === "weekly");
+  const weeklyLanguages = new Set(weeklySources.map((source) => String(source.language || "").toLowerCase()));
+
+  assert(weeklySources.some((source) => source.name === "GitHub Trending weekly"));
+  assert.deepEqual(
+    [...weeklyLanguages].sort(),
+    ["all", "go", "java", "python", "rust", "typescript"]
+  );
+  assert(weeklySources.every((source) => /since=weekly/.test(source.url)));
+});
+
+test("report:draft merges weekly GitHub all-language and selected language pools to Top20", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-weekly-top20-"));
+  const reportDate = "2026-06-17";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const mainCandidates = Array.from({ length: 7 }, (_unused, index) => mainStreamRepairCandidate(reportDate, {
+    id: `github-top20-main-${index + 1}`,
+    source: "OpenAI News RSS",
+    url: `https://openai.com/news/github-top20-main-${index + 1}`,
+    title: `OpenAI publishes platform update ${index + 1} for developer teams`,
+    evidence: `OpenAI describes platform update ${index + 1} with API changes, enterprise controls, evaluation hooks, rollout notes, and deployment boundaries for AI product teams.`,
+    sourceLevel: "official_company_news",
+    editorialCategory: "ai_industry"
+  }));
+  const readmeSummary = (repo) => `${repo} 是面向 AI 工程团队的开源项目，README 展示核心能力、安装入口、运行示例、集成边界和维护信号，适合先验证依赖、许可证、示例质量和团队接入成本后再进入试点。`;
+  const githubCandidate = ({ repo, source, language, rank, readmeFailed = false }) => ({
+    id: `github-${repo.replace(/[^a-z0-9]+/gi, "-")}`,
+    source_id: `github-${source.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    category: "project",
+    title: repo,
+    repo,
+    url: `https://github.com/${repo}`,
+    source,
+    event_date: reportDate,
+    status: "excluded",
+    rank,
+    trend: rank === 1 ? "new" : "same",
+    language,
+    window: "weekly",
+    stars_this_week: 1000 - rank,
+    evidence: `${repo} appeared on ${source} rank #${rank} with ${1000 - rank} stars this week.`,
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: `https://github.com/${repo}`,
+    verification_sources: [`https://github.com/${repo}`],
+    ...(readmeFailed
+      ? { readme_fetch_status: "failed", readme_error: "timeout" }
+      : { readme_fetch_status: "ok", readme_summary: readmeSummary(repo) })
+  });
+  const allWeekly = Array.from({ length: 10 }, (_unused, index) => githubCandidate({
+    repo: `example/all-weekly-${index + 1}`,
+    source: "GitHub Trending weekly",
+    language: "all",
+    rank: index + 1
+  }));
+  const languageSpecs = [
+    ["Python", "python"],
+    ["TypeScript", "typescript"],
+    ["Rust", "rust"],
+    ["Go", "go"],
+    ["Java", "java"]
+  ];
+  const languageWeekly = languageSpecs.flatMap(([label, language]) => Array.from({ length: 10 }, (_unused, index) => githubCandidate({
+    repo: `example/${language}-weekly-${index + 1}`,
+    source: `GitHub Trending ${label} weekly`,
+    language,
+    rank: index + 1,
+    readmeFailed: language === "java" && index === 0
+  })));
+  const discovery = discoveryEnvelope({
+    candidates: [...mainCandidates, ...allWeekly, ...languageWeekly],
+    sourceNames: ["OpenAI News RSS", "GitHub Trending weekly", ...languageSpecs.map(([label]) => `GitHub Trending ${label} weekly`)]
+  });
+  discovery.source_audit.github_trending = {
+    checked: true,
+    sources: [
+      { name: "GitHub Trending weekly", url: "https://github.com/trending?since=weekly", status: "checked", parsed_count: 10, notes: "10 repositories parsed" },
+      ...languageSpecs.map(([label, language]) => ({
+        name: `GitHub Trending ${label} weekly`,
+        url: `https://github.com/trending/${language}?since=weekly`,
+        status: "checked",
+        parsed_count: 10,
+        notes: "10 repositories parsed"
+      }))
+    ],
+    candidates_found: allWeekly.length + languageWeekly.length,
+    included: 0,
+    notes: "Fixture weekly GitHub Trending sources checked."
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.github_trending.length, 20);
+  assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), Array.from({ length: 20 }, (_unused, index) => index + 1));
+  assert(drafted.report.github_trending.every((item) => item.window === "weekly"));
+  for (const language of ["python", "typescript", "rust", "go", "java"]) {
+    assert(drafted.report.github_trending.some((item) => String(item.language).toLowerCase() === language), `missing ${language}`);
+  }
+  const failedReadmeItem = drafted.report.github_trending.find((item) => item.repo === "example/java-weekly-1");
+  assert(failedReadmeItem);
+  assert.equal(failedReadmeItem.readme_fetch_status, "failed");
+  assert.equal(Object.hasOwn(failedReadmeItem, "description"), false);
+
+  const input = reportToInteractionInput(drafted.report);
+  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 20");
+  assert(section);
+  assert(section.content.includes("README拉取失败"));
+  assert(!section.content.includes("仓库名指向java weekly"));
+});
+
 test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-browser-export-"));
   const exportPath = path.join(tmp, "github-trending.html");
@@ -2753,6 +2877,7 @@ test("GitHub trending discovery retries transient fetch failures and records ret
     sources: [source],
     reportDate: "2026-05-16",
     retryDelayMs: 0,
+    readmeEnrichment: false,
     fetchImpl: async () => {
       calls += 1;
       if (calls === 1) {
@@ -8312,6 +8437,7 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   const reportDate = "2026-05-26";
   const discoveryPath = path.join(tmp, "discovery.json");
   const discovery = autodraftDiscoveryFixture(reportDate);
+  const weeklyReadmeSummary = (repo) => `${repo} 是面向 AI 工程团队的开源项目，README 展示核心能力、安装入口、运行示例、集成边界和维护信号，适合先验证依赖、许可证、示例质量和团队接入成本后再进入试点。`;
   discovery.candidates.push({
     id: "github-weekly-rank-one",
     source_id: "github-github-trending-weekly",
@@ -8324,15 +8450,71 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
     status: "excluded",
     rank: 1,
     trend: "new",
-    language: "TypeScript",
+    language: "all",
     window: "weekly",
-    description: "Weekly-only project that must not replace the daily Top 10.",
+    readme_summary: weeklyReadmeSummary("example/weekly-project"),
+    readme_fetch_status: "ok",
     evidence: "GitHub Trending weekly rank #1 with recent stars this week.",
     verification_status: "primary_confirmed",
     source_level: "github",
     primary_url: "https://github.com/example/weekly-project",
     verification_sources: ["https://github.com/example/weekly-project"]
   });
+  const weeklyLanguageSpecs = [
+    ["Python", "python"],
+    ["TypeScript", "typescript"],
+    ["Rust", "rust"],
+    ["Go", "go"],
+    ["Java", "java"]
+  ];
+  const extraWeeklyGithubCandidates = [
+    ...Array.from({ length: 9 }, (_unused, index) => ({
+      repo: `example/all-weekly-${index + 2}`,
+      source: "GitHub Trending weekly",
+      language: "all",
+      rank: index + 2
+    })),
+    ...weeklyLanguageSpecs.flatMap(([label, language]) => Array.from({ length: 2 }, (_unused, index) => ({
+      repo: `example/${language}-weekly-${index + 1}`,
+      source: `GitHub Trending ${label} weekly`,
+      language,
+      rank: index + 1
+    })))
+  ].map((item) => ({
+    id: `github-${item.repo.replace(/[^a-z0-9]+/gi, "-")}`,
+    source_id: `github-${item.source.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    category: "project",
+    title: item.repo,
+    repo: item.repo,
+    url: `https://github.com/${item.repo}`,
+    source: item.source,
+    event_date: reportDate,
+    status: "excluded",
+    rank: item.rank,
+    trend: item.rank === 1 ? "new" : "same",
+    language: item.language,
+    window: "weekly",
+    stars_this_week: 900 - item.rank,
+    readme_summary: weeklyReadmeSummary(item.repo),
+    readme_fetch_status: "ok",
+    evidence: `${item.repo} appeared on ${item.source} rank #${item.rank} with ${900 - item.rank} stars this week.`,
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: `https://github.com/${item.repo}`,
+    verification_sources: [`https://github.com/${item.repo}`]
+  }));
+  discovery.candidates.push(...extraWeeklyGithubCandidates);
+  discovery.source_audit.github_trending.sources = [
+    { name: "GitHub Trending weekly", url: "https://github.com/trending?since=weekly", status: "checked", parsed_count: 10, notes: "10 repositories parsed" },
+    ...weeklyLanguageSpecs.map(([label, language]) => ({
+      name: `GitHub Trending ${label} weekly`,
+      url: `https://github.com/trending/${language}?since=weekly`,
+      status: "checked",
+      parsed_count: 2,
+      notes: "2 repositories parsed"
+    }))
+  ];
+  discovery.source_audit.github_trending.candidates_found = 1 + extraWeeklyGithubCandidates.length;
   discovery.candidates.push({
     id: "official-looking-intermediary",
     source_id: "content-google-research-blog",
@@ -8385,7 +8567,7 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   });
 
   assert(drafted.counts.main_items >= 7);
-  assert.equal(drafted.counts.github_trending, 10);
+  assert.equal(drafted.counts.github_trending, 20);
   assert.equal(drafted.counts.daily_tracking, 3);
   assert.deepEqual(drafted.report.daily_tracking.map((item) => item.id), [
     "openrouter-rankings",
@@ -8396,9 +8578,12 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(!drafted.report.evidence_assets.some((asset) =>
     /openrouter|browser screenshot|页面截图|screenshot/i.test(`${asset.title || ""} ${asset.caption || ""} ${asset.local_path || ""}`)
   ));
-  assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-  assert(drafted.report.github_trending.every((item) => item.source === "GitHub Trending daily"));
-  assert(!drafted.report.github_trending.some((item) => item.repo === "example/weekly-project"));
+  assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), Array.from({ length: 20 }, (_unused, index) => index + 1));
+  assert(drafted.report.github_trending.every((item) => item.window === "weekly"));
+  assert(drafted.report.github_trending.some((item) => item.repo === "example/weekly-project"));
+  for (const language of ["python", "typescript", "rust", "go", "java"]) {
+    assert(drafted.report.github_trending.some((item) => String(item.language).toLowerCase() === language), `missing ${language}`);
+  }
   assert(drafted.report.main_items.some((item) => item.editorial_category === "content_aigc"));
   assert(!drafted.report.main_items.some((item) => item.verification_status === "intermediary_only"));
   assert(!drafted.report.main_items.some((item) => item.url === "https://example.com/intermediary-google-model"));
@@ -8480,7 +8665,7 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
 
   assert.equal(written.report.report_date, reportDate);
   assert(written.report.main_items.length >= 7);
-  assert.equal(written.report.github_trending.length, 10);
+  assert.equal(written.report.github_trending.length, 20);
   assert.equal(written.report.daily_tracking.length, 3);
   assert.equal(written.report.quality_status.status, "degraded");
   assert(written.report.quality_status.reasons.includes("daily_tracking_source_blocked"));
@@ -9839,8 +10024,9 @@ test("report:draft favors plain-reader utility over hardcore research details", 
   );
   assert(drafted.report.github_trending.length > 0);
   for (const item of drafted.report.github_trending) {
-    assert.doesNotMatch(item.description, /(?:进入|进了) GitHub Trending Top 10/);
-    assert.doesNotMatch(item.description, /Agent workflow toolkit for local AI engineering/);
+    const description = item.description || item.readme_summary || "";
+    assert.doesNotMatch(description, /(?:进入|进了) GitHub Trending Top 10/);
+    assert.doesNotMatch(description, /Agent workflow toolkit for local AI engineering/);
   }
 });
 

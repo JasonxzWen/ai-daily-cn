@@ -91,9 +91,9 @@ structuredReport.projects = [
     domains: ["agent 记忆", "开发者 API"],
     use_case: "给 agent 应用提供跨会话记忆、检索和偏好复用能力，适合评估自动化任务的上下文连续性。",
     event_date: "2026-05-15",
-    source: "GitHub Trending daily",
+    source: "GitHub Trending weekly",
     signal: "trending",
-    evidence: "GitHub Trending daily showed 123 stars today."
+    evidence: "GitHub Trending weekly showed 456 stars this week."
   },
   {
     name: "Example Eval Harness",
@@ -102,30 +102,35 @@ structuredReport.projects = [
     domains: ["评测 harness", "coding agent"],
     use_case: "适合把 agent 任务回放、输出记录和回归比较纳入发布前质量检查。",
     event_date: "2026-05-15",
-    source: "GitHub Trending daily",
+    source: "GitHub Trending weekly",
     signal: "trending",
-    evidence: "GitHub Trending daily showed 98 stars today."
+    evidence: "GitHub Trending weekly showed 398 stars this week."
   }
 ];
-structuredReport.github_trending = Array.from({ length: 10 }, (_, index) => {
+structuredReport.github_trending = Array.from({ length: 20 }, (_, index) => {
   const rank = index + 1;
   const repo = index === 0 ? "example/agent-memory" : `example/agent-tool-${rank}`;
+  const languages = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
+  const language = languages[index % languages.length];
+  const readmeSummary = `${repo} 是面向 AI 工程团队的开源项目，README 展示核心能力、安装入口、运行示例、集成边界和维护信号，适合先验证依赖、许可证、示例质量和团队接入成本后再进入试点。`;
   return {
     name: repo,
     repo,
-    description: `${repo}：进入 GitHub Trending Top 10，可作为 agent 工具方向的实现线索。优先核对 README 示例、许可证、近期维护和本地复现门槛。`,
+    readme_summary: readmeSummary,
+    readme_fetch_status: "ok",
+    description: readmeSummary,
     url: `https://github.com/${repo}`,
     event_date: "2026-05-15",
-    source: "GitHub Trending daily",
-    language: "TypeScript",
-    window: "daily",
+    source: language === "all" ? "GitHub Trending weekly" : `GitHub Trending ${language} weekly`,
+    language,
+    window: "weekly",
     rank,
     previous_rank: index === 0 ? 3 : null,
     rank_delta: index === 0 ? 2 : null,
     trend: index === 0 ? "up" : "new",
     evidence: index === 0
-      ? "example/agent-memory appeared on GitHub Trending daily with 123 stars today."
-      : `${repo} appeared on GitHub Trending daily.`
+      ? "example/agent-memory appeared on GitHub Trending weekly with 456 stars this week."
+      : `${repo} appeared on GitHub Trending weekly.`
   };
 });
 structuredReport.hot_blogs.push({
@@ -237,12 +242,16 @@ structuredReport.daily_tracking = [
 structuredReport.source_audit = {
   github_trending: {
     checked: true,
-    candidates_found: 10,
-    included: 10,
+    candidates_found: 20,
+    included: 20,
     notes: "Fixture GitHub Trending audit.",
     sources: [
-      { name: "GitHub Trending daily", url: "https://github.com/trending?since=daily", status: "checked", notes: "Top 10 parsed." },
-      { name: "GitHub Trending weekly", url: "https://github.com/trending?since=weekly", status: "no_signal", notes: "Not used for this public day." }
+      { name: "GitHub Trending weekly", url: "https://github.com/trending?since=weekly", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending Python weekly", url: "https://github.com/trending/python?since=weekly", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending TypeScript weekly", url: "https://github.com/trending/typescript?since=weekly", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending Rust weekly", url: "https://github.com/trending/rust?since=weekly", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending Go weekly", url: "https://github.com/trending/go?since=weekly", status: "checked", notes: "Top 10 parsed." },
+      { name: "GitHub Trending Java weekly", url: "https://github.com/trending/java?since=weekly", status: "checked", notes: "Top 10 parsed." }
     ]
   },
   builder_sources: {
