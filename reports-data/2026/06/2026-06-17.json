@@ -177,7 +177,7 @@
       "candidates_found": 29,
       "included": 0,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T04:56:40.707Z",
+      "last_successful_feed_at": "2026-06-17T05:32:56.793Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -337,7 +337,7 @@
         "html_index": 10
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T04:56:44.548Z",
+      "last_successful_feed_at": "2026-06-17T05:32:59.773Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "content_sources": {
@@ -555,8 +555,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 4,
-          "notes": "4 recent intermediary lead entries parsed"
+          "parsed_count": 5,
+          "notes": "5 recent intermediary lead entries parsed"
         },
         {
           "name": "NVIDIA Newsroom RSS",
@@ -687,7 +687,7 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "no_signal",
+          "status": "blocked",
           "id": "content-baidu-press-releases",
           "source_kind": "html_index",
           "tier": "T0",
@@ -695,8 +695,7 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -1684,7 +1683,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-17T04:56:50.703Z",
+            "snapshot_as_of": "2026-06-17T05:33:04.807Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -1765,183 +1764,16 @@
         {
           "name": "Artificial Analysis Intelligence Index",
           "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "status": "checked",
-          "notes": "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
+          "status": "blocked",
+          "notes": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\", waiting until \"networkidle\"\u001b[22m\n; name=TimeoutError",
           "snapshot": {
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
-            "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-17T04:56:50.703Z",
+            "snapshot_status": "blocked",
+            "snapshot_as_of": "2026-06-17T05:33:04.807Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-            "top_entries": [
-              {
-                "rank": 1,
-                "model": "Claude Fable 5 (with fallback)",
-                "provider": "anthropic",
-                "tokens": "60 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 2,
-                "model": "Claude Opus 4.8 (max)",
-                "provider": "anthropic",
-                "tokens": "56 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 3,
-                "model": "GPT-5.5 (xhigh)",
-                "provider": "openai",
-                "tokens": "55 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 4,
-                "model": "Claude Opus 4.7 (max)",
-                "provider": "anthropic",
-                "tokens": "54 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 5,
-                "model": "GPT-5.5 (high)",
-                "provider": "openai",
-                "tokens": "53 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 6,
-                "model": "Gemini 3.5 Flash",
-                "provider": "google",
-                "tokens": "50 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 7,
-                "model": "Claude Sonnet 4.6 (max)",
-                "provider": "anthropic",
-                "tokens": "47 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 8,
-                "model": "Gemini 3.1 Pro Preview",
-                "provider": "google",
-                "tokens": "46 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 9,
-                "model": "Qwen3.7 Max",
-                "provider": "alibaba",
-                "tokens": "46 分",
-                "change": "AA Index"
-              },
-              {
-                "rank": 10,
-                "model": "MiniMax-M3",
-                "provider": "minimax",
-                "tokens": "44 分",
-                "change": "AA Index"
-              }
-            ],
-            "component_tabs": {
-              "score": {
-                "rows": [
-                  {
-                    "rank": 1,
-                    "model": "Claude Fable 5 (with fallback)",
-                    "provider": "anthropic",
-                    "value": 60,
-                    "value_label": "60 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 2,
-                    "model": "Claude Opus 4.8 (max)",
-                    "provider": "anthropic",
-                    "value": 56,
-                    "value_label": "56 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 3,
-                    "model": "GPT-5.5 (xhigh)",
-                    "provider": "openai",
-                    "value": 55,
-                    "value_label": "55 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 4,
-                    "model": "Claude Opus 4.7 (max)",
-                    "provider": "anthropic",
-                    "value": 54,
-                    "value_label": "54 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 5,
-                    "model": "GPT-5.5 (high)",
-                    "provider": "openai",
-                    "value": 53,
-                    "value_label": "53 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 6,
-                    "model": "Gemini 3.5 Flash",
-                    "provider": "google",
-                    "value": 50,
-                    "value_label": "50 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 7,
-                    "model": "Claude Sonnet 4.6 (max)",
-                    "provider": "anthropic",
-                    "value": 47,
-                    "value_label": "47 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 8,
-                    "model": "Gemini 3.1 Pro Preview",
-                    "provider": "google",
-                    "value": 46,
-                    "value_label": "46 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 9,
-                    "model": "Qwen3.7 Max",
-                    "provider": "alibaba",
-                    "value": 46,
-                    "value_label": "46 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  },
-                  {
-                    "rank": 10,
-                    "model": "MiniMax-M3",
-                    "provider": "minimax",
-                    "value": 44,
-                    "value_label": "44 分",
-                    "change": "AA Index",
-                    "metric": "Score"
-                  }
-                ]
-              }
-            },
-            "notes": "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof.",
+            "top_entries": [],
+            "notes": "page.goto:_Timeout_15000ms_exceeded._Call_log:_\u001b[2m_-_navigating_to_\"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\",_waiting_",
             "history_entries": []
           }
         },
@@ -1997,8 +1829,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 54,
-          "notes": "54 recent intermediary lead entries parsed"
+          "parsed_count": 56,
+          "notes": "56 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -2025,8 +1857,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 42,
-          "notes": "42 recent intermediary lead entries parsed"
+          "parsed_count": 43,
+          "notes": "43 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2067,8 +1899,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 39,
-          "notes": "39 recent intermediary lead entries parsed"
+          "parsed_count": 38,
+          "notes": "38 recent intermediary lead entries parsed"
         },
         {
           "name": "36Kr",
@@ -2583,7 +2415,7 @@
         "artificial_analysis_index_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T04:56:50.703Z",
+      "last_successful_feed_at": "2026-06-17T05:33:04.807Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2593,8 +2425,8 @@
         {
           "name": "GDELT",
           "url": "https://api.gdeltproject.org/",
-          "status": "checked",
-          "notes": "3 shadow candidates; provider_timeout_exceeded_45000ms"
+          "status": "blocked",
+          "notes": "provider_timeout_exceeded_45000ms"
         },
         {
           "name": "OpenAlex",
@@ -2606,18 +2438,18 @@
           "name": "arXiv",
           "url": "https://export.arxiv.org/",
           "status": "checked",
-          "notes": "1 shadow candidates"
+          "notes": "4 shadow candidates"
         }
       ],
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 57616,
-        "openalex": 20056,
-        "arxiv": 933
+        "gdelt": 52766,
+        "openalex": 19762,
+        "arxiv": 927
       },
       "provider_cost_units": {
-        "gdelt": 4,
+        "gdelt": 3,
         "openalex": 15,
         "arxiv": 15
       },
@@ -2876,9 +2708,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 1,
+          "recent_48h_entries": 2,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 1 within 48h"
+          "notes": "10 feed entries parsed; 2 within 48h"
         },
         {
           "name": "NVIDIA Newsroom RSS",
@@ -4334,9 +4166,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 32,
+          "recent_48h_entries": 35,
           "original_url_count": null,
-          "notes": "54 feed entries parsed; 32 within 48h"
+          "notes": "55 feed entries parsed; 35 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4419,9 +4251,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 21,
+          "recent_48h_entries": 22,
           "original_url_count": null,
-          "notes": "39 feed entries parsed; 21 within 48h"
+          "notes": "39 feed entries parsed; 22 within 48h"
         },
         {
           "name": "36Kr",
@@ -5048,9 +4880,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 24,
+          "recent_48h_entries": 25,
           "original_url_count": null,
-          "notes": "25 feed entries parsed; 24 within 48h"
+          "notes": "25 feed entries parsed; 25 within 48h"
         },
         {
           "name": "WeChat Platform AI Feed",
@@ -5221,8 +5053,8 @@
           "enablement": "manual",
           "verification_policy": "platform_signal_exempt",
           "platform": "reddit",
-          "parsed_count": 20,
-          "notes": "20 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=3, exclude_keywords_matched=2"
+          "parsed_count": 21,
+          "notes": "21 recent platform signal entries parsed。platform_rejections: include_keywords_not_matched=2, exclude_keywords_matched=2"
         }
       ],
       "candidates_found": 3,
@@ -5238,7 +5070,7 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T05:00:48.165Z",
+      "last_successful_feed_at": "2026-06-17T05:36:59.893Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
@@ -5650,13 +5482,13 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AIGC / content generation",
-      "summary": "AWS讲解SageMaker 推理容器缓存方案。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
+      "summary": "AWS讲解SageMaker 推理容器缓存方案，原文说明模型加载延迟、冷启动时间、发布风险和生产推理成本。读者可核对容器缓存、模型加载、冷启动延迟和部署成本，并留意收益取决于模型大小、镜像组织、缓存命中率和部署频率。",
       "key_points": [
+        "AWS讲解SageMaker 推理容器缓存方案，原文说明模型加载延迟、冷启动时间、发布风险和生产推理成本。",
+        "读者可核对容器缓存、模型加载、冷启动延迟和部署成本，并留意收益取决于模型大小、镜像组织、缓存命中率和部署频率。",
         "AWS讲解SageMaker 推理容器缓存方案。",
-        "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
-        "它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
-        "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
-        "文章真正有用的部分，在于它讲清了它怎样改变内容生产、素材生成或创作者工作流里的成本和质量判断，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
+        "原文重点覆盖模型加载延迟、冷启动时间、发布风险和生产推理成本。",
+        "可核对的信息包括容器缓存、模型加载、冷启动延迟和部署成本。"
       ],
       "content_type": "blog",
       "importance": "notable",
@@ -5673,13 +5505,13 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA拆解交易基础模型与反欺诈工作流。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA拆解交易基础模型与反欺诈工作流，原文说明交易序列建模、特征流水线、合成数据边界和部署取舍。读者可核对交易数据、序列建模、特征流水线和反欺诈部署，并留意金融场景还要处理数据偏差、可解释性、误报成本和合规要求。",
       "key_points": [
+        "NVIDIA拆解交易基础模型与反欺诈工作流，原文说明交易序列建模、特征流水线、合成数据边界和部署取舍。",
+        "读者可核对交易数据、序列建模、特征流水线和反欺诈部署，并留意金融场景还要处理数据偏差、可解释性、误报成本和合规要求。",
         "NVIDIA拆解交易基础模型与反欺诈工作流。",
-        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
+        "原文重点覆盖交易序列建模、特征流水线、合成数据边界和部署取舍。",
+        "可核对的信息包括交易数据、序列建模、特征流水线和反欺诈部署。"
       ],
       "content_type": "blog",
       "importance": "notable",
@@ -5696,20 +5528,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "AWS说明多 agent 安全护栏方案。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "AWS说明多 agent 安全护栏方案，原文说明策略检查、提示过滤、响应控制、企业应用和可观测性。读者可核对Guardrails、策略检查、提示过滤和响应控制，并留意多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底。",
       "key_points": [
+        "AWS说明多 agent 安全护栏方案，原文说明策略检查、提示过滤、响应控制、企业应用和可观测性。",
+        "读者可核对Guardrails、策略检查、提示过滤和响应控制，并留意多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底。",
         "AWS说明多 agent 安全护栏方案。",
-        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
+        "原文重点覆盖策略检查、提示过滤、响应控制、企业应用和可观测性。",
+        "可核对的信息包括Guardrails、策略检查、提示过滤和响应控制。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA更新agent 工作流和开发工具能力",
+      "title": "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程",
       "candidate_id": "content-nvidia-developer-blog-building-ai-agents-for-ar-glasses-and-xr-devices-w",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5719,20 +5551,20 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA更新agent 工作流和开发工具能力。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程，原文说明端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界。读者可核对XR AI、端侧推理、语音交互、感知输入和 SDK 集成，并留意落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度。",
       "key_points": [
-        "NVIDIA更新agent 工作流和开发工具能力。",
-        "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。"
+        "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程，原文说明端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界。",
+        "读者可核对XR AI、端侧推理、语音交互、感知输入和 SDK 集成，并留意落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度。",
+        "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程。",
+        "原文重点覆盖端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界。",
+        "可核对的信息包括XR AI、端侧推理、语音交互、感知输入和 SDK 集成。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA更新agent 工作流和开发工具能力",
+      "title": "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案",
       "candidate_id": "content-nvidia-developer-blog-build-on-device-ai-companions-with-the-nvidia-ace",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5742,20 +5574,20 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA更新agent 工作流和开发工具能力。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案，原文说明角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍。读者可核对ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口，并留意游戏内 agent 还要处理实时延迟、内容安全、角色一致性和引擎集成成本。",
       "key_points": [
-        "NVIDIA更新agent 工作流和开发工具能力。",
-        "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
+        "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案，原文说明角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍。",
+        "读者可核对ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口，并留意游戏内 agent 还要处理实时延迟、内容安全、角色一致性和引擎集成成本。",
+        "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案。",
+        "原文重点覆盖角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍。",
+        "可核对的信息包括ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "AWS讲解SageMaker 推理容器缓存方案",
+      "title": "AWS说明SageMaker 推测解码并行化方案",
       "candidate_id": "content-aws-machine-learning-parallelize-speculative-decoding-with-p-eagle-on-am",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5765,20 +5597,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "AWS讲解SageMaker 推理容器缓存方案。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "AWS说明SageMaker 推测解码并行化方案，原文说明draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件。读者可核对P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标，并留意优化收益取决于模型结构、请求形态、草稿模型质量和线上延迟预算。",
       "key_points": [
-        "AWS讲解SageMaker 推理容器缓存方案。",
-        "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
+        "AWS说明SageMaker 推测解码并行化方案，原文说明draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件。",
+        "读者可核对P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标，并留意优化收益取决于模型结构、请求形态、草稿模型质量和线上延迟预算。",
+        "AWS说明SageMaker 推测解码并行化方案。",
+        "原文重点覆盖draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件。",
+        "可核对的信息包括P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA披露模型能力和评估方法更新",
+      "title": "NVIDIA披露Blackwell MLPerf 训练性能结果",
       "candidate_id": "content-nvidia-newsroom-rss-fastest-largest-strongest-nvidia-blackwell-sweeps-ml",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5791,13 +5623,13 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-16",
       "topic": "AI industry",
-      "summary": "NVIDIA披露模型能力和评估方法更新。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
+      "summary": "NVIDIA披露Blackwell MLPerf 训练性能结果，原文说明训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。读者可核对Blackwell、MLPerf Training、吞吐指标和训练基准设置，并留意benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。",
       "key_points": [
-        "NVIDIA披露模型能力和评估方法更新。",
-        "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
-        "它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
-        "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
-        "文章真正有用的部分，在于它讲清了它反映的产品方向、平台策略或使用方式是否已经接近普通团队的日常选择，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
+        "NVIDIA披露Blackwell MLPerf 训练性能结果，原文说明训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。",
+        "读者可核对Blackwell、MLPerf Training、吞吐指标和训练基准设置，并留意benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。",
+        "NVIDIA披露Blackwell MLPerf 训练性能结果。",
+        "原文重点覆盖训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。",
+        "可核对的信息包括Blackwell、MLPerf Training、吞吐指标和训练基准设置。"
       ],
       "content_type": "blog",
       "importance": "notable",
@@ -5817,13 +5649,13 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA介绍机器人学习与多模态推理实验。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA介绍机器人学习与多模态推理实验，原文说明具身任务规划、训练数据、多模态推理和评估工作流。读者可核对机器人学习实验、多模态推理和任务规划评估，并留意研究信号仍需要看真实机器人任务、数据规模和评测设置。",
       "key_points": [
+        "NVIDIA介绍机器人学习与多模态推理实验，原文说明具身任务规划、训练数据、多模态推理和评估工作流。",
+        "读者可核对机器人学习实验、多模态推理和任务规划评估，并留意研究信号仍需要看真实机器人任务、数据规模和评测设置。",
         "NVIDIA介绍机器人学习与多模态推理实验。",
-        "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
-        "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。"
+        "原文重点覆盖具身任务规划、训练数据、多模态推理和评估工作流。",
+        "可核对的信息包括机器人学习实验、多模态推理和任务规划评估。"
       ],
       "content_type": "blog",
       "importance": "notable",
@@ -5975,7 +5807,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T04:56:50.703Z",
+        "snapshot_as_of": "2026-06-17T05:33:04.807Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -6056,10 +5888,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-17T04:56:50.703Z",
+        "collected_at": "2026-06-17T05:33:04.807Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:cf0186cc19f16ef14c443cd403e8274921f927967fb760365721c7042e6477c6",
-        "data_hash": "sha256:ca9d87d546864e0e1a3304013528dda07718df0e1f4b06973908de7b64c8d9e7",
+        "data_hash": "sha256:c7e368bef7b351bd331aac17eeac45195f416ff7526bfcd6d5438163f8dc7c6f",
         "tabs": [
           {
             "id": "top-models",
@@ -6360,9 +6192,9 @@
         "fallback_reason": "",
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-17T04:56:50.703Z",
+          "collected_at": "2026-06-17T05:33:04.807Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:ca9d87d546864e0e1a3304013528dda07718df0e1f4b06973908de7b64c8d9e7",
+          "data_hash": "sha256:c7e368bef7b351bd331aac17eeac45195f416ff7526bfcd6d5438163f8dc7c6f",
           "top_rows": [
             {
               "rank": 1,
@@ -6466,660 +6298,30 @@
       "category": "model_benchmark",
       "importance": "notable",
       "source_level": "primary",
-      "verification_status": "primary_confirmed",
-      "change_status": "changed",
-      "change_summary": "Artificial Analysis Intelligence Index Top 10 已解析：#1 Claude Fable 5 (with fallback) 60 分，#2 Claude Opus 4.8 (max) 56 分，#3 GPT-5.5 (xhigh) 55 分。",
-      "publish_to_public": true,
-      "summary": "Artificial Analysis 公开榜单显示，当前 Intelligence Index 第一是 Claude Fable 5 (with fallback)（anthropic，60 分）。 前三名为 Claude Fable 5 (with fallback) 60 分、Claude Opus 4.8 (max) 56 分、GPT-5.5 (xhigh) 55 分，Top 10 供应商分布为 anthropic 4、google 2、openai 2、alibaba 1、minimax 1。 这个榜单适合做模型 shortlist 和能力变化监测，但生产选型仍要结合延迟、价格、上下文长度和自有任务复测。",
+      "verification_status": "unverified",
+      "change_status": "blocked",
+      "change_summary": "本轮官方入口抓取受阻，不能确认榜单是否变化。",
+      "publish_to_public": false,
+      "summary": "关注独立基准里模型能力、速度、价格和 token 使用的相对位置；它适合做模型 shortlist，不能单独决定生产选型。 本轮自动抓取未取得可解析快照，读者需要点开官方页人工核对最新榜单。",
       "watch_points": [
-        "榜首 Claude Fable 5 (with fallback) 的综合分为 60 分，需要继续看它在代码、长上下文和 agentic task 分项上的表现。",
-        "Top 10 内部竞争接近：46 分有 2 个模型，不要只按一个名次做选型。",
-        "把 Intelligence Index 与价格、延迟、吞吐和可用地区一起看，避免用综合分替代真实 workload 复测。"
+        "榜首和 Top 10 是否发生换位，尤其是新模型是否进入综合能力前列。",
+        "分数、成本和 token 用量是否出现明显 trade-off。",
+        "把 Intelligence Index 与具体任务基准分开看，避免被单一综合分误导。"
       ],
       "metrics": [
         {
-          "label": "榜单范围",
-          "value": "Intelligence Index Top 10",
+          "label": "核心指标",
+          "value": "Intelligence Index / cost / token usage",
+          "trend": "unknown"
+        },
+        {
+          "label": "适用问题",
+          "value": "能力、价格和性能之间的模型取舍",
           "trend": "same"
-        },
-        {
-          "label": "供应商分布",
-          "value": "anthropic 4、google 2、openai 2、alibaba 1、minimax 1",
-          "trend": "unknown"
-        },
-        {
-          "label": "#1",
-          "value": "Claude Fable 5 (with fallback)（anthropic）：60 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#2",
-          "value": "Claude Opus 4.8 (max)（anthropic）：56 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#3",
-          "value": "GPT-5.5 (xhigh)（openai）：55 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#4",
-          "value": "Claude Opus 4.7 (max)（anthropic）：54 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#5",
-          "value": "GPT-5.5 (high)（openai）：53 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#6",
-          "value": "Gemini 3.5 Flash（google）：50 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#7",
-          "value": "Claude Sonnet 4.6 (max)（anthropic）：47 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#8",
-          "value": "Gemini 3.1 Pro Preview（google）：46 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#9",
-          "value": "Qwen3.7 Max（alibaba）：46 分",
-          "trend": "unknown"
-        },
-        {
-          "label": "#10",
-          "value": "MiniMax-M3（minimax）：44 分",
-          "trend": "unknown"
         }
       ],
-      "evidence": "Artificial Analysis 官方说明 Intelligence Index 聚合十项数学、科学、代码和推理评测，并由 Artificial Analysis 独立运行。 source_audit status=checked; 10 Artificial Analysis top models parsed from public_page_snapshot",
-      "watch_next": "若榜首或 Top 10 构成变化，继续核对分项 benchmark、价格、延迟和自有 workload 复测结果。",
-      "snapshot": {
-        "type": "artificial_analysis_intelligence_index_public_page",
-        "collection_method": "public_page_playwright",
-        "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T04:56:50.703Z",
-        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "top_entries": [
-          {
-            "rank": 1,
-            "model": "Claude Fable 5 (with fallback)",
-            "provider": "anthropic",
-            "tokens": "60 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 2,
-            "model": "Claude Opus 4.8 (max)",
-            "provider": "anthropic",
-            "tokens": "56 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 3,
-            "model": "GPT-5.5 (xhigh)",
-            "provider": "openai",
-            "tokens": "55 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 4,
-            "model": "Claude Opus 4.7 (max)",
-            "provider": "anthropic",
-            "tokens": "54 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 5,
-            "model": "GPT-5.5 (high)",
-            "provider": "openai",
-            "tokens": "53 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 6,
-            "model": "Gemini 3.5 Flash",
-            "provider": "google",
-            "tokens": "50 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 7,
-            "model": "Claude Sonnet 4.6 (max)",
-            "provider": "anthropic",
-            "tokens": "47 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 8,
-            "model": "Gemini 3.1 Pro Preview",
-            "provider": "google",
-            "tokens": "46 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 9,
-            "model": "Qwen3.7 Max",
-            "provider": "alibaba",
-            "tokens": "46 分",
-            "change": "AA Index"
-          },
-          {
-            "rank": 10,
-            "model": "MiniMax-M3",
-            "provider": "minimax",
-            "tokens": "44 分",
-            "change": "AA Index"
-          }
-        ],
-        "component_tabs": {
-          "score": {
-            "rows": [
-              {
-                "rank": 1,
-                "model": "Claude Fable 5 (with fallback)",
-                "provider": "anthropic",
-                "value": 60,
-                "value_label": "60 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 2,
-                "model": "Claude Opus 4.8 (max)",
-                "provider": "anthropic",
-                "value": 56,
-                "value_label": "56 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 3,
-                "model": "GPT-5.5 (xhigh)",
-                "provider": "openai",
-                "value": 55,
-                "value_label": "55 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 4,
-                "model": "Claude Opus 4.7 (max)",
-                "provider": "anthropic",
-                "value": 54,
-                "value_label": "54 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 5,
-                "model": "GPT-5.5 (high)",
-                "provider": "openai",
-                "value": 53,
-                "value_label": "53 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 6,
-                "model": "Gemini 3.5 Flash",
-                "provider": "google",
-                "value": 50,
-                "value_label": "50 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 7,
-                "model": "Claude Sonnet 4.6 (max)",
-                "provider": "anthropic",
-                "value": 47,
-                "value_label": "47 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 8,
-                "model": "Gemini 3.1 Pro Preview",
-                "provider": "google",
-                "value": 46,
-                "value_label": "46 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 9,
-                "model": "Qwen3.7 Max",
-                "provider": "alibaba",
-                "value": 46,
-                "value_label": "46 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 10,
-                "model": "MiniMax-M3",
-                "provider": "minimax",
-                "value": 44,
-                "value_label": "44 分",
-                "change": "AA Index",
-                "metric": "Score"
-              }
-            ]
-          }
-        },
-        "notes": "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof.",
-        "history_entries": []
-      },
-      "tracking_component_snapshot": {
-        "source": "Artificial Analysis",
-        "component_kind": "artificial_analysis_index",
-        "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-17T04:56:50.703Z",
-        "selector_version": "artificial-analysis-index-v1",
-        "raw_dom_hash": "sha256:8afac40ad218dd32c36454796b8d87dc0adb5aad52ec25929e0629907e86b26d",
-        "data_hash": "sha256:382225ea620d4981276f27f2763a5a6553586f47bb3fd25b4dbd8af5093cb9dd",
-        "tabs": [
-          {
-            "id": "score",
-            "label": "Score",
-            "view": "score_table",
-            "status": "complete",
-            "fallback_reason": ""
-          },
-          {
-            "id": "token-usage",
-            "label": "Token Usage",
-            "view": "stacked_bar",
-            "status": "fallback",
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "cost",
-            "label": "Cost",
-            "view": "stacked_bar",
-            "status": "fallback",
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "score-vs-token-usage",
-            "label": "Score vs. Token Usage",
-            "view": "scatter",
-            "status": "fallback",
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "score-vs-cost",
-            "label": "Score vs. Cost",
-            "view": "scatter",
-            "status": "fallback",
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "score-vs-compute",
-            "label": "Score vs. Compute",
-            "view": "scatter",
-            "status": "fallback",
-            "fallback_reason": "source_tab_not_collected"
-          }
-        ],
-        "series": [
-          {
-            "id": "artificial-analysis-score",
-            "tab_id": "score",
-            "label": "Score",
-            "chart": "score_table",
-            "rows": [
-              {
-                "rank": 1,
-                "model": "Claude Fable 5 (with fallback)",
-                "provider": "anthropic",
-                "value": 60,
-                "value_label": "60 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 2,
-                "model": "Claude Opus 4.8 (max)",
-                "provider": "anthropic",
-                "value": 56,
-                "value_label": "56 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 3,
-                "model": "GPT-5.5 (xhigh)",
-                "provider": "openai",
-                "value": 55,
-                "value_label": "55 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 4,
-                "model": "Claude Opus 4.7 (max)",
-                "provider": "anthropic",
-                "value": 54,
-                "value_label": "54 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 5,
-                "model": "GPT-5.5 (high)",
-                "provider": "openai",
-                "value": 53,
-                "value_label": "53 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 6,
-                "model": "Gemini 3.5 Flash",
-                "provider": "google",
-                "value": 50,
-                "value_label": "50 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 7,
-                "model": "Claude Sonnet 4.6 (max)",
-                "provider": "anthropic",
-                "value": 47,
-                "value_label": "47 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 8,
-                "model": "Gemini 3.1 Pro Preview",
-                "provider": "google",
-                "value": 46,
-                "value_label": "46 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 9,
-                "model": "Qwen3.7 Max",
-                "provider": "alibaba",
-                "value": 46,
-                "value_label": "46 分",
-                "change": "AA Index",
-                "metric": "Score"
-              },
-              {
-                "rank": 10,
-                "model": "MiniMax-M3",
-                "provider": "minimax",
-                "value": 44,
-                "value_label": "44 分",
-                "change": "AA Index",
-                "metric": "Score"
-              }
-            ],
-            "fallback_reason": ""
-          },
-          {
-            "id": "artificial-analysis-token-usage",
-            "tab_id": "token-usage",
-            "label": "Token Usage",
-            "chart": "stacked_bar",
-            "rows": [],
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "artificial-analysis-cost",
-            "tab_id": "cost",
-            "label": "Cost",
-            "chart": "stacked_bar",
-            "rows": [],
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "artificial-analysis-score-vs-token-usage",
-            "tab_id": "score-vs-token-usage",
-            "label": "Score vs. Token Usage",
-            "chart": "scatter",
-            "rows": [],
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "artificial-analysis-score-vs-cost",
-            "tab_id": "score-vs-cost",
-            "label": "Score vs. Cost",
-            "chart": "scatter",
-            "rows": [],
-            "fallback_reason": "source_tab_not_collected"
-          },
-          {
-            "id": "artificial-analysis-score-vs-compute",
-            "tab_id": "score-vs-compute",
-            "label": "Score vs. Compute",
-            "chart": "scatter",
-            "rows": [],
-            "fallback_reason": "source_tab_not_collected"
-          }
-        ],
-        "rows": [
-          {
-            "rank": 1,
-            "model": "Claude Fable 5 (with fallback)",
-            "provider": "anthropic",
-            "value": 60,
-            "value_label": "60 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 2,
-            "model": "Claude Opus 4.8 (max)",
-            "provider": "anthropic",
-            "value": 56,
-            "value_label": "56 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 3,
-            "model": "GPT-5.5 (xhigh)",
-            "provider": "openai",
-            "value": 55,
-            "value_label": "55 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 4,
-            "model": "Claude Opus 4.7 (max)",
-            "provider": "anthropic",
-            "value": 54,
-            "value_label": "54 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 5,
-            "model": "GPT-5.5 (high)",
-            "provider": "openai",
-            "value": 53,
-            "value_label": "53 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 6,
-            "model": "Gemini 3.5 Flash",
-            "provider": "google",
-            "value": 50,
-            "value_label": "50 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 7,
-            "model": "Claude Sonnet 4.6 (max)",
-            "provider": "anthropic",
-            "value": 47,
-            "value_label": "47 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 8,
-            "model": "Gemini 3.1 Pro Preview",
-            "provider": "google",
-            "value": 46,
-            "value_label": "46 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 9,
-            "model": "Qwen3.7 Max",
-            "provider": "alibaba",
-            "value": 46,
-            "value_label": "46 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          },
-          {
-            "rank": 10,
-            "model": "MiniMax-M3",
-            "provider": "minimax",
-            "value": 44,
-            "value_label": "44 分",
-            "change": "AA Index",
-            "metric": "AA Index"
-          }
-        ],
-        "previous_snapshot": null,
-        "diff": {
-          "status": "first_snapshot",
-          "summary": "No previous component snapshot was available for comparison.",
-          "changed_rows": [],
-          "new_entries": [
-            "Claude Fable 5 (with fallback)",
-            "Claude Opus 4.8 (max)",
-            "GPT-5.5 (xhigh)",
-            "Claude Opus 4.7 (max)",
-            "GPT-5.5 (high)",
-            "Gemini 3.5 Flash",
-            "Claude Sonnet 4.6 (max)",
-            "Gemini 3.1 Pro Preview",
-            "Qwen3.7 Max",
-            "MiniMax-M3"
-          ]
-        },
-        "cache_path": "",
-        "fallback_reason": "",
-        "public_trace": {
-          "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-17T04:56:50.703Z",
-          "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:382225ea620d4981276f27f2763a5a6553586f47bb3fd25b4dbd8af5093cb9dd",
-          "top_rows": [
-            {
-              "rank": 1,
-              "model": "Claude Fable 5 (with fallback)",
-              "provider": "anthropic",
-              "value_label": "60 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 2,
-              "model": "Claude Opus 4.8 (max)",
-              "provider": "anthropic",
-              "value_label": "56 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 3,
-              "model": "GPT-5.5 (xhigh)",
-              "provider": "openai",
-              "value_label": "55 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 4,
-              "model": "Claude Opus 4.7 (max)",
-              "provider": "anthropic",
-              "value_label": "54 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 5,
-              "model": "GPT-5.5 (high)",
-              "provider": "openai",
-              "value_label": "53 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 6,
-              "model": "Gemini 3.5 Flash",
-              "provider": "google",
-              "value_label": "50 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 7,
-              "model": "Claude Sonnet 4.6 (max)",
-              "provider": "anthropic",
-              "value_label": "47 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 8,
-              "model": "Gemini 3.1 Pro Preview",
-              "provider": "google",
-              "value_label": "46 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 9,
-              "model": "Qwen3.7 Max",
-              "provider": "alibaba",
-              "value_label": "46 分",
-              "change": "AA Index"
-            },
-            {
-              "rank": 10,
-              "model": "MiniMax-M3",
-              "provider": "minimax",
-              "value_label": "44 分",
-              "change": "AA Index"
-            }
-          ],
-          "diff": {
-            "status": "first_snapshot",
-            "summary": "No previous component snapshot was available for comparison.",
-            "changed_rows": [],
-            "new_entries": [
-              "Claude Fable 5 (with fallback)",
-              "Claude Opus 4.8 (max)",
-              "GPT-5.5 (xhigh)",
-              "Claude Opus 4.7 (max)",
-              "GPT-5.5 (high)",
-              "Gemini 3.5 Flash",
-              "Claude Sonnet 4.6 (max)",
-              "Gemini 3.1 Pro Preview",
-              "Qwen3.7 Max",
-              "MiniMax-M3"
-            ]
-          },
-          "cache_status": "live",
-          "fallback_reason": ""
-        }
-      }
+      "evidence": "Artificial Analysis 官方说明 Intelligence Index 聚合十项数学、科学、代码和推理评测，并由 Artificial Analysis 独立运行。 source_audit status=blocked; notes=page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index\", waiting until \"networkidle\"\u001b[22m\n; name=TimeoutError",
+      "watch_next": "若新模型进入前列，补查该模型在 coding、long context、agentic task 和价格页上的分项表现。"
     },
     {
       "id": "swe-bench-pro-public",
@@ -7673,16 +6875,16 @@
       "image_urls": []
     },
     {
-      "candidate_id": "content-hn-frontpage-wolfram-language-and-mathematica-version-15-ai-assistant-sy",
-      "title": "HNRSS Frontpage更新AI 产品、平台或工程实践",
-      "content": "HNRSS Frontpage更新AI 产品、平台或工程实践。",
-      "url": "https://writings.stephenwolfram.com/2026/06/launching-version-15-of-wolfram-language-mathematica-built-in-useful-ai-lots-of-new-core-functionality/",
+      "candidate_id": "content-techcrunch-ai-spacex-valuation-balloons-to-2-6t-briefly-passes-amazon",
+      "title": "TechCrunch AI更新AI 产品、平台或工程实践",
+      "content": "TechCrunch AI更新AI 产品、平台或工程实践。",
+      "url": "https://techcrunch.com/2026/06/16/spacex-valuation-balloons-to-2-6t-briefly-passes-amazon/",
       "event_date": "2026-06-16",
-      "source": "HNRSS Frontpage",
-      "evidence": "Article URL: Comments URL: Points: 118 # Comme。",
+      "source": "TechCrunch AI",
+      "evidence": "SpaceX's valuation has increased by $1 trillion since its shares started trading on Friday.",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
-      "verification_status": "original_social_only",
+      "verification_status": "intermediary_only",
       "importance": "general",
       "image_urls": []
     }
@@ -7771,7 +6973,7 @@
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 55,
+        "eligible_candidates": 54,
         "selected": 10,
         "strict_selected": 10,
         "refill_selected": 0,
@@ -7783,20 +6985,20 @@
           "recent_duplicate": 27,
           "generic_github_trending_text": 30,
           "builder_low_signal": 14,
-          "not_main_refill_material": 8,
+          "not_main_refill_material": 7,
           "unverified_high_risk_claim": 4,
-          "low_value": 14,
+          "low_value": 15,
           "low_signal_vendor_partnership": 1,
           "generic_hot_blog_announcement": 4,
           "primary_required_intermediary_lead": 53,
           "not_ai_relevant": 2,
           "hardcore_research_only": 7,
-          "missing_reader_visible_title": 6,
+          "missing_reader_visible_title": 7,
           "low_value_product_hunt_project": 3,
           "unverified_aggregator_lead": 31,
-          "statuspage": 10,
-          "search_shadow": 4,
-          "future_dated": 36
+          "statuspage": 11,
+          "future_dated": 36,
+          "search_shadow": 4
         }
       },
       "github_trending": {
@@ -7809,7 +7011,11 @@
       },
       "hot_blogs": {
         "eligible_candidates": 11,
-        "selected": 8
+        "target": 8,
+        "selected_before_prune": 8,
+        "selected": 8,
+        "pruned": 0,
+        "prune_reasons": {}
       },
       "chinese_media_dynamics": {
         "eligible_candidates": 3,
@@ -7849,17 +7055,17 @@
     "source_status_history": {
       "path": "source-status-history.json",
       "tracked_sources": 309,
-      "no_signal_or_blocked": 128,
+      "no_signal_or_blocked": 130,
       "stale_sources": 0,
       "window_days": 10
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "79263cf2a2b0875ebf77c547ec80becb03a2cd76",
-      "git_commit_short": "79263cf2a2b0",
+      "git_commit": "d04e0f33b563e96b019fcce23eddc8079685d518",
+      "git_commit_short": "d04e0f33b563",
       "git_branch": "main",
-      "origin_main_sha": "79263cf2a2b0875ebf77c547ec80becb03a2cd76",
-      "origin_main_short": "79263cf2a2b0",
+      "origin_main_sha": "d04e0f33b563e96b019fcce23eddc8079685d518",
+      "origin_main_short": "d04e0f33b563",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -7893,7 +7099,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-17T05:02:48.721Z",
+  "generated_at": "2026-06-17T05:38:44.893Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-17.html",
   "html_path": "reports/2026/06/2026-06-17.html",
