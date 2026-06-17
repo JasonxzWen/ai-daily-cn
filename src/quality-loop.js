@@ -157,7 +157,8 @@ export function reviewReportQuality(report, options = {}) {
   }
 
   collectMainItemDensityIssues(report, issues, aiReviewTasks);
-  collectHotBlogSummaryIssues(report, issues, aiReviewTasks);
+  collectHotBlogPrepublishGateIssues(report, issues, { autoDraft });
+  collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft });
   collectBuilderTranslationIssues(report, issues, aiReviewTasks);
   collectCandidatePoolIssues(report, candidatePool, issues, { autoDraft });
 
@@ -627,7 +628,44 @@ function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
   }
 }
 
-function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
+function collectHotBlogPrepublishGateIssues(report, issues, { autoDraft } = {}) {
+  if (!autoDraft) {
+    return;
+  }
+  const items = Array.isArray(report?.hot_blogs) ? report.hot_blogs : [];
+  const seenTitles = new Map();
+  items.forEach((item, index) => {
+    const titleKey = publicHotBlogTitleKey(item?.title);
+    if (titleKey && seenTitles.has(titleKey)) {
+      issues.push({
+        code: "hot_blog_duplicate_title",
+        severity: "error",
+        path: `hot_blogs[${index}].title`,
+        message: "Autodraft hot blogs must not publish repeated public titles; duplicate or near-template entries should be pruned before quality review.",
+        repairable: false,
+        details: {
+          duplicate_of: `hot_blogs[${seenTitles.get(titleKey)}].title`
+        }
+      });
+    } else if (titleKey) {
+      seenTitles.set(titleKey, index);
+    }
+    if (isRepeatedTemplateHotBlogCopy(item)) {
+      issues.push({
+        code: "hot_blog_template_repeated",
+        severity: "error",
+        path: `hot_blogs[${index}].summary`,
+        message: "Autodraft hot blog copy still looks templated; generation should prune or produce concrete source-grounded copy before repair.",
+        repairable: false,
+        details: {
+          template_hits: repeatedHotBlogTemplateHits(item)
+        }
+      });
+    }
+  });
+}
+
+function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft } = {}) {
   const items = Array.isArray(report?.hot_blogs) ? report.hot_blogs : [];
   items.forEach((item, index) => {
     const pathName = `hot_blogs[${index}].summary`;
@@ -694,12 +732,43 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks) {
         chinese_ratio: Number(chineseRatio.toFixed(3))
       }
     });
-    aiReviewTasks.push({
-      kind: "hot_blog_editorial_rewrite",
-      path: pathName,
-      instruction: "Rewrite the hot blog entry in Chinese for general readers: provide 3-5 concrete public points, explain what the article says, what evidence or method it gives, why it matters, and what boundary to watch without changing facts or links."
-    });
+    if (!(autoDraft && isRepeatedTemplateHotBlogCopy(item))) {
+      aiReviewTasks.push({
+        kind: "hot_blog_editorial_rewrite",
+        path: pathName,
+        instruction: "Rewrite the hot blog entry in Chinese for general readers: provide 3-5 concrete public points, explain what the article says, what evidence or method it gives, why it matters, and what boundary to watch without changing facts or links."
+      });
+    }
   });
+}
+
+function publicHotBlogTitleKey(value) {
+  return String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/[：:，,。；;、|｜\s]+/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function repeatedHotBlogTemplateHits(item) {
+  const text = [
+    item?.summary,
+    ...(Array.isArray(item?.key_points) ? item.key_points : [])
+  ].join(" ");
+  const phrases = [
+    "这类文章最有用的地方",
+    "文章真正有用的部分",
+    "真正的信息密度在真实场景",
+    "真正有价值的是作者给出的证据",
+    "原文把价值落在代码",
+    "它能帮助读者更新对模型能力的预期",
+    "能帮团队判断它该不该进入试点"
+  ];
+  return phrases.filter((phrase) => text.includes(phrase));
+}
+
+function isRepeatedTemplateHotBlogCopy(item) {
+  return repeatedHotBlogTemplateHits(item).length >= 2;
 }
 
 function hotBlogExplicitKeyPoints(item) {
@@ -949,8 +1018,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "hot_blog_editorial_quality",
-      ok: !failedCodes.has("hot_blog_summary_untranslated") && !failedCodes.has("hot_blog_points_invalid") && !failedCodes.has("hot_blog_summary_too_thin") && !failedCodes.has("hot_blog_summary_template"),
-      status: failedCodes.has("hot_blog_summary_untranslated") || failedCodes.has("hot_blog_points_invalid") || failedCodes.has("hot_blog_summary_too_thin") || failedCodes.has("hot_blog_summary_template") ? "failed" : "passed"
+      ok: !failedCodes.has("hot_blog_summary_untranslated") && !failedCodes.has("hot_blog_points_invalid") && !failedCodes.has("hot_blog_summary_too_thin") && !failedCodes.has("hot_blog_summary_template") && !failedCodes.has("hot_blog_duplicate_title") && !failedCodes.has("hot_blog_template_repeated"),
+      status: failedCodes.has("hot_blog_summary_untranslated") || failedCodes.has("hot_blog_points_invalid") || failedCodes.has("hot_blog_summary_too_thin") || failedCodes.has("hot_blog_summary_template") || failedCodes.has("hot_blog_duplicate_title") || failedCodes.has("hot_blog_template_repeated") ? "failed" : "passed"
     },
     {
       id: "autodraft_editorial_rewrite",

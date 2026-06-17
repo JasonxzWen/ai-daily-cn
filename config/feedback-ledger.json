@@ -957,6 +957,26 @@
       }
     },
     {
+      "id": "feedback/p1-prepublish-editorial-prune-gate",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Prune duplicate or templated public items before repair",
+      "problem": "Daily generation could pass structurally and publish, or enter AI repair, while retaining repeated hot blog titles, templated summaries, and low-information public copy. This makes repair look like the main quality strategy instead of a fallback.",
+      "expected_behavior": "Autodraft generation should convert hot blog evidence into concrete Chinese public copy, automatically prune duplicate-title or templated hot blog entries before quality review, record prune counts and reasons in `self_check.selection_snapshot.hot_blogs`, and let quality review hard-block any duplicate/template hot blog that slips through without making AI repair the normal path.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/draft.js",
+        "src/quality-loop.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "report:draft prunes duplicate and templated hot blogs before quality review",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-authoritative-retrospectives",
       "severity": "P1",
       "status": "implemented",

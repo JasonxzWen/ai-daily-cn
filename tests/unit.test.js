@@ -9218,10 +9218,12 @@ test("report:draft expands public signal coverage beyond strict factual sections
   });
 
   assert.equal(drafted.report.projects.length, 10);
-  assert.equal(drafted.report.hot_blogs.length, 8);
+  assert(drafted.report.hot_blogs.length >= 1);
+  assert(drafted.report.hot_blogs.length <= 8);
+  assert.equal(new Set(drafted.report.hot_blogs.map((item) => item.title)).size, drafted.report.hot_blogs.length);
+  assert(drafted.report.self_check.selection_snapshot.hot_blogs.pruned >= 1);
   assert.equal(drafted.report.builder_observations.length, 12);
   assert.equal(drafted.report.community_leads.length, 24);
-  assert(drafted.report.hot_blogs.some((item) => item.source_level === "intermediary"));
   assert(drafted.report.community_leads.some((item) => item.verification_status === "intermediary_only"));
 });
 
@@ -9918,6 +9920,162 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
   assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
   assert.deepEqual(review.ai_review_tasks, []);
+});
+
+test("report:draft prunes duplicate and templated hot blogs before quality review", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hot-blog-prune-gate-"));
+  const reportDate = "2026-06-17";
+  const mainCandidates = Array.from({ length: 10 }, (_unused, index) => mainStreamRepairCandidate(reportDate, {
+    id: `official-main-for-prune-${index + 1}`,
+    source: "OpenAI News RSS",
+    url: `https://openai.com/news/prune-main-${index + 1}`,
+    title: `OpenAI publishes platform update ${index + 1} for AI product teams`,
+    evidence: `OpenAI describes platform update ${index + 1} with API changes, rollout notes, enterprise controls, evaluation hooks, and deployment boundaries for AI product teams.`,
+    sourceLevel: "official_company_news",
+    editorialCategory: "ai_industry"
+  }));
+  const hotBlogCandidates = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "nvidia-xr-agent",
+      category: "hot_blog",
+      source: "NVIDIA Developer Blog",
+      url: "https://developer.nvidia.com/blog/xr-ai-agent",
+      title: "Building AI agents for AR glasses and XR devices with NVIDIA XR AI",
+      evidence: "NVIDIA explains AI agents for AR glasses and XR devices, including on-device inference, speech interaction, perception inputs, avatar rendering, deployment workflow, and SDK integration boundaries.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "nvidia-xr-agent-duplicate",
+      category: "hot_blog",
+      source: "NVIDIA Developer Blog",
+      url: "https://developer.nvidia.com/blog/xr-ai-agent-duplicate",
+      title: "Building AI agents for AR glasses and XR devices with NVIDIA XR AI",
+      evidence: "NVIDIA explains AI agents for AR glasses and XR devices, including on-device inference, speech interaction, perception inputs, avatar rendering, deployment workflow, and SDK integration boundaries.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "nvidia-unreal-agent-sdk",
+      category: "hot_blog",
+      source: "NVIDIA Developer Blog",
+      url: "https://developer.nvidia.com/blog/ace-game-agent-sdk-unreal",
+      title: "Build on-device AI companions with NVIDIA ACE Game Agent SDK and Unreal Engine plugins",
+      evidence: "NVIDIA walks through the ACE Game Agent SDK and Unreal Engine plugins for on-device AI companions, covering character behavior, speech interfaces, local inference, scene integration, and developer deployment tradeoffs.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "sagemaker-container-cache",
+      category: "hot_blog",
+      source: "AWS Machine Learning Blog",
+      url: "https://aws.amazon.com/blogs/machine-learning/sagemaker-container-cache",
+      title: "Introducing container caching in Amazon SageMaker AI for faster model scaling",
+      evidence: "AWS explains SageMaker inference container caching for faster model scaling, model loading latency, cold-start reduction, rollout risk, cache hit behavior, and production serving cost boundaries.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "sagemaker-peagle",
+      category: "hot_blog",
+      source: "AWS Machine Learning Blog",
+      url: "https://aws.amazon.com/blogs/machine-learning/sagemaker-peagle-speculative-decoding",
+      title: "Parallelize speculative decoding with P-EAGLE on Amazon SageMaker AI",
+      evidence: "AWS explains P-EAGLE speculative decoding on SageMaker, covering draft model parallelism, decoding latency, throughput tradeoffs, deployment setup, and when the optimization does not help.",
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    })
+  ];
+  const discoveryPath = path.join(tmp, "discovery.json");
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discoveryEnvelope({
+    candidates: [...mainCandidates, ...hotBlogCandidates],
+    sourceNames: ["OpenAI News RSS", "NVIDIA Developer Blog", "AWS Machine Learning Blog"]
+  }), null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const titles = drafted.report.hot_blogs.map((item) => item.title.replace(/\s+/g, " ").trim());
+  assert.equal(new Set(titles).size, titles.length, `hot blog titles should be unique: ${JSON.stringify(titles)}`);
+  assert(!drafted.report.hot_blogs.some((item) => item.candidate_id === "nvidia-xr-agent-duplicate"));
+  assert(drafted.report.hot_blogs.length < hotBlogCandidates.length);
+  const snapshot = drafted.report.self_check.selection_snapshot.hot_blogs;
+  assert(snapshot.pruned >= 1, JSON.stringify(snapshot));
+  assert.equal(snapshot.prune_reasons.duplicate_title >= 1, true, JSON.stringify(snapshot));
+
+  const publicText = JSON.stringify(drafted.report.hot_blogs);
+  for (const fragment of [
+    "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图",
+    "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界"
+  ]) {
+    assert(!publicText.includes(fragment), `hot blog retained templated public copy: ${fragment}`);
+  }
+
+  const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
+  assert.deepEqual(review.ai_review_tasks, []);
+});
+
+test("quality review flags duplicate or templated hot blogs as prepublish gate failures", () => {
+  const base = strictPublishReportFixture();
+  const report = {
+    ...base,
+    report_date: "2026-06-17",
+    source_window: {
+      date_from: "2026-06-15",
+      date_to: "2026-06-17",
+      fallback_window_used: true,
+      notes: "report:draft uses a candidate pool"
+    },
+    self_check: {
+      ...base.self_check,
+      report_date: "2026-06-17",
+      builder_skill_used: ["candidate-pool-autodraft"],
+      notes: "autodraft fixture"
+    },
+    hot_blogs: [
+      {
+        title: "NVIDIA更新agent 工作流和开发工具能力",
+        url: "https://developer.nvidia.com/blog/example-agent-1",
+        publisher: "NVIDIA",
+        author: "NVIDIA",
+        event_date: "2026-06-17",
+        topic: "agent",
+        summary: "NVIDIA更新agent 工作流和开发工具能力。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+        key_points: [
+          "NVIDIA更新agent 工作流和开发工具能力。",
+          "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
+          "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。"
+        ]
+      },
+      {
+        title: "NVIDIA更新agent 工作流和开发工具能力",
+        url: "https://developer.nvidia.com/blog/example-agent-2",
+        publisher: "NVIDIA",
+        author: "NVIDIA",
+        event_date: "2026-06-17",
+        topic: "agent",
+        summary: "NVIDIA更新agent 工作流和开发工具能力。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界。",
+        key_points: [
+          "NVIDIA更新agent 工作流和开发工具能力。",
+          "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
+          "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界。"
+        ]
+      }
+    ]
+  };
+
+  const review = reviewReportQuality(report, { candidatePool: { candidates: [] } });
+  const codes = review.issues.map((issue) => issue.code);
+  assert.equal(review.ok, false);
+  assert(codes.includes("hot_blog_duplicate_title"), JSON.stringify(review.issues, null, 2));
+  assert(codes.includes("hot_blog_template_repeated"), JSON.stringify(review.issues, null, 2));
+  assert(!review.ai_review_tasks.some((task) => task.kind === "hot_blog_editorial_rewrite"));
 });
 
 test("report:draft does not fill main stream with generic GitHub trending text", async () => {

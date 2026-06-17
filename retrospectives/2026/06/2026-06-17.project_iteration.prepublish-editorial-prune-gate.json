@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-17.project_iteration.prepublish-editorial-prune-gate",
+  "run_type": "project_iteration",
+  "date": "2026-06-17",
+  "title": "Prepublish editorial prune gate",
+  "status": "completed",
+  "summary": "Project iteration record for promoting duplicate, templated, or low-information hot blog copy to a prepublish hard gate while keeping automatic pruning in report:draft as the first response. AI repair remains a fallback for exceptional editorial wording issues, not the normal mechanism for producing acceptable public daily content.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"report:draft prunes duplicate and templated hot blogs before quality review|quality review flags duplicate or templated hot blogs as prepublish gate failures\"",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run retrospectives:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Repair is a fallback, not the product loop.",
+      "evidence": "The accepted design requires public daily generation to prefer fewer useful hot blog items over filling the section with duplicate titles or generic repeated templates that later require repair.",
+      "scope": "daily_generation_quality",
+      "persistence": "implemented",
+      "recommended_action": "Keep public-section quality failures anchored in deterministic generation and review tests before widening any AI repair contract."
+    },
+    {
+      "lesson": "A hard gate should still choose the least expensive valid recovery path first.",
+      "evidence": "The new fixture includes duplicate and templated hot blog candidates; report:draft now prunes them and records prune counts before quality review, so acceptable output can publish without generating an AI repair task.",
+      "scope": "hot_blogs",
+      "persistence": "implemented",
+      "recommended_action": "When a candidate is plausible but not publication-grade, drop it before repair unless there is enough unique evidence to rewrite it deterministically."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Hot blog generation could preserve repeated Chinese titles or templated summary copy, allowing low-information public content to become a normal AI repair workload.",
+      "evidence": "Regression tests now cover generation-side pruning, selection snapshot audit data, and quality-review hard failures for duplicate or templated auto-draft hot blogs that bypass pruning.",
+      "module": "src/draft.js, src/quality-loop.js",
+      "suggestion": "Generate concrete hot blog copy from candidate evidence, prune duplicate or templated items during report:draft, and make any remaining duplicate/template auto-draft hot blog a quality-review gate failure instead of a repair task.",
+      "expected_benefit": "Scheduled daily publishing favors concise, higher-density public sections and keeps repair reserved for true fallback scenarios.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in draft selection, review gates, feedback ledger, quick-reference documentation, and deterministic unit tests.",
+      "ledger_links": [
+        "feedback/p1-prepublish-editorial-prune-gate",
+        "feedback/p1-ai-quality-review-loop",
+        "feedback/p1-public-daily-content-contract",
+        "feedback/p1-public-reader-section-quality",
+        "feedback/p1-public-editorial-repair-template"
+      ],
+      "validation_evidence": [
+        "report:draft prunes duplicate and templated hot blogs before quality review",
+        "quality review flags duplicate or templated hot blogs as prepublish gate failures",
+        "node --test tests/unit.test.js"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-public-editorial-repair-template",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Apply the same prune-before-repair shape to builder and community sections when their source pools become dense enough for deterministic de-duplication.",
+      "owner": "project"
+    }
+  ]
+}

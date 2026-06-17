@@ -389,7 +389,12 @@ function selectReportItems(merged, options = {}) {
     }
   }
   ensureChineseHotBlogSeed(hotBlogSeeds, [...hotBlogPool, ...chinaHotBlogFallbackPool], hotBlogSeenUrls);
-  const hotBlogs = hotBlogSeeds.map((candidate) => {
+  const hotBlogDrafts = hotBlogSeeds.map((candidate) => ({
+    candidate,
+    item: hotBlogItem(candidate)
+  }));
+  const hotBlogPrune = pruneHotBlogDrafts(hotBlogDrafts);
+  const hotBlogs = hotBlogPrune.items.map(({ candidate }) => {
     const hotCandidate = markIncludedCandidate(candidate, "hot_blog", "hot_blogs");
     selectedIds.add(candidate.id);
     return hotBlogItem(hotCandidate);
@@ -476,9 +481,71 @@ function selectReportItems(merged, options = {}) {
       ...platformSelections.eligibleCounts
     },
     selection_snapshot: {
-      main_items: mainSelectionSnapshot
+      main_items: mainSelectionSnapshot,
+      hot_blogs: {
+        eligible_candidates: hotBlogPool.length,
+        target: HOT_BLOG_TARGET,
+        selected_before_prune: hotBlogDrafts.length,
+        selected: hotBlogs.length,
+        pruned: hotBlogPrune.pruned,
+        prune_reasons: hotBlogPrune.prune_reasons
+      }
     }
   };
+}
+
+function pruneHotBlogDrafts(entries) {
+  const kept = [];
+  const seenTitles = new Set();
+  const pruneReasons = {};
+  for (const entry of entries) {
+    const titleKey = publicHotBlogTitleKey(entry.item?.title);
+    let reason = "";
+    if (titleKey && seenTitles.has(titleKey)) {
+      reason = "duplicate_title";
+    } else if (isRepeatedTemplateHotBlogCopy(entry.item)) {
+      reason = "template_or_low_information";
+    }
+    if (reason) {
+      pruneReasons[reason] = (pruneReasons[reason] || 0) + 1;
+      continue;
+    }
+    if (titleKey) {
+      seenTitles.add(titleKey);
+    }
+    kept.push(entry);
+  }
+  return {
+    items: kept,
+    pruned: entries.length - kept.length,
+    prune_reasons: pruneReasons
+  };
+}
+
+function publicHotBlogTitleKey(value) {
+  return String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/[：:，,。；;、|｜\s]+/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function isRepeatedTemplateHotBlogCopy(item) {
+  const text = [
+    item?.summary,
+    ...(Array.isArray(item?.key_points) ? item.key_points : [])
+  ].join(" ");
+  const phrases = [
+    "这类文章最有用的地方",
+    "文章真正有用的部分",
+    "真正的信息密度在真实场景",
+    "真正有价值的是作者给出的证据",
+    "原文把价值落在代码",
+    "它能帮助读者更新对模型能力的预期",
+    "能帮团队判断它该不该进入试点"
+  ];
+  const hits = phrases.filter((phrase) => text.includes(phrase)).length;
+  return hits >= 2;
 }
 
 function finalizeMainAudit(candidates) {
@@ -814,8 +881,10 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
           selected: selection.huggingface_trending.length
         },
         hot_blogs: {
-          eligible_candidates: selection.eligible_counts?.hot_blogs || 0,
-          selected: selection.hot_blogs.length
+          ...(selection.selection_snapshot?.hot_blogs || {
+            eligible_candidates: selection.eligible_counts?.hot_blogs || 0,
+            selected: selection.hot_blogs.length
+          })
         },
         chinese_media_dynamics: {
           eligible_candidates: selection.eligible_counts?.chinese_media_dynamics || 0,
@@ -4152,6 +4221,15 @@ function englishSignalProfile(text) {
       factFocus: "prompt、工具轨迹、仓库快照和回归回放字段"
     };
   }
+  if (/p-eagle|speculative decoding|draft model parallelism|decoding latency|throughput tradeoffs/.test(text)) {
+    return {
+      verb: "说明",
+      topic: "SageMaker 推测解码并行化方案",
+      scope: "draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件",
+      boundary: "优化收益取决于模型结构、请求形态、草稿模型质量和线上延迟预算",
+      factFocus: "P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标"
+    };
+  }
   if (/sagemaker|container caching|model loading latency|cold-start|serving cost/.test(text)) {
     return {
       verb: "讲解",
@@ -4177,6 +4255,33 @@ function englishSignalProfile(text) {
       scope: "策略检查、提示过滤、响应控制、企业应用和可观测性",
       boundary: "多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底",
       factFocus: "Guardrails、策略检查、提示过滤和响应控制"
+    };
+  }
+  if (/ar glasses|xr devices|xr ai|speech interaction|perception inputs|avatar rendering/.test(text)) {
+    return {
+      verb: "拆解",
+      topic: "XR 眼镜里的端侧 agent 开发流程",
+      scope: "端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界",
+      boundary: "落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度",
+      factFocus: "XR AI、端侧推理、语音交互、感知输入和 SDK 集成"
+    };
+  }
+  if (/ace game agent sdk|unreal engine|ai companions|character behavior|scene integration/.test(text)) {
+    return {
+      verb: "介绍",
+      topic: "游戏 agent SDK 与 Unreal 插件方案",
+      scope: "角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍",
+      boundary: "游戏内 agent 还要处理实时延迟、内容安全、角色一致性和引擎集成成本",
+      factFocus: "ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口"
+    };
+  }
+  if (/mlperf|blackwell|training performance|benchmark/.test(text)) {
+    return {
+      verb: "披露",
+      topic: "Blackwell MLPerf 训练性能结果",
+      scope: "训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提",
+      boundary: "benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断",
+      factFocus: "Blackwell、MLPerf Training、吞吐指标和训练基准设置"
     };
   }
   if (/agent|workflow|developer|coding|software|repository|ide|tool|platform/.test(text)) {
@@ -5039,6 +5144,10 @@ export function hotBlogSummary(candidate) {
   if (specific) {
     return trimText(specific, 420);
   }
+  const evidenceSummary = hotBlogEvidenceDrivenSummary(candidate);
+  if (evidenceSummary) {
+    return trimText(evidenceSummary, 420);
+  }
   const digest = candidateReaderDigest(candidate) || hotBlogClaimForCandidate(candidate);
   const angle = hotBlogSpecificAngle(candidate) || hotBlogEvidenceForCandidate(candidate);
   const action = hotBlogActionForCandidate(candidate);
@@ -5050,6 +5159,7 @@ function hotBlogKeyPoints(candidate, summary) {
   const candidates = [
     ...explicitPoints,
     ...splitHotBlogSummaryPoints(summary),
+    ...hotBlogEvidenceDrivenPoints(candidate),
     hotBlogClaimForCandidate(candidate),
     hotBlogSpecificAngle(candidate),
     hotBlogEvidenceForCandidate(candidate),
@@ -5077,6 +5187,37 @@ function hotBlogKeyPoints(candidate, summary) {
     cleaned.push(fallback);
   }
   return cleaned.slice(0, 5);
+}
+
+function hotBlogEvidenceDrivenSummary(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (!text || hasReaderChineseText(candidate.summary) || hasReaderChineseText(candidate.evidence)) {
+    return "";
+  }
+  const actor = publicActorLabel(candidate);
+  const profile = englishSignalProfile(text);
+  if (!profile) {
+    return "";
+  }
+  return `${actor}${profile.verb}${profile.topic}，原文说明${profile.scope}。读者可核对${profile.factFocus}，并留意${profile.boundary}。`;
+}
+
+function hotBlogEvidenceDrivenPoints(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (!text) {
+    return [];
+  }
+  const actor = publicActorLabel(candidate);
+  const profile = englishSignalProfile(text);
+  if (!profile) {
+    return [];
+  }
+  return [
+    `${actor}${profile.verb}${profile.topic}`,
+    `原文重点覆盖${profile.scope}`,
+    `可核对的信息包括${profile.factFocus}`,
+    `需要注意的边界是${profile.boundary}`
+  ];
 }
 
 function splitHotBlogSummaryPoints(summary) {
