@@ -2711,6 +2711,50 @@ test("GitHub trending fixed sources cover weekly all-language and selected langu
   assert(weeklySources.every((source) => /since=weekly/.test(source.url)));
 });
 
+test("GitHub trending discovery limit preserves required weekly language pools", async () => {
+  const sources = DEFAULT_GITHUB_TRENDING_SOURCES;
+  const htmlForSource = (source) => Array.from({ length: 12 }, (_unused, index) => {
+    const language = source.language || "all";
+    const window = source.window || "daily";
+    const repo = `example/${language}-${window}-${index + 1}`;
+    return `
+<article class="Box-row">
+  <h2 class="h3 lh-condensed"><a href="/${repo}">${repo.replace("/", " / ")}</a></h2>
+  <p class="col-9 color-fg-muted my-1 pr-4">Agent workflow toolkit with examples and evaluation fixtures.</p>
+</article>`;
+  }).join("\n");
+
+  const collected = await collectGitHubTrending({
+    sources,
+    reportDate: "2026-06-17",
+    limit: 50,
+    history: false,
+    readmeEnrichment: false,
+    fetchImpl: async (url) => {
+      const source = sources.find((item) => item.url === url);
+      assert(source, `unexpected source ${url}`);
+      return {
+        ok: true,
+        text: async () => htmlForSource(source)
+      };
+    }
+  });
+
+  assert(collected.candidates.length <= 50);
+  const weeklyLanguages = new Set(
+    collected.candidates
+      .filter((candidate) => candidate.window === "weekly")
+      .map((candidate) => String(candidate.language || "").toLowerCase())
+  );
+  assert.deepEqual([...weeklyLanguages].sort(), ["all", "go", "java", "python", "rust", "typescript"]);
+  for (const language of ["all", "python", "typescript", "rust", "go", "java"]) {
+    assert(
+      collected.candidates.some((candidate) => candidate.window === "weekly" && String(candidate.language || "").toLowerCase() === language),
+      `missing weekly ${language}`
+    );
+  }
+});
+
 test("report:draft merges weekly GitHub all-language and selected language pools to Top20", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-weekly-top20-"));
   const reportDate = "2026-06-17";
@@ -14395,7 +14439,21 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(summary.length >= 80, summary);
   assert(summary.length <= 130, summary);
-  assert.match(summary, /Agent Workbench|agent|工作区|评测|调试/);
+  assert.match(summary, /Agent 构建|评测|调试|工具调用/);
+  assert.doesNotMatch(summary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
+
+  const securitySummary = summarizeGithubReadme({
+    repo: "NVIDIA/SkillSpector",
+    readme: [
+      "# SkillSpector Security scanner for AI agent skills. Detect vulnerabilities before publishing skills.",
+      "SkillSpector scans agent skill folders, validates metadata, detects unsafe tool usage, and emits security findings for CI.",
+      "It ships examples, policy checks, and reports for production review."
+    ].join("\n"),
+    maxChars: 120
+  });
+  assert(securitySummary.length >= 80, securitySummary);
+  assert.doesNotMatch(securitySummary, /SkillSpector Security scanner for AI agent skills/i);
+  assert.doesNotMatch(securitySummary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
 
   const item = applyGithubReadmeSummary(
     {
