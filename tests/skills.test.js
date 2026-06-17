@@ -947,6 +947,97 @@ test("effective-interact filterable cards render local tracking components and p
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
+test("effective-interact renders sanitized official tracking component snapshots", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-tracking-component-"));
+  const inputPath = path.join(tmp, "official-tracking-component.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-06-12",
+      summary: "Official tracking component snapshot check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Daily Tracking",
+          group: "signals",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "model usage",
+              title: "OpenRouter",
+              href: "https://openrouter.ai/rankings",
+              body: "Official component snapshot recolored locally.",
+              component: {
+                kind: "openrouter_rankings",
+                source: "OpenRouter",
+                sourceUrl: "https://openrouter.ai/rankings",
+                collectedAt: "2026-06-12T02:00:00+08:00",
+                officialSnapshot: {
+                  status: "available",
+                  source: "official_dom",
+                  componentKind: "openrouter_rankings",
+                  sourceUrl: "https://openrouter.ai/rankings",
+                  capturedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "openrouter-rankings-v1",
+                  sourceSelector: "main [data-openrouter-rankings]",
+                  html: "<section class=\"or-card\" data-openrouter-rankings><header>OpenRouter Top Models</header><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section>",
+                  css: ".or-card { color: rgb(12, 18, 28); background: #fff; } .or-card table { width: 100%; }",
+                  domHash: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                  cssHash: "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                },
+                tabs: [
+                  { id: "leaderboard", label: "LLM Leaderboard", view: "leaderboard", status: "complete" }
+                ],
+                series: [],
+                rows: [],
+                trace: {
+                  sourceUrl: "https://openrouter.ai/rankings",
+                  collectedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "openrouter-rankings-v1",
+                  dataHash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  rawDomHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                  cacheStatus: "live",
+                  topRows: [],
+                  diff: { status: "first_snapshot", changedRows: [] }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "official-tracking-component", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-official-component-snapshot/);
+  assert.match(html, /data-component-kind="openrouter_rankings"/);
+  assert.match(html, /OpenRouter Top Models/);
+  assert.match(html, /DeepSeek V4 Flash/);
+  assert.match(html, /data-official-tracking-css/);
+  assert.doesNotMatch(html, /data-scale-mode="linear"/);
+  assert.doesNotMatch(html, /<div class="toolbar tracking-component-tabs"/);
+  assert.doesNotMatch(html, /<script>window\.__bad|onclick|javascript:/i);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact renders Artificial Analysis collected tabs without fallback panels", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-aa-component-"));
   const inputPath = path.join(tmp, "aa-component.json");

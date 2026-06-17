@@ -1302,6 +1302,35 @@ body.lightbox-open {
   min-width: 0;
 }
 
+.official-tracking-component {
+  overflow: hidden;
+}
+
+.official-tracking-snapshot {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(209, 207, 197, 0.72);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.official-tracking-snapshot > * {
+  max-width: 100%;
+}
+
+.official-tracking-snapshot table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.official-tracking-snapshot th,
+.official-tracking-snapshot td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(209, 207, 197, 0.72);
+  text-align: left;
+  vertical-align: top;
+}
+
 .tracking-bars {
   display: grid;
   gap: 7px;

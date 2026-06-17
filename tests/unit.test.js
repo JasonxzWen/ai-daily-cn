@@ -46,6 +46,7 @@ import {
   buildTrackingComponentSnapshot,
   attachTrackingComponentSnapshots
 } from "../src/tracking-components.js";
+import { createOfficialComponentSnapshot } from "../src/official-component-snapshot.js";
 import {
   applyGithubReadmeSummary,
   githubReadmeCacheKey,
@@ -713,6 +714,78 @@ function openRouterSnapshotFixture(rows = 10) {
     notes: "Public OpenRouter rankings page snapshot."
   };
 }
+
+function openRouterOfficialComponentFixture() {
+  return {
+    source_selector: "main [data-openrouter-rankings]",
+    html: [
+      "<section class=\"or-card\" data-openrouter-rankings onclick=\"alert(1)\">",
+      "<script>window.__bad = true</script>",
+      "<header class=\"or-title\">OpenRouter Top Models</header>",
+      "<table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table>",
+      "<a href=\"javascript:alert(1)\">bad link</a>",
+      "</section>"
+    ].join(""),
+    css: [
+      "@import url('https://example.com/bad.css');",
+      ".or-card { color: rgb(10, 20, 30); background: url('https://example.com/bad.png'); }",
+      ".or-title { font-weight: 700; }"
+    ].join("\n")
+  };
+}
+
+function artificialAnalysisOfficialComponentFixture() {
+  return {
+    source_selector: "main [data-aa-index]",
+    html: [
+      "<section class=\"aa-card\" data-aa-index>",
+      "<header class=\"aa-title\">Artificial Analysis Intelligence Index</header>",
+      "<table><tbody><tr><td>Claude Opus 4.8</td><td>61</td></tr></tbody></table>",
+      "</section>"
+    ].join(""),
+    css: ".aa-card { color: #111827; background: #ffffff; } .aa-title { font-weight: 700; }"
+  };
+}
+
+function officialComponentSnapshotFixture({ componentKind, sourceUrl, selectorVersion, fixture }) {
+  return createOfficialComponentSnapshot({
+    componentKind,
+    sourceUrl,
+    capturedAt: fixedGeneratedAt,
+    selectorVersion,
+    sourceSelector: fixture.source_selector,
+    html: fixture.html,
+    css: fixture.css
+  });
+}
+
+test("official component snapshots require publishable metadata", () => {
+  const fixture = openRouterOfficialComponentFixture();
+  assert.equal(
+    createOfficialComponentSnapshot({
+      componentKind: "openrouter_rankings",
+      sourceUrl: "javascript:alert(1)",
+      capturedAt: fixedGeneratedAt,
+      selectorVersion: "openrouter-rankings-v1",
+      sourceSelector: fixture.source_selector,
+      html: fixture.html,
+      css: fixture.css
+    }),
+    null
+  );
+  assert.equal(
+    createOfficialComponentSnapshot({
+      componentKind: "unknown_component",
+      sourceUrl: "https://openrouter.ai/rankings",
+      capturedAt: fixedGeneratedAt,
+      selectorVersion: "openrouter-rankings-v1",
+      sourceSelector: fixture.source_selector,
+      html: fixture.html,
+      css: fixture.css
+    }),
+    null
+  );
+});
 
 function artificialAnalysisIndexSampleText(rows = 10) {
   const entries = [
@@ -3519,6 +3592,85 @@ test("collectContentSources stores OpenRouter public page snapshot without candi
   assert.equal(collected.candidates.length, 0);
 });
 
+test("collectContentSources stores sanitized OpenRouter official DOM/CSS component snapshots", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-openrouter-rankings",
+        name: "OpenRouter Rankings",
+        url: "https://openrouter.ai/rankings",
+        source_kind: "openrouter_rankings_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    openrouterRankingsText: openRouterRankingsSampleText(),
+    openrouterOfficialComponentSnapshot: openRouterOfficialComponentFixture()
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  const official = source.snapshot.official_component_snapshot;
+  assert.equal(official.status, "available");
+  assert.equal(official.source, "official_dom");
+  assert.equal(official.component_kind, "openrouter_rankings");
+  assert.match(official.dom_hash, /^sha256:[a-f0-9]{64}$/);
+  assert.match(official.css_hash, /^sha256:[a-f0-9]{64}$/);
+  assert.match(official.sanitized_html, /data-openrouter-rankings/);
+  assert.match(official.sanitized_html, /DeepSeek V4 Flash/);
+  assert.doesNotMatch(official.sanitized_html, /<script|onclick|javascript:/i);
+  assert.match(official.sanitized_css, /\.or-title/);
+  assert.doesNotMatch(official.sanitized_css, /@import|url\(/i);
+
+  const component = buildTrackingComponentSnapshot({
+    id: "openrouter-rankings",
+    name: "OpenRouter",
+    url: "https://openrouter.ai/rankings",
+    source: "OpenRouter Rankings",
+    snapshot: source.snapshot
+  });
+  assert.equal(component.official_component_snapshot.status, "available");
+  assert.match(component.official_component_snapshot.sanitized_html, /OpenRouter Top Models/);
+
+  const report = strictPublishReportFixture();
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      event_date: report.report_date,
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      importance: "notable",
+      source_level: "primary",
+      verification_status: "primary_confirmed",
+      change_status: "changed",
+      publish_to_public: true,
+      summary: "OpenRouter parsed Top Models and leaderboard rows.",
+      watch_points: ["Track top model usage and provider share."],
+      evidence: "OpenRouter public page parsed successfully.",
+      metrics: [],
+      snapshot: source.snapshot,
+      tracking_component_snapshot: component
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const trackingSection = input.sections.find((section) => section.cardClass === "tracking-card");
+  const card = trackingSection.items.find((item) => item.title === "OpenRouter");
+  assert.equal(card.component.kind, "openrouter_rankings");
+  assert.equal(card.component.officialSnapshot.status, "available");
+  assert.match(card.component.officialSnapshot.html, /OpenRouter Top Models/);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
+});
+
 test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomplete", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-05",
@@ -3658,7 +3810,8 @@ test("collectContentSources stores Artificial Analysis token cost and scatter ta
         verification_policy: "primary_allowed"
       }
     ],
-    artificialAnalysisIndexText: artificialAnalysisComponentSampleText()
+    artificialAnalysisIndexText: artificialAnalysisComponentSampleText(),
+    artificialAnalysisOfficialComponentSnapshot: artificialAnalysisOfficialComponentFixture()
   });
 
   const source = collected.source_audit.content_sources.sources[0];
@@ -3762,7 +3915,15 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
       url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
       status: "checked",
       notes: "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
-      snapshot: artificialAnalysisSnapshotFixture()
+      snapshot: {
+        ...artificialAnalysisSnapshotFixture(),
+        official_component_snapshot: officialComponentSnapshotFixture({
+          componentKind: "artificial_analysis_index",
+          sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          selectorVersion: "artificial-analysis-index-v1",
+          fixture: artificialAnalysisOfficialComponentFixture()
+        })
+      }
     }
   );
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
@@ -3792,10 +3953,51 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(card.points.length, 0);
   assert.equal(card.component.kind, "artificial_analysis_index");
   assert.equal(card.component.tabs.length, 6);
-  assert.equal(card.table.rows.length, 10);
-  assert(card.table.columns.some((column) => column.key === "tokens" && column.label === "分数"));
-  assert(card.table.columns.some((column) => column.key === "change" && column.label === "指标"));
-  assert(card.table.rows.some((row) => row.rank === "#1" && row.tokens === "61 分"));
+  assert.equal(card.component.officialSnapshot.status, "available");
+  assert.match(card.component.officialSnapshot.html, /Artificial Analysis Intelligence Index/);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
+});
+
+test("report:draft shows only an Artificial Analysis source-unavailable note when official snapshot is absent", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-aa-official-snapshot-missing-"));
+  const reportDate = "2026-06-05";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.content_sources.sources.push({
+    name: "Artificial Analysis Intelligence Index",
+    url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    status: "checked",
+    notes: "public_page_snapshot; 10 top models parsed; official_component_snapshot_missing",
+    snapshot: artificialAnalysisSnapshotFixture()
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const tracking = drafted.report.daily_tracking.find((item) => item.id === "artificial-analysis-intelligence-index");
+  assert.equal(tracking.publish_to_public, true);
+  assert.equal(tracking.change_status, "blocked");
+  assert.equal(tracking.verification_status, "unverified");
+  assert.match(tracking.source_unavailable_note, /Artificial Analysis|snapshot/i);
+  assert.equal(tracking.tracking_component_snapshot, undefined);
+
+  const input = reportToInteractionInput(drafted.report);
+  const trackingSection = input.sections.find((section) => section.items?.some((item) => item.title === "Artificial Analysis"));
+  assert(trackingSection);
+  const card = trackingSection.items.find((item) => item.title === "Artificial Analysis");
+  assert.match(card.body, /Artificial Analysis|snapshot/i);
+  assert.equal(card.component, undefined);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
 });
 
 test("registered source registry covers official company news lanes", async () => {
@@ -13313,7 +13515,15 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
       watch_points: ["Track Score, Token Usage, Cost and trade-off tabs."],
       evidence: "Artificial Analysis public Intelligence Index page parsed successfully.",
       metrics: [],
-      snapshot: artificialAnalysisSnapshotFixture()
+      snapshot: {
+        ...artificialAnalysisSnapshotFixture(),
+        official_component_snapshot: officialComponentSnapshotFixture({
+          componentKind: "artificial_analysis_index",
+          sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          selectorVersion: "artificial-analysis-index-v1",
+          fixture: artificialAnalysisOfficialComponentFixture()
+        })
+      }
     }
   ].map((item) => ({
     ...item,

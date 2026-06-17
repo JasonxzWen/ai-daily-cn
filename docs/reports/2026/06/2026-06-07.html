@@ -1311,6 +1311,35 @@ body.lightbox-open {
   min-width: 0;
 }
 
+.official-tracking-component {
+  overflow: hidden;
+}
+
+.official-tracking-snapshot {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(209, 207, 197, 0.72);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.official-tracking-snapshot > * {
+  max-width: 100%;
+}
+
+.official-tracking-snapshot table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.official-tracking-snapshot th,
+.official-tracking-snapshot td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(209, 207, 197, 0.72);
+  text-align: left;
+  vertical-align: top;
+}
+
 .tracking-bars {
   display: grid;
   gap: 7px;
@@ -3284,115 +3313,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-07</span></div>
 
-    <div class="tracking-component" data-tracking-component data-component-kind="artificial_analysis_index" data-scale="linear">
-    <div class="tracking-component-header">
-      <div>
-        <div class="card-visual-title">Artificial Analysis</div>
-        <span class="tracking-component-meta">2026-06-08T08:51:56.179Z</span>
-      </div>
-      <div class="tracking-scale-toggle" role="group" aria-label="Scale">
-        <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
-        <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
-      </div>
-    </div>
-    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="Artificial Analysis tabs"><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score" aria-selected="true">Score</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-token-usage" aria-selected="false">Token Usage</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-cost" aria-selected="false">Cost</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-token-usage" aria-selected="false">Score vs. Token Usage</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-cost" aria-selected="false">Score vs. Cost</button><button type="button" data-tab-group="tracking-artificial-analysis-index" data-tab="tracking-artificial-analysis-index-score-vs-compute" aria-selected="false">Score vs. Compute</button></div>
-    <div class="tracking-component-panel" id="tracking-artificial-analysis-index-score" data-tab-panel-group="tracking-artificial-analysis-index" >
-      <div class="table-scroll tracking-table-scroll" data-table-wrap>
-    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="Score">
-      <thead><tr>
-        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0">Rank</th>
-        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1">Model</th>
-        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2">Provider</th>
-        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3">Value</th>
-        <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4">Change</th>
-      </tr></thead>
-      <tbody><tr data-tracking-tooltip="#1 Claude Opus4.8 (max) | provider: anthropic | metric: AA Index | 61 分 | change: AA Index" title="#1 Claude Opus4.8 (max) | provider: anthropic | metric: AA Index | 61 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="0">#1</td>
-      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="1">Claude Opus4.8 (max)</td>
-      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="2">anthropic</td>
-      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="3">61 分</td>
-      <td tabindex="0" data-table-cell data-table-row="1" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#2 GPT-5.5(xhigh) | provider: openai | metric: AA Index | 60 分 | change: AA Index" title="#2 GPT-5.5(xhigh) | provider: openai | metric: AA Index | 60 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="0">#2</td>
-      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="1">GPT-5.5(xhigh)</td>
-      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="2">openai</td>
-      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="3">60 分</td>
-      <td tabindex="0" data-table-cell data-table-row="2" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#3 GPT-5.5(high) | provider: openai | metric: AA Index | 59 分 | change: AA Index" title="#3 GPT-5.5(high) | provider: openai | metric: AA Index | 59 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="0">#3</td>
-      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="1">GPT-5.5(high)</td>
-      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="2">openai</td>
-      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="3">59 分</td>
-      <td tabindex="0" data-table-cell data-table-row="3" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#4 Claude Opus4.7 (max) | provider: anthropic | metric: AA Index | 57 分 | change: AA Index" title="#4 Claude Opus4.7 (max) | provider: anthropic | metric: AA Index | 57 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="0">#4</td>
-      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="1">Claude Opus4.7 (max)</td>
-      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="2">anthropic</td>
-      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="3">57 分</td>
-      <td tabindex="0" data-table-cell data-table-row="4" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#5 Gemini 3.1Pro Preview | provider: google | metric: AA Index | 57 分 | change: AA Index" title="#5 Gemini 3.1Pro Preview | provider: google | metric: AA Index | 57 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="0">#5</td>
-      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="1">Gemini 3.1Pro Preview</td>
-      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="2">google</td>
-      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="3">57 分</td>
-      <td tabindex="0" data-table-cell data-table-row="5" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#6 Qwen3.7 Max | provider: alibaba | metric: AA Index | 57 分 | change: AA Index" title="#6 Qwen3.7 Max | provider: alibaba | metric: AA Index | 57 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="0">#6</td>
-      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="1">Qwen3.7 Max</td>
-      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="2">alibaba</td>
-      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="3">57 分</td>
-      <td tabindex="0" data-table-cell data-table-row="6" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#7 Gemini 3.5Flash | provider: google | metric: AA Index | 55 分 | change: AA Index" title="#7 Gemini 3.5Flash | provider: google | metric: AA Index | 55 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="0">#7</td>
-      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="1">Gemini 3.5Flash</td>
-      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="2">google</td>
-      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="3">55 分</td>
-      <td tabindex="0" data-table-cell data-table-row="7" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#8 MiniMax-M3 | provider: minimax | metric: AA Index | 55 分 | change: AA Index" title="#8 MiniMax-M3 | provider: minimax | metric: AA Index | 55 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="0">#8</td>
-      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="1">MiniMax-M3</td>
-      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="2">minimax</td>
-      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="3">55 分</td>
-      <td tabindex="0" data-table-cell data-table-row="8" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#9 Kimi K2.6 | provider: moonshot | metric: AA Index | 54 分 | change: AA Index" title="#9 Kimi K2.6 | provider: moonshot | metric: AA Index | 54 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="0">#9</td>
-      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="1">Kimi K2.6</td>
-      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="2">moonshot</td>
-      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="3">54 分</td>
-      <td tabindex="0" data-table-cell data-table-row="9" data-table-column="4">AA Index</td>
-    </tr><tr data-tracking-tooltip="#10 MiMo-V2.5-Pro | provider: xiaomi | metric: AA Index | 54 分 | change: AA Index" title="#10 MiMo-V2.5-Pro | provider: xiaomi | metric: AA Index | 54 分 | change: AA Index">
-      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="0">#10</td>
-      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="1">MiMo-V2.5-Pro</td>
-      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="2">xiaomi</td>
-      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="3">54 分</td>
-      <td tabindex="0" data-table-cell data-table-row="10" data-table-column="4">AA Index</td>
-    </tr></tbody>
-    </table>
-  </div>
-    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-token-usage" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
-      <div class="tracking-component-fallback">source_tab_not_collected</div>
-    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-cost" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
-      <div class="tracking-component-fallback">source_tab_not_collected</div>
-    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-token-usage" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
-      <div class="tracking-component-fallback">source_tab_not_collected</div>
-    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-cost" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
-      <div class="tracking-component-fallback">source_tab_not_collected</div>
-    </div><div class="tracking-component-panel" id="tracking-artificial-analysis-index-score-vs-compute" data-tab-panel-group="tracking-artificial-analysis-index" hidden>
-      <div class="tracking-component-fallback">source_tab_not_collected</div>
-    </div>
-    <details class="tracking-trace" data-tracking-trace>
-    <summary>Trace</summary>
-    <dl>
-      <div><dt>Source</dt><dd><a href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer">https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index</a></dd></div>
-      <div><dt>Selector</dt><dd>artificial-analysis-index-v1</dd></div>
-      <div><dt>Data hash</dt><dd>sha256:3077f4ea3775bb1ad326371705a3583db258b8f55412704aead04884cdc53990</dd></div>
-      <div><dt>DOM hash</dt><dd>sha256:d7339102b2fc1db76e0b2225125a7ed5b1908e544c5d88d97fc3074d4eb018a4</dd></div>
-      <div><dt>Cache</dt><dd>live</dd></div>
-      <div><dt>Diff</dt><dd>No previous component snapshot was available for comparison.</dd></div>
-      <div><dt>Top rows</dt><dd>#1 Claude Opus4.8 (max), #2 GPT-5.5(xhigh), #3 GPT-5.5(high), #4 Claude Opus4.7 (max), #5 Gemini 3.1Pro Preview</dd></div>
-    </dl>
-  </details>
-  </div><div class="card-stat-grid" data-card-stats>
+    <div class="card-stat-grid" data-card-stats>
     <div class="card-stat">
       <span class="card-stat-label">覆盖</span>
       <strong>Top 10</strong>
