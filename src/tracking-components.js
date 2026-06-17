@@ -62,6 +62,9 @@ export function trackingComponentForInteraction(item) {
     return null;
   }
   const officialSnapshot = officialSnapshotForInteraction(snapshot.official_component_snapshot);
+  if (requiresOfficialSnapshot(snapshot) && snapshot.official_component_snapshot && !officialSnapshot) {
+    return null;
+  }
   return {
     kind: snapshot.component_kind,
     source: snapshot.source,
@@ -96,6 +99,19 @@ export function trackingComponentForInteraction(item) {
       diff: snapshot.public_trace?.diff || snapshot.diff || {}
     }
   };
+}
+
+export function hasInvalidOfficialTrackingSnapshot(item) {
+  const snapshot = item?.tracking_component_snapshot || item?.snapshot;
+  const official = snapshot?.official_component_snapshot || item?.snapshot?.official_component_snapshot;
+  if (!official) {
+    return false;
+  }
+  const componentKind = snapshot?.component_kind || official?.component_kind || snapshotKindFromItem(item);
+  if (!requiresOfficialSnapshot({ component_kind: componentKind })) {
+    return false;
+  }
+  return !officialSnapshotForInteraction(official);
 }
 
 function buildOpenRouterSnapshot(item, snapshot, options) {
@@ -197,6 +213,17 @@ function buildArtificialAnalysisSnapshot(item, snapshot, options) {
     fallbackReason,
     officialComponentSnapshot
   });
+}
+
+function requiresOfficialSnapshot(snapshot) {
+  return snapshot?.component_kind === "openrouter_rankings" || snapshot?.component_kind === "artificial_analysis_index";
+}
+
+function snapshotKindFromItem(item) {
+  const text = `${item?.id || ""} ${item?.name || ""} ${item?.source || ""} ${item?.snapshot?.type || ""}`.toLowerCase();
+  if (text.includes("openrouter")) return "openrouter_rankings";
+  if (text.includes("artificial") || text.includes("intelligence_index")) return "artificial_analysis_index";
+  return "";
 }
 
 function componentSnapshot({

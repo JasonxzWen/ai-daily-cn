@@ -282,13 +282,32 @@ function githubScope(report, entries) {
 function hasOfficialTrackingSnapshot(item) {
   const snapshot = item?.component_snapshot || item?.source_component_snapshot || item?.tracking_component_snapshot || {};
   const official = item?.official_component_snapshot || item?.snapshot?.official_component_snapshot || snapshot?.official_component_snapshot;
-  if (official && textValue(official.sanitized_html) && textValue(official.dom_hash)) {
+  if (official && isPublishableOfficialSnapshot(official)) {
     return true;
   }
   const directOfficial = textValue(item?.official_dom_snapshot || snapshot?.official_dom_snapshot || snapshot?.official_html_snapshot);
   const directSanitized = textValue(item?.sanitized_dom_snapshot || snapshot?.sanitized_dom_snapshot || snapshot?.sanitized_html_snapshot);
   const kind = textValue(snapshot?.kind || snapshot?.source || item?.snapshot_kind);
   return Boolean(directOfficial && directSanitized) || /official_dom_snapshot|official_snapshot/i.test(kind);
+}
+
+function isPublishableOfficialSnapshot(official) {
+  const html = textValue(official?.sanitized_html || official?.html || official?.sanitizedHtml);
+  const selector = textValue(official?.source_selector || official?.sourceSelector).toLowerCase().replace(/\s+/g, " ");
+  if (!html || !textValue(official?.dom_hash || official?.domHash)) {
+    return false;
+  }
+  if (["html", "body", "main", "#root", "#__next"].includes(selector)) {
+    return false;
+  }
+  if (html.length > 30000 || /^<\s*(html|body|main)(?:\s|>)/i.test(html)) {
+    return false;
+  }
+  const rowLikeCount = (html.match(/<\s*tr\b|role\s*=\s*["']row["']|<\s*li\b/gi) || []).length;
+  const hasStructuredSurface = /<\s*table\b|role\s*=\s*["']table["']/i.test(html) || rowLikeCount > 0;
+  const hasComponentMarker = /data-[^=]*(openrouter|ranking|leaderboard|analysis|index|aa)|class\s*=\s*["'][^"']*(ranking|leaderboard|analysis|index|card)/i.test(html);
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 20 && (hasStructuredSurface || hasComponentMarker);
 }
 
 function isFakeTrackingComponent(item) {

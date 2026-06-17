@@ -256,6 +256,40 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "OpenRouter and Artificial Analysis should render structured table rows and no public screenshot media.",
       { issues: trackingScreenshotIssues }
     );
+    const officialSnapshotLayoutIssues = trackingCards
+      .map((card, index) => {
+        const snapshot = card.querySelector("[data-official-component-snapshot] .official-tracking-snapshot, .official-tracking-snapshot");
+        if (!snapshot) {
+          return null;
+        }
+        const rect = snapshot.getBoundingClientRect();
+        const directBroadRoot = snapshot.querySelector(":scope > main, :scope > body, :scope > html");
+        const directChrome = snapshot.querySelector(":scope > nav, :scope > header, :scope > footer, :scope > aside");
+        const heightLimit = document.documentElement.clientWidth <= 760 ? 460 : 540;
+        const mediaTooTall = Array.from(snapshot.querySelectorAll("svg, img, canvas, video")).some((node) => {
+          const mediaRect = node.getBoundingClientRect();
+          return mediaRect.height > 180 || mediaRect.width > rect.width + 2;
+        });
+        const ok = rect.height <= heightLimit && !directBroadRoot && !directChrome && !mediaTooTall;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              height: Math.round(rect.height),
+              height_limit: heightLimit,
+              direct_broad_root: directBroadRoot?.tagName?.toLowerCase() || "",
+              direct_page_chrome: directChrome?.tagName?.toLowerCase() || "",
+              media_too_tall: mediaTooTall
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_official_snapshot_layout",
+      officialSnapshotLayoutIssues.length === 0,
+      "Official tracking snapshots must be bounded component fragments, not full-page DOM dumps or oversized visual blocks.",
+      { issues: officialSnapshotLayoutIssues }
+    );
     function officialTrackingSnapshotRows(card) {
       const snapshot = card.querySelector("[data-official-component-snapshot] .official-tracking-snapshot, .official-tracking-snapshot");
       if (!snapshot) {

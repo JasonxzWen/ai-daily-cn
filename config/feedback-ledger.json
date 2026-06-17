@@ -984,6 +984,33 @@
       }
     },
     {
+      "id": "feedback/p1-official-snapshot-layout-containment",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Reject full-page official tracking snapshots",
+      "problem": "OpenRouter and Artificial Analysis official snapshot capture could fall back to `main` or `body`, causing the public daily page to render whole-page navigation, huge logos, oversized SVGs, and thousands of pixels of broken layout while previous gates still passed.",
+      "expected_behavior": "Official tracking snapshots are publishable only when they are bounded component fragments, not full-page DOM dumps. `main`, `body`, `html`, `#root`, and `#__next` snapshots are rejected; legacy broad snapshots degrade to a source-unavailable note rather than rendering local fake components or giant official page fragments. Page checks fail oversized official snapshots on desktop and mobile.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/official-component-snapshot.js",
+        "src/discovery.js",
+        "src/tracking-components.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "scripts/check-daily-content-contract.mjs",
+        ".codex/skills/effective-interact/scripts/create-interaction.mjs",
+        ".codex/skills/effective-interact/assets/components/interaction-ui.css",
+        "tests/unit.test.js",
+        "tests/skills.test.js"
+      ],
+      "validation": {
+        "command": "npm run test",
+        "test_name": "daily tracking broad official snapshots degrade instead of rendering full-page dumps",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-prepublish-editorial-prune-gate",
       "severity": "P1",
       "status": "implemented",

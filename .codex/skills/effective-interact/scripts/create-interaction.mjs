@@ -1339,6 +1339,9 @@ function renderOfficialTrackingComponent(component) {
   if (!html) {
     return "";
   }
+  if (!isPublishableOfficialTrackingSnapshot(snapshot, html)) {
+    return renderOfficialTrackingUnavailable(component, snapshot);
+  }
   const snapshotId = slugify(`${component.kind || component.source || "official"}-${snapshot.domHash || snapshot.dom_hash || "snapshot"}`);
   const css = scopeOfficialSnapshotCss(snapshot.css || snapshot.sanitizedCss || snapshot.sanitized_css || "", snapshotId);
   const style = css ? `<style data-official-tracking-css>${escapeStyleContent(css)}</style>` : "";
@@ -1358,6 +1361,24 @@ function renderOfficialTrackingComponent(component) {
     <div class="official-tracking-snapshot" data-official-snapshot-id="${escapeAttr(snapshotId)}">
       ${html}
     </div>
+    ${renderTrackingTrace(component.trace)}
+  </div>`;
+}
+
+function renderOfficialTrackingUnavailable(component, snapshot = {}) {
+  const meta = [
+    component.collectedAt,
+    snapshot.sourceSelector ? `selector: ${snapshot.sourceSelector}` : "",
+    snapshot.domHash || snapshot.dom_hash || ""
+  ].filter(Boolean).join(" · ");
+  return `<div class="tracking-component official-tracking-component tracking-component-fallback" data-tracking-component data-official-component-unavailable data-component-kind="${escapeAttr(component.kind || "")}">
+    <div class="tracking-component-header">
+      <div>
+        <div class="card-visual-title">${escapeHtml(component.source || "Tracking component")}</div>
+        ${meta ? `<span class="tracking-component-meta">${escapeHtml(meta)}</span>` : ""}
+      </div>
+    </div>
+    <p>官方 web 组件 snapshot 本轮不可用；为避免渲染整页级 DOM 或未核验的巨型页面片段，本卡只保留官方入口供读者手动核对。</p>
     ${renderTrackingTrace(component.trace)}
   </div>`;
 }
@@ -1391,6 +1412,21 @@ function sanitizeOfficialSnapshotHtml(value) {
     .replace(/\s(href|src)\s*=\s*'(?!(?:https?:|\/|#))[^']*'/gi, "")
     .replace(/\s(href|src)\s*=\s*(?!(?:https?:|\/|#))[^\s>]+/gi, "")
     .trim();
+}
+
+function isPublishableOfficialTrackingSnapshot(snapshot, html) {
+  const selector = String(snapshot.sourceSelector || snapshot.source_selector || "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (["html", "body", "main", "#root", "#__next"].includes(selector)) {
+    return false;
+  }
+  if (html.length > 30000 || /^<\s*(html|body|main)(?:\s|>)/i.test(html)) {
+    return false;
+  }
+  const rowLikeCount = (html.match(/<\s*tr\b|role\s*=\s*["']row["']|<\s*li\b/gi) || []).length;
+  const hasStructuredSurface = /<\s*table\b|role\s*=\s*["']table["']/i.test(html) || rowLikeCount > 0;
+  const hasComponentMarker = /data-[^=]*(openrouter|ranking|leaderboard|analysis|index|aa)|class\s*=\s*["'][^"']*(ranking|leaderboard|analysis|index|card)/i.test(html);
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 20 && (hasStructuredSurface || hasComponentMarker);
 }
 
 function scopeOfficialSnapshotCss(value, snapshotId) {

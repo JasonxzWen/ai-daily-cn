@@ -1038,6 +1038,87 @@ test("effective-interact renders sanitized official tracking component snapshots
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
+test("effective-interact rejects broad official tracking page dumps", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-broad-official-tracking-component-"));
+  const inputPath = path.join(tmp, "broad-official-tracking-component.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily 2026-06-12",
+      summary: "Broad official tracking component snapshot check.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Daily Tracking",
+          group: "signals",
+          cardClass: "tracking-card",
+          showFilters: false,
+          items: [
+            {
+              group: "model usage",
+              title: "OpenRouter",
+              href: "https://openrouter.ai/rankings",
+              body: "Official component snapshot should not render a whole page dump.",
+              component: {
+                kind: "openrouter_rankings",
+                source: "OpenRouter",
+                sourceUrl: "https://openrouter.ai/rankings",
+                collectedAt: "2026-06-12T02:00:00+08:00",
+                officialSnapshot: {
+                  status: "available",
+                  source: "official_dom",
+                  componentKind: "openrouter_rankings",
+                  sourceUrl: "https://openrouter.ai/rankings",
+                  capturedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "openrouter-rankings-v1",
+                  sourceSelector: "main",
+                  html: "<main class=\"tabular-nums\"><nav>OpenRouter navigation</nav><section><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section></main>",
+                  css: ".tabular-nums { min-height: 4000px; } nav { display: block; }",
+                  domHash: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                  cssHash: "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                },
+                trace: {
+                  sourceUrl: "https://openrouter.ai/rankings",
+                  collectedAt: "2026-06-12T02:00:00+08:00",
+                  selectorVersion: "openrouter-rankings-v1",
+                  dataHash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  rawDomHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                  cacheStatus: "live",
+                  topRows: [],
+                  diff: { status: "first_snapshot", changedRows: [] }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "broad-official-tracking-component", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.doesNotMatch(html, /data-official-component-snapshot/);
+  assert.doesNotMatch(html, /<main class="tabular-nums"/);
+  assert.match(html, /snapshot 本轮不可用|source unavailable|官方 web 组件/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact renders Artificial Analysis collected tabs without fallback panels", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-aa-component-"));
   const inputPath = path.join(tmp, "aa-component.json");
