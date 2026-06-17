@@ -3527,7 +3527,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>NVIDIA 文章讨论世界行动模型如何先学习环境表征，再面向行动决策做微调。它的重点不是单个 demo，而是把“想象未来状态”和“选择下一步动作”放进同一类模型能力框架。读者可以用它判断具身智能、仿真训练和机器人 agent 什么时候需要从语言推理转向世界模型评估。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章把世界行动模型描述为先学习环境和状态变化，再通过微调服务于具体行动决策的模型路线。</span></dd></div><div><dt>要点 2</dt><dd><span>它关注的证据是模型能否把未来状态预测和动作选择连接起来，而不是只生成一段文本解释。</span></dd></div><div><dt>要点 3</dt><dd><span>对做机器人、仿真或 agent 评估的团队来说，边界在于训练数据、环境覆盖和真实任务迁移效果。</span></dd></div><div><dt>要点 4</dt><dd><span>这类模型路线提示团队把评测从问答准确率扩展到状态预测、计划质量和动作后果。</span></dd></div><div><dt>要点 5</dt><dd><span>真正需要继续核对的是文章中的实验设置、场景假设和能否复现到自己的控制任务。</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
@@ -3536,7 +3536,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>NVIDIA 文章聚焦 MoE 训练吞吐瓶颈，说明融合内核如何减少调度和数据搬运开销。具体方法落在训练系统实现层，包括 kernel 融合、专家路由和并行数据流的配合。训练团队复现时需要同时对齐硬件、通信拓扑和 batch 规模，否则公开吞吐提升很难直接迁移。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章围绕 MoE 训练吞吐展开，重点是用融合内核减少专家路由、通信和算子调度带来的损耗。</span></dd></div><div><dt>要点 2</dt><dd><span>它提供的工程线索是训练系统优化需要同时看 kernel、并行策略和数据流，而不是只调模型参数。</span></dd></div><div><dt>要点 3</dt><dd><span>对大模型训练团队，关键边界是优化是否依赖特定 GPU、通信拓扑和训练框架版本。</span></dd></div><div><dt>要点 4</dt><dd><span>这篇文章适合作为排查 MoE 训练低吞吐时的实现层参考，尤其是定位算子碎片化问题。</span></dd></div><div><dt>要点 5</dt><dd><span>公开吞吐提升能否复现，取决于模型规模、专家数量和集群网络是否接近文章设置。</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI industry" data-search-target="html-work-report">
 
@@ -3545,7 +3545,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>Cloudflare 文章说明 Ensemble AI 的人才加入其 AI 团队，信号在于边缘网络公司继续增强模型和 agent 相关能力。它不只是人事消息，还反映 Cloudflare 希望把 AI 能力嵌入开发者平台、网络安全和边缘计算产品。读者可以关注后续是否出现新的推理、工作流或安全产品，因为那才会体现这次团队扩充的业务结果。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>Cloudflare 披露 Ensemble AI 相关人才加入公司，用于加强内部 AI 产品和工程能力。</span></dd></div><div><dt>要点 2</dt><dd><span>这条消息的产品含义在于 Cloudflare 可能把 AI 更深地放进开发者平台、边缘网络和安全服务。</span></dd></div><div><dt>要点 3</dt><dd><span>判断价值不在团队规模本身，而在后续是否推出可用的推理、agent 工作流或安全自动化能力。</span></dd></div><div><dt>要点 4</dt><dd><span>对平台团队来说，值得观察 Cloudflare 是否用其网络分发优势降低 AI 应用的延迟和部署复杂度。</span></dd></div><div><dt>要点 5</dt><dd><span>当前边界是公开信息仍以团队扩充为主，具体产品路线还需要后续发布验证。</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
@@ -3554,7 +3554,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>AWS 文章把 agent 失败检测和根因分析放进 Strands Evals 的评测流程，说明如何沿任务轨迹定位失败原因。方法覆盖工具调用、失败模式和可复现评测样例，适合把最终答案对错扩展成过程级检查。团队采用时需要把评测数据、失败分类和自有任务映射起来，才能形成内部 agent 发布安全门。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章展示用 Strands Evals 检测 AI agent 失败，并把失败原因拆到任务轨迹和工具调用层。</span></dd></div><div><dt>要点 2</dt><dd><span>这套检查让团队在上线前区分 agent 是规划失败、工具使用失败，还是环境反馈处理失败。</span></dd></div><div><dt>要点 3</dt><dd><span>评测能否复用，取决于文章给出的数据、失败标签和代码是否能映射到团队自己的任务。</span></dd></div><div><dt>要点 4</dt><dd><span>这类方法适合放进 agent 发布前的回归测试，而不是只在事故后做人工复盘。</span></dd></div><div><dt>要点 5</dt><dd><span>边界在于公开示例覆盖的任务类型有限，复杂业务流程仍需要补充自有失败样本。</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
@@ -3563,7 +3563,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>AWS 文章介绍如何把 Deep Agents 与 Bedrock AgentCore 组合起来构建研究型 agent，重点是让代理在较长任务中保留上下文。内容覆盖工具接入、上下文组织和研究流程拆分，而不是只给一个聊天式示例。权限边界、数据访问、成本和失败恢复方式会决定这套方案是否适合内部研究工作流。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>文章把 Deep Agents 和 Bedrock AgentCore 组合成研究代理方案，目标是处理需要长上下文的研究任务。</span></dd></div><div><dt>要点 2</dt><dd><span>它关注的实现点包括工具调用、上下文组织、任务拆分和代理在多步骤研究中的状态保持。</span></dd></div><div><dt>要点 3</dt><dd><span>方案评估应聚焦权限、数据边界、成本和失败恢复，而不是只看 demo 是否流畅。</span></dd></div><div><dt>要点 4</dt><dd><span>这篇文章适合作为研究型 agent 试点的架构参考，尤其是需要连接内部资料和外部搜索时。</span></dd></div><div><dt>要点 5</dt><dd><span>落地边界在于不同组织的知识库权限和审计要求差异很大，公开方案仍需改造。</span></dd></div></dl>
+
   </article>
     </div>
   </section>
@@ -3584,7 +3584,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>三连发！阿里发布首个具身大模型Qwen-Robot系列：边走、边看、边思考。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>三连发</span></dd></div><div><dt>要点 2</dt><dd><span>阿里发布首个具身大模型Qwen-Robot系列：边走、边看、边思考</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
@@ -3593,7 +3593,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>从技术向运营生产力“质变”：神州数码以AI for Process构建AI落地产业的“飞轮”：QbitAI published this intermediary lead entry.</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>从技术向运营生产力“质变”：神州数码以AI for Process构建AI落地产业的“飞轮”：QbitAI published this intermediary lead entry.</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
@@ -3602,7 +3602,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>沙利文权威认证：范式 Rise vGPU 获评 Tier 1 领先平台：成为全球领先的通用人工智能科技公司。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>沙利文权威认证：范式 Rise vGPU 获评 Tier 1 领先平台：成为全球领先的通用人工智能科技公司</span></dd></div></dl>
+
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
@@ -3611,7 +3611,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>上线首月吸引 10 万开发者，AnySearch 为 Agent 解锁网页之外的世界：专为 Agent 设计的 AI 搜索层服务。</p>
-    <dl class="card-detail-list"><div><dt>要点 1</dt><dd><span>上线首月吸引 10 万开发者，AnySearch 为 Agent 解锁网页之外的世界：专为 Agent 设计的 AI 搜索层服务</span></dd></div></dl>
+
   </article>
     </div>
   </section>

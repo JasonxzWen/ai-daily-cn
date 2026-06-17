@@ -1432,12 +1432,11 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(hotBlogsSection.items[0].body.includes("这篇文章把长运行 agent 的 harness"));
   assert.equal(hotBlogsSection.items[0].showGroup, false);
   assert.deepEqual(hotBlogsSection.items[0].tags, ["notable|值得关注", "topic|agent harness", "topic|long-running agents"]);
-  assert(hotBlogsSection.items[0].points.length > 0);
+  assert.deepEqual(hotBlogsSection.items[0].points, []);
   assert.equal(hotBlogsSection.items[0].media.length, 1);
   assert(hotBlogsSection.items[0].media[0].src.endsWith("assets/evidence/harness-architecture.png"));
-  assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("发布方"));
-  assert(!JSON.stringify(hotBlogsSection.items[0].points).includes("日期"));
-  assert(!hotBlogsSection.items[0].points.some((point) => ["发布方", "作者", "日期"].includes(point.label)));
+  assert(!JSON.stringify(hotBlogsSection.items[0]).includes("发布方是 Example Blog"));
+  assert(!JSON.stringify(hotBlogsSection.items[0]).includes("日期"));
   assert(!hotBlogsSection.items[0].body.includes("为什么重要"));
   assert(!input.sections.some((section) => section.title === "模型发布"));
   assert(!input.sections.some((section) => section.title === "今日值得关注的项目"));
@@ -6492,23 +6491,44 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
 });
 
-test("quality review requires hot blogs to expose three to five public points", async () => {
+test("quality review accepts hot blog summaries without public key points", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const summary = "这篇文章把长运行 agent 的工程化拆成任务规划、上下文压缩、工具权限、失败恢复和结果回放几个环节，强调稳定性来自可审计流程而不是单次补全。作者结合 coding agent 与研究代理示例说明，团队应先设计隔离、日志和回滚边界，再评估是否接入具体模型或平台。";
   report.hot_blogs = [
     {
       ...report.hot_blogs[0],
-      title: "Two Point Blog",
-      url: "https://example.com/blog/two-points",
-      summary: "这篇博客拆解 agent 平台的任务规划、工具权限和失败恢复，说明团队不能只看模型能力。作者用工程案例说明上下文压缩、审计日志和回放评估会决定长任务稳定性。"
+      title: "长运行 Agent 工程化拆解",
+      url: "https://example.com/blog/agent-harness-summary",
+      summary
     }
   ];
+  delete report.hot_blogs[0].key_points;
+
+  const review = reviewReportQuality(report);
+
+  assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
+});
+
+test("quality review blocks hot blog summaries outside the 100-200 character contract", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const overlongSummary = "这篇文章拆解长运行 agent 的工程化约束，覆盖任务规划、上下文压缩、工具权限、失败恢复、日志回放、评估样本、人工接管、发布门禁和成本归因，强调生产系统要先有可审计流程，再讨论模型选择。".repeat(3);
+  report.hot_blogs = [
+    {
+      ...report.hot_blogs[0],
+      title: "长运行 Agent 工程化长文",
+      url: "https://example.com/blog/overlong-summary",
+      summary: "这篇文章把长运行 agent 的工程化拆成任务规划、上下文压缩、工具权限、失败恢复和结果回放几个环节，强调稳定性来自可审计流程而不是单次补全。作者结合 coding agent 与研究代理示例说明，团队应先设计隔离、日志和回滚边界，再评估是否接入具体模型或平台。文章还讨论了多租户隔离、预算控制、命令审批、文件系统权限、失败重试、人工接管、评估样本构造、发布门禁、灰度策略、成本归因、上下文保留、观测指标、权限审批和事故复盘，最后提醒团队不要把演示成功误认为生产可用。"
+    }
+  ];
+  report.hot_blogs[0].summary = overlongSummary;
+  delete report.hot_blogs[0].key_points;
 
   const review = reviewReportQuality(report);
   const issue = review.issues.find((item) => item.path === "hot_blogs[0].summary");
 
   assert.equal(review.ok, false);
-  assert.equal(issue?.code, "hot_blog_points_invalid");
-  assert(issue.details.problems.includes("points_not_3_to_5"));
+  assert.equal(issue?.code, "hot_blog_summary_too_thin");
+  assert(issue.details.problems.includes("summary_too_long"));
 });
 
 test("quality review flags untranslated main item source excerpts", async () => {
@@ -8390,16 +8410,13 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   assert(!drafted.report.builder_observations.some((item) => item.original_text?.includes("not anything ai related")));
   assert(drafted.report.hot_blogs.every((item) => {
     const summary = String(item.summary || "");
-    const points = Array.isArray(item.key_points) ? item.key_points : summary
-      .split(/(?<=[\u3002\uff01\uff1f!?\uff1b;])\s*/u)
-      .map((part) => part.trim())
-      .filter(Boolean);
-    return summary.length >= 100 && /\p{Script=Han}/u.test(summary) && points.length >= 3 && points.length <= 5;
+    const chineseChars = (summary.match(/\p{Script=Han}/gu) || []).length;
+    return chineseChars >= 100 && chineseChars <= 200 && /\p{Script=Han}/u.test(summary) && !Array.isArray(item.key_points);
   }));
   const draftInput = reportToInteractionInput(drafted.report);
   const blogCards = draftInput.sections.find((section) => section.cardClass === "blog-card")?.items || [];
   assert(blogCards.length > 0);
-  assert(blogCards.every((card) => Array.isArray(card.points) && card.points.filter((point) => /^要点\s*\d+/.test(point.label)).length >= 3));
+  assert(blogCards.every((card) => Array.isArray(card.points) && card.points.length === 0));
   assert(drafted.report.main_items.every((item) =>
     Array.isArray(item.bullets) &&
     item.bullets.every((bullet) => !/重点看|值不值得试|决策信号/u.test(String(bullet || "")))
@@ -10160,8 +10177,11 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
     assert(/\p{Script=Han}/u.test(item.title), `main title should be Chinese: ${item.title}`);
     assert((item.title.match(/[A-Za-z]/g) || []).length <= 24, `main title should stay under Latin limit: ${item.title}`);
     assert(/\p{Script=Han}/u.test(item.summary), `main summary should be Chinese: ${item.summary}`);
-    assert(Array.isArray(item.bullets) && item.bullets.length >= 1);
-    assert(item.bullets.every((bullet) => /\p{Script=Han}/u.test(String(bullet || ""))));
+    assert(Array.isArray(item.bullets) && item.bullets.length >= 2);
+    assert(item.bullets.every((bullet) => {
+      const text = String(bullet || "");
+      return /\p{Script=Han}/u.test(text) && (text.match(/\p{Script=Han}/gu) || []).length >= 24;
+    }));
   }
   for (const highlight of drafted.report.hero_highlights) {
     assert(/\p{Script=Han}/u.test(highlight.title), `hero title should be Chinese: ${highlight.title}`);
@@ -10172,8 +10192,9 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
     assert(/\p{Script=Han}/u.test(blog.title), `hot blog title should be Chinese: ${blog.title}`);
     assert((blog.title.match(/[A-Za-z]/g) || []).length <= 24, `hot blog title should stay under Latin limit: ${blog.title}`);
     assert(/\p{Script=Han}/u.test(blog.summary), `hot blog summary should be Chinese: ${blog.summary}`);
-    assert(Array.isArray(blog.key_points) && blog.key_points.length >= 3);
-    assert(blog.key_points.every((point) => /\p{Script=Han}/u.test(String(point || ""))));
+    assert((blog.summary.match(/\p{Script=Han}/gu) || []).length >= 100, `hot blog summary should be substantive: ${blog.summary}`);
+    assert((blog.summary.match(/\p{Script=Han}/gu) || []).length <= 200, `hot blog summary should stay concise: ${blog.summary}`);
+    assert(!Array.isArray(blog.key_points), "new draft hot blogs should not depend on key_points");
   }
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });

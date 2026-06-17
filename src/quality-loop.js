@@ -34,13 +34,9 @@ const AUTO_DRAFT_TEMPLATE_PHRASES = [
   "当前公开信息主要集中在"
 ];
 
-const HOT_BLOG_SUMMARY_MIN_LENGTH = 100;
-const HOT_BLOG_SUMMARY_MAX_LENGTH = 520;
-const HOT_BLOG_MIN_POINTS = 3;
-const HOT_BLOG_MAX_POINTS = 5;
-const HOT_BLOG_MIN_POINT_LENGTH = 18;
+const HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS = 100;
+const HOT_BLOG_SUMMARY_MAX_CHINESE_CHARS = 200;
 const HOT_BLOG_MIN_CHINESE_RATIO = 0.45;
-const HOT_BLOG_MIN_CHINESE_CHARS = 60;
 const MAIN_ITEM_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_MAX_LATIN_CHARS = 90;
 const MAIN_ITEM_REPORT_WRITE_MIN_CHARS = 70;
@@ -670,36 +666,20 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
   items.forEach((item, index) => {
     const pathName = `hot_blogs[${index}].summary`;
     const summary = String(item?.summary || "").replace(/\s+/g, " ").trim();
-    const explicitPoints = hotBlogExplicitKeyPoints(item);
-    const publicPoints = explicitPoints.length > 0 ? explicitPoints : hotBlogPublicPoints(summary);
-    const combinedPublicText = explicitPoints.length > 0
-      ? `${summary} ${explicitPoints.join(" ")}`
-      : summary;
-    const plain = stripMarkup(combinedPublicText).replace(/\s+/g, " ").trim();
-    const summaryPlain = stripMarkup(summary).replace(/\s+/g, " ").trim();
-    const pointCount = publicPoints.length;
-    const weakPointText = publicPoints
-      .map((point) => stripMarkup(point).replace(/\s+/g, " ").trim())
-      .some((point) => point.length > 0 && point.length < HOT_BLOG_MIN_POINT_LENGTH);
+    const plain = stripMarkup(summary).replace(/\s+/g, " ").trim();
     const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
     const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
     const ratioBase = chineseChars + latinChars;
     const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
     const problems = [];
 
-    if (plain.length < HOT_BLOG_SUMMARY_MIN_LENGTH) {
+    if (chineseChars < HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS) {
       problems.push("summary_too_short");
     }
-    if (summaryPlain.length > HOT_BLOG_SUMMARY_MAX_LENGTH) {
+    if (chineseChars > HOT_BLOG_SUMMARY_MAX_CHINESE_CHARS) {
       problems.push("summary_too_long");
     }
-    if (pointCount < HOT_BLOG_MIN_POINTS || pointCount > HOT_BLOG_MAX_POINTS) {
-      problems.push("points_not_3_to_5");
-    }
-    if (weakPointText) {
-      problems.push("point_too_short");
-    }
-    if (chineseChars < HOT_BLOG_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
+    if (chineseChars < HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
       problems.push("not_chinese_editorial_summary");
     }
     if (looksLikeTemplatedHotBlogSummary(plain) || lacksHotBlogEditorialCoverage(plain)) {
@@ -714,20 +694,16 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
       ? "hot_blog_summary_untranslated"
       : problems.includes("template_or_low_information")
         ? "hot_blog_summary_template"
-      : problems.includes("points_not_3_to_5") || problems.includes("point_too_short")
-        ? "hot_blog_points_invalid"
         : "hot_blog_summary_too_thin";
     issues.push({
       code,
       severity: "error",
       path: pathName,
-      message: "Hot blog entries must expose reader-facing Chinese analysis: 3-5 public points, enough detail to explain what the article says, and no untranslated English excerpt.",
+      message: "Hot blog entries must expose a 100-200 Chinese-character article summary with enough detail to explain what the article says, what evidence or method it gives, and why it matters.",
       repairable: false,
       details: {
         problems,
         length: plain.length,
-        summary_length: summaryPlain.length,
-        point_count: pointCount,
         chinese_chars: chineseChars,
         chinese_ratio: Number(chineseRatio.toFixed(3))
       }
@@ -736,7 +712,7 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
       aiReviewTasks.push({
         kind: "hot_blog_editorial_rewrite",
         path: pathName,
-        instruction: "Rewrite the hot blog entry in Chinese for general readers: provide 3-5 concrete public points, explain what the article says, what evidence or method it gives, why it matters, and what boundary to watch without changing facts or links."
+        instruction: "Rewrite the hot blog entry as one 100-200 Chinese-character article summary for general readers: explain what the article says, what evidence or method it gives, why it matters, and what boundary to watch without changing facts or links."
       });
     }
   });
