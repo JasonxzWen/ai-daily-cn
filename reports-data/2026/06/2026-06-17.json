@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-17",
   "title": "AI 日报 2026-06-17",
-  "summary": "今天主线包括：OpenAI 用部署模拟预判模型上线行为；阿里云发布 Qwen-Robot 系列，强调具身智能；微软讨论 AI 成功落地；同时关注 Grok、Warp、GitHub Models 和 ReproRepo 等工具与研究信号。",
+  "summary": "今天最值得看的主线有 Qwen 团队介绍机器人学习与多模态推理实验；OpenAI披露模型能力和评估方法更新；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。",
   "source_window": {
     "date_from": "2026-06-15",
     "date_to": "2026-06-17",
@@ -11,31 +11,31 @@
   },
   "hero_highlights": [
     {
-      "title": "OpenAI 用部署模拟预判模型上线行为",
+      "title": "OpenAI披露模型能力和评估方法更新",
       "url": "https://openai.com/index/deployment-simulation",
       "reason": "研究价值集中在评测设置、能力边界和内部实验参照",
-      "what_happened": "OpenAI 介绍用部署模拟在模型发布前预测行为。",
+      "what_happened": "OpenAI披露模型能力和评估方法更新，材料覆盖能力边界、评估设置、数据来源、使用场景和限制说明，边界落在结论仍要依赖可复现评测、真实任务和公开限制",
       "why_watch": "研究价值集中在评测设置、能力边界和内部实验参照",
       "category": "model_platform",
       "source_item_ref": "main-content-openai-news-predicting-model-behavior-before-release-by-simulating-deplo"
     },
     {
-      "title": "Grok Build 增加 agent 仪表盘",
+      "title": "Agent Dashboard发布生产 agent 观测面板",
       "url": "https://x.ai/news/agent-dashboard",
       "reason": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
-      "what_happened": "xAI 为 Grok Build 加入 agent 仪表盘。",
+      "what_happened": "Agent Dashboard发布生产 agent 观测面板，材料覆盖工具调用轨迹、事故时间线、成本归因、回滚状态和发布健康度，边界落在观测价值取决于能否把失败记录、成本和发布状态串进同一条链路",
       "why_watch": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "category": "product_tool",
       "source_item_ref": "main-content-xai-company-news-agent-dashboard-in-grok-build"
     },
     {
-      "title": "阿里云发布 Qwen-Robot 具身智能套件",
-      "url": "https://www.alibabacloud.com/blog/entering-the-physical-ai-era-introducing-the-qwen-robot-suite_603261",
+      "title": "Qwen 团队介绍机器人学习与多模态推理实验",
+      "url": "https://www.alibabacloud.com/blog/qwen-robot-suite-a-foundation-model-suite-for-physical-world-intelligence_603262",
       "reason": "信号集中在 AI 产品、模型或平台策略的实际变化",
-      "what_happened": "阿里云介绍 Qwen-Robot 系列，强调面向物理场景的 AI 能力。",
+      "what_happened": "Qwen 团队介绍机器人学习与多模态推理实验，材料覆盖具身任务规划、训练数据、多模态推理和评估工作流，边界落在研究信号仍需要看真实机器人任务、数据规模和评测设置",
       "why_watch": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "category": "china_open_source_community",
-      "source_item_ref": "main-content-alibaba-cloud-blog-entering-the-physical-ai-era-introducing-the-qwen-rob"
+      "source_item_ref": "main-content-alibaba-cloud-blog-qwen-robot-suite-a-foundation-model-suite-for-physica"
     }
   ],
   "source_audit": {
@@ -159,7 +159,7 @@
           "name": "Simon Willison Weblog",
           "url": "https://simonwillison.net/atom/everything/",
           "status": "checked",
-          "notes": "8 recent original entries parsed"
+          "notes": "9 recent original entries parsed"
         },
         {
           "name": "Chip Huyen Blog",
@@ -174,10 +174,10 @@
           "notes": "0 recent original entries parsed"
         }
       ],
-      "candidates_found": 28,
+      "candidates_found": 29,
       "included": 0,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T03:37:11.896Z",
+      "last_successful_feed_at": "2026-06-17T04:56:40.707Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -337,7 +337,7 @@
         "html_index": 10
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T03:37:19.502Z",
+      "last_successful_feed_at": "2026-06-17T04:56:44.548Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "content_sources": {
@@ -687,7 +687,7 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "blocked",
+          "status": "no_signal",
           "id": "content-baidu-press-releases",
           "source_kind": "html_index",
           "tier": "T0",
@@ -695,7 +695,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -1225,8 +1226,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 10,
-          "notes": "10 recent blog/interview entries parsed"
+          "parsed_count": 11,
+          "notes": "11 recent blog/interview entries parsed"
         },
         {
           "name": "Moonshot AI Kimi Platform Blog",
@@ -1683,7 +1684,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-17T03:37:24.586Z",
+            "snapshot_as_of": "2026-06-17T04:56:50.703Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -1770,7 +1771,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-17T03:37:24.586Z",
+            "snapshot_as_of": "2026-06-17T04:56:50.703Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -1996,13 +1997,13 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 58,
-          "notes": "58 recent intermediary lead entries parsed"
+          "parsed_count": 54,
+          "notes": "54 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
           "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
-          "status": "no_signal",
+          "status": "checked",
           "id": "general-news-google-aigc-content",
           "source_kind": "rss",
           "tier": "T3",
@@ -2010,8 +2011,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "parsed_count": 48,
+          "notes": "48 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -2024,8 +2025,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 24,
-          "notes": "24 recent intermediary lead entries parsed"
+          "parsed_count": 42,
+          "notes": "42 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2038,8 +2039,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 6,
-          "notes": "6 recent intermediary lead entries parsed"
+          "parsed_count": 7,
+          "notes": "7 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News China Big Tech Company Watch RSS",
@@ -2560,8 +2561,8 @@
           "notes": "5 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 177,
-      "included": 30,
+      "candidates_found": 182,
+      "included": 34,
       "sources_checked": 142,
       "enablement_counts": {
         "core": 65,
@@ -2582,7 +2583,7 @@
         "artificial_analysis_index_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T03:37:24.586Z",
+      "last_successful_feed_at": "2026-06-17T04:56:50.703Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2611,12 +2612,12 @@
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 51275,
-        "openalex": 23722,
-        "arxiv": 926
+        "gdelt": 57616,
+        "openalex": 20056,
+        "arxiv": 933
       },
       "provider_cost_units": {
-        "gdelt": 3,
+        "gdelt": 4,
         "openalex": 15,
         "arxiv": 15
       },
@@ -4333,9 +4334,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 29,
+          "recent_48h_entries": 32,
           "original_url_count": null,
-          "notes": "52 feed entries parsed; 29 within 48h"
+          "notes": "54 feed entries parsed; 32 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4352,7 +4353,7 @@
           "feed_like": true,
           "recent_48h_entries": 29,
           "original_url_count": null,
-          "notes": "47 feed entries parsed; 29 within 48h"
+          "notes": "48 feed entries parsed; 29 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -4367,9 +4368,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 17,
+          "recent_48h_entries": 32,
           "original_url_count": null,
-          "notes": "19 feed entries parsed; 17 within 48h"
+          "notes": "43 feed entries parsed; 32 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -4384,9 +4385,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 4,
+          "recent_48h_entries": 5,
           "original_url_count": null,
-          "notes": "100 feed entries parsed; 4 within 48h"
+          "notes": "100 feed entries parsed; 5 within 48h"
         },
         {
           "name": "Google News China Big Tech Company Watch RSS",
@@ -4418,9 +4419,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 20,
+          "recent_48h_entries": 21,
           "original_url_count": null,
-          "notes": "39 feed entries parsed; 20 within 48h"
+          "notes": "39 feed entries parsed; 21 within 48h"
         },
         {
           "name": "36Kr",
@@ -4435,9 +4436,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 27,
+          "recent_48h_entries": 28,
           "original_url_count": null,
-          "notes": "30 feed entries parsed; 27 within 48h"
+          "notes": "30 feed entries parsed; 28 within 48h"
         },
         {
           "name": "QbitAI",
@@ -4486,9 +4487,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 17,
+          "recent_48h_entries": 19,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 17 within 48h"
+          "notes": "20 feed entries parsed; 19 within 48h"
         },
         {
           "name": "InfoQ CN",
@@ -4503,9 +4504,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 17,
+          "recent_48h_entries": 18,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 17 within 48h"
+          "notes": "20 feed entries parsed; 18 within 48h"
         },
         {
           "name": "SSPAI",
@@ -4520,9 +4521,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 6,
+          "recent_48h_entries": 7,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 6 within 48h"
+          "notes": "10 feed entries parsed; 7 within 48h"
         },
         {
           "name": "iFanr",
@@ -5237,13 +5238,35 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-17T03:41:38.408Z",
+      "last_successful_feed_at": "2026-06-17T05:00:48.165Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
   "main_items": [
     {
-      "title": "OpenAI 用部署模拟预判模型上线行为",
+      "title": "Qwen 团队介绍机器人学习与多模态推理实验",
+      "candidate_id": "main-content-alibaba-cloud-blog-qwen-robot-suite-a-foundation-model-suite-for-physica",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-17",
+      "url": "https://www.alibabacloud.com/blog/qwen-robot-suite-a-foundation-model-suite-for-physical-world-intelligence_603262",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Qwen 团队介绍机器人学习与多模态推理实验，材料覆盖具身任务规划、训练数据、多模态推理和评估工作流，边界落在研究信号仍需要看真实机器人任务、数据规模和评测设置。",
+      "bullets": [
+        "**Qwen 团队介绍机器人学习与多模态推理实验**：材料把机器人学习与多模态推理实验落到具身任务规划、训练数据、多模态推理和评估工作流，已披露事实集中在机器人学习实验、多模态推理和任务规划评估。"
+      ],
+      "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
+      "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
+      "importance": "major",
+      "image_urls": []
+    },
+    {
+      "title": "OpenAI披露模型能力和评估方法更新",
       "candidate_id": "main-content-openai-news-predicting-model-behavior-before-release-by-simulating-deplo",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -5255,9 +5278,9 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI 介绍用部署模拟在模型发布前预测行为，重点是把模型放入接近真实上线的情境中观察风险、能力边界和可能的用户反应。",
+      "summary": "OpenAI披露模型能力和评估方法更新，材料覆盖能力边界、评估设置、数据来源、使用场景和限制说明，边界落在结论仍要依赖可复现评测、真实任务和公开限制。",
       "bullets": [
-        "**部署模拟**：这条更新把模型评估前移到发布前阶段，适合评测、平台和安全团队核对上线风险。"
+        "**OpenAI披露模型能力和评估方法更新**：材料把模型能力和评估方法更新落到能力边界、评估设置、数据来源、使用场景和限制说明，已披露事实集中在模型能力、评估设置、数据来源和限制说明。"
       ],
       "why_it_matters": "研究价值集中在评测设置、能力边界和内部实验参照",
       "reader_relevance": "适合算法、平台和评测团队更新能力边界和内部实验设计",
@@ -5265,29 +5288,7 @@
       "image_urls": []
     },
     {
-      "title": "阿里云发布 Qwen-Robot 具身智能套件",
-      "candidate_id": "main-content-alibaba-cloud-blog-entering-the-physical-ai-era-introducing-the-qwen-rob",
-      "editorial_category": "ai_industry",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-17",
-      "url": "https://www.alibabacloud.com/blog/entering-the-physical-ai-era-introducing-the-qwen-robot-suite_603261",
-      "source": "Alibaba Cloud Blog",
-      "tier": "T0",
-      "entities": [
-        "Alibaba Cloud Blog"
-      ],
-      "summary": "阿里云介绍 Qwen-Robot 系列，把 Qwen 模型能力延伸到机器人和物理交互场景，重点是具身智能产品线和后续应用入口。",
-      "bullets": [
-        "**具身智能**：Qwen-Robot 系列把模型能力放到机器人、感知和行动场景中展示，读者应继续核对产品入口和能力边界。"
-      ],
-      "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
-      "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "微软：AI 成功落地的组织路径",
+      "title": "微软研究院更新AI 产品、平台或工程实践",
       "candidate_id": "main-content-microsoft-official-blog-achieving-success-with-ai",
       "editorial_category": "company_business",
       "source_level": "official",
@@ -5299,9 +5300,9 @@
       "entities": [
         "Official Microsoft Blog"
       ],
-      "summary": "微软这篇文章围绕企业 AI 落地展开，重点放在业务目标、工作流改造、员工采用和可衡量成效，而不是只讨论模型能力本身。",
+      "summary": "微软研究院更新AI 产品、平台或工程实践，材料覆盖功能变化、使用场景、接入方式、限制条件和后续部署边界，边界落在公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
       "bullets": [
-        "**落地路径**：这条内容适合业务、采购和组织管理团队复盘 AI 项目的推进方式、衡量指标和合作风险。"
+        "**微软研究院更新AI 产品、平台或工程实践**：材料把AI 产品、平台或工程实践落到功能变化、使用场景、接入方式、限制条件和后续部署边界，已披露事实集中在功能变化、适用场景、接入方式和限制条件。"
       ],
       "why_it_matters": "信号集中在大厂资源投入、组织重心和商业优先级变化",
       "reader_relevance": "适合业务、采购和组织管理团队复盘行业风向、供应商策略和合作风险",
@@ -5309,7 +5310,7 @@
       "image_urls": []
     },
     {
-      "title": "Qoder 1.0 从 AI IDE 走向自主开发桌面",
+      "title": "Qoder发布面向软件团队的 agent 平台",
       "candidate_id": "main-content-alibaba-cloud-blog-introducing-qoder-1-0-from-ai-ide-to-autonomous-devel",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -5321,9 +5322,9 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "阿里云介绍 Qoder 1.0，将定位从 AI IDE 扩展到自主开发桌面，核心关注开发任务、上下文和自动化执行流程。",
+      "summary": "Qoder发布面向软件团队的 agent 平台，材料覆盖代码仓库上下文、工作流编排、IDE 集成、企业控制和评估钩子，边界落在工程落地取决于仓库权限、上下文质量、评估回放和团队治理。",
       "bullets": [
-        "**开发桌面**：Qoder 1.0 强调从编辑器辅助走向更完整的自主开发工作流，适合研发团队评估迁移窗口。"
+        "**Qoder发布面向软件团队的 agent 平台**：材料把面向软件团队的 agent 平台落到代码仓库上下文、工作流编排、IDE 集成、企业控制和评估钩子，已披露事实集中在coding agent、仓库上下文、IDE 集成和评估钩子。"
       ],
       "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
@@ -5331,7 +5332,7 @@
       "image_urls": []
     },
     {
-      "title": "Google DeepMind 用 AI 加速英国住房规划",
+      "title": "DeepMind展示住房建设约束规划项目",
       "candidate_id": "main-content-google-deepmind-rss-unlocking-uk-house-building-with-ai-accelerated-plan",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -5343,9 +5344,9 @@
       "entities": [
         "Google DeepMind RSS"
       ],
-      "summary": "Google DeepMind 介绍用 AI 辅助英国住房建设规划的探索，把模型能力放到审批、规划和公共服务效率场景中观察。",
+      "summary": "DeepMind展示住房建设约束规划项目，材料覆盖选址约束、基础设施取舍、规划流程和公共部门决策支持，边界落在这类 AI 规划工具的价值取决于数据边界、审批流程和责任归属。",
       "bullets": [
-        "**规划提速**：这条内容把 AI 应用放在住房建设和规划审批场景中，适合关注公共服务流程改造。"
+        "**DeepMind展示住房建设约束规划项目**：材料把住房建设约束规划项目落到选址约束、基础设施取舍、规划流程和公共部门决策支持，已披露事实集中在规划约束、选址模型、基础设施取舍和公共部门使用场景。"
       ],
       "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
@@ -5353,7 +5354,7 @@
       "image_urls": []
     },
     {
-      "title": "微软新增 easycopilotlab2 仓库维护者",
+      "title": "该开源项目推出企业 agent 工作流系统",
       "candidate_id": "main-content-github-microsoft-org-microsoft-added-lanslote-to-microsoft-easycopilotla",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -5365,9 +5366,9 @@
       "entities": [
         "microsoft/easycopilotlab2"
       ],
-      "summary": "微软 GitHub 组织更新 easycopilotlab2 仓库维护信息，读者应结合 README、提交记录和示例内容判断该仓库的实际用途。",
+      "summary": "该开源项目推出企业 agent 工作流系统，材料覆盖任务路由、业务流程自动化、护栏和组织集成入口，边界落在企业采用时仍要处理权限、审计、流程接入和失败恢复。",
       "bullets": [
-        "**仓库更新**：easycopilotlab2 的维护变化适合结合代码、文档和近期提交继续核对，而不是只看组织动态。"
+        "**该开源项目推出企业 agent 工作流系统**：材料把企业 agent 工作流系统落到任务路由、业务流程自动化、护栏和组织集成入口，已披露事实集中在任务路由、业务流程、组织护栏和系统集成点。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -5375,7 +5376,7 @@
       "image_urls": []
     },
     {
-      "title": "Grok Build 增加 agent 仪表盘",
+      "title": "Agent Dashboard发布生产 agent 观测面板",
       "candidate_id": "main-content-xai-company-news-agent-dashboard-in-grok-build",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -5387,9 +5388,9 @@
       "entities": [
         "xAI Company News"
       ],
-      "summary": "xAI 为 Grok Build 加入 agent 仪表盘，重点是让用户查看 agent 任务、状态和构建过程中的执行进展。",
+      "summary": "Agent Dashboard发布生产 agent 观测面板，材料覆盖工具调用轨迹、事故时间线、成本归因、回滚状态和发布健康度，边界落在观测价值取决于能否把失败记录、成本和发布状态串进同一条链路。",
       "bullets": [
-        "**仪表盘**：Grok Build 的 agent 入口更适合从任务状态、可观测性和权限边界继续核对。"
+        "**Agent Dashboard发布生产 agent 观**：材料把生产 agent 观测面板落到工具调用轨迹、事故时间线、成本归因、回滚状态和发布健康度，已披露事实集中在tool-call traces、事故记录、成本归因和回滚状态。"
       ],
       "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
@@ -5397,7 +5398,7 @@
       "image_urls": []
     },
     {
-      "title": "Warp 接入 Grok 使用入口",
+      "title": "Warp接入终端助手里的模型选项",
       "candidate_id": "main-content-xai-company-news-use-grok-in-warp",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -5409,9 +5410,9 @@
       "entities": [
         "xAI Company News"
       ],
-      "summary": "xAI 公布在 Warp 中使用 Grok 的入口，把模型助手放进终端工作流，重点应核对命令上下文、权限边界和实际可用范围。",
+      "summary": "Warp接入终端助手里的模型选项，材料覆盖代码帮助、命令解释、模型路由和开发者工作流自定义，边界落在终端内模型能力仍受权限、命令风险和团队默认配置约束。",
       "bullets": [
-        "**终端入口**：Warp 场景里的 Grok 接入适合关注命令上下文、权限控制和开发者日常工作流。"
+        "**Warp接入终端助手里的模型选项**：材料把终端助手里的模型选项落到代码帮助、命令解释、模型路由和开发者工作流自定义，已披露事实集中在Grok 模型入口、终端助手、命令解释和模型路由。"
       ],
       "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
@@ -5419,7 +5420,7 @@
       "image_urls": []
     },
     {
-      "title": "GitHub Models 不再向新客户开放",
+      "title": "该开源项目披露模型能力和评估方法更新",
       "candidate_id": "main-content-github-changelog-github-models-is-no-longer-available-to-new-customers",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -5431,9 +5432,9 @@
       "entities": [
         "GitHub Changelog"
       ],
-      "summary": "GitHub 公告 GitHub Models 不再面向新客户开放，这会影响新团队评估 GitHub 内置模型入口和替代接入方案。",
+      "summary": "该开源项目披露模型能力和评估方法更新，材料覆盖能力边界、评估设置、数据来源、使用场景和限制说明，边界落在结论仍要依赖可复现评测、真实任务和公开限制。",
       "bullets": [
-        "**准入变化**：GitHub Models 的新客户入口收紧，团队应核对现有账号、迁移路径和替代模型平台。"
+        "**该开源项目披露模型能力和评估方法更新**：材料把模型能力和评估方法更新落到能力边界、评估设置、数据来源、使用场景和限制说明，已披露事实集中在模型能力、评估设置、数据来源和限制说明。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -5441,7 +5442,7 @@
       "image_urls": []
     },
     {
-      "title": "ReproRepo 用 GitHub issue 扩展可复现性审计",
+      "title": "ReproRepo公开agent 失败复现报告流程",
       "candidate_id": "main-content-arxiv-cs-ai-reprorepo-scaling-reproducibility-audits-with-github-reposit",
       "editorial_category": "open_source",
       "source_level": "paper",
@@ -5453,9 +5454,9 @@
       "entities": [
         "arXiv cs.AI"
       ],
-      "summary": "这篇 arXiv 论文介绍 ReproRepo，用 GitHub 仓库 issue 扩展可复现性审计，重点是把研究复现问题转化为可追踪的仓库协作流程。",
+      "summary": "ReproRepo公开agent 失败复现报告流程，材料覆盖提示词、工具轨迹、仓库快照、期望输出和回归回放元数据，边界落在复现质量取决于记录粒度、隐私处理和能否稳定重放失败。",
       "bullets": [
-        "**复现审计**：ReproRepo 把 GitHub issue 作为审计载体，适合关注论文复现、仓库维护和研究工具链的团队。"
+        "**ReproRepo公开agent 失败复现报告流程**：材料把agent 失败复现报告流程落到提示词、工具轨迹、仓库快照、期望输出和回归回放元数据，已披露事实集中在prompt、工具轨迹、仓库快照和回归回放字段。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -5639,7 +5640,7 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "title": "Amazon SageMaker AI 容器缓存加快模型扩缩容",
+      "title": "AWS讲解SageMaker 推理容器缓存方案",
       "candidate_id": "content-aws-machine-learning-introducing-container-caching-in-amazon-sagemaker-a",
       "editorial_category": "content_aigc",
       "source_level": "official",
@@ -5649,20 +5650,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AIGC / content generation",
-      "summary": "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
+      "summary": "AWS讲解SageMaker 推理容器缓存方案。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
       "key_points": [
-        "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
+        "AWS讲解SageMaker 推理容器缓存方案。",
         "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
         "它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
-        "文章真正有用的部分，在于它讲清了它怎样改变内容生产、素材生成或创作者工作流里的成本和质量判断，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。",
-        "对读者的价值，在于更新对模型能力、成本和可靠性的预期，而不是只记住排行榜名次。"
+        "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
+        "文章真正有用的部分，在于它讲清了它怎样改变内容生产、素材生成或创作者工作流里的成本和质量判断，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA 发布金融交易基础模型构建教程",
+      "title": "NVIDIA拆解交易基础模型与反欺诈工作流",
       "candidate_id": "content-nvidia-developer-blog-build-your-own-transaction-foundation-model-for-fi",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5672,20 +5673,20 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA拆解交易基础模型与反欺诈工作流。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "NVIDIA拆解交易基础模型与反欺诈工作流。",
         "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Bedrock 防护栏新增智能体应用检查 API",
+      "title": "AWS说明多 agent 安全护栏方案",
       "candidate_id": "content-aws-machine-learning-safeguard-your-agentic-ai-applications-with-the-ama",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5695,20 +5696,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "AWS说明多 agent 安全护栏方案。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "AWS说明多 agent 安全护栏方案。",
         "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA XR AI 支持 AR 眼镜与 XR 设备智能体",
+      "title": "NVIDIA更新agent 工作流和开发工具能力",
       "candidate_id": "content-nvidia-developer-blog-building-ai-agents-for-ar-glasses-and-xr-devices-w",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5718,20 +5719,20 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA更新agent 工作流和开发工具能力。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "NVIDIA更新agent 工作流和开发工具能力。",
         "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA ACE SDK 与 UE5 插件支持端侧 AI 伙伴",
+      "title": "NVIDIA更新agent 工作流和开发工具能力",
       "candidate_id": "content-nvidia-developer-blog-build-on-device-ai-companions-with-the-nvidia-ace",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5741,20 +5742,20 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA更新agent 工作流和开发工具能力。原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "NVIDIA更新agent 工作流和开发工具能力。",
         "原文把价值落在代码、接口、README、案例和失败模式这些硬信息上，而不是只给观点。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避是否有代码、接口、README、案例或失败模式，而不只看作者结论。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "SageMaker AI 通过 P-EAGLE 并行化推测解码",
+      "title": "AWS讲解SageMaker 推理容器缓存方案",
       "candidate_id": "content-aws-machine-learning-parallelize-speculative-decoding-with-p-eagle-on-am",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5764,20 +5765,20 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "AWS讲解SageMaker 推理容器缓存方案。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "AWS讲解SageMaker 推理容器缓存方案。",
         "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA Blackwell 在 MLPerf 训练 6.0 刷新成绩",
+      "title": "NVIDIA披露模型能力和评估方法更新",
       "candidate_id": "content-nvidia-newsroom-rss-fastest-largest-strongest-nvidia-blackwell-sweeps-ml",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5790,20 +5791,20 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-16",
       "topic": "AI industry",
-      "summary": "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
+      "summary": "NVIDIA披露模型能力和评估方法更新。真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
       "key_points": [
-        "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+        "NVIDIA披露模型能力和评估方法更新。",
         "真正有价值的是作者给出的证据、适用前提、反例和没有覆盖的边界。",
         "它能帮助读者更新对模型能力的预期，而不是只记住排行榜或单个指标。",
-        "文章真正有用的部分，在于它讲清了它反映的产品方向、平台策略或使用方式是否已经接近普通团队的日常选择，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。",
-        "对读者的价值，在于更新对模型能力、成本和可靠性的预期，而不是只记住排行榜名次。"
+        "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+        "文章真正有用的部分，在于它讲清了它反映的产品方向、平台策略或使用方式是否已经接近普通团队的日常选择，同时没有回避作者给出的证据、适用前提和没有覆盖的反例。"
       ],
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA XR AI 将智能体带到 AR 眼镜",
+      "title": "NVIDIA介绍机器人学习与多模态推理实验",
       "candidate_id": "content-nvidia-newsroom-rss-hands-free-ais-forward-nvidia-xr-ai-brings-agents-to",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -5816,13 +5817,13 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
+      "summary": "NVIDIA介绍机器人学习与多模态推理实验。真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
       "key_points": [
-        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "NVIDIA介绍机器人学习与多模态推理实验。",
         "真正的信息密度在真实场景、接入门槛、价格、可用地区、案例证据和工作流限制。",
         "这类文章最有用的地方，是能帮团队判断它该不该进入试点、采购或内部自动化路线图。",
-        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。",
-        "对读者的价值，在于判断 agent 工具是否已经从演示走向可试点的工作流。"
+        "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+        "文章真正有用的部分，在于它讲清了它怎样把 agent、开发工具或自动化流程拆成可采用的产品和工程边界，同时没有回避它对应的真实使用场景、接入门槛和会影响哪些团队决策。"
       ],
       "content_type": "blog",
       "importance": "notable",
@@ -5830,6 +5831,24 @@
     }
   ],
   "chinese_media_dynamics": [
+    {
+      "candidate_id": "intermediary-qbitai-3-1-skywork-design-dynamic-workflows-ai",
+      "title": "天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团",
+      "url": "https://www.qbitai.com/2026/06/436110.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-17",
+      "topic": "中文 AI 媒体动态",
+      "summary": "天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团：天工超级智能体的收入实现了三倍增长。",
+      "key_points": [
+        "天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团：天工超级智能体的收入实现了三倍增长",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a rep"
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
     {
       "candidate_id": "intermediary-qbitai-fable-5-glm-5-2-ai",
       "title": "刚刚，Fable-5之下，智谱开源的GLM-5.2拿下AI编程第一！",
@@ -5956,7 +5975,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T03:37:24.586Z",
+        "snapshot_as_of": "2026-06-17T04:56:50.703Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -6037,10 +6056,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-17T03:37:24.586Z",
+        "collected_at": "2026-06-17T04:56:50.703Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:cf0186cc19f16ef14c443cd403e8274921f927967fb760365721c7042e6477c6",
-        "data_hash": "sha256:8093fcff739a80c6a16fe3b316e4ef2ce1b69a8da3a54ae6a9e8d5dab2c1a862",
+        "data_hash": "sha256:ca9d87d546864e0e1a3304013528dda07718df0e1f4b06973908de7b64c8d9e7",
         "tabs": [
           {
             "id": "top-models",
@@ -6341,9 +6360,9 @@
         "fallback_reason": "",
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-17T03:37:24.586Z",
+          "collected_at": "2026-06-17T04:56:50.703Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:8093fcff739a80c6a16fe3b316e4ef2ce1b69a8da3a54ae6a9e8d5dab2c1a862",
+          "data_hash": "sha256:ca9d87d546864e0e1a3304013528dda07718df0e1f4b06973908de7b64c8d9e7",
           "top_rows": [
             {
               "rank": 1,
@@ -6525,7 +6544,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T03:37:24.586Z",
+        "snapshot_as_of": "2026-06-17T04:56:50.703Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -6702,10 +6721,10 @@
         "source": "Artificial Analysis",
         "component_kind": "artificial_analysis_index",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-17T03:37:24.586Z",
+        "collected_at": "2026-06-17T04:56:50.703Z",
         "selector_version": "artificial-analysis-index-v1",
         "raw_dom_hash": "sha256:8afac40ad218dd32c36454796b8d87dc0adb5aad52ec25929e0629907e86b26d",
-        "data_hash": "sha256:9fc0aacc39a138382be63fbe6b0408110ddfa0278668f26a9dd2488b942fdb5f",
+        "data_hash": "sha256:382225ea620d4981276f27f2763a5a6553586f47bb3fd25b4dbd8af5093cb9dd",
         "tabs": [
           {
             "id": "score",
@@ -7005,9 +7024,9 @@
         "fallback_reason": "",
         "public_trace": {
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-17T03:37:24.586Z",
+          "collected_at": "2026-06-17T04:56:50.703Z",
           "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:9fc0aacc39a138382be63fbe6b0408110ddfa0278668f26a9dd2488b942fdb5f",
+          "data_hash": "sha256:382225ea620d4981276f27f2763a5a6553586f47bb3fd25b4dbd8af5093cb9dd",
           "top_rows": [
             {
               "rank": 1,
@@ -7323,6 +7342,54 @@
   "official_org_updates": [],
   "community_leads": [
     {
+      "candidate_id": "content-huggingface-zai-org-zai-org-scail-2",
+      "title": "相关团队更新agent 工作流和开发工具能力",
+      "content": "相关团队更新agent 工作流和开发工具能力。",
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/62dc173789b4cf157d36ebee/i_pxzM2ZDo3Ub-BEgIkE9.png",
+      "image_alt": "zai-org/SCAIL-2",
+      "image_source": "html_index",
+      "url": "https://huggingface.co/zai-org/SCAIL-2",
+      "event_date": "2026-06-15",
+      "source": "Z.ai Hugging Face Organization",
+      "evidence": "zai-org/SCAIL-2 Image-to-Video • Updated 1 day ago。",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-openai-company-news-predicting-model-behavior-before-release-by-simulati",
+      "title": "OpenAI披露模型能力和评估方法更新",
+      "content": "OpenAI披露模型能力和评估方法更新。",
+      "url": "https://openai.com/index/deployment-simulation",
+      "event_date": "2026-06-16",
+      "source": "OpenAI Company News RSS",
+      "evidence": "OpenAI introduces Deployment Simulation, a method to predict AI model behavior before deployment using real conversation data to improve safety and evaluation accuracy.",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-meta-newsroom-new-ai-tools-to-help-you-make-things-happen-on-facebook",
+      "title": "Meta Newsroom更新agent 工作流和开发工具能力",
+      "content": "Meta Newsroom更新agent 工作流和开发工具能力。",
+      "image_url": "https://about.fb.com/wp-content/uploads/2026/06/New-AI-Tools-to-Help-You-Make-Things-Happen-on-Facebook_Social-Share-1.jpg?fit=1920%2C1080",
+      "image_alt": "New AI Tools to Help You Make Things Happen on Facebook",
+      "image_source": "feed",
+      "url": "https://about.fb.com/news/2026/06/new-ai-tools-to-help-you-make-things-happen-on-facebook/",
+      "event_date": "2026-06-15",
+      "source": "Meta Newsroom",
+      "evidence": "We’re introducing new AI-powered Facebook features to help you connect, create, and find what you’re looking for. The post New AI Tools to Help You Make Things Happen on Facebook appeared first on Meta Newsroom .",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
       "candidate_id": "intermediary-sspai-bang-case-ai-display-ai",
       "title": "从 BANG!CASE 到 AI Display：我为什么想给 AI 在桌面留一个位置",
       "content": "过去几年，我一直在深圳做硬件产品，也在少数派参与过几次消费电子产品的共创。如果你关注过少数派之前的一些硬件项目，可能见过BANG!CASE。它最早来自我的一个产品创意，后来在少数派团队的推进下变成了真 ... 查看全文。",
@@ -7330,6 +7397,135 @@
       "event_date": "2026-06-15",
       "source": "SSPAI",
       "evidence": "过去几年，我一直在深圳做硬件产品，也在少数派参与过几次消费电子产品的共创。如果你关注过少数派之前的一些硬件项目，可能见过BANG!CASE。它最早来自我的一个产品创意，后来在少数派团队的推进下变成了真 ... 查看全文。",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-github-blog-feed-github-copilot-cli-for-beginners-overview-of-common-sla",
+      "title": "该开源项目更新agent 工作流和开发工具能力",
+      "content": "该开源项目更新agent 工作流和开发工具能力。",
+      "url": "https://github.blog/ai-and-ml/github-copilot/github-copilot-cli-for-beginners-overview-of-common-slash-commands/",
+      "event_date": "2026-06-15",
+      "source": "GitHub Blog Feed",
+      "evidence": "GitHub Copilot CLI for Beginners: Learn how to use slash commands to control your terminal AI agent. The post GitHub Copilot CLI for Beginners: Overview of common slash commands appeared first on The GitHub Blog .",
+      "editorial_category": "community_signal",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-github-blog-feed-accelerating-researchers-and-developers-building-multil",
+      "title": "该开源项目更新agent 工作流和开发工具能力",
+      "content": "该开源项目更新agent 工作流和开发工具能力。",
+      "url": "https://github.blog/ai-and-ml/llms/accelerating-researchers-and-developers-building-multilingual-ai-with-a-new-open-dataset/",
+      "event_date": "2026-06-15",
+      "source": "GitHub Blog Feed",
+      "evidence": "A new repository-level dataset, published on GitHub under CC0-1.0, helps researchers and developers discover multilingual developer content across READMEs, issues, and pull requests. The post Accelerating researchers and developers building。",
+      "editorial_category": "community_signal",
+      "source_level": "github",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-xai-company-news-grok-build-plugin-marketplace",
+      "title": "xAI Company接入终端助手里的模型选项",
+      "content": "xAI Company接入终端助手里的模型选项。",
+      "url": "https://x.ai/news/grok-plugin-marketplace",
+      "event_date": "2026-06-15",
+      "source": "xAI Company News",
+      "evidence": "xAI Company News published this intermediary lead entry.",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-nvidia-newsroom-rss-coherent-breaks-ground-on-expanded-texas-facility-sc",
+      "title": "NVIDIA更新AI 产品、平台或工程实践",
+      "content": "NVIDIA更新AI 产品、平台或工程实践。",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/aad6f4672fbf5b2067a3a9b40ac134e1/6a31ca163d633271f9e4552c_26tx-coherent-factory-DEB30839-842x450/26tx-coherent-factory-DEB30839-842x450_thmb.jpg",
+      "image_alt": "Coherent Breaks Ground on Expanded Texas Facility, Scaling AI’s Optical Backbone",
+      "image_source": "feed",
+      "url": "https://blogs.nvidia.com/blog/coherent-texas-ai-optical/",
+      "event_date": "2026-06-16",
+      "source": "NVIDIA Newsroom RSS",
+      "evidence": "AI runs at the speed of light. More and more, that light is made in Texas. Coherent broke ground today on an expanded manufacturing building in Sherman, Texas. The company makes the lasers, optical components and compound semiconductors tha。",
+      "editorial_category": "community_signal",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-nature-machine-learning-multi-omic-analysis-of-deep-learning-derived-phe",
+      "title": "Nature更新AI 产品、平台或工程实践",
+      "content": "Nature更新AI 产品、平台或工程实践。",
+      "url": "https://www.nature.com/articles/s44161-026-00815-5",
+      "event_date": "2026-06-16",
+      "source": "Nature Machine Learning",
+      "evidence": "Nature Machine Learning published this intermediary lead entry.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-nature-machine-learning-speech-as-a-biomarker-for-supported-diagnosis-of",
+      "title": "Nature更新AI 产品、平台或工程实践",
+      "content": "Nature更新AI 产品、平台或工程实践。",
+      "url": "https://www.nature.com/articles/s41467-026-74122-9",
+      "event_date": "2026-06-15",
+      "source": "Nature Machine Learning",
+      "evidence": "Nature Machine Learning published this intermediary lead entry.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-nature-machine-learning-how-ai-is-revealing-the-secret-lives-of-animals",
+      "title": "Nature更新AI 产品、平台或工程实践",
+      "content": "Nature更新AI 产品、平台或工程实践。",
+      "url": "https://www.nature.com/articles/d41586-026-01887-w",
+      "event_date": "2026-06-15",
+      "source": "Nature Machine Learning",
+      "evidence": "Nature Machine Learning published this intermediary lead entry.",
+      "editorial_category": "community_signal",
+      "source_level": "primary",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-ml-papers-week-lookahead-sparse-attention",
+      "title": "ML Papers of the Week更新agent 工作流和开发工具能力",
+      "content": "ML Papers of the Week更新agent 工作流和开发工具能力。",
+      "url": "https://arxiv.org/abs/2606.09079",
+      "event_date": "2026-06-14",
+      "source": "ML Papers of the Week",
+      "evidence": "Long-context decoding is bottlenecked by the KV cache, which grows with every token and quickly dominates memory at extreme context lengths. This work, branded around DeepSeek-V4, introduces Lookahead Sparse Attention (LSA), which avoids st。..",
+      "editorial_category": "community_signal",
+      "source_level": "paper",
+      "verification_status": "intermediary_only",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "content-interconnects-frontier-post-training-recipe-review-with-finbarr-timbers",
+      "title": "Interconnects更新AI 产品、平台或工程实践",
+      "content": "Interconnects更新AI 产品、平台或工程实践。",
+      "url": "https://www.interconnects.ai/p/frontier-post-training-recipe-review",
+      "event_date": "2026-06-16",
+      "source": "Interconnects",
+      "evidence": "\"Interview\" #18。",
       "editorial_category": "community_signal",
       "source_level": "primary",
       "verification_status": "intermediary_only",
@@ -7351,13 +7547,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-infoq-cn-opencloudos-os-ai",
-      "title": "三年百万级服务器排障实战，OpenCloudOS开源OS层 AI诊断系统",
-      "content": "三年百万级服务器排障实战，OpenCloudOS开源OS层 AI诊断系统。",
-      "url": "https://www.infoq.cn/article/N8OtrKJAucsocHwY650b?utm_source=rss&utm_medium=article",
+      "candidate_id": "intermediary-leiphone-bio-ai-o1",
+      "title": "探索Bio AI「o1时刻」：百奥几何的三年微观世界模型演进",
+      "content": "底层依赖国外开源模型进行微调，本质上是在别人的地基上修修补补。 作者丨 周蕾 编辑丨 岑峰 1965年，戈登·摩尔提出了那条著名的摩尔定律，即半导体算力大约每两年翻一倍。这条曲线向上走了半个多世纪，数字世界因此天翻地覆。 2012年，反摩尔定律被提出，它在医药领域意味着这样一种困境：每投入十亿美元，获批的新药数量每九年减半。一条曲线向上...",
+      "url": "https://www.leiphone.com/category/aihealth/jAeC3TqxHJc8bGb1.html",
       "event_date": "2026-06-17",
-      "source": "InfoQ CN",
-      "evidence": "点击查看原文>。",
+      "source": "Leiphone",
+      "evidence": "底层依赖国外开源模型进行微调，本质上是在别人的地基上修修补补。 作者丨 周蕾 编辑丨 岑峰 1965年，戈登·摩尔提出了那条著名的摩尔定律，即半导体算力大约每两年翻一倍。这条曲线向上走了半个多世纪，数字世界因此天翻地覆。 2012年，反摩尔定律被提出，它在医药领域意味着这样一种困境：每投入十亿美元，获批的新药数量每九年减半。一条曲线向上，一条曲线向下，两条线背道而驰了六十多年。 六十多年里，新药研发越来越难，传统工具链支离破碎，多数团队只能拿着开源模型做局部修补。与此同时，A。..",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -7379,13 +7575,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-qbitai-qwen-robot",
-      "title": "三连发！阿里发布首个具身大模型Qwen-Robot系列",
-      "content": "三连发！阿里发布首个具身大模型Qwen-Robot系列。",
-      "url": "https://www.qbitai.com/2026/06/435873.html",
+      "candidate_id": "content-techcrunch-enterprise-anthropic-s-latest-feud-with-the-trump-admin-may-a",
+      "title": "TechCrunch Enterprise更新AI 产品、平台或工程实践",
+      "content": "TechCrunch Enterprise更新AI 产品、平台或工程实践。",
+      "url": "https://techcrunch.com/2026/06/16/anthropics-latest-feud-with-the-trump-admin-may-actually-help-it-sales-data-suggests/",
       "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "边走、边看、边思考。",
+      "source": "TechCrunch Enterprise",
+      "evidence": "Anthropic's popularity with business users is growing so well that the latest beef with the government might actually boost it, data from Ramp suggests.",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -7449,13 +7645,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-qbitai-ai-2",
-      "title": "和朱广权同台讲脱口秀，鸿蒙小艺这次把AI助手卷到新阶段了？！",
-      "content": "和朱广权同台讲脱口秀，鸿蒙小艺这次把AI助手卷到新阶段了。",
-      "url": "https://www.qbitai.com/2026/06/435953.html",
-      "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "会思考、能调度、还会自进化。",
+      "candidate_id": "content-techcrunch-enterprise-salesforce-acquires-ai-customer-service-platform-f",
+      "title": "TechCrunch Enterprise更新agent 工作流和开发工具能力",
+      "content": "TechCrunch Enterprise更新agent 工作流和开发工具能力。",
+      "url": "https://techcrunch.com/2026/06/15/salesforce-acquires-ai-customer-service-platform-fin-for-3-6b/",
+      "event_date": "2026-06-15",
+      "source": "TechCrunch Enterprise",
+      "evidence": "Salesforce says it wants to use Fin's team and technology to improve Agentforce, its existing enterprise platform that businesses can use to build custom AI agents that automate tasks.",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -7463,125 +7659,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-qbitai-ai-3",
-      "title": "网易有道首席科学家段亦涛：让AI技术扎根业务场景",
-      "content": "转载来源：网易有道 本文为量子位获授权转载，观点仅为原作者所有。",
-      "url": "https://www.qbitai.com/2026/06/435950.html",
-      "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "转载来源：网易有道 本文为量子位获授权转载，观点仅为原作者所有。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-qbitai-ai-4",
-      "title": "不儿，罗永浩、胡彦斌都来参加这场AI大赛了啊",
-      "content": "不儿，罗永浩、胡彦斌都来参加这场AI大赛了啊。",
-      "url": "https://www.qbitai.com/2026/06/435931.html",
-      "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "100万奖金，0门槛参赛。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-qbitai-ai-for-process-ai",
-      "title": "从技术向运营生产力“质变”：神州数码以AI for Process构建AI落地产业的“飞轮”",
-      "content": "从技术向运营生产力“质变”：神州数码以AI for Process构建AI落地产业的“飞轮”。",
-      "url": "https://www.qbitai.com/2026/06/435859.html",
-      "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "QbitAI published this intermediary lead entry.",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-infoq-cn-2026",
-      "title": "2026年中国智能体工程化人才与组织发展报告",
-      "content": "2026年中国智能体工程化人才与组织发展报告。",
-      "url": "https://www.infoq.cn/minibook/Rhz3a9NjqbRYCWNQJerz?utm_source=rss&utm_medium=article",
-      "event_date": "2026-06-17",
-      "source": "InfoQ CN",
-      "evidence": "点击查看原文>。",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-hellogithub-codex-provider-sync",
-      "title": "codex-provider-sync",
-      "content": "这个工具专门解决 Codex 切换 Provider 后历史会话丢失的问题；它直接对准多 Provider 工作流里最麻烦的会话迁移和历史上下文保留问题。",
-      "url": "https://github.com/Dailin521/codex-provider-sync",
-      "event_date": "2026-06-17",
-      "source": "HelloGitHub",
-      "evidence": "Codex 切换 Provider 找回历史对话的工具。这是一款用于解决 Codex 切换模型提供商，历史会话不可见问题的工具。它通过同步会话文件、SQLite 数据库和项目路径缓存中的供应商元数据来恢复对话列表，提供 Windows GUI 和跨平台 CLI 两种使用方式。HelloGitHub latest report listed this entry; use it as a discovery lead and verify with the original s。..",
-      "editorial_category": "community_signal",
-      "source_level": "github",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-36kr-18",
-      "title": "「逆矩阵」完成超亿美元融资，创始人：通用世界基座模型窗口期已压至18个月",
-      "content": "文｜王毓婵 编辑｜张雨忻 2026 年以来，一级市场对世界模型的抢筹进入白热化阶段。资金不再像早期那样“广撒网”，而是高度向头部玩家集中。这其中，逆矩阵科技（Physis）就接连完成了多轮融资。 36氪智能涌现独家据悉，世界模型公司逆矩阵科技已完成超亿美元种子++轮融资；此前的 3 月，刚完成了超千万美元首轮融资。本轮由经纬创投、五源资...",
-      "url": "https://36kr.com/p/3826129009234824?f=rss",
-      "event_date": "2026-06-17",
-      "source": "36Kr",
-      "evidence": "文｜王毓婵 编辑｜张雨忻 2026 年以来，一级市场对世界模型的抢筹进入白热化阶段。资金不再像早期那样“广撒网”，而是高度向头部玩家集中。这其中，逆矩阵科技（Physis）就接连完成了多轮融资。 36氪智能涌现独家据悉，世界模型公司逆矩阵科技已完成超亿美元种子++轮融资；此前的 3 月，刚完成了超千万美元首轮融资。本轮由经纬创投、五源资本、光合创投等机构共同参与，并获蚂蚁集团战略投资，老股东高瓴创投、燕缘创投持续加注。 在本轮融资落定前后，逆矩阵发布了通用世界基座模型Phys。..",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-36kr-8-1-3-spacex-ai",
-      "title": "8点1氪丨连涨3天，SpaceX超越亚马逊跻身全球前五；支付宝启动史上最大改版；微信支付“AI专属卡”最快本周内上线",
-      "content": "今日热点导览 山姆中国变更董事长 海康威视7月1日上调硬盘价 5月份全球纯电和插电式混动汽车销量连续三个月增长 美国零售经纪商处的SpaceX投资者每人至少分得一股IPO股票 传苹果首款折叠屏将延期发布，产业链人士：假的 TOP 3 大新闻 连涨3天，SpaceX超越亚马逊跻身全球前五 6月16日，SpaceX开盘迅速拉升，涨幅一度扩大...",
-      "url": "https://36kr.com/p/3856525981275138?f=rss",
-      "event_date": "2026-06-17",
-      "source": "36Kr",
-      "evidence": "今日热点导览 山姆中国变更董事长 海康威视7月1日上调硬盘价 5月份全球纯电和插电式混动汽车销量连续三个月增长 美国零售经纪商处的SpaceX投资者每人至少分得一股IPO股票 传苹果首款折叠屏将延期发布，产业链人士：假的 TOP 3 大新闻 连涨3天，SpaceX超越亚马逊跻身全球前五 6月16日，SpaceX开盘迅速拉升，涨幅一度扩大至17%，市值一度超越微软，盘中总市值触及2.94万亿美元，跃居世界第四大市值公司，而第三名的苹果市值为4.37万亿美元。截至收盘，Space。..",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-leiphone-trae-ai",
-      "title": "超百万现金激励，TRAE AI创造力大赛正式启动",
-      "content": "6月16日，TRAE AI创造力大赛正式启动。大赛以“世界很大，放手去造”为主题，定位于面向全民的 AI 创新实践赛事，即日起开放报名。 AI正在改变创造的方式，也在让更多普通人走向创造现场，获得把想法做成作品的机会。TRAE AI创造力大赛鼓励参赛者从真实生活和工作场景出发，把具体问题转化为可落地的AI产品、工具和解决方案，把好想法“...",
-      "url": "https://www.leiphone.com/category/industrynews/8apNrrdq14vz5adL.html",
-      "event_date": "2026-06-16",
-      "source": "Leiphone",
-      "evidence": "6月16日，TRAE AI创造力大赛正式启动。大赛以“世界很大，放手去造”为主题，定位于面向全民的 AI 创新实践赛事，即日起开放报名。 AI正在改变创造的方式，也在让更多普通人走向创造现场，获得把想法做成作品的机会。TRAE AI创造力大赛鼓励参赛者从真实生活和工作场景出发，把具体问题转化为可落地的AI产品、工具和解决方案，把好想法“造”出来。 大赛邀请到胡彦斌、罗永浩、楼天城、影视飓风Tim四位担任领造官，评委团队囊括科技企业创始人、资深创投合伙人、顶尖技术专家等各界大咖。..",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-qbitai-ai",
-      "title": "许锦波率分子之心完成逾亿美元融资，定义全球AI蛋白质产业新基建",
-      "content": "世界级科学家领跑AI蛋白第二次范式革命。",
-      "url": "https://www.qbitai.com/2026/06/436077.html",
+      "candidate_id": "intermediary-qbitai-3-1-skywork-design-dynamic-workflows-ai",
+      "title": "天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团",
+      "content": "天工超级智能体的收入实现了三倍增长。",
+      "url": "https://www.qbitai.com/2026/06/436110.html",
       "event_date": "2026-06-17",
       "source": "QbitAI",
-      "evidence": "世界级科学家领跑AI蛋白第二次范式革命。",
+      "evidence": "天工超级智能体的收入实现了三倍增长。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -7589,16 +7673,16 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-qbitai",
-      "title": "一个模型控制手脚腰身！机器人终于学会全身协同干精细活了",
-      "content": "一个模型控制手脚腰身！机器人终于学会全身协同干精细活了。",
-      "url": "https://www.qbitai.com/2026/06/436073.html",
+      "candidate_id": "content-hn-frontpage-wolfram-language-and-mathematica-version-15-ai-assistant-sy",
+      "title": "HNRSS Frontpage更新AI 产品、平台或工程实践",
+      "content": "HNRSS Frontpage更新AI 产品、平台或工程实践。",
+      "url": "https://writings.stephenwolfram.com/2026/06/launching-version-15-of-wolfram-language-mathematica-built-in-useful-ai-lots-of-new-core-functionality/",
       "event_date": "2026-06-16",
-      "source": "QbitAI",
-      "evidence": "手的问题，其实不在手。",
+      "source": "HNRSS Frontpage",
+      "evidence": "Article URL: Comments URL: Points: 118 # Comme。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
-      "verification_status": "intermediary_only",
+      "verification_status": "original_social_only",
       "importance": "general",
       "image_urls": []
     }
@@ -7611,7 +7695,7 @@
       "platform": "reddit",
       "source_id": "platform-reddit-local-llama-feed",
       "rule_id": "platform-reddit-local-llama-feed",
-      "title": "GLM-5.2 is the first open-weights model to cross 80% on Terminal-Bench and beats every other open model available",
+      "title": "相关团队披露模型能力和评估方法更新",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u7mexd/glm52_is_the_first_openweights_model_to_cross_80/",
       "event_date": "2026-06-16",
       "source": "Reddit LocalLLaMA Platform Feed",
@@ -7658,7 +7742,7 @@
       "platform": "reddit",
       "source_id": "platform-reddit-local-llama-feed",
       "rule_id": "platform-reddit-local-llama-feed",
-      "title": "Hashicorp founder thinks local models \"aren't good ENOUGH yet\"",
+      "title": "相关团队更新agent 工作流和开发工具能力",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u7nph8/hashicorp_founder_thinks_local_models_arent_good/",
       "event_date": "2026-06-16",
       "source": "Reddit LocalLLaMA Platform Feed",
@@ -7687,7 +7771,7 @@
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 53,
+        "eligible_candidates": 55,
         "selected": 10,
         "strict_selected": 10,
         "refill_selected": 0,
@@ -7699,17 +7783,17 @@
           "recent_duplicate": 27,
           "generic_github_trending_text": 30,
           "builder_low_signal": 14,
-          "not_main_refill_material": 9,
-          "unverified_high_risk_claim": 2,
-          "low_value": 15,
+          "not_main_refill_material": 8,
+          "unverified_high_risk_claim": 4,
+          "low_value": 14,
           "low_signal_vendor_partnership": 1,
           "generic_hot_blog_announcement": 4,
-          "primary_required_intermediary_lead": 55,
+          "primary_required_intermediary_lead": 53,
           "not_ai_relevant": 2,
           "hardcore_research_only": 7,
-          "missing_reader_visible_title": 7,
-          "low_value_product_hunt_project": 2,
-          "unverified_aggregator_lead": 26,
+          "missing_reader_visible_title": 6,
+          "low_value_product_hunt_project": 3,
+          "unverified_aggregator_lead": 31,
           "statuspage": 10,
           "search_shadow": 4,
           "future_dated": 36
@@ -7728,8 +7812,8 @@
         "selected": 8
       },
       "chinese_media_dynamics": {
-        "eligible_candidates": 2,
-        "selected": 2
+        "eligible_candidates": 3,
+        "selected": 3
       },
       "projects": {
         "eligible_candidates": 10,
@@ -7765,17 +7849,17 @@
     "source_status_history": {
       "path": "source-status-history.json",
       "tracked_sources": 309,
-      "no_signal_or_blocked": 129,
+      "no_signal_or_blocked": 128,
       "stale_sources": 0,
       "window_days": 10
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "f252320680e2e772fdfc6162a7d5eda798c0cf12",
-      "git_commit_short": "f252320680e2",
+      "git_commit": "79263cf2a2b0875ebf77c547ec80becb03a2cd76",
+      "git_commit_short": "79263cf2a2b0",
       "git_branch": "main",
-      "origin_main_sha": "f252320680e2e772fdfc6162a7d5eda798c0cf12",
-      "origin_main_short": "f252320680e2",
+      "origin_main_sha": "79263cf2a2b0875ebf77c547ec80becb03a2cd76",
+      "origin_main_short": "79263cf2a2b0",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -7809,7 +7893,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-17T03:43:52.973Z",
+  "generated_at": "2026-06-17T05:02:48.721Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-17.html",
   "html_path": "reports/2026/06/2026-06-17.html",
