@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-17.project_iteration.daily-content-contract-pr1",
+  "run_type": "project_iteration",
+  "date": "2026-06-17",
+  "title": "Daily content contract hard gate PR1",
+  "status": "completed",
+  "summary": "Project iteration record for turning the 2026-06-17 weak-content feedback into executable daily content contracts before changing generators. This PR records the contract, adds deterministic red/green coverage, wires a no-network smoke gate into validation, and keeps PR2-PR5 responsible for generator fixes.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"daily content contract\" tests/unit.test.js",
+      "node scripts/check-daily-content-contract.mjs --self-test --json",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run retrospectives:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Repair output cannot be the definition of a successful daily report.",
+      "evidence": "The user explicitly clarified that repair is only a fallback; the generation strategy and source-specific selection rules must produce useful public content before repair.",
+      "scope": "daily_generation_quality",
+      "persistence": "implemented",
+      "recommended_action": "Keep content quality requirements in machine-checkable contracts and make each generator PR prove it satisfies its section before publish."
+    },
+    {
+      "lesson": "A contract gate must separate blocking content failures from degraded source availability.",
+      "evidence": "REQ-001, REQ-006, REQ-007, and REQ-008 are blocking; REQ-010 can degrade for missing official snapshots, but fake OpenRouter or Artificial Analysis components are blocking.",
+      "scope": "publish_quality",
+      "persistence": "implemented",
+      "recommended_action": "Use the content-contract checker after build and before dry-run so publish cannot mistake fake content for degraded source availability."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The project lacked one executable place to replay thin main bullets, weak GitHub Trending summaries, filler hot blogs, empty Builder/X selections, and fake tracking components.",
+      "evidence": "The new checker and tests replay the 2026-06-17 weak shape and distinguish blocking issues from degraded tracking-source absence.",
+      "module": "scripts/check-daily-content-contract.mjs",
+      "suggestion": "Evaluate final report JSON and optional HTML for daily content contracts before publish, and expose blocking/degraded summaries in machine-readable output.",
+      "expected_benefit": "Future generator changes can fail early with precise section codes instead of relying on chat memory or post-hoc repair.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented as a committed script, npm validation smoke gate, harness rule, feedback ledger item, and unit tests.",
+      "ledger_links": [
+        "feedback/p1-daily-content-contract-hard-gate"
+      ],
+      "validation_evidence": [
+        "daily content contract rejects 2026-06-17 weak generated shape",
+        "daily content contract accepts aligned generated shape",
+        "harness requires content contract validation for daily content contract tasks"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-github-readme-enrichment",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement PR2-PR5 so report:draft, discovery, rendering, and publish runner satisfy the new content contract on real generated artifacts.",
+      "owner": "project"
+    }
+  ],
+  "slug": "daily-content-contract-pr1"
+}

@@ -63,7 +63,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - 新日报目标为 55-75 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
 - `main_items` 目标为 5-30 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
 - 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
-- `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。
+- `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。对于 follow-builders X feed，抓到 feed 后先过滤低信号、非 AI、非科技内容；过滤后合格候选不少于 3 条时，`builder_observations` 不得为 0。允许把英文原帖做确定性中文摘要，但必须保留原帖 URL 和足够原文证据。
 - 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
 
@@ -110,12 +110,12 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `event_date`
 - `topic`
 - `summary`
-- `key_points`：3-5 条中文要点，每条写一个可直接复述的信息点，覆盖核心问题、方法/论证、关键结论、适用场景或局限。
+- `key_points`：兼容旧数据的内部字段，可选；公开页面不得渲染该字段。新草稿优先把文章概括写进 100-200 个中文字符的 `summary`。
 - 可选 `content_type`：`blog`、`interview`、`podcast`、`engineering_note`
 
-`hot_blogs[*].summary` 必须是中文内容摘要，`key_points` 必须给出 3-5 个分点式要点，合计要比一句话摘要更详实，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要另写 `why_it_matters`。历史数据可保留旧字段，但新草稿必须填写 `key_points`。
+`hot_blogs[*].summary` 必须是 100-200 个中文字符的文章概括，覆盖核心问题、方法或论证、关键结论、适用场景或局限；不要另写 `why_it_matters`。历史数据可保留旧 `key_points` 字段，但公开 HTML 必须忽略它，新草稿也不得依赖 `key_points` 作为主要信息载体。
 
-`github_trending` 用于独立展示 GitHub Trending Top 10 榜单，并承载经过核验的项目领域、用途和信号补充信息。默认展示 Top 10 仓库；没有可核验趋势时使用空数组。每项包含：
+`github_trending` 用于独立展示 GitHub Trending 榜单，并承载经过核验的项目领域、用途和信号补充信息。默认范围是 weekly all-language Top10 + Python/TypeScript/Rust/Go/Java weekly Top10，合并去重后最多 Top20；没有可核验趋势时使用空数组。每项包含：
 
 - `candidate_id`
 - `repo`
@@ -133,7 +133,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `evidence`
 
 `github_trending` 只描述趋势和用途；只有经过额外 release、README、近期 commit 或工程影响核验的项目，才另行进入 `projects` 作为 highlight 元数据，但公开页面仍合并在 GitHub Trending 中展示。
-`github_trending[*].description` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在 80-140 个中文字符以内，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计、泛化热度判断或“本条保留标签”之类的实现说明。页面展示会隐藏来源、语言等审计字段，只保留榜位、变化、star 变化 tag 和中文简介。
+`github_trending[*].description` / `readme_summary` 必须是中文改写，避免直接复制 GitHub 英文描述；长度控制在约 80-160 个中文字符，优先说明“是什么、解决什么问题、适合观察什么”，不要写来源审计、泛化热度判断或“本条保留标签”之类的实现说明。README 拉取失败时仍保留榜位、star、trend、语言、窗口等元数据，显式标注 `README拉取失败`，不要编造 description。
 
 `hero_highlights` 是可选亮点数据，不再是“今日必看”或首屏必需结构。可以为空；如果生成，数量为 1-3 条，并且必须来自已有公开条目的 `candidate_id` 或 URL，不能从 GitHub 排名格、信源审计或低价值 filler 中补数。
 
@@ -175,12 +175,21 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 `main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
-`projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case。公开 HTML 只会把匹配 GitHub Trending Top 10 的项目作为对应条目的行内领域、用途和信号说明，不生成单独项目卡片区、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表；未匹配 Top 10 的 `projects` 只保留在结构化 JSON 中。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。
+`projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case。公开 HTML 只会把匹配 GitHub Trending Top20 的项目作为对应条目的行内领域、用途和信号说明，不生成单独项目卡片区、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表；未匹配 Top20 的 `projects` 只保留在结构化 JSON 中。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。
 
 `builder_observations` 必须填写 `author`、`content`、`url`，新草稿还必须填写 `original_text` 和 `translation`。`original_text` 放原帖或原始连续摘录的完整英文/原文；`translation` 是完整、精确、忠于原意的中文翻译，不能压缩为观点摘要，不能添加原文没有的判断；`content` 为兼容字段，必须与 `translation` 保持同义，推荐直接填同一段完整翻译。可额外填写 `handle`、`role`、`event_date`、`source`、`evidence`、`avatar_url`、`avatar_local_path` 或 `avatar_data_uri`。如果有 X handle，应填写 `handle`；如果能取得头像 URL，填写 `avatar_url`，构建器会 best-effort 缓存到 `docs/assets/avatars/**` 并写入公开数据。没有原始 URL、没有原文或无法完整翻译的 builder 内容不得写入。
 
-当 `source_audit.builder_sources.candidates_found >= 5` 或候选池中存在至少 5 条合格 `builder_observation` 候选时，`builder_observations` 目标为 5-20 条；少于 5 条必须把过滤口径写入 `source_audit.builder_sources.notes` 或 `self_check.notes`，并在内部 `quality_status.degraded_sections` 记录 Builder 覆盖不足；公开页只允许显示短缺口说明。
+当 `source_audit.builder_sources.candidates_found >= 5` 或候选池中存在至少 5 条合格 `builder_observation` 候选时，`builder_observations` 目标为 5-20 条；少于 5 条必须把过滤口径写入 `source_audit.builder_sources.notes` 或 `self_check.notes`，并在内部 `quality_status.degraded_sections` 记录 Builder 覆盖不足；公开页只允许显示短缺口说明。对于 follow-builders X feed，`self_check.selection_snapshot.builder_observations.eligible_after_filter >= 3` 时，`selected` 不得为 0。
 
 Product Hunt 项目只有在官网、GitHub、README、文档或原始发布页完成交叉确认后才能写入 `projects`；否则写入 `community_leads` 或丢弃。融资类产品即使来自 Crunchbase、TechCrunch、36Kr 等来源，也必须满足 `primary_confirmed` 或 `multi_source_confirmed` 后才进入事实栏目。
 
 AI 开发工具计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 和 credit 变化必须作为常规候选被记录；影响开发者工作流、团队预算、上线容量或采购口径时可写入 `main_items`，否则写入 `community_leads`。
+
+## 2026-06-17 内容契约覆盖规则
+
+- `main_items[*].bullets` 必须是新闻形态：至少 2 条，优先写事实、变化、影响和本地相关性；重大科技、社交平台和内容平台新闻可进入“AI/科技/内容平台重要信号”范围。
+- `github_trending` 范围固定为 weekly all-language Top10 + Python/TypeScript/Rust/Go/Java weekly Top10，合并去重后最多 Top20；README 失败时保留榜位、star、trend、语言、窗口，标注 `README拉取失败`，不写猜测描述。
+- `hot_blogs` 公开页面只使用 `summary` 和来源；`summary` 目标 100-200 个中文字符。公开页面不得渲染 `key_points`。
+- `builder_observations` 可从英文原始 X 帖生成确定性中文摘要；follow-builders X feed 过滤后合格候选不少于 3 条时，不能 `selected=0`。
+- OpenRouter / Artificial Analysis 只能使用解析数据或 sanitized official DOM/CSS snapshot。Artificial Analysis 抓不到 snapshot 时隐藏数据卡并显示源不可用说明；fake/simple/toy component 属于阻塞。
+- 发布前内容契约以 `scripts/check-daily-content-contract.mjs` 为机器检查入口：REQ-001/006/007/008 任一失败阻塞；REQ-010 源不可用可 degraded，但 fake component 阻塞。

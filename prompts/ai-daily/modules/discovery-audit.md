@@ -9,8 +9,8 @@
    - 至少检查 GitHub Trending daily 与 weekly：`https://github.com/trending?since=daily`、`https://github.com/trending?since=weekly`。
    - 对 AI 工程常用语言补扫 Python、TypeScript、Rust、Go 的 daily/weekly trending。
    - 至少补看一个趋势交叉源：OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories，或等价可访问来源。
-   - GitHub Trending 必须单独生成 `github_trending` 板块，默认展示 Top 10 仓库，保留 `rank`、`previous_rank`、`rank_delta`、`trend`（`new`、`up`、`down`、`same`）和 star velocity 证据。展示文案用“GitHub Trending”，不要再写成“GitHub Trending 趋势”；`description` 必须翻译或改写成中文，不要直接复制英文 README/GitHub 描述。
-   - 候选项目只有在具备 release、明确 trending 记录、star velocity、notable PR、近期 commit 或可运行 README 时，才能额外进入 `projects`；公开页面只会把匹配 GitHub Trending Top 10 的 `projects` 渲染为对应条目的行内领域、用途和信号说明，不生成 `项目 highlight` 标签，否则只进入结构化 JSON、`github_trending`、`community_leads` 或丢弃。
+   - GitHub Trending 必须单独生成 `github_trending` 板块，固定采集 weekly all-language Top10 加 Python、TypeScript、Rust、Go、Java weekly Top10，合并去重后最多展示 Top20 仓库，保留 `rank`、`language`、`source_scope`、`previous_rank`、`rank_delta`、`trend`（`new`、`up`、`down`、`same`）和 star velocity 证据。展示文案用“GitHub Trending”，不要再写成“GitHub Trending 趋势”；README 拉取成功时 `description` 必须用中文充分概括 README，README 拉取失败时只展示排名、star、trend 并标注 `README拉取失败`，不得编造项目描述。
+   - 候选项目只有在具备 release、明确 trending 记录、star velocity、notable PR、近期 commit 或可运行 README 时，才能额外进入 `projects`；公开页面只会把匹配 GitHub Trending Top20 的 `projects` 渲染为对应条目的行内领域、用途和信号说明，不生成 `项目 highlight` 标签，否则只进入结构化 JSON、`github_trending`、`community_leads` 或丢弃。
    - GitHub trending 来源的 `projects` 必须尽量填写 `event_date`、`source`、`signal`、`evidence`，其中 `signal` 使用 `release`、`star_velocity`、`trending`、`notable_pr`、`ecosystem` 或 `official_update`。
 
 2. Builder 原始源面：
