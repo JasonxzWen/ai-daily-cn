@@ -1841,6 +1841,35 @@ test("community lead cards expand short summaries to reader-useful context", asy
   assert(!body.includes("事实性结论"));
 });
 
+test("community lead cards expand title-only Chinese media items without boilerplate", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [];
+  report.self_check.builder_observations = 0;
+  report.community_leads = [
+    {
+      title: "三连发！阿里发布首个具身大模型Qwen-Robot系列",
+      content: "三连发！阿里发布首个具身大模型Qwen-Robot系列。",
+      url: "https://www.qbitai.com/2026/06/435873.html",
+      source: "QbitAI",
+      event_date: "2026-06-16",
+      source_level: "intermediary",
+      verification_status: "intermediary_only"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.cardClass === "community-card");
+  const body = section.items[0].body;
+
+  assert(body.length >= 100);
+  assert(body.includes("Qwen-Robot"));
+  assert(body.includes("QbitAI"));
+  assert(body.includes("官方公告"));
+  assert(!body.includes("标题指向"));
+  assert(!body.includes("适合和同类产品"));
+  assert(!body.includes("不把单条社区讨论当作最终事实"));
+});
+
 test("public card media prefers local evidence assets and drops remote fallbacks", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [

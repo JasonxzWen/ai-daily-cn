@@ -2281,18 +2281,48 @@ function expandCommunityLeadBody(value, item = {}, title = "") {
   const eventDate = String(item?.event_date || "").trim();
   const cleanTitle = stripSentenceEnding(stripPublicBodySourcePrefix(title || item?.title || "", item));
   if (cleanTitle && !isNearDuplicateText(cleanTitle, initial)) {
-    fragments.push(`标题指向 ${cleanTitle}`);
+    fragments.push(`这条内容围绕「${cleanTitle}」展开`);
   }
   if (source || eventDate) {
-    fragments.push(`${source || "公开来源"}${eventDate ? `在 ${eventDate}` : ""}记录了这条讨论`);
+    fragments.push(communityLeadSourceContext(source, eventDate));
   }
   const relevance = stripCommunityLeadFallbackBoilerplate(item?.reader_relevance || "", item);
   if (relevance && !isNearDuplicateText(relevance, fragments.join(" "))) {
     fragments.push(stripSentenceEnding(relevance));
   } else {
-    fragments.push("适合和同类产品、官方入口、后续报道放在一起比较，不把单条社区讨论当作最终事实");
+    fragments.push(communityLeadDefaultReaderContext(cleanTitle || initial));
   }
-  return trimText(`${uniqueTextFragments(fragments).join("；")}。`, 220);
+  return trimText(`${uniqueTextFragments(fragments).join("；")}。`, 240);
+}
+
+function communityLeadSourceContext(source, eventDate) {
+  const sourceLabel = source || "公开来源";
+  return `${sourceLabel}${eventDate ? `在 ${eventDate}` : ""}记录了这条内容，公开信息仍应和官方公告、产品页或技术材料对照阅读`;
+}
+
+function communityLeadDefaultReaderContext(value) {
+  const topic = communityLeadTopicLabel(value);
+  return `读者可以把它当作${topic}的早期动态来看，重点关注涉及的产品入口、能力说明、应用场景和后续可复核材料，而不是只看传播热度`;
+}
+
+function communityLeadTopicLabel(value) {
+  const text = String(value || "");
+  if (/机器人|具身|Qwen-Robot|Robot/i.test(text)) {
+    return "具身智能和机器人产品线";
+  }
+  if (/AI\s*助手|小艺|手机|终端|桌面|Display/i.test(text)) {
+    return "终端 AI 助手和人机交互";
+  }
+  if (/大赛|创造力|赛事|开发者/i.test(text)) {
+    return "AI 创作活动和开发者生态";
+  }
+  if (/Agent|搜索|工具|工作流/i.test(text)) {
+    return "agent 工具和自动化工作流";
+  }
+  if (/GPU|vGPU|算力|平台|基准|模型/i.test(text)) {
+    return "AI 基础设施、模型或平台";
+  }
+  return "AI 产品、平台或产业动态";
 }
 
 function isReaderFacingChineseBody(value) {
