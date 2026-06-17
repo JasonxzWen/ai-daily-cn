@@ -1379,8 +1379,7 @@ function formatHotBlogCards(items, context = {}) {
     const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
       ...(context.mediaOptions || {})
     });
-    const points = hotBlogPointTexts(item);
-    const body = String(item.summary || "").trim() || points[0] || "";
+    const body = String(item.summary || "").trim();
     return {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
@@ -1393,10 +1392,7 @@ function formatHotBlogCards(items, context = {}) {
         sourceTrustCardTag(item),
         ...hotBlogTags(item).map((tag) => cardTag(tag, "topic"))
       ].filter(Boolean),
-      points: [
-        ...points.map((value, index) => ({ label: `要点 ${index + 1}`, value })),
-        ...editorialCardPoints(item, { includeReaderRelevance: false, includeWatchNext: false })
-      ],
+      points: [],
       ...(media.length > 0 ? { media } : {})
     };
   });

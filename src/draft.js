@@ -1149,9 +1149,7 @@ function normalizeAutodraftPublicText(report) {
   }
   for (const item of report.hot_blogs || []) {
     item.summary = stripDraftPublicBodyNoise(item.summary, item);
-    item.key_points = (item.key_points || [])
-      .map((point) => stripDraftPublicBodyNoise(point, item))
-      .filter(Boolean);
+    delete item.key_points;
   }
   for (const item of report.github_trending || []) {
     item.description = stripDraftPublicBodyNoise(item.description, item);
@@ -1314,22 +1312,29 @@ function mainItem(candidate, original) {
 
 function mainItemBullets(candidate, original, category) {
   const specificBullets = mainItemSpecificBullets(candidate);
-  if (specificBullets.length > 0) {
-    return uniqueEditorialSentences(specificBullets).slice(0, 3);
-  }
   const evidenceDetail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemEvidenceDetail(candidate), candidate));
+  const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
   if (evidenceDetail) {
-    const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
-    return [`**${label}**：${evidenceDetail}。`];
+    specificBullets.push(`**${label}**：${evidenceDetail}。`);
   }
   const detail = stripSentenceEnding(stripDraftPublicBodyNoise(mainItemDetail(candidate, category), candidate));
   if (detail) {
-    const label = readerLabelForCandidate(candidate) || compactMainItemLabel(candidate);
-    return [`**${label}**：${detail}。`];
+    specificBullets.push(`**${label}**：${detail}。`);
   }
-  return uniqueEditorialSentences([
+  const bullets = uniqueEditorialSentences([
+    ...specificBullets,
+    mainItemScopeBullet(candidate, category),
+    mainItemDecisionBullet(candidate, category),
     mainItemFactBullet(candidate, original)
-  ]).slice(0, 1);
+  ]);
+  if (bullets.length >= 2) {
+    return bullets.slice(0, 3);
+  }
+  const fallback = stripSentenceEnding(stripDraftPublicBodyNoise(audienceRelevanceForCandidate(candidate, category), candidate));
+  return uniqueEditorialSentences([
+    ...bullets,
+    fallback ? `${fallback}。` : ""
+  ]).slice(0, 3);
 }
 
 function mainItemFactBullet(candidate, original) {
@@ -1417,27 +1422,27 @@ function mainItemScopeFactText(candidate, category) {
     return "当前公开的是基础设施路线、合作方口径和英国本地落地节奏";
   }
   if (category === "company_business") {
-    return "当前公开信息主要落在投入方向、合作节奏、组织动作和执行安排";
+    return "已披露细节覆盖投入方向、合作节奏、组织动作、执行安排和后续资源配置";
   }
   if (category === "product_radar") {
-    return "当前公开的是入口、适用范围、价格、地区和上线节奏";
+    return "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏";
   }
   if (category === "open_source") {
-    return "当前公开的是代码、接口、许可证、维护节奏和可复用边界";
+    return "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "当前公开的是试用入口、样例质量、版权边界和价格信息";
+    return "当前公开的是试用入口、样例质量、版权边界、价格信息和生产可用范围";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
     return "当前公开的是部署方式、权限、上下文管理和失败恢复边界";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "当前公开的是实验设置、数据范围、对比基线和复现材料";
+    return "当前公开的是实验设置、数据范围、对比基线、复现材料和作者承认的限制";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "当前公开的是生效范围、执行主体、例外条款和落地安排";
+    return "当前公开的是生效范围、执行主体、例外条款、落地安排和责任边界";
   }
-  return "当前公开信息主要集中在适用对象、证据来源和后续执行安排";
+  return "已披露细节覆盖适用对象、证据来源、执行安排、后续时间表和风险边界";
 }
 
 function mainItemScopePhrase(candidate, category) {
@@ -1478,24 +1483,24 @@ function mainItemDecisionSentence(candidate, category) {
     return "这会影响市场对供应商投入方向、合作优先级和组织重心的判断";
   }
   if (category === "product_radar") {
-    return "这会改变团队安排试用、采购和替换工具的优先级";
+    return "这会改变产品和采购团队安排试用、预算审批、替换工具和风险复盘的优先级";
   }
   if (category === "open_source") {
-    return "这会影响团队是否把它放进 PoC、评估清单或现有工作流";
+    return "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "这会影响创作工具能否进入正式生产流程和预算清单";
+    return "这会影响内容团队判断创作工具能否进入正式生产流程、预算清单和版权审查";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "这会影响 agent 工具接入顺序、权限设计和团队落地成本";
+    return "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "这会改变团队对能力边界、成本和可靠性的预期";
+    return "这会改变模型和平台团队对能力边界、推理成本、可靠性和内部实验设计的预期";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "这类更新会直接牵动上线流程、风控口径和合规检查";
+    return "这类更新会直接牵动产品上线流程、风控口径、合规检查和责任分工";
   }
-  return "这会影响产品路线、接入时机和风险判断";
+  return "这会影响产品团队判断路线优先级、接入时机、资源投入和后续风险预案";
 }
 
 function highlightMainItemFact(candidate, fact) {
@@ -1767,7 +1772,6 @@ function hotBlogItem(candidate) {
     event_date: candidate.event_date,
     topic: topicForCandidate(candidate),
     summary,
-    key_points: hotBlogKeyPoints(candidate, summary),
     content_type: "blog"
   };
 }
@@ -5142,16 +5146,77 @@ function hotBlogSpecificSummary(candidate) {
 export function hotBlogSummary(candidate) {
   const specific = hotBlogSpecificSummary(candidate);
   if (specific) {
-    return trimText(specific, 420);
+    return normalizeHotBlogSummary(specific, candidate);
   }
   const evidenceSummary = hotBlogEvidenceDrivenSummary(candidate);
   if (evidenceSummary) {
-    return trimText(evidenceSummary, 420);
+    return normalizeHotBlogSummary(evidenceSummary, candidate);
   }
   const digest = candidateReaderDigest(candidate) || hotBlogClaimForCandidate(candidate);
   const angle = hotBlogSpecificAngle(candidate) || hotBlogEvidenceForCandidate(candidate);
   const action = hotBlogActionForCandidate(candidate);
-  return trimText(`${digest}。${angle}。${action}。`, 420);
+  return normalizeHotBlogSummary(`${digest}。${angle}。${action}。`, candidate);
+}
+
+function normalizeHotBlogSummary(value, candidate) {
+  const sentences = [
+    ...splitHotBlogSummaryPoints(value),
+    hotBlogClaimForCandidate(candidate),
+    hotBlogEvidenceForCandidate(candidate),
+    hotBlogActionForCandidate(candidate)
+  ];
+  const selected = [];
+  const seen = new Set();
+  for (const raw of sentences) {
+    let sentence = stripDraftPublicBodyNoise(stripSentenceEnding(String(raw || "")), candidate)
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!sentence) continue;
+    if (!hasReaderChineseText(sentence) && hasReaderEnglishText(sentence)) {
+      sentence = englishPublicPoint(candidate, sentence);
+    }
+    sentence = stripSentenceEnding(sentence);
+    if (!sentence) continue;
+    const key = sentence.replace(/\s+/g, " ").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const nextSentence = ensureChineseSentence(sentence);
+    const current = selected.join("");
+    const currentHan = hotBlogSummaryHanCount(current);
+    const nextHan = hotBlogSummaryHanCount(`${current}${nextSentence}`);
+    if (currentHan >= 100 && nextHan > 200) {
+      continue;
+    }
+    selected.push(nextSentence);
+    const selectedHan = hotBlogSummaryHanCount(selected.join(""));
+    if (selectedHan >= 100 && selectedHan <= 200) {
+      break;
+    }
+  }
+  return clipHotBlogSummary(selected.join(""), 200);
+}
+
+function hotBlogSummaryHanCount(value) {
+  return (String(value || "").match(/\p{Script=Han}/gu) || []).length;
+}
+
+function clipHotBlogSummary(value, maxHan) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (hotBlogSummaryHanCount(text) <= maxHan) {
+    return text;
+  }
+  let han = 0;
+  let result = "";
+  for (const char of text) {
+    if (/\p{Script=Han}/u.test(char)) {
+      han += 1;
+    }
+    if (han > maxHan) {
+      break;
+    }
+    result += char;
+  }
+  return ensureChineseSentence(stripSentenceEnding(result));
 }
 
 function hotBlogKeyPoints(candidate, summary) {

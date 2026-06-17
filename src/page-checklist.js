@@ -464,20 +464,19 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       .map((card, index) => {
         const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
         const pointRows = Array.from(card.querySelectorAll(".card-detail-list div"));
-        const summaryPointText = pointRows
-          .filter((row) => /^要点\s*\d+/.test(row.querySelector("dt")?.textContent || ""))
+        const legacyPointText = pointRows
+          .filter((row) => /^\u8981\u70b9\s*\d+/.test(row.querySelector("dt")?.textContent || ""))
           .map((row) => row.querySelector("dd")?.textContent?.replace(/\s+/g, " ").trim() || "")
           .filter(Boolean);
-        const detailText = Array.from(card.querySelectorAll(".card-detail-list dd"))
-          .map((item) => item.textContent.replace(/\s+/g, " ").trim())
-          .filter(Boolean);
-        const editorialText = [bodyText, ...detailText].join(" ");
-        const plain = editorialText.replace(/[#*_=`~]/g, "").trim();
+        const plain = bodyText.replace(/[#*_=`~]/g, "").trim();
         const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
         const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
         const ratioBase = chineseChars + latinChars;
         const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
-        const pointCount = summaryPointText.filter(Boolean).length;
+        const strictSummaryContract = !reportDate || String(reportDate) >= "2026-06-17";
+        const minChineseChars = strictSummaryContract ? 100 : 80;
+        const maxChineseOk = !strictSummaryContract || chineseChars <= 200;
+        const legacyPointCount = legacyPointText.filter(Boolean).length;
         const untranslatedEnglish = /\b[A-Z][A-Za-z0-9 ,;:'"()[\]\/-]{35,}[.!?]/.test(plain);
         const hotBlogTemplate = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
         const coveragePatterns = [
@@ -486,29 +485,31 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
           /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
         ];
         const coverageHits = coveragePatterns.filter((pattern) => pattern.test(plain)).length;
-        const weakPointText = [bodyText, ...summaryPointText].some((point) => point.length > 0 && point.length < 18);
-        const templateOrLowInfo = hotBlogTemplate.test(plain) || coverageHits < 2 || weakPointText;
-        const ok = plain.length >= 100 && chineseChars >= 60 && chineseRatio >= 0.45 && pointCount >= 3 && pointCount <= 5 && !untranslatedEnglish && !templateOrLowInfo;
+        const weakSummaryText = bodyText.length > 0 && chineseChars < minChineseChars;
+        const templateOrLowInfo = hotBlogTemplate.test(plain) || coverageHits < 2 || weakSummaryText;
+        const ok = chineseChars >= minChineseChars && maxChineseOk && chineseRatio >= 0.45 && legacyPointCount === 0 && !untranslatedEnglish && !templateOrLowInfo;
         return ok
           ? null
           : {
               index,
               title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
               length: plain.length,
-              point_count: pointCount,
+              legacy_point_count: legacyPointCount,
               chinese_chars: chineseChars,
+              min_chinese_chars: minChineseChars,
+              max_chinese_ok: maxChineseOk,
               chinese_ratio: Number(chineseRatio.toFixed(3)),
               untranslated_english: untranslatedEnglish,
               template_or_low_information: templateOrLowInfo,
               coverage_hits: coverageHits,
-              weak_point_text: weakPointText
+              weak_summary_text: weakSummaryText
             };
       })
       .filter(Boolean);
     addCheck(
       "hot_blog_cards_reader_facing",
       weakBlogCards.length === 0,
-      "Hot blog cards should render as reader-facing Chinese analysis with 3-5 readable points, not untranslated excerpts or thin summaries.",
+      "Hot blog cards should render as a reader-facing Chinese article summary, not legacy point rows, untranslated excerpts, or thin summaries.",
       { weak_cards: weakBlogCards }
     );
     const internalDebugPattern =
