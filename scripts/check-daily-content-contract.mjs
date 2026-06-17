@@ -281,6 +281,10 @@ function githubScope(report, entries) {
 
 function hasOfficialTrackingSnapshot(item) {
   const snapshot = item?.component_snapshot || item?.source_component_snapshot || item?.tracking_component_snapshot || {};
+  const official = item?.official_component_snapshot || item?.snapshot?.official_component_snapshot || snapshot?.official_component_snapshot;
+  if (official && textValue(official.sanitized_html) && textValue(official.dom_hash)) {
+    return true;
+  }
   const directOfficial = textValue(item?.official_dom_snapshot || snapshot?.official_dom_snapshot || snapshot?.official_html_snapshot);
   const directSanitized = textValue(item?.sanitized_dom_snapshot || snapshot?.sanitized_dom_snapshot || snapshot?.sanitized_html_snapshot);
   const kind = textValue(snapshot?.kind || snapshot?.source || item?.snapshot_kind);

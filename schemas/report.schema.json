@@ -510,6 +510,10 @@
           "type": "string",
           "minLength": 1
         },
+        "source_unavailable_note": {
+          "type": "string",
+          "minLength": 1
+        },
         "risk_note": {
           "type": "string",
           "minLength": 1
@@ -1442,6 +1446,9 @@
         "component_tabs": {
           "$ref": "#/$defs/daily_tracking_component_tabs"
         },
+        "official_component_snapshot": {
+          "$ref": "#/$defs/official_component_snapshot"
+        },
         "notes": {
           "type": "string"
         }
@@ -1626,8 +1633,66 @@
         "fallback_reason": {
           "type": "string"
         },
+        "official_component_snapshot": {
+          "$ref": "#/$defs/official_component_snapshot"
+        },
         "public_trace": {
           "$ref": "#/$defs/tracking_component_public_trace"
+        }
+      }
+    },
+    "official_component_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source",
+        "component_kind",
+        "source_url",
+        "captured_at",
+        "selector_version",
+        "source_selector",
+        "sanitized_html",
+        "sanitized_css",
+        "dom_hash",
+        "css_hash"
+      ],
+      "properties": {
+        "status": {
+          "enum": ["available"]
+        },
+        "source": {
+          "enum": ["official_dom"]
+        },
+        "component_kind": {
+          "enum": ["openrouter_rankings", "artificial_analysis_index"]
+        },
+        "source_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "selector_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_selector": {
+          "type": "string"
+        },
+        "sanitized_html": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sanitized_css": {
+          "type": "string"
+        },
+        "dom_hash": {
+          "$ref": "#/$defs/sha256_hash"
+        },
+        "css_hash": {
+          "$ref": "#/$defs/sha256_hash"
         }
       }
     },

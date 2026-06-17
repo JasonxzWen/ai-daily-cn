@@ -1092,11 +1092,13 @@ function formatProjectCards(items) {
 
 function formatDailyTrackingCards(items, context = {}) {
   return items.map((item) => {
-    const entries = dailyTrackingLeaderboardEntries(item);
-    const stats = dailyTrackingStats(item, entries);
-    const bars = dailyTrackingProviderBars(entries);
-    const table = dailyTrackingTable(item, entries);
     const component = trackingComponentForInteraction(item);
+    const unavailable = isDailyTrackingSourceUnavailable(item);
+    const hasOfficialSnapshot = Boolean(component?.officialSnapshot?.html);
+    const entries = unavailable ? [] : dailyTrackingLeaderboardEntries(item);
+    const stats = unavailable || hasOfficialSnapshot ? [] : dailyTrackingStats(item, entries);
+    const bars = unavailable || hasOfficialSnapshot ? { rows: [] } : dailyTrackingProviderBars(entries);
+    const table = unavailable || hasOfficialSnapshot ? { rows: [] } : dailyTrackingTable(item, entries);
     const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
       limit: 5,
       ...(context.mediaOptions || {})
@@ -1106,7 +1108,7 @@ function formatDailyTrackingCards(items, context = {}) {
       title: item.name,
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || item.name),
-      body: formatDailyTrackingBody(item, entries),
+      body: unavailable ? item.source_unavailable_note : formatDailyTrackingBody(item, entries),
       showGroup: true,
       tags: [
         cardTag(importanceTagFor("daily_tracking", item)),
@@ -1342,6 +1344,9 @@ function formatDailyTrackingBody(item, entries) {
 }
 
 function isPublicDailyTrackingChange(item) {
+  if (isDailyTrackingSourceUnavailable(item)) {
+    return true;
+  }
   if (item?.publish_to_public !== true) {
     return false;
   }
@@ -1349,6 +1354,10 @@ function isPublicDailyTrackingChange(item) {
     return false;
   }
   return item?.verification_status === "primary_confirmed" || item?.verification_status === "multi_source_confirmed";
+}
+
+function isDailyTrackingSourceUnavailable(item) {
+  return item?.publish_to_public === true && Boolean(String(item?.source_unavailable_note || "").trim());
 }
 
 function dailyTrackingCategoryLabel(category) {

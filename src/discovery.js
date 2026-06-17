@@ -16,6 +16,7 @@ import {
   platformSourceRejectReason,
   sectionForPlatformCategory
 } from "./platform-exempt.js";
+import { createOfficialComponentSnapshot } from "./official-component-snapshot.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -3336,18 +3337,29 @@ async function collectOpenRouterRankingsSource(sourceInfo, options = {}) {
     const pageSnapshot = typeof options.openrouterRankingsText === "string"
       ? {
           text: options.openrouterRankingsText,
+          official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.openrouterOfficialComponentSnapshot, sourceInfo, {
+            componentKind: "openrouter_rankings",
+            selectorVersion: "openrouter-rankings-v1",
+            capturedAt: options.generatedAt
+          }),
           evidence_assets: Array.isArray(options.openrouterRankingsEvidenceAssets) ? options.openrouterRankingsEvidenceAssets : []
         }
       : typeof options.openrouterRankingsTextFetcher === "function"
         ? {
             text: await options.openrouterRankingsTextFetcher(sourceInfo),
+            official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.openrouterOfficialComponentSnapshot, sourceInfo, {
+              componentKind: "openrouter_rankings",
+              selectorVersion: "openrouter-rankings-v1",
+              capturedAt: options.generatedAt
+            }),
             evidence_assets: Array.isArray(options.openrouterRankingsEvidenceAssets) ? options.openrouterRankingsEvidenceAssets : []
           }
         : await readOpenRouterRankingsPageSnapshot(sourceInfo, options);
     const text = pageSnapshot.text;
     const pageData = parseOpenRouterRankingsPageText(text);
     const snapshot = openRouterRankingsSnapshot(pageData.entries, sourceInfo, options.generatedAt, {
-      historyEntries: pageData.historyEntries
+      historyEntries: pageData.historyEntries,
+      officialComponentSnapshot: pageSnapshot.official_component_snapshot
     });
     const complete = snapshot.snapshot_status === "complete";
     return {
@@ -3389,6 +3401,16 @@ async function readOpenRouterRankingsPageSnapshot(sourceInfo, options = {}) {
     await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
     await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
     const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const official_component_snapshot = await captureOfficialComponentSnapshot(page, sourceInfo, {
+      componentKind: "openrouter_rankings",
+      selectorVersion: "openrouter-rankings-v1",
+      capturedAt: options.generatedAt,
+      selectors: [
+        "main [data-openrouter-rankings]",
+        "main",
+        "body"
+      ]
+    });
     const evidence_assets = await captureDailyTrackingPageEvidence({
       page,
       sourceInfo,
@@ -3397,7 +3419,7 @@ async function readOpenRouterRankingsPageSnapshot(sourceInfo, options = {}) {
       reportDate: options.reportDate,
       maxScreenshots: 5
     });
-    return { text, evidence_assets };
+    return { text, official_component_snapshot, evidence_assets };
   } finally {
     await browser.close();
   }
@@ -3521,6 +3543,7 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {
     source_url: sourceInfo.url,
     top_entries: topEntries,
     ...(historyEntries.length > 0 ? { history_entries: historyEntries } : {}),
+    ...(extras.officialComponentSnapshot ? { official_component_snapshot: extras.officialComponentSnapshot } : {}),
     notes: "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof."
   };
 }
@@ -3551,18 +3574,30 @@ async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
     const pageSnapshot = typeof options.artificialAnalysisIndexText === "string"
       ? {
           text: options.artificialAnalysisIndexText,
+          official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.artificialAnalysisOfficialComponentSnapshot, sourceInfo, {
+            componentKind: "artificial_analysis_index",
+            selectorVersion: "artificial-analysis-index-v1",
+            capturedAt: options.generatedAt
+          }),
           evidence_assets: Array.isArray(options.artificialAnalysisIndexEvidenceAssets) ? options.artificialAnalysisIndexEvidenceAssets : []
         }
       : typeof options.artificialAnalysisIndexTextFetcher === "function"
         ? {
             text: await options.artificialAnalysisIndexTextFetcher(sourceInfo),
+            official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.artificialAnalysisOfficialComponentSnapshot, sourceInfo, {
+              componentKind: "artificial_analysis_index",
+              selectorVersion: "artificial-analysis-index-v1",
+              capturedAt: options.generatedAt
+            }),
             evidence_assets: Array.isArray(options.artificialAnalysisIndexEvidenceAssets) ? options.artificialAnalysisIndexEvidenceAssets : []
           }
         : await readArtificialAnalysisIndexPageSnapshot(sourceInfo, options);
     const text = pageSnapshot.text;
     const entries = parseArtificialAnalysisIndexText(text);
     const componentTabs = parseArtificialAnalysisComponentTabs(text, entries);
-    const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt, componentTabs);
+    const snapshot = artificialAnalysisIndexSnapshot(entries, sourceInfo, options.generatedAt, componentTabs, {
+      officialComponentSnapshot: pageSnapshot.official_component_snapshot
+    });
     const complete = snapshot.snapshot_status === "complete";
     return {
       status: complete ? "checked" : "no_signal",
@@ -3603,6 +3638,17 @@ async function readArtificialAnalysisIndexPageSnapshot(sourceInfo, options = {})
     await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
     await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
     const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const official_component_snapshot = await captureOfficialComponentSnapshot(page, sourceInfo, {
+      componentKind: "artificial_analysis_index",
+      selectorVersion: "artificial-analysis-index-v1",
+      capturedAt: options.generatedAt,
+      selectors: [
+        "main [data-testid*='leaderboard']",
+        "main [class*='leaderboard']",
+        "main",
+        "body"
+      ]
+    });
     const evidence_assets = await captureDailyTrackingPageEvidence({
       page,
       sourceInfo,
@@ -3611,10 +3657,70 @@ async function readArtificialAnalysisIndexPageSnapshot(sourceInfo, options = {})
       reportDate: options.reportDate,
       maxScreenshots: 5
     });
-    return { text, evidence_assets };
+    return { text, official_component_snapshot, evidence_assets };
   } finally {
     await browser.close();
   }
+}
+
+function buildOfficialComponentSnapshotFromOption(value, sourceInfo, defaults = {}) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  return createOfficialComponentSnapshot({
+    componentKind: defaults.componentKind,
+    sourceUrl: sourceInfo.url,
+    capturedAt: defaults.capturedAt,
+    selectorVersion: defaults.selectorVersion,
+    sourceSelector: value.source_selector || value.sourceSelector,
+    html: value.html || value.sanitized_html || value.sanitizedHtml,
+    css: value.css || value.sanitized_css || value.sanitizedCss
+  });
+}
+
+async function captureOfficialComponentSnapshot(page, sourceInfo, options = {}) {
+  const selectors = Array.isArray(options.selectors) && options.selectors.length > 0 ? options.selectors : ["main", "body"];
+  const fragment = await page.evaluate(async ({ selectors: candidateSelectors }) => {
+    const firstExistingSelector = candidateSelectors.find((selector) => {
+      try {
+        return Boolean(document.querySelector(selector));
+      } catch {
+        return false;
+      }
+    }) || "body";
+    const element = document.querySelector(firstExistingSelector) || document.body;
+    const cssParts = [];
+    for (const style of Array.from(document.querySelectorAll("style"))) {
+      const text = style.textContent || "";
+      if (text.trim()) {
+        cssParts.push(text);
+      }
+    }
+    for (const sheet of Array.from(document.styleSheets)) {
+      try {
+        const rules = Array.from(sheet.cssRules || []).map((rule) => rule.cssText).join("\n");
+        if (rules.trim()) {
+          cssParts.push(rules);
+        }
+      } catch {
+        // Cross-origin stylesheets are expected on public pages; keep inline styles only.
+      }
+    }
+    return {
+      selector: firstExistingSelector,
+      html: element ? element.outerHTML : "",
+      css: cssParts.join("\n")
+    };
+  }, { selectors });
+  return createOfficialComponentSnapshot({
+    componentKind: options.componentKind,
+    sourceUrl: sourceInfo.url,
+    capturedAt: options.capturedAt,
+    selectorVersion: options.selectorVersion,
+    sourceSelector: fragment.selector,
+    html: fragment.html,
+    css: fragment.css
+  });
 }
 
 export function parseArtificialAnalysisIndexText(text) {
@@ -3706,7 +3812,7 @@ function artificialAnalysisProviderForModel(model) {
   return "";
 }
 
-function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, componentTabs = {}) {
+function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, componentTabs = {}, extras = {}) {
   const topEntries = entries.slice(0, 10).map((entry) => ({
     rank: entry.rank,
     model: entry.model,
@@ -3723,6 +3829,7 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, compo
     source_url: sourceInfo.url,
     top_entries: topEntries,
     ...(Object.keys(tabs).length > 0 ? { component_tabs: tabs } : {}),
+    ...(extras.officialComponentSnapshot ? { official_component_snapshot: extras.officialComponentSnapshot } : {}),
     notes: "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof."
   };
 }

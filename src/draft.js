@@ -23,6 +23,7 @@ import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { selectChineseMediaDynamics } from "./chinese-media.js";
 import { selectOfficialOrgUpdates } from "./official-updates.js";
 import { buildTrackingComponentSnapshot } from "./tracking-components.js";
+import { normalizeOfficialComponentSnapshot } from "./official-component-snapshot.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -1977,6 +1978,7 @@ function dailyTrackingItems(reportDate, sourceAudit) {
     const audit = dailyTrackingAuditStatus(sourceAudit, tracker);
     const blocked = audit.status === "blocked" || audit.verificationStatus === "unverified";
     const publishToPublic = audit.changeStatus === "changed" && audit.verificationStatus !== "unverified";
+    const publishUnavailableNote = Boolean(audit.sourceUnavailableNote);
     const item = {
       id: tracker.id,
       name: tracker.name,
@@ -1989,12 +1991,13 @@ function dailyTrackingItems(reportDate, sourceAudit) {
       verification_status: audit.verificationStatus,
       change_status: audit.changeStatus,
       change_summary: audit.changeSummary,
-      publish_to_public: publishToPublic,
+      publish_to_public: publishToPublic || publishUnavailableNote,
       summary: audit.summary || (blocked ? `${tracker.summary} 本轮自动抓取未取得可解析快照，读者需要点开官方页人工核对最新榜单。` : tracker.summary),
       watch_points: audit.watchPoints || tracker.watchPoints,
       metrics: audit.metrics || tracker.metrics,
       evidence: `${tracker.evidence} ${audit.evidenceNote}`.trim(),
       verification_note: audit.verificationNote,
+      ...(audit.sourceUnavailableNote ? { source_unavailable_note: audit.sourceUnavailableNote } : {}),
       risk_note: tracker.riskNote,
       watch_next: audit.watchNext || tracker.watchNext,
       ...(audit.snapshot ? { snapshot: audit.snapshot } : {})
@@ -2082,7 +2085,8 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
     const name = String(item?.name || "").toLowerCase();
     return (targetUrl && url === targetUrl) || name === targetName || name.includes(targetName);
   });
-  const source = matchingSources.find((item) => isCompleteDailyTrackingSnapshotForTracker(sanitizeDailyTrackingSnapshot(item?.snapshot), tracker)) ||
+  const source = matchingSources.find((item) => isCompleteDailyTrackingSnapshotForTracker(sanitizeDailyTrackingSnapshot(item?.snapshot), tracker) && hasRequiredOfficialComponentSnapshot(sanitizeDailyTrackingSnapshot(item?.snapshot), tracker)) ||
+    matchingSources.find((item) => isCompleteDailyTrackingSnapshotForTracker(sanitizeDailyTrackingSnapshot(item?.snapshot), tracker)) ||
     matchingSources.find((item) => item?.status === "checked") ||
     matchingSources[0];
   if (!source) {
@@ -2109,6 +2113,18 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} OpenRouter top models parsed from public_page_snapshot`,
       verificationNote: `已解析 OpenRouter 公开 Rankings 页面的 This Week Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是平台用量信号，不是全市场份额或能力评测。`,
       watchNext: "若榜首、Top 10 构成或周变化继续异常，回到模型发布、价格页和状态页核验是发布驱动、价格驱动还是平台内工作流迁移。"
+    };
+  }
+  if (tracker.id === "artificial-analysis-intelligence-index" && isCompleteArtificialAnalysisSnapshot(snapshot) && !hasOfficialComponentSnapshot(snapshot)) {
+    return {
+      status: "blocked",
+      verificationStatus: "unverified",
+      changeStatus: "blocked",
+      changeSummary: "Artificial Analysis 官方组件 snapshot 不可用，不能确认可发布的榜单组件。",
+      sourceUnavailableNote: "Artificial Analysis 官方 web 组件 snapshot 本轮不可用；已隐藏榜单数据卡，只保留官方入口供读者手动核对。",
+      evidenceNote: `source_audit status=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
+      verificationNote: "Artificial Analysis 需要官方 DOM/CSS snapshot 才能渲染公开追踪组件；本轮未取得可用 snapshot，因此不重画本地假组件。",
+      watchNext: "下次抓取若恢复官方 snapshot，再展示榜单组件；本轮以官方入口人工核对为准。"
     };
   }
   if (tracker.id === "artificial-analysis-intelligence-index" && isCompleteArtificialAnalysisSnapshot(snapshot)) {
@@ -2148,6 +2164,18 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
     evidenceNote: `source_audit status=${source.status || "blocked"}${source.notes ? `; notes=${source.notes}` : ""}`,
     verificationNote: `本轮固定入口抓取受阻：${source.notes || source.status || "blocked"}。`
   };
+}
+
+function hasOfficialComponentSnapshot(snapshot) {
+  const official = snapshot?.official_component_snapshot;
+  return Boolean(official && typeof official === "object" && String(official.sanitized_html || "").trim());
+}
+
+function hasRequiredOfficialComponentSnapshot(snapshot, tracker) {
+  if (tracker.id === "artificial-analysis-intelligence-index") {
+    return hasOfficialComponentSnapshot(snapshot);
+  }
+  return true;
 }
 
 function isCompleteDailyTrackingSnapshotForTracker(snapshot, tracker) {
@@ -2456,6 +2484,12 @@ function sanitizeDailyTrackingSnapshot(snapshot) {
       .filter((entry) => entry.week && Number.isInteger(entry.rank) && entry.rank > 0 && entry.model && entry.tokens)
     : [];
   const componentTabs = sanitizeDailyTrackingComponentTabs(snapshot.component_tabs);
+  const officialComponentSnapshot = normalizeOfficialComponentSnapshot(snapshot.official_component_snapshot, {
+    componentKind: String(snapshot.official_component_snapshot?.component_kind || "").trim(),
+    sourceUrl: isHttpUrl(snapshot.source_url) ? snapshot.source_url : "https://example.com/",
+    capturedAt: String(snapshot.snapshot_as_of || new Date().toISOString()),
+    selectorVersion: String(snapshot.official_component_snapshot?.selector_version || "")
+  });
   return {
     type: String(snapshot.type || "daily_tracking_snapshot"),
     collection_method: String(snapshot.collection_method || "public_page_playwright"),
@@ -2465,6 +2499,7 @@ function sanitizeDailyTrackingSnapshot(snapshot) {
     top_entries: topEntries,
     ...(historyEntries.length > 0 ? { history_entries: historyEntries } : {}),
     ...(componentTabs ? { component_tabs: componentTabs } : {}),
+    ...(officialComponentSnapshot ? { official_component_snapshot: officialComponentSnapshot } : {}),
     ...(snapshot.notes ? { notes: String(snapshot.notes) } : {})
   };
 }

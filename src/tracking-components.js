@@ -1,4 +1,8 @@
 import { createHash } from "node:crypto";
+import {
+  normalizeOfficialComponentSnapshot,
+  officialSnapshotForInteraction
+} from "./official-component-snapshot.js";
 
 const OPENROUTER_SELECTOR_VERSION = "openrouter-rankings-v1";
 const ARTIFICIAL_ANALYSIS_SELECTOR_VERSION = "artificial-analysis-index-v1";
@@ -57,11 +61,13 @@ export function trackingComponentForInteraction(item) {
   if (!snapshot || typeof snapshot !== "object") {
     return null;
   }
+  const officialSnapshot = officialSnapshotForInteraction(snapshot.official_component_snapshot);
   return {
     kind: snapshot.component_kind,
     source: snapshot.source,
     sourceUrl: snapshot.source_url,
     collectedAt: snapshot.collected_at,
+    ...(officialSnapshot ? { officialSnapshot } : {}),
     tabs: (snapshot.tabs || []).map((tab) => ({
       id: tab.id,
       label: tab.label,
@@ -95,6 +101,12 @@ export function trackingComponentForInteraction(item) {
 function buildOpenRouterSnapshot(item, snapshot, options) {
   const rows = normalizedSnapshotRows(snapshot);
   const historyRows = normalizedOpenRouterHistoryRows(snapshot);
+  const officialComponentSnapshot = normalizeOfficialComponentSnapshot(snapshot.official_component_snapshot, {
+    componentKind: "openrouter_rankings",
+    sourceUrl: snapshot.source_url || item.url,
+    capturedAt: snapshot.snapshot_as_of,
+    selectorVersion: OPENROUTER_SELECTOR_VERSION
+  });
   const status = rows.length >= 10 && snapshot.snapshot_status === "complete" ? "complete" : rows.length > 0 ? "partial" : "fallback";
   const fallbackReason = rows.length > 0 ? "" : "openrouter_rows_missing";
   const tabs = [
@@ -133,11 +145,21 @@ function buildOpenRouterSnapshot(item, snapshot, options) {
     tabs,
     series,
     cachePath: options.cachePath || "",
-    fallbackReason
+    fallbackReason,
+    officialComponentSnapshot
   });
 }
 
 function buildArtificialAnalysisSnapshot(item, snapshot, options) {
+  const officialComponentSnapshot = normalizeOfficialComponentSnapshot(snapshot.official_component_snapshot, {
+    componentKind: "artificial_analysis_index",
+    sourceUrl: snapshot.source_url || item.url,
+    capturedAt: snapshot.snapshot_as_of,
+    selectorVersion: ARTIFICIAL_ANALYSIS_SELECTOR_VERSION
+  });
+  if (!officialComponentSnapshot) {
+    return null;
+  }
   const scoreRows = normalizedSnapshotRows(snapshot).map((row) => ({
     ...row,
     metric: "AA Index",
@@ -172,7 +194,8 @@ function buildArtificialAnalysisSnapshot(item, snapshot, options) {
     tabs,
     series,
     cachePath: options.cachePath || "",
-    fallbackReason
+    fallbackReason,
+    officialComponentSnapshot
   });
 }
 
@@ -186,7 +209,8 @@ function componentSnapshot({
   tabs,
   series,
   cachePath,
-  fallbackReason
+  fallbackReason,
+  officialComponentSnapshot
 }) {
   const normalizedRows = rows.map((row) => normalizeComponentRow(row)).filter(Boolean);
   const payloadForHash = {
@@ -232,6 +256,7 @@ function componentSnapshot({
     diff,
     cache_path: cachePath || "",
     fallback_reason: fallbackReason || "",
+    ...(officialComponentSnapshot ? { official_component_snapshot: officialComponentSnapshot } : {}),
     public_trace: {
       source_url: sourceUrl,
       collected_at: collectedAt || new Date().toISOString(),

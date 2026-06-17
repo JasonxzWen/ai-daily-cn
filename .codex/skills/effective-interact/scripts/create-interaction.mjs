@@ -1298,6 +1298,9 @@ function renderTrackingComponent(component) {
   if (!component || typeof component !== "object") {
     return "";
   }
+  if (component.officialSnapshot?.html) {
+    return renderOfficialTrackingComponent(component);
+  }
   const tabs = Array.isArray(component.tabs) ? component.tabs.filter((tab) => tab && tab.id) : [];
   if (tabs.length === 0) {
     return "";
@@ -1330,6 +1333,35 @@ function renderTrackingComponent(component) {
   </div>`;
 }
 
+function renderOfficialTrackingComponent(component) {
+  const snapshot = component.officialSnapshot || {};
+  const html = sanitizeOfficialSnapshotHtml(snapshot.html || snapshot.sanitizedHtml || snapshot.sanitized_html || "");
+  if (!html) {
+    return "";
+  }
+  const snapshotId = slugify(`${component.kind || component.source || "official"}-${snapshot.domHash || snapshot.dom_hash || "snapshot"}`);
+  const css = scopeOfficialSnapshotCss(snapshot.css || snapshot.sanitizedCss || snapshot.sanitized_css || "", snapshotId);
+  const style = css ? `<style data-official-tracking-css>${escapeStyleContent(css)}</style>` : "";
+  const meta = [
+    component.collectedAt,
+    snapshot.sourceSelector ? `selector: ${snapshot.sourceSelector}` : "",
+    snapshot.domHash || snapshot.dom_hash || ""
+  ].filter(Boolean).join(" · ");
+  return `<div class="tracking-component official-tracking-component" data-tracking-component data-official-component-snapshot data-component-kind="${escapeAttr(component.kind || "")}">
+    ${style}
+    <div class="tracking-component-header">
+      <div>
+        <div class="card-visual-title">${escapeHtml(component.source || "Tracking component")}</div>
+        ${meta ? `<span class="tracking-component-meta">${escapeHtml(meta)}</span>` : ""}
+      </div>
+    </div>
+    <div class="official-tracking-snapshot" data-official-snapshot-id="${escapeAttr(snapshotId)}">
+      ${html}
+    </div>
+    ${renderTrackingTrace(component.trace)}
+  </div>`;
+}
+
 function renderTrackingComponentPanel(component, tab) {
   const series = trackingSeriesForTab(component, tab.id);
   const rows = trackingRowsForPanel(component, series);
@@ -1344,6 +1376,58 @@ function renderTrackingComponentPanel(component, tab) {
     return renderTrackingScatterFallback(rows, tab);
   }
   return renderTrackingBars(rows, tab);
+}
+
+function sanitizeOfficialSnapshotHtml(value) {
+  return String(value || "")
+    .replace(/\0/g, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<\s*(script|style|iframe|object|embed|form|input|textarea|select|option|link|meta|base|canvas)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+    .replace(/<\s*(script|style|iframe|object|embed|form|input|textarea|select|option|link|meta|base|canvas)[^>]*\/?>/gi, "")
+    .replace(/\s(on[a-z]+|style|srcdoc)\s*=\s*"[^"]*"/gi, "")
+    .replace(/\s(on[a-z]+|style|srcdoc)\s*=\s*'[^']*'/gi, "")
+    .replace(/\s(on[a-z]+|style|srcdoc)\s*=\s*[^\s>]+/gi, "")
+    .replace(/\s(href|src)\s*=\s*"(?!(?:https?:|\/|#))[^"]*"/gi, "")
+    .replace(/\s(href|src)\s*=\s*'(?!(?:https?:|\/|#))[^']*'/gi, "")
+    .replace(/\s(href|src)\s*=\s*(?!(?:https?:|\/|#))[^\s>]+/gi, "")
+    .trim();
+}
+
+function scopeOfficialSnapshotCss(value, snapshotId) {
+  const css = String(value || "")
+    .replace(/\0/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/@import[^;]+;/gi, "")
+    .replace(/url\s*\([^)]*\)/gi, "none")
+    .replace(/expression\s*\([^)]*\)/gi, "")
+    .replace(/<\/?style[^>]*>/gi, "")
+    .trim();
+  if (!css) {
+    return "";
+  }
+  const scope = `.official-tracking-snapshot[data-official-snapshot-id="${snapshotId}"]`;
+  return css.replace(/([^{}]+)\{([^{}]*)\}/g, (match, selectorText, body) => {
+    const selectors = selectorText
+      .split(",")
+      .map((selector) => selector.trim())
+      .filter(Boolean)
+      .filter((selector) => !selector.startsWith("@"));
+    if (selectors.length === 0) {
+      return "";
+    }
+    const declarations = body
+      .replace(/position\s*:\s*(fixed|sticky)\s*;?/gi, "")
+      .replace(/behavior\s*:[^;]+;/gi, "")
+      .trim();
+    if (!declarations) {
+      return "";
+    }
+    return `${selectors.map((selector) => `${scope} ${selector}`).join(", ")} { ${declarations} }`;
+  });
+}
+
+function escapeStyleContent(value) {
+  return String(value || "").replace(/<\/style/gi, "<\\/style");
 }
 
 function trackingSeriesForTab(component, tabId) {
