@@ -927,10 +927,63 @@ function githubTrendCardBody(item, project) {
   const projectDetail = stripGithubRepoLead(projectHighlightDetail(project, description), repo);
   const fallback = stripGithubRepoLead(String(item.description || item.evidence || ""), repo);
   const body = uniqueTextFragments([description, projectDetail, fallback])
+    .map((fragment) => cleanGithubTrendCardFragment(fragment))
     .filter((fragment) => !isGenericGithubTrendDescription(fragment))
     .slice(0, 2)
     .join(" ");
-  return trimText(body || fallback, 260);
+  if (isWeakGithubTrendCardBody(body)) {
+    return githubTrendMovementSummary(item);
+  }
+  return trimText(body || cleanGithubTrendCardFragment(fallback), 220);
+}
+
+function isWeakGithubTrendCardBody(value) {
+  const text = String(value || "");
+  return /README 将|核心能力集中在|它的价值在于|具体阅读时|把这些能力整理成可复现|领域：/u.test(text);
+}
+
+function githubTrendMovementSummary(item) {
+  const rank = Number.isFinite(Number(item?.rank)) ? `#${Number(item.rank)}` : "";
+  const source = String(item?.source || "GitHub Trending").trim();
+  const sourceLabel = source || "GitHub Trending";
+  const stars = githubTrendStarsMovement(item);
+  const move = githubTrendRankMovement(item);
+  const facts = [sourceLabel, rank, stars, move].filter(Boolean).join(" / ");
+  return trimText(`${facts}；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。`, 220);
+}
+
+function githubTrendStarsMovement(item) {
+  const evidence = String(item?.evidence || "");
+  const match = evidence.match(/with\s+([0-9,]+)\s+stars\s+(today|this week)/i);
+  if (!match) {
+    return "";
+  }
+  return `${match[2].toLowerCase() === "today" ? "今日" : "本周"} +${match[1]} stars`;
+}
+
+function githubTrendRankMovement(item) {
+  const previousRank = Number.isFinite(Number(item?.previous_rank)) ? Number(item.previous_rank) : null;
+  const rankDelta = Number.isFinite(Number(item?.rank_delta)) ? Number(item.rank_delta) : null;
+  if (previousRank === null || rankDelta === null) {
+    return "";
+  }
+  if (rankDelta > 0) {
+    return `较前次上升 ${rankDelta} 位`;
+  }
+  if (rankDelta < 0) {
+    return `较前次下降 ${Math.abs(rankDelta)} 位`;
+  }
+  return "较前次持平";
+}
+
+function cleanGithubTrendCardFragment(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/^README\s*(?:将该仓库定位为|把该仓库定位为|说明该项目是|显示该项目是)?\s*/u, "")
+    .replace(/它的价值在于[^。]*。?/gu, "")
+    .replace(/具体阅读时还应关注[^。]*。?/gu, "")
+    .replace(/优先核对\s*README[^。]*。?/gu, "")
+    .trim();
 }
 
 function stripGithubRepoLead(value, repo) {
@@ -1500,6 +1553,7 @@ function formatHotBlogCards(items, context = {}) {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
       href: item.url,
+      subtitle: [item.publisher || item.source, item.event_date || item.published_at].filter(Boolean).join(" / "),
       titleIcon: siteIconForUrl(item.url, item.publisher || item.title),
       body,
       showGroup: false,
