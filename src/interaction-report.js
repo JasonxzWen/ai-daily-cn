@@ -39,6 +39,7 @@ const PUBLIC_MEDIA_MIN_WIDTH = 240;
 const PUBLIC_MEDIA_MIN_HEIGHT = 160;
 const PUBLIC_MEDIA_MIN_AREA = 80000;
 const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
+const PROMPTLAYER_LAYOUT_REPORT_DATES = new Set(["2026-06-17"]);
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -123,6 +124,10 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
   DOMAIN_ICONS.set(domain, icon);
 }
 
+function usesPromptLayerDailyLayout(reportDate) {
+  return PROMPTLAYER_LAYOUT_REPORT_DATES.has(String(reportDate || ""));
+}
+
 export function reportToInteractionInput(report, options = {}) {
   const includeInternalSections = options.includeInternalSections === true;
   const mediaOptions = {
@@ -150,6 +155,7 @@ export function reportToInteractionInput(report, options = {}) {
   const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
   const dateIndexItem = options.dateIndexItem && typeof options.dateIndexItem === "object" ? options.dateIndexItem : null;
   const reportNavigation = options.reportNavigation && typeof options.reportNavigation === "object" ? options.reportNavigation : null;
+  const promptLayerLayout = usesPromptLayerDailyLayout(report.report_date);
   const dailyOverviewStats = [
     ...dateIndexHeroStats(dateIndexItem),
     ...dailyHeroStats(report, {
@@ -168,7 +174,8 @@ export function reportToInteractionInput(report, options = {}) {
     evidenceByUrl,
     trendAnnotations,
     mediaOptions,
-    compactMainItems: true
+    compactMainItems: true,
+    promptLayerLayout
   }));
 
   if (publicDailyTracking.length > 0) {
@@ -203,12 +210,21 @@ export function reportToInteractionInput(report, options = {}) {
     });
   }
   if (githubTrending.length > 0) {
-    sections.push({
-      type: "markdown",
-      title: "GitHub Trending · Top 20",
-      group: "projects",
-      content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
-    });
+    sections.push(promptLayerLayout
+      ? {
+          type: "filterable-cards",
+          title: "Repository movement",
+          group: "projects",
+          cardClass: "github-trending-card",
+          showFilters: false,
+          items: formatGithubTrendingCards(githubTrending, { trendAnnotations, projects })
+        }
+      : {
+          type: "markdown",
+          title: "GitHub Trending · Top 20",
+          group: "projects",
+          content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
+        });
   }
   if (huggingFaceTrending.length > 0) {
     sections.push({
@@ -711,6 +727,20 @@ function formatMainItemSections(items, context = {}) {
 }
 
 function formatCompactMainItemSections(items, context = {}) {
+  if (context.promptLayerLayout) {
+    return [
+      {
+        type: "filterable-cards",
+        title: "Today's signal cards",
+        richId: "main-signal-cards",
+        group: "main",
+        cardClass: "main-ticket-card",
+        showFilters: false,
+        items: items.map((item, index) => formatCompactMainItemCard(item, index, context))
+      }
+    ];
+  }
+
   const detailContent = mainItemContractGroups(items).map((group) => {
     const content = group.entries
       .map(({ item, originalIndex }) => formatMainItem(item, {
@@ -736,19 +766,21 @@ function formatCompactMainItemSections(items, context = {}) {
 
 function formatCompactMainItemCard(item, index, context = {}) {
   const facts = mainItemPublicFacts(item);
+  const category = mainItemCategoryLabel(item);
   const tags = [
+    cardTag(category, "topic"),
     importanceTagFor("main_items", item),
     sourceTrustHighlightTag(item),
     ...trendTagsFor(context.trendAnnotations, "main_items", index)
   ].filter(Boolean);
   return {
-    group: mainItemCategoryLabel(item),
+    group: String(index + 1).padStart(2, "0"),
     title: mainItemTitle(item),
-    subtitle: [item.source, item.event_date].filter(Boolean).join(" · "),
+    subtitle: [item.source, item.event_date].filter(Boolean).join(" / "),
     url: item.url,
     titleIcon: siteIconForUrl(item.url, item.source || item.title),
     tags,
-    body: facts[0] || item.summary || "",
+    body: trimText(stripPublicBodySourcePrefix(facts[0] || item.summary || "", item), 220),
     points: []
   };
 }
@@ -850,6 +882,83 @@ function formatGithubTrending(items, context = {}) {
     })
     .join("\n");
   return trendingLines;
+}
+
+function formatGithubTrendingCards(items, context = {}) {
+  const projects = Array.isArray(context.projects) ? context.projects : [];
+  const projectIndex = indexProjects(projects);
+  return items.slice(0, 20).map((item, index) => {
+    const project = projectForTrend(item, projectIndex);
+    const rank = Number.isFinite(Number(item.rank)) ? `#${Number(item.rank)}` : `#${index + 1}`;
+    const repo = item.repo || item.name || repoFromUrl(item.url);
+    const readmeStatus = githubReadmeStatusTag(item);
+    const tags = [
+      importanceTagFor("github_trending", item),
+      sourceTrustHighlightTag(item),
+      githubTrendStatusHighlightTag(item),
+      githubStarsTag(item),
+      readmeStatus,
+      item.language ? cardTag(item.language, "topic") : "",
+      item.window ? cardTag(item.window, "topic") : "",
+      ...(project ? projectHeatTags(project) : []),
+      ...trendTagsFor(context.trendAnnotations, "github_trending", index)
+    ].filter(Boolean);
+
+    return {
+      group: rank,
+      title: repo || item.name || "Repository",
+      href: item.url,
+      titleIcon: siteIconForUrl(item.url, repo || item.name),
+      subtitle: [item.source, item.event_date].filter(Boolean).join(" / "),
+      body: githubTrendCardBody(item, project),
+      showGroup: true,
+      tags,
+      points: []
+    };
+  });
+}
+
+function githubTrendCardBody(item, project) {
+  const repo = item.repo || item.name || repoFromUrl(item.url);
+  const description = stripGithubRepoLead(
+    cleanGithubTrendDescription(item) || cleanProjectDescription(item.description || ""),
+    repo
+  );
+  const projectDetail = stripGithubRepoLead(projectHighlightDetail(project, description), repo);
+  const fallback = stripGithubRepoLead(String(item.description || item.evidence || ""), repo);
+  const body = uniqueTextFragments([description, projectDetail, fallback])
+    .filter((fragment) => !isGenericGithubTrendDescription(fragment))
+    .slice(0, 2)
+    .join(" ");
+  return trimText(body || fallback, 260);
+}
+
+function stripGithubRepoLead(value, repo) {
+  let text = String(value || "").replace(/\s+/g, " ").trim();
+  const repoText = String(repo || "").trim();
+  if (!text || !repoText) {
+    return text;
+  }
+
+  const escapedRepo = escapeRegex(repoText);
+  text = text
+    .replace(new RegExp(`^${escapedRepo}\\s*[:：-]\\s*`, "i"), "")
+    .replace(new RegExp(`^${escapedRepo}\\s+`, "i"), "")
+    .trim();
+
+  if (repoText.includes("/")) {
+    const [owner, name] = repoText.split("/");
+    text = text
+      .replace(new RegExp(`^${escapeRegex(owner)}\\s*/\\s*${escapeRegex(name)}\\s*[:：-]?\\s*`, "i"), "")
+      .replace(new RegExp(`^${escapeRegex(name)}\\s*[:：-]\\s*`, "i"), "")
+      .trim();
+  }
+
+  return text;
+}
+
+function isGenericGithubTrendDescription(value) {
+  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week)/i.test(String(value || ""));
 }
 
 function formatHuggingFaceTrending(items, context = {}) {

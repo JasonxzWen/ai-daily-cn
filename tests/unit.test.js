@@ -2955,10 +2955,17 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   assert.equal(Object.hasOwn(failedReadmeItem, "description"), false);
 
   const input = reportToInteractionInput(drafted.report);
-  const section = input.sections.find((item) => item.title === "GitHub Trending · Top 20");
+  const section = input.sections.find((item) => item.cardClass === "github-trending-card" || item.title.startsWith("GitHub Trending"));
   assert(section);
-  assert(section.content.includes("README拉取失败"));
-  assert(!section.content.includes("仓库名指向java weekly"));
+  if (section.cardClass === "github-trending-card") {
+    const failedCard = section.items.find((item) => item.title === "example/java-weekly-1");
+    assert(failedCard);
+    assert(failedCard.tags.some((tag) => String(tag).includes("README")));
+    assert(!JSON.stringify(failedCard).includes("java weekly"));
+  } else {
+    assert(section.content.includes("README拉取失败"));
+    assert(!section.content.includes("仓库名指向java weekly"));
+  }
 });
 
 test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () => {
@@ -8119,6 +8126,9 @@ test("promptlayer-inspired daily theme is scoped to the approved production repo
   assert.match(html, /--daily-theme-bg:\s*#141413/);
   assert.match(html, /\.report-hero-daily/);
   assert.match(html, /\.interactive-card/);
+  assert.match(html, /main-ticket-card-grid/);
+  assert.match(html, /github-trending-card-grid/);
+  assert.match(html, /Repository movement/);
   assert.match(html, /prefers-reduced-motion:\s*reduce/);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
@@ -8129,6 +8139,7 @@ test("promptlayer-inspired daily theme is scoped to the approved production repo
   const historicalHtml = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme="promptlayer-inspired"/);
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme-style="promptlayer-inspired"/);
+  assert.doesNotMatch(historicalHtml, /main-ticket-card-grid|github-trending-card-grid|Repository movement/);
 });
 
 test("promptlayer-inspired daily theme injector is idempotent and self-contained", () => {
@@ -8141,6 +8152,9 @@ test("promptlayer-inspired daily theme injector is idempotent and self-contained
   assert.match(twice, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
   assert.match(promptLayerInspiredDailyThemeCss, /--daily-theme-bg:\s*#141413/);
   assert.match(promptLayerInspiredDailyThemeCss, /\.report-hero-daily/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.main-ticket-card-grid/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.github-trending-card-grid/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.blog-card::after/);
   assert.match(promptLayerInspiredDailyThemeCss, /prefers-reduced-motion:\s*reduce/);
   assert.doesNotMatch(promptLayerInspiredDailyThemeCss, /@import|https?:|promptlayer\.com|_next\/static/);
 });
