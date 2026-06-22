@@ -1345,11 +1345,7 @@ function renderOfficialTrackingComponent(component) {
   const snapshotId = slugify(`${component.kind || component.source || "official"}-${snapshot.domHash || snapshot.dom_hash || "snapshot"}`);
   const css = scopeOfficialSnapshotCss(snapshot.css || snapshot.sanitizedCss || snapshot.sanitized_css || "", snapshotId);
   const style = css ? `<style data-official-tracking-css>${escapeStyleContent(css)}</style>` : "";
-  const meta = [
-    component.collectedAt,
-    snapshot.sourceSelector ? `selector: ${snapshot.sourceSelector}` : "",
-    snapshot.domHash || snapshot.dom_hash || ""
-  ].filter(Boolean).join(" · ");
+  const meta = officialTrackingPublicMeta(component, snapshot);
   return `<div class="tracking-component official-tracking-component" data-tracking-component data-official-component-snapshot data-component-kind="${escapeAttr(component.kind || "")}">
     ${style}
     <div class="tracking-component-header">
@@ -1361,16 +1357,11 @@ function renderOfficialTrackingComponent(component) {
     <div class="official-tracking-snapshot" data-official-snapshot-id="${escapeAttr(snapshotId)}">
       ${html}
     </div>
-    ${renderTrackingTrace(component.trace)}
   </div>`;
 }
 
 function renderOfficialTrackingUnavailable(component, snapshot = {}) {
-  const meta = [
-    component.collectedAt,
-    snapshot.sourceSelector ? `selector: ${snapshot.sourceSelector}` : "",
-    snapshot.domHash || snapshot.dom_hash || ""
-  ].filter(Boolean).join(" · ");
+  const meta = officialTrackingPublicMeta(component, snapshot);
   return `<div class="tracking-component official-tracking-component tracking-component-fallback" data-tracking-component data-official-component-unavailable data-component-kind="${escapeAttr(component.kind || "")}">
     <div class="tracking-component-header">
       <div>
@@ -1379,8 +1370,11 @@ function renderOfficialTrackingUnavailable(component, snapshot = {}) {
       </div>
     </div>
     <p>官方 web 组件 snapshot 本轮不可用；为避免渲染整页级 DOM 或未核验的巨型页面片段，本卡只保留官方入口供读者手动核对。</p>
-    ${renderTrackingTrace(component.trace)}
   </div>`;
+}
+
+function officialTrackingPublicMeta() {
+  return "";
 }
 
 function renderTrackingComponentPanel(component, tab) {

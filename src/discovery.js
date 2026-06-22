@@ -36,6 +36,7 @@ const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
 const DEFAULT_SOURCE_CACHE_TTL_DAYS = 7;
 const OPENROUTER_RANKINGS_SOURCE_KIND = "openrouter_rankings_public_playwright";
 const ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND = "artificial_analysis_index_public_playwright";
+const SWE_BENCH_PRO_PUBLIC_SOURCE_KIND = "swe_bench_pro_public_playwright";
 const GITHUB_REPORT_MARKDOWN_SOURCE_KIND = "github_report_markdown";
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
@@ -1545,6 +1546,19 @@ export async function collectContentSources(options = {}) {
     }
     if (currentSource.source_kind === ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND) {
       const result = await collectArtificialAnalysisIndexSource(currentSource, {
+        ...options,
+        generatedAt,
+        reportDate
+      });
+      evidenceAssets.push(...(Array.isArray(result.evidence_assets) ? result.evidence_assets : []));
+      markSource(candidateSources.at(-1), result.status, result.notes);
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
+        snapshot: result.snapshot
+      }));
+      continue;
+    }
+    if (currentSource.source_kind === SWE_BENCH_PRO_PUBLIC_SOURCE_KIND) {
+      const result = await collectSweBenchProSource(currentSource, {
         ...options,
         generatedAt,
         reportDate
@@ -3649,6 +3663,8 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {
         change: entry.change || entry.week
       }))
     : [];
+  const officialComponentSnapshot = extras.officialComponentSnapshot ||
+    (hasCompleteTop10(topEntries) ? openRouterOfficialComponentSnapshot(topEntries, sourceInfo, generatedAt) : null);
   return {
     type: "openrouter_rankings_public_page",
     collection_method: "public_page_playwright",
@@ -3657,7 +3673,7 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {
     source_url: sourceInfo.url,
     top_entries: topEntries,
     ...(historyEntries.length > 0 ? { history_entries: historyEntries } : {}),
-    ...(extras.officialComponentSnapshot ? { official_component_snapshot: extras.officialComponentSnapshot } : {}),
+    ...(officialComponentSnapshot ? { official_component_snapshot: officialComponentSnapshot } : {}),
     notes: "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof."
   };
 }
@@ -3673,6 +3689,28 @@ function hasCompleteTop10(entries) {
     /tokens$/i.test(entry.tokens || "") &&
     entry.change
   );
+}
+
+function openRouterOfficialComponentSnapshot(entries, sourceInfo, generatedAt) {
+  return trackingTableOfficialComponentSnapshot({
+    componentKind: "openrouter_rankings",
+    sourceInfo,
+    generatedAt,
+    selectorVersion: "openrouter-rankings-v1",
+    sourceSelector: "[data-openrouter-rankings]",
+    className: "openrouter-rankings-card",
+    marker: "data-openrouter-rankings",
+    title: "OpenRouter Top Models",
+    subtitle: "This Week usage ranking",
+    columns: ["Rank", "Model", "Provider", "Tokens", "Change"],
+    rows: entries.map((entry) => [
+      `#${entry.rank}`,
+      entry.model,
+      entry.provider,
+      entry.tokens,
+      entry.change
+    ])
+  });
 }
 
 async function collectArtificialAnalysisIndexSource(sourceInfo, options = {}) {
@@ -3776,6 +3814,313 @@ async function readArtificialAnalysisIndexPageSnapshot(sourceInfo, options = {})
   } finally {
     await browser.close();
   }
+}
+
+async function collectSweBenchProSource(sourceInfo, options = {}) {
+  try {
+    if (
+      typeof options.sweBenchProText !== "string" &&
+      typeof options.sweBenchProTextFetcher !== "function" &&
+      Object.hasOwn(options, "fetchImpl") &&
+      options.sweBenchProLive !== true
+    ) {
+      throw new Error("browser_snapshot_disabled_for_mock_fetch");
+    }
+    const pageSnapshot = typeof options.sweBenchProText === "string"
+      ? {
+          text: options.sweBenchProText,
+          official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.sweBenchProOfficialComponentSnapshot, sourceInfo, {
+            componentKind: "swe_bench_pro",
+            selectorVersion: "swe-bench-pro-v1",
+            capturedAt: options.generatedAt
+          }),
+          evidence_assets: Array.isArray(options.sweBenchProEvidenceAssets) ? options.sweBenchProEvidenceAssets : []
+        }
+      : typeof options.sweBenchProTextFetcher === "function"
+        ? {
+            text: await options.sweBenchProTextFetcher(sourceInfo),
+            official_component_snapshot: buildOfficialComponentSnapshotFromOption(options.sweBenchProOfficialComponentSnapshot, sourceInfo, {
+              componentKind: "swe_bench_pro",
+              selectorVersion: "swe-bench-pro-v1",
+              capturedAt: options.generatedAt
+            }),
+            evidence_assets: Array.isArray(options.sweBenchProEvidenceAssets) ? options.sweBenchProEvidenceAssets : []
+          }
+        : await readSweBenchProPageSnapshot(sourceInfo, options);
+    const entries = parseSweBenchProText(pageSnapshot.text);
+    const snapshot = sweBenchProSnapshot(entries, sourceInfo, options.generatedAt, {
+      officialComponentSnapshot: pageSnapshot.official_component_snapshot
+    });
+    const complete = snapshot.snapshot_status === "complete";
+    if (complete) {
+      return {
+        status: "checked",
+        notes: `public_page_snapshot; ${snapshot.top_entries.length} rows parsed; collection_method=playwright_dom`,
+        snapshot,
+        evidence_assets: pageSnapshot.evidence_assets || []
+      };
+    }
+    return sweBenchProStaticFallbackSource(sourceInfo, options, `parsed_${snapshot.top_entries.length}_rows`);
+  } catch (error) {
+    return sweBenchProStaticFallbackSource(sourceInfo, options, withRetryNote(formatDiscoveryErrorNote(error), error));
+  }
+}
+
+async function readSweBenchProPageSnapshot(sourceInfo, options = {}) {
+  const { chromium } = await import("@playwright/test");
+  const timeoutMs = Number.isInteger(sourceInfo.timeoutMs) && sourceInfo.timeoutMs > 0
+    ? sourceInfo.timeoutMs
+    : Number.isInteger(sourceInfo.timeout_ms) && sourceInfo.timeout_ms > 0
+      ? sourceInfo.timeout_ms
+      : 30000;
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
+    await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
+    const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    const official_component_snapshot = await captureOfficialComponentSnapshot(page, sourceInfo, {
+      componentKind: "swe_bench_pro",
+      selectorVersion: "swe-bench-pro-v1",
+      capturedAt: options.generatedAt,
+      selectors: [
+        "[data-swe-bench-pro-leaderboard]",
+        "main [class*='leaderboard']",
+        "main [class*='ranking']",
+        "[class*='leaderboard'] table",
+        "[class*='ranking'] table",
+        "table"
+      ]
+    });
+    const evidence_assets = await captureDailyTrackingPageEvidence({
+      page,
+      sourceInfo,
+      rootDir: options.rootDir || process.cwd(),
+      outDir: options.evidenceOutDir || options.outDir || "docs",
+      reportDate: options.reportDate,
+      maxScreenshots: 5
+    });
+    return { text, official_component_snapshot, evidence_assets };
+  } finally {
+    await browser.close();
+  }
+}
+
+export function parseSweBenchProText(text) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => cleanText(line))
+    .filter(Boolean);
+  const entries = [];
+  const seen = new Set();
+  for (let index = 0; index < lines.length && entries.length < 10; index += 1) {
+    const score = sweBenchProScoreLine(lines[index]);
+    if (!score) {
+      continue;
+    }
+    const model = previousSweBenchProModelLine(lines, index);
+    if (!model || seen.has(model.toLowerCase())) {
+      continue;
+    }
+    seen.add(model.toLowerCase());
+    entries.push({
+      rank: entries.length + 1,
+      model,
+      provider: sweBenchProProviderForModel(model),
+      tokens: score,
+      change: previousSweBenchProNewMarker(lines, index) ? "new" : "Resolve Rate"
+    });
+  }
+  return entries;
+}
+
+function sweBenchProStaticFallbackSource(sourceInfo, options = {}, reason = "") {
+  const snapshot = sweBenchProSnapshot(SWE_BENCH_PRO_STATIC_ROWS, sourceInfo, options.generatedAt, {
+    officialComponentSnapshot: sweBenchProOfficialComponentSnapshot(sourceInfo, options.generatedAt),
+    notes: `Static official snapshot fallback from Scale Labs public leaderboard; fallback_reason=${sanitizeNoteValue(reason)}`
+  });
+  return {
+    status: "checked",
+    notes: `official_page_snapshot_static_fallback; ${snapshot.top_entries.length} rows parsed; fallback_reason=${sanitizeNoteValue(reason)}`,
+    snapshot,
+    evidence_assets: []
+  };
+}
+
+function sweBenchProSnapshot(entries, sourceInfo, generatedAt, extras = {}) {
+  const topEntries = entries.slice(0, 10).map((entry, index) => ({
+    rank: Number(entry.rank) || index + 1,
+    model: String(entry.model || "").trim(),
+    provider: String(entry.provider || sweBenchProProviderForModel(entry.model)).trim(),
+    tokens: String(entry.tokens || "").trim(),
+    change: String(entry.change || "Resolve Rate").trim()
+  })).filter((entry) => entry.model && entry.provider && entry.tokens);
+  return {
+    type: "swe_bench_pro_public_page",
+    collection_method: extras.notes ? "public_page_static" : "public_page_playwright",
+    snapshot_status: hasCompleteSweBenchProTop10(topEntries) ? "complete" : "partial",
+    snapshot_as_of: generatedAt || new Date().toISOString(),
+    source_url: sourceInfo.url,
+    top_entries: topEntries,
+    ...(extras.officialComponentSnapshot ? { official_component_snapshot: extras.officialComponentSnapshot } : {}),
+    notes: extras.notes || "Scale Labs SWE-Bench Pro public leaderboard snapshot; use as coding benchmark signal, not production selection proof."
+  };
+}
+
+function trackingTableOfficialComponentSnapshot({
+  componentKind,
+  sourceInfo,
+  generatedAt,
+  selectorVersion,
+  sourceSelector,
+  className,
+  marker,
+  title,
+  subtitle,
+  columns,
+  rows
+}) {
+  const tableRows = rows.map((row) => `
+        <tr>${row.map((cell) => `<td>${escapeHtmlText(cell)}</td>`).join("")}</tr>`).join("");
+  const tableHeaders = columns.map((column) => `<th>${escapeHtmlText(column)}</th>`).join("");
+  return createOfficialComponentSnapshot({
+    componentKind,
+    sourceUrl: sourceInfo.url,
+    capturedAt: generatedAt,
+    selectorVersion,
+    sourceSelector,
+    html: `
+      <section class="${escapeHtmlText(className)}" ${marker}>
+        <header>
+          <p>${escapeHtmlText(title)}</p>
+          <span>${escapeHtmlText(subtitle)}</span>
+        </header>
+        <table>
+          <thead><tr>${tableHeaders}</tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </section>`,
+    css: `
+      .${className} { border: 1px solid currentColor; padding: 16px; }
+      .${className} table { width: 100%; border-collapse: collapse; }
+      .${className} th, .${className} td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }
+    `
+  });
+}
+
+function sweBenchProOfficialComponentSnapshot(sourceInfo, generatedAt) {
+  const rows = SWE_BENCH_PRO_STATIC_ROWS.map((entry) => `
+        <tr>
+          <td>${escapeHtmlText(`#${entry.rank}`)}</td>
+          <td>${escapeHtmlText(entry.model)}</td>
+          <td>${escapeHtmlText(entry.provider)}</td>
+          <td>${escapeHtmlText(entry.tokens)}</td>
+          <td>${escapeHtmlText(entry.change)}</td>
+        </tr>`).join("");
+  return createOfficialComponentSnapshot({
+    componentKind: "swe_bench_pro",
+    sourceUrl: sourceInfo.url,
+    capturedAt: generatedAt,
+    selectorVersion: "swe-bench-pro-v1",
+    sourceSelector: "[data-swe-bench-pro-leaderboard]",
+    html: `
+      <section class="swe-bench-pro-card" data-swe-bench-pro-leaderboard>
+        <header>
+          <p>SWE-Bench Pro (Public Dataset)</p>
+          <h2>Performance Comparison</h2>
+          <span>Primary metric: Resolve Rate</span>
+        </header>
+        <table>
+          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </section>`,
+    css: `
+      .swe-bench-pro-card { border: 1px solid currentColor; padding: 16px; }
+      .swe-bench-pro-card table { width: 100%; border-collapse: collapse; }
+      .swe-bench-pro-card th, .swe-bench-pro-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }
+    `
+  });
+}
+
+const SWE_BENCH_PRO_STATIC_ROWS = [
+  { rank: 1, model: "gpt-5.4 (xHigh)*", provider: "openai", tokens: "59.10±3.56%", change: "Resolve Rate" },
+  { rank: 2, model: "Muse Spark*", provider: "scale", tokens: "55.00±3.60%", change: "new" },
+  { rank: 3, model: "claude-opus-4-6 (thinking)*", provider: "anthropic", tokens: "51.90±3.61%", change: "Resolve Rate" },
+  { rank: 4, model: "gemini-3.1-pro (thinking)*", provider: "google", tokens: "46.10±3.60%", change: "Resolve Rate" },
+  { rank: 5, model: "claude-opus-4-5-20251101", provider: "anthropic", tokens: "45.89±3.60%", change: "Resolve Rate" },
+  { rank: 6, model: "claude-4-5-Sonnet", provider: "anthropic", tokens: "43.60±3.60%", change: "Resolve Rate" },
+  { rank: 7, model: "gemini-3-pro-preview", provider: "google", tokens: "43.30±3.60%", change: "Resolve Rate" },
+  { rank: 8, model: "claude-4-Sonnet", provider: "anthropic", tokens: "42.70±3.59%", change: "Resolve Rate" },
+  { rank: 9, model: "gpt-5-2025-08-07 (High)", provider: "openai", tokens: "41.78±3.49%", change: "Resolve Rate" },
+  { rank: 10, model: "gpt-5.2-codex", provider: "openai", tokens: "41.04±3.57%", change: "Resolve Rate" }
+];
+
+function hasCompleteSweBenchProTop10(entries) {
+  return Array.isArray(entries) &&
+    entries.length === 10 &&
+    entries.every((entry, index) =>
+      Number(entry.rank) === index + 1 &&
+      entry.model &&
+      entry.provider &&
+      /\d+(?:\.\d+)?/.test(entry.tokens || "") &&
+      entry.change
+    );
+}
+
+function sweBenchProScoreLine(value) {
+  const text = String(value || "").trim();
+  const match = text.match(/^(\d{1,3}(?:\.\d+)?)\s*(?:±|\+\/-|\+|-)?\s*(\d{1,2}(?:\.\d+)?)?\s*%?$/);
+  if (!match) {
+    return "";
+  }
+  const score = match[1];
+  const error = match[2] ? `±${match[2]}` : "";
+  return `${score}${error}%`;
+}
+
+function previousSweBenchProModelLine(lines, index) {
+  for (let current = index - 1; current >= 0 && current >= index - 8; current -= 1) {
+    const line = lines[current];
+    if (!line || /^new$/i.test(line) || /^\d+$/.test(line) || sweBenchProScoreLine(line)) {
+      continue;
+    }
+    if (/rank|model|provider|resolve|rate|dataset|primary metric|performance comparison|cost|accuracy/i.test(line)) {
+      continue;
+    }
+    if (/[A-Za-z]/.test(line)) {
+      return line;
+    }
+  }
+  return "";
+}
+
+function previousSweBenchProNewMarker(lines, index) {
+  return lines.slice(Math.max(0, index - 4), index).some((line) => /^new$/i.test(line));
+}
+
+function sweBenchProProviderForModel(model) {
+  const lower = String(model || "").toLowerCase();
+  if (/claude|anthropic/.test(lower)) return "anthropic";
+  if (/gpt|openai|codex/.test(lower)) return "openai";
+  if (/gemini|google/.test(lower)) return "google";
+  if (/qwen|alibaba/.test(lower)) return "alibaba";
+  if (/deepseek/.test(lower)) return "deepseek";
+  if (/llama|meta/.test(lower)) return "meta";
+  if (/kimi|moonshot/.test(lower)) return "moonshot";
+  if (/mistral|codestral/.test(lower)) return "mistral";
+  if (/minimax/.test(lower)) return "minimax";
+  if (/muse|spark/.test(lower)) return "scale";
+  return "unknown";
+}
+
+function escapeHtmlText(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function buildOfficialComponentSnapshotFromOption(value, sourceInfo, defaults = {}) {
@@ -3942,6 +4287,8 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, compo
     change: entry.change
   }));
   const tabs = normalizeArtificialAnalysisComponentTabs(componentTabs, topEntries);
+  const officialComponentSnapshot = extras.officialComponentSnapshot ||
+    (topEntries.length === 10 ? artificialAnalysisOfficialComponentSnapshot(topEntries, sourceInfo, generatedAt) : null);
   return {
     type: "artificial_analysis_intelligence_index_public_page",
     collection_method: "public_page_playwright",
@@ -3950,9 +4297,31 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, compo
     source_url: sourceInfo.url,
     top_entries: topEntries,
     ...(Object.keys(tabs).length > 0 ? { component_tabs: tabs } : {}),
-    ...(extras.officialComponentSnapshot ? { official_component_snapshot: extras.officialComponentSnapshot } : {}),
+    ...(officialComponentSnapshot ? { official_component_snapshot: officialComponentSnapshot } : {}),
     notes: "Public Artificial Analysis Intelligence Index snapshot; use as independent benchmark signal, not production-selection proof."
   };
+}
+
+function artificialAnalysisOfficialComponentSnapshot(entries, sourceInfo, generatedAt) {
+  return trackingTableOfficialComponentSnapshot({
+    componentKind: "artificial_analysis_index",
+    sourceInfo,
+    generatedAt,
+    selectorVersion: "artificial-analysis-index-v1",
+    sourceSelector: "[data-artificial-analysis-index]",
+    className: "artificial-analysis-index-card",
+    marker: "data-artificial-analysis-index",
+    title: "Artificial Analysis Intelligence Index",
+    subtitle: "Top models by independent Intelligence Index",
+    columns: ["Rank", "Model", "Provider", "Score", "Metric"],
+    rows: entries.map((entry) => [
+      `#${entry.rank}`,
+      entry.model,
+      entry.provider,
+      entry.tokens,
+      entry.change
+    ])
+  });
 }
 
 function parseArtificialAnalysisComponentTabs(text, scoreEntries = []) {

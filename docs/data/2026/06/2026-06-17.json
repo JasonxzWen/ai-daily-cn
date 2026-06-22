@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-17",
   "title": "AI 日报 2026-06-17",
-  "summary": "今天最值得看的主线有 OpenAI披露模型能力和评估方法更新；Qwen 团队更新agent 工作流和开发工具能力；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。",
+  "summary": "今天最值得看的主线有 OpenAI披露模型能力和评估方法更新；Qwen 团队介绍机器人学习与多模态推理实验；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。",
   "hero_highlights": [
     {
       "title": "OpenAI披露模型能力和评估方法更新",
@@ -23,13 +23,13 @@
       "source_item_ref": "https://x.ai/news/agent-dashboard"
     },
     {
-      "title": "Qwen 团队更新agent 工作流和开发工具能力",
-      "url": "https://www.alibabacloud.com/blog/qwen-robotnav-a-scalable-navigation-model-designed-for-an-agentic-navigation-system_603266",
+      "title": "Qwen 团队介绍机器人学习与多模态推理实验",
+      "url": "https://www.alibabacloud.com/blog/qwen-robotworld-boundless-worlds-for-embodied-agents_603268",
       "reason": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
-      "what_happened": "Qwen 团队更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性",
+      "what_happened": "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力",
       "why_watch": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "category": "china_open_source_community",
-      "source_item_ref": "https://www.alibabacloud.com/blog/qwen-robotnav-a-scalable-navigation-model-designed-for-an-agentic-navigation-system_603266"
+      "source_item_ref": "https://www.alibabacloud.com/blog/qwen-robotworld-boundless-worlds-for-embodied-agents_603268"
     }
   ],
   "main_items": [
@@ -53,20 +53,20 @@
       "image_urls": []
     },
     {
-      "title": "Qwen 团队更新agent 工作流和开发工具能力",
+      "title": "Qwen 团队介绍机器人学习与多模态推理实验",
       "editorial_category": "ai_industry",
       "event_date": "2026-06-17",
-      "url": "https://www.alibabacloud.com/blog/qwen-robotnav-a-scalable-navigation-model-designed-for-an-agentic-navigation-system_603266",
+      "url": "https://www.alibabacloud.com/blog/qwen-robotworld-boundless-worlds-for-embodied-agents_603268",
       "source": "Alibaba Cloud Blog",
       "tier": "T0",
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "Qwen 团队更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
+      "summary": "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力。",
       "bullets": [
-        "**Qwen 团队更新agent 工作流和开发工具能力**：材料把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，已披露事实集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。",
-        "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本。"
+        "**具身智能路线**：专访把 VLA、世界模型和机器人对物理因果的理解放在一起，重点是当前系统仍缺少稳定的物理预测能力。",
+        "**Qwen 团队介绍机器人学习与多模态推理实验**：文章把行业焦虑落到具身智能的物理世界理解能力，讨论世界模型是否能成为补足 VLA 路线短板的方向。",
+        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。"
       ],
       "importance": "major",
       "image_urls": []
@@ -148,6 +148,25 @@
       "image_urls": []
     },
     {
+      "title": "相关团队更新AI 产品、平台或工程实践",
+      "editorial_category": "open_source",
+      "event_date": "2026-06-17",
+      "url": "https://huggingface.co/blog/zai-org/glm-52-blog",
+      "source": "Z.ai Hugging Face Organization",
+      "tier": "T0",
+      "entities": [
+        "Z.ai Hugging Face Organization"
+      ],
+      "summary": "相关团队更新AI 产品、平台或工程实践，材料覆盖功能变化、使用场景、接入方式、限制条件和后续部署边界，边界落在公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
+      "bullets": [
+        "**相关团队更新AI 产品、平台或工程实践**：材料把AI 产品、平台或工程实践落到功能变化、使用场景、接入方式、限制条件和后续部署边界，已披露事实集中在功能变化、适用场景、接入方式和限制条件。",
+        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
+        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+      ],
+      "importance": "major",
+      "image_urls": []
+    },
+    {
       "title": "Agent Dashboard发布生产 agent 观测面板",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-06-16",
@@ -203,33 +222,14 @@
       ],
       "importance": "notable",
       "image_urls": []
-    },
-    {
-      "title": "ReproRepo公开agent 失败复现报告流程",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-16",
-      "url": "https://arxiv.org/abs/2606.18237v1",
-      "source": "arXiv cs.AI",
-      "tier": "T2",
-      "entities": [
-        "arXiv cs.AI"
-      ],
-      "summary": "ReproRepo公开agent 失败复现报告流程，材料覆盖提示词、工具轨迹、仓库快照、期望输出和回归回放元数据，边界落在复现质量取决于记录粒度、隐私处理和能否稳定重放失败。",
-      "bullets": [
-        "**ReproRepo公开agent 失败复现报告流程**：材料把agent 失败复现报告流程落到提示词、工具轨迹、仓库快照、期望输出和回归回放元数据，已披露事实集中在prompt、工具轨迹、仓库快照和回归回放字段。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
-      ],
-      "importance": "notable",
-      "image_urls": []
     }
   ],
   "github_trending": [
     {
       "name": "apple/container",
       "repo": "apple/container",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/apple/container/main/unknown",
         "hit": true,
@@ -255,8 +255,8 @@
     {
       "name": "NVIDIA/SkillSpector",
       "repo": "NVIDIA/SkillSpector",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/nvidia/skillspector/main/unknown",
         "hit": true,
@@ -282,8 +282,8 @@
     {
       "name": "phuryn/pm-skills",
       "repo": "phuryn/pm-skills",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/phuryn/pm-skills/main/unknown",
         "hit": true,
@@ -309,8 +309,8 @@
     {
       "name": "addyosmani/agent-skills",
       "repo": "addyosmani/agent-skills",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/addyosmani/agent-skills/main/unknown",
         "hit": true,
@@ -336,8 +336,8 @@
     {
       "name": "iptv-org/iptv",
       "repo": "iptv-org/iptv",
-      "description": "该仓库面向知识库和数据应用，README 显示核心能力包括API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向知识库和数据应用，README 显示核心能力包括API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/iptv-org/iptv/master/unknown",
         "hit": true,
@@ -363,8 +363,8 @@
     {
       "name": "mvanhorn/last30days-skill",
       "repo": "mvanhorn/last30days-skill",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/mvanhorn/last30days-skill/main/unknown",
         "hit": true,
@@ -390,8 +390,8 @@
     {
       "name": "chopratejas/headroom",
       "repo": "chopratejas/headroom",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/chopratejas/headroom/main/unknown",
         "hit": true,
@@ -417,8 +417,8 @@
     {
       "name": "Panniantong/Agent-Reach",
       "repo": "Panniantong/Agent-Reach",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括Agent 构建、API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括Agent 构建、API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/panniantong/agent-reach/main/unknown",
         "hit": true,
@@ -444,8 +444,8 @@
     {
       "name": "asgeirtj/system_prompts_leaks",
       "repo": "asgeirtj/system_prompts_leaks",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工。",
       "readme_cache": {
         "key": "github-readme/asgeirtj/system_prompts_leaks/main/unknown",
         "hit": true,
@@ -471,8 +471,8 @@
     {
       "name": "music-assistant/server",
       "repo": "music-assistant/server",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/music-assistant/server/main/unknown",
         "hit": true,
@@ -498,8 +498,8 @@
     {
       "name": "soxoj/maigret",
       "repo": "soxoj/maigret",
-      "description": "该仓库面向浏览器自动化，README 显示核心能力包括API/SDK 适配，并提供示例。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向浏览器自动化，README 显示核心能力包括API/SDK 适配，并提供示例。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为浏览器自动化，核心能力集中在API/SDK 适配，并提供示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为浏览器自动化，核心能力集中在API/SDK 适配，并提供示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/soxoj/maigret/main/unknown",
         "hit": true,
@@ -525,8 +525,8 @@
     {
       "name": "puppeteer/puppeteer",
       "repo": "puppeteer/puppeteer",
-      "description": "该仓库面向浏览器自动化，README 显示核心能力包括工具调用和工作流编排、API/SDK 适配，并提供可复用包、示例。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向浏览器自动化，README 显示核心能力包括工具调用和工作流编排、API/SDK 适配，并提供可复用包、示例。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为浏览器自动化，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包、示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为浏览器自动化，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包、示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/puppeteer/puppeteer/main/unknown",
         "hit": true,
@@ -552,8 +552,8 @@
     {
       "name": "biomejs/biome",
       "repo": "biomejs/biome",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括API/SDK 适配，并提供可复用包。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括API/SDK 适配，并提供可复用包。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/biomejs/biome/main/unknown",
         "hit": true,
@@ -579,8 +579,8 @@
     {
       "name": "juicedata/juicefs",
       "repo": "juicedata/juicefs",
-      "description": "该仓库面向知识库和数据应用，README 显示核心能力包括评测与回归、记忆或知识检索，并提供测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向知识库和数据应用，README 显示核心能力包括评测与回归、记忆或知识检索，并提供测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为知识库和数据应用，核心能力集中在评测与回归、记忆或知识检索，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为知识库和数据应用，核心能力集中在评测与回归、记忆或知识检索，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/juicedata/juicefs/main/unknown",
         "hit": true,
@@ -606,8 +606,8 @@
     {
       "name": "jenkinsci/jenkins",
       "repo": "jenkinsci/jenkins",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/jenkinsci/jenkins/master/unknown",
         "hit": true,
@@ -633,8 +633,8 @@
     {
       "name": "roboflow/supervision",
       "repo": "roboflow/supervision",
-      "description": "该仓库面向知识库和数据应用，README 显示核心能力包括工具调用和工作流编排、API/SDK 适配，并提供可复用包。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向知识库和数据应用，README 显示核心能力包括工具调用和工作流编排、API/SDK 适配，并提供可复用包。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为知识库和数据应用，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为知识库和数据应用，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/roboflow/supervision/main/unknown",
         "hit": true,
@@ -660,8 +660,8 @@
     {
       "name": "freeCodeCamp/freeCodeCamp",
       "repo": "freeCodeCamp/freeCodeCamp",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/freecodecamp/freecodecamp/main/unknown",
         "hit": true,
@@ -687,8 +687,8 @@
     {
       "name": "rolldown/rolldown",
       "repo": "rolldown/rolldown",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排、API/SDK 适配，并提供可复用包、测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排、API/SDK 适配，并提供可复用包、测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排、API/SDK 适配，并提供可复用包、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排、API/SDK 适配，并提供可复用包、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/rolldown/rolldown/main/unknown",
         "hit": true,
@@ -714,8 +714,8 @@
     {
       "name": "kenn-io/agentsview",
       "repo": "kenn-io/agentsview",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建，并提供部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建，并提供部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建，并提供部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建，并提供部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/kenn-io/agentsview/main/unknown",
         "hit": true,
@@ -741,8 +741,8 @@
     {
       "name": "apache/flink",
       "repo": "apache/flink",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、记忆或知识检索、API/SDK 适配，并提供示例、测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、记忆或知识检索、API/SDK 适配，并提供示例、测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、记忆或知识检索、API/SDK 适配，并提供示例、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、记忆或知识检索、API/SDK 适配，并提供示例、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "readme_cache": {
         "key": "github-readme/apache/flink/master/unknown",
         "hit": true,
@@ -777,7 +777,7 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AIGC / content generation",
-      "summary": "AWS讲解SageMaker 推理容器缓存方案，原文说明模型加载延迟、冷启动时间、发布风险和生产推理成本。读者可核对容器缓存、模型加载、冷启动延迟和部署成本，并留意收益取决于模型大小、镜像组织、缓存命中率和部署频率。文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
+      "summary": "AWS讲解SageMaker 推理容器缓存方案，重点落在模型加载延迟、冷启动时间、发布风险和生产推理成本。更有价值的信息是容器缓存、模型加载、冷启动延迟和部署成本，判断这类方案时还要看收益取决于模型大小、镜像组织、缓存命中率和部署频率。文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -790,7 +790,7 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA拆解交易基础模型与反欺诈工作流，原文说明交易序列建模、特征流水线、合成数据边界和部署取舍。读者可核对交易数据、序列建模、特征流水线和反欺诈部署，并留意金融场景还要处理数据偏差、可解释性、误报成本和合规要求。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "NVIDIA拆解交易基础模型与反欺诈工作流，重点落在交易序列建模、特征流水线、合成数据边界和部署取舍。更有价值的信息是交易数据、序列建模、特征流水线和反欺诈部署，判断这类方案时还要看金融场景还要处理数据偏差、可解释性、误报成本和合规要求。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -803,7 +803,7 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "AWS说明多 agent 安全护栏方案，原文说明策略检查、提示过滤、响应控制、企业应用和可观测性。读者可核对Guardrails、策略检查、提示过滤和响应控制，并留意多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "AWS说明多 agent 安全护栏方案，重点落在策略检查、提示过滤、响应控制、企业应用和可观测性。更有价值的信息是Guardrails、策略检查、提示过滤和响应控制，判断这类方案时还要看多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -816,7 +816,7 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程，原文说明端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界。读者可核对XR AI、端侧推理、语音交互、感知输入和 SDK 集成，并留意落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "NVIDIA拆解XR 眼镜里的端侧 agent 开发流程，重点落在端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界。更有价值的信息是XR AI、端侧推理、语音交互、感知输入和 SDK 集成，判断这类方案时还要看落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -829,7 +829,7 @@
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案，原文说明角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍。读者可核对ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口，并留意游戏内 agent 还要处理实时延迟、内容安全、角色一致性和引擎集成成本。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案，重点落在角色行为、语音接口、本地推理、场景集成、插件工作流和部署取舍。更有价值的信息是ACE Game Agent SDK、Unreal Engine 插件、本地推理和角色行为接口，判断这类方案时还要看游戏内 agent 还要处理实时延迟、内容安全、角色一致性和引擎集成成本。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -842,7 +842,7 @@
       "author": "AWS Machine Learning Blog",
       "event_date": "2026-06-16",
       "topic": "AI engineering tools",
-      "summary": "AWS说明SageMaker 推测解码并行化方案，原文说明draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件。读者可核对P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标，并留意优化收益取决于模型结构、请求形态、草稿模型质量和线上延迟预算。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "AWS说明SageMaker 推测解码并行化方案，重点落在draft model 并行、解码延迟、吞吐取舍、部署设置和适用条件。更有价值的信息是P-EAGLE、speculative decoding、SageMaker 部署和吞吐延迟指标，判断这类方案时还要看优化收益取决于模型结构、请求形态、草稿模型质量和线上延迟预算。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -858,29 +858,41 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-16",
       "topic": "AI industry",
-      "summary": "NVIDIA披露Blackwell MLPerf 训练性能结果，原文说明训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。读者可核对Blackwell、MLPerf Training、吞吐指标和训练基准设置，并留意benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+      "summary": "NVIDIA披露Blackwell MLPerf 训练性能结果，重点落在训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。更有价值的信息是Blackwell、MLPerf Training、吞吐指标和训练基准设置，判断这类方案时还要看benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA介绍机器人学习与多模态推理实验",
+      "title": "Planet AI更新agent 工作流和开发工具能力",
       "editorial_category": "viewpoint_analysis",
-      "image_url": "https://iprsoftwaremedia.com/219/files/202606/9249f5850e0adb7f59ab8bdb79c3fcde/6a31cf733d63328c13ebeddd_NVIDIA-XR-AI_Featured-Image-Poster-Alt-842x450/NVIDIA-XR-AI_Featured-Image-Poster-Alt-842x450_thmb.jpg",
-      "image_alt": "Hands Free, AIs Forward: NVIDIA XR AI Brings Agents to AR Glasses",
-      "image_source": "feed",
-      "url": "https://blogs.nvidia.com/blog/nvidia-xr-ai/",
-      "publisher": "NVIDIA Newsroom RSS",
-      "author": "NVIDIA Newsroom RSS",
-      "event_date": "2026-06-16",
+      "url": "https://huggingface.co/blog/amazon/strands-lerobot-hub-to-hardware",
+      "publisher": "Planet AI",
+      "author": "Planet AI",
+      "event_date": "2026-06-17",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA介绍机器人学习与多模态推理实验，原文说明具身任务规划、训练数据、多模态推理和评估工作流。读者可核对机器人学习实验、多模态推理和任务规划评估，并留意研究信号仍需要看真实机器人任务、数据规模和评测设置。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "Planet AI更新agent 工作流和开发工具能力，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看落地质量取决于权限模型、评估回放、团队流程和可观测性。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     }
   ],
   "chinese_media_dynamics": [
+    {
+      "title": "困住医疗AI的死循环，终于有国产玩家跑通了",
+      "url": "https://www.qbitai.com/2026/06/436171.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-17",
+      "topic": "中文 AI 媒体动态",
+      "summary": "困住医疗AI的死循环，终于有国产玩家跑通了：在多项关键医疗测评上打败了GPT-5.5。",
+      "key_points": [
+        "困住医疗AI的死循环，终于有国产玩家跑通了：在多项关键医疗测评上打败了GPT-5.5",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+      ],
+      "importance": "notable",
+      "image_urls": []
+    },
     {
       "title": "微信支付发布AI专属卡 WorkBuddy率先接入",
       "url": "https://www.qbitai.com/2026/06/436160.html",
@@ -1073,7 +1085,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T08:34:45.256Z",
+        "snapshot_as_of": "2026-06-17T10:49:18.258Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -1147,16 +1159,28 @@
             "change": "4%"
           }
         ],
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "openrouter_rankings",
+          "source_url": "https://openrouter.ai/rankings",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "openrouter-rankings-v1",
+          "source_selector": "[data-openrouter-rankings]",
+          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>MiniMax M3</td><td>minimax</td><td>4.64T tokens</td><td>44%</td></tr>\n        <tr><td>#2</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.41T tokens</td><td>4%</td></tr>\n        <tr><td>#3</td><td>Hy3 preview</td><td>tencent</td><td>3.84T tokens</td><td>9%</td></tr>\n        <tr><td>#4</td><td>MiMo-V2.5</td><td>xiaomi</td><td>3.66T tokens</td><td>34%</td></tr>\n        <tr><td>#5</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.69T tokens</td><td>67%</td></tr>\n        <tr><td>#6</td><td>Owl Alpha</td><td>openrouter</td><td>2.45T tokens</td><td>22%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>1.97T tokens</td><td>3%</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.88T tokens</td><td>4%</td></tr>\n        <tr><td>#9</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.28T tokens</td><td>4%</td></tr>\n        <tr><td>#10</td><td>DeepSeek V3.2</td><td>deepseek</td><td>1.13T tokens</td><td>4%</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".openrouter-rankings-card { border: 1px solid currentColor; padding: 16px; }\n      .openrouter-rankings-card table { width: 100%; border-collapse: collapse; }\n      .openrouter-rankings-card th, .openrouter-rankings-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:ba75a68e760c6a68e6d6c9b43302f8f544ebdfde65e3aab7cb4a51d665fd79b9",
+          "css_hash": "sha256:e5df3dc0e07de42f5c2ca4021bbf59258d47d1ef0fa569d55d98b09876618e43"
+        },
         "history_entries": []
       },
       "tracking_component_snapshot": {
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-17T08:34:45.256Z",
+        "collected_at": "2026-06-17T10:49:18.258Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:cf0186cc19f16ef14c443cd403e8274921f927967fb760365721c7042e6477c6",
-        "data_hash": "sha256:204b1f4c465a944a5f2ea3b4b3d36a5cfd544f2da08b766d4153cbd6c06e1a7c",
+        "data_hash": "sha256:44156e911a7aa4480a82e772abbe489244c4a4dab1d1d19950c7cc5b89c87c36",
         "tabs": [
           {
             "id": "top-models",
@@ -1452,11 +1476,23 @@
         },
         "cache_path": "",
         "fallback_reason": "",
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "openrouter_rankings",
+          "source_url": "https://openrouter.ai/rankings",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "openrouter-rankings-v1",
+          "source_selector": "[data-openrouter-rankings]",
+          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>MiniMax M3</td><td>minimax</td><td>4.64T tokens</td><td>44%</td></tr>\n        <tr><td>#2</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.41T tokens</td><td>4%</td></tr>\n        <tr><td>#3</td><td>Hy3 preview</td><td>tencent</td><td>3.84T tokens</td><td>9%</td></tr>\n        <tr><td>#4</td><td>MiMo-V2.5</td><td>xiaomi</td><td>3.66T tokens</td><td>34%</td></tr>\n        <tr><td>#5</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.69T tokens</td><td>67%</td></tr>\n        <tr><td>#6</td><td>Owl Alpha</td><td>openrouter</td><td>2.45T tokens</td><td>22%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>1.97T tokens</td><td>3%</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.88T tokens</td><td>4%</td></tr>\n        <tr><td>#9</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.28T tokens</td><td>4%</td></tr>\n        <tr><td>#10</td><td>DeepSeek V3.2</td><td>deepseek</td><td>1.13T tokens</td><td>4%</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".openrouter-rankings-card { border: 1px solid currentColor; padding: 16px; }\n      .openrouter-rankings-card table { width: 100%; border-collapse: collapse; }\n      .openrouter-rankings-card th, .openrouter-rankings-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:ba75a68e760c6a68e6d6c9b43302f8f544ebdfde65e3aab7cb4a51d665fd79b9",
+          "css_hash": "sha256:e5df3dc0e07de42f5c2ca4021bbf59258d47d1ef0fa569d55d98b09876618e43"
+        },
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-17T08:34:45.256Z",
+          "collected_at": "2026-06-17T10:49:18.258Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:204b1f4c465a944a5f2ea3b4b3d36a5cfd544f2da08b766d4153cbd6c06e1a7c",
+          "data_hash": "sha256:44156e911a7aa4480a82e772abbe489244c4a4dab1d1d19950c7cc5b89c87c36",
           "top_rows": [
             {
               "rank": 1,
@@ -1632,7 +1668,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-17T08:34:45.256Z",
+        "snapshot_as_of": "2026-06-17T10:49:18.258Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -1802,16 +1838,28 @@
             ]
           }
         },
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "artificial_analysis_index",
+          "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "artificial-analysis-index-v1",
+          "source_selector": "[data-artificial-analysis-index]",
+          "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".artificial-analysis-index-card { border: 1px solid currentColor; padding: 16px; }\n      .artificial-analysis-index-card table { width: 100%; border-collapse: collapse; }\n      .artificial-analysis-index-card th, .artificial-analysis-index-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:2a6211eed7acea0dbf188caca37b12ac5937ac03c08119c42ccd2e94f897d66e",
+          "css_hash": "sha256:ca6c14bf5033437bf403050f8a1267f835b68aab80f54905dfa8ecc653808bbf"
+        },
         "history_entries": []
       },
       "tracking_component_snapshot": {
         "source": "Artificial Analysis",
         "component_kind": "artificial_analysis_index",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-17T08:34:45.256Z",
+        "collected_at": "2026-06-17T10:49:18.258Z",
         "selector_version": "artificial-analysis-index-v1",
         "raw_dom_hash": "sha256:caa7d33c2116c5495c0ff87bb3af671e33346e063be109cb1e5beccdf50e227a",
-        "data_hash": "sha256:634b94a0eed071a3d86dc0c4f7bcee90fee3aff59f6dd333b7cab6a87c5a8039",
+        "data_hash": "sha256:a673bd2b91d22697e0ca6b71afbf6ab505f2a1c1c6c94f16c15975fe32ff3db9",
         "tabs": [
           {
             "id": "score",
@@ -2102,11 +2150,23 @@
         },
         "cache_path": "",
         "fallback_reason": "",
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "artificial_analysis_index",
+          "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "artificial-analysis-index-v1",
+          "source_selector": "[data-artificial-analysis-index]",
+          "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".artificial-analysis-index-card { border: 1px solid currentColor; padding: 16px; }\n      .artificial-analysis-index-card table { width: 100%; border-collapse: collapse; }\n      .artificial-analysis-index-card th, .artificial-analysis-index-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:2a6211eed7acea0dbf188caca37b12ac5937ac03c08119c42ccd2e94f897d66e",
+          "css_hash": "sha256:ca6c14bf5033437bf403050f8a1267f835b68aab80f54905dfa8ecc653808bbf"
+        },
         "public_trace": {
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-17T08:34:45.256Z",
+          "collected_at": "2026-06-17T10:49:18.258Z",
           "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:634b94a0eed071a3d86dc0c4f7bcee90fee3aff59f6dd333b7cab6a87c5a8039",
+          "data_hash": "sha256:a673bd2b91d22697e0ca6b71afbf6ab505f2a1c1c6c94f16c15975fe32ff3db9",
           "top_rows": [
             {
               "rank": 1,
@@ -2199,18 +2259,526 @@
           "fallback_reason": ""
         }
       }
+    },
+    {
+      "id": "swe-bench-pro-public",
+      "name": "SWE-bench Pro",
+      "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      "event_date": "2026-06-17",
+      "source": "Scale Labs SWE-Bench Pro",
+      "category": "coding_benchmark",
+      "importance": "major",
+      "change_status": "changed",
+      "change_summary": "SWE-bench Pro Public Dataset Top 10 已解析：#1 gpt-5.4 (xHigh)* 59.10±3.56%，#2 Muse Spark* 55.00±3.60%，#3 claude-opus-4-6 (thinking)* 51.90±3.61%；新进榜条目包括 Muse Spark*。",
+      "summary": "Scale Labs 公开榜单显示，SWE-bench Pro Public Dataset 当前第一是 gpt-5.4 (xHigh)*（openai，Resolve Rate 59.10±3.56%）。 前三名为 gpt-5.4 (xHigh)* 59.10±3.56%、Muse Spark* 55.00±3.60%、claude-opus-4-6 (thinking)* 51.90±3.61%，Top 10 供应商分布为 anthropic 4、openai 3、google 2、scale 1。 这个榜单适合观察 coding agent 在长周期真实工程任务上的相对表现，但生产选型仍要结合 scaffold、成本上限、置信区间和团队自有仓库复测。",
+      "watch_points": [
+        "榜首 gpt-5.4 (xHigh)* 的 Resolve Rate 为 59.10±3.56%，需要看它是否依赖特定 agent scaffold 或成本上限。",
+        "新进榜条目：Muse Spark*（scale）。",
+        "把 SWE-bench Pro 与真实 IDE/CI 工作流分开看，避免把公开 benchmark 直接等同于团队仓库里的修复率。"
+      ],
+      "metrics": [
+        {
+          "label": "榜单范围",
+          "value": "SWE-bench Pro Public Top 10",
+          "trend": "same"
+        },
+        {
+          "label": "供应商分布",
+          "value": "anthropic 4、openai 3、google 2、scale 1",
+          "trend": "unknown"
+        },
+        {
+          "label": "#1",
+          "value": "gpt-5.4 (xHigh)*（openai）：Resolve Rate 59.10±3.56%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#2",
+          "value": "Muse Spark*（scale）：Resolve Rate 55.00±3.60%",
+          "trend": "new"
+        },
+        {
+          "label": "#3",
+          "value": "claude-opus-4-6 (thinking)*（anthropic）：Resolve Rate 51.90±3.61%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#4",
+          "value": "gemini-3.1-pro (thinking)*（google）：Resolve Rate 46.10±3.60%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#5",
+          "value": "claude-opus-4-5-20251101（anthropic）：Resolve Rate 45.89±3.60%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#6",
+          "value": "claude-4-5-Sonnet（anthropic）：Resolve Rate 43.60±3.60%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#7",
+          "value": "gemini-3-pro-preview（google）：Resolve Rate 43.30±3.60%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#8",
+          "value": "claude-4-Sonnet（anthropic）：Resolve Rate 42.70±3.59%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#9",
+          "value": "gpt-5-2025-08-07 (High)（openai）：Resolve Rate 41.78±3.49%",
+          "trend": "unknown"
+        },
+        {
+          "label": "#10",
+          "value": "gpt-5.2-codex（openai）：Resolve Rate 41.04±3.57%",
+          "trend": "unknown"
+        }
+      ],
+      "snapshot": {
+        "type": "swe_bench_pro_public_page",
+        "collection_method": "public_page_static",
+        "snapshot_status": "complete",
+        "snapshot_as_of": "2026-06-17T10:49:18.258Z",
+        "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        "top_entries": [
+          {
+            "rank": 1,
+            "model": "gpt-5.4 (xHigh)*",
+            "provider": "openai",
+            "tokens": "59.10±3.56%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 2,
+            "model": "Muse Spark*",
+            "provider": "scale",
+            "tokens": "55.00±3.60%",
+            "change": "new"
+          },
+          {
+            "rank": 3,
+            "model": "claude-opus-4-6 (thinking)*",
+            "provider": "anthropic",
+            "tokens": "51.90±3.61%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 4,
+            "model": "gemini-3.1-pro (thinking)*",
+            "provider": "google",
+            "tokens": "46.10±3.60%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 5,
+            "model": "claude-opus-4-5-20251101",
+            "provider": "anthropic",
+            "tokens": "45.89±3.60%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 6,
+            "model": "claude-4-5-Sonnet",
+            "provider": "anthropic",
+            "tokens": "43.60±3.60%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 7,
+            "model": "gemini-3-pro-preview",
+            "provider": "google",
+            "tokens": "43.30±3.60%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 8,
+            "model": "claude-4-Sonnet",
+            "provider": "anthropic",
+            "tokens": "42.70±3.59%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 9,
+            "model": "gpt-5-2025-08-07 (High)",
+            "provider": "openai",
+            "tokens": "41.78±3.49%",
+            "change": "Resolve Rate"
+          },
+          {
+            "rank": 10,
+            "model": "gpt-5.2-codex",
+            "provider": "openai",
+            "tokens": "41.04±3.57%",
+            "change": "Resolve Rate"
+          }
+        ],
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "swe_bench_pro",
+          "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "swe-bench-pro-v1",
+          "source_selector": "[data-swe-bench-pro-leaderboard]",
+          "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".swe-bench-pro-card { border: 1px solid currentColor; padding: 16px; }\n      .swe-bench-pro-card table { width: 100%; border-collapse: collapse; }\n      .swe-bench-pro-card th, .swe-bench-pro-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:cc4506cfb6f43dc3ea7331ad2e9ab545ed056a3aab2309bf4201d14baa1ce040",
+          "css_hash": "sha256:bbb18aff9c5bd0f35808108d31a64c2b62e0adcab81b24181da21bcd9a31c42d"
+        },
+        "history_entries": []
+      },
+      "tracking_component_snapshot": {
+        "source": "Scale Labs SWE-Bench Pro",
+        "component_kind": "swe_bench_pro",
+        "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        "collected_at": "2026-06-17T10:49:18.258Z",
+        "selector_version": "swe-bench-pro-v1",
+        "raw_dom_hash": "sha256:2d5ebf88219cf9ca3b8537c2a99a9339988bd6f4b8cb73e80b37c9c1e786a9a9",
+        "data_hash": "sha256:4a2b521368077791598faa67547d3e67a97e2557092e96bc3a6b9223cb7d7496",
+        "tabs": [
+          {
+            "id": "leaderboard",
+            "label": "Public Leaderboard",
+            "view": "leaderboard",
+            "fallback_reason": ""
+          }
+        ],
+        "series": [
+          {
+            "id": "swe-bench-pro-public-leaderboard",
+            "tab_id": "leaderboard",
+            "label": "SWE-Bench Pro Public Dataset",
+            "chart": "leaderboard",
+            "rows": [
+              {
+                "rank": 1,
+                "model": "gpt-5.4 (xHigh)*",
+                "provider": "openai",
+                "value": 59.1,
+                "value_label": "59.10±3.56%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 2,
+                "model": "Muse Spark*",
+                "provider": "scale",
+                "value": 55,
+                "value_label": "55.00±3.60%",
+                "change": "new",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 3,
+                "model": "claude-opus-4-6 (thinking)*",
+                "provider": "anthropic",
+                "value": 51.9,
+                "value_label": "51.90±3.61%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 4,
+                "model": "gemini-3.1-pro (thinking)*",
+                "provider": "google",
+                "value": 46.1,
+                "value_label": "46.10±3.60%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 5,
+                "model": "claude-opus-4-5-20251101",
+                "provider": "anthropic",
+                "value": 45.89,
+                "value_label": "45.89±3.60%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 6,
+                "model": "claude-4-5-Sonnet",
+                "provider": "anthropic",
+                "value": 43.6,
+                "value_label": "43.60±3.60%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 7,
+                "model": "gemini-3-pro-preview",
+                "provider": "google",
+                "value": 43.3,
+                "value_label": "43.30±3.60%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 8,
+                "model": "claude-4-Sonnet",
+                "provider": "anthropic",
+                "value": 42.7,
+                "value_label": "42.70±3.59%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 9,
+                "model": "gpt-5-2025-08-07 (High)",
+                "provider": "openai",
+                "value": 41.78,
+                "value_label": "41.78±3.49%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              },
+              {
+                "rank": 10,
+                "model": "gpt-5.2-codex",
+                "provider": "openai",
+                "value": 41.04,
+                "value_label": "41.04±3.57%",
+                "change": "Resolve Rate",
+                "metric": "Resolve Rate"
+              }
+            ],
+            "fallback_reason": ""
+          }
+        ],
+        "rows": [
+          {
+            "rank": 1,
+            "model": "gpt-5.4 (xHigh)*",
+            "provider": "openai",
+            "value": 59.1,
+            "value_label": "59.10±3.56%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 2,
+            "model": "Muse Spark*",
+            "provider": "scale",
+            "value": 55,
+            "value_label": "55.00±3.60%",
+            "change": "new",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 3,
+            "model": "claude-opus-4-6 (thinking)*",
+            "provider": "anthropic",
+            "value": 51.9,
+            "value_label": "51.90±3.61%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 4,
+            "model": "gemini-3.1-pro (thinking)*",
+            "provider": "google",
+            "value": 46.1,
+            "value_label": "46.10±3.60%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 5,
+            "model": "claude-opus-4-5-20251101",
+            "provider": "anthropic",
+            "value": 45.89,
+            "value_label": "45.89±3.60%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 6,
+            "model": "claude-4-5-Sonnet",
+            "provider": "anthropic",
+            "value": 43.6,
+            "value_label": "43.60±3.60%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 7,
+            "model": "gemini-3-pro-preview",
+            "provider": "google",
+            "value": 43.3,
+            "value_label": "43.30±3.60%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 8,
+            "model": "claude-4-Sonnet",
+            "provider": "anthropic",
+            "value": 42.7,
+            "value_label": "42.70±3.59%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 9,
+            "model": "gpt-5-2025-08-07 (High)",
+            "provider": "openai",
+            "value": 41.78,
+            "value_label": "41.78±3.49%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          },
+          {
+            "rank": 10,
+            "model": "gpt-5.2-codex",
+            "provider": "openai",
+            "value": 41.04,
+            "value_label": "41.04±3.57%",
+            "change": "Resolve Rate",
+            "metric": "Resolve Rate"
+          }
+        ],
+        "previous_snapshot": null,
+        "diff": {
+          "summary": "No previous component snapshot was available for comparison.",
+          "changed_rows": [],
+          "new_entries": [
+            "gpt-5.4 (xHigh)*",
+            "Muse Spark*",
+            "claude-opus-4-6 (thinking)*",
+            "gemini-3.1-pro (thinking)*",
+            "claude-opus-4-5-20251101",
+            "claude-4-5-Sonnet",
+            "gemini-3-pro-preview",
+            "claude-4-Sonnet",
+            "gpt-5-2025-08-07 (High)",
+            "gpt-5.2-codex"
+          ]
+        },
+        "cache_path": "",
+        "fallback_reason": "",
+        "official_component_snapshot": {
+          "source": "official_dom",
+          "component_kind": "swe_bench_pro",
+          "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+          "captured_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "swe-bench-pro-v1",
+          "source_selector": "[data-swe-bench-pro-leaderboard]",
+          "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
+          "sanitized_css": ".swe-bench-pro-card { border: 1px solid currentColor; padding: 16px; }\n      .swe-bench-pro-card table { width: 100%; border-collapse: collapse; }\n      .swe-bench-pro-card th, .swe-bench-pro-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
+          "dom_hash": "sha256:cc4506cfb6f43dc3ea7331ad2e9ab545ed056a3aab2309bf4201d14baa1ce040",
+          "css_hash": "sha256:bbb18aff9c5bd0f35808108d31a64c2b62e0adcab81b24181da21bcd9a31c42d"
+        },
+        "public_trace": {
+          "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+          "collected_at": "2026-06-17T10:49:18.258Z",
+          "selector_version": "swe-bench-pro-v1",
+          "data_hash": "sha256:4a2b521368077791598faa67547d3e67a97e2557092e96bc3a6b9223cb7d7496",
+          "top_rows": [
+            {
+              "rank": 1,
+              "model": "gpt-5.4 (xHigh)*",
+              "provider": "openai",
+              "value_label": "59.10±3.56%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 2,
+              "model": "Muse Spark*",
+              "provider": "scale",
+              "value_label": "55.00±3.60%",
+              "change": "new"
+            },
+            {
+              "rank": 3,
+              "model": "claude-opus-4-6 (thinking)*",
+              "provider": "anthropic",
+              "value_label": "51.90±3.61%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 4,
+              "model": "gemini-3.1-pro (thinking)*",
+              "provider": "google",
+              "value_label": "46.10±3.60%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 5,
+              "model": "claude-opus-4-5-20251101",
+              "provider": "anthropic",
+              "value_label": "45.89±3.60%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 6,
+              "model": "claude-4-5-Sonnet",
+              "provider": "anthropic",
+              "value_label": "43.60±3.60%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 7,
+              "model": "gemini-3-pro-preview",
+              "provider": "google",
+              "value_label": "43.30±3.60%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 8,
+              "model": "claude-4-Sonnet",
+              "provider": "anthropic",
+              "value_label": "42.70±3.59%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 9,
+              "model": "gpt-5-2025-08-07 (High)",
+              "provider": "openai",
+              "value_label": "41.78±3.49%",
+              "change": "Resolve Rate"
+            },
+            {
+              "rank": 10,
+              "model": "gpt-5.2-codex",
+              "provider": "openai",
+              "value_label": "41.04±3.57%",
+              "change": "Resolve Rate"
+            }
+          ],
+          "diff": {
+            "summary": "No previous component snapshot was available for comparison.",
+            "changed_rows": [],
+            "new_entries": [
+              "gpt-5.4 (xHigh)*",
+              "Muse Spark*",
+              "claude-opus-4-6 (thinking)*",
+              "gemini-3.1-pro (thinking)*",
+              "claude-opus-4-5-20251101",
+              "claude-4-5-Sonnet",
+              "gemini-3-pro-preview",
+              "claude-4-Sonnet",
+              "gpt-5-2025-08-07 (High)",
+              "gpt-5.2-codex"
+            ]
+          },
+          "cache_status": "live",
+          "fallback_reason": ""
+        }
+      }
     }
   ],
   "projects": [
     {
       "name": "apple/container",
       "editorial_category": "open_source",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "适合评估该仓库面向AI 工程实践，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/apple/container",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2220,12 +2788,12 @@
     {
       "name": "NVIDIA/SkillSpector",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/NVIDIA/SkillSpector",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2235,12 +2803,12 @@
     {
       "name": "phuryn/pm-skills",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括评测与回归、工具调用和工作流编排，并提供测试或评测资产。适合...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/phuryn/pm-skills",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2250,12 +2818,12 @@
     {
       "name": "addyosmani/agent-skills",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、API/SDK 适配...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/addyosmani/agent-skills",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2265,12 +2833,12 @@
     {
       "name": "iptv-org/iptv",
       "editorial_category": "open_source",
-      "description": "该仓库面向知识库和数据应用，README 显示核心能力包括API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向知识库和数据应用，README 显示核心能力包括API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "适合评估该仓库面向知识库和数据应用，README 显示核心能力包括API/SDK 适配，并提供README 说明和使用入口。适...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/iptv-org/iptv",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2280,12 +2848,12 @@
     {
       "name": "mvanhorn/last30days-skill",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归，并提供测试或评测资产。适合先核...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/mvanhorn/last30days-skill",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2295,12 +2863,12 @@
     {
       "name": "chopratejas/headroom",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、工具调用和工作流编排、记忆或知识检索，并提...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/chopratejas/headroom",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2310,12 +2878,12 @@
     {
       "name": "Panniantong/Agent-Reach",
       "editorial_category": "open_source",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括Agent 构建、API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括Agent 构建、API/SDK 适配，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向AI 工程实践，README 显示核心能力包括Agent 构建、API/SDK 适配，并提供README 说...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README ...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/Panniantong/Agent-Reach",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2325,12 +2893,12 @@
     {
       "name": "asgeirtj/system_prompts_leaks",
       "editorial_category": "open_source",
-      "description": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工。",
+      "readme_summary": "README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工。",
       "domains": [
         "agent"
       ],
-      "use_case": "适合评估该仓库面向开发者本地工作流，README 显示核心能力包括Agent 构建、评测与回归、工具调用和工作流编排、记忆或知...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/asgeirtj/system_prompts_leaks",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2340,12 +2908,12 @@
     {
       "name": "music-assistant/server",
       "editorial_category": "open_source",
-      "description": "该仓库面向AI 工程实践，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
-      "readme_summary": "该仓库面向AI 工程实践，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。",
+      "description": "README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
+      "readme_summary": "README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "适合评估该仓库面向AI 工程实践，README 显示核心能力包括项目框架、示例代码和可复用工具链，并提供README 说明和使...相关能力是否能复用到现有工具链。",
+      "use_case": "适合评估README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和...相关能力是否能复用到现有工具链。",
       "url": "https://github.com/music-assistant/server",
       "event_date": "2026-06-17",
       "source": "GitHub Trending weekly",
@@ -2565,11 +3133,44 @@
       "image_urls": []
     },
     {
+      "title": "ReproRepo公开agent 失败复现报告流程",
+      "content": "ReproRepo公开agent 失败复现报告流程。",
+      "url": "https://arxiv.org/abs/2606.18237v1",
+      "event_date": "2026-06-16",
+      "source": "arXiv cs.AI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
       "title": "具透 | 动态应用网格、Liquid Glass 微调，watchOS 27 首个开发者测试版一览",
       "content": "AI 之外，watchOS 27 中还有这些新功能。 查看全文。",
       "url": "https://sspai.com/post/110958",
       "event_date": "2026-06-17",
       "source": "SSPAI",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "阿里云扩建全球基础设施，新增法国巴黎、马来西亚柔佛地域",
+      "content": "6月17日，阿里云在‌VivaTech大会期间宣布法国巴黎、马来西亚柔佛地域正式开服，同时扩建日本东京和墨西哥的数据中心，以满足AI出海与全球市场激增的Token调用需求。本轮扩张完成后，阿里云全球布局升至 32 个地域、105个可用区。据 Gartner 数据，阿里云是中国最大、亚太第一的云服务商。 柔佛新地域上线后，阿里云在马来西亚...",
+      "url": "https://www.leiphone.com/category/industrynews/65PN2PmZCC0YKFaS.html",
+      "event_date": "2026-06-17",
+      "source": "Leiphone",
+      "editorial_category": "community_signal",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "NVIDIA介绍机器人学习与多模态推理实验",
+      "content": "NVIDIA介绍机器人学习与多模态推理实验。",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/9249f5850e0adb7f59ab8bdb79c3fcde/6a31cf733d63328c13ebeddd_NVIDIA-XR-AI_Featured-Image-Poster-Alt-842x450/NVIDIA-XR-AI_Featured-Image-Poster-Alt-842x450_thmb.jpg",
+      "image_alt": "Hands Free, AIs Forward: NVIDIA XR AI Brings Agents to AR Glasses",
+      "image_source": "feed",
+      "url": "https://blogs.nvidia.com/blog/nvidia-xr-ai/",
+      "event_date": "2026-06-16",
+      "source": "NVIDIA Newsroom RSS",
       "editorial_category": "community_signal",
       "importance": "general",
       "image_urls": []
@@ -2658,16 +3259,6 @@
       "image_urls": []
     },
     {
-      "title": "刷新权威榜单SOTA！ACE-Ego 解锁“以人为中心”的规模化具身模型训练新范式",
-      "content": "近日，大晓机器人联合香港中文大学多媒体实验室（CUHK MMLab）正式发布全新“一脑多型”具身操作VLA模型 ACE-Ego，并向行业开源。作为“以人为中心”ACE 研发范式在具身模型预训练的核心落地成果，ACE-Ego提出大规模第一视角人类视频与多型机器人数据高效联合预训练的新范式， 在两大国际权威具身智能基准上双双领先，并在复杂零...",
-      "url": "https://www.leiphone.com/category/ai/Dt3i3KlHCTdZGukZ.html",
-      "event_date": "2026-06-17",
-      "source": "Leiphone",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
       "title": "派早报：SpaceX 宣布收购 Cursor、字节跳动推出 Seedance 2.0 Mini 等",
       "content": "夏普推出 AQUOS R11 手机、理光宣布 GR 系列调整建议零售价等。 查看全文。",
       "url": "https://sspai.com/post/111124",
@@ -2716,16 +3307,6 @@
       "editorial_category": "community_signal",
       "importance": "general",
       "image_urls": []
-    },
-    {
-      "title": "人脸与人体识别",
-      "content": "人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:09 全新智能语音交互，即刻感受“开口即真人”的全新体验 【重磅升级】文档解析（Padd。",
-      "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=27",
-      "event_date": "2026-06-17",
-      "source": "Baidu AI News",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
     }
   ],
   "wechat_items": [],
@@ -2754,22 +3335,10 @@
       "summary": "https://x.com/Designarena/status/2066940737011560652 submitted by /u/Recoil42 [link] [comments]",
       "risk_label": "medium",
       "importance": "general"
-    },
-    {
-      "platform": "reddit",
-      "title": "zai-org/GLM-5.2 is here!",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u7kcwf/zaiorgglm52_is_here/",
-      "event_date": "2026-06-16",
-      "source": "Reddit LocalLLaMA Platform Feed",
-      "claim_text": "submitted by /u/queendumbria [link] [comments]",
-      "disclosure": "平台内扩散发现，未做一手回源核验。",
-      "summary": "submitted by /u/queendumbria [link] [comments]",
-      "risk_label": "medium",
-      "importance": "general"
     }
   ],
   "evidence_assets": [],
-  "generated_at": "2026-06-17T08:40:08.753Z",
+  "generated_at": "2026-06-17T11:00:59.232Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-17.html",
   "html_path": "reports/2026/06/2026-06-17.html"

@@ -729,7 +729,6 @@ function formatCompactMainItemSections(items, context = {}) {
       richId: "main-item-details",
       group: "main",
       collapsed: false,
-      summary: "主体条目的事实摘要、关键 bullets 和证据图片默认展开，避免与快速列表重复。",
       content: detailContent
     }
   ];

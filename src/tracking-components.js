@@ -6,6 +6,7 @@ import {
 
 const OPENROUTER_SELECTOR_VERSION = "openrouter-rankings-v1";
 const ARTIFICIAL_ANALYSIS_SELECTOR_VERSION = "artificial-analysis-index-v1";
+const SWE_BENCH_PRO_SELECTOR_VERSION = "swe-bench-pro-v1";
 
 const AA_TABS = [
   ["score", "Score", "score_table"],
@@ -52,6 +53,9 @@ export function buildTrackingComponentSnapshot(item, options = {}) {
   }
   if (isArtificialAnalysisItem(item, snapshot)) {
     return buildArtificialAnalysisSnapshot(item, snapshot, options);
+  }
+  if (isSweBenchProItem(item, snapshot)) {
+    return buildSweBenchProSnapshot(item, snapshot, options);
   }
   return null;
 }
@@ -215,14 +219,62 @@ function buildArtificialAnalysisSnapshot(item, snapshot, options) {
   });
 }
 
+function buildSweBenchProSnapshot(item, snapshot, options) {
+  const officialComponentSnapshot = normalizeOfficialComponentSnapshot(snapshot.official_component_snapshot, {
+    componentKind: "swe_bench_pro",
+    sourceUrl: snapshot.source_url || item.url,
+    capturedAt: snapshot.snapshot_as_of,
+    selectorVersion: SWE_BENCH_PRO_SELECTOR_VERSION
+  });
+  if (!officialComponentSnapshot) {
+    return null;
+  }
+  const rows = normalizedSnapshotRows(snapshot).map((row) => ({
+    ...row,
+    metric: "Resolve Rate",
+    value_label: row.value_label || row.tokens
+  }));
+  const status = rows.length >= 10 && snapshot.snapshot_status === "complete" ? "complete" : rows.length > 0 ? "partial" : "fallback";
+  const fallbackReason = rows.length > 0 ? "" : "swe_bench_pro_rows_missing";
+  const tabs = [
+    tab("leaderboard", "Public Leaderboard", "leaderboard", status, fallbackReason)
+  ];
+  const series = [
+    {
+      id: "swe-bench-pro-public-leaderboard",
+      tab_id: "leaderboard",
+      label: "SWE-Bench Pro Public Dataset",
+      chart: "leaderboard",
+      rows,
+      fallback_reason: fallbackReason
+    }
+  ];
+  return componentSnapshot({
+    source: "Scale Labs SWE-Bench Pro",
+    componentKind: "swe_bench_pro",
+    selectorVersion: SWE_BENCH_PRO_SELECTOR_VERSION,
+    sourceUrl: snapshot.source_url || item.url,
+    collectedAt: snapshot.snapshot_as_of,
+    rows,
+    tabs,
+    series,
+    cachePath: options.cachePath || "",
+    fallbackReason,
+    officialComponentSnapshot
+  });
+}
+
 function requiresOfficialSnapshot(snapshot) {
-  return snapshot?.component_kind === "openrouter_rankings" || snapshot?.component_kind === "artificial_analysis_index";
+  return snapshot?.component_kind === "openrouter_rankings" ||
+    snapshot?.component_kind === "artificial_analysis_index" ||
+    snapshot?.component_kind === "swe_bench_pro";
 }
 
 function snapshotKindFromItem(item) {
   const text = `${item?.id || ""} ${item?.name || ""} ${item?.source || ""} ${item?.snapshot?.type || ""}`.toLowerCase();
   if (text.includes("openrouter")) return "openrouter_rankings";
   if (text.includes("artificial") || text.includes("intelligence_index")) return "artificial_analysis_index";
+  if (text.includes("swe") || text.includes("scale")) return "swe_bench_pro";
   return "";
 }
 
@@ -484,6 +536,11 @@ function isOpenRouterItem(item, snapshot) {
 function isArtificialAnalysisItem(item, snapshot) {
   const text = `${item.id || ""} ${item.name || ""} ${item.source || ""} ${snapshot.type || ""}`.toLowerCase();
   return text.includes("artificial") || text.includes("aa index");
+}
+
+function isSweBenchProItem(item, snapshot) {
+  const text = `${item.id || ""} ${item.name || ""} ${item.source || ""} ${snapshot.type || ""}`.toLowerCase();
+  return text.includes("swe-bench") || text.includes("swe_bench") || text.includes("scale labs");
 }
 
 function isHttpUrl(value) {
