@@ -393,6 +393,8 @@ try {
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
+  assert.equal(await page.locator('html[data-ai-daily-theme="promptlayer-inspired"]').count(), 0);
+  assert.equal(await page.locator('style[data-ai-daily-theme-style="promptlayer-inspired"]').count(), 0);
   assert.equal(await page.locator('meta[name="generator"][content="effective-interact create-interaction.mjs"]').count(), 1);
   assert.equal(await page.locator("html[data-public-daily-version]").count(), 0);
   assert.equal(await page.locator("#report-top[data-hero-mode='daily-report']").count(), 1);

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 const MAX_HTML_LENGTH = 50000;
 const MAX_CSS_LENGTH = 25000;
-const SUPPORTED_COMPONENT_KINDS = new Set(["openrouter_rankings", "artificial_analysis_index"]);
+const SUPPORTED_COMPONENT_KINDS = new Set(["openrouter_rankings", "artificial_analysis_index", "swe_bench_pro"]);
 const BROAD_SOURCE_SELECTORS = new Set(["html", "body", "main", "#root", "#__next"]);
 const MAX_PUBLIC_HTML_LENGTH = 30000;
 
@@ -50,7 +50,7 @@ export function isPublishableOfficialComponentFragment(input = {}) {
     return false;
   }
   const rowLikeCount = (html.match(/<\s*tr\b|role\s*=\s*["']row["']|<\s*li\b/gi) || []).length;
-  const hasComponentMarker = /data-[^=]*(openrouter|ranking|leaderboard|analysis|index|aa)|class\s*=\s*["'][^"']*(ranking|leaderboard|analysis|index|card)/i.test(html);
+  const hasComponentMarker = /data-[^=]*(openrouter|ranking|leaderboard|analysis|index|aa|swe|bench)|class\s*=\s*["'][^"']*(ranking|leaderboard|analysis|index|card|swe|bench)/i.test(html);
   const hasStructuredSurface = /<\s*table\b|role\s*=\s*["']table["']/i.test(html) || rowLikeCount > 0;
   const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   return text.length >= 20 && (hasStructuredSurface || hasComponentMarker);

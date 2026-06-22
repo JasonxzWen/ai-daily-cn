@@ -2056,7 +2056,7 @@ const DAILY_TRACKERS = [
     id: "swe-bench-pro-public",
     name: "SWE-bench Pro",
     source: "Scale Labs SWE-Bench Pro",
-    url: "https://scale.com/leaderboard/swe_bench_pro_public",
+    url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
     category: "coding_benchmark",
     importance: "major",
     summary: "关注 coding agent 在长周期真实工程任务上的 Resolve Rate；它比短题 benchmark 更接近修 bug、跨文件修改和测试通过能力。",
@@ -2142,6 +2142,33 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchNext: "若榜首或 Top 10 构成变化，继续核对分项 benchmark、价格、延迟和自有 workload 复测结果。"
     };
   }
+  if (tracker.id === "swe-bench-pro-public" && isCompleteSweBenchProSnapshot(snapshot) && !hasOfficialComponentSnapshot(snapshot)) {
+    return {
+      status: "blocked",
+      verificationStatus: "unverified",
+      changeStatus: "blocked",
+      changeSummary: "SWE-bench Pro 官方组件 snapshot 不可用，不能确认可发布的榜单组件。",
+      sourceUnavailableNote: "SWE-bench Pro 官方 web 组件 snapshot 本轮不可用；已隐藏榜单数据卡，只保留官方入口供读者手动核对。",
+      evidenceNote: `source_audit status=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
+      verificationNote: "SWE-bench Pro 需要官方榜单组件 snapshot 才能渲染公开追踪卡；本轮未取得可用 snapshot，因此不重画本地假组件。",
+      watchNext: "下次抓取若恢复官方 snapshot，再展示榜单组件；本轮以官方入口人工核对为准。"
+    };
+  }
+  if (tracker.id === "swe-bench-pro-public" && isCompleteSweBenchProSnapshot(snapshot)) {
+    return {
+      status: source.status,
+      verificationStatus: "primary_confirmed",
+      changeStatus: "changed",
+      changeSummary: sweBenchProSnapshotChangeSummary(snapshot),
+      summary: sweBenchProSnapshotSummary(snapshot),
+      watchPoints: sweBenchProSnapshotWatchPoints(snapshot),
+      metrics: sweBenchProSnapshotMetrics(snapshot),
+      snapshot,
+      evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} SWE-bench Pro rows parsed from official page snapshot`,
+      verificationNote: `已解析 Scale Labs SWE-Bench Pro Public Dataset 的 Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是 coding benchmark 信号，不是生产选型结论。`,
+      watchNext: "若榜首或 Top 10 构成变化，继续核对 agent scaffold、成本限制、置信区间和团队自有仓库复测结果。"
+    };
+  }
   if (source.status === "checked" || source.status === "no_signal") {
     return {
       status: source.status,
@@ -2172,7 +2199,7 @@ function hasOfficialComponentSnapshot(snapshot) {
 }
 
 function hasRequiredOfficialComponentSnapshot(snapshot, tracker) {
-  if (tracker.id === "artificial-analysis-intelligence-index") {
+  if (tracker.id === "artificial-analysis-intelligence-index" || tracker.id === "swe-bench-pro-public") {
     return hasOfficialComponentSnapshot(snapshot);
   }
   return true;
@@ -2184,6 +2211,9 @@ function isCompleteDailyTrackingSnapshotForTracker(snapshot, tracker) {
   }
   if (tracker.id === "artificial-analysis-intelligence-index") {
     return isCompleteArtificialAnalysisSnapshot(snapshot);
+  }
+  if (tracker.id === "swe-bench-pro-public") {
+    return isCompleteSweBenchProSnapshot(snapshot);
   }
   return false;
 }
@@ -2200,6 +2230,13 @@ function isCompleteArtificialAnalysisSnapshot(snapshot) {
     Array.isArray(snapshot.top_entries) &&
     snapshot.top_entries.length === 10 &&
     snapshot.top_entries.every((entry, index) => entry.rank === index + 1 && entry.model && entry.provider && /\d+(?:\.\d+)?\s*分/.test(entry.tokens || "") && entry.change);
+}
+
+function isCompleteSweBenchProSnapshot(snapshot) {
+  return snapshot?.snapshot_status === "complete" &&
+    Array.isArray(snapshot.top_entries) &&
+    snapshot.top_entries.length === 10 &&
+    snapshot.top_entries.every((entry, index) => entry.rank === index + 1 && entry.model && entry.provider && /\d+(?:\.\d+)?/.test(entry.tokens || "") && entry.change);
 }
 
 function openRouterSnapshotChangeSummary(snapshot) {
@@ -2287,6 +2324,49 @@ function artificialAnalysisSnapshotMetrics(snapshot) {
   }));
   return [
     { label: "榜单范围", value: `Intelligence Index Top ${snapshot.top_entries.length}`, trend: "same" },
+    { label: "供应商分布", value: providerMix(snapshot.top_entries), trend: "unknown" },
+    ...topMetrics
+  ];
+}
+
+function sweBenchProSnapshotChangeSummary(snapshot) {
+  const top = snapshot.top_entries.slice(0, 3);
+  const topText = top.map((entry) => `#${entry.rank} ${entry.model} ${entry.tokens}`).join("，");
+  const newEntries = snapshot.top_entries.filter((entry) => /^new$/i.test(entry.change));
+  return newEntries.length > 0
+    ? `SWE-bench Pro Public Dataset Top 10 已解析：${topText}；新进榜条目包括 ${newEntries.map((entry) => entry.model).join("、")}。`
+    : `SWE-bench Pro Public Dataset Top 10 已解析：${topText}。`;
+}
+
+function sweBenchProSnapshotSummary(snapshot) {
+  const top = snapshot.top_entries[0];
+  const providers = providerMix(snapshot.top_entries);
+  const topRows = snapshot.top_entries.slice(0, 3).map((entry) => `${entry.model} ${entry.tokens}`).join("、");
+  return [
+    `Scale Labs 公开榜单显示，SWE-bench Pro Public Dataset 当前第一是 ${top.model}（${top.provider}，Resolve Rate ${top.tokens}）。`,
+    `前三名为 ${topRows}，Top 10 供应商分布为 ${providers}。`,
+    "这个榜单适合观察 coding agent 在长周期真实工程任务上的相对表现，但生产选型仍要结合 scaffold、成本上限、置信区间和团队自有仓库复测。"
+  ].join(" ");
+}
+
+function sweBenchProSnapshotWatchPoints(snapshot) {
+  const top = snapshot.top_entries[0];
+  const newEntries = snapshot.top_entries.filter((entry) => /^new$/i.test(entry.change));
+  return [
+    `榜首 ${top.model} 的 Resolve Rate 为 ${top.tokens}，需要看它是否依赖特定 agent scaffold 或成本上限。`,
+    newEntries.length > 0 ? `新进榜条目：${newEntries.map((entry) => `${entry.model}（${entry.provider}）`).join("、")}。` : "如果 Top 10 没有新进榜，重点看相邻模型的置信区间是否重叠。",
+    "把 SWE-bench Pro 与真实 IDE/CI 工作流分开看，避免把公开 benchmark 直接等同于团队仓库里的修复率。"
+  ];
+}
+
+function sweBenchProSnapshotMetrics(snapshot) {
+  const topMetrics = snapshot.top_entries.map((entry) => ({
+    label: `#${entry.rank}`,
+    value: `${entry.model}（${entry.provider}）：Resolve Rate ${entry.tokens}`,
+    trend: /^new$/i.test(entry.change) ? "new" : "unknown"
+  }));
+  return [
+    { label: "榜单范围", value: `SWE-bench Pro Public Top ${snapshot.top_entries.length}`, trend: "same" },
     { label: "供应商分布", value: providerMix(snapshot.top_entries), trend: "unknown" },
     ...topMetrics
   ];
@@ -5359,7 +5439,7 @@ function hotBlogEvidenceDrivenSummary(candidate) {
   if (!profile) {
     return "";
   }
-  return `${actor}${profile.verb}${profile.topic}，原文说明${profile.scope}。读者可核对${profile.factFocus}，并留意${profile.boundary}。`;
+  return `${actor}${profile.verb}${profile.topic}，重点落在${profile.scope}。更有价值的信息是${profile.factFocus}，判断这类方案时还要看${profile.boundary}。`;
 }
 
 function hotBlogEvidenceDrivenPoints(candidate) {
@@ -5374,9 +5454,9 @@ function hotBlogEvidenceDrivenPoints(candidate) {
   }
   return [
     `${actor}${profile.verb}${profile.topic}`,
-    `原文重点覆盖${profile.scope}`,
-    `可核对的信息包括${profile.factFocus}`,
-    `需要注意的边界是${profile.boundary}`
+    `重点覆盖${profile.scope}`,
+    `关键信息包括${profile.factFocus}`,
+    `判断边界是${profile.boundary}`
   ];
 }
 

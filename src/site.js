@@ -15,11 +15,13 @@ import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
+import { applyPromptLayerInspiredDailyTheme } from "./daily-theme.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
+const PROMPTLAYER_INSPIRED_REPORT_DATES = new Set(["2026-06-17"]);
 const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_id",
   "candidate_pool_path",
@@ -676,7 +678,7 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
     trendAnnotations: options.trendAnnotations,
     reportNavigation: options.reportNavigation,
     dateIndexItem: options.dateIndexItem
-  }));
+  }), report.report_date);
   await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
   if (options.includeInternalData && reportJsonPath) {
@@ -687,14 +689,17 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
   }
 }
 
-function applyDailyReportHtmlOverrides(html) {
-  if (!html || html.includes("data-ai-daily-css-overrides")) {
-    return html;
+function applyDailyReportHtmlOverrides(html, reportDate) {
+  let result = PROMPTLAYER_INSPIRED_REPORT_DATES.has(reportDate)
+    ? applyPromptLayerInspiredDailyTheme(html)
+    : html;
+  if (!result || result.includes("data-ai-daily-css-overrides")) {
+    return result;
   }
-  if (html.includes("</head>")) {
-    return html.replace("</head>", `${DAILY_REPORT_HTML_OVERRIDES}\n</head>`);
+  if (result.includes("</head>")) {
+    return result.replace("</head>", `${DAILY_REPORT_HTML_OVERRIDES}\n</head>`);
   }
-  return `${DAILY_REPORT_HTML_OVERRIDES}\n${html}`;
+  return `${DAILY_REPORT_HTML_OVERRIDES}\n${result}`;
 }
 
 async function readReportJson(filePath) {

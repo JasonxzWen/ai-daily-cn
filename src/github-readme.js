@@ -1,4 +1,4 @@
-const DEFAULT_MAX_CHARS = 120;
+const DEFAULT_MAX_CHARS = 170;
 
 export function githubReadmeCacheKey(input) {
   const repo = normalizeRepo(input?.repo || input?.name || input);
@@ -19,7 +19,7 @@ export function summarizeGithubReadme(input = {}) {
   const capability = pickCapability(source || readme);
   const maturity = pickMaturity(source || readme);
   const scenario = pickScenario(source || readme);
-  const base = `该仓库面向${scenario}，README 显示核心能力包括${capability}，并提供${maturity}。适合先核对安装方式、运行示例、依赖边界、许可证和近期维护，再判断能否进入团队试点或技术雷达。`;
+  const base = `README 将该仓库定位为${scenario}，核心能力集中在${capability}，并提供${maturity}。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。`;
   return clampChineseSummary(base, maxChars);
 }
 

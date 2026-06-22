@@ -216,9 +216,18 @@ function checkBuilderX(report, issues, degraded) {
 function checkTrackingComponents(report, options, issues, degraded) {
   const trackingItems = asArray(report?.daily_tracking).filter((item) => {
     const name = textValue(item?.name || item?.source || item?.id);
-    return /openrouter|artificial analysis/i.test(name);
+    return /openrouter|artificial analysis|swe[-\s]?bench/i.test(name);
   });
   const html = String(options.html || "");
+
+  if (hasPublicTrackingDebugTrace(html)) {
+    issues.push(blockingIssue({
+      code: "tracking_public_debug_trace_visible",
+      requirement: "REQ-010",
+      section: "daily_tracking",
+      message: "Public tracking cards must not render selector/hash/Trace debug provenance; keep it in JSON evidence only."
+    }));
+  }
 
   for (const item of trackingItems) {
     const name = textValue(item?.name || item?.source || item?.id) || "tracking source";
@@ -253,6 +262,13 @@ function checkTrackingComponents(report, options, issues, degraded) {
       }));
     }
   }
+}
+
+function hasPublicTrackingDebugTrace(html) {
+  if (!html) {
+    return false;
+  }
+  return /<details\b[^>]*class=["'][^"']*\btracking-trace\b|data-tracking-trace|tracking-component-meta[^>]*>[^<]*(selector:|sha256:)/i.test(html);
 }
 
 function githubScope(report, entries) {

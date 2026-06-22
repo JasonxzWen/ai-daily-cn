@@ -19,7 +19,8 @@ import {
   parseGitHubTrendingHtml,
   parseGitHubReportMarkdownEntries,
   parseOpenRouterRankingsText,
-  parseArtificialAnalysisIndexText
+  parseArtificialAnalysisIndexText,
+  parseSweBenchProText
 } from "../src/discovery.js";
 import { collectSearchNews } from "../src/search-news.js";
 import { checkSourcesHealth } from "../src/source-health.js";
@@ -75,6 +76,10 @@ import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
+import {
+  applyPromptLayerInspiredDailyTheme,
+  promptLayerInspiredDailyThemeCss
+} from "../src/daily-theme.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -622,6 +627,7 @@ test("interaction input renders expanded main detail without compact full list",
   assert.equal(detailSection.title, "重点详情");
   assert.equal(detailSection.type, "markdown");
   assert.equal(detailSection.collapsed, false);
+  assert.equal(detailSection.summary, undefined);
   assert(mainContent.includes("Signal 1 changes the visible product or project surface today"));
 });
 test("public daily renders one expanded renamed main detail section without compact full list", async () => {
@@ -637,6 +643,7 @@ test("public daily renders one expanded renamed main detail section without comp
   assert.equal(detailSection.title, "重点详情");
   assert.equal(detailSection.type, "markdown");
   assert.equal(detailSection.collapsed, false);
+  assert.equal(detailSection.summary, undefined);
   assert(detailSection.content.includes("AI 行业动态"));
 });
 
@@ -747,6 +754,19 @@ function artificialAnalysisOfficialComponentFixture() {
   };
 }
 
+function sweBenchProOfficialComponentFixture() {
+  return {
+    source_selector: "[data-swe-bench-pro-leaderboard]",
+    html: [
+      "<section class=\"swe-card\" data-swe-bench-pro-leaderboard>",
+      "<header class=\"swe-title\">SWE-Bench Pro (Public Dataset)</header>",
+      "<table><tbody><tr><td>gpt-5.4 (xHigh)*</td><td>59.10±3.56%</td></tr></tbody></table>",
+      "</section>"
+    ].join(""),
+    css: ".swe-card { color: #111827; background: #ffffff; } .swe-title { font-weight: 700; }"
+  };
+}
+
 function officialComponentSnapshotFixture({ componentKind, sourceUrl, selectorVersion, fixture }) {
   return createOfficialComponentSnapshot({
     componentKind,
@@ -817,6 +837,17 @@ test("official component snapshots reject broad full-page fragments", () => {
       sourceSelector: "main [data-openrouter-rankings]",
       html: "<section data-openrouter-rankings><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section>",
       css: ".or-card { color: #111827; }"
+    })
+  );
+  assert(
+    createOfficialComponentSnapshot({
+      componentKind: "swe_bench_pro",
+      sourceUrl: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+      capturedAt: fixedGeneratedAt,
+      selectorVersion: "swe-bench-pro-v1",
+      sourceSelector: "[data-swe-bench-pro-leaderboard]",
+      html: "<section data-swe-bench-pro-leaderboard><table><tbody><tr><td>gpt-5.4 (xHigh)*</td><td>59.10±3.56%</td></tr></tbody></table></section>",
+      css: ".swe-card { color: #111827; }"
     })
   );
 });
@@ -927,6 +958,40 @@ function artificialAnalysisSnapshotFixture(rows = 10) {
     source_url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
     top_entries: parseArtificialAnalysisIndexText(artificialAnalysisIndexSampleText(rows)),
     notes: "Public Artificial Analysis Intelligence Index snapshot."
+  };
+}
+
+function sweBenchProSampleText(rows = 10) {
+  const entries = [
+    ["1", "gpt-5.4 (xHigh)*", "59.10±3.56"],
+    ["1", "Muse Spark*", "NEW", "55.00±3.60"],
+    ["2", "claude-opus-4-6 (thinking)*", "51.90±3.61"],
+    ["3", "gemini-3.1-pro (thinking)*", "46.10±3.60"],
+    ["3", "claude-opus-4-5-20251101", "45.89±3.60"],
+    ["4", "claude-4-5-Sonnet", "43.60±3.60"],
+    ["4", "gemini-3-pro-preview", "43.30±3.60"],
+    ["4", "claude-4-Sonnet", "42.70±3.59"],
+    ["4", "gpt-5-2025-08-07 (High)", "41.78±3.49"],
+    ["4", "gpt-5.2-codex", "41.04±3.57"]
+  ].slice(0, rows);
+  return [
+    "SWE-Bench Pro (Public Dataset)",
+    "Performance Comparison",
+    "Primary metric: Resolve Rate",
+    ...entries.flat(),
+    "Cost"
+  ].join("\n");
+}
+
+function sweBenchProSnapshotFixture(rows = 10) {
+  return {
+    type: "swe_bench_pro_public_page",
+    collection_method: "public_page_playwright",
+    snapshot_status: rows === 10 ? "complete" : "partial",
+    snapshot_as_of: fixedGeneratedAt,
+    source_url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+    top_entries: parseSweBenchProText(sweBenchProSampleText(rows)),
+    notes: "Public Scale Labs SWE-Bench Pro snapshot."
   };
 }
 
@@ -1504,6 +1569,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(detailSection?.title, "重点详情");
   assert.equal(detailSection?.type, "markdown");
   assert.equal(detailSection?.collapsed, false);
+  assert.equal(detailSection?.summary, undefined);
   assert(detailSection?.content.includes("### AI 行业动态"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
@@ -3606,7 +3672,7 @@ test("registered content sources include fixed daily tracking leaderboards", asy
   const expected = [
     ["content-openrouter-rankings", "https://openrouter.ai/rankings"],
     ["content-artificial-analysis-intelligence-index", "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"],
-    ["content-swe-bench-pro-public", "https://scale.com/leaderboard/swe_bench_pro_public"]
+    ["content-swe-bench-pro-public", "https://labs.scale.com/leaderboard/swe_bench_pro_public"]
   ];
 
   for (const [id, url] of expected) {
@@ -3615,7 +3681,8 @@ test("registered content sources include fixed daily tracking leaderboards", asy
     assert.equal(normalizedSourceUrl(source.url), normalizedSourceUrl(url));
     const expectedSourceKind = new Map([
       ["content-openrouter-rankings", "openrouter_rankings_public_playwright"],
-      ["content-artificial-analysis-intelligence-index", "artificial_analysis_index_public_playwright"]
+      ["content-artificial-analysis-intelligence-index", "artificial_analysis_index_public_playwright"],
+      ["content-swe-bench-pro-public", "swe_bench_pro_public_playwright"]
     ]);
     assert.equal(source.source_kind, expectedSourceKind.get(id) || "html_index");
     assert.equal(source.candidate_category, "community_lead");
@@ -3667,6 +3734,8 @@ test("collectContentSources stores OpenRouter public page snapshot without candi
   assert.equal(source.snapshot.collection_method, "public_page_playwright");
   assert.equal(source.snapshot.top_entries.length, 10);
   assert.equal(source.snapshot.top_entries[0].model, "DeepSeek V4 Flash");
+  assert.equal(source.snapshot.official_component_snapshot.component_kind, "openrouter_rankings");
+  assert.match(source.snapshot.official_component_snapshot.sanitized_html, /data-openrouter-rankings/);
   assert.equal(collected.candidates.length, 0);
 });
 
@@ -3841,6 +3910,23 @@ test("parseArtificialAnalysisIndexText extracts public Intelligence Index Top 10
   assert.equal(rows[9].provider, "xiaomi");
 });
 
+test("parseSweBenchProText extracts public Resolve Rate Top 10 rows", () => {
+  const rows = parseSweBenchProText(sweBenchProSampleText());
+
+  assert.equal(rows.length, 10);
+  assert.deepEqual(rows[0], {
+    rank: 1,
+    model: "gpt-5.4 (xHigh)*",
+    provider: "openai",
+    tokens: "59.10±3.56%",
+    change: "Resolve Rate"
+  });
+  assert.equal(rows[1].model, "Muse Spark*");
+  assert.equal(rows[1].provider, "scale");
+  assert.equal(rows[1].change, "new");
+  assert.equal(rows[9].model, "gpt-5.2-codex");
+});
+
 test("collectContentSources stores Artificial Analysis public page snapshot without candidate pollution", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-05",
@@ -3868,6 +3954,8 @@ test("collectContentSources stores Artificial Analysis public page snapshot with
   assert.equal(source.snapshot.collection_method, "public_page_playwright");
   assert.equal(source.snapshot.top_entries.length, 10);
   assert.equal(source.snapshot.top_entries[0].model, "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)");
+  assert.equal(source.snapshot.official_component_snapshot.component_kind, "artificial_analysis_index");
+  assert.match(source.snapshot.official_component_snapshot.sanitized_html, /data-artificial-analysis-index/);
   assert.equal(collected.candidates.length, 0);
 });
 
@@ -3924,6 +4012,38 @@ test("collectContentSources stores Artificial Analysis token cost and scatter ta
   assert(cost.rows.some((row) => row.model.includes("GPT-5.5") && row.value_label === "$3,357"));
   assert(scoreVsCost.rows.some((row) => row.model.includes("Gemini") && row.metric === "Score vs. Cost"));
   assert(!JSON.stringify(component.public_trace).includes("raw_dom"));
+});
+
+test("collectContentSources recovers SWE-bench Pro with official snapshot fallback when local page access is blocked", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-17",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-swe-bench-pro-public",
+        name: "Scale Labs SWE-Bench Pro",
+        url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        source_kind: "swe_bench_pro_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    fetchImpl: async () => ({ ok: false, status: 403, text: async () => "" })
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.match(source.notes, /official_page_snapshot_static_fallback/);
+  assert.equal(source.snapshot.snapshot_status, "complete");
+  assert.equal(source.snapshot.collection_method, "public_page_static");
+  assert.equal(source.snapshot.top_entries.length, 10);
+  assert.equal(source.snapshot.top_entries[0].model, "gpt-5.4 (xHigh)*");
+  assert.equal(source.snapshot.official_component_snapshot.component_kind, "swe_bench_pro");
+  assert.match(source.snapshot.official_component_snapshot.sanitized_html, /SWE-Bench Pro/);
+  assert.equal(collected.candidates.length, 0);
 });
 
 test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
@@ -4036,6 +4156,62 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(card.table, undefined);
   assert.equal(card.bars, undefined);
   assert.equal(card.stats, undefined);
+});
+
+test("report:draft publishes SWE-bench Pro official snapshot as reader-facing daily tracking card", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-swe-bench-pro-snapshot-"));
+  const reportDate = "2026-06-17";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.content_sources.sources.push({
+    name: "Scale Labs SWE-Bench Pro",
+    url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+    status: "checked",
+    notes: "official_page_snapshot_static_fallback; 10 rows parsed",
+    snapshot: {
+      ...sweBenchProSnapshotFixture(),
+      official_component_snapshot: officialComponentSnapshotFixture({
+        componentKind: "swe_bench_pro",
+        sourceUrl: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        selectorVersion: "swe-bench-pro-v1",
+        fixture: sweBenchProOfficialComponentFixture()
+      })
+    }
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const tracking = drafted.report.daily_tracking.find((item) => item.id === "swe-bench-pro-public");
+  assert.equal(tracking.publish_to_public, true);
+  assert.equal(tracking.change_status, "changed");
+  assert.equal(tracking.verification_status, "primary_confirmed");
+  assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert.equal(tracking.tracking_component_snapshot.component_kind, "swe_bench_pro");
+  assert.equal(tracking.tracking_component_snapshot.tabs.length, 1);
+  assert.equal(tracking.tracking_component_snapshot.public_trace.selector_version, "swe-bench-pro-v1");
+  assert(tracking.summary.includes("gpt-5.4"));
+  assert(tracking.summary.includes("Resolve Rate"));
+
+  const input = reportToInteractionInput(drafted.report);
+  const trackingSection = input.sections.find((section) => section.items?.some((item) => item.title === "SWE-bench Pro"));
+  assert(trackingSection);
+  const card = trackingSection.items.find((item) => item.title === "SWE-bench Pro");
+  assert.equal(card.points.length, 0);
+  assert.equal(card.component.kind, "swe_bench_pro");
+  assert.equal(card.component.tabs.length, 1);
+  assert.equal(card.component.officialSnapshot.status, "available");
+  assert.match(card.component.officialSnapshot.html, /SWE-Bench Pro/);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
+  assert(!JSON.stringify(card).includes("HTTP 403"));
 });
 
 test("report:draft shows only an Artificial Analysis source-unavailable note when official snapshot is absent", async () => {
@@ -5804,6 +5980,7 @@ test("daily content contract rejects 2026-06-17 weak generated shape", () => {
     '<section id="daily-tracking">',
     '<div class="openrouter-mini-card"><div class="bar"></div><div class="bar"></div></div>',
     '<div class="artificial-analysis-mini-card"><div class="metric">fake benchmark</div></div>',
+    '<details class="tracking-trace"><summary>Trace</summary><dl><dt>Data hash</dt><dd>sha256:debug</dd></dl></details>',
     "</section>"
   ].join("");
 
@@ -5820,7 +5997,8 @@ test("daily content contract rejects 2026-06-17 weak generated shape", () => {
     "hot_blog_summary_contract_failed",
     "hot_blog_public_key_points_rendered",
     "builder_x_selection_empty",
-    "tracking_fake_component_rendered"
+    "tracking_fake_component_rendered",
+    "tracking_public_debug_trace_visible"
   ]) {
     assert(issueCodes.includes(code), `${code} should block weak generated content`);
   }
@@ -7912,6 +8090,59 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
   assert.equal(publicData.evidence_assets.length, 1);
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
+});
+
+test("promptlayer-inspired daily theme is scoped to the approved production report html", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-promptlayer-theme-"));
+  const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
+  const outDir = path.join(tmp, "docs");
+  const baseReport = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data/2026/06/2026-06-15.json"), "utf8"));
+  const themedReport = structuredReportForDate(baseReport, "2026-06-17");
+  const historicalReport = structuredReportForDate(baseReport, "2026-06-15");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.writeFile(path.join(dataInputDir, "2026-06-17.json"), `${JSON.stringify(themedReport, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(dataInputDir, "2026-06-15.json"), `${JSON.stringify(historicalReport, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-17.html"), "utf8");
+  assert.match(html, /<html[^>]+data-ai-daily-theme="promptlayer-inspired"/);
+  assert.match(html, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
+  assert.match(html, /--daily-theme-bg:\s*#141413/);
+  assert.match(html, /\.report-hero-daily/);
+  assert.match(html, /\.interactive-card/);
+  assert.match(html, /prefers-reduced-motion:\s*reduce/);
+  assert.match(html, /effective-interact create-interaction\.mjs/);
+  assert.match(html, /data-render-mode="pre-rendered"/);
+  assert.match(html, /data-section-type="filterable-cards"/);
+  assert.doesNotMatch(html, /<link rel="stylesheet"/);
+  assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
+
+  const historicalHtml = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
+  assert.doesNotMatch(historicalHtml, /data-ai-daily-theme="promptlayer-inspired"/);
+  assert.doesNotMatch(historicalHtml, /data-ai-daily-theme-style="promptlayer-inspired"/);
+});
+
+test("promptlayer-inspired daily theme injector is idempotent and self-contained", () => {
+  const html = '<!doctype html><html lang="zh-CN"><head></head><body><main class="report-shell"></main></body></html>';
+  const once = applyPromptLayerInspiredDailyTheme(html);
+  const twice = applyPromptLayerInspiredDailyTheme(once);
+
+  assert.equal((twice.match(/<html[^>]+data-ai-daily-theme="promptlayer-inspired"/g) || []).length, 1);
+  assert.equal((twice.match(/<style data-ai-daily-theme-style="promptlayer-inspired">/g) || []).length, 1);
+  assert.match(twice, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
+  assert.match(promptLayerInspiredDailyThemeCss, /--daily-theme-bg:\s*#141413/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.report-hero-daily/);
+  assert.match(promptLayerInspiredDailyThemeCss, /prefers-reduced-motion:\s*reduce/);
+  assert.doesNotMatch(promptLayerInspiredDailyThemeCss, /@import|https?:|promptlayer\.com|_next\/static/);
 });
 
 test("buildSite writes effective-interact report html for 2026-06-15 without internal leakage", async () => {
@@ -13842,6 +14073,7 @@ test("public daily contract renders main items as industry and content-track str
   assert.equal(compactList, undefined);
   assert.equal(mainSections[0].title, "重点详情");
   assert.equal(mainSections[0].collapsed, false);
+  assert.equal(mainSections[0].summary, undefined);
   assert(content.includes("### AI 行业动态"));
   assert(content.includes("### 内容赛道动态"));
   assert(content.includes("1. **["));
