@@ -2868,7 +2868,7 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     sourceLevel: "official_company_news",
     editorialCategory: "ai_industry"
   }));
-  const readmeSummary = (repo) => `${repo} 是面向 AI 工程团队的开源项目，README 展示核心能力、安装入口、运行示例、集成边界和维护信号，适合先验证依赖、许可证、示例质量和团队接入成本后再进入试点。`;
+  const readmeSummary = () => "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、工具调用和工作流编排，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。";
   const githubCandidate = ({ repo, source, language, rank, readmeFailed = false }) => ({
     id: `github-${repo.replace(/[^a-z0-9]+/gi, "-")}`,
     source_id: `github-${source.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
@@ -2962,6 +2962,14 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     assert(failedCard);
     assert(failedCard.tags.some((tag) => String(tag).includes("README")));
     assert(!JSON.stringify(failedCard).includes("java weekly"));
+    const healthyCard = section.items.find((item) => item.title === "example/all-weekly-1");
+    assert(healthyCard);
+    assert(!String(healthyCard.body).includes("它的价值在于"));
+    assert(!String(healthyCard.body).includes("优先核对 README"));
+    assert(!String(healthyCard.body).includes("核心能力集中"));
+    assert(String(healthyCard.body).includes("GitHub Trending weekly"));
+    assert(String(healthyCard.body).includes("本周 +999 stars"));
+    assert(!/appeared on .*rank #/i.test(String(healthyCard.body)));
   } else {
     assert(section.content.includes("README拉取失败"));
     assert(!section.content.includes("仓库名指向java weekly"));
@@ -8152,8 +8160,11 @@ test("promptlayer-inspired daily theme injector is idempotent and self-contained
   assert.match(twice, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
   assert.match(promptLayerInspiredDailyThemeCss, /--daily-theme-bg:\s*#141413/);
   assert.match(promptLayerInspiredDailyThemeCss, /\.report-hero-daily/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.report-shell::before/);
   assert.match(promptLayerInspiredDailyThemeCss, /\.main-ticket-card-grid/);
   assert.match(promptLayerInspiredDailyThemeCss, /\.github-trending-card-grid/);
+  assert.match(promptLayerInspiredDailyThemeCss, /\.blog-card:first-child/);
+  assert.match(promptLayerInspiredDailyThemeCss, /animation-timeline:\s*view\(\)/);
   assert.match(promptLayerInspiredDailyThemeCss, /\.blog-card::after/);
   assert.match(promptLayerInspiredDailyThemeCss, /prefers-reduced-motion:\s*reduce/);
   assert.doesNotMatch(promptLayerInspiredDailyThemeCss, /@import|https?:|promptlayer\.com|_next\/static/);
@@ -14782,6 +14793,8 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(summary.length >= 80, summary);
   assert(summary.length <= 130, summary);
+  assert.doesNotMatch(summary, /README 将|核心能力集中|它的价值在于|具体阅读时/);
+  assert.match(summary, /README 主要围绕/);
   assert.match(summary, /Agent 构建|评测|调试|工具调用/);
   assert.doesNotMatch(summary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
 

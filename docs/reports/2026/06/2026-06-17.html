@@ -3066,9 +3066,40 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-shell {
   padding: 0 0 44px;
 }
 
+html[data-ai-daily-theme="promptlayer-inspired"] .report-shell::before {
+  content: "AI Daily";
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 64px;
+  padding: 0 32px 0 92px;
+  border: 1px solid var(--daily-theme-line);
+  border-top: 0;
+  background:
+    linear-gradient(#8c8478 0 0) 20px 22px / 28px 1px no-repeat,
+    linear-gradient(#8c8478 0 0) 20px 31px / 28px 1px no-repeat,
+    linear-gradient(#8c8478 0 0) 20px 40px / 28px 1px no-repeat,
+    linear-gradient(90deg, transparent 64px, var(--daily-theme-line) 64px, transparent 65px),
+    var(--daily-theme-bg);
+  color: var(--daily-theme-ink);
+  font-family: Arial, "Noto Sans CJK SC", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily {
-  min-height: clamp(310px, 42vh, 520px);
-  padding: clamp(30px, 6vw, 76px) clamp(24px, 5vw, 72px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(380px, 0.78fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+  min-height: clamp(560px, 72vh, 760px);
+  padding: clamp(58px, 7vw, 112px) clamp(24px, 5vw, 72px) clamp(140px, 16vw, 190px);
   border: 1px solid var(--daily-theme-line);
   border-top: 0;
   border-radius: 0;
@@ -3078,6 +3109,48 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily {
   color: var(--daily-theme-ink);
   box-shadow: none;
   animation: daily-theme-rise 420ms ease-out both;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily::before {
+  content: "";
+  position: absolute;
+  right: clamp(40px, 6vw, 92px);
+  top: clamp(78px, 9vw, 128px);
+  width: min(39vw, 520px);
+  height: clamp(280px, 40vw, 520px);
+  border: 1px solid rgba(216, 208, 194, 0.58);
+  background:
+    radial-gradient(circle at 50% 36%, transparent 0 39%, rgba(67, 44, 16, 0.12) 39.2% 39.55%, transparent 39.8%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(90deg, transparent calc(33.333% - 1px), rgba(67, 44, 16, 0.12) 33.333%, transparent calc(33.333% + 1px)),
+    linear-gradient(90deg, transparent calc(66.666% - 1px), rgba(67, 44, 16, 0.12) 66.666%, transparent calc(66.666% + 1px)),
+    linear-gradient(180deg, transparent calc(58% - 1px), rgba(67, 44, 16, 0.12) 58%, transparent calc(58% + 1px)),
+    var(--daily-theme-paper);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.28);
+  opacity: 0.86;
+  transform: rotate(-2.5deg);
+  pointer-events: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily::after {
+  content: "MAIN STREAM · TRACKING · GITHUB · BLOGS";
+  position: absolute;
+  right: clamp(70px, 9vw, 150px);
+  top: clamp(250px, 28vw, 395px);
+  width: min(32vw, 430px);
+  color: rgba(67, 44, 16, 0.46);
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  transform: rotate(-2.5deg);
+  pointer-events: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily > * {
+  position: relative;
+  z-index: 1;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .eyebrow,
@@ -3090,21 +3163,38 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .meta {
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-date-title {
-  max-width: 12ch;
+  max-width: 8ch;
   color: var(--daily-theme-ink);
   font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, "Times New Roman", serif;
-  font-size: clamp(48px, 8vw, 112px);
+  font-size: clamp(56px, 8vw, 104px);
   font-weight: 400;
-  line-height: 0.94;
+  line-height: 0.92;
   letter-spacing: 0;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .title-row {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  align-content: center;
+  min-width: 0;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .toolbar {
   align-self: start;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  margin-top: 28px;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-brief {
+  display: contents;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-summary-text {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  max-width: min(100%, 660px);
   min-height: 0;
   border: 0;
   border-left: 1px solid var(--daily-theme-line-strong);
@@ -3117,14 +3207,23 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-summar
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat-grid {
-  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--daily-theme-line);
+  background: rgba(20, 20, 19, 0.78);
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat {
-  min-height: 86px;
+  min-height: 112px;
+  padding: 24px 22px;
+  border-width: 0 1px 0 0;
   border-color: var(--daily-theme-line);
   border-radius: 0;
-  background: rgba(248, 244, 235, 0.04);
+  background: transparent;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat span,
@@ -3136,8 +3235,14 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat s
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat strong {
   color: var(--daily-theme-ink);
   font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
-  font-size: 26px;
+  font-size: clamp(22px, 2vw, 30px);
   font-weight: 650;
+  letter-spacing: 0;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat:last-child strong {
+  font-size: clamp(18px, 1.35vw, 23px);
+  line-height: 1.04;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .status-pill,
@@ -3365,11 +3470,12 @@ html[data-ai-daily-theme="promptlayer-inspired"] .report-section-stack > .panel 
   border-width: 0 0 1px;
   border-radius: 0;
   background: transparent;
+  scroll-margin-top: 76px;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .section-heading {
   position: relative;
-  min-height: clamp(220px, 28vw, 360px);
+  min-height: clamp(170px, 22vw, 300px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3409,7 +3515,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .section-heading > div {
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .section-heading h2 {
-  font-size: clamp(42px, 6.2vw, 86px);
+  font-size: clamp(36px, 5.2vw, 74px);
   line-height: 0.98;
 }
 
@@ -3566,11 +3672,22 @@ html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card-grid {
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "tracking-title"
+    "tracking-tags"
+    "tracking-stats"
+    "tracking-component"
+    "tracking-bars"
+    "tracking-table"
+    "tracking-body";
+  gap: 18px;
   min-height: 0;
   padding: clamp(30px, 4vw, 56px);
   border-width: 0 0 1px;
   border-radius: 0;
   background: rgba(240, 235, 226, 0.60);
+  scroll-margin-top: 76px;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card h3 {
@@ -3604,11 +3721,18 @@ html[data-ai-daily-theme="promptlayer-inspired"] .blog-card {
   grid-template-columns: 88px minmax(0, 1fr) minmax(90px, 140px);
   column-gap: clamp(18px, 3vw, 44px);
   align-items: start;
-  min-height: 220px;
+  min-height: 200px;
   padding: clamp(30px, 4.5vw, 56px) clamp(24px, 5vw, 68px);
   border-width: 0 0 1px;
   border-radius: 0;
   background: transparent;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card:first-child {
+  margin: clamp(28px, 4vw, 54px) clamp(24px, 5vw, 68px);
+  padding: clamp(34px, 5vw, 64px);
+  border: 1px solid #d7cdbd;
+  background: rgba(240, 235, 226, 0.34);
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::before {
@@ -3637,8 +3761,8 @@ html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::after {
 html[data-ai-daily-theme="promptlayer-inspired"] .blog-card h3 {
   grid-column: 2;
   margin: 0;
-  font-size: clamp(30px, 4vw, 56px);
-  line-height: 1;
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.08;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-tags,
@@ -3651,8 +3775,8 @@ html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-media-grid {
 html[data-ai-daily-theme="promptlayer-inspired"] .blog-card p {
   max-width: 820px;
   color: #6d5f51;
-  font-size: clamp(18px, 1.8vw, 24px);
-  line-height: 1.45;
+  font-size: clamp(17px, 1.45vw, 21px);
+  line-height: 1.55;
 }
 
 html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-title-icon {
@@ -3673,6 +3797,15 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   animation-delay: 120ms;
 }
 
+@supports (animation-timeline: view()) {
+  html[data-ai-daily-theme="promptlayer-inspired"] .report-section-stack > .panel,
+  html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card {
+    animation: daily-theme-rise both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+}
+
 @keyframes daily-theme-rise {
   from {
     opacity: 0;
@@ -3691,11 +3824,18 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   }
 
   html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily {
+    display: block;
+    grid-template-columns: 1fr;
     min-height: auto;
     padding: 26px 20px 28px;
     background:
       linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgba(248, 244, 235, 0.12) calc(50% - 1px), rgba(248, 244, 235, 0.12) 50%, transparent 50%),
       var(--daily-theme-bg);
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily::before,
+  html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily::after {
+    display: none;
   }
 
   html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .title-row {
@@ -3731,8 +3871,11 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   }
 
   html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat-grid {
+    position: static;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    gap: 0;
+    margin-top: 20px;
+    border: 1px solid var(--daily-theme-line);
   }
 
   html[data-ai-daily-theme="promptlayer-inspired"] .report-hero-daily .hero-stat {
@@ -4228,7 +4371,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="evidence-grid focus-field blog-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AIGC / content generation" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/introducing-container-caching-in-amazon-sagemaker-ai-for-faster-model-scaling/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS讲解SageMaker 推理容器缓存方案</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/introducing-container-caching-in-amazon-sagemaker-ai-for-faster-model-scaling/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS讲解SageMaker 推理容器缓存方案</span><span class="card-subtitle">AWS Machine Learning Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AIGC</span><span class="chip chip-topic">content generation</span></div>
 
 
@@ -4237,7 +4380,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/build-your-own-transaction-foundation-model-for-financial-intelligence/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA拆解交易基础模型与反欺诈工作流</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/build-your-own-transaction-foundation-model-for-financial-intelligence/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA拆解交易基础模型与反欺诈工作流</span><span class="card-subtitle">NVIDIA Developer Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4246,7 +4389,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/safeguard-your-agentic-ai-applications-with-the-amazon-bedrock-guardrails-invokeguardrailchecks-api/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS说明多 agent 安全护栏方案</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/safeguard-your-agentic-ai-applications-with-the-amazon-bedrock-guardrails-invokeguardrailchecks-api/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS说明多 agent 安全护栏方案</span><span class="card-subtitle">AWS Machine Learning Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4255,7 +4398,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/building-ai-agents-for-ar-glasses-and-xr-devices-with-nvidia-xr-ai/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA拆解XR 眼镜里的端侧 agent 开发流程</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/building-ai-agents-for-ar-glasses-and-xr-devices-with-nvidia-xr-ai/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA拆解XR 眼镜里的端侧 agent 开发流程</span><span class="card-subtitle">NVIDIA Developer Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4264,7 +4407,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/build-on-device-ai-companions-with-the-nvidia-ace-game-agent-sdk-and-unreal-engine-5-plugins/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://developer.nvidia.com/blog/build-on-device-ai-companions-with-the-nvidia-ace-game-agent-sdk-and-unreal-engine-5-plugins/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA介绍游戏 agent SDK 与 Unreal 插件方案</span><span class="card-subtitle">NVIDIA Developer Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4273,7 +4416,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/parallelize-speculative-decoding-with-p-eagle-on-amazon-sagemaker-ai/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS说明SageMaker 推测解码并行化方案</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://aws.amazon.com/blogs/machine-learning/parallelize-speculative-decoding-with-p-eagle-on-amazon-sagemaker-ai/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>AWS说明SageMaker 推测解码并行化方案</span><span class="card-subtitle">AWS Machine Learning Blog / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4282,7 +4425,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI industry" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/blackwell-mlperf-training-6-0/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA披露Blackwell MLPerf 训练性能结果</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/blackwell-mlperf-training-6-0/" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA披露Blackwell MLPerf 训练性能结果</span><span class="card-subtitle">NVIDIA Newsroom RSS / 2026-06-16</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI industry</span></div>
 
 
@@ -4291,7 +4434,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="AI engineering tools" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://huggingface.co/blog/amazon/strands-lerobot-hub-to-hardware" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAAABgQFBwEDAv/EADIQAAICAQMCBQIEBQUAAAAAAAECAwQFABESBiETMUFRgRSRInFykhVCUmGTFiMyM2L/xAAXAQADAQAAAAAAAAAAAAAAAAAAAgMB/8QAHREAAgIDAAMAAAAAAAAAAAAAAAECEQMhMRIi8P/aAAwDAQACEQMRAD8AxHU+xhsnWxdfKWKM8dCyxWGwybI5Hsfg/nsdeWKpnI5OpSDcfHmWMt/SCe5+B3065TLdRZCpfuT1rB6TMIhSuGXwq8O4WFlXfswPA7+v5arQjlQgaNGjWDBo0aNABo0aNAF/0VQe/lp1jmihaKlYYSStxVSUKKSfT8TjTb0R05ZxnXeMlyUlN6zb/wC3DYEgcKh47j1AIB/MDSFjXKUsuAduVNQf88Wp+DtL05fS/LHI8oJVUTtxQgjkf7keQ9tz7bvCr2SyXWul9n+kJZ6N1+nacU9XDvNLfso6gjkeQQA9yqRqvyX0lX6ktC/ZpWOPjVpXik4ncclJB2+2tB6WsSTR05fLxsk3igeRQ0/x/GxOuWul8Jl8tkLU2YminXLW/wCIRrDuK8QFiRWHudoG3/UPmbeykeGca96VOe9K8dZeTJDJM2522RELsfsp1puB6LxmLzXjTZWQGKzPsqpyP0RjkRJSNv8AkXG22lahgMbZ6fjyNDLTm8gsrchEfERjwZ3jAPryWFuXn2f7ljCpo0yw9P48wU55r8ixmMSXdkG8KsnJNvfc7j7aidTVoqr0IUlMkqVVSYcdgrAkED3776dwaVklli3SPnDyVIMbkZnUzWxEOMLL+DiHjPI+/f0/t31ZBsdmaCY21eWher3J5PGnG8c4fbuzejDiB39NUmEcLdZTGJFkhkUof59lLAfJAGre7/p7KTSCGrbx950JjijfxoppT3UAnuAdx99CegkvYtKWZv8ATXQ+VpwpVkkt3GpySleRRDBsTGe2xIO2+mzKIkOPzEcVKBBI96eS2se0kzsuSXiW9QqxgAeh399ZTlbMont0UnLU1tu6KPIkfhB/aBqTN1Xnp6X0c2Slat4k0nhkLtylDCQ+XqHb9x20jRQ1a3cmFihTr4VJRPSZJMmAS6bF2EXt58Dt/wCtUNOutfomCtBj4o1NVpmtLFtJYkepf3DN/MF2AA9PnSTF1bn4UjSLJzKsdtLijZf+5VCq3l37ADby7eWvM9UZs4+Ch/EZfpa7SNFHsuymQMHPl6iR/vrKAucc306ZMTU0tMtapvWl3AYiLcg7d+wBPxqn6oeSW7DNNF4TyQ8mT+lubbj4PbUWHMZCC59ZFadbHIN4gA33ClR6exI+dR57dixFDHPKzpCGEYb05EsfuSTqrlaojHG1Ly+4cqztWsxToN2icOB77Hy0yrHBTmTK/TKIayCStOJCfGcDaJSvuDxJ/SffSrrpZioQseIO4XfsNKmVas5o0aNYaGjRo0AGjRo0Af/Z" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Planet AI更新agent 工作流和开发工具能力</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://huggingface.co/blog/amazon/strands-lerobot-hub-to-hardware" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAAABgQFBwEDAv/EADIQAAICAQMCBQIEBQUAAAAAAAECAwQFABESBiETMUFRgRSRInFykhVCUmGTFiMyM2L/xAAXAQADAQAAAAAAAAAAAAAAAAAAAgMB/8QAHREAAgIDAAMAAAAAAAAAAAAAAAECEQMhMRIi8P/aAAwDAQACEQMRAD8AxHU+xhsnWxdfKWKM8dCyxWGwybI5Hsfg/nsdeWKpnI5OpSDcfHmWMt/SCe5+B3065TLdRZCpfuT1rB6TMIhSuGXwq8O4WFlXfswPA7+v5arQjlQgaNGjWDBo0aNABo0aNAF/0VQe/lp1jmihaKlYYSStxVSUKKSfT8TjTb0R05ZxnXeMlyUlN6zb/wC3DYEgcKh47j1AIB/MDSFjXKUsuAduVNQf88Wp+DtL05fS/LHI8oJVUTtxQgjkf7keQ9tz7bvCr2SyXWul9n+kJZ6N1+nacU9XDvNLfso6gjkeQQA9yqRqvyX0lX6ktC/ZpWOPjVpXik4ncclJB2+2tB6WsSTR05fLxsk3igeRQ0/x/GxOuWul8Jl8tkLU2YminXLW/wCIRrDuK8QFiRWHudoG3/UPmbeykeGca96VOe9K8dZeTJDJM2522RELsfsp1puB6LxmLzXjTZWQGKzPsqpyP0RjkRJSNv8AkXG22lahgMbZ6fjyNDLTm8gsrchEfERjwZ3jAPryWFuXn2f7ljCpo0yw9P48wU55r8ixmMSXdkG8KsnJNvfc7j7aidTVoqr0IUlMkqVVSYcdgrAkED3776dwaVklli3SPnDyVIMbkZnUzWxEOMLL+DiHjPI+/f0/t31ZBsdmaCY21eWher3J5PGnG8c4fbuzejDiB39NUmEcLdZTGJFkhkUof59lLAfJAGre7/p7KTSCGrbx950JjijfxoppT3UAnuAdx99CegkvYtKWZv8ATXQ+VpwpVkkt3GpySleRRDBsTGe2xIO2+mzKIkOPzEcVKBBI96eS2se0kzsuSXiW9QqxgAeh399ZTlbMont0UnLU1tu6KPIkfhB/aBqTN1Xnp6X0c2Slat4k0nhkLtylDCQ+XqHb9x20jRQ1a3cmFihTr4VJRPSZJMmAS6bF2EXt58Dt/wCtUNOutfomCtBj4o1NVpmtLFtJYkepf3DN/MF2AA9PnSTF1bn4UjSLJzKsdtLijZf+5VCq3l37ADby7eWvM9UZs4+Ch/EZfpa7SNFHsuymQMHPl6iR/vrKAucc306ZMTU0tMtapvWl3AYiLcg7d+wBPxqn6oeSW7DNNF4TyQ8mT+lubbj4PbUWHMZCC59ZFadbHIN4gA33ClR6exI+dR57dixFDHPKzpCGEYb05EsfuSTqrlaojHG1Ly+4cqztWsxToN2icOB77Hy0yrHBTmTK/TKIayCStOJCfGcDaJSvuDxJ/SffSrrpZioQseIO4XfsNKmVas5o0aNYaGjRo0AGjRo0Af/Z" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Planet AI更新agent 工作流和开发工具能力</span><span class="card-subtitle">Planet AI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI engineering tools</span></div>
 
 
@@ -4312,7 +4455,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="evidence-grid focus-field blog-card chinese-media-card-grid" data-focus-field="html-work-report">
       <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436171.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>困住医疗AI的死循环，终于有国产玩家跑通了</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436171.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>困住医疗AI的死循环，终于有国产玩家跑通了</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4321,7 +4464,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436160.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>微信支付发布AI专属卡 WorkBuddy率先接入</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436160.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>微信支付发布AI专属卡 WorkBuddy率先接入</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4330,7 +4473,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436148.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>头部具身大脑公司再获数亿美元融资！世界模型路线，15家VC抢着投</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436148.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>头部具身大脑公司再获数亿美元融资！世界模型路线，15家VC抢着投</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4339,7 +4482,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436134.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Grok 4.3现已在Amazon Bedrock上正式可用</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436134.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Grok 4.3现已在Amazon Bedrock上正式可用</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4348,7 +4491,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436110.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436110.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>天工3.1 重磅发布：上线 Skywork Design 与 Dynamic Workflows，给 AI 一张画布和一支军团</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4357,7 +4500,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436085.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>刚刚，Fable-5之下，智谱开源的GLM-5.2拿下AI编程第一！</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436085.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>刚刚，Fable-5之下，智谱开源的GLM-5.2拿下AI编程第一！</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4366,7 +4509,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436077.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>许锦波率分子之心完成逾亿美元融资，定义全球AI蛋白质产业新基建</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436077.html" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>许锦波率分子之心完成逾亿美元融资，定义全球AI蛋白质产业新基建</span><span class="card-subtitle">QbitAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4375,7 +4518,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="中文 AI 媒体动态" data-search-target="html-work-report">
 
-    <h3><a class="card-title-link" href="https://sspai.com/post/110958" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>具透 | 动态应用网格、Liquid Glass 微调，watchOS 27 首个开发者测试版一览</span></span></a></h3>
+    <h3><a class="card-title-link" href="https://sspai.com/post/110958" rel="noopener noreferrer"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>具透 | 动态应用网格、Liquid Glass 微调，watchOS 27 首个开发者测试版一览</span><span class="card-subtitle">SSPAI / 2026-06-17</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
@@ -4400,7 +4543,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-trend-up">↑ UP +1</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +10,896 stars</span></div>
 
 
-    <p>README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：AI tooling</p>
+    <p>GitHub Trending weekly / #1 / 本周 +10,896 stars / 较前次上升 1 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#2" data-search-target="repository-movement">
@@ -4409,7 +4552,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-trend-up">↑ UP +15</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +5,190 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：agent</p>
+    <p>GitHub Trending weekly / #2 / 本周 +5,190 stars / 较前次上升 15 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#3" data-search-target="repository-movement">
@@ -4418,7 +4561,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-same">SAME</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +5,775 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：AI tooling</p>
+    <p>GitHub Trending weekly / #3 / 本周 +5,775 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#4" data-search-target="repository-movement">
@@ -4427,7 +4570,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +2</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +11,431 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、API/SDK 适配，并提供可复用包、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：agent</p>
+    <p>GitHub Trending weekly / #4 / 本周 +11,431 stars / 较前次上升 2 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#5" data-search-target="repository-movement">
@@ -4436,7 +4579,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-down">↓ DOWN -4</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +6,246 stars</span></div>
 
 
-    <p>README 将该仓库定位为知识库和数据应用，核心能力集中在API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：AI tooling</p>
+    <p>GitHub Trending weekly / #5 / 本周 +6,246 stars / 较前次下降 4 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#6" data-search-target="repository-movement">
@@ -4445,7 +4588,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-down">↓ DOWN -5</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +7,226 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归，并提供测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：agent</p>
+    <p>GitHub Trending weekly / #6 / 本周 +7,226 stars / 较前次下降 5 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#7" data-search-target="repository-movement">
@@ -4454,7 +4597,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-down">↓ DOWN -2</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +9,766 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、工具调用和工作流编排、记忆或知识检索，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：agent</p>
+    <p>GitHub Trending weekly / #7 / 本周 +9,766 stars / 较前次下降 2 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#8" data-search-target="repository-movement">
@@ -4463,7 +4606,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-down">↓ DOWN -5</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +6,427 stars</span></div>
 
 
-    <p>README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、API/SDK 适配，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：agent</p>
+    <p>GitHub Trending weekly / #8 / 本周 +6,427 stars / 较前次下降 5 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#9" data-search-target="repository-movement">
@@ -4472,7 +4615,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +7</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +1,220 stars</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建、评测与回归、工具调用和工作流编排、记忆或知识检索，并提供可复用包、测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工。 领域：agent</p>
+    <p>GitHub Trending weekly / #9 / 本周 +1,220 stars / 较前次上升 7 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#10" data-search-target="repository-movement">
@@ -4481,7 +4624,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +1</span><span class="chip chip-topic">all</span><span class="chip chip-topic">weekly</span><span class="chip chip-stars">本周 +865 stars</span></div>
 
 
-    <p>README 将该仓库定位为AI 工程实践，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。 领域：AI tooling</p>
+    <p>GitHub Trending weekly / #10 / 本周 +865 stars / 较前次上升 1 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#11" data-search-target="repository-movement">
@@ -4490,7 +4633,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +2</span><span class="chip chip-topic">python</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为浏览器自动化，核心能力集中在API/SDK 适配，并提供示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Python weekly / #11 / 本周 +1,752 stars / 较前次上升 2 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#12" data-search-target="repository-movement">
@@ -4499,7 +4642,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +8</span><span class="chip chip-topic">typescript</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为浏览器自动化，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包、示例。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending TypeScript weekly / #12 / 本周 +353 stars / 较前次上升 8 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#13" data-search-target="repository-movement">
@@ -4508,7 +4651,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-new">NEW</span><span class="chip chip-topic">rust</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为AI 工程实践，核心能力集中在API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Rust weekly / #13 / 本周 +154 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#14" data-search-target="repository-movement">
@@ -4517,7 +4660,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-new">NEW</span><span class="chip chip-topic">go</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为知识库和数据应用，核心能力集中在评测与回归、记忆或知识检索，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Go weekly / #14 / 本周 +186 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#15" data-search-target="repository-movement">
@@ -4526,7 +4669,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-new">NEW</span><span class="chip chip-topic">java</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、工具调用和工作流编排，并提供测试或评测资产、部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Java weekly / #15 / 本周 +68 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#16" data-search-target="repository-movement">
@@ -4535,7 +4678,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +2</span><span class="chip chip-topic">python</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为知识库和数据应用，核心能力集中在工具调用和工作流编排、API/SDK 适配，并提供可复用包。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Python weekly / #16 / 本周 +1,669 stars / 较前次上升 2 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#17" data-search-target="repository-movement">
@@ -4544,7 +4687,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-same">SAME</span><span class="chip chip-topic">typescript</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在项目框架、示例代码和可复用工具链，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending TypeScript weekly / #17 / 本周 +2,003 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#18" data-search-target="repository-movement">
@@ -4553,7 +4696,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-new">NEW</span><span class="chip chip-topic">rust</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为AI 工程实践，核心能力集中在评测与回归、工具调用和工作流编排、API/SDK 适配，并提供可复用包、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Rust weekly / #18 / 本周 +70 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#19" data-search-target="repository-movement">
@@ -4562,7 +4705,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-up">↑ UP +12</span><span class="chip chip-topic">go</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在Agent 构建，并提供部署说明。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Go weekly / #19 / 本周 +1,514 stars / 较前次上升 12 位；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight github-trending-card" data-evidence-spotlight data-filter-target="repository-movement" data-filter-value="#20" data-search-target="repository-movement">
@@ -4571,7 +4714,7 @@ html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n)
     <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-trend-new">NEW</span><span class="chip chip-topic">java</span><span class="chip chip-topic">weekly</span></div>
 
 
-    <p>README 将该仓库定位为开发者本地工作流，核心能力集中在评测与回归、记忆或知识检索、API/SDK 适配，并提供示例、测试或评测资产。它的价值在于把这些能力整理成可复现的工程入口，团队可据此评估集成成本、维护状态、权限边界和试点场景；具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。</p>
+    <p>GitHub Trending Java weekly / #20 / 本周 +39 stars / 较前次持平；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。</p>
 
   </article>
     </div>

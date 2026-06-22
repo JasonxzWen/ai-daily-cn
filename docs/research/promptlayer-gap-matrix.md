@@ -10,47 +10,42 @@
 
 ## Current State Summary
 
-The current 2026-06-17 AI Daily page has the right high-level direction but still reads as a dark dashboard with large white report panels. Its content is dense and source-backed, which is valuable, but its section grammar is too generic:
+The 2026-06-17 AI Daily sample now carries a scoped PromptLayer-inspired visual system rather than the original generic report shell. The page still keeps AI Daily's content and source contracts, but the visible grammar has moved closer to the reference:
 
-- the hero uses boxed stat cards instead of PromptLayer-like rail cells;
-- the main news body is one long white document panel, not ticket/grid information architecture;
-- the navigation is a tab strip, not a fixed PromptLayer-like header;
-- most sections reuse the same panel/card treatment;
-- hover/reveal exists but is weak compared with the reference's section-specific motion and staggered transitions;
-- the page lacks ticket notches, circular arcs, logo/source rails, and editorial article-row rhythm.
+- a fixed PromptLayer-like top chrome with hamburger rail and brand signal;
+- a dark editorial hero with a tilted paper preview and bottom rail cells instead of dashboard stat boxes;
+- main news and GitHub sections use ticket/card grids with notch details and compact metadata;
+- tracking cards keep local structured tables/components while using full-width editorial title rhythm;
+- blog/community rows use thin separators and editorial row spacing rather than generic cards;
+- scroll reveal, hover lift, sticky nav, and reduced-motion fallbacks are scoped to the target theme;
+- mobile keeps the same visual language stacked without horizontal overflow.
+
+The remaining differences are intentional or queued rather than accidental: AI Daily does not copy PromptLayer text, scripts, customer/logo content, or scroll hijacking; the site still favors long-report scanning over a pure landing-page journey.
 
 ## Gap Matrix
 
-| Area | Reference Behavior | Current Behavior | Upgrade Direction |
+| Area | Reference Behavior | Current Behavior | Status / Next Direction |
 |---|---|---|---|
-| Header | Fixed 64px chrome, hamburger rail, brand, uppercase link cluster, dark/light state | Hero-local toolbar and tab strip after hero | Add fixed PromptLayer-style top chrome under theme; keep in-page nav but restyle as rail |
-| Hero | Dark two-column editorial composition with preview panel and bottom rail | Dark hero but date dominates and stats are boxed dashboard cards | Convert stats to rail cells; add report-preview panel; reduce dashboard feel |
-| Main items | Ticket/case-study grid with notches and compact cards | Long white panel with numbered bullets | Render main detail as PromptLayer ticket grid in theme CSS/interaction input |
-| Section headings | Centered or editorial serif with small uppercase eyebrow dot | Large section headings inside generic panels | Add section-specific heading treatments and hide explanation summaries |
-| Tracking | Could map to feature split: explanation left, table/component right | Cards exist but live in generic paper panels | Use split/ticket component styling for tracking cards |
-| GitHub | Should use ticket/list cards with source/rank metadata first | Dense list is useful but visually cramped and line-like | Use ticket-grid/list hybrid; preserve README summary |
-| Blogs | Reference uses editorial rows with thin separators and right media | Current screenshot shows dense list/card mismatch depending scroll position | Convert to editorial rows; no highlighted action block |
-| Use-case arcs | Large circular outlines and centered text | No equivalent | Add optional arc overview for group summaries or source coverage |
-| Testimonial rail | Active detail plus muted cells | No equivalent | Adapt to Builder/community/source observations if useful |
-| Motion | Staggered transform transitions, scroll-driven visual section | Minimal hover lift and reveal | Add stronger reveal/stagger CSS and reduced-motion fallback |
-| Mobile | Same visual grammar stacked with full-width rule cells | Good no-overflow, but still dashboard/card-heavy | Preserve no-overflow while using rail/ticket stack |
+| Header | Fixed 64px chrome, hamburger rail, brand, uppercase link cluster, dark/light state | Scoped theme now adds sticky top chrome and separate scrollable report nav | Mostly addressed; optional next pass can add right-side nav links if useful |
+| Hero | Dark two-column editorial composition with preview panel and bottom rail | Dark two-column hero with tilted paper preview, left summary, and bottom rail cells | Addressed for sample; keep monitoring mobile density |
+| Main items | Ticket/case-study grid with notches and compact cards | Main stream renders PromptLayer-like ticket cards with source/date metadata first | Addressed |
+| Section headings | Centered or editorial serif with small uppercase eyebrow dot | Section headings are shorter, centered/editorial, and explanation copy is removed from public sections | Addressed |
+| Tracking | Feature/split component rhythm with large titles and table-like UI | Tracking cards use full-width title flow and bounded local official snapshots/tables | Addressed after fixing Artificial Analysis title wrapping |
+| GitHub | Ticket/list cards with source/rank metadata first | GitHub Top20 renders card grid with repo title, source/date, rank, stars, and no duplicated README/template body | Addressed; future data quality depends on better upstream README extraction |
+| Blogs | Editorial rows with thin separators and right media/action | Blog cards use editorial row layout; first item gets a light feature frame | Mostly addressed; can add media rhythm when stronger local evidence exists |
+| Use-case arcs | Large circular outlines and centered text | Not copied; AI Daily does not currently need a pure marketing use-case overview | Deferred intentionally |
+| Testimonial rail | Active detail plus muted cells | Not copied; Builder/community observations remain report content, not customer proof | Deferred intentionally |
+| Motion | Staggered transform transitions, scroll-driven visual section | Scoped hover lift plus view-timeline reveal with reduced-motion fallback | Partially addressed; no scroll hijacking by design |
+| Mobile | Same visual grammar stacked with full-width rule cells | Verified 375/390px mobile screenshots have no horizontal overflow and readable stacked cards | Addressed |
 
-## First Implementation Slice
+## Implemented In The Fidelity Pass
 
-This slice should make the final state materially more true without rewriting the whole renderer:
-
-1. Upgrade `src/daily-theme.js`:
-   - switch from generic paper panels to PromptLayer-style paper/ticket system;
-   - add fixed header/nav treatment, rail cells, ticket notches, editorial rows, and section-specific rules;
-   - keep all CSS scoped to `promptlayer-inspired`.
-2. Lightly adjust `src/interaction-report.js` only if CSS alone cannot expose needed component hooks for main/news/blog sections.
-3. Keep theme scoped to `2026-06-17` in `src/site.js` unless user broadens rollout.
-4. Add/adjust tests for:
-   - theme contains ticket/grid/editorial component selectors;
-   - older reports do not receive the theme;
-   - built 2026-06-17 remains effective-interact and no remote PromptLayer assets/scripts.
-5. Rebuild `docs/reports/2026/06/2026-06-17.html`, then restore unrelated historical HTML if `npm run build` rewrites it.
-6. Run Playwright page check and screenshot review at desktop and mobile.
+1. `src/daily-theme.js` now adds scoped PromptLayer-like header chrome, hero preview, rail cells, ticket grids, editorial rows, tracking title layout, hover/reveal motion, and mobile collapse.
+2. `src/interaction-report.js` now emits cleaner GitHub card bodies and degrades old saved README boilerplate into rank/stars movement copy.
+3. `src/github-readme.js` now avoids the old generic "README 将 / 核心能力集中 / 它的价值在于" template for future generated reports.
+4. `tests/unit.test.js` covers scoped theme selectors, GitHub card fallback text, and README summary template avoidance.
+5. `docs/reports/2026/06/2026-06-17.html` was regenerated; non-target historical HTML diffs were reverted after builds.
+6. Playwright screenshots and `scripts/check-daily-page.mjs` verified desktop/mobile no-overflow, no key overlap, tracking component containment, and GitHub reader-facing card quality.
 
 ## Known Reference Gaps We Should Not Copy 1:1
 
