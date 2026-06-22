@@ -50,8 +50,8 @@ html[data-ai-daily-theme="promptlayer-inspired"] body::before {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 72% 8%, rgba(242, 201, 76, 0.10), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 180px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 180px),
+    linear-gradient(90deg, transparent calc(100% - 1px), rgba(248, 244, 235, 0.07) 0) 0 0 / min(25vw, 312px) 100%;
   mix-blend-mode: screen;
 }
 
@@ -290,6 +290,387 @@ html[data-ai-daily-theme="promptlayer-inspired"] .tracking-component {
   border-radius: 2px;
 }
 
+html[data-ai-daily-theme="promptlayer-inspired"] .report-layout {
+  display: block;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 0 28px;
+  border-color: #d7cdbd;
+  border-top: 0;
+  background: rgba(240, 235, 226, 0.92);
+  color: var(--daily-theme-paper-ink);
+  backdrop-filter: blur(14px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav-title {
+  color: var(--daily-theme-paper-ink);
+  font-family: Arial, "Noto Sans CJK SC", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  min-width: max-content;
+  border: 0;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav a {
+  min-height: 36px;
+  padding: 8px 12px;
+  color: #81776a;
+  background: transparent;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-nav a + a::before {
+  content: "/";
+  margin-right: 12px;
+  color: #c0b5a4;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-section-stack {
+  gap: 0;
+  padding: 0;
+  border-right: 1px solid #d7cdbd;
+  border-left: 1px solid #d7cdbd;
+  background:
+    linear-gradient(90deg, transparent calc(25% - 1px), rgba(58, 43, 29, 0.055) 25%, transparent calc(25% + 1px)),
+    linear-gradient(90deg, transparent calc(50% - 1px), rgba(58, 43, 29, 0.055) 50%, transparent calc(50% + 1px)),
+    linear-gradient(90deg, transparent calc(75% - 1px), rgba(58, 43, 29, 0.055) 75%, transparent calc(75% + 1px)),
+    var(--daily-theme-paper);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .report-section-stack > .panel {
+  margin: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .section-heading {
+  position: relative;
+  min-height: clamp(220px, 28vw, 360px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(48px, 7vw, 112px) clamp(24px, 7vw, 92px);
+  text-align: center;
+  border-bottom: 1px solid #d7cdbd;
+  overflow: hidden;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .section-heading::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  top: clamp(34px, 5vw, 78px);
+  left: 50%;
+  border: 6px solid rgba(245, 207, 99, 0.24);
+  border-radius: 999px;
+  background: var(--daily-theme-gold);
+  transform: translateX(-50%);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .section-heading::after {
+  content: "";
+  position: absolute;
+  right: -14%;
+  bottom: -78%;
+  width: min(72vw, 920px);
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(58, 43, 29, 0.10);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .section-heading > div {
+  width: min(100%, 980px);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .section-heading h2 {
+  font-size: clamp(42px, 6.2vw, 86px);
+  line-height: 0.98;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .evidence-grid {
+  gap: 0;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card-grid,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 0;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card {
+  position: relative;
+  min-height: 330px;
+  padding: clamp(34px, 4.5vw, 64px);
+  border-width: 0 1px 1px 0;
+  border-color: #d7cdbd;
+  border-radius: 0;
+  background: rgba(240, 235, 226, 0.48);
+  overflow: visible;
+  animation: daily-theme-rise 560ms ease-out both;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card {
+  min-height: 292px;
+  padding: 32px 28px;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card::before,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card::before {
+  content: "";
+  position: absolute;
+  right: -15px;
+  bottom: -15px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d7cdbd;
+  border-radius: 999px;
+  background: var(--daily-theme-paper);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card .meta,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card .meta {
+  margin: 0 0 38px;
+  color: #b1a697;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card .meta {
+  margin-bottom: 26px;
+  font-size: 15px;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card h3,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card h3 {
+  margin: 0;
+  color: var(--daily-theme-paper-ink);
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.02;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card h3 {
+  font-size: clamp(22px, 2vw, 29px);
+  line-height: 1.08;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card h3 a,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card h3 a,
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card .card-title-link,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card .card-title-link {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card .card-title-icon,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card .card-title-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 0.3em;
+  opacity: 0.62;
+  filter: sepia(0.45) saturate(0.7);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card .card-subtitle,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card .card-subtitle {
+  margin-top: 18px;
+  color: #81776a;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card p,
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card p {
+  margin-top: 24px;
+  color: #4d3a29;
+  font-size: clamp(17px, 1.6vw, 22px);
+  line-height: 1.5;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .card-tags {
+  gap: 7px;
+  margin-top: 18px;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .chip {
+  border-color: #d8ccb8;
+  background: transparent;
+  color: #8b7b66;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-major,
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-notable,
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-new,
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-trend-new,
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-tag-stars,
+html[data-ai-daily-theme="promptlayer-inspired"] .chip-stars {
+  border-color: rgba(154, 109, 22, 0.42);
+  background: #f6e7b8;
+  color: #76520e;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card {
+  min-height: 0;
+  padding: clamp(30px, 4vw, 56px);
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: rgba(240, 235, 226, 0.60);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card h3 {
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card > p {
+  max-width: 980px;
+  color: #5c4b3b;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-component,
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-component-panel,
+html[data-ai-daily-theme="promptlayer-inspired"] .tracking-data-table,
+html[data-ai-daily-theme="promptlayer-inspired"] .card-data-table {
+  border-radius: 0;
+  background: #ebe3d6;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card-grid,
+html[data-ai-daily-theme="promptlayer-inspired"] .chinese-media-card-grid {
+  display: block;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) minmax(90px, 140px);
+  column-gap: clamp(18px, 3vw, 44px);
+  align-items: start;
+  min-height: 220px;
+  padding: clamp(30px, 4.5vw, 56px) clamp(24px, 5vw, 68px);
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::before {
+  content: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -15px;
+  height: 30px;
+  pointer-events: none;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::after {
+  content: "READ  →";
+  grid-column: 3;
+  grid-row: 1 / span 4;
+  align-self: center;
+  justify-self: end;
+  color: #9a6d16;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card h3 {
+  grid-column: 2;
+  margin: 0;
+  font-size: clamp(30px, 4vw, 56px);
+  line-height: 1;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-tags,
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card p,
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-detail-list,
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-media-grid {
+  grid-column: 2;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card p {
+  max-width: 820px;
+  color: #6d5f51;
+  font-size: clamp(18px, 1.8vw, 24px);
+  line-height: 1.45;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-title-icon {
+  position: absolute;
+  left: clamp(24px, 5vw, 68px);
+  top: clamp(34px, 5vw, 62px);
+  width: 36px;
+  height: 36px;
+  opacity: 0.64;
+  filter: sepia(0.45) saturate(0.7);
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(2n) {
+  animation-delay: 70ms;
+}
+
+html[data-ai-daily-theme="promptlayer-inspired"] .interactive-card:nth-child(3n) {
+  animation-delay: 120ms;
+}
+
 @keyframes daily-theme-rise {
   from {
     opacity: 0;
@@ -364,7 +745,87 @@ html[data-ai-daily-theme="promptlayer-inspired"] .tracking-component {
   }
 
   html[data-ai-daily-theme="promptlayer-inspired"] .report-section-stack {
-    padding: 14px 9px 0;
+    padding: 0;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .report-nav {
+    display: flex;
+    align-items: center;
+    min-height: 0;
+    padding: 12px 16px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .report-nav-group {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin-top: 0;
+    margin-left: 10px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .section-heading {
+    min-height: 220px;
+    padding: 54px 22px 42px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .section-heading h2 {
+    font-size: 42px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card-grid,
+  html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card,
+  html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card,
+  html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card {
+    min-height: 0;
+    padding: 28px 22px;
+    border-right: 0;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card h3,
+  html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card h3 {
+    font-size: 27px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .main-ticket-card p,
+  html[data-ai-daily-theme="promptlayer-inspired"] .github-trending-card p,
+  html[data-ai-daily-theme="promptlayer-inspired"] .tracking-card > p {
+    font-size: 16px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 30px 22px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card h3,
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-tags,
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card p,
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-detail-list,
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-media-grid,
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::after {
+    grid-column: 1;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card h3 {
+    font-size: 32px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card::after {
+    grid-row: auto;
+    justify-self: start;
+    margin-top: 12px;
+  }
+
+  html[data-ai-daily-theme="promptlayer-inspired"] .blog-card .card-title-icon {
+    position: static;
+    width: 28px;
+    height: 28px;
   }
 }
 

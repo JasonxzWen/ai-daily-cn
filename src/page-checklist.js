@@ -52,6 +52,12 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const mustReadSection = document.querySelector("#section-today-must-read");
     const compactMainList = document.querySelector("#section-compact-main-list");
     const mainDetails = document.querySelector("#section-main-item-details");
+    const mainSignalCards = document.querySelector("#section-main-signal-cards");
+    const mainSignalCardCount = mainSignalCards?.querySelectorAll(".main-ticket-card").length || 0;
+    const mainDetailsOk = Boolean(mainDetails) &&
+      /重点详情/.test(mainDetails.textContent || "") &&
+      (mainDetails.tagName !== "DETAILS" || mainDetails.open);
+    const mainSignalCardsOk = Boolean(mainSignalCards) && mainSignalCardCount >= 5;
     addCheck(
       "today_must_read_not_required",
       !mustReadSection,
@@ -63,14 +69,13 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "main_detail_expanded_default",
       !compactMainList &&
-        Boolean(mainDetails) &&
-        /重点详情/.test(mainDetails.textContent || "") &&
-        (mainDetails.tagName !== "DETAILS" || mainDetails.open),
-      "The public page should remove the duplicate 完整列表 section and keep the renamed main detail section expanded by default.",
+        (mainDetailsOk || mainSignalCardsOk),
+      "The public page should remove the duplicate 完整列表 section and keep the renamed main detail section expanded by default, or render the scoped PromptLayer signal-card layout.",
       {
         compact_list_present: Boolean(compactMainList),
         details_tag: mainDetails?.tagName || "",
-        details_open: mainDetails?.tagName === "DETAILS" ? Boolean(mainDetails?.open) : true
+        details_open: mainDetails?.tagName === "DETAILS" ? Boolean(mainDetails?.open) : true,
+        signal_cards: mainSignalCardCount
       }
     );
     addCheck(
@@ -168,17 +173,21 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Public card title links should include source or avatar icons.",
       { count: cardTitleLinks.length, missing_titles: missingCardTitleIcons }
     );
-    const githubTrendingSection = document.querySelector("section[id*='github-trending']");
+    const githubTrendingSection = document.querySelector(".github-trending-card-grid")?.closest("section") ||
+      document.querySelector("section[id*='github-trending']");
+    const githubTrendCards = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll(".github-trending-card")) : [];
     const githubTrendRows = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll("ol > li")) : [];
-    const weakGithubTrendRows = githubTrendRows
+    const githubTrendItems = githubTrendCards.length > 0 ? githubTrendCards : githubTrendRows;
+    const weakGithubTrendRows = githubTrendItems
       .map((row, index) => {
         const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
-        const prose = text
+        const bodyText = row.querySelector("p")?.textContent?.replace(/\s+/g, " ").trim() || text;
+        const prose = bodyText
           .replace(/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/g, "")
-          .replace(/\b(?:GitHub|Trending|Top|README|AI|RAG|AIGC|agent|infra|eval|NEW|SAME|DOWN|UP|stars)\b/gi, "")
+          .replace(/\b(?:GitHub|Trending|Top|README|AI|RAG|AIGC|agent|infra|eval|NEW|SAME|DOWN|UP|stars|weekly|daily|all|python|typescript|rust|go|java)\b/gi, "")
           .replace(/https?:\/\/\S+/gi, "");
         const longEnglishRun = /[A-Za-z][A-Za-z0-9 ,;:'"()[\]/.!?+~`#-]{45,}/.test(prose);
-        const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+        const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
         return longEnglishRun || chineseChars < 10
           ? { index, text: text.slice(0, 220), long_english_run: longEnglishRun, chinese_chars: chineseChars }
           : null;
@@ -186,10 +195,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       .filter(Boolean);
     addCheck(
       "github_trending_reader_facing_top20",
-      githubTrendRows.length === 20 && weakGithubTrendRows.length === 0,
+      githubTrendItems.length === 20 && weakGithubTrendRows.length === 0,
       "GitHub Trending should render exactly Top 20 with README-grounded Chinese reader-facing summaries when README fetch succeeds.",
       {
-        count: githubTrendRows.length,
+        count: githubTrendItems.length,
         weak_rows: weakGithubTrendRows
       }
     );
