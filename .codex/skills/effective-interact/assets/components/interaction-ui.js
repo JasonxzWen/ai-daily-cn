@@ -234,14 +234,24 @@
       if (isActive) activeLink = link;
     });
 
-    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
-      try {
-        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
-      } catch (_) {
-        activeLink.scrollIntoView();
-      }
+    if (active && active.id !== lastActiveNavId && activeLink) {
+      keepActiveNavLinkVisible(activeLink);
     }
     lastActiveNavId = active ? active.id : "";
+  }
+
+  function keepActiveNavLinkVisible(activeLink) {
+    var scroller = activeLink.closest("[data-nav-group]") || activeLink.closest("[data-report-" + "nav]");
+    if (!scroller || scroller.scrollWidth <= scroller.clientWidth) return;
+
+    var linkRect = activeLink.getBoundingClientRect();
+    var scrollerRect = scroller.getBoundingClientRect();
+    var inset = 8;
+    if (linkRect.left < scrollerRect.left + inset) {
+      scroller.scrollLeft += linkRect.left - scrollerRect.left - inset;
+    } else if (linkRect.right > scrollerRect.right - inset) {
+      scroller.scrollLeft += linkRect.right - scrollerRect.right + inset;
+    }
   }
 
   var imageLightbox = null;

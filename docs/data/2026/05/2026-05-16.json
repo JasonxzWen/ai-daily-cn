@@ -23,7 +23,8 @@
         "对产品团队来说，这说明 ChatGPT 的数据连接正在从文档、邮件和工作流扩展到高敏感个人数据；权限、审计、免责声明和数据最小化会成为同等重要的设计约束。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3",
@@ -45,7 +46,8 @@
         "文档同时提示价格会按新目标模型计算；依赖旧 slug 的服务即使不报错，也可能在成本和 reasoning 行为上变化，应显式改模型名和 effort。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点",
@@ -67,7 +69,8 @@
         "使用托管模型目录的团队需要把模型生命周期纳入配置审计；仅依赖 OpenAI-compatible endpoint 形状并不能保证模型长期可用。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub 合并推进 Copilot app 和 cloud agent 自动选模",
@@ -89,7 +92,8 @@
         "对企业团队而言，关键不只是入口变多，而是要记录 agent session、实际模型、成本和合并动作，避免自动选模让审计口径变模糊。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Google 为 Genkit 发布 middleware 控制层",
@@ -111,54 +115,13 @@
         "这类框架更新说明生产级 agent app 的竞争点正在转向横切控制：谁能稳定拦截工具调用、审批破坏性动作、记录延迟并做可靠 fallback。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
-  "projects": [
-    {
-      "name": "ChatGPT Finances",
-      "description": "ChatGPT Pro 面向美国用户逐步 rollout 的个人财务体验，通过 Plaid 连接账户并提供财务上下文问答。",
-      "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Grok model retirement guide",
-      "description": "xAI 的 2026-05-15 模型退役迁移说明，列出旧 slug、重定向目标、reasoning effort 和价格变化风险。",
-      "url": "https://docs.x.ai/developers/migration/may-15-retirement",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Databricks Foundation Model APIs",
-      "description": "Databricks 托管模型目录，记录 Meta Llama 3.1 405B provisioned throughput 退役和 OpenAI GPT OSS 120B 替代路径。",
-      "url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "GitHub Copilot app",
-      "description": "GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面。",
-      "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Genkit Middleware",
-      "description": "Genkit generation/tool loop 的 composable middleware，用于 retries、fallbacks、approval、observability 和 per-tool control。",
-      "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
-      "domains": [],
-      "importance": "general"
-    }
-  ],
+  "projects": [],
   "builder_observations": [],
   "community_leads": [
-    {
-      "content": "OpenAI 的 2026-05-14 ChatGPT release notes 包含 Codex mobile remote access；该条已在上一期作为 OpenAI Codex 主体覆盖，本轮不重复计入主体数量。",
-      "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
-      "image_urls": [],
-      "importance": "general"
-    },
     {
       "content": "Hugging Face 2026-05-14 发布 continuous batching 异步化文章，解释 CPU/GPU 工作负载解耦；上一期已作为主体，本轮保留为推理服务工程线索。",
       "url": "https://huggingface.co/blog/continuous_async",
@@ -184,7 +147,108 @@
   "generated_at": "2026-05-15T18:46:24.275Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-6825453-chatgpt-reles-notes",
+      "title": "OpenAI 在 ChatGPT 中推出个人财务体验",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-15",
+      "primary_entity": "OpenAI Help Center",
+      "event_type": "launch",
+      "object": "OpenAI 在 ChatGPT 中推出个人财务体验",
+      "what_happened": "OpenAI 的 ChatGPT release notes 显示，Pro 用户在美国开始获得个人财务体验，可通过 Plaid 连接受支持的金融账户，在 ChatGPT 中查看财务概览并提出基于账户上下文的问题。",
+      "why_it_matters": "OpenAI 明确边界：ChatGPT 可帮助理解和规划，但不能转账、付款、交易、报税，也不充当金融、法律、税务或投资顾问。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/6825453-chatgpt-reles-notes",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-may-15-retirement",
+      "title": "xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-15",
+      "primary_entity": "xAI Docs",
+      "event_type": "update",
+      "object": "xAI 在 API 中退役多组旧 Grok 模型并重定向到 Grok 4.3",
+      "what_happened": "xAI 的迁移文档说明，2026-05-15 12:00 PT 起，多组旧 Grok、Grok Code 和 Grok Imagine 模型 slug 退役；请求不会直接中断，而是按类型重定向到 Grok 4.3 或新的图像模型。",
+      "why_it_matters": "reasoning slug 会默认路由到 `grok-4.3` 的 low reasoning effort，non-reasoning slug 会路由到 none reasoning effort，图像 pro slug 会路由到 `grok-imagine-image-quality`。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "xAI Docs",
+          "url": "https://docs.x.ai/developers/migration/may-15-retirement",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-supported-models",
+      "title": "Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-15",
+      "primary_entity": "Databricks Docs",
+      "event_type": "update",
+      "object": "Databricks 进入 Meta Llama 3.1 405B provisioned throughput 退役节点",
+      "what_happened": "Databricks 的 Foundation Model APIs 文档显示，Meta-Llama-3.1-405B-Instruct 已在 2026-02-15 停止 pay-per-token，并于 2026-05-15 对 provisioned throughput 工作负载退役。",
+      "why_it_matters": "Databricks 的退役策略页面把 provisioned throughput 的推荐替代列为 OpenAI GPT OSS 120B，说明云平台模型目录会持续按供应和性能重新排布。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Databricks Docs",
+          "url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05-14-github-copilot-app-is-now-available-in-technical-preview",
+      "title": "GitHub 合并推进 Copilot app 和 cloud agent 自动选模",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "launch",
+      "object": "GitHub 合并推进 Copilot app 和 cloud agent 自动选模",
+      "what_happened": "GitHub 在同一窗口发布 Copilot app technical preview，并为 Copilot cloud agent 增加 Auto model selection；本轮合并为一条，避免把同一 Copilot agent 工作流拆散。",
+      "why_it_matters": "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并对正常 model multiplier 给出折扣，同时不受 weekly rate limits 影响。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps",
+      "title": "Google 为 Genkit 发布 middleware 控制层",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "Google Developers Blog",
+      "event_type": "launch",
+      "object": "Google 为 Genkit 发布 middleware 控制层",
+      "what_happened": "Google 宣布 Genkit Middleware，用 composable hooks 拦截 generation call 和 tool execution loop，让 agentic app 可以统一加上重试、fallback、人工审批、安全检查和可观测性。",
+      "why_it_matters": "首批 middleware 覆盖 TypeScript、Go 和 Dart，Python 支持仍在后续计划中。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Developers Blog",
+          "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [],

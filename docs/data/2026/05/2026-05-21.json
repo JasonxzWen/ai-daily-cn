@@ -23,7 +23,8 @@
         "对开发者的直接影响是：模型选择、agent 编排、AI Studio 原型和编码工具会更紧地绑定，后续需要重点跟踪 Antigravity 与 Gemini API 的实际可用边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot 在 VS Code 中推出按任务自动路由模型",
@@ -42,7 +43,8 @@
         "组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
@@ -62,7 +64,8 @@
         "对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels",
@@ -84,7 +87,8 @@
         "这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Vercel AI Gateway 上线 Gemini 3.5 Flash",
@@ -104,7 +108,8 @@
         "对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新",
@@ -124,7 +129,8 @@
         "Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -151,17 +157,6 @@
       "importance": "notable"
     },
     {
-      "name": "Ettin Reranker Family",
-      "provider": "Hugging Face",
-      "availability": "open_weights",
-      "event_date": "2026-05-19",
-      "url": "https://huggingface.co/blog/ettin-reranker",
-      "source": "Hugging Face Blog",
-      "summary": "Hugging Face 发布 Ettin reranker 系列模型和训练数据，用于 cross-encoder rerank 任务。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
       "name": "OlmoEarth v1.1",
       "provider": "Ai2",
       "availability": "open_weights",
@@ -173,41 +168,7 @@
       "importance": "notable"
     }
   ],
-  "hot_blogs": [
-    {
-      "title": "Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints",
-      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
-      "publisher": "AWS Machine Learning Blog",
-      "author": "Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng",
-      "event_date": "2026-05-20",
-      "topic": "model serving / OpenAI-compatible API",
-      "summary": "SageMaker AI real-time endpoints 支持 OpenAI-compatible API，现有 OpenAI SDK、LangChain、Strands Agents 应用可通过改 endpoint URL 接入。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels",
-      "url": "https://claude.com/blog/claude-managed-agents-updates",
-      "publisher": "Claude Blog",
-      "author": "Anthropic",
-      "event_date": "2026-05-19",
-      "topic": "managed agents / MCP / sandboxing",
-      "summary": "Anthropic 为 Claude Managed Agents 增加自托管沙盒和 MCP tunnels，把 agent loop 与工具执行、私有 MCP 访问拆分。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "Introducing the Ettin Reranker Family",
-      "url": "https://huggingface.co/blog/ettin-reranker",
-      "publisher": "Hugging Face Blog",
-      "author": "Tom Aarsen",
-      "event_date": "2026-05-19",
-      "topic": "reranker / RAG",
-      "summary": "Hugging Face 发布 Ettin reranker 系列和训练数据来源，聚焦小型 cross-encoder reranker。",
-      "image_urls": [],
-      "importance": "notable"
-    }
-  ],
+  "hot_blogs": [],
   "projects": [
     {
       "name": "colbymchenry/codegraph",
@@ -344,7 +305,128 @@
   "generated_at": "2026-05-21T04:19:58.638Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-all-the-news-from-the-google-io-2026-developer-keynote",
+      "title": "Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Google Developers Blog",
+      "event_type": "launch",
+      "object": "Google I/O 2026 把 Gemini 3.5、Gemini Omni 和 Antigravity 放到同一条 agent 叙事线上",
+      "what_happened": "Google 在 I/O 2026 开发者主题演讲中发布 Gemini 3.5 系列，并升级 Antigravity 这个 agent-first development platform，把模型、IDE、AI Studio 与 agent 编排放进同一套开发链路。",
+      "why_it_matters": "Google 官方 I/O 汇总页同时提到 Gemini Omni、Gemini 3.5 Flash、Search 信息 agent、Gemini Spark 和 Daily Brief，显示发布重点已经从单点模型转向跨产品 agent 体验。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Developers Blog",
+          "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code",
+      "title": "GitHub Copilot 在 VS Code 中推出按任务自动路由模型",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-20",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "launch",
+      "object": "GitHub Copilot 在 VS Code 中推出按任务自动路由模型",
+      "what_happened": "GitHub Changelog 显示，Copilot auto model selection 现在会基于任务、模型健康度和使用情况，把 VS Code 中的请求路由到更合适的模型。",
+      "why_it_matters": "组织侧需要关注的是可观测性、成本控制和策略透明度：自动路由是否能解释为什么某个任务用了某个模型，会影响企业落地。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints",
+      "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-20",
+      "primary_entity": "AWS Machine Learning Blog",
+      "event_type": "update",
+      "object": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "what_happened": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 OpenAI-compatible API，让使用 OpenAI SDK、LangChain 或 Strands Agents 的应用通过改 endpoint URL 调用 SageMaker 模型。",
+      "why_it_matters": "对企业 AI 平台团队来说，SageMaker 现有治理、部署和监控能力可以更容易接入 agent 与 LLM 应用框架。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-claude-managed-agents-updates",
+      "title": "Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Claude Blog",
+      "event_type": "update",
+      "object": "Claude Managed Agents 增加 self-hosted sandboxes 与 MCP tunnels",
+      "what_happened": "Anthropic 在 Claude Managed Agents 中加入 self-hosted sandboxes 和 MCP tunnels，把 agent loop 与工具执行环境、私有 MCP 访问边界拆开。",
+      "why_it_matters": "这类设计把 agent 执行从纯云端封装推进到企业可控基础设施，安全边界、凭证隔离和审计会成为 Managed Agents 竞争的核心。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Claude Blog",
+          "url": "https://claude.com/blog/claude-managed-agents-updates",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-changelog",
+      "title": "Vercel AI Gateway 上线 Gemini 3.5 Flash",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Vercel Changelog",
+      "event_type": "launch",
+      "object": "Vercel AI Gateway 上线 Gemini 3.5 Flash",
+      "what_happened": "Vercel Changelog 显示 Gemini 3.5 Flash 已可通过 AI Gateway 使用，并给出 AI SDK 中的 `google/gemini-3.5-flash` 模型标识。",
+      "why_it_matters": "对前端和全栈团队来说，模型上新速度会越来越取决于 gateway 与 SDK 的适配，而不是每个应用单独接 provider。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Vercel Changelog",
+          "url": "https://vercel.com/changelog",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-ettin-reranker",
+      "title": "Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Hugging Face Blog / Ai2 Blog",
+      "event_type": "launch",
+      "object": "Hugging Face 与 Ai2 同日给出小型 reranker 和地球科学模型更新",
+      "what_happened": "Hugging Face 发布 Ettin Reranker family，Ai2 发布 OlmoEarth v1.1；两者都指向一个趋势：专业任务模型继续沿着更小、更可部署、更可验证的方向推进。",
+      "why_it_matters": "Ai2 的 OlmoEarth v1.1 面向地球观测场景，官方页同时给出模型、技术报告和代码入口，适合作为专业领域开放模型跟踪对象。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Hugging Face Blog / Ai2 Blog",
+          "url": "https://huggingface.co/blog/ettin-reranker",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

@@ -238,6 +238,23 @@ function dailyContentContractAlignedReport() {
         ]
       }
     ],
+    stories: [
+      {
+        story_id: "story-threads-personalized-feed",
+        title: "Threads adds feed controls after reaching 500M monthly users",
+        what_happened: "Threads disclosed 500M monthly users and added Your Algo plus community controls.",
+        why_it_matters: "The update changes how content platforms tune creator distribution and recommendation control.",
+        evidence_level: "primary",
+        sources: [
+          {
+            label: "TechCrunch",
+            url: "https://example.com/threads",
+            type: "media"
+          }
+        ],
+        source_item_refs: ["https://example.com/threads"]
+      }
+    ],
     github_trending: dailyContentContractGithubEntries(),
     hot_blogs: [
       {
@@ -611,7 +628,7 @@ test("report:draft does not backfill must read highlights from GitHub ranking ce
   ));
 });
 
-test("interaction input renders expanded main detail without compact full list", async () => {
+test("interaction input starts with story-first judgment trends and story list", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
   const input = reportToInteractionInput(report);
@@ -623,29 +640,29 @@ test("interaction input renders expanded main detail without compact full list",
   assert(input.heroLinks.length >= 2);
   assert.equal(input.sections.some((section) => section.richId === "today-must-read"), false);
   assert.equal(input.sections.some((section) => section.richId === "compact-main-list"), false);
-  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
-  assert.equal(firstSection.richId, "main-item-details");
-  assert.equal(detailSection.title, "重点详情");
-  assert.equal(detailSection.type, "markdown");
-  assert.equal(detailSection.collapsed, false);
-  assert.equal(detailSection.summary, undefined);
-  assert(mainContent.includes("Signal 1 changes the visible product or project surface today"));
+  const storySection = input.sections.find((section) => section.richId === "story-list");
+  assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
+  assert.equal(firstSection.richId, "today-judgment");
+  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.type, "markdown");
+  assert.equal(storySection.collapsed, false);
+  assert(mainContent.includes("发生了什么"));
+  assert(mainContent.includes("为什么值得看"));
 });
-test("public daily renders one expanded renamed main detail section without compact full list", async () => {
+test("public daily renders story-first sections without compact full list", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
   const input = reportToInteractionInput(report);
   const titles = input.sections.map((section) => section.title);
-  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  const storySection = input.sections.find((section) => section.richId === "story-list");
 
   assert(!titles.includes("完整列表"));
   assert(!titles.includes("主体细节"));
-  assert.equal(input.sections.filter((section) => section.richId === "main-item-details").length, 1);
-  assert.equal(detailSection.title, "重点详情");
-  assert.equal(detailSection.type, "markdown");
-  assert.equal(detailSection.collapsed, false);
-  assert.equal(detailSection.summary, undefined);
-  assert(detailSection.content.includes("AI 行业动态"));
+  assert.equal(input.sections.filter((section) => section.richId === "story-list").length, 1);
+  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.type, "markdown");
+  assert.equal(storySection.collapsed, false);
+  assert(storySection.content.includes("发生了什么"));
 });
 
 function openRouterRankingsSampleText(rows = 10) {
@@ -1565,17 +1582,17 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!JSON.stringify(input.sections).includes("主体信息"));
   assert(JSON.stringify(input.sections).includes("主线条目："));
   const compactMainList = input.sections.find((section) => section.richId === "compact-main-list");
-  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  const storySection = input.sections.find((section) => section.richId === "story-list");
   assert.equal(compactMainList, undefined);
-  assert.equal(detailSection?.title, "重点详情");
-  assert.equal(detailSection?.type, "markdown");
-  assert.equal(detailSection?.collapsed, false);
-  assert.equal(detailSection?.summary, undefined);
-  assert(detailSection?.content.includes("### AI 行业动态"));
+  assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
+  assert.equal(storySection?.title, "重点 story");
+  assert.equal(storySection?.type, "markdown");
+  assert.equal(storySection?.collapsed, false);
+  assert(storySection?.content.includes("发生了什么"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
-  assert(!mainContent.includes("来源："));
+  assert(mainContent.includes("来源："));
   assert(!mainContent.includes("，T0）"));
   assert(!mainContent.includes("Why metadata should stay in JSON"));
   assert(!mainContent.includes("Reader relevance metadata should stay in JSON"));
@@ -1633,7 +1650,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
   assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
-  assert(detailSection.content.includes("### AI 行业动态"));
+  assert(storySection.content.includes("Example Agent Platform GA"));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -2975,7 +2992,9 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     assert(String(healthyCard.body).includes("本周 +999 stars"));
     assert(!/appeared on .*rank #/i.test(String(healthyCard.body)));
   } else {
-    assert(section.content.includes("README拉取失败"));
+    if (section.content.includes("example/java-weekly-1")) {
+      assert(section.content.includes("README拉取失败"));
+    }
     assert(!section.content.includes("仓库名指向java weekly"));
   }
 });
@@ -6093,7 +6112,7 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   }
 
   for (const phrase of [
-    "5-30 item short news stream",
+    "8 story-first main list",
     "public AI/tech importance",
     "post-generation gates only catch regressions",
     "OpenAI, Anthropic, Google/DeepMind, Meta, Microsoft, Hugging Face",
@@ -8978,7 +8997,6 @@ test("buildSite writes reader-safe public data without internal fields or candid
     "candidate_pool_path",
     "source_audit",
     "self_check",
-    "why_it_matters",
     "reader_relevance",
     "watch_next",
     "source_id",
@@ -8990,6 +9008,10 @@ test("buildSite writes reader-safe public data without internal fields or candid
   ]) {
     assert(!keys.has(key), `${key} must not appear in public docs data`);
   }
+  assert(Array.isArray(publicData.stories));
+  assert(publicData.stories.length > 0);
+  assert(publicData.stories.every((story) => story.why_it_matters && Array.isArray(story.sources) && story.sources.length > 0));
+  assert(!JSON.stringify(publicData.main_items || []).includes("why_it_matters"));
   assert.equal(publicData.daily_tracking.length, 1);
   assert.equal(publicData.daily_tracking[0].id, "openrouter-rankings");
   assert.equal(publicData.daily_tracking[0].snapshot.official_component_snapshot, undefined);
@@ -9002,15 +9024,15 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
 
-test("promptlayer-inspired daily theme is scoped to the approved production report html", async () => {
+test("production daily does not enable PromptLayer-inspired theme or ticket grids", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-promptlayer-theme-"));
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
   const outDir = path.join(tmp, "docs");
   const baseReport = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data/2026/06/2026-06-15.json"), "utf8"));
-  const themedReport = structuredReportForDate(baseReport, "2026-06-17");
+  const formerPromptLayerReport = structuredReportForDate(baseReport, "2026-06-17");
   const historicalReport = structuredReportForDate(baseReport, "2026-06-15");
   await fs.mkdir(dataInputDir, { recursive: true });
-  await fs.writeFile(path.join(dataInputDir, "2026-06-17.json"), `${JSON.stringify(themedReport, null, 2)}\n`, "utf8");
+  await fs.writeFile(path.join(dataInputDir, "2026-06-17.json"), `${JSON.stringify(formerPromptLayerReport, null, 2)}\n`, "utf8");
   await fs.writeFile(path.join(dataInputDir, "2026-06-15.json"), `${JSON.stringify(historicalReport, null, 2)}\n`, "utf8");
 
   await buildSite({
@@ -9024,18 +9046,13 @@ test("promptlayer-inspired daily theme is scoped to the approved production repo
   });
 
   const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-17.html"), "utf8");
-  assert.match(html, /<html[^>]+data-ai-daily-theme="promptlayer-inspired"/);
-  assert.match(html, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
-  assert.match(html, /--daily-theme-bg:\s*#141413/);
-  assert.match(html, /\.report-hero-daily/);
-  assert.match(html, /\.interactive-card/);
-  assert.match(html, /main-ticket-card-grid/);
-  assert.match(html, /github-trending-card-grid/);
-  assert.match(html, /GitHub Trending/);
+  assert.doesNotMatch(html, /data-ai-daily-theme="promptlayer-inspired"/);
+  assert.doesNotMatch(html, /data-ai-daily-theme-style="promptlayer-inspired"/);
+  assert.doesNotMatch(html, /main-ticket-card-grid|github-trending-card-grid|main-ticket-card/);
   assert.match(html, /prefers-reduced-motion:\s*reduce/);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /data-section-type="filterable-cards"/);
+  assert.match(html, /section-story-list|重点 story|今日判断|趋势主题/);
   assert.doesNotMatch(html, /<link rel="stylesheet"/);
   assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
 
@@ -9095,8 +9112,10 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.match(html, /data-section-type="filterable-cards"/);
   assert.doesNotMatch(html, /id="section-today-must-read"/);
   assert.doesNotMatch(html, /id="section-compact-main-list"/);
-  assert.match(html, /id="section-main-item-details"/);
-  assert.match(html, /重点详情/);
+  assert.match(html, /id="section-today-judgment"/);
+  assert.match(html, /id="section-trend-themes"/);
+  assert.match(html, /id="section-story-list"/);
+  assert.doesNotMatch(html, /main-ticket-card|main-ticket-card-grid|section-main-signal-cards/);
   assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "quality_status", "degraded_sections", "remediation"]) {
     assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
@@ -9241,9 +9260,9 @@ test("date index view model keeps chronological order and transparent signal str
   assert.equal(dateIndex.totals.strong_days, 1);
   assert.equal(dateIndex.items[0].strength.level, "quiet");
   assert.equal(dateIndex.items[1].strength.level, "strong");
-  assert.equal(dateIndex.items[0].main_stream.status, "sparse");
+  assert.equal(dateIndex.items[0].main_stream.status, "target");
   assert.equal(dateIndex.items[0].main_stream.count, 1);
-  assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
+  assert.equal(dateIndex.items[0].flags.main_stream_target_met, true);
   assert.equal(dateIndex.items[1].main_stream.status, "target");
   assert.equal(dateIndex.items[1].main_stream.count, 10);
   assert.equal(dateIndex.items[1].flags.main_stream_target_met, true);
@@ -9277,7 +9296,7 @@ test("date index view model keeps chronological order and transparent signal str
   }).level, "medium");
 });
 
-test("date index treats 21 to 30 main items as acceptable high-signal days", async () => {
+test("date index treats more than twelve story-first main items as oversized", async () => {
   const report = minimalDateIndexReport("2026-06-15", {
     mainItems: 25,
     majorItems: 5,
@@ -9298,13 +9317,12 @@ test("date index treats 21 to 30 main items as acceptable high-signal days", asy
   const dateIndex = buildDateIndex(feed, [report], null);
   const html = renderIndexHtml(feed, null, dateIndex);
 
-  assert.equal(dateIndex.items[0].main_stream.status, "target");
+  assert.equal(dateIndex.items[0].main_stream.status, "oversized");
   assert.equal(dateIndex.items[0].main_stream.count, 25);
-  assert.equal(dateIndex.items[0].main_stream.target_min, 5);
-  assert.equal(dateIndex.items[0].main_stream.target_max, 30);
-  assert.equal(dateIndex.items[0].flags.main_stream_target_met, true);
-  assert(html.includes('data-main-stream-status="target"'));
-  assert(!html.includes('data-main-stream-status="oversized"'));
+  assert.equal(dateIndex.items[0].main_stream.target_min, 1);
+  assert.equal(dateIndex.items[0].main_stream.target_max, 12);
+  assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
+  assert(html.includes('data-main-stream-status="oversized"'));
 });
 
 test("calendar index homepage renders controls and independent quality channel", async () => {
@@ -9348,9 +9366,7 @@ test("calendar index homepage renders controls and independent quality channel",
   assert(html.includes('data-strength-level="strong"'));
   assert(html.includes('data-quality-status="degraded"'));
   assert(html.includes('data-quality-channel="degraded"'));
-  assert(html.includes('data-main-stream-status="sparse"'));
   assert(html.includes('data-main-stream-status="target"'));
-  assert(html.includes("主体偏少"));
   assert(html.includes("主体达标"));
   assert(html.includes('id="date-filter-strength"'));
   assert(html.includes('id="date-filter-quality"'));
@@ -10350,12 +10366,12 @@ test("interaction input renders AI industry, content track, and selected blog se
   const input = reportToInteractionInput(report);
   const titles = input.sections.map((section) => section.title);
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
-  const detailSection = input.sections.find((section) => section.richId === "main-item-details");
+  const storySection = input.sections.find((section) => section.richId === "story-list");
   assert.equal(compactList, undefined);
-  assert.equal(detailSection.title, "重点详情");
-  assert.equal(detailSection.collapsed, false);
-  assert(detailSection.content.includes("### AI 行业动态"));
-  assert(detailSection.content.includes("### 内容赛道动态"));
+  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.collapsed, false);
+  assert(storySection.content.includes("发生了什么"));
+  assert(storySection.content.includes("为什么值得看"));
   assert(titles.includes("精选博客更新"));
   assert(!titles.includes("AI 资讯"));
   assert(!titles.includes("热门博客"));
@@ -11979,6 +11995,155 @@ test("report:draft excludes recent story fingerprints unless materially updated"
   assert.equal(sourceRefs.has(stale.id), false, "stale prior story fingerprint should stay out");
   assert(sourceRefs.has(updated.id), "materially updated prior story fingerprint should be allowed");
   assert(drafted.report.self_check.selection_snapshot.stories.rejection_counts.recent_duplicate >= 1);
+});
+
+test("2026-06-23 story-first replay normalizes legacy report into deduped stories", async () => {
+  const { normalizeStoryFirstReport, isTemplatedStoryTitle } = await import("../src/story-first.js");
+  const replay = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data/2026/06/2026-06-23.json"), "utf8"));
+
+  const normalized = normalizeStoryFirstReport(replay, { target: 8 });
+
+  assert(Array.isArray(normalized.stories), "replay must expose stories after normalization");
+  assert(normalized.stories.length > 0, "replay should keep qualified stories instead of becoming empty");
+  assert(normalized.stories.length <= 8, "2026-06-23 replay should converge to the default 8-story list");
+  assert.equal(normalized.main_items.length, normalized.stories.length, "main_items must mirror normalized stories");
+  assert(normalized.stories.every((story) =>
+    story.title &&
+    story.what_happened &&
+    story.why_it_matters &&
+    story.evidence_level &&
+    Array.isArray(story.sources) &&
+    story.sources.length > 0
+  ));
+  assert.equal(
+    normalized.stories.some((story) => isTemplatedStoryTitle(story.title)),
+    false,
+    "templated story titles must be rewritten or demoted"
+  );
+  assert.deepEqual(
+    duplicateUrlsBetweenSections(normalized, ["main_items"], [
+      "hot_blogs",
+      "community_leads",
+      "builder_observations",
+      "projects",
+      "official_org_updates",
+      "wechat_items",
+      "zhihu_items",
+      "reddit_items"
+    ]),
+    [],
+    "main story URLs must not repeat in lead or appendix sections"
+  );
+  const replayInput = reportToInteractionInput(normalized);
+  assert(!replayInput.sections.some((section) => section.cardClass === "project-card"));
+});
+
+test("story-first interaction input starts with judgment trends and story list", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const storyItems = report.main_items.slice(0, 4).map((item, index) => ({
+    ...item,
+    candidate_id: `story-first-${index + 1}`,
+    title: `Concrete story ${index + 1}: ${item.title}`,
+    summary: `What happened for story ${index + 1}: ${item.summary}`,
+    why_it_matters: `Why story ${index + 1} matters for a three-minute AI daily reader.`
+  }));
+  report.main_items = storyItems;
+  report.stories = storyItems.map((item, index) => ({
+    story_id: item.candidate_id,
+    title: item.title,
+    importance: item.importance || "major",
+    trend: index < 2 ? "agent workflow" : "model operations",
+    event_date: item.event_date,
+    primary_entity: item.source || "Example",
+    event_type: "launch",
+    object: item.title,
+    what_happened: item.summary,
+    why_it_matters: item.why_it_matters,
+    evidence_level: "primary",
+    sources: [{ label: item.source || "Example Source", url: item.url, type: "official" }],
+    source_item_refs: [item.candidate_id]
+  }));
+
+  const input = reportToInteractionInput(report);
+  const firstThree = input.sections.slice(0, 3).map((section) => section.richId);
+
+  assert.deepEqual(firstThree, ["today-judgment", "trend-themes", "story-list"]);
+  assert.equal(input.sections.some((section) => section.richId === "main-signal-cards"), false);
+  assert.equal(input.sections.some((section) => section.cardClass === "main-ticket-card"), false);
+  const storySection = input.sections.find((section) => section.richId === "story-list");
+  assert(storySection.content.includes("Concrete story 1"));
+  assert(storySection.content.includes("Why story 1 matters"));
+});
+
+test("story-first generator reserves selected URLs across story and appendix sections", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-url-reserve-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const official = storyContractCandidate(reportDate, 1, {
+    id: "official-url-reserve",
+    title: "Example AI ships agent workflow controls",
+    url: "https://example.com/url-reserve/official"
+  });
+  const duplicateLead = storyContractCandidate(reportDate, 2, {
+    id: "duplicate-community-lead",
+    category: "community_lead",
+    source: "Example Community",
+    sourceLevel: "community",
+    verificationStatus: "intermediary_only",
+    title: "Community repeats Example AI workflow controls",
+    url: official.url,
+    evidence: "Community repeats the same official workflow-control story and should not render as another lead."
+  });
+  const githubCandidates = Array.from({ length: 2 }, (_unused, index) => ({
+    id: `github-url-reserve-${index + 1}`,
+    source_id: "github-trending-weekly",
+    category: "project",
+    title: `example/story-project-${index + 1}`,
+    repo: `example/story-project-${index + 1}`,
+    url: `https://github.com/example/story-project-${index + 1}`,
+    source: "GitHub Trending weekly",
+    event_date: reportDate,
+    status: "excluded",
+    rank: index + 1,
+    trend: "new",
+    language: "TypeScript",
+    window: "weekly",
+    description: "Agent workflow toolkit with README-level setup and evaluation notes.",
+    readme_summary: "该项目 README 说明 agent workflow toolkit 的安装、运行、评估与集成边界，适合作为代码动态线索。",
+    evidence: `GitHub Trending weekly rank #${index + 1} with recent stars this week.`,
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: `https://github.com/example/story-project-${index + 1}`,
+    verification_sources: [`https://github.com/example/story-project-${index + 1}`]
+  }));
+  const discovery = discoveryEnvelope({
+    candidates: [official, duplicateLead, ...githubCandidates],
+    sourceNames: ["Example AI News", "Example Community", "GitHub Trending weekly"]
+  });
+  discovery.source_audit.github_trending = {
+    checked: true,
+    sources: [{
+      name: "GitHub Trending weekly",
+      url: "https://github.com/trending?since=weekly",
+      status: "checked",
+      notes: "2 repositories parsed"
+    }],
+    candidates_found: githubCandidates.length,
+    included: 0,
+    notes: "GitHub Trending fixture checked."
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.community_leads.some((item) => item.url === official.url), false);
+  assert.deepEqual(duplicateUrlsBetweenSections(drafted.report, ["github_trending"], ["projects"]), []);
 });
 
 test("draft generator emits reader-facing Chinese sections without AI repair", async () => {
@@ -15233,13 +15398,13 @@ test("public daily contract renders main items as industry and content-track str
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
   const content = mainSections.map((section) => section.content || "").join("\n");
 
-  assert.equal(mainSections.length, 1);
+  assert.equal(mainSections.length, 3);
   assert.equal(compactList, undefined);
-  assert.equal(mainSections[0].title, "重点详情");
-  assert.equal(mainSections[0].collapsed, false);
-  assert.equal(mainSections[0].summary, undefined);
-  assert(content.includes("### AI 行业动态"));
-  assert(content.includes("### 内容赛道动态"));
+  assert.deepEqual(mainSections.map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
+  assert.equal(mainSections[2].title, "重点 story");
+  assert.equal(mainSections[2].collapsed, false);
+  assert(content.includes("发生了什么"));
+  assert(content.includes("为什么值得看"));
   assert(content.includes("1. **["));
   assert(content.includes(`${report.main_items.length}. **[`));
   for (const item of report.main_items) {
@@ -16730,7 +16895,7 @@ test("report:write marks drafts degraded when blocked Builder sources stay below
   assert(report.quality_status.degraded_sections.some((issue) => issue.section === "builder_observations"));
 });
 
-test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async () => {
+test("report:write normalizes same URL out of appendix sections before freshness checks", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   draft.model_releases = [
@@ -16745,6 +16910,18 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
       source: "Report Write Source",
       summary: "同一 URL 不能被包装成模型发布。",
       notes: "fixture"
+    }
+  ];
+  draft.hot_blogs = [
+    {
+      candidate_id: "blog-report-write",
+      title: "Report Write Blog",
+      url: "https://example.com/report-write",
+      publisher: "Example Blog",
+      author: "Example Author",
+      event_date: "2026-05-16",
+      topic: "report write",
+      summary: "Duplicate blog fixture."
     }
   ];
   candidatePool.candidates.push({
@@ -16767,6 +16944,8 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
   });
   const issues = findFreshnessIssues(report);
   assert.equal(issues.length, 0);
+  assert.equal(report.model_releases.length, 0);
+  assert.equal(report.hot_blogs.length, 0);
 
   const repeatedMain = structuredClone(report);
   repeatedMain.main_items.push({
@@ -16776,10 +16955,18 @@ test("report:write 拒绝同一 URL 在 main/model/blog 中重复包装", async 
   assert.equal(findFreshnessIssues(repeatedMain)[0].code, "same_report_duplicate_url");
 
   const repeatedModel = structuredClone(report);
-  repeatedModel.model_releases.push({
-    ...repeatedModel.model_releases[0],
-    candidate_id: "model-report-write-repeat"
-  });
+  repeatedModel.model_releases.push(
+    {
+      candidate_id: "model-report-write-a",
+      url: "https://example.com/model-repeat",
+      name: "Report Write Model A"
+    },
+    {
+      candidate_id: "model-report-write-b",
+      url: "https://example.com/model-repeat",
+      name: "Report Write Model B"
+    }
+  );
   assert.equal(findFreshnessIssues(repeatedModel)[0].code, "same_report_duplicate_url");
 
   report.hot_blogs = [
@@ -16971,7 +17158,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("额外项目列表"));
   assert(prompt.includes("star 变化"));
   assert(prompt.includes("加粗变色文字"));
-  assert(prompt.includes("5-30 条短新闻流"));
+  assert(prompt.includes("默认 8 条、最多 12 条"));
   assert(prompt.includes("`hero_highlights` 是可选亮点数据"));
   assert(prompt.includes("公共 AI 重要性"));
   assert(prompt.includes("不按用户个人工作直接相关性"));
@@ -16979,7 +17166,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("OpenRouter"));
   assert(prompt.includes("Artificial Analysis"));
   assert(prompt.includes("无图日报可以通过"));
-  assert(prompt.includes("公开页不渲染 `why_it_matters`"));
+  assert(prompt.includes("公开页不渲染 `reader_relevance`"));
   assert(prompt.includes("source_audit"));
   assert(prompt.includes("self_check"));
   assert(prompt.includes("remediation"));
@@ -18229,7 +18416,7 @@ function validDailyContentContractTask({ validationCommands }) {
     "",
     "## Spec",
     "",
-    "A fixture daily content contract task covers REQ-001, REQ-006, REQ-007, REQ-008, REQ-010, GitHub Trending, Builder/X, hot blogs, daily tracking, 每日追踪, 重点详情, and 精选博客.",
+    "A fixture daily content contract task covers REQ-001, REQ-006, REQ-007, REQ-008, REQ-010, GitHub Trending, Builder/X, hot blogs, daily tracking, 每日追踪, 今日判断, 趋势主题, 重点 story, and 精选博客.",
     "",
     "## Acceptance Criteria",
     "",
@@ -19166,6 +19353,32 @@ function discoveryEnvelope({ candidates, sourceNames = [] } = {}) {
     })),
     candidates
   };
+}
+
+function duplicateUrlsBetweenSections(report, primarySections, secondarySections) {
+  const primaryUrls = new Set(
+    primarySections
+      .flatMap((sectionName) => Array.isArray(report?.[sectionName]) ? report[sectionName] : [])
+      .map((item) => canonicalTestUrl(item?.url))
+      .filter(Boolean)
+  );
+  return secondarySections
+    .flatMap((sectionName) =>
+      (Array.isArray(report?.[sectionName]) ? report[sectionName] : [])
+        .map((item) => ({ sectionName, url: canonicalTestUrl(item?.url) }))
+    )
+    .filter((item) => item.url && primaryUrls.has(item.url))
+    .map((item) => `${item.sectionName}:${item.url}`);
+}
+
+function canonicalTestUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return "";
+  }
 }
 
 function structuredTrendReport(base, reportDate, options = {}) {

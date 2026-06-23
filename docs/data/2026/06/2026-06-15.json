@@ -83,40 +83,6 @@
       ],
       "importance": "major",
       "image_urls": []
-    },
-    {
-      "title": "Claude Code 2026 指南梳理 25 个功能点",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-15",
-      "url": "https://www.marktechpost.com/2026/06/14/claude-code-guide-2026-25-features-with-examples-demo/",
-      "source": "Planet AI",
-      "tier": "T3",
-      "entities": [
-        "Planet AI"
-      ],
-      "summary": "这篇指南把 Claude Code 拆成 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能，并配示例和演示。",
-      "bullets": [
-        "**Claude Code 用法**：指南把 CLAUDE.md、skills、subagents、hooks、MCP 和 Auto Mode 等功能拆成示例与场景。"
-      ],
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "智源王仲远谈 VLA 与世界模型路线",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-15",
-      "url": "https://36kr.com/p/3853016586359817?f=rss",
-      "source": "36Kr",
-      "tier": "T3",
-      "entities": [
-        "36Kr"
-      ],
-      "summary": "36Kr 专访围绕具身智能短板、VLA 与世界模型关系展开，核心是机器人是否能补上物理规律和因果预测能力。",
-      "bullets": [
-        "**具身智能路线**：专访把 VLA、世界模型和机器人对物理因果的理解放在一起，重点是当前系统仍缺少稳定的物理预测能力。"
-      ],
-      "importance": "general",
-      "image_urls": []
     }
   ],
   "github_trending": [
@@ -1836,5 +1802,66 @@
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-15.html",
   "html_path": "reports/2026/06/2026-06-15.html",
-  "stories": []
+  "stories": [
+    {
+      "story_id": "main-content-alibaba-cloud-blog-security-new-features-in-may-2026",
+      "title": "阿里云汇总 2026 年 5 月安全产品新功能",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-15",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "阿里云汇总 2026 年 5 月安全产品新功能",
+      "what_happened": "这篇阿里云博客按产品线汇总 2026 年 5 月安全产品更新，重点是面向国际市场的安全能力变化。",
+      "why_it_matters": "**阿里云安全产品**：原文按产品线汇总 2026 年 5 月功能变化，重点是国际站安全能力、控制台入口和防护范围。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-alibaba-cloud-blog-automating-daily-outlook-email-summarization-with-her",
+      "title": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-13",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "阿里云示例用 HermesAgent 在 ECS 上自动汇总 Outlook 邮件",
+      "what_happened": "文章演示在 Alibaba Cloud ECS 上用 HermesAgent 自动汇总 Outlook 邮件，把邮件处理接入云端 agent 工作流。",
+      "why_it_matters": "**HermesAgent 工作流**：文章演示在 Alibaba Cloud ECS 上自动汇总 Outlook 邮件，把邮箱处理接入云端 agent 任务链。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/automating-daily-outlook-email-summarization-with-hermesagent-on-alibaba-cloud-ecs_603250",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-nvidia-developer-blog-cut-checkpoint-costs-with-about-30-lines-of-python",
+      "title": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-15",
+      "primary_entity": "NVIDIA Developer Blog",
+      "event_type": "update",
+      "object": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
+      "what_happened": "NVIDIA 文章把训练检查点成本压缩落到 nvCOMP 和约 30 行 Python 代码，关注权重、优化器状态和梯度快照的存储开销。",
+      "why_it_matters": "**训练检查点成本**：NVIDIA 把 nvCOMP 压缩库接到 checkpoint 流程里，关注权重、优化器状态和梯度快照的存储开销。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
+          "type": "official"
+        }
+      ]
+    }
+  ]
 }

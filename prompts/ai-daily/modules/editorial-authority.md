@@ -21,7 +21,7 @@
 ### 当前主板块
 
 - `summary` / hero：写成编辑导语，先讲今天主线，不写生产过程，不写“本次筛了多少条”。
-- `main_items`：目标为 5-30 条短新闻流；5 是低信号日最低值，5-20 是常规舒适区，21-30 是高信号日可接受区间。按公共 AI 重要性、科技新闻声量、大厂名气和泛 AI 热点排序，不按用户个人工作直接相关性排序，也不按抓取偶然性排序。每条只展示标题、2-3 句/行可追溯事实概括和来源链接。
+- `stories`：目标为编辑合并后的 story 主列表，默认 8 条、最多 12 条，允许少于 8。按公共 AI 重要性、科技新闻声量、大厂名气和泛 AI 热点排序，不按用户个人工作直接相关性排序，也不按抓取偶然性排序。每条必须有具体标题、`what_happened`、紧凑 `why_it_matters`、`sources[]` 和 `evidence_level`；`main_items` 只作为兼容映射。
 - `hot_blogs`：对外固定显示为“热门博客”，承载观点、产品拆解、平台策略、内容生态、组织方法、创作者工作流、高质量工程深读、访谈和播客。
 - GitHub Trending：保留 weekly all-language + Python/TypeScript/Rust/Go/Java 的 Top10 合并去重结果，最多 Top20；要解释 README 里的项目能力、解决什么问题、为什么值得看，但它不再主导整份日报的主线。README 拉取失败时只展示榜位/star/trend 并标注失败，不编造描述。
 - Builder / X / 社区线索：只保留争议、分歧和早期信号，不做帖子搬运流。
@@ -40,7 +40,7 @@
 - 说人话。不要写工作汇报腔、评审腔、模板判断句。
 - 禁止把机器日志、shell 超时、source audit 过程、候选池写回、抓取成功/失败说明写进公开摘要、主体、热门博客或公开建议区。
 - 禁止 `读者应重点核对`、`判断点`、`把它当作……信号`、`后续继续跟进` 这一类模板句。
-- 主体、热门博客和社区线索不写重复的“为什么重要 / 后续跟进 / 风险提示 / 启示 / 影响”空话，除非有具体、可验证的边界说明。`why_it_matters`、`reader_relevance`、入选理由、候选分数和 watch-next 只可作为内部兼容元数据，不得成为公开正文。
+- 主体、热门博客和社区线索不写重复的“后续跟进 / 风险提示 / 启示 / 影响”空话，除非有具体、可验证的边界说明。Story 的 `why_it_matters` 必须是紧凑、具体、可公开的判断句；`reader_relevance`、入选理由、候选分数和 watch-next 只可作为内部兼容元数据，不得成为公开正文。
 
 ### 覆盖与保留
 
@@ -60,7 +60,7 @@
 4. 机器日志和模板判断句进入硬质量门。
 5. GitHub Trending weekly Top20 覆盖面保留完整，但叙事权重下调。
 6. 旧的分散文档只作归档参考，不再作为当前合同。
-7. `main_items` 固定为 5-30 条短新闻流，公开页不再展示入选理由、`why_it_matters`、`reader_relevance` 或 watch-next 模板字段。
+7. `stories` 固定为 story-first 主列表，默认 8 条、最多 12 条；公开页展示紧凑 `why_it_matters`，但不展示入选理由、`reader_relevance` 或 watch-next 模板字段。
 8. 主线选择按公共 AI 重要性、科技新闻声量、大厂名气和泛 AI 热点排序，不按个人工作相关性收窄。
 9. OpenRouter / Artificial Analysis 等榜单优先用结构化表格，禁止整页截图作为公开正文主内容。
 10. 图片允许为空；只有原文内部资产在尺寸、语义和可读性合格时才展示。
@@ -80,13 +80,13 @@
 8. GitHub Trending 保留 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重后的 Top20，但只承担能力地图和项目解释，不再抢占日报主线。
 9. 公开正文禁止机器日志、source audit 过程、模板判断句、工作汇报腔和“后续继续跟进”空话。
 10. 后续同类迭代必须把修改清单、good case / bad case 和覆盖关系回写到这份资产。
-11. 主体信息改为 5-30 条短新闻流，每条只保留标题、事实概括和来源链接。
-12. 删除主体公开写法里的“为什么重要 / 启示 / 入选条件 / 读者相关性”模板展示。
+11. 主体信息改为 story-first 主列表，每条保留标题、发生了什么、为什么值得看、证据等级和来源链接。
+12. 删除主体公开写法里的“启示 / 入选条件 / 读者相关性”模板展示，`why_it_matters` 只能写具体判断。
 13. 将主线排序改为公共 AI 重要性优先，明确不按个人工作相关性过滤。
 14. 将 OpenRouter / Artificial Analysis 等榜单改为结构化表格优先，截图最多作为折叠证据或不展示。
 15. 图片展示改为质量门控制：可无图，禁止 tiny icon、logo、头像、整页截图和不可读图片。
 16. 公开日报隐藏内部审计和执行诊断，只在内部 JSON / 质量报告 / 交接中保留。
-17. GitHub Trending、热门博客、Builder、社区线索、国内/平台内容都视为重要板块，不能被短新闻流替代。
+17. GitHub Trending、热门博客、Builder、社区线索、国内/平台内容都视为重要紧凑区或来源线索，不能与主 story 列表等权平铺。
 18. 公开页模板固定为 effective-interact `pre-rendered` 产物：允许源覆盖降级，但降级只能以短的读者说明出现，不能以 source audit、candidate、self-check 或 remediation 字段出现。
 
 ### 当前优先级
@@ -131,7 +131,7 @@
 
 - `2026-06-08`：把分散的 ROI、质量索引、旧 prompt 口径和用户最新反馈收口到这份唯一权威资产；补上 `迭代维护机制`、`本轮修改清单`、`Good Case`、`Bad Case`、`Forbidden Case` 和 `迭代历史`，后续同类迭代统一在这里后写覆盖前写。
 - `2026-06-09`：根据用户回归反馈固定公开日报新合同：短新闻流、公共 AI 重要性排序、公开页不展示解释模板、榜单结构化表格优先、禁止整页截图主内容、图片质量门和公开/内部报告分离；其它 prompt 模块若冲突，以本记录覆盖。
-- `2026-06-15`：用户校准目标形态为 5-30 条短新闻流，不再需要“今日必看”或首屏优先；5-20 是常规舒适区，21-30 是高信号日可接受区间。后续改动必须同时检查 index 页是否仍按 `main_items` 与质量状态计算信号强度。
+- `2026-06-23`：用户校准目标形态为 story-first 主列表，不再继续 PromptLayer-inspired landing/report 方向；默认 8 条 story、最多 12 条，允许少于 8，`main_items` 仅作兼容映射。后续改动必须同时检查 index 页是否仍按 story 数量与质量状态计算信号强度。
 - `2026-06-15`：明确不能绕过 effective-interact 组件体系；严格点前移到生成和 interaction input 边界，公开页用 effective-interact 展示干净读者内容，事后校验只挡事故级泄漏和视觉破损。
 - `2026-06-15`：主体准入从官方/一手白名单改为黑名单剔除；官方/一手/多源用于排序和保留优先级。GitHub、Builder/X、热门博客、社区弱信号和白名单公众号等候选可按低风险边界参与主体补位，但融资、估值、价格、benchmark、安全事故、监管和模型能力等高风险事实仍需官方/一手或多源确认。
 - `2026-06-17`：将用户反馈固化为发布前内容契约门。主线详情必须是新闻形态的事实/影响/相关性分点；GitHub Trending 范围固定为 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重到 Top20；热门博客公开页只展示 100-200 字文章概括和来源，不再渲染 key_points；follow-builders X feed 过滤后合格候选不少于 3 条时 Builder/X 不得为 0；OpenRouter / Artificial Analysis 必须使用 sanitized official snapshot 或解析数据，REQ-010 可 degraded 但不能渲染 fake component。

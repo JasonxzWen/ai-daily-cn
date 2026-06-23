@@ -32,6 +32,7 @@ import {
   requirePlatformExemptItemContract
 } from "./platform-exempt.js";
 import { attachTrackingComponentSnapshots } from "./tracking-components.js";
+import { isTemplatedStoryTitle, normalizeStoryFirstReport, STORY_FIRST_MAX } from "./story-first.js";
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -164,6 +165,13 @@ export function normalizeReportDraft(draft, options = {}) {
     };
   }
 
+  const hadExplicitStories = Array.isArray(draft.stories) && draft.stories.length > 0;
+  const storyFirstReport = normalizeStoryFirstReport(report, {
+    preserveExistingStories: hadExplicitStories,
+    allowSecondarySingleSource: true
+  });
+  Object.assign(report, storyFirstReport);
+
   report.quality_status = deriveQualityStatus(report, options.candidatePool);
 
   const validation = validateReport(report);
@@ -238,12 +246,22 @@ function stripPrivateDisclosureFields(report) {
 
 function requireStoryContract(report) {
   const stories = Array.isArray(report.stories) ? report.stories : [];
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  const errors = [];
   if (stories.length === 0) {
-    return;
+    if (mainItems.length > 0) {
+      errors.push("stories must be present when main_items are present");
+    } else {
+      return;
+    }
+  }
+  if (stories.length > STORY_FIRST_MAX) {
+    errors.push(`stories must not exceed ${STORY_FIRST_MAX}; got ${stories.length}`);
   }
 
   const storyIds = new Set();
-  const errors = [];
+  const storySourceRefs = new Set();
+  const storyUrlOwner = new Map();
   stories.forEach((story, index) => {
     const storyId = String(story?.story_id || "").trim();
     if (!storyId) {
@@ -253,16 +271,35 @@ function requireStoryContract(report) {
     } else {
       storyIds.add(storyId);
     }
+    for (const ref of Array.isArray(story?.source_item_refs) ? story.source_item_refs : []) {
+      const value = String(ref || "").trim();
+      if (value) {
+        storySourceRefs.add(value);
+      }
+    }
+    if (isTemplatedStoryTitle(story?.title)) {
+      errors.push(`stories[${index}].title is templated and must be concrete`);
+    }
     const sources = Array.isArray(story?.sources) ? story.sources : [];
     if (sources.length === 0) {
       errors.push(`stories[${index}].sources must contain at least one public source`);
     }
+    for (const source of sources) {
+      const url = normalizeUrlForEvidenceGate(source?.url);
+      if (!url) {
+        continue;
+      }
+      const previousOwner = storyUrlOwner.get(url);
+      if (previousOwner && previousOwner !== storyId) {
+        errors.push(`stories[${index}].sources reuses canonical URL ${url} from ${previousOwner}`);
+      }
+      storyUrlOwner.set(url, storyId || `stories[${index}]`);
+    }
   });
 
-  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
   if (mainItems.length > 0) {
     const mainIds = mainItems.map((item) => String(item?.candidate_id || "").trim()).filter(Boolean);
-    const missing = mainIds.filter((id) => !storyIds.has(id));
+    const missing = mainIds.filter((id) => !storyIds.has(id) && !storySourceRefs.has(id));
     if (missing.length > 0) {
       errors.push(`main_items must be derived from stories; missing story ids: ${missing.slice(0, 5).join(", ")}`);
     }

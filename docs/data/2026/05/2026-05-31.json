@@ -189,7 +189,8 @@
         "对工程团队的直接影响是：以后做模型横评或供应商准入时，报告模板需要暴露执行环境和 elicitation 方式，不能只存最终分数。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot usage metrics API 增加 adoption cohorts",
@@ -210,7 +211,8 @@
         "对采购和治理团队来说，这类指标能把 AI 工具 ROI 讨论从总使用量转向具体工作流迁移，但仍需要结合代码质量、review 和安全事件数据。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -351,16 +353,6 @@
       "importance": "notable"
     },
     {
-      "author": "OpenAI evals team",
-      "content": "OpenAI 在第三方评测框架中强调：agentic system 的能力结论必须和 harness、工具、预算、elicitation 方式绑定。这个观点对 builder 的含义是，评测资产本身会成为产品能力的一部分。",
-      "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
-      "role": "OpenAI safety and evaluations team",
-      "event_date": "2026-05-29",
-      "source": "OpenAI",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
       "author": "OpenAI / Thrive / Crete",
       "content": "Tax AI 案例显示垂直 agent 的构建重心正在转向生产反馈闭环：专家给出判断，真实任务产生信号，Codex 把改进转成代码与验证循环。这个模式比单次 prompt 调优更接近长期产品工程。",
       "url": "https://openai.com/index/building-self-improving-tax-agents-with-codex/",
@@ -374,7 +366,48 @@
   "community_leads": [],
   "evidence_assets": [],
   "generated_at": "2026-05-30T18:48:38.339Z",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-openai-third-party-eval-playbook",
+      "title": "OpenAI 发布第三方评测 playbook，要求把 harness 与有效性证据讲清楚",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-29",
+      "primary_entity": "OpenAI",
+      "event_type": "launch",
+      "object": "OpenAI 发布第三方评测 playbook，要求把 harness 与有效性证据讲清楚",
+      "what_happened": "OpenAI 发布面向前沿模型第三方评测的实践框架，核心不是给出单一榜单，而是要求评测报告明确 claim、harness、工具、预算、模型设置和有效性证据。文章特别强调 agentic 系统的表现会被调用框架显著影响，因此第三方评测不能只公布结果分数。",
+      "why_it_matters": "OpenAI 提出评测报告应记录模型、工具、harness、预算和 validity checks，避免把一次运行结果包装成过宽的能力结论。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI",
+          "url": "https://openai.com/index/trustworthy-third-party-evaluations-foundations/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-github-copilot-usage-cohorts",
+      "title": "GitHub Copilot usage metrics API 增加 adoption cohorts",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-29",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot usage metrics API 增加 adoption cohorts",
+      "what_happened": "GitHub 在 Copilot usage metrics API 中加入 adoption cohorts，让企业管理员可以按代码优先、agent 优先、多 agent 等使用成熟度观察组织采用进展，而不是只看活跃用户数量。该能力通过 REST API 暴露，并可与 teams filter 组合。",
+      "why_it_matters": "cohorts 可以帮助企业识别哪些团队停留在代码补全，哪些团队已经进入 agent-first 或 multi-agent 使用模式。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-29-copilot-usage-metrics-api-adds-cohorts-for-ai-adoption/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

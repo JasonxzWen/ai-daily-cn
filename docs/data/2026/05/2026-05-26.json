@@ -25,7 +25,8 @@
         "同一张支持表也列出多个 Claude 4.x 模型和区域 profile，可作为后续模型生命周期巡检的固定来源。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力",
@@ -46,7 +47,8 @@
         "Google 明确 Drive 体验遵守现有权限、DLP 和 IRM 控制；管理员要检查 Workspace smart features 与 Gemini for Workspace 的启用边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident",
@@ -67,7 +69,8 @@
         "如果内部监控只看应用错误而不关联模型供应商状态页，排障时容易把平台抖动误判成本地代码问题。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [],
@@ -97,7 +100,68 @@
   "generated_at": "2026-05-25T18:36:48.879Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-salesforce-agentforce-claude-reroute",
+      "title": "Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "Salesforce Help",
+      "event_type": "update",
+      "object": "Salesforce Agentforce 把 Bedrock Claude 4 Sonnet 请求改路由到 Claude Sonnet 4.6",
+      "what_happened": "Salesforce 的 LLM support 文档显示，Bedrock 上的 Claude 4 Sonnet 在 2026-05-26 改路由到 Claude Sonnet 4.6。",
+      "why_it_matters": "团队需要重新检查关键 prompt、审批链和输出评估，尤其是把 Agentforce 当成业务系统入口的场景。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Salesforce Help",
+          "url": "https://help.salesforce.com/s/articleView?id=sf.generative_ai_large_language_model_support.htm&language=en_US&type=5",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-google-workspace-gemini-rollout",
+      "title": "Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "Google Workspace Updates",
+      "event_type": "launch",
+      "object": "Google Workspace 在 Scheduled Release 域开始扩展 Gemini Chat 与 Drive 能力",
+      "what_happened": "Google Workspace Updates 显示，Gemini in Chat 的多语言 refine 能力在 Scheduled Release 域从 2026-05-26 开始完整 rollout；Ask Gemini in Drive 的额外语言 rollout 同日进入 Scheduled Release。",
+      "why_it_matters": "Drive 侧的 Ask Gemini 已经是 GA，额外语言 rollout 让文件问答、项目资料整理和跨文件理解覆盖更多团队。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Workspace Updates",
+          "url": "https://workspaceupdates.googleblog.com/2026/05/refine-in-chat-additional-language-support.html",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-claude-opus-status",
+      "title": "Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-25",
+      "primary_entity": "Claude Status",
+      "event_type": "update",
+      "object": "Claude Opus 4.7 在 2026-05-25 出现并恢复错误率升高 incident",
+      "what_happened": "Claude Status 记录了 Opus 4.7 在 2026-05-25 06:30-10:30 UTC 的错误率升高，并在 10:39 UTC 标记 resolved。",
+      "why_it_matters": "状态页当前显示系统 operational，但同页历史记录里 Opus 4.7 在 5 月多次出现短时错误率事件。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Claude Status",
+          "url": "https://status.claude.com/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

@@ -194,7 +194,8 @@
         "==管理员需要核对 **Actions entitlement / budgets / runner 设置**，否则自动 PR review 会变成新的 CI 成本项。=="
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Microsoft Foundry 更新 agent 评测、成本归因和本地运行能力",
@@ -215,7 +216,8 @@
         "==成本归因只解释模型/项目使用，完整账单仍要结合 Azure Cost Management、Search、Storage、Key Vault 等资源看。=="
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "MiniMax M3 发布，主打 coding、长上下文和原生多模态",
@@ -236,7 +238,8 @@
         "开发者侧有 Token Plan、API、MiniMax Code 和待开源本地部署路径，==价格/配额会直接影响 coding agent 使用成本==。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "NVIDIA Cosmos 3 面向 physical AI 推理、世界模型和动作模型",
@@ -257,7 +260,8 @@
         "NVIDIA 同步开放 6 类 synthetic datasets，并提供 BF16、FP8、NVFP4 NIM 路径，==物理 AI 不只是视频生成==。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "NVIDIA 用 DOCA In-Silicon Security 强化 agentic AI 基础设施",
@@ -278,7 +282,8 @@
         "==DOCA Argus、Vault、Flow 分别对应运行时威胁检测、文件级 zero-trust 访问和硬件加速网络策略。=="
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "NVIDIA Alpamayo 文章聚焦自动驾驶模型闭环后训练",
@@ -298,7 +303,8 @@
         "==输出关注 mean reward、failure rates、policy loss、rollout throughput 和 checkpoint，可用于 AV 模型闭环验收。=="
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "阿里云 Quick BI 推 ticket-based enhanced embedding 处理数据分享权限",
@@ -319,7 +325,8 @@
         "治理看板跟踪授权用户、嵌入报表数、访问量和启用报表数，==BI 分享从链接分发变成可运营服务==。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Lingyang 在 Qwen Conference 展示 Quick BI 企业级数据方案",
@@ -340,77 +347,11 @@
         "==案例称手工日报工作量下降约 90%、问题发现解决提速 10x，报表迁移人工校验工作量下降 50% 以上。=="
       ],
       "image_urls": [],
-      "importance": "major"
-    },
-    {
-      "title": "Vercel AI Gateway 出现按 API Key 设置 spend cap 的成本控制线索",
-      "event_date": "2026-05-30",
-      "url": "https://x.com/rauchg/status/2060787704166776927",
-      "source": "Guillermo Rauch X status",
-      "tier": "T1",
-      "entities": [
-        "Vercel AI Gateway",
-        "API key",
-        "spend cap",
-        "cost control"
-      ],
-      "summary": "X 原始信号：Guillermo Rauch 提到 Vercel AI Gateway 可按 API Key 设置 spend cap。 成本归因：per-key cap 能把项目、环境、客户或团队拆开限额，避免共享 key 把预算和责任混在一起。 这类变化属于 AI 开发工具的计费/配额/预算控制项，应和模型发布、状态页 incident 分开记录。",
-      "bullets": [
-        "**X 原始信号**：Guillermo Rauch 提到 Vercel AI Gateway 可按 API Key 设置 spend cap。",
-        "**成本归因**：per-key cap 能把项目、环境、客户或团队拆开限额，避免共享 key 把预算和责任混在一起。",
-        "这类变化属于 AI 开发工具的计费/配额/预算控制项，==应和模型发布、状态页 incident 分开记录==。"
-      ],
-      "image_urls": [],
-      "importance": "major"
-    },
-    {
-      "title": "Nature 论文用全国尺度声学监测分析鸟类多样性与迁徙",
-      "event_date": "2026-05-30",
-      "url": "https://www.nature.com/articles/s42003-026-10389-4",
-      "source": "Nature Communications",
-      "tier": "T1",
-      "entities": [
-        "acoustic monitoring",
-        "machine learning",
-        "biodiversity",
-        "migration"
-      ],
-      "summary": "数据规模：研究在挪威 28 个联网传感器采集 37,429 小时春季迁徙音频。 模型结果：开源检测算法经专家验证后，57 个物种达到至少 80% precision，其中 14 个为完整迁徙物种。 研究用自动检测构建 3 种常见候鸟 arrival curves，并训练声学物种分布模型，展示科研/公共领域 AI 应用面。",
-      "bullets": [
-        "==**数据规模**：研究在挪威 28 个联网传感器采集 37,429 小时春季迁徙音频。==",
-        "**模型结果**：开源检测算法经专家验证后，57 个物种达到至少 80% precision，其中 14 个为完整迁徙物种。",
-        "研究用自动检测构建 3 种常见候鸟 arrival curves，并训练声学物种分布模型，展示科研/公共领域 AI 应用面。"
-      ],
-      "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
-  "model_releases": [
-    {
-      "name": "MiniMax M3",
-      "provider": "MiniMax",
-      "availability": "open_weights",
-      "release_scope": "provider_official_launch",
-      "event_date": "2026-06-01",
-      "url": "https://www.minimax.io/models/text/m3",
-      "source": "MiniMax model page",
-      "summary": "MiniMax 发布 M3，定位为 coding、1M context 和原生多模态模型；本条按模型首发记录，不和网关可用性混写。",
-      "image_urls": [],
-      "importance": "major"
-    },
-    {
-      "name": "NVIDIA Cosmos 3",
-      "provider": "NVIDIA",
-      "availability": "open_weights",
-      "release_scope": "provider_official_launch",
-      "event_date": "2026-06-01",
-      "url": "https://developer.nvidia.com/blog/develop-physical-ai-reasoning-world-and-action-models-with-nvidia-cosmos-3/",
-      "source": "NVIDIA Developer Blog",
-      "summary": "Hugging Face 的 NVIDIA 文章介绍 Cosmos 3 open omni-model，用于 physical AI reasoning and action；本条只记录模型发布本身。",
-      "image_urls": [],
-      "importance": "major"
-    }
-  ],
+  "model_releases": [],
   "hot_blogs": [
     {
       "title": "Comprehensive observability for Amazon SageMaker AI LLM inference",
@@ -621,7 +562,168 @@
     }
   ],
   "generated_at": "2026-06-01T16:00:00+08:00",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-github-copilot-billing-june1",
+      "title": "GitHub Copilot 计费切换今天生效，代码审查进入成本归因",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot 计费切换今天生效，代码审查进入成本归因",
+      "what_happened": "今天生效：GitHub Copilot code review 从 2026-06-01 起在私有仓库消耗 Actions minutes，公有仓库 Actions minutes 仍免费。 双计费：每次 review 同时进入 Copilot AI Credits 和 GitHub Actions minutes，覆盖 Pro、Pro+、Business、Enterprise。 管理员需要核对 Actions entitlement / budgets / runner 设置，否则自动 PR review 会变成新的 CI 成本项。",
+      "why_it_matters": "**双计费**：每次 review 同时进入 Copilot AI Credits 和 GitHub Actions minutes，覆盖 Pro、Pro+、Business、Enterprise。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-04-27-github-copilot-code-review-will-start-consuming-github-actions-minutes-on-june-1-2026/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-microsoft-foundry-may-update",
+      "title": "Microsoft Foundry 更新 agent 评测、成本归因和本地运行能力",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-30",
+      "primary_entity": "Microsoft Foundry Blog",
+      "event_type": "update",
+      "object": "Microsoft Foundry 更新 agent 评测、成本归因和本地运行能力",
+      "what_happened": "评测与追踪：Foundry 把托管/外部 agent traces、评测和项目视角成本归因放在同一组更新里。 本地能力：Foundry Local 1.1 带来实时 ASR、embedding、Qwen 3.5 Vision、WebGPU 插件；1.2 又补多语 ASR、ARM64、WinML 2.0。 成本归因只解释模型/项目使用，完整账单仍要结合 Azure Cost Management、Search、Storage、Key Vault 等资源看。",
+      "why_it_matters": "**本地能力**：Foundry Local 1.1 带来实时 ASR、embedding、Qwen 3.5 Vision、WebGPU 插件；1.2 又补多语 ASR、ARM64、WinML 2.0。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Microsoft Foundry Blog",
+          "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-may-2026/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-minimax-m3-model-page",
+      "title": "MiniMax M3 发布，主打 coding、长上下文和原生多模态",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "MiniMax model page",
+      "event_type": "launch",
+      "object": "MiniMax M3 发布，主打 coding、长上下文和原生多模态",
+      "what_happened": "三能力合一：M3 主打 open-weight、coding/agentic、1M context 和原生多模态，API 最低保证 512K context。 长任务数据：官方案例给出 ICLR 论文复现 12 小时、18 commits、23 figures，以及 FP8 GEMM 147 次提交、9.4x speedup。 开发者侧有 Token Plan、API、MiniMax Code 和待开源本地部署路径，价格/配额会直接影响 coding agent 使用成本。",
+      "why_it_matters": "**长任务数据**：官方案例给出 ICLR 论文复现 12 小时、18 commits、23 figures，以及 FP8 GEMM 147 次提交、9.4x speedup。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "MiniMax model page",
+          "url": "https://www.minimax.io/models/text/m3",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-nvidia-cosmos-3-physical-ai",
+      "title": "NVIDIA Cosmos 3 面向 physical AI 推理、世界模型和动作模型",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "NVIDIA Developer Blog",
+      "event_type": "update",
+      "object": "NVIDIA Cosmos 3 面向 physical AI 推理、世界模型和动作模型",
+      "what_happened": "架构变化：Cosmos 3 用 MoT 把 reasoner tower 和 generator tower 合并，输入可含文本、图像、视频、音频、动作。 模型规格：Nano 为 8B，面向工作站实时推理；Super 为 32B，面向 Hopper/Blackwell 数据中心部署。 NVIDIA 同步开放 6 类 synthetic datasets，并提供 BF16、FP8、NVFP4 NIM 路径，物理 AI 不只是视频生成。",
+      "why_it_matters": "**模型规格**：Nano 为 8B，面向工作站实时推理；Super 为 32B，面向 Hopper/Blackwell 数据中心部署。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/develop-physical-ai-reasoning-world-and-action-models-with-nvidia-cosmos-3/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-nvidia-doca-ai-security",
+      "title": "NVIDIA 用 DOCA In-Silicon Security 强化 agentic AI 基础设施",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "NVIDIA Developer Blog",
+      "event_type": "update",
+      "object": "NVIDIA 用 DOCA In-Silicon Security 强化 agentic AI 基础设施",
+      "what_happened": "安全边界下沉：BlueField DPU 把监控、策略执行、遥测放到独立信任域，主机被攻破时仍可执行控制。 性能指标：DOCA 文章给出 runtime threat detection 最高 1,000x、网络/文件访问策略执行最高 800 Gb/s。 DOCA Argus、Vault、Flow 分别对应运行时威胁检测、文件级 zero-trust 访问和硬件加速网络策略。",
+      "why_it_matters": "**性能指标**：DOCA 文章给出 runtime threat detection 最高 1,000x、网络/文件访问策略执行最高 800 Gb/s。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/advancing-ai-infrastructure-for-agentic-ai-with-nvidia-doca-in-silicon-security/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-nvidia-alpamayo-posttrain",
+      "title": "NVIDIA Alpamayo 文章聚焦自动驾驶模型闭环后训练",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "NVIDIA Developer Blog",
+      "event_type": "launch",
+      "object": "NVIDIA Alpamayo 文章聚焦自动驾驶模型闭环后训练",
+      "what_happened": "训练范式：AlpaGym 把 AlpaSim closed-loop rollouts 接入策略训练，让模型从自己动作造成的后果中学习。 工程依赖：教程要求 CUDA/cuDNN、NCCL、Redis、Git LFS、Hugging Face auth，并用 Hydra 配置 policy、scene、reward。 输出关注 mean reward、failure rates、policy loss、rollout throughput 和 checkpoint，可用于 AV 模型闭环验收。",
+      "why_it_matters": "**工程依赖**：教程要求 CUDA/cuDNN、NCCL、Redis、Git LFS、Hugging Face auth，并用 Hydra 配置 policy、scene、reward。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/how-to-post-train-autonomous-vehicle-models-in-closed-loop-with-nvidia-alpamayo/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-alibaba-ticket-embedding",
+      "title": "阿里云 Quick BI 推 ticket-based enhanced embedding 处理数据分享权限",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "policy",
+      "object": "阿里云 Quick BI 推 ticket-based enhanced embedding 处理数据分享权限",
+      "what_happened": "权限模型：Quick BI ticket-based enhanced embedding 支持时间锁、访问次数锁和按角色个性化视图。 嵌入粒度：可嵌完整 dashboard、单个可视化组件、ad hoc query 和自助分析模块到 ERP、OA、CRM、App 或小程序。 治理看板跟踪授权用户、嵌入报表数、访问量和启用报表数，BI 分享从链接分发变成可运营服务。",
+      "why_it_matters": "**嵌入粒度**：可嵌完整 dashboard、单个可视化组件、ad hoc query 和自助分析模块到 ERP、OA、CRM、App 或小程序。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/sharing-data-without-risking-leaks-let-ticket-based-enhanced-embedding-strike-the-perfect-balance_603197",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-alibaba-lingyang-qwen-quickbi",
+      "title": "Lingyang 在 Qwen Conference 展示 Quick BI 企业级数据方案",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "Lingyang 在 Qwen Conference 展示 Quick BI 企业级数据方案",
+      "what_happened": "会议场景：Qwen Conference Singapore 上，Quick BI 把 enterprise Agentic Analytics 讲成“Goals -> Inferences -> Actions”。 业务覆盖：文章列出电商运营、销售运营、制造运营、供应链、金融运营等场景，强调统一指标和权限边界。 案例称手工日报工作量下降约 90%、问题发现解决提速 10x，报表迁移人工校验工作量下降 50% 以上。",
+      "why_it_matters": "**业务覆盖**：文章列出电商运营、销售运营、制造运营、供应链、金融运营等场景，强调统一指标和权限边界。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/lingyang-debuts-at-the-qwen-conference-in-singapore-quick-bi-deconstructs-enterprise-grade-data-solutions-for-the-ai-era_603196",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

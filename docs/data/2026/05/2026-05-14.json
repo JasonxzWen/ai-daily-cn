@@ -23,7 +23,8 @@
         "权限边界沿用原业务系统权限，Anthropic 同时强调 Team 与 Enterprise 计划默认不使用客户数据训练；这类包装方式把 Agent 从单个聊天窗口推向可审计的业务动作。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub 开放 Copilot cloud agent 任务 REST API 预览",
@@ -45,7 +46,8 @@
         "对平台团队而言，关键变化不是 Agent 本身，而是它变成可编排接口：迁移、批量重构、周例行发布准备和内部开发者门户都可以把编码任务派发给 cloud agent。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "SAP 发布 Business AI Platform 与 Autonomous Suite",
@@ -67,7 +69,8 @@
         "SAP 同时宣布 Joule Work、AI Agent Hub、合作伙伴基金和多家云/模型/工作流伙伴集成；企业引入 Agent 时，数据语义层、治理层和迁移工具会成为落地门槛。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛",
@@ -89,7 +92,8 @@
         "对做评测、竞赛和研究平台的团队，这篇复盘说明 Agent 不只提升个人效率，也会改变排行榜治理、无效提交过滤、社区工具和人才识别流程。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Thinking Machines 发布 Interaction Models 研究预览",
@@ -111,7 +115,8 @@
         "官方披露该模型是 276B 参数 MoE、12B active，并报告 FD-bench 与 Audio MultiChallenge 等结果；由于仍是研究预览，日报将它视为技术方向信号，而不是可直接采购的生产 API。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "projects": [
@@ -119,27 +124,6 @@
       "name": "Copilot Agent tasks REST API",
       "description": "GitHub 的 public preview API 让组织可以从脚本或内部平台启动 Copilot cloud agent 任务，并跟踪 queued、in_progress、waiting_for_user、completed 等状态。",
       "url": "https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/cloud-agent/use-cloud-agent-via-the-api",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "SAP Business AI Platform",
-      "description": "SAP 把 BTP、Business Data Cloud 和 Business AI 合并到带知识图谱、Joule Studio 和 AI Agent Hub 的企业 Agent 平台，适合观察大企业如何包装 Agent 治理层。",
-      "url": "https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "TML-Interaction-Small",
-      "description": "Thinking Machines 的研究预览模型展示原生 full-duplex、音视频文本连续处理和 background model 协同，是实时协作式 AI 的高信号技术样本。",
-      "url": "https://thinkingmachines.ai/blog/interaction-models/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Parameter Golf",
-      "description": "OpenAI 的开放 ML 挑战复盘揭示 coding agent 已经进入研究竞赛基础设施，影响实验速度、提交审查、规则边界和社区协作。",
-      "url": "https://openai.com/index/what-parameter-golf-taught-us/",
       "domains": [],
       "importance": "general"
     }
@@ -165,7 +149,108 @@
   "generated_at": "2026-05-13T18:42:18.601Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-claude-for-small-business",
+      "title": "Anthropic 发布 Claude for Small Business",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-13",
+      "primary_entity": "Anthropic",
+      "event_type": "launch",
+      "object": "Anthropic 发布 Claude for Small Business",
+      "what_happened": "Anthropic 把 Claude Cowork、连接器和 ready-to-run workflows 打包成面向小企业的方案，让业主在 QuickBooks、PayPal、HubSpot、Canva、Docusign、Google Workspace 和 Microsoft 365 等工具里运行受审批约束的 Agent 工作流。",
+      "why_it_matters": "首批覆盖财务、运营、销售、营销、人力和客服等场景，包含 15 个 agentic workflows 与 15 个 skills，示例包括工资规划、月结、现金流脉搏、发票催收、合同审查和营销活动生成。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic",
+          "url": "https://www.anthropic.com/news/claude-for-small-business",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api",
+      "title": "GitHub 开放 Copilot cloud agent 任务 REST API 预览",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-13",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub 开放 Copilot cloud agent 任务 REST API 预览",
+      "what_happened": "GitHub 让 Copilot Business 与 Copilot Enterprise 用户可以用 Agent tasks REST API 程序化启动、列出和跟踪 Copilot cloud agent 任务，把后台编码 Agent 接入企业自动化流程。",
+      "why_it_matters": "GitHub 文档说明该能力仅支持 user-to-server token，包括个人访问令牌、OAuth token 或 GitHub App user access token；GitHub App installation access token 暂不支持。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-13-start-copilot-cloud-agent-tasks-via-the-rest-api/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-sap-sapphire-sap-unveils-autonomous-enterprise",
+      "title": "SAP 发布 Business AI Platform 与 Autonomous Suite",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-12",
+      "primary_entity": "SAP News Center",
+      "event_type": "launch",
+      "object": "SAP 发布 Business AI Platform 与 Autonomous Suite",
+      "what_happened": "SAP 在 Sapphire 上发布 Autonomous Enterprise 方向，把 Business Technology Platform、Business Data Cloud 和 Business AI 合并为统一 Business AI Platform，并用 Autonomous Suite 承载跨业务函数的 Agent 与 Joule Assistants。",
+      "why_it_matters": "Autonomous Suite 计划覆盖财务、供应链、采购、人力和客户体验，部署 50 多个领域 Joule Assistants，并由 200 多个专门 Agent 执行具体任务。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "SAP News Center",
+          "url": "https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-what-parameter-golf-taught-us",
+      "title": "OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-12",
+      "primary_entity": "OpenAI",
+      "event_type": "launch",
+      "object": "OpenAI 复盘 Parameter Golf：AI coding agent 改变开放研究竞赛",
+      "what_happened": "OpenAI 发布 Parameter Golf 复盘，记录一个受 16 MB artifact 与 10 分钟 8×H100 训练预算约束的开放机器学习挑战如何被 AI coding agent、压缩、优化器调参和评测策略共同改变。",
+      "why_it_matters": "OpenAI 认为 coding agent 降低了实验门槛，也带来归因、评分和规则边界问题；组织者为高峰提交量开发了内部 Codex triage bot 辅助人审。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI",
+          "url": "https://openai.com/index/what-parameter-golf-taught-us/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-interaction-models",
+      "title": "Thinking Machines 发布 Interaction Models 研究预览",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-11",
+      "primary_entity": "Thinking Machines Lab",
+      "event_type": "launch",
+      "object": "Thinking Machines 发布 Interaction Models 研究预览",
+      "what_happened": "Thinking Machines Lab 发布 Interaction Models 技术博文，主张把实时交互能力训练进模型本体，而不是依赖语音活动检测、外部对话管理和工具编排脚手架。",
+      "why_it_matters": "系统由实时 interaction model 与异步 background model 组成：前者保持对话存在感，后者处理更长推理、工具调用和检索，并把结果按当前上下文插回会话。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Thinking Machines Lab",
+          "url": "https://thinkingmachines.ai/blog/interaction-models/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [],

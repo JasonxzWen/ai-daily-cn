@@ -25,7 +25,8 @@
         "AI Studio 增加 Workspace 集成、导出到 Antigravity、原生 Android prompt-to-app 和 Google Play 内测发布路径，目标是把原型、代码、测试和部署压到同一工作面。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot 接入 Gemini 3.5 Flash，并把代码评审建议批量交给 cloud agent 修复",
@@ -47,7 +48,8 @@
         "批量修复入口意味着 Copilot code review 不再只是评论生成器，而是把 review comments 变成 cloud agent 的可执行任务队列。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "OpenAI 与 Google 同步推进 AI 内容溯源：C2PA、SynthID 和检测 API 开始合流",
@@ -70,7 +72,8 @@
         "对生成式媒体产品而言，溯源从“附加说明”变成平台互操作能力；上传、截图、转码和再分发后的信号保真会成为工程约束。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Chrome DevTools for agents 1.0 稳定发布，让 coding agent 能观察真实浏览器运行态",
@@ -93,7 +96,8 @@
         "第三方 developer tools 能把应用内部状态和组件细节暴露给 agent，降低 agent 只能从 DOM 或截图猜测状态的风险。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Anthropic 与 KPMG 建立全球联盟，把 Claude 嵌入审计、税务、法务和 PE 工作流",
@@ -115,7 +119,8 @@
         "对企业 AI 平台团队而言，关键不只是采购模型，而是把模型能力嵌入已有业务系统、客户交付流程和行业合规边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面",
@@ -138,7 +143,8 @@
         "Remote MCP Server 新增 Admin API 和产品文档工具，AI assistant 能排查 job error 并回到实时官方文档，而不是只生成查询。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -189,17 +195,6 @@
   ],
   "hot_blogs": [
     {
-      "title": "Streamline your AI coding workflow with Chrome DevTools for agents 1.0",
-      "url": "https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en",
-      "publisher": "Chrome for Developers",
-      "author": "Matthias Rohmer, José Luis Zapata",
-      "event_date": "2026-05-19",
-      "topic": "Agent debugging / browser runtime verification",
-      "summary": "Chrome 团队用 1.0 发布说明解释 agent 如何通过 DevTools、MCP、CLI、Lighthouse、WebMCP 和内存工具观察浏览器运行态。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
       "title": "Introducing the Ettin Reranker Family",
       "url": "https://huggingface.co/blog/ettin-reranker",
       "publisher": "Hugging Face Blog",
@@ -209,17 +204,6 @@
       "summary": "文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。",
       "image_urls": [],
       "importance": "notable"
-    },
-    {
-      "title": "What's shipped in dbt — May 2026",
-      "url": "https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026",
-      "publisher": "dbt Labs",
-      "author": "Corinne Hallander",
-      "event_date": "2026-05-19",
-      "topic": "Analytics engineering agents / MCP / BYOK",
-      "summary": "dbt Labs 汇总 Developer Agent、MCP OAuth、Remote MCP Server Admin API、产品文档工具和 Anthropic BYOK。",
-      "image_urls": [],
-      "importance": "notable"
     }
   ],
   "projects": [
@@ -227,27 +211,6 @@
       "name": "Gemini API Managed Agents",
       "description": "Gemini API preview 能创建运行工具和代码的隔离 Linux 环境，并支持以 AGENTS.md 和 SKILL.md 定义 custom managed agents。",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/managed-agents-gemini-api/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Google Antigravity 2.0",
-      "description": "Google 的 agent-first 开发平台新增桌面应用、CLI、SDK、多 agent 编排、动态 subagents 和定时后台任务。",
-      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Chrome DevTools for agents",
-      "description": "稳定 1.0 版本提供 MCP server、CLI、agent skills、Lighthouse、WebMCP 调试和浏览器上下文 handoff。",
-      "url": "https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "dbt Developer Agent",
-      "description": "dbt 的 AI-native developer 预览，面向 dbt project graph、lineage、校验和模型构建工作流。",
-      "url": "https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026",
       "domains": [],
       "importance": "general"
     },
@@ -292,7 +255,128 @@
   "generated_at": "2026-05-20T06:14:47.546Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-google-io-2026-developer-highlights",
+      "title": "Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Google Blog",
+      "event_type": "launch",
+      "object": "Google I/O 2026 把 Gemini 3.5 Flash、Antigravity 2.0 和 Managed Agents 打成一套开发者 agent 栈",
+      "what_happened": "Google 在 I/O 2026 的开发者发布中，把 Gemini 3.5 Flash、Antigravity 2.0 桌面应用、Antigravity CLI/SDK、Gemini API Managed Agents 和 AI Studio Android 构建能力放在同一条 agent 开发链路里。",
+      "why_it_matters": "Gemini API Managed Agents 用单次 API 调用创建可运行工具和代码的隔离 Linux 环境，并能通过 AGENTS.md 与 SKILL.md 定义可版本化 agent。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Blog",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-05-2026",
+      "title": "GitHub Copilot 接入 Gemini 3.5 Flash，并把代码评审建议批量交给 cloud agent 修复",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot 接入 Gemini 3.5 Flash，并把代码评审建议批量交给 cloud agent 修复",
+      "what_happened": "GitHub Changelog 在 2026-05-19 同日列出两项 Copilot 变化：Gemini 3.5 Flash 开始向 Copilot 用户滚动可用，Copilot code review 的建议按钮升级为 Fix with Copilot 和 Fix batch with Copilot。",
+      "why_it_matters": "Fix with Copilot 会在 handoff 前弹出对话框，让用户选择是直接改当前 PR、开新 PR、选择模型还是补充指令。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/month/05-2026/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-advancing-content-provenance",
+      "title": "OpenAI 与 Google 同步推进 AI 内容溯源：C2PA、SynthID 和检测 API 开始合流",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "OpenAI",
+      "event_type": "launch",
+      "object": "OpenAI 与 Google 同步推进 AI 内容溯源：C2PA、SynthID 和检测 API 开始合流",
+      "what_happened": "OpenAI 宣布强化内容溯源：成为 C2PA conformant generator product，引入 Google DeepMind SynthID 水印，并开放早期公开验证工具；Google 同日说明 OpenAI、Kakao 和 ElevenLabs 将把 SynthID 带到更多生成内容，同时推出 AI Content Detection API。",
+      "why_it_matters": "Google 的检测 API 放在 Gemini Enterprise Agent Platform 上，面向企业后台审核、事实核验、内容排序和合成媒体标注场景。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI",
+          "url": "https://openai.com/index/advancing-content-provenance/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-devtools-for-agents-v1",
+      "title": "Chrome DevTools for agents 1.0 稳定发布，让 coding agent 能观察真实浏览器运行态",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Chrome for Developers",
+      "event_type": "launch",
+      "object": "Chrome DevTools for agents 1.0 稳定发布，让 coding agent 能观察真实浏览器运行态",
+      "what_happened": "Chrome 团队发布 DevTools for agents 1.0，提供 MCP server、CLI、agent skills、Lighthouse 审计、设备/地理/网络仿真、Chrome Extension 调试、WebMCP 工具调试和内存泄漏分析。",
+      "why_it_matters": "auto-connect 允许把当前已登录浏览器上下文交给 agent，适合调试需要认证的后台或内部系统，减少重复登录和环境搭建。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Chrome for Developers",
+          "url": "https://developer.chrome.com/blog/devtools-for-agents-v1?hl=en",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-anthropic-kpmg",
+      "title": "Anthropic 与 KPMG 建立全球联盟，把 Claude 嵌入审计、税务、法务和 PE 工作流",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Anthropic",
+      "event_type": "update",
+      "object": "Anthropic 与 KPMG 建立全球联盟，把 Claude 嵌入审计、税务、法务和 PE 工作流",
+      "what_happened": "Anthropic 宣布与 KPMG 建立全球联盟，把 Claude 嵌入 KPMG Digital Gateway，并向 KPMG 全球员工开放 Claude，首批面向税务、法务客户和 private equity portfolio companies。",
+      "why_it_matters": "这类部署要求模型输出可审计、可追责，并能适配受监管行业的安全、权限和数据治理要求。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic",
+          "url": "https://www.anthropic.com/news/anthropic-kpmg?939688b5_page=1",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-what-s-shipped-in-dbt-may-2026",
+      "title": "dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "dbt Labs",
+      "event_type": "launch",
+      "object": "dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面",
+      "what_happened": "dbt Labs 的 2026 年 5 月 shipped 汇总列出 Developer Agent 预览、MCP OAuth、Remote MCP Server Admin API 和产品文档工具，以及 Anthropic BYOK 支持。",
+      "why_it_matters": "MCP OAuth 让 Claude、ChatGPT、Glean 等 OAuth-enabled AI tools 能用现有 dbt 登录连接，不必手工分发 token。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "dbt Labs",
+          "url": "https://www.getdbt.com/blog/what-s-shipped-in-dbt-may-2026",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

@@ -413,11 +413,13 @@ try {
   const reportBody = await page.locator("body").textContent();
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
-  assert.equal(desktopChecklist.checks.find((check) => check.id === "main_detail_expanded_default")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "story_first_sections_expanded")?.ok, true);
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
-  assert.equal(await page.locator("#section-main-item-details").evaluate((node) => node.tagName), "SECTION");
-  assert.match(await page.locator("#section-main-item-details").textContent(), /重点详情/);
+  assert.equal(await page.locator("#section-today-judgment").evaluate((node) => node.tagName), "SECTION");
+  assert.equal(await page.locator("#section-trend-themes").evaluate((node) => node.tagName), "SECTION");
+  assert.equal(await page.locator("#section-story-list").evaluate((node) => node.tagName), "SECTION");
+  assert.match(await page.locator("#section-story-list").textContent(), /发生了什么|为什么值得看/);
   assert.equal(await page.locator('section[data-section-type="filterable-cards"]').count() > 0, true);
   assert.doesNotMatch(reportBody, /模型发布|ExampleModel 2|信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id|quality_status|degraded_sections|remediation/);
   assert.match(reportBody, /精选博客更新/);
@@ -476,6 +478,15 @@ try {
   await page.setViewportSize({ width: 375, height: 812 });
   const mobileChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
+  await page.locator("#section-story-list h2").evaluate((node) => {
+    node.scrollIntoView({ block: "start", behavior: "instant" });
+  });
+  await page.waitForTimeout(120);
+  const storyListHeadingBox = await page.locator("#section-story-list h2").boundingBox();
+  assert(
+    storyListHeadingBox && storyListHeadingBox.y >= 0 && storyListHeadingBox.y < 240,
+    JSON.stringify(storyListHeadingBox)
+  );
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await hasHorizontalOverflow(page), false);
 

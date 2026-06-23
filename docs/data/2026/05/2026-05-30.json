@@ -188,7 +188,8 @@
         "对部署团队来说，关键约束是访问对象、任务范围和支持机制，而不是模型名称本身；后续应跟踪伙伴案例是否披露评测方法和边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA",
@@ -210,7 +211,8 @@
         "Gemini API 路径为开发者提供更直接的试用入口，但官方明确它不由企业 SLA 覆盖，不能与企业平台承诺混为一谈。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴",
@@ -237,7 +239,8 @@
         "对企业采购来说，Claude 同时覆盖 AWS、Google Cloud 和 Azure 的叙述，降低了只押单一云入口的必要性，但真实可用区域、价格和配额仍要按各云文档核验。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [],
@@ -346,16 +349,6 @@
       "source": "TechCrunch interview",
       "image_urls": [],
       "importance": "notable"
-    },
-    {
-      "author": "Gary Abel",
-      "content": "OpenAI 的 Rosalind Biodefense 文章把 GPT-Rosalind 的使用放进 Fourth Eon Biosecurity 等伙伴场景中，强调分析、筛查和生物防御准备。这里可见的 Builder 取向是先限定用户和任务，再讨论模型能力。",
-      "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
-      "role": "Fourth Eon Biosecurity Co-Founder and Chief Scientist",
-      "event_date": "2026-05-29",
-      "source": "OpenAI",
-      "image_urls": [],
-      "importance": "notable"
     }
   ],
   "community_leads": [],
@@ -363,7 +356,68 @@
   "generated_at": "2026-05-29T18:39:17.274Z",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-30.html",
   "html_path": "reports/2026/05/2026-05-30.html",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-openai-rosalind-biodefense",
+      "title": "OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-29",
+      "primary_entity": "OpenAI",
+      "event_type": "launch",
+      "object": "OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问",
+      "what_happened": "OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。",
+      "why_it_matters": "文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI",
+          "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-google-cloud-nano-banana-ga",
+      "title": "Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-29",
+      "primary_entity": "Google Cloud",
+      "event_type": "update",
+      "object": "Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA",
+      "what_happened": "Google Cloud 宣布 Nano Banana 2 和 Nano Banana Pro 在 Gemini Enterprise Agent Platform 上 GA。官方说明把 Nano Banana 2 对应为 Gemini 3.1 Flash Image，把 Nano Banana Pro 对应为 Gemini 3 Pro Image，并提示开发者也可通过 Gemini API 使用这些模型，但 API 路径不享有企业 SLA。",
+      "why_it_matters": "Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Cloud",
+          "url": "https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-anthropic-series-h",
+      "title": "Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-28",
+      "primary_entity": "Anthropic",
+      "event_type": "update",
+      "object": "Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴",
+      "what_happened": "Anthropic 宣布完成 Series H，称本轮融资规模为 650 亿美元，由 Altimeter、Dragoneer、Greenoaks 与 Sequoia 共同领投。公司同时披露年化收入、战略内存伙伴、Amazon 与 Google/Broadcom 算力协议、SpaceX GPU 容量，以及 Claude 可在 AWS、Google Cloud 和 Azure 获得的部署路径。",
+      "why_it_matters": "Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic",
+          "url": "https://www.anthropic.com/news/series-h",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

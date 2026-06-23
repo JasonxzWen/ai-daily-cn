@@ -20,6 +20,7 @@ import {
   hasInvalidOfficialTrackingSnapshot,
   trackingComponentForInteraction
 } from "./tracking-components.js";
+import { normalizeStoryFirstReport } from "./story-first.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -39,7 +40,6 @@ const PUBLIC_MEDIA_MIN_WIDTH = 240;
 const PUBLIC_MEDIA_MIN_HEIGHT = 160;
 const PUBLIC_MEDIA_MIN_AREA = 80000;
 const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
-const PROMPTLAYER_LAYOUT_REPORT_DATES = new Set(["2026-06-17"]);
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -124,11 +124,8 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
   DOMAIN_ICONS.set(domain, icon);
 }
 
-function usesPromptLayerDailyLayout(reportDate) {
-  return PROMPTLAYER_LAYOUT_REPORT_DATES.has(String(reportDate || ""));
-}
-
 export function reportToInteractionInput(report, options = {}) {
+  report = normalizeStoryFirstReport(report);
   const includeInternalSections = options.includeInternalSections === true;
   const mediaOptions = {
     assetRootDir: options.assetRootDir || options.outDir || ""
@@ -156,7 +153,6 @@ export function reportToInteractionInput(report, options = {}) {
   const trendAnnotations = normalizeTrendAnnotations(options.trendAnnotations);
   const dateIndexItem = options.dateIndexItem && typeof options.dateIndexItem === "object" ? options.dateIndexItem : null;
   const reportNavigation = options.reportNavigation && typeof options.reportNavigation === "object" ? options.reportNavigation : null;
-  const promptLayerLayout = usesPromptLayerDailyLayout(report.report_date);
   const dailyOverviewStats = [
     ...dateIndexHeroStats(dateIndexItem),
     ...dailyHeroStats(report, {
@@ -170,14 +166,12 @@ export function reportToInteractionInput(report, options = {}) {
     })
   ];
   const sections = [];
-  sections.push(...formatMainItemSections(mainItems, {
+  sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
     trendAnnotations,
     storyById: storyIndexById(stories),
-    mediaOptions,
-    compactMainItems: true,
-    promptLayerLayout
+    mediaOptions
   }));
 
   if (publicDailyTracking.length > 0) {
@@ -212,17 +206,8 @@ export function reportToInteractionInput(report, options = {}) {
     });
   }
   if (githubTrending.length > 0) {
-    sections.push(promptLayerLayout
-        ? {
-            type: "filterable-cards",
-          title: "GitHub Trending · Top 8",
-          group: "projects",
-          cardClass: "github-trending-card",
-          showFilters: false,
-          items: formatGithubTrendingCards(githubTrending, { trendAnnotations, projects })
-        }
-      : {
-          type: "markdown",
+    sections.push({
+      type: "markdown",
           title: "GitHub Trending · Top 8",
           group: "projects",
           content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
@@ -361,7 +346,7 @@ export function reportToInteractionInput(report, options = {}) {
       audience: "3-10 年经验的研发工程师与技术管理者",
       primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？`,
       decision: "只保留有可回源证据、与工程工作流相关、且通过日报自检的条目。",
-      timeBudget: "8 分钟",
+      timeBudget: "3 分钟",
       artifactKind: "research",
       successCriteria: [
         "主体信息不强行凑数",
@@ -698,6 +683,113 @@ function trendTagsFor(annotations, section, index) {
   return match.tags.map((tag) => tag.text || tag.label).filter(Boolean);
 }
 
+function formatStoryFirstSections(stories, context = {}) {
+  if (!Array.isArray(stories) || stories.length === 0) {
+    return formatMainItemSections([], context);
+  }
+  return [
+    {
+      type: "markdown",
+      title: "今日判断",
+      richId: "today-judgment",
+      group: "main",
+      collapsed: false,
+      content: formatTodayJudgment(stories)
+    },
+    {
+      type: "markdown",
+      title: "趋势主题",
+      richId: "trend-themes",
+      group: "main",
+      collapsed: false,
+      content: formatTrendThemes(stories)
+    },
+    {
+      type: "markdown",
+      title: "重点 story",
+      richId: "story-list",
+      group: "main",
+      collapsed: false,
+      content: formatStoryList(stories, context)
+    }
+  ];
+}
+
+function formatTodayJudgment(stories) {
+  return stories.slice(0, 5).map((story) => {
+    const link = storyPrimaryLink(story);
+    const title = link
+      ? markdownLink(link.url, story.title, { icon: siteIconForUrl(link.url, link.label || story.title), iconLabel: link.label })
+      : story.title;
+    return `- **${title}**：${formatDailyInlineText(story.why_it_matters || story.what_happened || "", story)}`;
+  }).join("\n");
+}
+
+function formatTrendThemes(stories) {
+  const groups = new Map();
+  for (const story of stories) {
+    const trend = String(story?.trend || "AI industry").trim();
+    if (!groups.has(trend)) {
+      groups.set(trend, []);
+    }
+    groups.get(trend).push(story);
+  }
+  return [...groups.entries()].slice(0, 4).map(([trend, items]) => {
+    const titles = items.slice(0, 3).map((story) => story.title).join(" / ");
+    return `- **${trend}**：${titles}`;
+  }).join("\n");
+}
+
+function formatStoryList(stories, context = {}) {
+  return stories.map((story, index) => {
+    const link = storyPrimaryLink(story);
+    const title = link
+      ? markdownLink(link.url, story.title, { icon: siteIconForUrl(link.url, link.label || story.title), iconLabel: link.label })
+      : story.title;
+    const tags = formatHighlightTags([
+      importanceTagFor("stories", story),
+      storyEvidenceTag(story),
+      ...trendTagsFor(context.trendAnnotations, "stories", index),
+      ...trendTagsFor(context.trendAnnotations, "main_items", index)
+    ].filter(Boolean));
+    const sources = formatStorySourceLinks(story);
+    const evidence = formatInlineEvidenceAssets(
+      context.report,
+      evidenceForUrl(context.evidenceByUrl, link?.url),
+      context.mediaOptions
+    );
+    return [
+      `${index + 1}. **${title}**${tags}`,
+      `  - 发生了什么：${formatDailyInlineText(story.what_happened || "", story)}`,
+      `  - 为什么值得看：${formatDailyInlineText(story.why_it_matters || "", story)}`,
+      sources ? `  - 来源：${sources}` : "",
+      evidence ? `\n${evidence}` : ""
+    ].filter(Boolean).join("\n");
+  }).join("\n\n");
+}
+
+function storyPrimaryLink(story) {
+  return (Array.isArray(story?.sources) ? story.sources : []).find((source) => source?.url) || null;
+}
+
+function storyEvidenceTag(story) {
+  const level = String(story?.evidence_level || "").trim();
+  if (!level) {
+    return "";
+  }
+  return cardTag(level, "topic");
+}
+
+function formatStorySourceLinks(story) {
+  return (Array.isArray(story?.sources) ? story.sources : [])
+    .filter((source) => source?.url)
+    .map((source) => markdownLink(source.url, source.label || source.type || "Source", {
+      icon: siteIconForUrl(source.url, source.label || story?.title),
+      iconLabel: source.label || source.type
+    }))
+    .join(" / ");
+}
+
 function formatMainItemSections(items, context = {}) {
   if (items.length === 0) {
     return [
@@ -757,8 +849,8 @@ function formatCompactMainItemSections(items, context = {}) {
   return [
     {
       type: "markdown",
-      title: "重点详情",
-      richId: "main-item-details",
+      title: "重点 story",
+      richId: "story-list",
       group: "main",
       collapsed: false,
       content: detailContent

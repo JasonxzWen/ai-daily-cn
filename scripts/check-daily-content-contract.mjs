@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { canonicalStoryUrl, isTemplatedStoryTitle, STORY_FIRST_MAX } from "../src/story-first.js";
 
 const REQUIRED_GITHUB_LANGUAGES = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
 const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核对|可继续关注|本轮材料|信息较为有限|公开描述提到|需要结合/i;
@@ -13,6 +14,7 @@ export function evaluateDailyContentContract(report, options = {}) {
   const degraded = [];
   const html = String(options.html || "");
 
+  checkStoryFirst(report, issues);
   checkMainItems(report, issues);
   checkGitHubTrending(report, issues);
   checkHotBlogs(report, { html }, issues);
@@ -41,6 +43,112 @@ export function evaluateDailyContentContract(report, options = {}) {
       }
     }
   };
+}
+
+function checkStoryFirst(report, issues) {
+  const stories = asArray(report?.stories);
+  const mainItems = asArray(report?.main_items);
+  if (mainItems.length > 0 && stories.length === 0) {
+    issues.push(blockingIssue({
+      code: "story_first_stories_missing",
+      requirement: "REQ-STORY-001",
+      section: "stories",
+      message: "Daily reports with main_items must expose the edited story-first list in stories[]."
+    }));
+    return;
+  }
+
+  if (stories.length > STORY_FIRST_MAX) {
+    issues.push(blockingIssue({
+      code: "story_first_story_limit_exceeded",
+      requirement: "REQ-STORY-001",
+      section: "stories",
+      message: `The main story list must not exceed ${STORY_FIRST_MAX} stories.`,
+      count: stories.length
+    }));
+  }
+
+  const weakStories = [];
+  const storyUrlOwners = new Map();
+  for (const [index, story] of stories.entries()) {
+    const sources = asArray(story?.sources);
+    const requiredMissing = !textValue(story?.title) ||
+      !textValue(story?.what_happened) ||
+      !textValue(story?.why_it_matters) ||
+      !textValue(story?.evidence_level) ||
+      sources.length === 0;
+    const templatedTitle = isTemplatedStoryTitle(story?.title);
+    if (requiredMissing || templatedTitle) {
+      weakStories.push({
+        index,
+        title: textValue(story?.title),
+        required_missing: requiredMissing,
+        templated_title: templatedTitle
+      });
+    }
+    for (const source of sources) {
+      const url = canonicalStoryUrl(source?.url);
+      if (!url) continue;
+      const storyId = textValue(story?.story_id) || `stories[${index}]`;
+      const existing = storyUrlOwners.get(url);
+      if (existing && existing !== storyId) {
+        issues.push(blockingIssue({
+          code: "story_first_duplicate_story_url",
+          requirement: "REQ-STORY-002",
+          section: "stories",
+          message: "The same canonical source URL cannot belong to more than one story.",
+          details: { url, first_story: existing, duplicate_story: storyId }
+        }));
+      }
+      storyUrlOwners.set(url, storyId);
+    }
+  }
+
+  if (weakStories.length > 0) {
+    issues.push(blockingIssue({
+      code: "story_first_story_shape_failed",
+      requirement: "REQ-STORY-001",
+      section: "stories",
+      message: "Each story needs a concrete title, what_happened, why_it_matters, evidence_level, and sources[].",
+      count: weakStories.length,
+      examples: weakStories.slice(0, 5)
+    }));
+  }
+
+  const mainUrls = new Set(mainItems.flatMap((item) => itemUrls(item)));
+  const duplicateLowerUrls = [];
+  for (const sectionName of [
+    "model_releases",
+    "hot_blogs",
+    "community_leads",
+    "builder_observations",
+    "projects",
+    "official_org_updates",
+    "wechat_items",
+    "zhihu_items",
+    "reddit_items"
+  ]) {
+    for (const item of asArray(report?.[sectionName])) {
+      const duplicates = itemUrls(item).filter((url) => mainUrls.has(url));
+      if (duplicates.length > 0) {
+        duplicateLowerUrls.push({ section: sectionName, url: duplicates[0], title: textValue(item?.title || item?.name || item?.repo) });
+      }
+    }
+  }
+  if (duplicateLowerUrls.length > 0) {
+    issues.push(blockingIssue({
+      code: "story_first_main_url_repeated_in_appendix",
+      requirement: "REQ-STORY-002",
+      section: "stories",
+      message: "Main story URLs must not be repeated as separate lower-priority leads or project cards.",
+      count: duplicateLowerUrls.length,
+      examples: duplicateLowerUrls.slice(0, 5)
+    }));
+  }
+
+  // GitHub-matching projects may remain as structured metadata for the compact
+  // GitHub Trending module. The public renderer must not turn them into a
+  // standalone project-card grid.
 }
 
 function checkMainItems(report, issues) {
@@ -371,6 +479,15 @@ function textValue(value) {
   return String(value ?? "").trim();
 }
 
+function itemUrls(item) {
+  return [
+    item?.url,
+    item?.primary_url,
+    item?.source_url,
+    ...(Array.isArray(item?.verification_sources) ? item.verification_sources : [])
+  ].map((value) => canonicalStoryUrl(value)).filter(Boolean);
+}
+
 function normalizeWhitespace(value) {
   return textValue(value).replace(/\s+/g, " ");
 }
@@ -485,8 +602,20 @@ function selfTestReport() {
 
   return {
     report_date: "2026-06-17",
+    stories: [
+      {
+        story_id: "story-content-platform-signal",
+        title: "Content platform ships personalized creator controls",
+        event_date: "2026-06-17",
+        what_happened: "平台发布新的个性化控制功能，并披露可观察的内容分发变化。",
+        why_it_matters: "内容和产品团队可以据此判断推荐权重、创作者分发和广告库存是否需要跟进。",
+        evidence_level: "primary",
+        sources: [{ label: "Example", url: "https://example.com/news", type: "primary" }]
+      }
+    ],
     main_items: [
       {
+        candidate_id: "story-content-platform-signal",
         title: "Content platform signal",
         url: "https://example.com/news",
         source: "Example",

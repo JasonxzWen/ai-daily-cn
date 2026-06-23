@@ -350,49 +350,6 @@
       ],
       "editorial_category": "engineering_toolchain",
       "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "title": "NVIDIA DGX Spark 强调本地长运行 agent，私有 agent lab 更具体了",
-      "event_date": "2026-06-01",
-      "url": "https://developer.nvidia.com/blog/run-local-ai-agents-with-faster-models-and-multi-node-clustering-on-nvidia-dgx-spark/",
-      "source": "NVIDIA Developer Blog",
-      "tier": "T0",
-      "entities": [
-        "NVIDIA",
-        "DGX Spark",
-        "NemoClaw",
-        "OpenClaw",
-        "Qwen3.6"
-      ],
-      "summary": "DGX Spark 文章把 NemoClaw 安装、OpenClaw 示例、Qwen3.6 优化和多节点集群连成 developer path。",
-      "bullets": [
-        "**DGX Spark** 面向本地 autonomous agents：文章强调长上下文、并发 subagents、隐私和 per-token cost 驱动本地运行，NemoClaw 负责安装与执行编排。",
-        "**Qwen3.6** 在 DGX Spark 上经 Computex 优化后展示吞吐改进，并提供 guided multi-node cluster setup；适合评估私有 agent lab 是否能从单机扩展到 ==multi-node==。"
-      ],
-      "editorial_category": "engineering_toolchain",
-      "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "title": "Qwen Code + Model Studio CLI 把公众号封面做成 AIGC workflow",
-      "event_date": "2026-06-02",
-      "url": "https://www.alibabacloud.com/blog/qwen-code-%C3%97-model-studio-cli-wechat-cover-generation-guide_603198",
-      "source": "Alibaba Cloud Blog",
-      "tier": "T1",
-      "entities": [
-        "Alibaba Cloud",
-        "Qwen Code",
-        "Model Studio CLI",
-        "AIGC"
-      ],
-      "summary": "Alibaba Cloud 示例把标题/主题分析、tone 判断、style 选择、prompt 压缩和图像调用固化为可复用 Skill。",
-      "bullets": [
-        "**Qwen Code + Model Studio CLI** 被写成内容生产 Skill：输入标题或主题后自动分析 tone、选择 style、压缩标题并生成 prompt，减少公众号封面制作的 ==manual design loop==。",
-        "**AIGC workflow** 的看点不是“又能生成图”，而是把风格选择、prompt 生成、模型调用和产物审核变成团队可复用的流程。"
-      ],
-      "editorial_category": "content_aigc",
-      "image_urls": []
     }
   ],
   "model_releases": [],
@@ -587,7 +544,168 @@
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html",
   "html_path": "reports/2026/06/2026-06-02.html",
   "generated_at": "2026-06-02T06:14:41.487Z",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-openai-aws-frontier-codex",
+      "title": "OpenAI/Codex 正式进入 AWS，企业 AI 采购链路被重写",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "update",
+      "object": "OpenAI/Codex 正式进入 AWS，企业 AI 采购链路被重写",
+      "what_happened": "OpenAI 和 AWS 把 frontier AI、Codex on Amazon Bedrock、Commercial/GovCloud 可用性放到同一条企业部署线上。",
+      "why_it_matters": "**Codex** 被纳入 AWS 运行与治理模型后，代码生成、review、debug 和现代化任务可以沿用企业既有合规、采购、账单和权限流程。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-stargate-michigan",
+      "title": "OpenAI 把 Stargate 落到 Michigan，算力扩张进入地方经济叙事",
+      "importance": "major",
+      "trend": "AI policy and infrastructure",
+      "event_date": "2026-06-01",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "update",
+      "object": "OpenAI 把 Stargate 落到 Michigan，算力扩张进入地方经济叙事",
+      "what_happened": "OpenAI 在 Michigan 启动 1GW 数据中心 campus，并把能源、就业、税收和学生 Codex credits 放进同一份基础设施公告。",
+      "why_it_matters": "**Codex credits** 被放进 workforce training 叙事：OpenAI 将向 Michigan 40 万名合格学生提供最高 4500 万美元 credits。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/stargate-michigan-data-center",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-policy-advocacy",
+      "title": "OpenAI 公开划清 AI policy 与政治捐赠边界",
+      "importance": "notable",
+      "trend": "AI policy and infrastructure",
+      "event_date": "2026-06-01",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "policy",
+      "object": "OpenAI 公开划清 AI policy 与政治捐赠边界",
+      "what_happened": "OpenAI 表示没有 super PAC、候选人或竞选活动捐款，也没有 employee-funded PAC，并把员工个人政治参与和公司政策立场分开。",
+      "why_it_matters": "**AI policy** 部分强调支持监管、强模型测试、安全标准、公共问责和广泛可及，属于判断后续政策新闻时可引用的官方口径。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/our-views-on-ai-policy-and-political-advocacy",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-anthropic-confidential-s1",
+      "title": "Anthropic 秘密提交 draft S-1，Claude 供应商走向公开市场",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-01",
+      "primary_entity": "Anthropic News",
+      "event_type": "update",
+      "object": "Anthropic 秘密提交 draft S-1，Claude 供应商走向公开市场",
+      "what_happened": "Anthropic 宣布已向 U.S. SEC 机密提交 Form S-1 draft registration statement，当前只是获得未来上市选项，股数和价格尚未设定。",
+      "why_it_matters": "**Claude** 背后的收入、训练成本、资本开支和云依赖一旦进入公开披露，会给企业客户和开发者提供更多可审计信号。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic News",
+          "url": "https://www.anthropic.com/news/confidential-draft-s1-sec",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-github-copilot-june1-billing-auto",
+      "title": "GitHub Copilot 计费改成 AI Credits，AI 编程开始进入 FinOps",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-01",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot 计费改成 AI Credits，AI 编程开始进入 FinOps",
+      "what_happened": "GitHub 从 6 月 1 日起让 Copilot 各计划进入 usage-based billing，同时 code review 会额外消耗 Actions minutes。",
+      "why_it_matters": "**Copilot code review** 除 AI Credits 外还消耗 GitHub Actions minutes；同日 changelog 还说明 individual non-enterprise 用户的 auto model selection 可能被分配到 evaluation models。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-06-01-updates-to-github-copilot-billing-and-plans",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-jetbrains-mellum2",
+      "title": "JetBrains Mellum2 走小 MoE 路线，瞄准 IDE 和内部工具常驻推理",
+      "importance": "major",
+      "trend": "model releases",
+      "event_date": "2026-06-01",
+      "primary_entity": "Hugging Face Blog",
+      "event_type": "launch",
+      "object": "JetBrains Mellum2 走小 MoE 路线，瞄准 IDE 和内部工具常驻推理",
+      "what_happened": "Mellum2 是 12B MoE、每 token 激活 2.5B、Apache 2.0 发布的工作流模型，目标是低延迟 coding、routing、RAG 和 private deployment。",
+      "why_it_matters": "**使用场景** 写得很具体：routing、RAG、summarization、sub-agents、高吞吐 coding features 和 private deployments。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/JetBrains/mellum2-launch",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-aws-agentcore-auth-code-flow",
+      "title": "AWS AgentCore Gateway 把 MCP 拉进企业身份和审计链路",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-01",
+      "primary_entity": "AWS Machine Learning Blog",
+      "event_type": "update",
+      "object": "AWS AgentCore Gateway 把 MCP 拉进企业身份和审计链路",
+      "what_happened": "AWS 文章把 Kiro IDE、MCP client、AgentCore Gateway、企业 IdP 和 MCP server 串成授权码流程，重点是 agent-to-tool 的身份核验。",
+      "why_it_matters": "**企业 IdP** 支持 Okta、Microsoft Entra ID 和 Amazon Cognito 等路径；重点不是再写一个 MCP server，而是让 agent 访问工具前经过集中认证、路由和审计。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/building-a-secure-auth-code-flow-setup-using-agentcore-gateway-with-mcp-clients/",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-nvidia-jetpack-72-agentic-edge",
+      "title": "NVIDIA JetPack 7.2 把边缘 AI 推向 agent-ready 工具栈",
+      "importance": "notable",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-01",
+      "primary_entity": "NVIDIA Developer Blog",
+      "event_type": "update",
+      "object": "NVIDIA JetPack 7.2 把边缘 AI 推向 agent-ready 工具栈",
+      "what_happened": "JetPack 7.2 把 NemoClaw、Jetson agent skills、memory/performance 优化、Super Mode 和 Jetson Thor MIG 串成边缘 agent 部署路径。",
+      "why_it_matters": "**Jetson Thor MIG** 和 Super Mode 让多 workload 隔离与性能调度更明确，会影响本地模型、工具调用和机器人控制放在同一边缘设备上的设计。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "NVIDIA Developer Blog",
+          "url": "https://developer.nvidia.com/blog/deploy-agentic-ready-ai-at-the-edge-with-memory-efficiency-in-nvidia-jetpack-7-2/",
+          "type": "primary"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

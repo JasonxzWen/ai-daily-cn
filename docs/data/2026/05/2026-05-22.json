@@ -23,7 +23,8 @@
         "WebMCP origin trial、Chrome DevTools for agents 和 Modern Web Guidance 指向浏览器侧 agent 工具标准化，后续值得跟踪它与现有 MCP server 生态的兼容边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent",
@@ -45,7 +46,8 @@
         "Chat SDK 工具层默认对写操作保留 approval gate，`reader`、`messenger`、`moderator` preset 也让 agent 权限范围更容易被产品代码表达。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表",
@@ -66,7 +68,8 @@
         "Web Chat 移除所有 Gemini 模型和部分其他模型，显示大厂 coding assistant 正在同时追求模型多样性和产品面稳定性。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
@@ -87,7 +90,8 @@
         "对平台团队来说，关键变化是不用在应用层维护 SigV4 wrapper 或自定义 client，就能把治理、部署和监控留在 SageMaker。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels",
@@ -108,7 +112,8 @@
         "这会让企业评估 managed agent 时重点看凭据隔离、网络边界、审计日志和 sandbox provider 的实际运行特性。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节",
@@ -129,7 +134,8 @@
         "`/code-review high` 这种命令形态也表明代码评审开始被做成一等交互，而不是单纯的 prompt 模板。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径",
@@ -150,7 +156,8 @@
         "相比泛化大模型更新，这类专用 reranker 更直接影响检索增强应用的召回后排序质量。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -165,90 +172,9 @@
       "release_scope": "model_card_update",
       "image_urls": [],
       "importance": "notable"
-    },
-    {
-      "name": "Qwen 3.7 Max on Vercel AI Gateway",
-      "provider": "Alibaba / Vercel",
-      "availability": "closed_api",
-      "event_date": "2026-05-21",
-      "url": "https://vercel.com/changelog",
-      "source": "Vercel Changelog",
-      "summary": "Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。",
-      "release_scope": "gateway_availability",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "name": "Grok Build 0.1 on Vercel AI Gateway",
-      "provider": "xAI / Vercel",
-      "availability": "closed_api",
-      "event_date": "2026-05-20",
-      "url": "https://vercel.com/changelog",
-      "source": "Vercel Changelog",
-      "summary": "Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。",
-      "release_scope": "gateway_availability",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "name": "Ettin Reranker Family",
-      "provider": "Hugging Face",
-      "availability": "open_weights",
-      "event_date": "2026-05-19",
-      "url": "https://huggingface.co/blog/ettin-reranker",
-      "source": "Hugging Face Blog",
-      "summary": "Hugging Face 发布 6 个 Sentence Transformers CrossEncoder rerankers，覆盖多个尺寸并公开训练 recipe。",
-      "release_scope": "provider_official_launch",
-      "image_urls": [],
-      "importance": "major"
     }
   ],
-  "hot_blogs": [
-    {
-      "title": "All the news from the Google I/O 2026 Developer keynote",
-      "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
-      "publisher": "Google Developers Blog",
-      "author": "The Google I/O team",
-      "event_date": "2026-05-19",
-      "topic": "agentic development / WebMCP / Antigravity",
-      "summary": "Google 将 Gemini 3.5、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 放进开发者 keynote。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "Announcing OpenAI-compatible API support for Amazon SageMaker AI endpoints",
-      "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
-      "publisher": "AWS Machine Learning Blog",
-      "author": "Marc Karp, Dmitry Soldatkin, Shrijeet Joshi, Kareem Syed-Mohammed, Xu Deng",
-      "event_date": "2026-05-20",
-      "topic": "model serving / OpenAI-compatible API",
-      "summary": "SageMaker AI real-time inference endpoints 支持 `/openai/v1`，OpenAI SDK、LangChain 和 Strands Agents 应用可通过 endpoint URL 接入。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels",
-      "url": "https://claude.com/blog/claude-managed-agents-updates",
-      "publisher": "Claude Blog",
-      "author": "Anthropic",
-      "event_date": "2026-05-19",
-      "topic": "managed agents / sandboxing / MCP",
-      "summary": "Claude Managed Agents 支持用户控制的 sandbox 执行环境，并通过 MCP tunnels 连接私有 MCP servers。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "Introducing the Ettin Reranker Family",
-      "url": "https://huggingface.co/blog/ettin-reranker",
-      "publisher": "Hugging Face Blog",
-      "author": "Tom Aarsen",
-      "event_date": "2026-05-19",
-      "topic": "reranker / RAG",
-      "summary": "Hugging Face 发布 Ettin reranker 系列、训练数据来源和 full training recipe。",
-      "image_urls": [],
-      "importance": "notable"
-    }
-  ],
+  "hot_blogs": [],
   "projects": [
     {
       "name": "anthropics/claude-plugins-official",
@@ -344,7 +270,148 @@
   "generated_at": "2026-05-21T18:40:13.114Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-all-the-news-from-the-google-io-2026-developer-keynote",
+      "title": "Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Google Developers Blog",
+      "event_type": "launch",
+      "object": "Google I/O 2026 把 Gemini 3.5、Antigravity 和 WebMCP 放进同一条 agent 开发链路",
+      "what_happened": "Google I/O 开发者主题演讲确认 Gemini 3.5 系列、Antigravity 2.0、Antigravity CLI、Gemini API Managed Agents、WebMCP、Android CLI 和 Chrome DevTools for agents 等能力同场发布，核心不是单点模型，而是让 agent 在 IDE、浏览器、移动端和托管运行环境之间形成更完整的执行链路。",
+      "why_it_matters": "Google AI Studio、Cloud Run、Firebase 与 Antigravity 的项目状态导出被放在同一段落，意味着从原型到部署的 agent workflow 会被更紧地绑定到 Google 开发者工具。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Developers Blog",
+          "url": "https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-changelog",
+      "title": "Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Vercel Changelog",
+      "event_type": "update",
+      "object": "Vercel AI Gateway 接入 Qwen 3.7 Max 与 Grok Build 0.1，并把 Chat SDK 工具层开放给 agent",
+      "what_happened": "Vercel 在 48 小时内连续更新 AI Gateway 与 Chat SDK：Qwen 3.7 Max 可通过 `alibaba/qwen-3.7-max` 调用，Grok Build 0.1 可通过 `xai/grok-build-0.1` 调用，Chat SDK 新增 `chat/ai` 工具入口，`createChatTools(chat)` 可把聊天读写动作接入 agent。",
+      "why_it_matters": "Grok Build 0.1 是 early access 的 agentic coding 模型，并且明确没有可配置 reasoning effort 或 non-reasoning mode。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Vercel Changelog",
+          "url": "https://vercel.com/changelog",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code",
+      "title": "GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-20",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "launch",
+      "object": "GitHub Copilot 同日更新任务路由、语义 issue 检索和 Web 模型列表",
+      "what_happened": "GitHub Copilot 的 auto model selection 现在会结合实时可用性、可靠性和任务维度为 VS Code 请求选模型；同日 Copilot Chat on web 上线语义 issue 检索，并收窄 Web Chat 的可用模型列表以保证稳定响应。",
+      "why_it_matters": "语义 issue 检索使 Copilot Chat 能用自然语言寻找、分组和分析 issue，不再只依赖标题或精确关键词。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-20-auto-model-selection-now-routes-based-on-your-task-in-vs-code/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints",
+      "title": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-20",
+      "primary_entity": "AWS Machine Learning Blog",
+      "event_type": "update",
+      "object": "Amazon SageMaker AI endpoints 增加 OpenAI-compatible API",
+      "what_happened": "AWS 宣布 SageMaker AI real-time inference endpoints 支持 `/openai/v1` 路径，现有 OpenAI SDK、LangChain 或 Strands Agents 应用可以通过更换 endpoint URL 调用自有 SageMaker 模型，且支持 streaming 与 time-limited bearer token。",
+      "why_it_matters": "SageMaker 通过 endpoint name 路由请求，并允许 inference components 下多个模型共享同一接口，适合多模型托管和 fine-tuned model serving。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/announcing-openai-compatible-api-support-for-amazon-sagemaker-ai-endpoints/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-claude-managed-agents-updates",
+      "title": "Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Claude Blog",
+      "event_type": "research",
+      "object": "Claude Managed Agents 增加 self-hosted sandboxes 和 MCP tunnels",
+      "what_happened": "Anthropic 宣布 Claude Managed Agents 可在用户控制的 sandbox 中执行工具，并通过 MCP tunnels 连接私有 MCP servers；self-hosted sandboxes 处于 public beta，MCP tunnels 处于 research preview。",
+      "why_it_matters": "self-hosting 控制代码执行位置，MCP tunnels 控制 Anthropic 如何访问企业网络中的 MCP servers，两者相互独立也可以组合使用。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Claude Blog",
+          "url": "https://claude.com/blog/claude-managed-agents-updates",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-changelog-2",
+      "title": "Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Claude Code Docs",
+      "event_type": "update",
+      "object": "Claude Code 2.1.146 修复 Windows PowerShell、分页 MCP 和后台会话细节",
+      "what_happened": "Claude Code 2.1.146 将 `/simplify` 更名为 `/code-review` 并支持 effort level，同时修复 winget 或 Microsoft Store 安装的 pwsh 命令行错误、MCP resources/prompts 分页丢项、Windows Terminal 后台会话 strobing 和 Agent SDK 流结束异常等问题。",
+      "why_it_matters": "MCP 分页修复会影响大型 MCP server 的资源、模板和 prompt 枚举完整性，适合放入 agent 工具链稳定性观察。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Claude Code Docs",
+          "url": "https://code.claude.com/docs/en/changelog",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-ettin-reranker",
+      "title": "Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-19",
+      "primary_entity": "Hugging Face Blog",
+      "event_type": "launch",
+      "object": "Hugging Face 发布 Ettin Reranker Family，补强小型 cross-encoder rerank 路径",
+      "what_happened": "Hugging Face 发布 6 个基于 Ettin ModernBERT encoders 的 Sentence Transformers CrossEncoder rerankers，并同时给出数据与训练 recipe，面向 RAG 检索链路中的轻量 rerank 评估和部署。",
+      "why_it_matters": "文章公开 distillation、training dataset 和 evaluation 细节，降低团队在自有语料上复现实验的门槛。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/ettin-reranker",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

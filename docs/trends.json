@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T02:21:36.763Z",
+  "generated_at": "2026-06-23T06:54:21.405Z",
   "window_days": 7,
   "source": {
     "report_count": 35,
@@ -32,14 +32,16 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "watching",
-      "occurrences": 7,
+      "occurrences": 8,
       "active_days": 2,
       "sections": [
-        "builder_observations"
+        "builder_observations",
+        "main_items"
       ],
       "entities": [
         "Claude Code",
-        "Codex"
+        "Codex",
+        "OpenAI"
       ],
       "dates": [
         "2026-06-17",
@@ -54,13 +56,7 @@
   "candidate_topics": [
     {
       "term": "with",
-      "occurrences": 64,
-      "active_days": 2,
-      "display": false
-    },
-    {
-      "term": "github",
-      "occurrences": 62,
+      "occurrences": 65,
       "active_days": 2,
       "display": false
     },
@@ -84,6 +80,12 @@
     },
     {
       "term": "appeared github",
+      "occurrences": 60,
+      "active_days": 2,
+      "display": false
+    },
+    {
+      "term": "github",
       "occurrences": 60,
       "active_days": 2,
       "display": false
@@ -150,7 +152,7 @@
     },
     {
       "term": "agent",
-      "occurrences": 41,
+      "occurrences": 39,
       "active_days": 2,
       "display": false
     },
@@ -191,15 +193,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "active",
-              "text": "coding agent: 7d 8x/3d",
+              "text": "coding agent: 7d 5x/3d",
               "window_days": 7,
-              "occurrences": 8,
+              "occurrences": 5,
               "active_days": 3,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "OpenAI"
               ]
             }
           ]
@@ -220,15 +222,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 10x/4d",
+              "text": "coding agent: 7d 6x/4d",
               "window_days": 7,
-              "occurrences": 10,
+              "occurrences": 6,
               "active_days": 4,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "OpenAI"
               ]
             }
           ]
@@ -245,15 +247,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 14x/5d",
+              "text": "coding agent: 7d 9x/5d",
               "window_days": 7,
-              "occurrences": 14,
+              "occurrences": 9,
               "active_days": 5,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             }
           ]
@@ -265,15 +267,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 14x/5d",
+              "text": "coding agent: 7d 9x/5d",
               "window_days": 7,
-              "occurrences": 14,
+              "occurrences": 9,
               "active_days": 5,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             }
           ]
@@ -285,15 +287,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 14x/5d",
+              "text": "coding agent: 7d 9x/5d",
               "window_days": 7,
-              "occurrences": 14,
+              "occurrences": 9,
               "active_days": 5,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             }
           ]
@@ -310,15 +312,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 17x/6d",
+              "text": "coding agent: 7d 12x/6d",
               "window_days": 7,
-              "occurrences": 17,
+              "occurrences": 12,
               "active_days": 6,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             }
           ]
@@ -330,9 +332,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "active",
-              "text": "MCP: 7d 9x/3d",
+              "text": "MCP: 7d 7x/3d",
               "window_days": 7,
-              "occurrences": 9,
+              "occurrences": 7,
               "active_days": 3,
               "entities": [
                 "Anthropic",
@@ -350,24 +352,24 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 17x/6d",
+              "text": "coding agent: 7d 12x/6d",
               "window_days": 7,
-              "occurrences": 17,
+              "occurrences": 12,
               "active_days": 6,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             },
             {
               "topic_id": "mcp",
               "label": "MCP",
               "status": "active",
-              "text": "MCP: 7d 9x/3d",
+              "text": "MCP: 7d 7x/3d",
               "window_days": 7,
-              "occurrences": 9,
+              "occurrences": 7,
               "active_days": 3,
               "entities": [
                 "Anthropic",
@@ -385,15 +387,15 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 17x/6d",
+              "text": "coding agent: 7d 12x/6d",
               "window_days": 7,
-              "occurrences": 17,
+              "occurrences": 12,
               "active_days": 6,
               "entities": [
                 "Anthropic",
-                "AWS",
                 "Claude Code",
-                "Codex"
+                "Codex",
+                "GitHub"
               ]
             }
           ]
@@ -468,9 +470,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 16x/6d",
+              "text": "coding agent: 7d 11x/6d",
               "window_days": 7,
-              "occurrences": 16,
+              "occurrences": 11,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -483,9 +485,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "active",
-              "text": "MCP: 7d 12x/3d",
+              "text": "MCP: 7d 7x/3d",
               "window_days": 7,
-              "occurrences": 12,
+              "occurrences": 7,
               "active_days": 3,
               "entities": [
                 "Anthropic",
@@ -503,9 +505,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 16x/6d",
+              "text": "coding agent: 7d 11x/6d",
               "window_days": 7,
-              "occurrences": 16,
+              "occurrences": 11,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -518,9 +520,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "active",
-              "text": "MCP: 7d 12x/3d",
+              "text": "MCP: 7d 7x/3d",
               "window_days": 7,
-              "occurrences": 12,
+              "occurrences": 7,
               "active_days": 3,
               "entities": [
                 "Anthropic",
@@ -543,9 +545,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 15x/4d",
+              "text": "MCP: 7d 9x/4d",
               "window_days": 7,
-              "occurrences": 15,
+              "occurrences": 9,
               "active_days": 4,
               "entities": [
                 "Anthropic",
@@ -558,9 +560,9 @@
               "topic_id": "enterprise-agent-governance",
               "label": "enterprise agent governance",
               "status": "hot",
-              "text": "enterprise agent governance: 7d 8x/4d",
+              "text": "enterprise agent governance: 7d 7x/4d",
               "window_days": 7,
-              "occurrences": 8,
+              "occurrences": 7,
               "active_days": 4,
               "entities": [
                 "Anthropic",
@@ -583,9 +585,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 27x/6d",
+              "text": "coding agent: 7d 23x/6d",
               "window_days": 7,
-              "occurrences": 27,
+              "occurrences": 23,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -598,9 +600,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 20x/5d",
+              "text": "MCP: 7d 13x/5d",
               "window_days": 7,
-              "occurrences": 20,
+              "occurrences": 13,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -618,9 +620,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 27x/6d",
+              "text": "coding agent: 7d 23x/6d",
               "window_days": 7,
-              "occurrences": 27,
+              "occurrences": 23,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -638,9 +640,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 20x/5d",
+              "text": "MCP: 7d 13x/5d",
               "window_days": 7,
-              "occurrences": 20,
+              "occurrences": 13,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -653,9 +655,9 @@
               "topic_id": "enterprise-agent-governance",
               "label": "enterprise agent governance",
               "status": "hot",
-              "text": "enterprise agent governance: 7d 12x/5d",
+              "text": "enterprise agent governance: 7d 9x/5d",
               "window_days": 7,
-              "occurrences": 12,
+              "occurrences": 9,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -673,9 +675,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 27x/6d",
+              "text": "coding agent: 7d 23x/6d",
               "window_days": 7,
-              "occurrences": 27,
+              "occurrences": 23,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -688,9 +690,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 20x/5d",
+              "text": "MCP: 7d 13x/5d",
               "window_days": 7,
-              "occurrences": 20,
+              "occurrences": 13,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -713,9 +715,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 34x/7d",
+              "text": "coding agent: 7d 30x/7d",
               "window_days": 7,
-              "occurrences": 34,
+              "occurrences": 30,
               "active_days": 7,
               "entities": [
                 "Anthropic",
@@ -733,9 +735,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 24x/6d",
+              "text": "MCP: 7d 17x/6d",
               "window_days": 7,
-              "occurrences": 24,
+              "occurrences": 17,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -758,9 +760,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/6d",
+              "text": "coding agent: 7d 30x/6d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 30,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -778,9 +780,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/6d",
+              "text": "coding agent: 7d 30x/6d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 30,
               "active_days": 6,
               "entities": [
                 "Anthropic",
@@ -807,9 +809,9 @@
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 13x/4d",
+              "text": "MCP: 7d 11x/4d",
               "window_days": 7,
-              "occurrences": 13,
+              "occurrences": 11,
               "active_days": 4,
               "entities": [
                 "Anthropic",
@@ -822,9 +824,9 @@
               "topic_id": "enterprise-agent-governance",
               "label": "enterprise agent governance",
               "status": "active",
-              "text": "enterprise agent governance: 7d 8x/3d",
+              "text": "enterprise agent governance: 7d 5x/3d",
               "window_days": 7,
-              "occurrences": 8,
+              "occurrences": 5,
               "active_days": 3,
               "entities": [
                 "Anthropic",
@@ -841,9 +843,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 30x/5d",
+              "text": "coding agent: 7d 29x/5d",
               "window_days": 7,
-              "occurrences": 30,
+              "occurrences": 29,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -866,9 +868,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/5d",
+              "text": "coding agent: 7d 31x/5d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 31,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -886,9 +888,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/5d",
+              "text": "coding agent: 7d 31x/5d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 31,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -908,9 +910,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/5d",
+              "text": "coding agent: 7d 31x/5d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 31,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -928,9 +930,9 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 32x/5d",
+              "text": "coding agent: 7d 31x/5d",
               "window_days": 7,
-              "occurrences": 32,
+              "occurrences": 31,
               "active_days": 5,
               "entities": [
                 "Anthropic",
@@ -1595,28 +1597,7 @@
       "github_trending": []
     },
     "2026-06-15": {
-      "main_items": [
-        {
-          "index": 3,
-          "tags": [
-            {
-              "topic_id": "coding-agent",
-              "label": "coding agent",
-              "status": "hot",
-              "text": "coding agent: 7d 21x/6d",
-              "window_days": 7,
-              "occurrences": 21,
-              "active_days": 6,
-              "entities": [
-                "Claude Code",
-                "Codex",
-                "Google",
-                "OpenAI"
-              ]
-            }
-          ]
-        }
-      ],
+      "main_items": [],
       "github_trending": []
     },
     "2026-06-16": {
@@ -1628,10 +1609,10 @@
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 18x/6d",
+              "text": "coding agent: 7d 17x/5d",
               "window_days": 7,
-              "occurrences": 18,
-              "active_days": 6,
+              "occurrences": 17,
+              "active_days": 5,
               "entities": [
                 "Claude Code",
                 "Codex",

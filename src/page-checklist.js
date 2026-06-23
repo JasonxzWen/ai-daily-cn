@@ -51,13 +51,14 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     );
     const mustReadSection = document.querySelector("#section-today-must-read");
     const compactMainList = document.querySelector("#section-compact-main-list");
-    const mainDetails = document.querySelector("#section-main-item-details");
-    const mainSignalCards = document.querySelector("#section-main-signal-cards");
-    const mainSignalCardCount = mainSignalCards?.querySelectorAll(".main-ticket-card").length || 0;
-    const mainDetailsOk = Boolean(mainDetails) &&
-      /重点详情/.test(mainDetails.textContent || "") &&
-      (mainDetails.tagName !== "DETAILS" || mainDetails.open);
-    const mainSignalCardsOk = Boolean(mainSignalCards) && mainSignalCardCount >= 5;
+    const todayJudgment = document.querySelector("#section-today-judgment");
+    const trendThemes = document.querySelector("#section-trend-themes");
+    const storyList = document.querySelector("#section-story-list");
+    const promptLayerTheme = document.documentElement.getAttribute("data-ai-daily-theme") === "promptlayer-inspired";
+    const ticketCards = document.querySelectorAll(".main-ticket-card, .main-ticket-card-grid, #section-main-signal-cards").length;
+    const storyFirstOk = Boolean(todayJudgment && trendThemes && storyList) &&
+      Boolean((storyList.textContent || "").trim()) &&
+      (storyList.tagName !== "DETAILS" || storyList.open);
     addCheck(
       "today_must_read_not_required",
       !mustReadSection,
@@ -67,15 +68,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       }
     );
     addCheck(
-      "main_detail_expanded_default",
-      !compactMainList &&
-        (mainDetailsOk || mainSignalCardsOk),
-      "The public page should remove the duplicate 完整列表 section and keep the renamed main detail section expanded by default, or render the scoped PromptLayer signal-card layout.",
+      "story_first_sections_expanded",
+      !compactMainList && storyFirstOk && !promptLayerTheme && ticketCards === 0,
+      "The public page should start with 今日判断, 趋势主题, and 重点 story, without PromptLayer ticket-card layout.",
       {
         compact_list_present: Boolean(compactMainList),
-        details_tag: mainDetails?.tagName || "",
-        details_open: mainDetails?.tagName === "DETAILS" ? Boolean(mainDetails?.open) : true,
-        signal_cards: mainSignalCardCount
+        today_judgment: Boolean(todayJudgment),
+        trend_themes: Boolean(trendThemes),
+        story_list: Boolean(storyList),
+        promptlayer_theme: promptLayerTheme,
+        ticket_cards: ticketCards
       }
     );
     addCheck(
@@ -836,7 +838,7 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
     addCheck(
       "date_cards_main_stream_status",
       cards.length > 0 && cardsWithoutMainStreamChip.length === 0,
-      "Every date card should separately expose whether the 5-30 main news stream target is met.",
+      "Every date card should separately expose whether the 1-12 story-first main stream target is met.",
       { weak_cards: cardsWithoutMainStreamChip }
     );
     addCheck(

@@ -176,7 +176,8 @@
         "**自动化处理**：依赖 Codex 的 CI 或自动修复流程应保留可重放输入；状态页异常时先降级或排队，恢复后再复跑。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理",
@@ -197,7 +198,8 @@
         "**可跟进项**：后续观察 Cisco 或 OpenAI 是否披露可复用的评估指标，例如缺陷修复通过率、review 周期、误改回滚率。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界",
@@ -218,7 +220,8 @@
         "**合并门禁**：Code Quality setup API 与 PR coverage preview 把覆盖率和静态质量配置前移到 review 流程，对 AI 改代码尤其关键。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [],
@@ -353,7 +356,68 @@
   "generated_at": "2026-05-28T10:30:44.358Z",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-28.html",
   "html_path": "reports/2026/05/2026-05-28.html",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-openai-codex-context-compaction-resolved",
+      "title": "Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-28",
+      "primary_entity": "OpenAI Status",
+      "event_type": "update",
+      "object": "Codex context compaction latency 已恢复，但长上下文任务要把状态页纳入运行门禁",
+      "what_happened": "OpenAI Statuspage 本轮显示 Codex Context Compaction Latency incident 已恢复，受影响组件包括 Codex API、Codex Web、CLI、App 和 VS Code extension。",
+      "why_it_matters": "**运行分类**：长上下文代码任务的失败记录要拆分为 context compaction、工具执行、网络重试和模型答复质量，避免把供应商延迟误判成 prompt 或 agent 配置问题。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Status",
+          "url": "https://status.openai.com/incidents/01KSN9ATSF1WCJ5ZTQSR1H9CC7",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-cisco-codex-enterprise",
+      "title": "Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-27",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "policy",
+      "object": "Cisco 与 OpenAI 的 Codex 案例把 agent 从个人提效推进到工程治理",
+      "what_happened": "OpenAI 在 Cisco 案例中把 Codex 放在企业工程、AI Defense 和缺陷修复流程里，而不是只展示单个开发者的编码辅助。",
+      "why_it_matters": "**团队门槛**：企业采用 coding agent 时，真正难点会落到仓库权限、任务审计、上下文边界和修复结果验收，而不是单次生成速度。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/cisco",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-github-copilot-code-quality-controls",
+      "title": "GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub 把 Copilot 记忆、模型准入和 Code Quality 放进管理边界",
+      "what_happened": "GitHub 2026-05-26 Changelog 同日出现多条企业控制面更新：Copilot Memory 删除与 scope 控制、组织级 model rules、Code Quality setup API 和 PR 覆盖率预览。",
+      "why_it_matters": "**模型准入**：organization model rules 把模型开放从企业全局拆到组织范围，适合多业务线分别做安全评审和成本约束。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

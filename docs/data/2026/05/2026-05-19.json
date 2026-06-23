@@ -27,7 +27,8 @@
         "对工程组织而言，重点不是又一个 coding assistant，而是企业 agent 的部署边界改变：代码、知识库、系统权限和本地基础设施需要被统一纳入治理。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制",
@@ -50,7 +51,8 @@
         "Spaces API 与 CLI 远程控制把上下文管理、会话监控、权限批准和移动端续接连起来，Copilot 正在形成跨 CLI、Web、移动端和 IDE 的 agent 操作面。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "xAI 推出 Grok Skills，让偏好和工作流跨会话复用",
@@ -73,7 +75,8 @@
         "这和近期 coding agent 的 AGENTS.md、插件、MCP 配置相呼应：可迁移、可复用的“技能文件”正在成为 AI 产品争夺工作流记忆的接口。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Sigma 发布面向 AI coding agents 的数据建模能力",
@@ -96,7 +99,8 @@
         "数据平台团队需要关注模型变更的审计、review 和回滚：当 agent 能改 data model，analytics governance 会变成软件工程流程的一部分。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报",
@@ -119,7 +123,8 @@
         "这代表 agent 系统的一个现实约束：很多高风险场景需要上游信息形成层先做过滤、富集、验证和结构化，不能让 agent 直接吞原始噪声。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [],
@@ -159,13 +164,6 @@
       "importance": "general"
     },
     {
-      "name": "Grok Skills",
-      "description": "xAI 的跨会话技能系统，覆盖内置 office 文档技能、PDF、表格和自定义 skill 创建。",
-      "url": "https://x.ai/news/grok-skills",
-      "domains": [],
-      "importance": "general"
-    },
-    {
       "name": "PaddleOCR 3.5 Transformers backend",
       "description": "PaddleOCR 的 OCR 与文档解析模型新增 Hugging Face Transformers 推理后端，服务 Document AI 和 RAG ingestion。",
       "url": "https://huggingface.co/blog/PaddlePaddle/paddleocr-transformers",
@@ -191,7 +189,108 @@
   "generated_at": "2026-05-19T07:28:39.901Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-dell-codex-enterprise-partnership",
+      "title": "OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "OpenAI News",
+      "event_type": "update",
+      "object": "OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境",
+      "what_happened": "OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。",
+      "why_it_matters": "双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News",
+          "url": "https://openai.com/index/dell-codex-enterprise-partnership/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-changelog",
+      "title": "GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制",
+      "what_happened": "GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。",
+      "why_it_matters": "模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-grok-skills",
+      "title": "xAI 推出 Grok Skills，让偏好和工作流跨会话复用",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "xAI News",
+      "event_type": "launch",
+      "object": "xAI 推出 Grok Skills，让偏好和工作流跨会话复用",
+      "what_happened": "xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。",
+      "why_it_matters": "技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "xAI News",
+          "url": "https://x.ai/news/grok-skills",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-series-e",
+      "title": "Sigma 发布面向 AI coding agents 的数据建模能力",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "Sigma Announcement",
+      "event_type": "launch",
+      "object": "Sigma 发布面向 AI coding agents 的数据建模能力",
+      "what_happened": "Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。",
+      "why_it_matters": "这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Sigma Announcement",
+          "url": "https://www.sigmacomputing.com/resources/announcements/series-e",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-zignal-labs-launches-zignal-ai-to-deliver-structured-intelligence-for-mission-systems-partners-and-agent-driven-workflows",
+      "title": "Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "Zignal Labs / GlobeNewswire Press Release",
+      "event_type": "launch",
+      "object": "Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报",
+      "what_happened": "Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。",
+      "why_it_matters": "发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Zignal Labs / GlobeNewswire Press Release",
+          "url": "https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

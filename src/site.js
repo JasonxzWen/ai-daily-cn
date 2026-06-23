@@ -15,13 +15,12 @@ import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
-import { applyPromptLayerInspiredDailyTheme } from "./daily-theme.js";
+import { normalizeStoryFirstReport } from "./story-first.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
-const PROMPTLAYER_INSPIRED_REPORT_DATES = new Set(["2026-06-17"]);
 const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_id",
   "candidate_pool_path",
@@ -63,6 +62,13 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
 const NON_PUBLIC_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "thumbnail"]);
 const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page[_-]?capture)/i;
 const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
+.report-nav {
+  position: static;
+  top: auto;
+  z-index: auto;
+  backdrop-filter: none;
+}
+
 @media (max-width: 760px) {
   .tracking-card .card-table-scroll {
     overflow-x: auto;
@@ -379,8 +385,8 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
 
 function publicMainStreamStatus(metrics = {}) {
   const count = Number(metrics.main_items_count || 0);
-  const targetMin = 5;
-  const targetMax = 30;
+  const targetMin = 1;
+  const targetMax = 12;
   if (count >= targetMin && count <= targetMax) {
     return {
       status: "target",
@@ -493,6 +499,7 @@ function topicLookupByDate(trends) {
 }
 
 function dateSignalMetrics(feedReport = {}, report = {}) {
+  const stories = arrayValue(report.stories);
   const mainItems = arrayValue(report.main_items);
   const modelReleases = arrayValue(report.model_releases);
   const hotBlogs = arrayValue(report.hot_blogs);
@@ -507,7 +514,7 @@ function dateSignalMetrics(feedReport = {}, report = {}) {
     ...arrayValue(report.zhihu_items),
     ...arrayValue(report.reddit_items)
   ];
-  const mainItemsCount = mainItems.length > 0 ? mainItems.length : Number(feedReport.main_items || 0);
+  const mainItemsCount = stories.length > 0 ? stories.length : mainItems.length > 0 ? mainItems.length : Number(feedReport.main_items || 0);
   const builderCount = builderObservations.length > 0 ? builderObservations.length : Number(feedReport.builder_observations || 0);
   const sectionCounts = [
     mainItemsCount,
@@ -690,9 +697,7 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
 }
 
 function applyDailyReportHtmlOverrides(html, reportDate) {
-  let result = PROMPTLAYER_INSPIRED_REPORT_DATES.has(reportDate)
-    ? applyPromptLayerInspiredDailyTheme(html)
-    : html;
+  let result = html;
   if (!result || result.includes("data-ai-daily-css-overrides")) {
     return result;
   }
@@ -712,11 +717,11 @@ async function readReportJson(filePath) {
     });
   }
 
-  const report = {
+  const report = normalizeStoryFirstReport({
     ...withDefaultImportanceForReport(validation.value),
     evidence_assets: Array.isArray(validation.value.evidence_assets) ? validation.value.evidence_assets : [],
     quality_status: deriveQualityStatus(validation.value, null)
-  };
+  });
   const finalValidation = validateReport(report);
   if (!finalValidation.valid) {
     throw new PublisherError("schema_validation_failed", `结构化日报 JSON 未通过 schema 校验：${filePath}`, {
@@ -730,6 +735,7 @@ async function readReportJson(filePath) {
 function withDefaultImportanceForReport(report) {
   const result = { ...report };
   for (const sectionName of [
+    "stories",
     "main_items",
     "model_releases",
     "hot_blogs",
@@ -752,12 +758,36 @@ function withDefaultImportanceForReport(report) {
 
 function publicReportData(report) {
   const result = sanitizePublicValue(report);
+  result.stories = publicStories(report?.stories);
   result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
   result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
   return result;
+}
+
+function publicStories(stories = []) {
+  return arrayValue(stories)
+    .map((story) => ({
+      story_id: story.story_id,
+      title: story.title,
+      importance: story.importance,
+      trend: story.trend,
+      event_date: story.event_date,
+      primary_entity: story.primary_entity,
+      event_type: story.event_type,
+      object: story.object,
+      what_happened: story.what_happened,
+      why_it_matters: story.why_it_matters,
+      evidence_level: story.evidence_level,
+      sources: arrayValue(story.sources).map((source) => ({
+        label: source.label,
+        url: source.url,
+        type: source.type
+      }))
+    }))
+    .filter((story) => story.title && story.sources.length > 0);
 }
 
 function publicHeroHighlights(highlights = []) {
