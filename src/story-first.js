@@ -537,7 +537,7 @@ function storyWhyItMatters(item, title) {
   if (explicitReason && !looksLikeInternalMetadata(explicitReason)) {
     return explicitReason;
   }
-  return `这条 story 影响 AI 产品、工程或组织决策，需要回到来源确认适用范围。`;
+  return "";
 }
 
 function looksLikeInternalMetadata(value) {

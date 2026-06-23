@@ -649,6 +649,22 @@ test("interaction input starts with story-first judgment trends and story list",
   assert(mainContent.includes("发生了什么"));
   assert(mainContent.includes("为什么值得看"));
 });
+
+test("interaction input uses compact same-month coverage stat for mobile hero", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+  report.source_window = {
+    date_from: "2026-06-21",
+    date_to: "2026-06-23",
+    fallback_window_used: true
+  };
+
+  const input = reportToInteractionInput(report);
+  const coverageStat = input.heroStats.find((item) => item.label === "覆盖");
+
+  assert(coverageStat);
+  assert.equal(coverageStat.value, "06.21-23");
+});
+
 test("public daily renders story-first sections without compact full list", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
@@ -1566,7 +1582,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
       ["精选博客", "1", "深读"],
       ["GitHub", "1", "Top 10"],
       ["Builder", "0", "观察"],
-      ["覆盖", "05-15", "标准时间范围"]
+      ["覆盖", "05.15", "标准时间范围"]
     ]
   );
   assert(input.heroLinks.some((item) => item.label === "结构化 JSON" && item.href.endsWith("/data/2026/05/2026-05-15.json")));
@@ -1983,7 +1999,7 @@ test("interaction input keeps source audit fields out of reader-facing signal ca
   assert(!rendered.includes("verification_status"));
 });
 
-test("builder interaction section renders translated Twitter-style cards and omits explicit evidence bullets", async () => {
+test("builder interaction section renders original Twitter-style cards and omits explicit evidence bullets", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
     {
@@ -2021,8 +2037,8 @@ test("builder interaction section renders translated Twitter-style cards and omi
   assert.equal(section.cardClass, "builder-card");
   assert.equal(section.items[0].title, "Example Builder");
   assert.equal(section.items[0].subtitle, "@examplebuilder");
-  assert.equal(section.items[0].body, "Coding agent 在无人值守工作之前需要 eval loops。");
-  assert(section.items[0].points.some((point) => point.label === "原文" && point.value.includes("unattended work")));
+  assert.equal(section.items[0].body, "Coding agents need eval loops before unattended work.");
+  assert(!section.items[0].points.some((point) => point.value.includes("unattended work")));
   assert.equal(section.items[0].media.length, 1);
   assert(section.items[0].media[0].src.endsWith("assets/evidence/builder-post.png"));
   assert(!section.items[0].points.some((point) => point.label === "账号"));
@@ -2051,8 +2067,8 @@ test("builder discussion renders with missing optional Twitter fields", async ()
   assert.equal(section.title, "X/Twitter 讨论");
   assert.equal(card.title, "browserbuilder");
   assert.equal(card.subtitle, "@browserbuilder");
-  assert(card.body.includes("浏览器 agent"));
-  assert(card.points.some((point) => point.label === "原文" && point.value.includes("Browser agents need failure screenshots")));
+  assert(card.body.includes("Browser agents need failure screenshots"));
+  assert(!card.points.some((point) => point.value.includes("Browser agents need failure screenshots")));
 });
 
 test("compact builder discussion truncates original posts", () => {
@@ -2069,11 +2085,12 @@ test("compact builder discussion truncates original posts", () => {
 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.group === "signals" && item.cardClass === "builder-card");
-  const originalPoint = section.items[0].points.find((point) => point.value.includes("sentence-1"));
+  const body = section.items[0].body;
 
-  assert(originalPoint);
-  assert(originalPoint.value.length <= 220);
-  assert(originalPoint.value.endsWith("..."));
+  assert(body.includes("sentence-1"));
+  assert(body.length <= 220);
+  assert(body.endsWith("..."));
+  assert.equal(section.items[0].points.length, 0);
 });
 
 test("community leads omit low-signal statuspage troubleshooting items", async () => {
@@ -2198,7 +2215,7 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   assert(section.items[0].media[0].src.endsWith("assets/evidence/openai-super-app.png"));
 });
 
-test("community lead cards expand short summaries to reader-useful context", async () => {
+test("community lead cards keep short summaries without template expansion", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.self_check.builder_observations = 0;
@@ -2219,15 +2236,17 @@ test("community lead cards expand short summaries to reader-useful context", asy
   const section = input.sections.find((item) => item.title === "社区线索");
   const body = section.items[0].body;
 
-  assert(body.length >= 100);
+  assert(body.length >= 20);
+  assert(body.length < 100);
   assert(body.includes("OpenAI"));
   assert(body.includes("super app"));
   assert(!body.includes("中介来源"));
   assert(!body.includes("发现线索"));
   assert(!body.includes("事实性结论"));
+  assert.doesNotMatch(body, /读者可以|公开信息仍应|产品入口|后续可复核/);
 });
 
-test("community lead cards expand title-only Chinese media items without boilerplate", async () => {
+test("community lead cards keep title-only Chinese media items without boilerplate expansion", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.self_check.builder_observations = 0;
@@ -2245,15 +2264,86 @@ test("community lead cards expand title-only Chinese media items without boilerp
 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.cardClass === "community-card");
+  assert(section);
   const body = section.items[0].body;
 
-  assert(body.length >= 100);
+  assert(body.length >= 20);
+  assert(body.length < 120);
   assert(body.includes("Qwen-Robot"));
-  assert(body.includes("QbitAI"));
-  assert(body.includes("官方公告"));
+  assert(!body.includes("官方公告"));
   assert(!body.includes("标题指向"));
   assert(!body.includes("适合和同类产品"));
   assert(!body.includes("不把单条社区讨论当作最终事实"));
+  assert.doesNotMatch(body, /读者可以|公开信息仍应|产品入口|后续可复核/);
+});
+
+test("community lead cards strip Chinese policy boilerplate before public write", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-community-policy-boilerplate-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const url = "https://www.leiphone.com/category/industrynews/30qYFuhjh76yBsIV.html";
+  discovery.candidates.unshift({
+    id: "community-leiphone-tts-policy-boilerplate",
+    source_id: "intermediary-leiphone",
+    category: "community_lead",
+    title: "网易有道首发14语种零口音语音克隆模型，无需参考文本即可复刻任意音色",
+    url,
+    source: "Leiphone",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "当前，人工智能作为培育新质生产力的核心引擎，已上升为国家战略层面。国务院《关于深入实施“人工智能+”行动的意见》明确提出，要加快AI核心技术自主创新、降低产业落地门槛、构建开放共享的国产AI生态，推动人工智能与千行百业深度融合。在这一战略背景下，网易有道正式推出“子曰4.0”大模型体系TTS语音合成引擎——Confucius4-TTS，并已面向全球用户开放。该引擎不依赖参考文本即可实现14语种无口音跨语种语音克隆。",
+    verification_status: "intermediary_only",
+    source_level: "intermediary"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const item = drafted.report.community_leads.find((entry) => entry.url === url);
+  const publicText = `${item?.content || ""}\n${item?.evidence || ""}`;
+
+  assert(item, "policy-boilerplate media candidate should remain as a community lead");
+  assert.match(publicText, /网易有道|Confucius4-TTS|14语种|语音克隆/);
+  assert.doesNotMatch(publicText, /新质生产力|国家战略|人工智能\+|深度融合|千行百业/);
+  assert.equal(findPlainLanguageIssues({ community_leads: [item] }).length, 0);
+});
+
+test("community lead cards reject promotional venture event filler before public write", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-community-venture-filler-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const url = "https://36kr.com/p/3865226824389892?f=rss";
+  discovery.candidates.unshift({
+    id: "community-36kr-waves-promotional-filler",
+    source_id: "content-rss-36kr",
+    category: "community_lead",
+    title: "WAVES 2026：今年盛夏，在创投浪潮里，做迎风而立的少数人！",
+    url,
+    source: "36Kr",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "盛夏赴约WAVES 2026！一群迎风的少数人，掀起中国新一代创新力量的风口。2026年，创投圈的浪潮再次翻涌：AI从技术概念走进产业深水区，硬科技创业从小众方向变成主流共识，年轻的创业者们正在重新定义中国创新的未来坐标。每一年，由36氪主办的WAVES大会，都是中国创投圈的年度风向标，通过深度圆桌、独立演讲、名册发布等诸多精彩环节展开。",
+    verification_status: "intermediary_only",
+    source_level: "intermediary"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(!drafted.report.community_leads.some((entry) => entry.url === url));
 });
 
 test("public card media prefers local evidence assets and drops remote fallbacks", async () => {
@@ -3849,11 +3939,10 @@ test("collectContentSources stores sanitized OpenRouter official DOM/CSS compone
   const trackingSection = input.sections.find((section) => section.cardClass === "tracking-card");
   const card = trackingSection.items.find((item) => item.title === "OpenRouter");
   assert.equal(card.component.kind, "openrouter_rankings");
-  assert.equal(card.component.officialSnapshot.status, "available");
-  assert.match(card.component.officialSnapshot.html, /OpenRouter Top Models/);
-  assert.equal(card.table, undefined);
-  assert.equal(card.bars, undefined);
-  assert.equal(card.stats, undefined);
+  assert.equal(card.component.officialSnapshot, undefined);
+  assert.equal(card.table.rows.length, 10);
+  assert(card.bars.rows.length > 0);
+  assert(card.stats.length > 0);
 });
 
 test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomplete", async () => {
@@ -4189,11 +4278,10 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(card.points.length, 0);
   assert.equal(card.component.kind, "artificial_analysis_index");
   assert.equal(card.component.tabs.length, 6);
-  assert.equal(card.component.officialSnapshot.status, "available");
-  assert.match(card.component.officialSnapshot.html, /Artificial Analysis Intelligence Index/);
-  assert.equal(card.table, undefined);
-  assert.equal(card.bars, undefined);
-  assert.equal(card.stats, undefined);
+  assert.equal(card.component.officialSnapshot, undefined);
+  assert.equal(card.table.rows.length, 10);
+  assert(card.bars.rows.length > 0);
+  assert(card.stats.length > 0);
 });
 
 test("report:draft publishes SWE-bench Pro official snapshot as reader-facing daily tracking card", async () => {
@@ -4244,11 +4332,10 @@ test("report:draft publishes SWE-bench Pro official snapshot as reader-facing da
   assert.equal(card.points.length, 0);
   assert.equal(card.component.kind, "swe_bench_pro");
   assert.equal(card.component.tabs.length, 1);
-  assert.equal(card.component.officialSnapshot.status, "available");
-  assert.match(card.component.officialSnapshot.html, /SWE-Bench Pro/);
-  assert.equal(card.table, undefined);
-  assert.equal(card.bars, undefined);
-  assert.equal(card.stats, undefined);
+  assert.equal(card.component.officialSnapshot, undefined);
+  assert.equal(card.table.rows.length, 10);
+  assert(card.bars.rows.length > 0);
+  assert(card.stats.length > 0);
   assert(!JSON.stringify(card).includes("HTTP 403"));
 });
 
@@ -8957,6 +9044,25 @@ test("buildSite writes reader-safe public data without internal fields or candid
   report.daily_tracking[0].snapshot.official_component_snapshot = broadOfficialSnapshot;
   report.daily_tracking[0].tracking_component_snapshot = buildTrackingComponentSnapshot(report.daily_tracking[0]);
   report.daily_tracking[0].tracking_component_snapshot.official_component_snapshot = broadOfficialSnapshot;
+  report.source_effectiveness = [
+    {
+      id: "meta-ai",
+      name: "Meta AI Blog",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "parsed_but_no_candidate_created",
+      source_ids: ["content-meta-ai-blog"],
+      source_kinds: ["html_index"],
+      statuses: ["no_signal", "checked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "rss_not_available_404=https://ai.meta.com/blog/rss/; strategy=html_index:https://ai.meta.com/blog/"
+    }
+  ];
   await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   await fs.writeFile(path.join(reportDir, `${report.report_date}.candidates.json`), `${JSON.stringify({
     schema_version: 1,
@@ -9020,6 +9126,9 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.hero_highlights[0].why_watch, "Public impact for the must-read card.");
   assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
+  assert.equal(publicData.source_effectiveness.length, 1);
+  assert.match(publicData.source_effectiveness[0].notes, /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
+  assert.match(publicData.source_effectiveness[0].notes, /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
   assert.equal(publicData.evidence_assets.length, 1);
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
@@ -11156,7 +11265,7 @@ test("report:draft limits paper and GitHub overflow in community leads while kee
   assert(drafted.report.community_leads.filter((item) => item.source_level === "github").length <= 3);
 });
 
-test("report:draft expands public signal coverage beyond strict factual sections", async () => {
+test("report:draft caps public signal coverage beyond strict factual sections", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-expanded-signals-"));
   const reportDate = "2026-06-08";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -11192,19 +11301,50 @@ test("report:draft expands public signal coverage beyond strict factual sections
     verification_status: "original_social_only",
     source_level: "original_social"
   }));
-  const extraCommunityLeads = Array.from({ length: 30 }, (_, index) => ({
-    id: `community-expanded-${index + 1}`,
-    source_id: `content-techcrunch-ai-expanded-${index + 1}`,
-    category: "community_lead",
-    title: `AI agent 市场信号 ${index + 1}：企业工作流进入产品化阶段`,
-    url: `https://techcrunch.com/2026/06/08/ai-agent-market-signal-${index + 1}/`,
-    source: "TechCrunch AI",
-    event_date: reportDate,
-    status: "excluded",
-    evidence: `第三方报道描述 AI agent 市场信号 ${index + 1}，重点包括产品发布、企业工作流采用、定价影响和开发者平台上下文。`,
-    verification_status: "intermediary_only",
-    source_level: "intermediary"
-  }));
+  const communityFixtures = [
+    {
+      slug: "super-app",
+      title: "OpenAI is still working on that super app",
+      evidence: "\"Chat is dead\" according to a senior OpenAI employee."
+    },
+    {
+      slug: "climate-ai",
+      title: "The weather and climate science AI revolution is not revolutionary",
+      evidence: "Machine learning has its limits; how is it being used in climate science?"
+    },
+    {
+      slug: "skillopt",
+      title: "SkillOpt",
+      evidence: "Skill optimization for agent workflows."
+    },
+    {
+      slug: "autoscientists",
+      title: "AutoScientists",
+      evidence: "Multi-agent science workflows without a central planner."
+    },
+    {
+      slug: "tokenpocalypse",
+      title: "The tokenpocalypse and enterprise AI token costs",
+      evidence: "Enterprise teams discuss token cost control for production AI systems."
+    }
+  ];
+  const extraCommunityLeads = Array.from({ length: 15 }, (_, index) => {
+    const fixture = communityFixtures[index % communityFixtures.length];
+    const number = index + 1;
+    return {
+      id: `community-expanded-${number}`,
+      source_id: `content-techcrunch-ai-expanded-${number}`,
+      category: "community_lead",
+      title: `${fixture.title} ${number}`,
+      url: `https://techcrunch.com/2026/06/08/${fixture.slug}-${number}/`,
+      source: "TechCrunch AI",
+      event_date: reportDate,
+      status: "excluded",
+      evidence: fixture.evidence,
+      verification_status: "intermediary_only",
+      source_level: "intermediary"
+    };
+  });
 
   discovery.candidates = [
     ...discovery.candidates,
@@ -11229,7 +11369,8 @@ test("report:draft expands public signal coverage beyond strict factual sections
   assert.equal(new Set(drafted.report.hot_blogs.map((item) => item.title)).size, drafted.report.hot_blogs.length);
   assert(Number.isInteger(drafted.report.self_check.selection_snapshot.hot_blogs.pruned));
   assert.equal(drafted.report.builder_observations.length, 12);
-  assert.equal(drafted.report.community_leads.length, 24);
+  assert(drafted.report.community_leads.length > 0);
+  assert(drafted.report.community_leads.length <= 6);
   assert(drafted.report.community_leads.some((item) => item.verification_status === "intermediary_only"));
 });
 
@@ -12036,6 +12177,321 @@ test("2026-06-23 story-first replay normalizes legacy report into deduped storie
   );
   const replayInput = reportToInteractionInput(normalized);
   assert(!replayInput.sections.some((section) => section.cardClass === "project-card"));
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: Builder cards use original X text", () => {
+  const report = strictPublishReportFixture();
+  report.builder_observations = [
+    {
+      candidate_id: "builder-original-x",
+      author: "Example Builder",
+      handle: "examplebuilder",
+      role: "builder",
+      original_text: "Finally, eval loops for browser agents are becoming part of production release gates.",
+      translation: "浏览器 agent 的评测循环正在进入生产发布门。",
+      content: "浏览器 agent 的评测循环正在进入生产发布门。",
+      url: "https://x.com/examplebuilder/status/2059000000000000000",
+      event_date: report.report_date,
+      source: "follow-builders X feed",
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      importance: "notable"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const builderSection = input.sections.find((section) => section.cardClass === "builder-card");
+  const card = builderSection?.items?.[0];
+
+  assert(card, "Builder/X section should render the original X status");
+  assert.equal(card.body, report.builder_observations[0].original_text);
+  assert(!JSON.stringify(card.points || []).includes(report.builder_observations[0].original_text));
+  assert.doesNotMatch(card.body, /浏览器 agent 的评测循环|已保留原文|适合结合原帖/);
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: tracking prefers parsed compact data", () => {
+  const report = strictPublishReportFixture();
+  const item = {
+    id: "openrouter-rankings",
+    name: "OpenRouter",
+    url: "https://openrouter.ai/rankings",
+    event_date: report.report_date,
+    source: "OpenRouter Rankings",
+    category: "model_usage",
+    importance: "notable",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    change_status: "changed",
+    publish_to_public: true,
+    summary: "OpenRouter parsed Top 10 model usage rows.",
+    metrics: [],
+    snapshot: openRouterSnapshotFixture()
+  };
+  item.tracking_component_snapshot = buildTrackingComponentSnapshot(item);
+  item.tracking_component_snapshot.official_component_snapshot = {
+    status: "available",
+    source: "official_dom",
+    component_kind: "openrouter_rankings",
+    source_url: item.url,
+    captured_at: fixedGeneratedAt,
+    selector_version: "openrouter-rankings-v1",
+    source_selector: ".rankings-table",
+    sanitized_html: "<section class=\"rankings-table\"><table><tbody><tr><td>DeepSeek V4 Flash</td><td>2.9T tokens</td></tr></tbody></table></section>",
+    sanitized_css: ".rankings-table { display: block; }",
+    dom_hash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    css_hash: "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  };
+  report.daily_tracking = [item];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((current) => current.group === "signals" && current.cardClass === "tracking-card");
+  const card = section?.items?.find((current) => current.title === "OpenRouter");
+
+  assert(card, "OpenRouter tracking card should render");
+  assert.equal(card.table?.rows?.length, 10);
+  assert(card.bars?.rows?.length > 0);
+  assert(card.stats?.length > 0);
+  assert.equal(card.component?.officialSnapshot, undefined);
+  assert.doesNotMatch(card.body, /不等同模型能力评测|公开榜单信号|继续核对/);
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: stories reject generic why_it_matters fallback", async () => {
+  const { normalizeStoryFirstReport } = await import("../src/story-first.js");
+  const report = {
+    report_date: "2026-06-23",
+    title: "AI Daily fallback regression",
+    summary: "Fixture report.",
+    main_items: [
+      {
+        candidate_id: "official-ai-release",
+        title: "OpenAI releases a concrete enterprise admin control",
+        event_date: "2026-06-23",
+        url: "https://openai.com/news/example-enterprise-admin-control",
+        source: "OpenAI News RSS",
+        summary: "OpenAI released an enterprise admin control with documented rollout scope and source evidence.",
+        bullets: [],
+        source_level: "official",
+        verification_status: "primary_confirmed",
+        importance: "major"
+      }
+    ],
+    source_audit: sourceAuditFixture(),
+    self_check: {}
+  };
+
+  const normalized = normalizeStoryFirstReport(report, { target: 8 });
+  const storyText = JSON.stringify(normalized.stories);
+
+  assert.equal(normalized.stories.length, 1);
+  assert.doesNotMatch(storyText, /这条 story 影响 AI 产品、工程或组织决策|需要回到来源确认适用范围/);
+  assert(normalized.stories[0].why_it_matters.length === 0 || /enterprise|admin|rollout|OpenAI|source/i.test(normalized.stories[0].why_it_matters));
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: effective-interact CSS has no hover dim", async () => {
+  const cssPaths = [
+    path.join(rootDir, ".codex/skills/effective-interact/assets/components/interaction-ui.css"),
+    path.join(rootDir, ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css")
+  ];
+
+  for (const cssPath of cssPaths) {
+    const css = await fs.readFile(cssPath, "utf8");
+    assert.doesNotMatch(css, /\.focus-field:has\(\.interactive-card:hover\)\s+\.interactive-card:not\(:hover\)/);
+    assert.doesNotMatch(css, /filter:\s*grayscale\(0\.45\)/);
+  }
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: README and API aggregators are not blocked as non-feed-like", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-health-contract-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  await fs.writeFile(sourcesPath, `${JSON.stringify({
+    schema_version: 1,
+    sources: [
+      {
+        id: "content-ml-papers-week",
+        name: "ML Papers of the Week",
+        url: "https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md",
+        source_kind: "github_report_markdown",
+        candidate_category: "community_lead",
+        tier: "T2",
+        authority: "aggregator",
+        enablement: "optional",
+        verification_policy: "primary_required",
+        requires_original_url: false,
+        max_items_per_run: 8
+      },
+      {
+        id: "hn-topstories-api",
+        name: "Hacker News Topstories API",
+        url: "https://hacker-news.firebaseio.com/v0/topstories.json",
+        source_kind: "search_api",
+        candidate_category: "community_lead",
+        tier: "T2",
+        authority: "community",
+        enablement: "optional",
+        verification_policy: "community_only",
+        requires_original_url: false,
+        max_items_per_run: 8,
+        source_level: "community_api"
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const health = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-06-23",
+    enablement: "optional",
+    fetchImpl: async (url) => {
+      if (String(url).includes("topstories")) {
+        return new Response("[1,2,3]", { status: 200 });
+      }
+      return new Response("# ML Papers of the Week\n\n- [Agentic RL](https://arxiv.org/abs/2606.00001) - 2026-06-23\n", { status: 200 });
+    }
+  });
+  const byId = new Map(health.results.map((source) => [source.id, source]));
+
+  assert.notEqual(byId.get("content-ml-papers-week")?.status, "blocked");
+  assert.notEqual(byId.get("hn-topstories-api")?.status, "blocked");
+  assert.match(byId.get("content-ml-papers-week")?.notes || "", /github_report_markdown|markdown|source-specific/i);
+  assert.match(byId.get("hn-topstories-api")?.notes || "", /search_api|api|source-specific/i);
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: clean build avatars and source effectiveness are explicit", async () => {
+  const report = strictPublishReportFixture();
+  report.html_path = "reports/2026/06/2026-06-23.html";
+  report.builder_observations = [
+    {
+      candidate_id: "builder-missing-avatar",
+      author: "Missing Avatar Builder",
+      handle: "missingavatar",
+      original_text: "Original X status should not depend on a pre-existing docs avatar file.",
+      url: "https://x.com/missingavatar/status/2059000000000000001",
+      avatar_local_path: "assets/avatars/2026/06/missing-avatar.png",
+      event_date: report.report_date,
+      source: "follow-builders X feed",
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      importance: "notable"
+    }
+  ];
+  report.source_audit.content_sources.sources.push(
+    {
+      id: "content-meta-ai-blog",
+      name: "Meta AI Blog",
+      url: "https://ai.meta.com/blog/",
+      source_kind: "html_index",
+      status: "no_signal",
+      parsed_count: 0,
+      checked_at: fixedGeneratedAt,
+      notes: "Meta AI RSS endpoint https://ai.meta.com/blog/rss/ returned 404; using HTML index."
+    },
+    {
+      id: "content-meta-ai-blog",
+      name: "Meta AI Blog",
+      url: "https://ai.meta.com/blog/",
+      source_kind: "html_index",
+      status: "checked",
+      parsed_count: 1,
+      checked_at: fixedGeneratedAt,
+      notes: "Meta AI HTML index parsed."
+    }
+  );
+
+  const input = reportToInteractionInput(report, { assetRootDir: path.join(rootDir, ".tmp/nonexistent-assets") });
+  const builderCard = input.sections.find((section) => section.cardClass === "builder-card")?.items?.[0];
+  assert(builderCard);
+  assert.doesNotMatch(builderCard.titleIcon || "", /assets\/avatars\/2026\/06\/missing-avatar\.png/);
+
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const rows = buildSourceEffectivenessTable({
+    report,
+    candidates: [
+      {
+        id: "openai-candidate",
+        source_id: "content-openai-news-rss",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example",
+        included_in: "stories"
+      }
+    ]
+  });
+  const openai = rows.find((row) => /OpenAI/i.test(row.name || row.source_name || ""));
+
+  assert(openai, "source-effectiveness should include OpenAI core source");
+  for (const key of ["configured", "reachable", "parsed_recent", "candidate_created", "public_included"]) {
+    assert.equal(typeof openai[key], "boolean", `${key} should be a boolean`);
+  }
+  assert("not_included_reason" in openai);
+  assert.match(openai.notes || "", /canonical_rss=.*openai\.com\/news\/rss\.xml/);
+
+  const meta = rows.find((row) => row.id === "meta-ai");
+  assert(meta, "source-effectiveness should include Meta AI core source");
+  assert.deepEqual(meta.source_ids, ["content-meta-ai-blog"]);
+  assert.match(meta.notes || "", /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
+  assert.match(meta.notes || "", /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
+});
+
+test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: report:draft rewrites OpenAI official English titles", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-openai-title-rewrite-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.unshift(
+    mainStreamRepairCandidate(reportDate, {
+      id: "story-content-openai-news-patch-the-planet",
+      sourceId: "content-openai-news",
+      category: "main_item",
+      title: "Patch the Planet: a Daybreak initiative to support open source maintainers",
+      url: "https://openai.com/index/patch-the-planet",
+      source: "OpenAI News RSS",
+      sourceLevel: "official",
+      editorialCategory: "open_source",
+      evidence: "OpenAI introduces Patch the Planet, a Daybreak initiative helping open-source maintainers find, validate, and fix vulnerabilities with AI and expert review."
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "story-content-openai-news-codex-maxxing-long-running-work",
+      sourceId: "content-openai-news",
+      category: "main_item",
+      title: "Codex-maxxing for long-running work",
+      url: "https://openai.com/index/codex-maxxing-long-running-work",
+      source: "OpenAI News RSS",
+      sourceLevel: "official",
+      editorialCategory: "engineering_toolchain",
+      evidence: "Learn how Jason Liu uses Codex to preserve context, manage complex projects, and help work continue beyond a single prompt."
+    })
+  );
+  discovery.source_audit.content_sources.candidates_found += 2;
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const patchUrl = "https://openai.com/index/patch-the-planet";
+  const codexUrl = "https://openai.com/index/codex-maxxing-long-running-work";
+  const patchIndex = drafted.report.main_items.findIndex((item) => item.url === patchUrl);
+  const codexIndex = drafted.report.main_items.findIndex((item) => item.url === codexUrl);
+  const patchTitle = drafted.report.main_items[patchIndex]?.title || "";
+  const codexTitle = drafted.report.main_items[codexIndex]?.title || "";
+  const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  const selectedTitlePaths = new Set([
+    `main_items[${patchIndex}].title`,
+    `main_items[${codexIndex}].title`
+  ]);
+  const blockingTitleCodes = review.issues
+    .filter((issue) => selectedTitlePaths.has(issue.path || ""))
+    .map((issue) => issue.code);
+
+  assert.notEqual(patchIndex, -1, "Patch the Planet official source should enter the public main stream");
+  assert.notEqual(codexIndex, -1, "Codex-maxxing official source should enter the public main stream");
+  assert.match(patchTitle, /OpenAI|开源|漏洞|安全/);
+  assert.match(codexTitle, /OpenAI|Codex|长时间|工作流/);
+  assert.doesNotMatch(`${patchTitle}\n${codexTitle}`, /OpenAI News RSS:|Patch the Planet|Codex-maxxing|long-running work/i);
+  assert(!blockingTitleCodes.includes("main_item_untranslated"));
+  assert(!blockingTitleCodes.includes("public_source_prefix"));
 });
 
 test("story-first interaction input starts with judgment trends and story list", async () => {

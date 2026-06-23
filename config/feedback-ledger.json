@@ -466,8 +466,8 @@
       "severity": "P1",
       "status": "implemented",
       "title": "Keep X/Twitter discussion cards compact",
-      "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace or render long raw original posts by default, making the public discussion section hard to scan.",
-      "expected_behavior": "Public Builder/X cards show author, handle, date, a concise Chinese translation/summary, and a collapsed or truncated original excerpt. Internal fields, generic source-bucket labels, and full raw thread dumps are not exposed in the public card body.",
+      "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace, translate or paraphrase original posts into generic commentary, or expose internal source-bucket labels.",
+      "expected_behavior": "Public Builder/X cards show author, handle, date, source link, and the original X/Twitter post text as the card body. Do not translate, tag, or replace the original with generic summaries; truncate only for layout, and keep internal fields out of public content.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -476,7 +476,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "compact builder discussion truncates original posts",
+        "test_name": "public daily IA reset enforces stories original X compact tracking hover and source effectiveness",
         "gate": "npm run validate"
       }
     },
@@ -677,7 +677,7 @@
       "status": "implemented",
       "title": "Publish qualified signals without generic source-label clutter",
       "problem": "Daily report safety gates could be too strict, then the attempted fix made qualified third-party reports, builder posts, blogs, and community leads readable only through repetitive generic labels such as 来源/第三方报道/社区线索.",
-      "expected_behavior": "The factual main stream stays strict, but qualified non-primary content is published in hot blogs, builder observations, GitHub trends, and community leads. Keep source_level and verification_status in structured data for audit, but the public interaction page must not render generic source buckets or implementation labels as repeated chips or detail cells.",
+      "expected_behavior": "The factual main stream stays strict, but qualified non-primary content is published in hot blogs, builder observations, GitHub trends, and a capped community/media signal section. Community leads must pass reader-facing qualification gates and stay small enough to support, not dilute, the story-first page. Keep source_level and verification_status in structured data for audit, but the public interaction page must not render generic source buckets or implementation labels as repeated chips or detail cells.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -691,7 +691,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "interaction input keeps source audit fields out of reader-facing signal cards",
+        "test_name": "report:draft caps public signal coverage beyond strict factual sections",
         "gate": "npm run validate"
       }
     },
@@ -907,7 +907,36 @@
         "test_name": "public daily renders story-first sections without compact full list",
         "gate": "npm run validate"
       }
-    },    {
+    },
+    {
+      "id": "feedback/p1-public-daily-ia-source-effectiveness-reset",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Reset public daily IA and source effectiveness gates",
+      "problem": "The public daily could still be technically generated while showing low-density sections, generic explanatory filler, translated X/Twitter commentary, table-like daily tracking regressions, hover-dim interactions, and no clear answer for whether each core source was configured, reachable, parsed, selected as candidate, and publicly included.",
+      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top 5-8 module, parsed compact daily tracking components, original X/Twitter text, collapsed/limited source coverage and community signals, no generic public filler copy, no hover dim/blur of sibling cards, clean-build reproducibility, and a source-effectiveness table with `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN, and GitHub sources. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "tasks/current-task.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/story-first.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "src/source-health.js",
+        ".codex/skills/effective-interact/assets/components/interaction-ui.css",
+        ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css",
+        "tests/e2e/site.e2e.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily IA reset enforces stories original X compact tracking hover and source effectiveness",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-effective-interact-production-renderer",
       "severity": "P1",
       "status": "implemented",

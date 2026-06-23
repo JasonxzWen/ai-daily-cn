@@ -192,8 +192,8 @@ structuredReport.builder_observations = [
 structuredReport.self_check.builder_observations = structuredReport.builder_observations.length;
 structuredReport.community_leads = [
   {
-    title: "企业开始把 token 成本当成模型路由约束",
-    content: "TechCrunch 报道企业在多模型工作流里开始把 token 成本、路由策略和失败率一起算，模型选择正从单模型能力比较转向系统成本控制。",
+    title: "企业开始把用量成本当成模型路由约束",
+    content: "媒体报道显示，企业在多模型工作流里开始把用量成本、路由策略和失败率一起计算，模型选择正从单模型能力比较转向系统成本控制。对工程团队来说，这类线索更适合作为成本治理和模型编排的补充观察，也能提示采购、监控和评估要一起设计。",
     url: "https://techcrunch.com/example-token-routing-costs/",
     source: "TechCrunch AI",
     event_date: "2026-05-15",
@@ -434,9 +434,8 @@ try {
   assert.equal(await page.locator(".card-media-grid img[src^='http']").count(), 0);
   const builderCardsText = await page.locator(".builder-card-grid").textContent();
   assert.match(builderCardsText, /@examplebuilder/);
-  assert.match(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
-  assert.match(builderCardsText, /原文/);
   assert.match(builderCardsText, /Coding agents need eval loops before unattended work/);
+  assert.doesNotMatch(builderCardsText, /Coding agent 在无人值守工作之前需要 eval loops/);
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
   const trackingComponent = page.locator("[data-tracking-component][data-component-kind='openrouter_rankings']");
   assert.equal(await trackingComponent.count(), 1);
@@ -530,11 +529,11 @@ try {
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   if (await page.locator(".builder-card > p").count()) {
     await page.locator(".builder-card > p").first().evaluate((node) => {
-      node.textContent = "Finally! the first eval ship from cog. To contextualize: METR evals cap out at about 16 hours, while Cog has private enterprise evals up to 100 hours.";
+      node.textContent = "这条 X/Twitter 讨论适合继续核对原帖，但事实性结论仍需更多来源确认。";
     });
     const weakBuilderChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
     assert.equal(weakBuilderChecklist.ok, false);
-    assert(weakBuilderChecklist.issues.some((issue) => issue.id === "builder_cards_translated"));
+    assert(weakBuilderChecklist.issues.some((issue) => issue.id === "builder_cards_original_text"));
   }
 } finally {
   await browser.close();
