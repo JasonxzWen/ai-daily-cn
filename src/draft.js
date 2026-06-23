@@ -25,6 +25,7 @@ import { selectOfficialOrgUpdates } from "./official-updates.js";
 import { buildTrackingComponentSnapshot } from "./tracking-components.js";
 import { normalizeOfficialComponentSnapshot } from "./official-component-snapshot.js";
 import { normalizeStoryFirstReport } from "./story-first.js";
+import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -207,7 +208,7 @@ const HUGGINGFACE_TRENDING_TARGET = 10;
 const PROJECT_TARGET = 10;
 const HOT_BLOG_TARGET = 8;
 const BUILDER_OBSERVATION_TARGET = 12;
-const COMMUNITY_LEAD_TARGET = 24;
+const COMMUNITY_LEAD_TARGET = 6;
 const COMMUNITY_PAPER_TARGET = 3;
 const COMMUNITY_GITHUB_TARGET = 3;
 const COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET = 2;
@@ -266,6 +267,7 @@ export async function generateReportDraft(options = {}) {
     generatedAt,
     selection,
     sourceAudit,
+    candidates: candidatePool.candidates,
     evidenceAssets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets)
   });
   const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
@@ -974,7 +976,7 @@ function modelLaunchTopicKey(candidate) {
   return releaseLike ? `model:${namedModel[0].replace(/\s+/g, "-").toLowerCase()}` : "";
 }
 
-function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evidenceAssets }) {
+function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, candidates = [], evidenceAssets }) {
   const aigcCount = selection.main_items.filter((item) => item.editorial_category === "content_aigc").length +
     selection.community_leads.filter((item) => item.editorial_category === "content_aigc").length;
   const report = {
@@ -990,6 +992,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     },
     hero_highlights: selectHeroHighlights(selection),
     source_audit: sourceAudit,
+    source_effectiveness: buildSourceEffectivenessTable({ report: { source_audit: sourceAudit }, candidates }),
     stories: selection.stories || [],
     main_items: selection.main_items,
     github_trending: selection.github_trending,
@@ -1359,9 +1362,30 @@ function stripDraftPublicBodyNoise(value, item = {}) {
     .replace(/[，,]?\s*(?:不进入|未进入)\s*AI\s*主体事实[。；;]?/gi, "")
     .replace(/\s{2,}/g, " ")
     .trim();
+  text = stripLeadingChinesePolicyBoilerplate(text);
   text = rewritePublicStockPhrases(text);
   text = stripDraftSourcePrefixes(text, item);
   return text.trim();
+}
+
+function stripLeadingChinesePolicyBoilerplate(value) {
+  let text = String(value || "").trim();
+  for (let index = 0; index < 4; index += 1) {
+    const match = text.match(/^([^。！？!?]{8,240}[。！？!?])\s*/u);
+    if (!match || !isChinesePolicyBoilerplateSentence(match[1])) {
+      break;
+    }
+    text = text.slice(match[0].length).trimStart();
+  }
+  return text
+    .replace(/^在这一(?:战略|政策|产业|行业)?背景下[，,]\s*/u, "")
+    .trim();
+}
+
+function isChinesePolicyBoilerplateSentence(sentence) {
+  return /人工智能作为|新质生产力|国家战略|人工智能\+|千行百业|深度融合|核心引擎|产业落地门槛|开放共享的国产AI生态/u.test(
+    String(sentence || "")
+  );
 }
 
 function rewritePublicStockPhrases(value) {
@@ -1996,7 +2020,7 @@ function communityLeadPublicSummary(candidate) {
 }
 
 function hasCommunityLeadReaderMaterial(candidate) {
-  return Boolean(communityLeadReaderMaterial(candidate));
+  return isPublishableCommunityLeadReaderMaterial(communityLeadReaderMaterial(candidate), candidate);
 }
 
 function communityLeadReaderMaterial(candidate) {
@@ -2018,6 +2042,55 @@ function communityLeadReaderMaterial(candidate) {
     }
   }
   return "";
+}
+
+function isPublishableCommunityLeadReaderMaterial(value, candidate = {}) {
+  const text = stripDraftPublicBodyNoise(value, candidate).replace(/\s+/g, " ").trim();
+  if (!text || isGenericCommunityLeadPublicText(text, candidate)) {
+    return false;
+  }
+  const hanCount = (text.match(/\p{Script=Han}/gu) || []).length;
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (sourceLevel === "intermediary" || sourceLevel === "community" || sourceLevel === "community_api") {
+    return text.length >= 80 && hanCount >= 30;
+  }
+  return text.length >= 50 && hanCount >= 20;
+}
+
+function isGenericCommunityLeadPublicText(value, candidate = {}) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const generic = genericChineseHeadline(candidate);
+  if (generic && text === generic) {
+    return true;
+  }
+  if (isPromotionalCommunityLeadPublicText(text, candidate)) {
+    return true;
+  }
+  return /(?:相关团队|相关平台|Nature|TechCrunch AI|Crunchbase AI|HNRSS Frontpage|Planet AI|NVIDIA|MIT Technology Review|Interconnects|Smol AI)更新(?:AI 产品、平台或工程实践|agent 工作流和开发工具能力)|披露模型能力和评估方法更新/u.test(text);
+}
+
+function isPromotionalCommunityLeadPublicText(value, candidate = {}) {
+  const combined = [
+    value,
+    candidate.title,
+    candidate.summary,
+    candidate.evidence,
+    candidate.source
+  ]
+    .filter(Boolean)
+    .map((item) => String(item).replace(/\s+/g, " ").trim())
+    .join(" ");
+  if (!combined) {
+    return false;
+  }
+  const promotionalEventSignal = /WAVES\s*2026|\u76db\u590f\u8d74\u7ea6|\u8fce\u98ce\u800c\u7acb|\u521b\u6295\u6d6a\u6f6e|\u521b\u6295\u5708|\u5e74\u5ea6\u98ce\u5411\u6807|\u98ce\u53e3/u.test(combined);
+  if (!promotionalEventSignal) {
+    return false;
+  }
+  const action = "\u53d1\u5e03|\u63a8\u51fa|\u4e0a\u7ebf|\u5f00\u6e90|\u5f00\u653e|\u53ef\u7528";
+  const object = "\u6a21\u578b|\u5927\u6a21\u578b|API|SDK|CLI|\u5de5\u5177|\u5e73\u53f0|\u4ea7\u54c1|\u8bba\u6587|\u57fa\u51c6|\u8bc4\u6d4b|\u6570\u636e\u96c6|Agent|agent|\u667a\u80fd\u4f53|\u8bed\u97f3\u514b\u9686|TTS";
+  const concreteAiFact = new RegExp(`(?:${action}).{0,24}(?:${object})|(?:${object}).{0,24}(?:${action})`, "u").test(combined);
+  return !concreteAiFact;
 }
 
 function communityLeadTitleForCandidate(candidate) {
@@ -3896,6 +3969,8 @@ function candidateScore(candidate) {
   if (isOriginalModelLaunchCandidate(candidate)) score += 120;
   if (isModelAvailabilityDuplicateCandidate(candidate)) score -= 90;
   if (/openai|anthropic|deepmind|google|meta|microsoft|qwen|zhipu|deepseek|bytedance|tencent|minimax|moonshot|kimi|alibaba|meituan|runway|pika|luma|kling|adobe/i.test(`${candidate.source} ${candidate.title}`)) score += 5;
+  if (isSpecificStrategicOfficialCandidate(candidate)) score += 30;
+  if (isGenericOfficialPlatformUpdateCandidate(candidate)) score -= 80;
   if (isLowValueMainCandidate(candidate)) score -= 40;
   return score;
 }
@@ -4121,6 +4196,22 @@ function strategicCoreOfficialScore(candidate) {
   if (candidate.category === "hot_blog") score += 20;
   if (isAigcCandidate(candidate)) score += 16;
   return score;
+}
+
+function isSpecificStrategicOfficialCandidate(candidate) {
+  if (!isStrategicCoreOfficialCandidate(candidate) || isGenericOfficialPlatformUpdateCandidate(candidate)) {
+    return false;
+  }
+  const title = String(candidate?.title || "").replace(/\s+/g, " ").trim();
+  if (!title || title.length < 12) {
+    return false;
+  }
+  return !/^(?:official|latest|new)\s+ai\s+(?:platform|product|model|governance)\s+update\b/i.test(title);
+}
+
+function isGenericOfficialPlatformUpdateCandidate(candidate) {
+  const title = String(candidate?.title || "").replace(/\s+/g, " ").trim();
+  return /^official ai platform update\s+\d+$/i.test(title);
 }
 
 function isStrategicCoreOfficialCandidate(candidate) {
@@ -5139,6 +5230,12 @@ function chineseLeadForCandidate(candidate) {
   if (/economic research exchange/.test(text)) {
     return "OpenAI 推出经济研究交流项目，面向 AI 经济影响研究";
   }
+  if (/patch the planet/.test(text)) {
+    return "OpenAI 推出开源维护者漏洞修复计划";
+  }
+  if (/codex[-\s]?maxxing|long-running work/.test(text)) {
+    return "OpenAI 总结长时间运行 Codex 的工程工作流实践";
+  }
   if (/train models faster with jax and maxtext|nvfp4.*blackwell|blackwell.*nvfp4/.test(text)) {
     return "英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速";
   }
@@ -5473,6 +5570,12 @@ function genericChineseFact(candidate, original) {
 
 function englishTitleToChineseHeadline(rawTitle, candidate = {}) {
   const lower = String(rawTitle || "").toLowerCase();
+  if (/patch the planet/.test(lower)) {
+    return "OpenAI 推出开源维护者漏洞修复计划";
+  }
+  if (/codex[-\s]?maxxing|long-running work/.test(lower)) {
+    return "OpenAI 总结长时间运行 Codex 的工程工作流实践";
+  }
   if (/security new features in may 2026/.test(lower)) {
     return "阿里云汇总 2026 年 5 月安全产品新功能";
   }

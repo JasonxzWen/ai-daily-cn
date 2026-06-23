@@ -763,6 +763,7 @@ function publicReportData(report) {
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
+  result.source_effectiveness = publicSourceEffectiveness(report?.source_effectiveness);
   result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
   return result;
 }
@@ -810,6 +811,28 @@ function publicHeroHighlights(highlights = []) {
       }
       return result;
     });
+}
+
+function publicSourceEffectiveness(rows = []) {
+  return arrayValue(rows)
+    .filter((row) => row?.id && row?.name)
+    .map((row) => ({
+      id: String(row.id || ""),
+      name: String(row.name || ""),
+      role: String(row.role || ""),
+      configured: Boolean(row.configured),
+      reachable: Boolean(row.reachable),
+      parsed_recent: Boolean(row.parsed_recent),
+      candidate_created: Boolean(row.candidate_created),
+      public_included: Boolean(row.public_included),
+      not_included_reason: String(row.not_included_reason || ""),
+      source_ids: arrayValue(row.source_ids).map((item) => String(item || "")).filter(Boolean),
+      source_kinds: arrayValue(row.source_kinds).map((item) => String(item || "")).filter(Boolean),
+      statuses: arrayValue(row.statuses).map((item) => String(item || "")).filter(Boolean),
+      candidate_count: Number.isInteger(row.candidate_count) ? row.candidate_count : 0,
+      included_count: Number.isInteger(row.included_count) ? row.included_count : 0,
+      notes: String(row.notes || "")
+    }));
 }
 
 function sanitizePublicValue(value, key = "") {
@@ -958,13 +981,11 @@ async function localizeSingleBuilderAvatar(outDir, report, item, writtenFiles, f
     return;
   }
   if (await exists(target)) {
-    item.avatar_local_path = relativePath;
     return;
   }
 
   const downloaded = await downloadImage(fetchImpl, avatarUrl, target);
   if (downloaded) {
-    item.avatar_local_path = relativePath;
     writtenFiles.push(relativePath);
   }
 }

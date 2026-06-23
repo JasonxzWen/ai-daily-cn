@@ -2024,7 +2024,7 @@ body.lightbox-open {
 
 .interactive-card {
   scroll-margin-top: 96px;
-  transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  transition: opacity 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
 .interactive-card:hover,
@@ -2055,10 +2055,8 @@ body.lightbox-open {
   opacity: 1;
 }
 
-.focus-field:has(.interactive-card:hover) .interactive-card:not(:hover),
 .focus-field.has-filter .interactive-card[hidden] {
   opacity: 0.42;
-  filter: grayscale(0.45);
 }
 
 .chip,

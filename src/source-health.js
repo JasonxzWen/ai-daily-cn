@@ -46,6 +46,12 @@ export async function checkSourcesHealth(options = {}) {
       }
 
       const text = await response.text();
+      const sourceSpecific = sourceSpecificHealthResult(source, text, response.status, reportDate);
+      if (sourceSpecific) {
+        results.push(sourceSpecific);
+        continue;
+      }
+
       const entries = parseFeedEntries(text);
       const feedLike = isFeedLike(text);
       const htmlIndex = source.source_kind === "html_index";
@@ -97,6 +103,66 @@ function skipReasonForSource(source) {
     };
   }
   return contentSourceSkipReason(source);
+}
+
+function sourceSpecificHealthResult(source, text, httpStatus, reportDate) {
+  const sourceKind = String(source?.source_kind || "").trim();
+  if (sourceKind === "github_report_markdown") {
+    const recentHints = countRecentMarkdownHints(text, reportDate);
+    const linkCount = markdownLinkCount(text);
+    const reachable = String(text || "").trim().length > 0;
+    return healthResult(source, reachable ? "checked" : "no_signal", {
+      http_status: httpStatus,
+      feed_like: false,
+      recent_48h_entries: recentHints,
+      notes: `source-specific github_report_markdown health; markdown_links=${linkCount}; recent_48h_hints=${recentHints}`
+    });
+  }
+
+  if (sourceKind === "search_api") {
+    const recordCount = jsonRecordCount(text);
+    return healthResult(source, recordCount > 0 ? "checked" : "no_signal", {
+      http_status: httpStatus,
+      feed_like: false,
+      recent_48h_entries: recordCount,
+      notes: `source-specific search_api health; api_records=${recordCount}`
+    });
+  }
+
+  return null;
+}
+
+function countRecentMarkdownHints(text, reportDate) {
+  const dates = String(text || "").match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
+  const recentDates = dates.filter((date) => isWithinHours(date, reportDate, 48)).length;
+  if (recentDates > 0) {
+    return recentDates;
+  }
+  return markdownLinkCount(text) > 0 ? 1 : 0;
+}
+
+function markdownLinkCount(text) {
+  return (String(text || "").match(/\[[^\]]+\]\(https?:\/\/[^)]+\)/g) || []).length;
+}
+
+function jsonRecordCount(text) {
+  try {
+    const value = JSON.parse(String(text || ""));
+    if (Array.isArray(value)) {
+      return value.length;
+    }
+    if (!value || typeof value !== "object") {
+      return 0;
+    }
+    for (const key of ["items", "results", "data", "hits", "stories"]) {
+      if (Array.isArray(value[key])) {
+        return value[key].length;
+      }
+    }
+    return Object.keys(value).length;
+  } catch {
+    return 0;
+  }
 }
 
 function healthResult(source, status, extra = {}) {

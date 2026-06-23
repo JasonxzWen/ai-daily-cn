@@ -120,6 +120,13 @@
     "source_audit": {
       "$ref": "#/$defs/source_audit"
     },
+    "source_effectiveness": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_effectiveness_row"
+      },
+      "default": []
+    },
     "quality_status": {
       "$ref": "#/$defs/quality_status",
       "default": {
@@ -2385,6 +2392,90 @@
           }
         }
       ]
+    },
+    "source_effectiveness_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "role",
+        "configured",
+        "reachable",
+        "parsed_recent",
+        "candidate_created",
+        "public_included",
+        "not_included_reason",
+        "source_ids",
+        "source_kinds",
+        "statuses",
+        "candidate_count",
+        "included_count",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string"
+        },
+        "configured": {
+          "type": "boolean"
+        },
+        "reachable": {
+          "type": "boolean"
+        },
+        "parsed_recent": {
+          "type": "boolean"
+        },
+        "candidate_created": {
+          "type": "boolean"
+        },
+        "public_included": {
+          "type": "boolean"
+        },
+        "not_included_reason": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "source_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "candidate_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "included_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
     },
     "source_audit": {
       "type": "object",

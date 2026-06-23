@@ -571,17 +571,27 @@ function affectedSectionIssues(status) {
 }
 
 function formatHeroDateRange(dateFrom, dateTo) {
+  const startParts = compactDateParts(dateFrom);
+  const endParts = compactDateParts(dateTo);
   const start = formatHeroDate(dateFrom);
   const end = formatHeroDate(dateTo);
   if (!start && !end) return "";
   if (!start) return end;
   if (!end || start === end) return start;
+  if (startParts && endParts && startParts.year === endParts.year && startParts.month === endParts.month) {
+    return `${startParts.month}.${startParts.day}-${endParts.day}`;
+  }
   return `${start}..${end}`;
 }
 
 function formatHeroDate(value) {
-  const match = String(value || "").match(/^\d{4}-(\d{2})-(\d{2})$/);
-  return match ? `${match[1]}-${match[2]}` : "";
+  const parts = compactDateParts(value);
+  return parts ? `${parts.month}.${parts.day}` : "";
+}
+
+function compactDateParts(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? { year: match[1], month: match[2], day: match[3] } : null;
 }
 
 export async function renderReportWithEffectiveInteract(report, options = {}) {
@@ -1383,11 +1393,11 @@ function formatDailyTrackingCards(items, context = {}) {
     const component = trackingComponentForInteraction(item);
     const invalidOfficialSnapshot = hasInvalidOfficialTrackingSnapshot(item);
     const unavailable = isDailyTrackingSourceUnavailable(item) || invalidOfficialSnapshot;
-    const hasOfficialSnapshot = Boolean(component?.officialSnapshot?.html);
     const entries = unavailable ? [] : dailyTrackingLeaderboardEntries(item);
-    const stats = unavailable || hasOfficialSnapshot ? [] : dailyTrackingStats(item, entries);
-    const bars = unavailable || hasOfficialSnapshot ? { rows: [] } : dailyTrackingProviderBars(entries);
-    const table = unavailable || hasOfficialSnapshot ? { rows: [] } : dailyTrackingTable(item, entries);
+    const publicComponent = unavailable ? null : dailyTrackingPublicComponent(component, entries);
+    const stats = unavailable ? [] : dailyTrackingStats(item, entries);
+    const bars = unavailable ? { rows: [] } : dailyTrackingProviderBars(entries);
+    const table = unavailable ? { rows: [] } : dailyTrackingTable(item, entries);
     const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
       limit: 5,
       ...(context.mediaOptions || {})
@@ -1406,12 +1416,25 @@ function formatDailyTrackingCards(items, context = {}) {
       ].filter(Boolean),
       points: [],
       ...(media.length > 0 ? { media } : {}),
-      ...(component && !unavailable ? { component } : {}),
+      ...(publicComponent ? { component: publicComponent } : {}),
       ...(stats.length > 0 ? { stats } : {}),
       ...(bars.rows.length > 0 ? { bars } : {}),
       ...(table.rows.length > 0 ? { table } : {})
     };
   });
+}
+
+function dailyTrackingPublicComponent(component, entries) {
+  if (!component || typeof component !== "object") {
+    return null;
+  }
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return component;
+  }
+  const sanitized = { ...component };
+  delete sanitized.officialSnapshot;
+  delete sanitized.official_component_snapshot;
+  return sanitized;
 }
 
 function dailyTrackingLeaderboardEntries(item) {
@@ -1618,7 +1641,7 @@ function formatDailyTrackingBody(item, entries) {
     const biggest = biggestTrackingChange(entries);
     const newEntries = entries.filter((entry) => entry.change === "NEW");
     const parts = [
-      `这是公开榜单信号，不等同模型能力评测。榜首 ${top.model}${top.provider ? `（${top.provider}）` : ""}${top.tokens ? `，${top.tokens}` : ""}${top.change ? `，${top.change}` : ""}`,
+      `榜首 ${top.model}${top.provider ? `（${top.provider}）` : ""}${top.tokens ? `，${top.tokens}` : ""}${top.change ? `，${top.change}` : ""}`,
       biggest && biggest !== top ? `最大周变化是 ${biggest.model}（${biggest.change}）` : "",
       newEntries.length > 0 ? `新进榜：${newEntries.map((entry) => entry.model).join("、")}` : ""
     ].filter(Boolean);
@@ -1717,9 +1740,8 @@ function formatOfficialOrgUpdateCards(items, context = {}) {
 
 function formatBuilderObservationCards(items, report, context = {}) {
   return items.map((item) => {
-    const translation = builderTranslationText(item);
     const handle = builderHandle(item);
-    const originalText = compactBuilderOriginalText(builderOriginalText(item));
+    const body = builderOriginalBodyText(item);
     const media = formatBuilderMedia(report, item, context.mediaOptions || {});
     const displayName = builderDisplayName(item, handle);
 
@@ -1728,8 +1750,8 @@ function formatBuilderObservationCards(items, report, context = {}) {
       title: displayName,
       href: item.url,
       subtitle: handle ? `@${handle}` : "",
-      titleIcon: builderAvatarIcon(report, item),
-      body: formatDailyInlineText(translation, item),
+      titleIcon: builderAvatarIcon(report, item, context.mediaOptions || {}),
+      body: formatDailyInlineText(body, item),
       showGroup: false,
       tags: [
         cardTag(importanceTagFor("builder_observations", item)),
@@ -1737,10 +1759,25 @@ function formatBuilderObservationCards(items, report, context = {}) {
         item.role ? cardTag(item.role, "topic") : "",
         item.event_date ? cardTag(item.event_date, "date") : ""
       ].filter(Boolean),
-      points: originalText ? [{ label: "原文", value: originalText }] : [],
+      points: [],
       ...(media.length > 0 ? { media } : {})
     };
   });
+}
+
+function builderOriginalBodyText(item) {
+  const original = compactBuilderOriginalText(builderOriginalText(item));
+  if (original) {
+    return original;
+  }
+  return compactBuilderOriginalText(
+    item?.content ||
+    item?.text ||
+    item?.summary ||
+    item?.translation ||
+    item?.translated_text ||
+    ""
+  );
 }
 
 function builderTranslationText(item) {
@@ -1843,12 +1880,16 @@ function builderHandle(item) {
   }
 }
 
-function builderAvatarIcon(report, item) {
+function builderAvatarIcon(report, item, options = {}) {
   if (item?.avatar_data_uri) {
     return item.avatar_data_uri;
   }
   if (item?.avatar_local_path && report?.html_path) {
-    return relativeAssetHref(report.html_path, item.avatar_local_path);
+    const assetRootDir = options.assetRootDir || "";
+    const assetPath = assetRootDir ? path.join(assetRootDir, item.avatar_local_path) : "";
+    if (!assetRootDir || fsSync.existsSync(assetPath)) {
+      return relativeAssetHref(report.html_path, item.avatar_local_path);
+    }
   }
   return generatedSiteIcon(siteInitials(item?.author || builderHandle(item) || "Builder"), "#111827", "#ffffff");
 }
@@ -2407,7 +2448,7 @@ function formatCommunityLeadCards(items, context = {}) {
   const leads = items.filter((item) => !isLowSignalStatuspageLead(item));
   return leads.map((item) => {
     const body = communityLeadBody(item);
-    if (!isReaderFacingChineseBody(body)) {
+    if (!isPublishableCommunityLeadBody(body, item)) {
       return null;
     }
     const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
@@ -2480,15 +2521,15 @@ function platformCardBody(item, platform) {
   const originalTitle = platformOriginalTitle(item);
   const text = `${originalTitle} ${raw}`;
   if (/xiaomi|mimo|1,?000\+?\s*(?:tps|tokens?\/sec)|1t model|8-gpu/i.test(text)) {
-    return "原帖讨论小米 MiMo-V2.5-Pro UltraSpeed 声称在标准 8-GPU 节点上让 1T MoE 模型达到 1000+ tokens/sec 输出。这是社区线索，尚需等待官方原文或独立 benchmark。";
+    return "原帖讨论小米 MiMo-V2.5-Pro UltraSpeed 声称在标准 8-GPU 节点上让 1T MoE 模型达到 1000+ tokens/sec 输出。";
   }
   if (/gemma.*4[-\s]?bit.*qat|4[-\s]?bit.*qat.*8[-\s]?bit|benchmark/i.test(text)) {
-    return "原帖在找 Gemma 4-bit QAT 与传统 8-bit PTQ 量化的直接 benchmark，重点是准确率和速度是否有硬数据对比。这是 Reddit 讨论线索，不等同于已确认结论。";
+    return "原帖在找 Gemma 4-bit QAT 与传统 8-bit PTQ 量化的直接 benchmark，重点是准确率和速度是否有硬数据对比。";
   }
   if (containsChineseText(raw) && !isGeneratedPlatformTitle(raw)) {
     return trimText(raw, 180);
   }
-  return `${platformItemLabel(platform)}出现一条讨论线索：${trimText(originalTitle || raw, 90)}。这不是一手确认事实，需要回到原帖和后续来源核对。`;
+  return trimText(originalTitle || raw, 180);
 }
 
 function platformOriginalTitle(item) {
@@ -2520,6 +2561,9 @@ function summarizeCommunityLeadBody(text, title) {
   let body = originalBody;
   if (title && body.startsWith(title)) {
     body = body.slice(title.length).replace(/^[，,；;：:\s]+/u, "").trim();
+    if (!body.replace(/[。！？!?；;，,：:\s]+/gu, "")) {
+      return trimText(originalBody, 160);
+    }
   }
   const sentences = body
     .split(/(?<=[。！？!?；;])\s*/u)
@@ -2548,17 +2592,16 @@ function communityLeadBody(item) {
   }
   const title = stripSentenceEnding(stripPublicBodySourcePrefix(communityLeadTitle(item), item));
   const summarizedPrimaryBody = summarizeCommunityLeadBody(primaryBody, title);
-  const expandedPrimaryBody = expandCommunityLeadBody(summarizedPrimaryBody, item, title);
-  if (isReaderFacingChineseBody(expandedPrimaryBody)) {
-    return expandedPrimaryBody;
+  const cleanedPrimaryBody = stripCommunityLeadFallbackBoilerplate(summarizedPrimaryBody, item);
+  if (isReaderFacingChineseBody(cleanedPrimaryBody)) {
+    return trimText(cleanedPrimaryBody, 220);
   }
   const fallbackBody = stripCommunityLeadFallbackBoilerplate(rawBody, item);
   const summarizedFallbackBody = summarizeCommunityLeadBody(fallbackBody, title);
-  const expandedFallbackBody = expandCommunityLeadBody(summarizedFallbackBody, item, title);
-  if (expandedFallbackBody) {
-    return expandedFallbackBody;
+  if (isReaderFacingChineseBody(summarizedFallbackBody)) {
+    return trimText(summarizedFallbackBody, 220);
   }
-  return expandCommunityLeadBody(summarizedPrimaryBody || trimText(primaryBody || rawBody, 160), item, title);
+  return trimText(cleanedPrimaryBody || summarizedFallbackBody || fallbackBody || primaryBody || rawBody, 220);
 }
 
 function expandCommunityLeadBody(value, item = {}, title = "") {
@@ -2627,6 +2670,23 @@ function isReaderFacingChineseBody(value) {
   const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
   const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
   return chineseChars >= 10 && chineseRatio >= 0.35 && !longEnglishRun;
+}
+
+function isPublishableCommunityLeadBody(value, item = {}) {
+  if (isReaderFacingChineseBody(value)) {
+    return true;
+  }
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text || !item?.url) {
+    return false;
+  }
+  const textWithoutUrls = text.replace(/https?:\/\/\S+/gi, "").trim();
+  const chineseChars = (text.match(/\p{Script=Han}/gu) || []).length;
+  const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
+  if (chineseChars >= 4 && text.length >= 18 && !longEnglishRun) {
+    return true;
+  }
+  return Boolean(item?.source || item?.source_level || item?.publisher) && text.length >= 18;
 }
 
 function shouldPreferCommunityLeadBodyTitle(title, fallbackTitle) {

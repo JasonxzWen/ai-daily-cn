@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T02:21:34.986Z",
+  "generated_at": "2026-06-23T08:45:44.464Z",
   "notes": "Daily source status history; one record per date/group/source. Repeated generation for the same day overwrites the same source key.",
   "records": [
     {
@@ -38059,14 +38059,26 @@
     {
       "date": "2026-06-23",
       "group": "builder_sources",
+      "source_key": "https://example.com",
+      "name": "Missing builder_sources discovery output",
+      "url": "https://example.com/",
+      "status": "no_signal",
+      "notes": "report:draft did not receive this discovery output",
+      "candidates_found": 0,
+      "included": 0,
+      "observed_at": "2026-06-23T08:45:44.464Z"
+    },
+    {
+      "date": "2026-06-23",
+      "group": "builder_sources",
       "source_key": "https://huyenchip.com/feed.xml",
       "name": "Chip Huyen Blog",
       "url": "https://huyenchip.com/feed.xml",
       "status": "no_signal",
       "notes": "0 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38077,8 +38089,8 @@
       "status": "no_signal",
       "notes": "0 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38089,8 +38101,8 @@
       "status": "no_signal",
       "notes": "0 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38101,8 +38113,8 @@
       "status": "no_signal",
       "notes": "0 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38113,8 +38125,8 @@
       "status": "checked",
       "notes": "27 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38125,8 +38137,8 @@
       "status": "checked",
       "notes": "5 recent original entries parsed",
       "candidates_found": 25,
-      "included": 9,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "included": 8,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38134,12 +38146,12 @@
       "source_key": "http://export.arxiv.org/api/query?search_query=cat:cs.ai&sortby=submitteddate&sortorder=descending&max_results=20",
       "name": "arXiv cs.AI",
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "checked",
+      "notes": "20 recent intermediary lead entries parsed",
+      "parsed_count": 20,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38150,9 +38162,9 @@
       "status": "checked",
       "notes": "30 recent intermediary lead entries parsed",
       "parsed_count": 30,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38163,9 +38175,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38176,9 +38188,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38189,9 +38201,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38201,9 +38213,9 @@
       "url": "https://api-docs.deepseek.com/news",
       "status": "blocked",
       "notes": "HTTP 404",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38213,9 +38225,9 @@
       "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
       "status": "checked",
       "notes": "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38226,9 +38238,9 @@
       "status": "checked",
       "notes": "3 recent blog/interview entries parsed",
       "parsed_count": 3,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38239,9 +38251,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38252,9 +38264,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38264,9 +38276,9 @@
       "url": "https://blog.adobe.com/en/topics/ai",
       "status": "blocked",
       "notes": "HTTP 404",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38277,9 +38289,9 @@
       "status": "checked",
       "notes": "1 recent blog/interview entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38288,11 +38300,11 @@
       "name": "Google Keyword Blog",
       "url": "https://blog.google/rss/",
       "status": "checked",
-      "notes": "5 recent intermediary lead entries parsed",
-      "parsed_count": 5,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "6 recent intermediary lead entries parsed",
+      "parsed_count": 6,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38303,9 +38315,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38316,9 +38328,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38329,9 +38341,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38342,9 +38354,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38353,11 +38365,11 @@
       "name": "NVIDIA Developer Blog",
       "url": "https://developer.nvidia.com/blog/feed/",
       "status": "checked",
-      "notes": "4 recent blog/interview entries parsed",
-      "parsed_count": 4,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "5 recent blog/interview entries parsed",
+      "parsed_count": 5,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38368,9 +38380,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38381,9 +38393,21 @@
       "status": "checked",
       "notes": "1 recent blog/interview entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
+    },
+    {
+      "date": "2026-06-23",
+      "group": "content_sources",
+      "source_key": "https://example.com",
+      "name": "Missing content_sources discovery output",
+      "url": "https://example.com/",
+      "status": "no_signal",
+      "notes": "report:draft did not receive this discovery output",
+      "candidates_found": 0,
+      "included": 0,
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -38392,11 +38416,11 @@
       "name": "Ars Technica",
       "url": "https://feeds.arstechnica.com/arstechnica/index",
       "status": "checked",
-      "notes": "14 recent intermediary lead entries parsed",
-      "parsed_count": 14,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "15 recent intermediary lead entries parsed",
+      "parsed_count": 15,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38407,9 +38431,9 @@
       "status": "checked",
       "notes": "1 recent blog/interview entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38420,9 +38444,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38433,9 +38457,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38446,9 +38470,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38459,9 +38483,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38472,9 +38496,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38485,9 +38509,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38498,9 +38522,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38511,9 +38535,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38524,9 +38548,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38537,9 +38561,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38550,9 +38574,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38563,9 +38587,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38576,9 +38600,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38589,9 +38613,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38602,9 +38626,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38615,9 +38639,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38628,9 +38652,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38641,9 +38665,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38652,11 +38676,11 @@
       "name": "Hacker News Topstories API",
       "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
       "status": "checked",
-      "notes": "10 recent intermediary lead entries parsed",
-      "parsed_count": 10,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "13 recent intermediary lead entries parsed",
+      "parsed_count": 13,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38665,11 +38689,11 @@
       "name": "HNRSS Frontpage",
       "url": "https://hnrss.org/frontpage",
       "status": "checked",
-      "notes": "20 recent intermediary lead entries parsed; retry_succeeded_after_1",
+      "notes": "20 recent intermediary lead entries parsed",
       "parsed_count": 20,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38680,9 +38704,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38691,11 +38715,11 @@
       "name": "Hugging Face Blog",
       "url": "https://huggingface.co/blog/feed.xml",
       "status": "checked",
-      "notes": "1 recent blog/interview entries parsed",
-      "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "3 recent blog/interview entries parsed",
+      "parsed_count": 3,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38706,9 +38730,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38719,9 +38743,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38732,9 +38756,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38745,9 +38769,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38758,9 +38782,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38771,9 +38795,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38784,9 +38808,9 @@
       "status": "checked",
       "notes": "3 recent intermediary lead entries parsed",
       "parsed_count": 3,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38797,9 +38821,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38810,9 +38834,9 @@
       "status": "checked",
       "notes": "2 recent intermediary lead entries parsed",
       "parsed_count": 2,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38823,9 +38847,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38836,9 +38860,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38849,9 +38873,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38859,12 +38883,11 @@
       "source_key": "https://ir.baidu.com/index.php/press-releases",
       "name": "Baidu Press Releases",
       "url": "https://ir.baidu.com/index.php/press-releases",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "blocked",
+      "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1",
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38875,9 +38898,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38888,9 +38911,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38901,9 +38924,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38914,9 +38937,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38927,9 +38950,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38939,9 +38962,9 @@
       "url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
       "status": "checked",
       "notes": "official_page_snapshot_static_fallback; 10 rows parsed; fallback_reason=parsed_0_rows",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38952,9 +38975,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38965,9 +38988,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38978,9 +39001,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -38990,9 +39013,9 @@
       "url": "https://mp.weixin.qq.com/",
       "status": "no_signal",
       "notes": "no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39003,9 +39026,9 @@
       "status": "checked",
       "notes": "5 recent intermediary lead entries parsed",
       "parsed_count": 5,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39014,11 +39037,11 @@
       "name": "Google News AIGC Video Image Game RSS",
       "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "56 recent intermediary lead entries parsed",
-      "parsed_count": 56,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "57 recent intermediary lead entries parsed",
+      "parsed_count": 57,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39027,11 +39050,11 @@
       "name": "Google News Official Open Source Watch RSS",
       "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "25 recent intermediary lead entries parsed",
-      "parsed_count": 25,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "26 recent intermediary lead entries parsed",
+      "parsed_count": 26,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39040,11 +39063,11 @@
       "name": "Google News Big Tech Company Watch RSS",
       "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20Google%20OR%20Microsoft%20OR%20Apple%20OR%20Meta%20OR%20Amazon%20OR%20NVIDIA%20OR%20xAI)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20conference%20OR%20GitHub%20OR%20%22open%20source%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "4 recent intermediary lead entries parsed",
-      "parsed_count": 4,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "3 recent intermediary lead entries parsed",
+      "parsed_count": 3,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39055,9 +39078,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39068,9 +39091,9 @@
       "status": "checked",
       "notes": "100 recent intermediary lead entries parsed",
       "parsed_count": 100,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39079,11 +39102,11 @@
       "name": "Google News AI Policy RSS",
       "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "33 recent intermediary lead entries parsed",
-      "parsed_count": 33,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "37 recent intermediary lead entries parsed",
+      "parsed_count": 37,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39092,11 +39115,11 @@
       "name": "Google News AIGC Content Industry RSS",
       "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "42 recent intermediary lead entries parsed",
-      "parsed_count": 42,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "43 recent intermediary lead entries parsed",
+      "parsed_count": 43,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39104,12 +39127,12 @@
       "source_key": "https://news.smol.ai/rss.xml",
       "name": "Smol AI News",
       "url": "https://news.smol.ai/rss.xml",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "checked",
+      "notes": "1 recent intermediary lead entries parsed",
+      "parsed_count": 1,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39118,11 +39141,11 @@
       "name": "NVIDIA Newsroom RSS",
       "url": "https://nvidianews.nvidia.com/rss.xml",
       "status": "checked",
-      "notes": "9 recent intermediary lead entries parsed",
-      "parsed_count": 9,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "10 recent intermediary lead entries parsed",
+      "parsed_count": 10,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39131,11 +39154,11 @@
       "name": "OpenAI Blog RSS",
       "url": "https://openai.com/blog/rss.xml",
       "status": "checked",
-      "notes": "4 recent blog/interview entries parsed",
-      "parsed_count": 4,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "5 recent blog/interview entries parsed",
+      "parsed_count": 5,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39144,11 +39167,11 @@
       "name": "OpenAI News RSS",
       "url": "https://openai.com/news/rss.xml",
       "status": "checked",
-      "notes": "4 recent blog/interview entries parsed",
-      "parsed_count": 4,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "5 recent blog/interview entries parsed",
+      "parsed_count": 5,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39158,9 +39181,9 @@
       "url": "https://openrouter.ai/rankings",
       "status": "checked",
       "notes": "public_page_snapshot; 10 top models parsed; collection_method=playwright_dom",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39171,9 +39194,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39184,9 +39207,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39197,9 +39220,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39210,9 +39233,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39223,9 +39246,9 @@
       "status": "checked",
       "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/content/HelloGitHub122.md; report_title=第_122_期; 30 within 45d source window",
       "parsed_count": 30,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39236,9 +39259,9 @@
       "status": "checked",
       "notes": "10 report entries parsed; latest_report_url=https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/years/2026.md#top-ai-papers-of-the-week-june-14---june-21---2026; report_title=Top_AI_Papers_of_the_Week_(June_14_-_June_21); 10 within 14d source window",
       "parsed_count": 10,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39249,9 +39272,9 @@
       "status": "checked",
       "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-400.md; report_title=rsync_的争论; 30 within 14d source window",
       "parsed_count": 30,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39262,9 +39285,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39275,9 +39298,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39288,9 +39311,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39301,9 +39324,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39312,11 +39335,11 @@
       "name": "SSPAI",
       "url": "https://sspai.com/feed",
       "status": "checked",
-      "notes": "7 recent intermediary lead entries parsed",
-      "parsed_count": 7,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "9 recent intermediary lead entries parsed",
+      "parsed_count": 9,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39327,9 +39350,9 @@
       "status": "checked",
       "notes": "11 recent intermediary lead entries parsed",
       "parsed_count": 11,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39340,9 +39363,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39353,9 +39376,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39366,9 +39389,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39379,9 +39402,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39389,12 +39412,12 @@
       "source_key": "https://www.aboutamazon.com/news/rss",
       "name": "Amazon News",
       "url": "https://www.aboutamazon.com/news/rss",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "checked",
+      "notes": "1 recent intermediary lead entries parsed",
+      "parsed_count": 1,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39403,11 +39426,11 @@
       "name": "Alibaba Cloud Blog",
       "url": "https://www.alibabacloud.com/blog",
       "status": "checked",
-      "notes": "6 recent blog/interview entries parsed",
-      "parsed_count": 6,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "11 recent blog/interview entries parsed",
+      "parsed_count": 11,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39418,9 +39441,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39431,9 +39454,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39444,9 +39467,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39457,9 +39480,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39470,9 +39493,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39483,9 +39506,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39495,9 +39518,9 @@
       "url": "https://www.fastcompany.com/section/creator-economy",
       "status": "blocked",
       "notes": "HTTP 403",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39508,9 +39531,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39519,11 +39542,11 @@
       "name": "InfoQ CN",
       "url": "https://www.infoq.cn/feed",
       "status": "checked",
-      "notes": "14 recent intermediary lead entries parsed",
-      "parsed_count": 14,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "16 recent intermediary lead entries parsed",
+      "parsed_count": 16,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39534,9 +39557,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39547,9 +39570,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39560,9 +39583,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39571,11 +39594,11 @@
       "name": "Latent.Space",
       "url": "https://www.latent.space/feed",
       "status": "checked",
-      "notes": "2 recent intermediary lead entries parsed",
-      "parsed_count": 2,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "3 recent intermediary lead entries parsed",
+      "parsed_count": 3,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39584,11 +39607,11 @@
       "name": "Leiphone",
       "url": "https://www.leiphone.com/feed",
       "status": "checked",
-      "notes": "12 recent intermediary lead entries parsed",
-      "parsed_count": 12,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "20 recent intermediary lead entries parsed",
+      "parsed_count": 20,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39599,9 +39622,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39612,9 +39635,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39625,9 +39648,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39638,9 +39661,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39651,9 +39674,9 @@
       "status": "checked",
       "notes": "1 recent intermediary lead entries parsed",
       "parsed_count": 1,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39664,9 +39687,9 @@
       "status": "checked",
       "notes": "50 recent intermediary lead entries parsed",
       "parsed_count": 50,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39677,9 +39700,9 @@
       "status": "checked",
       "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed",
       "parsed_count": 50,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39690,9 +39713,9 @@
       "status": "checked",
       "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed",
       "parsed_count": 50,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39701,11 +39724,11 @@
       "name": "QbitAI",
       "url": "https://www.qbitai.com/feed",
       "status": "checked",
-      "notes": "7 recent intermediary lead entries parsed",
-      "parsed_count": 7,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "notes": "10 recent intermediary lead entries parsed",
+      "parsed_count": 10,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39715,9 +39738,9 @@
       "url": "https://www.reddit.com/r/MachineLearning/.json",
       "status": "blocked",
       "notes": "HTTP 403",
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39728,9 +39751,9 @@
       "status": "checked",
       "notes": "3 recent intermediary lead entries parsed",
       "parsed_count": 3,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39741,9 +39764,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39751,12 +39774,12 @@
       "source_key": "https://www.tencent.com/en-us/media.html",
       "name": "Tencent Media Center",
       "url": "https://www.tencent.com/en-us/media.html",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "checked",
+      "notes": "2 recent intermediary lead entries parsed",
+      "parsed_count": 2,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39764,12 +39787,12 @@
       "source_key": "https://www.tencent.com/zh-cn/media.html",
       "name": "Tencent Newsroom CN",
       "url": "https://www.tencent.com/zh-cn/media.html",
-      "status": "no_signal",
-      "notes": "0 recent intermediary lead entries parsed",
-      "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "status": "checked",
+      "notes": "2 recent intermediary lead entries parsed",
+      "parsed_count": 2,
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39780,9 +39803,9 @@
       "status": "checked",
       "notes": "4 recent intermediary lead entries parsed",
       "parsed_count": 4,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39793,9 +39816,9 @@
       "status": "checked",
       "notes": "10 recent intermediary lead entries parsed",
       "parsed_count": 10,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39806,9 +39829,9 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39819,9 +39842,9 @@
       "status": "no_signal",
       "notes": "0 recent intermediary lead entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39832,9 +39855,21 @@
       "status": "no_signal",
       "notes": "0 recent blog/interview entries parsed",
       "parsed_count": 0,
-      "candidates_found": 154,
-      "included": 33,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "candidates_found": 172,
+      "included": 9,
+      "observed_at": "2026-06-23T08:25:16.734Z"
+    },
+    {
+      "date": "2026-06-23",
+      "group": "github_trending",
+      "source_key": "https://example.com",
+      "name": "Missing github_trending discovery output",
+      "url": "https://example.com/",
+      "status": "no_signal",
+      "notes": "report:draft did not receive this discovery output",
+      "candidates_found": 0,
+      "included": 0,
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -39847,7 +39882,7 @@
       "parsed_count": 16,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39860,7 +39895,7 @@
       "parsed_count": 18,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39873,7 +39908,7 @@
       "parsed_count": 23,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39886,7 +39921,7 @@
       "parsed_count": 21,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39899,7 +39934,7 @@
       "parsed_count": 22,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39912,7 +39947,7 @@
       "parsed_count": 23,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39925,7 +39960,7 @@
       "parsed_count": 14,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39938,7 +39973,7 @@
       "parsed_count": 17,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39951,7 +39986,7 @@
       "parsed_count": 16,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39964,7 +39999,7 @@
       "parsed_count": 18,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39977,7 +40012,7 @@
       "parsed_count": 15,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -39990,7 +40025,7 @@
       "parsed_count": 21,
       "candidates_found": 178,
       "included": 30,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -40002,7 +40037,7 @@
       "notes": "6 shadow candidates; provider_timeout_exceeded_45000ms",
       "candidates_found": 40,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -40014,7 +40049,19 @@
       "notes": "34 shadow candidates",
       "candidates_found": 40,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
+    },
+    {
+      "date": "2026-06-23",
+      "group": "search_sources",
+      "source_key": "https://example.com",
+      "name": "Missing search_sources discovery output",
+      "url": "https://example.com/",
+      "status": "no_signal",
+      "notes": "report:draft did not receive this discovery output",
+      "candidates_found": 0,
+      "included": 0,
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40022,11 +40069,11 @@
       "source_key": "https://export.arxiv.org",
       "name": "arXiv",
       "url": "https://export.arxiv.org/",
-      "status": "blocked",
-      "notes": "provider_timeout_exceeded_45000ms",
+      "status": "no_signal",
+      "notes": "0 shadow candidates",
       "candidates_found": 40,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:25:16.734Z"
     },
     {
       "date": "2026-06-23",
@@ -40035,10 +40082,10 @@
       "name": "arXiv cs.AI",
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "status": "no_signal",
-      "notes": "20 feed entries parsed; 0 within 48h",
+      "notes": "source-specific search_api health; api_records=0",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40050,7 +40097,7 @@
       "notes": "30 feed entries parsed; 30 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40062,7 +40109,7 @@
       "notes": "10 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40074,7 +40121,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40086,7 +40133,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40098,7 +40145,7 @@
       "notes": "HTTP 404",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40110,7 +40157,7 @@
       "notes": "response is not feed-like",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40122,7 +40169,7 @@
       "notes": "20 feed entries parsed; 3 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40134,7 +40181,7 @@
       "notes": "10 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40146,7 +40193,7 @@
       "notes": "20 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40158,7 +40205,7 @@
       "notes": "HTTP 404",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40170,7 +40217,7 @@
       "notes": "20 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40179,10 +40226,10 @@
       "name": "Google Keyword Blog",
       "url": "https://blog.google/rss/",
       "status": "checked",
-      "notes": "20 feed entries parsed; 5 within 48h",
+      "notes": "20 feed entries parsed; 6 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40194,7 +40241,7 @@
       "notes": "10 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40206,7 +40253,7 @@
       "notes": "10 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40218,7 +40265,7 @@
       "notes": "100 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40230,7 +40277,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40239,10 +40286,10 @@
       "name": "NVIDIA Developer Blog",
       "url": "https://developer.nvidia.com/blog/feed/",
       "status": "checked",
-      "notes": "100 feed entries parsed; 3 within 48h",
+      "notes": "100 feed entries parsed; 4 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40254,7 +40301,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40266,7 +40313,7 @@
       "notes": "9 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40278,7 +40325,7 @@
       "notes": "kill_switch_enabled",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40290,7 +40337,7 @@
       "notes": "kill_switch_enabled",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40299,10 +40346,10 @@
       "name": "Ars Technica",
       "url": "https://feeds.arstechnica.com/arstechnica/index",
       "status": "checked",
-      "notes": "20 feed entries parsed; 12 within 48h",
+      "notes": "20 feed entries parsed; 13 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40314,7 +40361,7 @@
       "notes": "10 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40326,7 +40373,7 @@
       "notes": "10 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40338,7 +40385,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40350,7 +40397,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40362,7 +40409,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40374,7 +40421,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40386,7 +40433,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40398,7 +40445,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40410,7 +40457,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40422,7 +40469,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40434,7 +40481,7 @@
       "notes": "14 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40446,7 +40493,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40458,7 +40505,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40470,7 +40517,7 @@
       "notes": "11 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40482,7 +40529,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40494,7 +40541,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40506,7 +40553,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40518,7 +40565,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40530,7 +40577,7 @@
       "notes": "0 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40538,11 +40585,11 @@
       "source_key": "https://hacker-news.firebaseio.com/v0/topstories.json",
       "name": "Hacker News Topstories API",
       "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
-      "status": "blocked",
-      "notes": "response is not feed-like",
+      "status": "checked",
+      "notes": "source-specific search_api health; api_records=500",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40554,7 +40601,7 @@
       "notes": "20 feed entries parsed; 20 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40566,7 +40613,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40575,10 +40622,10 @@
       "name": "Hugging Face Blog",
       "url": "https://huggingface.co/blog/feed.xml",
       "status": "checked",
-      "notes": "804 feed entries parsed; 1 within 48h",
+      "notes": "806 feed entries parsed; 3 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40590,7 +40637,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40602,7 +40649,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40614,7 +40661,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40626,7 +40673,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40638,7 +40685,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40650,7 +40697,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40662,7 +40709,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40674,7 +40721,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40686,7 +40733,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40698,7 +40745,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40710,7 +40757,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40722,7 +40769,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40734,7 +40781,7 @@
       "notes": "The operation was aborted due to timeout; name=TimeoutError",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40746,7 +40793,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40758,7 +40805,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40770,7 +40817,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40782,7 +40829,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40790,11 +40837,11 @@
       "source_key": "https://kuaishou.gcs-web.com/news-events/company-news",
       "name": "Kuaishou Company News",
       "url": "https://kuaishou.gcs-web.com/news-events/company-news",
-      "status": "checked",
-      "notes": "html_index source is reachable; feed_like=false",
+      "status": "blocked",
+      "notes": "The operation was aborted due to timeout; name=TimeoutError",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40806,7 +40853,7 @@
       "notes": "HTTP 403",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40818,7 +40865,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40830,7 +40877,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40842,7 +40889,7 @@
       "notes": "10 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40854,7 +40901,7 @@
       "notes": "skipped_manual_source",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40866,7 +40913,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40875,10 +40922,10 @@
       "name": "Google News AIGC Video Image Game RSS",
       "url": "https://news.google.com/rss/search?q=(AI%20video%20OR%20AI%20image%20OR%20generative%20game%20OR%20AI%20game%20tools%20OR%20Runway%20OR%20Pika%20OR%20Luma%20OR%20Kling%20OR%20Firefly)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "56 feed entries parsed; 34 within 48h",
+      "notes": "57 feed entries parsed; 41 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40887,10 +40934,10 @@
       "name": "Google News Official Open Source Watch RSS",
       "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20DeepSeek%20OR%20Qwen%20OR%20Kimi%20OR%20Moonshot%20OR%20MiniMax%20OR%20Hunyuan%20OR%20Zhipu%20OR%20%22Meta%20Llama%22)%20(GitHub%20OR%20Hugging%20Face%20OR%20open-source%20OR%20%22model%20weights%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "25 feed entries parsed; 16 within 48h",
+      "notes": "26 feed entries parsed; 21 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40899,10 +40946,10 @@
       "name": "Google News Big Tech Company Watch RSS",
       "url": "https://news.google.com/rss/search?q=(OpenAI%20OR%20Anthropic%20OR%20Google%20OR%20Microsoft%20OR%20Apple%20OR%20Meta%20OR%20Amazon%20OR%20NVIDIA%20OR%20xAI)%20(earnings%20OR%20layoffs%20OR%20reorganization%20OR%20regulation%20OR%20partnership%20OR%20product%20OR%20conference%20OR%20GitHub%20OR%20%22open%20source%22)%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "100 feed entries parsed; 3 within 48h",
+      "notes": "100 feed entries parsed; 2 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40914,7 +40961,7 @@
       "notes": "100 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40926,7 +40973,7 @@
       "notes": "100 feed entries parsed; 100 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40935,10 +40982,10 @@
       "name": "Google News AI Policy RSS",
       "url": "https://news.google.com/rss/search?q=artificial%20intelligence%20policy%20OR%20AI%20regulation%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "33 feed entries parsed; 23 within 48h",
+      "notes": "37 feed entries parsed; 26 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40947,10 +40994,10 @@
       "name": "Google News AIGC Content Industry RSS",
       "url": "https://news.google.com/rss/search?q=generative%20AI%20creator%20economy%20OR%20AI%20video%20OR%20AIGC%20when%3A2d&hl=en-US&gl=US&ceid=US%3Aen",
       "status": "checked",
-      "notes": "42 feed entries parsed; 35 within 48h",
+      "notes": "43 feed entries parsed; 37 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40958,11 +41005,11 @@
       "source_key": "https://news.smol.ai/rss.xml",
       "name": "Smol AI News",
       "url": "https://news.smol.ai/rss.xml",
-      "status": "no_signal",
-      "notes": "659 feed entries parsed; 0 within 48h",
+      "status": "checked",
+      "notes": "660 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40971,10 +41018,10 @@
       "name": "NVIDIA Newsroom RSS",
       "url": "https://nvidianews.nvidia.com/rss.xml",
       "status": "checked",
-      "notes": "20 feed entries parsed; 9 within 48h",
+      "notes": "20 feed entries parsed; 10 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40983,10 +41030,10 @@
       "name": "OpenAI Blog RSS",
       "url": "https://openai.com/blog/rss.xml",
       "status": "checked",
-      "notes": "1016 feed entries parsed; 3 within 48h",
+      "notes": "1017 feed entries parsed; 4 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -40995,10 +41042,10 @@
       "name": "OpenAI News RSS",
       "url": "https://openai.com/news/rss.xml",
       "status": "checked",
-      "notes": "1016 feed entries parsed; 3 within 48h",
+      "notes": "1017 feed entries parsed; 4 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41010,7 +41057,7 @@
       "notes": "response is not feed-like",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41018,11 +41065,11 @@
       "source_key": "https://paperswithcode.com/api/v1",
       "name": "Papers with Code API",
       "url": "https://paperswithcode.com/api/v1/",
-      "status": "blocked",
-      "notes": "response is not feed-like",
+      "status": "no_signal",
+      "notes": "source-specific search_api health; api_records=0",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41034,7 +41081,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41046,7 +41093,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41058,7 +41105,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41066,11 +41113,11 @@
       "source_key": "https://raw.githubusercontent.com/521xueweihan/hellogithub/master/readme.md",
       "name": "HelloGitHub",
       "url": "https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md",
-      "status": "blocked",
-      "notes": "response is not feed-like",
+      "status": "checked",
+      "notes": "source-specific github_report_markdown health; markdown_links=5; recent_48h_hints=1",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41078,11 +41125,11 @@
       "source_key": "https://raw.githubusercontent.com/dair-ai/ml-papers-of-the-week/main/readme.md",
       "name": "ML Papers of the Week",
       "url": "https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md",
-      "status": "blocked",
-      "notes": "response is not feed-like",
+      "status": "checked",
+      "notes": "source-specific github_report_markdown health; markdown_links=3; recent_48h_hints=1",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41090,11 +41137,11 @@
       "source_key": "https://raw.githubusercontent.com/ruanyf/weekly/master/readme.md",
       "name": "RuanYF Weekly",
       "url": "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
-      "status": "blocked",
-      "notes": "response is not feed-like",
+      "status": "checked",
+      "notes": "source-specific github_report_markdown health; markdown_links=2; recent_48h_hints=1",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41106,7 +41153,7 @@
       "notes": "100 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41118,7 +41165,7 @@
       "notes": "skipped_missing_base_url",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41130,7 +41177,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41142,7 +41189,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41154,7 +41201,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41163,10 +41210,10 @@
       "name": "SSPAI",
       "url": "https://sspai.com/feed",
       "status": "checked",
-      "notes": "10 feed entries parsed; 5 within 48h",
+      "notes": "10 feed entries parsed; 7 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41178,7 +41225,7 @@
       "notes": "20 feed entries parsed; 9 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41190,7 +41237,7 @@
       "notes": "20 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41202,7 +41249,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41214,7 +41261,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41226,7 +41273,7 @@
       "notes": "7 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41238,7 +41285,7 @@
       "notes": "skipped_missing_base_url",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41246,11 +41293,11 @@
       "source_key": "https://www.aboutamazon.com/news/rss",
       "name": "Amazon News",
       "url": "https://www.aboutamazon.com/news/rss",
-      "status": "no_signal",
-      "notes": "10 feed entries parsed; 0 within 48h",
+      "status": "checked",
+      "notes": "10 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41262,7 +41309,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41274,7 +41321,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41286,7 +41333,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41298,7 +41345,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41310,7 +41357,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41322,7 +41369,7 @@
       "notes": "20 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41334,7 +41381,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41346,7 +41393,7 @@
       "notes": "HTTP 403",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41358,7 +41405,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41367,10 +41414,10 @@
       "name": "iFanr",
       "url": "https://www.ifanr.com/feed",
       "status": "checked",
-      "notes": "20 feed entries parsed; 8 within 48h",
+      "notes": "20 feed entries parsed; 11 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41379,10 +41426,10 @@
       "name": "InfoQ CN",
       "url": "https://www.infoq.cn/feed",
       "status": "checked",
-      "notes": "20 feed entries parsed; 13 within 48h",
+      "notes": "20 feed entries parsed; 15 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41394,7 +41441,7 @@
       "notes": "20 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41406,7 +41453,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41418,7 +41465,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41427,10 +41474,10 @@
       "name": "Latent.Space",
       "url": "https://www.latent.space/feed",
       "status": "checked",
-      "notes": "20 feed entries parsed; 1 within 48h",
+      "notes": "20 feed entries parsed; 2 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41439,10 +41486,10 @@
       "name": "Leiphone",
       "url": "https://www.leiphone.com/feed",
       "status": "checked",
-      "notes": "20 feed entries parsed; 12 within 48h",
+      "notes": "20 feed entries parsed; 20 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41454,7 +41501,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41466,7 +41513,7 @@
       "notes": "10 feed entries parsed; 0 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41478,7 +41525,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41490,7 +41537,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41502,7 +41549,7 @@
       "notes": "30 feed entries parsed; 1 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41514,7 +41561,7 @@
       "notes": "50 feed entries parsed; 50 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41526,7 +41573,7 @@
       "notes": "50 feed entries parsed; 50 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41538,7 +41585,7 @@
       "notes": "50 feed entries parsed; 50 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41547,10 +41594,10 @@
       "name": "QbitAI",
       "url": "https://www.qbitai.com/feed",
       "status": "checked",
-      "notes": "10 feed entries parsed; 5 within 48h",
+      "notes": "10 feed entries parsed; 9 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41559,10 +41606,10 @@
       "name": "Reddit LocalLLaMA Platform Feed",
       "url": "https://www.reddit.com/r/LocalLLaMA/.rss",
       "status": "checked",
-      "notes": "25 feed entries parsed; 23 within 48h",
+      "notes": "25 feed entries parsed; 24 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41574,7 +41621,7 @@
       "notes": "HTTP 403",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41586,7 +41633,7 @@
       "notes": "10 feed entries parsed; 3 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41598,7 +41645,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41610,7 +41657,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41622,7 +41669,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41634,7 +41681,7 @@
       "notes": "10 feed entries parsed; 4 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41646,7 +41693,7 @@
       "notes": "10 feed entries parsed; 10 within 48h",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41658,7 +41705,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41670,7 +41717,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     },
     {
       "date": "2026-06-23",
@@ -41682,7 +41729,7 @@
       "notes": "html_index source is reachable; feed_like=false",
       "candidates_found": 0,
       "included": 0,
-      "observed_at": "2026-06-23T02:21:34.986Z"
+      "observed_at": "2026-06-23T08:45:44.464Z"
     }
   ]
 }

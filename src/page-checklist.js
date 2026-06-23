@@ -400,35 +400,27 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const originalText = originalRows
           .map((row) => row.querySelector("dd")?.textContent?.replace(/\s+/g, " ").trim() || "")
           .join(" ");
-        const textWithoutUrls = bodyText.replace(/https?:\/\/\S+/gi, "").trim();
-        const chineseChars = (bodyText.match(/\p{Script=Han}/gu) || []).length;
-        const latinChars = (bodyText.match(/[A-Za-z]/g) || []).length;
-        const ratioBase = chineseChars + latinChars;
-        const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
-        const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{60,}/.test(textWithoutUrls);
-        const originalAttached = originalText.length >= 10;
+        const summaryLike = /(?:已保留原文|适合结合原帖|这条\s*X\/Twitter\s*讨论|原帖讨论|可作为|读者可|继续核对|重点看|适合用来核对|事实性结论仍需)/i.test(bodyText);
+        const originalBuried = originalText.length >= 10;
         const ok = bodyText.length > 0 &&
-          chineseChars >= 10 &&
-          chineseRatio >= 0.35 &&
-          !longEnglishRun &&
-          originalAttached;
+          !summaryLike &&
+          !originalBuried;
         return ok
           ? null
           : {
               index,
               title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
               body: bodyText.slice(0, 180),
-              chinese_chars: chineseChars,
-              chinese_ratio: Number(chineseRatio.toFixed(3)),
-              long_english_run: longEnglishRun,
-              original_attached: originalAttached
+              summary_like: summaryLike,
+              original_buried: originalBuried,
+              original_text: originalText.slice(0, 180)
             };
       })
       .filter(Boolean);
     addCheck(
-      "builder_cards_translated",
+      "builder_cards_original_text",
       weakBuilderCards.length === 0,
-      "X/Twitter builder cards should render Chinese translations in the body and attach the original post below.",
+      "X/Twitter builder cards should render the original post text in the body, not a translated/generic summary with the original buried in details.",
       { weak_cards: weakBuilderCards }
     );
     const internalReviewLanguageRe = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
