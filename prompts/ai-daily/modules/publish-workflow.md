@@ -1,5 +1,7 @@
 ## Codex-native runner contract
 
+Daily resilience policy: `config/daily-resilience-policy.json` is the authoritative retry/fallback/degrade/block table for the Codex-native runner. Workflow, prompt, and automation changes must pass `npm run resilience:validate`; safe public source/coverage failures may end as `published_degraded`; successful repository publish with delayed Pages propagation may end as `published_pending_pages_verification`; unsafe content, unrecoverable rendering/schema failures, internal leakage, fake tracking components, and exhausted publish infrastructure end as `infrastructure_blocked_after_fallback_exhausted` or another whitelisted blocker.
+
 Status self-check: the 21:30 automation must call `status:self-check` after the daily publish window. It records `.tmp/status-self-check-YYYY-MM-DD.json`, verifies `sources:phase5-audit`/`publish:dry-run:daily` still pass from the clean runner baseline, and treats `multiple_active_daily_publish_automations` as a blocking issue.
 
 定时任务和长程发布任务必须从 launcher worktree 启动，只调用 runner：
@@ -23,3 +25,4 @@ npm run daily:run -- --date YYYY-MM-DD --publish
 - `final_status:"blocked"`：报告 `.tmp/run-summary-YYYY-MM-DD.json`、失败 stage、错误码、已生成 HTML/JSON 路径和可恢复动作；不要伪称发布成功。
 - `final_status:"generated_only"`：说明 dry-run-only 已完成，并汇报 `publish:dry-run:daily` 结果和 expected Pages URL。
 - `final_status:"published"`：汇报真实 publish、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要和最终 URL。
+- `final_status:"published_pending_pages_verification"`：仓库发布已成功但 Pages 验证仍在缓存/网络延迟中；汇报 URL、`pages_verify` 尝试次数和 `next_action.kind:"verify_pages_later"`，不要重复 publish 或声称 Pages 已确认。

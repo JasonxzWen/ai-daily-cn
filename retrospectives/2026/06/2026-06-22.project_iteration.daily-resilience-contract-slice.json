@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-22.project_iteration.daily-resilience-contract-slice",
+  "run_type": "project_iteration",
+  "date": "2026-06-22",
+  "title": "Daily resilience contract slice",
+  "status": "completed",
+  "summary": "Project iteration record for the current daily publishing resilience refactor slice. This slice restores the safe degraded daily_tracking source-unavailable write contract, adds executable policy validation, enforces runner retries, makes Pages verification an explicit post-publish stage, adds deterministic discovery and draft-input degradation for source outages, and separates infrastructure publish exhaustion from content or safety blockers.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"report:write accepts source-unavailable daily tracking as degraded\"",
+      "node --test tests/unit.test.js --test-name-pattern \"daily resilience policy\"",
+      "node --test tests/unit.test.js --test-name-pattern \"daily runner degraded discovery artifact remains consumable by report draft and write\"",
+      "node --test tests/unit.test.js --test-name-pattern \"report:draft degrades missing known discovery input when explicitly allowed|report:draft does not degrade unknown missing inputs|report:draft does not degrade malformed known discovery input|daily runner wires platform exempt discovery outputs into report draft\"",
+      "node --test tests/unit.test.js --test-name-pattern \"daily runner writes infrastructure-exhausted correction rollup when publish and fallback fail\"",
+      "node --test tests/unit.test.js --test-name-pattern \"retrospective writer preserves degraded daily terminal statuses\"",
+      "npm run resilience:validate",
+      "node scripts/check-daily-content-contract.mjs --self-test --json",
+      "node scripts/harness-validate.mjs",
+      "npm run feedback:validate",
+      "npm run retrospectives:validate",
+      "npm test",
+      "npm run validate",
+      "npm run test:e2e",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Recoverability policy must be explicit before broad runner behavior changes.",
+      "evidence": "The resilience table now lists current daily runner stages and their retry, fallback, degrade, block, summary, and replay-fixture intent before changing the executor.",
+      "scope": "daily_publish_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Use `config/daily-resilience-policy.json` as the design source for later source circuit breakers, browser fallbacks, AI repair fail-open behavior, and historical replay tests."
+    },
+    {
+      "lesson": "A degraded publish is only acceptable when the public artifact remains honest and readable.",
+      "evidence": "The policy keeps page rendering, internal leakage, fake tracking components, unsafe content, and unrecoverable schema failures as blocking while allowing source-unavailable daily tracking to publish as degraded.",
+      "scope": "publish_quality",
+      "persistence": "implemented",
+      "recommended_action": "Do not widen degraded status to hide PromptLayer layout regressions, broad official snapshots, internal/debug text, or fake components."
+    },
+    {
+      "lesson": "Runner-written degraded source artifacts must be proven through the real report pipeline, not only by runner summary assertions.",
+      "evidence": "A regression now feeds a runner-written builder fallback artifact into `generateReportDraft` and `writeReportDraft`, producing `quality_status.status:\"degraded\"`, `builder_sources_blocked`, and no blocking issues.",
+      "scope": "generation_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Use real-chain tests whenever adding a new degraded artifact shape or source-lane fallback."
+    },
+    {
+      "lesson": "Infrastructure exhaustion needs a distinct terminal state so operators know the report may be valid but delivery failed.",
+      "evidence": "When `publish_real` and `publish_github_api_fallback` both fail, the runner now emits `infrastructure_blocked_after_fallback_exhausted`, `recover_infrastructure_publish`, and a correction retrospective with the same status.",
+      "scope": "publish_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Keep content/safety blockers and delivery infrastructure blockers separate in summaries, retrospectives, and recovery prompts."
+    },
+    {
+      "lesson": "Draft fallback must be narrow: degrade missing known source inputs, not arbitrary missing files or empty runs.",
+      "evidence": "`report:draft --allow-degraded-inputs` now converts missing known discovery outputs into blocked public source-audit lanes, while tests prove unknown missing inputs still throw `ENOENT` and malformed known inputs still throw `SyntaxError`.",
+      "scope": "report_draft_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Keep draft recovery input-name allowlisted and rely on report-write/page/validate gates for publishability."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The daily runner had no single executable table proving which failures should retry, fallback, degrade, or block.",
+      "evidence": "`npm run resilience:validate` checks `config/daily-resilience-policy.json`, current runner stage coverage, package validation wiring, workflow contract markers, and public workflow docs.",
+      "module": "config/daily-resilience-policy.json, src/resilience-policy.js, scripts/validate-daily-resilience-policy.mjs",
+      "suggestion": "Keep retry/fallback/degrade/block rules in a policy-as-code file and fail validation when runner stages or workflow docs drift from it.",
+      "expected_benefit": "Future robustness work can change runner behavior against a durable contract instead of rebuilding expectations from failed automation logs.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented as a committed policy file, validator, package script, workflow contract marker, feedback ledger entries, and unit tests.",
+      "ledger_links": [
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-degraded-daily-tracking-publishable"
+      ],
+      "validation_evidence": [
+        "daily resilience policy validates current runner stages and workflow gates",
+        "report:write accepts source-unavailable daily tracking as degraded",
+        "npm run resilience:validate"
+      ]
+    },
+    {
+      "status": "implemented",
+      "issue": "Source-lane outages were historically treated as all-or-nothing blockers even when the public report could honestly mark a section degraded.",
+      "evidence": "Runner discovery fallback writes deterministic degraded artifacts, and the real report-chain regression proves those artifacts produce schema-aware degraded public output.",
+      "module": "src/daily-runner.js, src/cli.js, schemas/report.schema.json, tests/unit.test.js",
+      "suggestion": "Allow policy-approved source outages to continue generation through explicit degraded artifacts, while preserving block reasons for unsafe or fake public content.",
+      "expected_benefit": "A partial source outage no longer prevents a publishable daily report when the degraded section is public, explicit, and schema-valid.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented with runner fallback artifacts, `report:write` quality status output, real-chain tests, and safety-block regression coverage.",
+      "ledger_links": [
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-degraded-daily-tracking-publishable",
+        "feedback/p1-daily-content-contract-hard-gate"
+      ],
+      "validation_evidence": [
+        "daily runner writes degraded discovery artifact after exhausted source failure",
+        "daily runner degraded discovery artifact remains consumable by report draft and write",
+        "daily runner blocks safety failures before degraded discovery fallback"
+      ]
+    },
+    {
+      "status": "implemented",
+      "issue": "Publish infrastructure exhaustion was collapsed into generic `blocked`, which hid the recovery path after both publish transports failed.",
+      "evidence": "The runner now reports `infrastructure_blocked_after_fallback_exhausted`, emits `recover_infrastructure_publish`, and retrospective schema validation preserves the status.",
+      "module": "src/daily-runner.js, src/retrospectives.js, schemas/retrospective.schema.json, tests/unit.test.js",
+      "suggestion": "Classify terminal states by operator action: content repair, source degradation, Pages pending verification, or infrastructure publish recovery.",
+      "expected_benefit": "Automation summaries and retrospectives can trigger the right recovery action instead of sending every failed run into generic manual inspection.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented with terminal status handling, retrospective schema extension, and correction rollup regression tests.",
+      "ledger_links": [
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "daily runner writes infrastructure-exhausted correction rollup when publish and fallback fail",
+        "daily runner records stdout and stderr from failed publish stages",
+        "retrospective writer preserves degraded daily terminal statuses"
+      ]
+    },
+    {
+      "status": "implemented",
+      "issue": "`report_draft` was marked degradable in policy but missing discovery input files still caused immediate `ENOENT` failures.",
+      "evidence": "Runner now passes `--allow-degraded-inputs`, and `generateReportDraft` only degrades known discovery output filenames while preserving hard failures for unknown inputs or zero readable inputs.",
+      "module": "src/draft.js, src/cli.js, src/daily-runner.js, config/daily-resilience-policy.json, tests/unit.test.js",
+      "suggestion": "Use explicit degraded source-audit lanes for known missing discovery files instead of inventing report content or relaxing downstream validation.",
+      "expected_benefit": "Transient file/write gaps in one discovery lane no longer block generation when other discovery data is present and public degradation is honest.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented with CLI flag, runner wiring, policy narrowing, and positive/negative draft input tests.",
+      "ledger_links": [
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-daily-content-contract-hard-gate"
+      ],
+      "validation_evidence": [
+        "report:draft degrades missing known discovery input when explicitly allowed",
+        "report:draft does not degrade unknown missing inputs",
+        "report:draft does not degrade malformed known discovery input",
+        "daily runner wires platform exempt discovery outputs into report draft"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-degraded-daily-tracking-publishable",
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-official-snapshot-layout-containment",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add broader per-source partial success fixtures, browser/export fallbacks, AI repair fail-open boundaries, historical replay fixtures, external automation inventory cleanup, PR creation, and merge.",
+      "owner": "project"
+    }
+  ],
+  "slug": "daily-resilience-contract-slice"
+}

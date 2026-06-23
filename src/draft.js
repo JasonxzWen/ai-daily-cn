@@ -35,6 +35,89 @@ const REQUIRED_AUDIT_GROUPS = [
   "sources_health",
   ...PLATFORM_AUDIT_GROUPS
 ];
+const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
+  {
+    pattern: /^github-trending-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "github_trending",
+    sourceName: "GitHub Trending",
+    sourceUrl: "https://github.com/trending",
+    sourceCategory: "github_trending"
+  },
+  {
+    pattern: /^huggingface-trending-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "huggingface_trending",
+    sourceName: "Hugging Face Trending",
+    sourceUrl: "https://huggingface.co/models?sort=trending",
+    sourceCategory: "project"
+  },
+  {
+    pattern: /^builders-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "builder_sources",
+    sourceName: "Builder discovery",
+    sourceUrl: "https://x.com/",
+    sourceCategory: "builder"
+  },
+  {
+    pattern: /^china-ai-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "china_ai_sources",
+    sourceName: "China AI discovery",
+    sourceUrl: "https://www.qbitai.com/",
+    sourceCategory: "community"
+  },
+  {
+    pattern: /^content-sources-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "content_sources",
+    sourceName: "Content source discovery",
+    sourceUrl: "https://openai.com/news/",
+    sourceCategory: "community"
+  },
+  {
+    pattern: /^statuspage-incidents-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "content_sources",
+    sourceName: "Statuspage incident discovery",
+    sourceUrl: "https://status.openai.com/",
+    sourceCategory: "official_release"
+  },
+  {
+    pattern: /^search-news-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "search_sources",
+    sourceName: "Search/news discovery",
+    sourceUrl: "https://www.google.com/search?q=AI",
+    sourceCategory: "community"
+  },
+  {
+    pattern: /^wechat-platform-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "wechat_sources",
+    sourceName: "WeChat platform discovery",
+    sourceUrl: "https://weixin.qq.com/",
+    sourceCategory: "community",
+    platform: "wechat"
+  },
+  {
+    pattern: /^zhihu-platform-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "zhihu_sources",
+    sourceName: "Zhihu platform discovery",
+    sourceUrl: "https://www.zhihu.com/",
+    sourceCategory: "community",
+    platform: "zhihu"
+  },
+  {
+    pattern: /^reddit-platform-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "reddit_sources",
+    sourceName: "Reddit platform discovery",
+    sourceUrl: "https://www.reddit.com/r/MachineLearning/",
+    sourceCategory: "community",
+    platform: "reddit"
+  },
+  {
+    pattern: /^sources-health-\d{4}-\d{2}-\d{2}\.json$/i,
+    auditGroup: "sources_health",
+    sourceName: "Source health check",
+    sourceUrl: "https://github.com/JasonxzWen/ai-daily-cn/tree/main/config/sources",
+    sourceCategory: "community"
+  }
+];
+const DEGRADED_DISCOVERY_INPUT_ERROR_CODES = new Set(["ENOENT", "EACCES", "EPERM", "EBUSY", "EIO", "EMFILE", "ENFILE"]);
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
 const PRIMARY_STATUSES = new Set(["primary_confirmed", "multi_source_confirmed"]);
 const REPORT_AUDIT_GROUP_FIELDS = new Set([
@@ -147,7 +230,11 @@ export async function generateReportDraft(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
   const inputPaths = normalizeInputPaths(options.inputPaths || options.inputs || options.input);
-  const loaded = await loadDiscoveryInputs(rootDir, inputPaths);
+  const loaded = await loadDiscoveryInputsWithDegraded(rootDir, inputPaths, {
+    reportDate,
+    generatedAt,
+    allowDegradedInputs: options.allowDegradedInputs === true
+  });
   const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
   const recentMainUrlHistory = await loadRecentMainUrlHistory(rootDir, reportDate);
   const selection = selectReportItems(merged, { reportDate, recentMainUrlHistory });
@@ -5880,6 +5967,107 @@ async function loadDiscoveryInputs(rootDir, inputPaths) {
     payloads.push(JSON.parse(await fs.readFile(path.resolve(rootDir, inputPath), "utf8")));
   }
   return payloads;
+}
+
+async function loadDiscoveryInputsWithDegraded(rootDir, inputPaths, options = {}) {
+  if (options.allowDegradedInputs !== true) {
+    return await loadDiscoveryInputs(rootDir, inputPaths);
+  }
+  if (inputPaths.length === 0) {
+    throw new PublisherError(
+      "report_draft_inputs_missing",
+      "report:draft needs --input pointing at discovery output JSON."
+    );
+  }
+
+  const payloads = [];
+  let readableInputs = 0;
+  for (const inputPath of inputPaths) {
+    try {
+      payloads.push(JSON.parse(await fs.readFile(path.resolve(rootDir, inputPath), "utf8")));
+      readableInputs += 1;
+    } catch (error) {
+      if (!isDegradableDiscoveryInputError(error)) {
+        throw error;
+      }
+      const degraded = degradedDiscoveryInputPayload(inputPath, {
+        reportDate: options.reportDate,
+        generatedAt: options.generatedAt,
+        error
+      });
+      if (!degraded) {
+        throw error;
+      }
+      payloads.push(degraded);
+    }
+  }
+
+  if (readableInputs === 0) {
+    throw new PublisherError(
+      "report_draft_inputs_unavailable",
+      "report:draft needs at least one readable discovery input before degraded input fallback can continue."
+    );
+  }
+  return payloads;
+}
+
+function degradedDiscoveryInputPayload(inputPath, { reportDate, generatedAt, error } = {}) {
+  const spec = fallbackSpecForDiscoveryInput(inputPath);
+  if (!spec) {
+    return null;
+  }
+  const baseName = path.basename(inputPath);
+  const errorCode = String(error?.code || error?.name || "discovery_input_unavailable");
+  const reason = `Missing or unreadable discovery input ${baseName}: ${errorCode}`;
+  const auditSource = {
+    name: spec.sourceName,
+    url: spec.sourceUrl,
+    status: "blocked",
+    notes: reason
+  };
+  if (spec.platform) {
+    auditSource.platform = spec.platform;
+  }
+  return {
+    ok: true,
+    degraded: true,
+    fallback_used: true,
+    fallback_kind: "degraded_discovery_input",
+    report_date: reportDate,
+    generated_at: generatedAt,
+    source_audit: {
+      [spec.auditGroup]: {
+        checked: true,
+        sources: [auditSource],
+        candidates_found: 0,
+        included: 0,
+        blocked_reason: errorCode,
+        notes: reason
+      }
+    },
+    sources: [
+      {
+        id: `${spec.platform || spec.auditGroup}-${slugId(spec.sourceName) || "source"}`,
+        name: spec.sourceName,
+        url: spec.sourceUrl,
+        category: spec.sourceCategory,
+        status: "blocked",
+        checked_at: generatedAt,
+        notes: reason,
+        ...(spec.platform ? { platform: spec.platform } : {})
+      }
+    ],
+    candidates: []
+  };
+}
+
+function fallbackSpecForDiscoveryInput(inputPath) {
+  const baseName = path.basename(String(inputPath || ""));
+  return DEGRADED_DISCOVERY_INPUT_FALLBACKS.find((spec) => spec.pattern.test(baseName)) || null;
+}
+
+function isDegradableDiscoveryInputError(error) {
+  return DEGRADED_DISCOVERY_INPUT_ERROR_CODES.has(String(error?.code || ""));
 }
 
 function requireReportDate(reportDate) {

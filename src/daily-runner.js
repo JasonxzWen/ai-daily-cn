@@ -17,6 +17,67 @@ const DEFAULT_REPORT_PATH = ".tmp/daily-report.json";
 const OPTIMIZED_REPORT_PATH = ".tmp/daily-report.optimized.json";
 const CONTENT_SOURCE_DISCOVERY_LIMIT = 240;
 const CONTENT_SOURCE_PER_SOURCE_LIMIT = 3;
+const RESILIENCE_POLICY_PATH = path.join("config", "daily-resilience-policy.json");
+const DISCOVERY_DEGRADE_FALLBACKS = {
+  discover_github_trending: {
+    auditGroup: "github_trending",
+    sourceName: "GitHub Trending",
+    sourceCategory: "github_trending"
+  },
+  discover_huggingface_trending: {
+    auditGroup: "huggingface_trending",
+    sourceName: "Hugging Face Trending",
+    sourceCategory: "project"
+  },
+  discover_builders: {
+    auditGroup: "builder_sources",
+    sourceName: "Builder discovery",
+    sourceCategory: "builder"
+  },
+  discover_china_ai: {
+    auditGroup: "china_ai_sources",
+    sourceName: "China AI discovery",
+    sourceCategory: "community"
+  },
+  discover_content_sources: {
+    auditGroup: "content_sources",
+    sourceName: "Content source discovery",
+    sourceCategory: "community"
+  },
+  discover_statuspage_incidents: {
+    auditGroup: "content_sources",
+    sourceName: "Statuspage incident discovery",
+    sourceCategory: "official_release"
+  },
+  discover_search_news: {
+    auditGroup: "search_sources",
+    sourceName: "Search/news discovery",
+    sourceCategory: "community"
+  },
+  discover_wechat_platform: {
+    auditGroup: "wechat_sources",
+    sourceName: "WeChat platform discovery",
+    sourceCategory: "community",
+    platform: "wechat"
+  },
+  discover_zhihu_platform: {
+    auditGroup: "zhihu_sources",
+    sourceName: "Zhihu platform discovery",
+    sourceCategory: "community",
+    platform: "zhihu"
+  },
+  discover_reddit_platform: {
+    auditGroup: "reddit_sources",
+    sourceName: "Reddit platform discovery",
+    sourceCategory: "community",
+    platform: "reddit"
+  },
+  sources_health: {
+    auditGroup: "sources_health",
+    sourceName: "Source health check",
+    sourceCategory: "community"
+  }
+};
 const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
   "public_editorial_rewrite",
   "main_item_editorial_rewrite",
@@ -51,6 +112,8 @@ export async function runDailyWorkflow(options = {}) {
       mode,
       maxReviewRepairLoops,
       explicitMaxReviewRepairLoops,
+      resiliencePolicy: options.resiliencePolicy,
+      retryDelayMs: options.retryDelayMs,
       runStage,
       now
     });
@@ -78,30 +141,48 @@ export async function runDailyWorkflow(options = {}) {
 
   await writeSummary(summaryPath, summary);
 
+  const launcherResiliencePolicy = options.resiliencePolicy || await loadRunnerResiliencePolicy({ launcherRoot });
   const prepareCleanWorktree = options.prepareCleanWorktree || defaultPrepareCleanWorktree;
+  const prepareArgs = {
+    launcherRoot,
+    reportDate,
+    publish,
+    allowedBranch: options.allowedBranch,
+    worktreeDir: options.worktreeDir
+  };
   let prepared;
+  let prepareOutcome;
   try {
-    prepared = await prepareCleanWorktree({
-      launcherRoot,
-      reportDate,
-      publish,
-      allowedBranch: options.allowedBranch,
-      worktreeDir: options.worktreeDir
+    prepareOutcome = await prepareCleanWorktreeWithRetry({
+      prepareCleanWorktree,
+      prepareArgs,
+      resiliencePolicy: launcherResiliencePolicy,
+      retryDelayMs: options.retryDelayMs
     });
+    prepared = prepareOutcome.prepared;
     summary.clean_repo_root = path.resolve(prepared.next_cwd || prepared.clean_repo_root || prepared.repo_root || "");
     recordStage(summary, {
       id: "prepare_clean_worktree",
       status: "passed",
-      output: {
-        next_cwd: summary.clean_repo_root,
-        remote_main_sha: prepared.remote_main_sha || prepared.remoteMainSha || ""
-      },
+      output: stageAttemptOutput({
+        output: {
+          next_cwd: summary.clean_repo_root,
+          remote_main_sha: prepared.remote_main_sha || prepared.remoteMainSha || ""
+        },
+        attempts: prepareOutcome.attempts,
+        retryAttempts: prepareOutcome.retryAttempts
+      }),
       now
     });
   } catch (error) {
     recordStage(summary, {
       id: "prepare_clean_worktree",
       status: "failed",
+      output: stageAttemptOutput({
+        output: extractErrorOutput(error) || {},
+        attempts: error.attempts || 1,
+        retryAttempts: Array.isArray(error.retryAttempts) ? error.retryAttempts : []
+      }),
       error,
       now
     });
@@ -111,6 +192,10 @@ export async function runDailyWorkflow(options = {}) {
     return { summary, summaryPath };
   }
 
+  const resiliencePolicy = options.resiliencePolicy || await loadRunnerResiliencePolicy({
+    cleanRoot: summary.clean_repo_root,
+    launcherRoot
+  });
   const context = {
     launcherRoot,
     cleanRoot: summary.clean_repo_root,
@@ -120,6 +205,8 @@ export async function runDailyWorkflow(options = {}) {
     summaryPath,
     maxReviewRepairLoops,
     writeRetrospective: options.writeRetrospective !== false,
+    resiliencePolicy,
+    retryDelayMs: options.retryDelayMs,
     now
   };
 
@@ -180,6 +267,8 @@ async function resumeDailyWorkflowFromAiRepair({
   mode,
   maxReviewRepairLoops,
   explicitMaxReviewRepairLoops,
+  resiliencePolicy: providedResiliencePolicy,
+  retryDelayMs,
   runStage,
   now
 }) {
@@ -250,6 +339,10 @@ async function resumeDailyWorkflowFromAiRepair({
   summary.quality_review_path = summary.quality_review_path || qualityReviewPath(reportDate);
   summary.quality_repair_path = summary.quality_repair_path || qualityRepairPath(reportDate);
 
+  const loadedResiliencePolicy = providedResiliencePolicy || await loadRunnerResiliencePolicy({
+    cleanRoot: path.resolve(summary.clean_repo_root),
+    launcherRoot
+  });
   const context = {
     launcherRoot,
     cleanRoot: path.resolve(summary.clean_repo_root),
@@ -259,6 +352,8 @@ async function resumeDailyWorkflowFromAiRepair({
     summaryPath,
     maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
     writeRetrospective: true,
+    resiliencePolicy: loadedResiliencePolicy,
+    retryDelayMs,
     now
   };
   const sourceReportPath = stagePath(summary.current_report_path, context.cleanRoot) || DEFAULT_REPORT_PATH;
@@ -358,7 +453,7 @@ async function runPostQualityStages({
         summary,
         context,
         reportDate,
-        status: "generated_only",
+        status: finalWorkflowStatus({ publish: false, summary }),
         now
       });
       if (retrospectiveOutcome.blocked) {
@@ -393,16 +488,18 @@ async function runPostQualityStages({
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
       if (fallbackOutcome.blocked) {
-        summary.final_status = "blocked";
-        summary.next_action = {
-          ...blockedNextAction(fallbackOutcome.error),
-          failed_stage_id: fallbackStage.id,
-          previous_stage_id: stage.id
-        };
+        summary.final_status = "infrastructure_blocked_after_fallback_exhausted";
+        summary.next_action = infrastructurePublishRecoveryNextAction({
+          outcome: fallbackOutcome,
+          stageId: fallbackStage.id,
+          previousStageId: stage.id,
+          summaryPath
+        });
         await writePublishCorrectionForBlockedRun({
           summary,
           context,
           reportDate,
+          status: summary.final_status,
           now,
           runStage
         });
@@ -410,17 +507,18 @@ async function runPostQualityStages({
         return { summary, summaryPath };
       }
       if (!fallbackOutcome.normalized.ok) {
-        summary.final_status = "blocked";
-        summary.next_action = {
-          kind: "inspect_stage_failure",
-          stage_id: fallbackStage.id,
-          previous_stage_id: stage.id,
-          summary_path: summaryPath
-        };
+        summary.final_status = "infrastructure_blocked_after_fallback_exhausted";
+        summary.next_action = infrastructurePublishRecoveryNextAction({
+          outcome: fallbackOutcome,
+          stageId: fallbackStage.id,
+          previousStageId: stage.id,
+          summaryPath
+        });
         await writePublishCorrectionForBlockedRun({
           summary,
           context,
           reportDate,
+          status: summary.final_status,
           now,
           runStage
         });
@@ -429,6 +527,13 @@ async function runPostQualityStages({
       }
       await writeSummary(summaryPath, summary);
       continue;
+    }
+    if (publish && stage.id === "pages_verify" && (outcome.blocked || !outcome.normalized.ok)) {
+      summary.final_status = "published_pending_pages_verification";
+      summary.next_action = pagesVerifyPendingNextAction({ outcome, summaryPath });
+      summary.updated_at = now();
+      await writeSummary(summaryPath, summary);
+      return { summary, summaryPath };
     }
     if (outcome.blocked) {
       summary.final_status = "blocked";
@@ -449,7 +554,7 @@ async function runPostQualityStages({
     await writeSummary(summaryPath, summary);
   }
 
-  summary.final_status = publish ? "published" : "generated_only";
+  summary.final_status = finalWorkflowStatus({ publish, summary });
   summary.next_action = { kind: "none" };
   summary.updated_at = now();
   await writeSummary(summaryPath, summary);
@@ -468,7 +573,7 @@ async function finalizeRetrospectiveBeforePublish({
     summary,
     context,
     reportDate,
-    status: "published",
+    status: finalWorkflowStatus({ publish: true, summary }),
     now,
     stageId: "retrospective_finalize",
     summaryKey: "retrospective_finalization"
@@ -562,7 +667,7 @@ async function writeRetrospectiveStage({
   }
 }
 
-async function writePublishCorrectionForBlockedRun({ summary, context, reportDate, now, runStage }) {
+async function writePublishCorrectionForBlockedRun({ summary, context, reportDate, status = "blocked", now, runStage }) {
   if (context.writeRetrospective === false) {
     return { blocked: false, skipped: true };
   }
@@ -571,7 +676,7 @@ async function writePublishCorrectionForBlockedRun({ summary, context, reportDat
       rootDir: context.cleanRoot,
       summary,
       reportDate,
-      status: "blocked",
+      status,
       now
     });
     summary.retrospective_correction = output;
@@ -752,6 +857,7 @@ function buildInitialWorkflowStages({ reportDate }) {
       reportDate,
       "--input",
       discoveryInputs,
+      "--allow-degraded-inputs",
       "--output",
       DEFAULT_REPORT_PATH,
       "--candidate-output",
@@ -828,13 +934,40 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
     npmStage("publish_dry_run_daily", ["run", "publish:dry-run:daily", "--", "--date", reportDate])
   ];
   if (publish) {
-    stages.push(npmStage("publish_real", ["run", "publish", "--", "confirm-push", reportDate]));
+    stages.push(npmStage("publish_real", [
+      "run",
+      "publish",
+      "--",
+      "confirm-push",
+      reportDate,
+      "--skip-pages-verify"
+    ]));
+    stages.push(buildPagesVerifyStage(reportDate));
   }
   return stages;
 }
 
 function buildPublishFallbackStage(reportDate) {
-  return npmStage("publish_github_api_fallback", ["run", "publish:github-api", "--", "confirm-push", reportDate]);
+  return npmStage("publish_github_api_fallback", [
+    "run",
+    "publish:github-api",
+    "--",
+    "confirm-push",
+    reportDate,
+    "--skip-pages-verify"
+  ]);
+}
+
+function buildPagesVerifyStage(reportDate) {
+  return nodeCliStage("pages_verify", [
+    "publish:verify-pages",
+    "--date",
+    reportDate,
+    "--attempts",
+    "1",
+    "--interval-ms",
+    "0"
+  ]);
 }
 
 function buildRetrospectiveValidateStage(id) {
@@ -855,30 +988,496 @@ async function defaultPrepareCleanWorktree({ launcherRoot, allowedBranch, worktr
   });
 }
 
+async function loadRunnerResiliencePolicy({ cleanRoot, launcherRoot } = {}) {
+  const candidateRoots = uniqueExistingStrings([cleanRoot, launcherRoot, process.cwd()]);
+  for (const root of candidateRoots) {
+    try {
+      const policyPath = path.join(root, RESILIENCE_POLICY_PATH);
+      const policy = JSON.parse(await fs.readFile(policyPath, "utf8"));
+      return normalizeRunnerResiliencePolicy(policy, policyPath);
+    } catch (error) {
+      if (error.code === "ENOENT") continue;
+      return {
+        policy_path: path.join(root, RESILIENCE_POLICY_PATH),
+        stage_policies: new Map(),
+        error: error.message
+      };
+    }
+  }
+  return {
+    policy_path: "",
+    stage_policies: new Map(),
+    error: "daily_resilience_policy_not_found"
+  };
+}
+
+function normalizeRunnerResiliencePolicy(policy, policyPath = "") {
+  const stagePolicies = new Map();
+  if (Array.isArray(policy?.stages)) {
+    for (const stage of policy.stages) {
+      if (stage?.id) stagePolicies.set(stage.id, stage);
+    }
+  }
+  return {
+    policy_path: policyPath,
+    stage_policies: stagePolicies
+  };
+}
+
+async function prepareCleanWorktreeWithRetry({
+  prepareCleanWorktree,
+  prepareArgs,
+  resiliencePolicy,
+  retryDelayMs
+}) {
+  const retryPolicy = getStageRetryPolicy(resiliencePolicy, "prepare_clean_worktree");
+  const maxAttempts = retryMaxAttempts(retryPolicy);
+  const retryAttempts = [];
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const prepared = await prepareCleanWorktree(prepareArgs);
+      const normalized = normalizeStageResult({
+        ok: prepared?.ok !== false,
+        output: prepared || {}
+      });
+      retryAttempts.push(summarizeRetryAttempt({ attempt, normalized }));
+      if (normalized.ok) {
+        return {
+          prepared,
+          attempts: retryAttempts.length,
+          retryAttempts
+        };
+      }
+      lastError = new PublisherError(
+        "prepare_clean_worktree_failed",
+        normalized.output?.error || normalized.output?.message || "prepare_clean_worktree returned ok:false."
+      );
+      if (attempt >= maxAttempts || !shouldRetryStageFailure({ retryPolicy, normalized, error: lastError })) break;
+    } catch (error) {
+      lastError = error;
+      retryAttempts.push(summarizeRetryAttempt({ attempt, error }));
+      if (attempt >= maxAttempts || !shouldRetryStageFailure({ retryPolicy, error })) break;
+    }
+    await waitForRetryAttempt({
+      context: { retryDelayMs },
+      retryPolicy,
+      attempt
+    });
+  }
+
+  lastError.attempts = retryAttempts.length;
+  lastError.retryAttempts = retryAttempts;
+  throw lastError;
+}
+
 async function runAndRecordStage({ stage, context, summary, runStage, now }) {
-  let stageResult;
-  try {
-    stageResult = await runStage(stage, context);
-  } catch (error) {
+  const retryPolicy = getStageRetryPolicy(context.resiliencePolicy, stage.id);
+  const maxAttempts = retryMaxAttempts(retryPolicy);
+  const retryAttempts = [];
+  let lastError = null;
+  let normalized = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const stageResult = await runStage(stage, context);
+      normalized = normalizeStageResult(stageResult);
+      retryAttempts.push(summarizeRetryAttempt({ attempt, normalized }));
+      if (
+        normalized.ok ||
+        attempt >= maxAttempts ||
+        !shouldRetryStageFailure({ retryPolicy, normalized })
+      ) {
+        break;
+      }
+    } catch (error) {
+      lastError = error;
+      normalized = null;
+      retryAttempts.push(summarizeRetryAttempt({ attempt, error }));
+      if (attempt >= maxAttempts || !shouldRetryStageFailure({ retryPolicy, error })) break;
+    }
+    await waitForRetryAttempt({ context, retryPolicy, attempt });
+  }
+
+  if (lastError && !normalized) {
+    const fallback = await applyDegradedStageFallback({
+      stage,
+      context,
+      stagePolicy: retryPolicy,
+      error: lastError,
+      retryAttempts
+    });
+    if (fallback) {
+      const output = stageAttemptOutput({
+        output: fallback.output,
+        attempts: retryAttempts.length,
+        retryAttempts
+      });
+      recordStage(summary, {
+        id: stage.id,
+        status: "degraded",
+        command: stage.command,
+        output,
+        now
+      });
+      return {
+        blocked: false,
+        degraded: true,
+        normalized: {
+          ok: true,
+          output
+        }
+      };
+    }
     recordStage(summary, {
       id: stage.id,
       status: "failed",
       command: stage.command,
-      error,
+      output: stageAttemptOutput({
+        output: extractErrorOutput(lastError) || {},
+        attempts: retryAttempts.length,
+        retryAttempts
+      }),
+      error: lastError,
       now
     });
-    return { blocked: true, error };
+    return { blocked: true, error: lastError };
   }
 
-  const normalized = normalizeStageResult(stageResult);
+  if (!normalized.ok) {
+    const fallback = await applyDegradedStageFallback({
+      stage,
+      context,
+      stagePolicy: retryPolicy,
+      normalized,
+      retryAttempts
+    });
+    if (fallback) {
+      const output = stageAttemptOutput({
+        output: fallback.output,
+        attempts: retryAttempts.length,
+        retryAttempts
+      });
+      recordStage(summary, {
+        id: stage.id,
+        status: "degraded",
+        command: stage.command,
+        output,
+        now
+      });
+      return {
+        blocked: false,
+        degraded: true,
+        normalized: {
+          ok: true,
+          output
+        }
+      };
+    }
+  }
+
+  const output = stageAttemptOutput({
+    output: normalized.output,
+    attempts: retryAttempts.length,
+    retryAttempts
+  });
   recordStage(summary, {
     id: stage.id,
     status: normalized.ok ? "passed" : "failed",
     command: stage.command,
-    output: normalized.output,
+    output,
     now
   });
-  return { blocked: false, normalized };
+  return {
+    blocked: false,
+    normalized: {
+      ...normalized,
+      output
+    }
+  };
+}
+
+function getStageRetryPolicy(resiliencePolicy, stageId) {
+  if (!resiliencePolicy || !stageId) return null;
+  if (resiliencePolicy.stage_policies instanceof Map) {
+    return resiliencePolicy.stage_policies.get(stageId) || null;
+  }
+  if (resiliencePolicy.stagePolicies instanceof Map) {
+    return resiliencePolicy.stagePolicies.get(stageId) || null;
+  }
+  if (Array.isArray(resiliencePolicy.stages)) {
+    return resiliencePolicy.stages.find((stage) => stage?.id === stageId) || null;
+  }
+  return null;
+}
+
+function retryMaxAttempts(stagePolicy) {
+  const attempts = Number(stagePolicy?.retry?.max_attempts || 1);
+  if (!Number.isFinite(attempts) || attempts < 1) return 1;
+  return Math.floor(attempts);
+}
+
+function shouldRetryStageFailure({ retryPolicy, normalized, error }) {
+  const retrySignals = Array.isArray(retryPolicy?.retry?.on) ? retryPolicy.retry.on : [];
+  if (retrySignals.length === 0) return true;
+  const signalText = retrySignalText({ normalized, error });
+  if (!signalText) return true;
+  return retrySignals.some((signal) => retrySignalMatches(signal, signalText));
+}
+
+function retrySignalText({ normalized, error }) {
+  const output = normalized?.output && typeof normalized.output === "object" ? normalized.output : {};
+  const publishStatus = output.publish_status && typeof output.publish_status === "object" ? output.publish_status : {};
+  const parts = [
+    error?.code,
+    error?.message,
+    error?.stdout,
+    error?.stderr,
+    output.error_code,
+    output.code,
+    output.error,
+    output.message,
+    output.stdout,
+    output.stderr,
+    publishStatus.publish_error,
+    publishStatus.error_code
+  ];
+  return parts
+    .filter((part) => part !== undefined && part !== null && String(part).trim().length > 0)
+    .map((part) => String(part).toLowerCase())
+    .join(" ");
+}
+
+function retrySignalMatches(signal, signalText) {
+  const normalizedSignal = String(signal || "").toLowerCase();
+  const candidates = [
+    normalizedSignal,
+    normalizedSignal.replace(/_/g, " "),
+    ...retrySignalAliases(normalizedSignal)
+  ];
+  return candidates.some((candidate) => candidate && signalText.includes(candidate));
+}
+
+function retrySignalAliases(signal) {
+  const aliases = {
+    api_timeout: ["api timeout", "timeout", "timedout", "etimedout"],
+    feed_parse_error: ["feed parse", "parse error"],
+    git_fetch_timeout: ["git fetch timeout", "fetch timeout", "timedout", "etimedout"],
+    git_push_timeout: ["git push timeout", "push timeout", "timedout", "etimedout"],
+    network_error: [
+      "network error",
+      "econnreset",
+      "econnrefused",
+      "enotfound",
+      "eai_again",
+      "etimedout",
+      "fetch failed",
+      "socket hang up"
+    ],
+    provider_timeout: ["provider timeout", "timeout", "timedout", "etimedout"],
+    pages_cache_delay: ["pages cache delay", "pages_verification_failed", "http 404", "http 403"],
+    rate_limit: ["rate limit", "rate-limited", "too many requests", " 429 "],
+    timeout: ["timeout", "timedout", "etimedout"]
+  };
+  return aliases[signal] || [];
+}
+
+async function waitForRetryAttempt({ context, retryPolicy, attempt }) {
+  const overrideDelay = Number(context.retryDelayMs);
+  const delayMs = Number.isFinite(overrideDelay)
+    ? overrideDelay
+    : retryBackoffMs(retryPolicy, attempt);
+  if (delayMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+}
+
+function retryBackoffMs(retryPolicy, attempt) {
+  const values = Array.isArray(retryPolicy?.retry?.backoff_ms) ? retryPolicy.retry.backoff_ms : [];
+  const raw = values[Math.min(attempt, Math.max(0, values.length - 1))] || 0;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+async function applyDegradedStageFallback({ stage, context, stagePolicy, normalized, error, retryAttempts }) {
+  if (stagePolicy?.degrade?.allowed !== true) {
+    return null;
+  }
+  if (stageFailureMatchesBlockReason({ stagePolicy, normalized, error })) {
+    return null;
+  }
+  const fallbackSpec = DISCOVERY_DEGRADE_FALLBACKS[stage.id];
+  if (!fallbackSpec) {
+    return null;
+  }
+  const outputPath = outputArgValue(stage);
+  if (!outputPath) {
+    return null;
+  }
+  return await writeDegradedDiscoveryArtifact({
+    stage,
+    context,
+    fallbackSpec,
+    outputPath,
+    normalized,
+    error,
+    retryAttempts
+  });
+}
+
+function stageFailureMatchesBlockReason({ stagePolicy, normalized, error }) {
+  const blockReasons = Array.isArray(stagePolicy?.block?.reasons) ? stagePolicy.block.reasons : [];
+  if (blockReasons.length === 0) {
+    return false;
+  }
+  const signalText = retrySignalText({ normalized, error });
+  if (!signalText) {
+    return false;
+  }
+  return blockReasons.some((reason) => retrySignalMatches(reason, signalText));
+}
+
+async function writeDegradedDiscoveryArtifact({
+  stage,
+  context,
+  fallbackSpec,
+  outputPath,
+  normalized,
+  error,
+  retryAttempts
+}) {
+  const generatedAt = typeof context.now === "function" ? context.now() : new Date().toISOString();
+  const errorCode = degradedFallbackErrorCode({ normalized, error });
+  const reason = degradedFallbackReason({ normalized, error });
+  const sourceId = `${fallbackSpec.platform || fallbackSpec.auditGroup}-${slugStageId(fallbackSpec.sourceName) || "source"}`;
+  const sourceUrl = fallbackSpec.sourceUrl || "https://example.com/";
+  const auditSource = {
+    name: fallbackSpec.sourceName,
+    url: sourceUrl,
+    status: "blocked",
+    notes: reason
+  };
+  if (fallbackSpec.platform) {
+    auditSource.platform = fallbackSpec.platform;
+  }
+  const payload = {
+    ok: true,
+    degraded: true,
+    fallback_used: true,
+    fallback_kind: "degraded_discovery_artifact",
+    report_date: context.reportDate,
+    generated_at: generatedAt,
+    source_audit: {
+      [fallbackSpec.auditGroup]: {
+        checked: true,
+        sources: [auditSource],
+        candidates_found: 0,
+        included: 0,
+        blocked_reason: errorCode,
+        notes: `Degraded fallback generated after ${stage.id} failed: ${reason}`
+      }
+    },
+    sources: [
+      {
+        id: sourceId,
+        name: fallbackSpec.sourceName,
+        url: sourceUrl,
+        category: fallbackSpec.sourceCategory || "community",
+        status: "blocked",
+        checked_at: generatedAt,
+        notes: reason,
+        ...(fallbackSpec.platform ? { platform: fallbackSpec.platform } : {})
+      }
+    ],
+    candidates: []
+  };
+  const resolvedOutputPath = absoluteCleanPath(context.cleanRoot, outputPath);
+  await fs.mkdir(path.dirname(resolvedOutputPath), { recursive: true });
+  await fs.writeFile(resolvedOutputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  return {
+    output: {
+      ok: true,
+      degraded: true,
+      fallback_used: true,
+      fallback_kind: "degraded_discovery_artifact",
+      fallback_path: stagePath(outputPath, context.cleanRoot),
+      source_audit_group: fallbackSpec.auditGroup,
+      candidate_count: 0,
+      error_code: errorCode,
+      degraded_reason: reason,
+      retry_attempts_exhausted: retryAttempts.length
+    }
+  };
+}
+
+function outputArgValue(stage) {
+  const args = Array.isArray(stage?.command?.args) ? stage.command.args : [];
+  const index = args.indexOf("--output");
+  if (index < 0 || index >= args.length - 1) {
+    return "";
+  }
+  return String(args[index + 1] || "").trim();
+}
+
+function degradedFallbackErrorCode({ normalized, error }) {
+  const output = normalized?.output && typeof normalized.output === "object" ? normalized.output : {};
+  return String(error?.code || output.error_code || output.code || "source_discovery_failed").trim() || "source_discovery_failed";
+}
+
+function degradedFallbackReason({ normalized, error }) {
+  const output = normalized?.output && typeof normalized.output === "object" ? normalized.output : {};
+  const publishStatus = output.publish_status && typeof output.publish_status === "object" ? output.publish_status : {};
+  return trimOutput(
+    error?.message ||
+    output.error ||
+    output.message ||
+    publishStatus.publish_error ||
+    degradedFallbackErrorCode({ normalized, error })
+  );
+}
+
+function slugStageId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function summarizeRetryAttempt({ attempt, normalized, error }) {
+  const output = normalized?.output && typeof normalized.output === "object" ? normalized.output : {};
+  const summary = {
+    attempt,
+    ok: Boolean(normalized?.ok) && !error
+  };
+  const errorCode = error?.code || output.error_code || output.code || "";
+  const message =
+    error?.message ||
+    output.error ||
+    output.message ||
+    output.publish_status?.publish_error ||
+    "";
+  if (errorCode) summary.error_code = String(errorCode);
+  if (message) summary.error = trimOutput(message);
+  return summary;
+}
+
+function stageAttemptOutput({ output, attempts, retryAttempts }) {
+  const retryHistory = retryAttempts.length > 1 || retryAttempts.some((attempt) => !attempt.ok);
+  const retryFields = {
+    attempts,
+    ...(retryHistory ? { retry_attempts: retryAttempts } : {})
+  };
+  if (!output || typeof output !== "object" || Array.isArray(output)) {
+    return {
+      result: output,
+      ...retryFields
+    };
+  }
+  return {
+    ...output,
+    ...retryFields
+  };
 }
 
 async function defaultRunStage(stage, context) {
@@ -1126,16 +1725,31 @@ function normalizeStageResult(stageResult) {
 
 function recordStage(summary, { id, status, command, output, error, now }) {
   const errorOutput = error ? extractErrorOutput(error) : null;
+  const combinedOutput = mergeStageOutput(output, errorOutput);
   summary.stages.push({
     id,
     status,
     ...(command ? { command } : {}),
-    ...(output ? { output: sanitizeStageOutput(output) } : {}),
-    ...(errorOutput ? { output: sanitizeStageOutput(errorOutput) } : {}),
+    ...(combinedOutput ? { output: sanitizeStageOutput(combinedOutput) } : {}),
     ...(error ? { error: error.message, error_code: error.code || "" } : {}),
     updated_at: now()
   });
   summary.updated_at = now();
+}
+
+function mergeStageOutput(output, errorOutput) {
+  if (!output) return errorOutput;
+  if (!errorOutput) return output;
+  if (isPlainStageObject(output) && isPlainStageObject(errorOutput)) {
+    return {
+      ...output,
+      ...errorOutput
+    };
+  }
+  return {
+    result: output,
+    ...errorOutput
+  };
 }
 
 function extractErrorOutput(error) {
@@ -1147,6 +1761,14 @@ function extractErrorOutput(error) {
     output.stderr = trimOutput(error.stderr);
   }
   return Object.keys(output).length > 0 ? output : null;
+}
+
+function isPlainStageObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function uniqueExistingStrings(values) {
+  return [...new Set(values.filter((value) => typeof value === "string" && value.trim().length > 0))];
 }
 
 async function writeSummary(summaryPath, summary) {
@@ -1229,6 +1851,72 @@ function blockedNextAction(error) {
     kind: "inspect_blocker",
     error_code: error.code || "unexpected_error",
     message: error.message
+  };
+}
+
+function finalWorkflowStatus({ publish, summary }) {
+  const degraded = summaryHasDegradedOutput(summary);
+  if (publish) {
+    return degraded ? "published_degraded" : "published";
+  }
+  return degraded ? "generated_degraded" : "generated_only";
+}
+
+function summaryHasDegradedOutput(summary) {
+  return (summary?.stages || []).some((stage) => {
+    if (stage?.status === "degraded") {
+      return true;
+    }
+    const output = stage?.output && typeof stage.output === "object" ? stage.output : {};
+    if (output.degraded === true) {
+      return true;
+    }
+    const qualityStatus = output.quality_status && typeof output.quality_status === "object" ? output.quality_status : {};
+    return qualityStatus.status === "degraded";
+  });
+}
+
+function pagesVerifyPendingNextAction({ outcome, summaryPath }) {
+  const output = outcome?.normalized?.output || extractErrorOutput(outcome?.error) || {};
+  const publishStatus = output.publish_status && typeof output.publish_status === "object"
+    ? output.publish_status
+    : {};
+  const result = output.result && typeof output.result === "object" ? output.result : {};
+  const pagesUrl = output.pages_url || publishStatus.pages_url || result.pages_url || "";
+  const message =
+    output.verification_error ||
+    output.error ||
+    output.message ||
+    publishStatus.publish_error ||
+    result.verification_error ||
+    outcome?.error?.message ||
+    "Pages verification did not confirm the published report yet.";
+  return {
+    kind: "verify_pages_later",
+    stage_id: "pages_verify",
+    summary_path: summaryPath,
+    pages_url: pagesUrl,
+    message
+  };
+}
+
+function infrastructurePublishRecoveryNextAction({ outcome, stageId, previousStageId, summaryPath }) {
+  const output = outcome?.normalized?.output || extractErrorOutput(outcome?.error) || {};
+  const publishStatus = output.publish_status && typeof output.publish_status === "object"
+    ? output.publish_status
+    : {};
+  const message =
+    output.error ||
+    output.message ||
+    publishStatus.publish_error ||
+    outcome?.error?.message ||
+    "Git publish and GitHub API publish fallback both failed.";
+  return {
+    kind: "recover_infrastructure_publish",
+    stage_id: stageId,
+    previous_stage_id: previousStageId,
+    summary_path: summaryPath,
+    message
   };
 }
 

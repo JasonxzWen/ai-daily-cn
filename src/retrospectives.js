@@ -250,7 +250,19 @@ function summarizeStageFailure(stage) {
 
 function normalizeRetrospectiveStatus(status, mode) {
   const value = String(status || "").trim();
-  if (["published", "blocked", "degraded", "completed", "generated_only", "rolled_up"].includes(value)) {
+  if ([
+    "published",
+    "published_degraded",
+    "published_pending_pages_verification",
+    "blocked",
+    "unsafe_blocked",
+    "infrastructure_blocked_after_fallback_exhausted",
+    "degraded",
+    "completed",
+    "generated_only",
+    "generated_degraded",
+    "rolled_up"
+  ].includes(value)) {
     return value;
   }
   if (value === "failed") {
