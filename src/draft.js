@@ -193,9 +193,12 @@ const MAIN_STREAM_SOURCE_IMPACT_GROUPS = [
   "reddit_sources",
   "sources_health"
 ];
+const STORY_TARGET_MIN = 1;
+const STORY_TARGET = 8;
+const STORY_TARGET_MAX = 12;
 const MAIN_TARGET_MIN = 5;
-const MAIN_TARGET = 10;
-const MAIN_TARGET_MAX = 30;
+const MAIN_TARGET = STORY_TARGET;
+const MAIN_TARGET_MAX = STORY_TARGET_MAX;
 const MAIN_REFILL_WINDOW_DAYS = 3;
 const GITHUB_TRENDING_TARGET = 20;
 const GITHUB_TRENDING_LANGUAGE_SCOPES = ["python", "typescript", "rust", "go", "java"];
@@ -409,15 +412,10 @@ function selectReportItems(merged, options = {}) {
     .filter((entry) => entry.eligible)
     .map((entry) => entry.candidate)
     .sort(compareMainCandidates);
-  let mainSeeds = pickMainCandidates(strictMainPool, Math.min(MAIN_TARGET, MAIN_TARGET_MAX));
-  if (mainSeeds.length < MAIN_TARGET_MIN) {
-    const strictSeedIds = new Set(mainSeeds.map((candidate) => candidate.id));
-    mainSeeds = pickMainCandidates([
-      ...mainSeeds,
-      ...refillMainPool.filter((candidate) => !strictSeedIds.has(candidate.id))
-    ], MAIN_TARGET_MIN);
-  }
-  const mainSeedIds = new Set(mainSeeds.map((candidate) => candidate.id));
+  const storyPool = uniqueCandidatesById([...strictMainPool, ...refillMainPool]);
+  const storyClusters = pickStoryClusters(storyPool, Math.min(STORY_TARGET, STORY_TARGET_MAX));
+  const mainSeeds = storyClusters.map((cluster) => cluster.primary);
+  const mainSeedIds = new Set(storyClusters.flatMap((cluster) => cluster.candidates.map((candidate) => candidate.id)));
   for (const entry of mainEvaluations) {
     if (!entry.eligible || mainSeedIds.has(entry.candidate.id)) {
       continue;
@@ -427,17 +425,25 @@ function selectReportItems(merged, options = {}) {
   const mainSelectionSnapshot = mainSelectionSnapshotFor(mainEvaluations, mainSeeds, {
     sourceAudit: merged.sourceAudit
   });
-  const mainItems = mainSeeds.map((candidate) => {
+  const stories = [];
+  const mainItems = storyClusters.map((cluster) => {
+    const candidate = cluster.primary;
     const mainCandidate = derivedCandidate(candidate, {
       idPrefix: "main",
       category: "main_item",
       includedIn: "main_items",
       existing: [...includedCandidates, ...derived]
     });
+    mainCandidate.id = uniqueCandidateId([...includedCandidates, ...derived], storyIdForCluster(cluster));
     derived.push(mainCandidate);
-    selectedIds.add(candidate.id);
-    selectedIds.add(`project:${candidate.id}`);
-    return mainItem(mainCandidate, candidate);
+    for (const sourceCandidate of cluster.candidates) {
+      selectedIds.add(sourceCandidate.id);
+      selectedIds.add(`project:${sourceCandidate.id}`);
+    }
+    const item = mainItem(mainCandidate, candidate);
+    const story = storyItemFromCluster(cluster, item, mainCandidate.id);
+    stories.push(story);
+    return item;
   });
 
   const projectSeeds = publicGithubCandidates
@@ -547,6 +553,7 @@ function selectReportItems(merged, options = {}) {
 
   return {
     candidates: finalizeMainAudit([...includedCandidates, ...derived]),
+    stories,
     main_items: mainItems,
     github_trending: githubTrending,
     huggingface_trending: huggingFaceTrending,
@@ -571,6 +578,7 @@ function selectReportItems(merged, options = {}) {
     },
     selection_snapshot: {
       main_items: mainSelectionSnapshot,
+      stories: storySelectionSnapshotFor(mainEvaluations, storyClusters),
       hot_blogs: {
         eligible_candidates: hotBlogPool.length,
         target: HOT_BLOG_TARGET,
@@ -710,6 +718,22 @@ async function loadRecentMainUrlHistory(rootDir, reportDate, lookbackDays = 7) {
         if (key && !urls.has(key)) {
           urls.set(key, `${parsed?.report_date || dateString}:${sectionName}[${index}]`);
         }
+        const storyKey = recentStoryHistoryKey(item);
+        if (storyKey && !urls.has(storyKey)) {
+          urls.set(storyKey, `${parsed?.report_date || dateString}:${sectionName}[${index}]`);
+        }
+      }
+    }
+    for (const [index, story] of (Array.isArray(parsed?.stories) ? parsed.stories : []).entries()) {
+      const storyKey = recentStoryHistoryKey(story);
+      if (storyKey && !urls.has(storyKey)) {
+        urls.set(storyKey, `${parsed?.report_date || dateString}:stories[${index}]`);
+      }
+      for (const source of Array.isArray(story?.sources) ? story.sources : []) {
+        const key = normalizeUrl(source?.url);
+        if (key && !urls.has(key)) {
+          urls.set(key, `${parsed?.report_date || dateString}:stories[${index}].sources`);
+        }
       }
     }
   }
@@ -727,16 +751,47 @@ function normalizeRecentMainUrlHistory(value) {
 }
 
 function isFreshForMainItems(candidate, recentMainUrlHistory) {
-  const key = normalizeUrl(candidate?.url);
-  if (!key) {
+  if (hasMaterialStoryUpdate(candidate)) {
     return true;
   }
-  const previous = recentMainUrlHistory.get(key);
-  if (!previous) {
+  const keys = recentCandidateHistoryKeys(candidate);
+  for (const key of keys) {
+    const previous = recentMainUrlHistory.get(key);
+    if (previous) {
+      candidate.exclusion_reason = `recent_duplicate_main_item:${previous}`;
+      return false;
+    }
+  }
+  return true;
+}
+
+function recentCandidateHistoryKeys(candidate) {
+  return uniqueValues([
+    normalizeUrl(candidate?.url),
+    storyHistoryKey(explicitStoryKey(candidate))
+  ].filter(Boolean));
+}
+
+function recentStoryHistoryKey(item) {
+  return storyHistoryKey(
+    item?.claim_fingerprint ||
+    item?.story_key ||
+    item?.story_id ||
+    item?.candidate_id ||
+    item?.source_item_ref
+  );
+}
+
+function storyHistoryKey(value) {
+  const key = String(value || "").trim();
+  return key ? `story:${slugId(key.replace(/^story-/i, ""))}` : "";
+}
+
+function hasMaterialStoryUpdate(candidate) {
+  if (candidate?.material_update === true || candidate?.material_new_progress === true) {
     return true;
   }
-  candidate.exclusion_reason = `recent_duplicate_main_item:${previous}`;
-  return false;
+  return /\b(material_update|new_progress|material_new_progress)\s*=\s*true\b/i.test(String(candidate?.notes || ""));
 }
 
 function mergeEvidenceAssets(...groups) {
@@ -931,6 +986,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     },
     hero_highlights: selectHeroHighlights(selection),
     source_audit: sourceAudit,
+    stories: selection.stories || [],
     main_items: selection.main_items,
     github_trending: selection.github_trending,
     huggingface_trending: selection.huggingface_trending,
@@ -948,6 +1004,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
     evidence_assets: evidenceAssets,
     self_check: {
       report_date: reportDate,
+      stories: (selection.stories || []).length,
       main_items: selection.main_items.length,
       builder_observations: selection.builder_observations.length,
       builder_skill_used: ["candidate-pool-autodraft"],
@@ -959,6 +1016,15 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, evi
           target: MAIN_TARGET,
           target_max: MAIN_TARGET_MAX,
           shortfall: selection.main_items.length < MAIN_TARGET_MIN,
+          rejection_counts: {}
+        },
+        stories: selection.selection_snapshot?.stories || {
+          eligible_candidates: selection.eligible_counts?.main_items || 0,
+          selected: (selection.stories || []).length,
+          target_min: STORY_TARGET_MIN,
+          target: STORY_TARGET,
+          target_max: STORY_TARGET_MAX,
+          shortfall: (selection.stories || []).length < STORY_TARGET,
           rejection_counts: {}
         },
         github_trending: {
@@ -2850,6 +2916,9 @@ function normalizeCandidate(rawCandidate, context) {
     ...(rawCandidate.verification_note ? { verification_note: rawCandidate.verification_note } : {}),
     ...(rawCandidate.risk_note ? { risk_note: rawCandidate.risk_note } : {}),
     ...(rawCandidate.reader_relevance ? { reader_relevance: rawCandidate.reader_relevance } : {}),
+    ...(rawCandidate.story_key ? { story_key: String(rawCandidate.story_key).trim() } : {}),
+    ...(rawCandidate.claim_fingerprint ? { claim_fingerprint: String(rawCandidate.claim_fingerprint).trim() } : {}),
+    ...(rawCandidate.material_update ? { material_update: true } : {}),
     ...(Array.isArray(rawCandidate.verification_sources) ? { verification_sources: rawCandidate.verification_sources.filter(isHttpUrl) } : {}),
     ...(rawCandidate.platform ? { platform: rawCandidate.platform } : {}),
     ...(rawCandidate.rule_id ? { rule_id: rawCandidate.rule_id } : {}),
@@ -2893,6 +2962,225 @@ function derivedCandidate(candidate, options) {
 
 function cloneCandidates(candidates) {
   return candidates.map((candidate) => ({ ...candidate }));
+}
+
+function uniqueCandidatesById(candidates) {
+  const seen = new Set();
+  const result = [];
+  for (const candidate of candidates) {
+    const id = String(candidate?.id || "").trim();
+    if (!id || seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    result.push(candidate);
+  }
+  return result;
+}
+
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function pickStoryClusters(candidates, target) {
+  const clusters = clusterStoryCandidates(candidates);
+  const picked = [];
+  const seenUrls = new Set();
+  const seenTopics = new Set();
+  const enforceInfraVendorCap = shouldEnforceInfraVendorCap(clusters.map((cluster) => cluster.primary), target);
+  let infraVendorCount = 0;
+  let lowSignalPartnershipCount = 0;
+  for (const cluster of clusters) {
+    if (picked.length >= target) break;
+    const candidate = cluster.primary;
+    const clusterUrls = storyClusterUrls(cluster);
+    if (clusterUrls.length === 0 || clusterUrls.some((url) => seenUrls.has(url))) continue;
+    const topicKey = mainTopicKey(candidate);
+    if (topicKey && seenTopics.has(topicKey)) continue;
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      if (enforceInfraVendorCap && infraVendorCount >= MAX_INFRA_VENDOR_MAIN_ITEMS) continue;
+    }
+    if (isLowSignalVendorPartnership(candidate)) {
+      if (lowSignalPartnershipCount >= 1) continue;
+      lowSignalPartnershipCount += 1;
+    }
+    picked.push(cluster);
+    for (const url of clusterUrls) {
+      seenUrls.add(url);
+    }
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      infraVendorCount += 1;
+    }
+    if (topicKey) {
+      seenTopics.add(topicKey);
+    }
+  }
+  return picked;
+}
+
+function clusterStoryCandidates(candidates) {
+  const byKey = new Map();
+  const ordered = [];
+  for (const candidate of candidates) {
+    const key = storyClusterKey(candidate);
+    if (!key) {
+      continue;
+    }
+    let cluster = byKey.get(key);
+    if (!cluster) {
+      cluster = {
+        key,
+        explicit_key: explicitStoryKey(candidate),
+        primary: candidate,
+        candidates: []
+      };
+      byKey.set(key, cluster);
+      ordered.push(cluster);
+    }
+    cluster.candidates.push(candidate);
+    if (compareMainCandidates(candidate, cluster.primary) < 0) {
+      cluster.primary = candidate;
+    }
+  }
+  return ordered.sort((left, right) => compareMainCandidates(left.primary, right.primary));
+}
+
+function storyClusterKey(candidate) {
+  const explicit = explicitStoryKey(candidate);
+  if (explicit) {
+    return `story:${slugId(explicit)}`;
+  }
+  const url = normalizeUrl(candidate?.url);
+  return url ? `url:${url}` : "";
+}
+
+function explicitStoryKey(candidate) {
+  return [
+    candidate?.claim_fingerprint,
+    candidate?.story_key,
+    candidate?.story_id,
+    candidate?.fingerprint
+  ].map((value) => String(value || "").trim()).find(Boolean) || "";
+}
+
+function storyClusterUrls(cluster) {
+  return uniqueValues(cluster.candidates.map((candidate) => normalizeUrl(candidate?.url)).filter(Boolean));
+}
+
+function storyIdForCluster(cluster) {
+  const explicit = cluster.explicit_key || explicitStoryKey(cluster.primary);
+  if (explicit) {
+    return `story-${slugId(explicit)}`;
+  }
+  return `story-${slugId(cluster.primary?.id || cluster.primary?.url || cluster.key)}`;
+}
+
+function storySelectionSnapshotFor(evaluations, clusters) {
+  const rejectionCounts = {};
+  for (const entry of evaluations) {
+    if (!entry.eligible) {
+      incrementCount(rejectionCounts, entry.reject_reason || "rejected");
+    }
+  }
+  return {
+    eligible_candidates: evaluations.filter((entry) => entry.eligible).length,
+    eligible_story_clusters: clusterStoryCandidates(evaluations.filter((entry) => entry.eligible).map((entry) => entry.candidate)).length,
+    selected: clusters.length,
+    target_min: STORY_TARGET_MIN,
+    target: STORY_TARGET,
+    target_max: STORY_TARGET_MAX,
+    shortfall: clusters.length < STORY_TARGET,
+    rejection_counts: rejectionCounts
+  };
+}
+
+function storyItemFromCluster(cluster, mainItemValue, storyId) {
+  const candidate = cluster.primary;
+  const sources = storySourcesForCluster(cluster);
+  return {
+    story_id: storyId,
+    title: mainItemValue.title,
+    importance: mainItemValue.importance || "general",
+    trend: storyTrendForCandidate(candidate),
+    event_date: candidate.event_date || mainItemValue.event_date,
+    primary_entity: mainEntity(candidate) || candidate.source || "AI",
+    event_type: storyEventType(candidate),
+    object: trimText(displayTitleForCandidate(candidate), 96),
+    what_happened: mainItemValue.summary || mainItemPublicLine(mainItemValue),
+    why_it_matters: mainItemValue.why_it_matters || mainItemValue.reader_relevance || mainItemPublicLine(mainItemValue),
+    evidence_level: storyEvidenceLevel(cluster, sources),
+    sources,
+    source_item_refs: uniqueValues(cluster.candidates.map((item) => item.id || item.url).filter(Boolean))
+  };
+}
+
+function mainItemPublicLine(item) {
+  return [
+    item?.summary,
+    ...(Array.isArray(item?.bullets) ? item.bullets : [])
+  ].map((value) => String(value || "").trim()).find(Boolean) || String(item?.title || "").trim();
+}
+
+function storySourcesForCluster(cluster) {
+  const sources = [];
+  const seen = new Set();
+  for (const candidate of cluster.candidates) {
+    const url = candidate.url || candidate.primary_url || (Array.isArray(candidate.verification_sources) ? candidate.verification_sources[0] : "");
+    if (!isHttpUrl(url)) {
+      continue;
+    }
+    const key = `${normalizeUrl(url)}|${candidate.source || candidate.source_id || ""}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    sources.push({
+      label: String(candidate.source || candidate.source_id || "Source").trim(),
+      url,
+      type: storySourceType(candidate)
+    });
+  }
+  return sources;
+}
+
+function storySourceType(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (sourceLevel === "official" || sourceLevel === "official_company_news") return "official";
+  if (sourceLevel === "primary" || sourceLevel === "model_registry") return "primary";
+  if (sourceLevel === "paper" || sourceLevel === "paper_api") return "paper";
+  if (sourceLevel === "github" || sourceLevel === "official_open_source_account" || sourceLevel === "official_model_host_account") return "github";
+  if (sourceLevel === "community") return "community";
+  if (sourceLevel === "original_social") return "social";
+  if (sourceLevel === "intermediary") return "media";
+  return "source";
+}
+
+function storyEvidenceLevel(cluster, sources) {
+  const sourceLevels = new Set(cluster.candidates.map((candidate) => sourceLevelForCandidate(candidate)));
+  const uniqueUrls = new Set(sources.map((source) => normalizeUrl(source.url)).filter(Boolean));
+  if (uniqueUrls.size >= 2 || sourceLevels.has("multi_source")) return "multi_source";
+  const sourceLevel = sourceLevelForCandidate(cluster.primary);
+  if (sourceLevel === "community" || sourceLevel === "original_social") return "community_signal";
+  if (sourceLevel === "intermediary") return "secondary";
+  return "primary";
+}
+
+function storyTrendForCandidate(candidate) {
+  const category = inferredEditorialCategory(candidate);
+  if (category === "engineering_toolchain" || category === "product_radar") return "AI products and developer workflow";
+  if (category === "open_source") return "open source AI";
+  if (category === "content_aigc") return "AI content workflow";
+  if (category === "model_release") return "model releases";
+  if (category === "funding" || category === "company_business") return "AI business";
+  return "AI industry";
+}
+
+function storyEventType(candidate) {
+  const text = candidateText(candidate).toLowerCase();
+  if (/\b(launch|release|ship|rollout|available|introduce|open source)\b|发布|推出|上线|开源/u.test(text)) return "launch";
+  if (/\b(update|upgrade|add|support)\b|更新|新增|支持/u.test(text)) return "update";
+  if (/\b(research|paper|benchmark|eval)\b|论文|研究|评测|基准/u.test(text)) return "research";
+  return "signal";
 }
 
 function evaluateMainCandidates(candidates, options = {}) {
@@ -3144,6 +3432,7 @@ function mainRejectReason(candidate, options = {}) {
   if (!candidate || typeof candidate !== "object") return "invalid_candidate";
   if (!candidate.url) return "missing_url";
   if (!hasReaderVisibleTitle(candidate)) return "missing_reader_visible_title";
+  if (isTemplatedStoryTitleCandidate(candidate)) return "templated_story_title";
   if (isFutureDatedCandidate(candidate, reportDate)) return "future_dated";
   if (isOutsideMainWindowCandidate(candidate, reportDate)) return "outside_main_window";
   if (!isFreshForMainItems(candidate, recentMainUrlHistory)) return "recent_duplicate";
@@ -3162,10 +3451,67 @@ function mainRejectReason(candidate, options = {}) {
   if (isLowSignalVendorPartnership(candidate)) return "low_signal_vendor_partnership";
   if (candidate.category === "builder_observation" && isLowSignalBuilderMainCandidate(candidate)) return "builder_low_signal";
   if (isHardcoreResearchOnly(candidate)) return "hardcore_research_only";
+  if (isCommunitySingleSourceStoryCandidate(candidate)) return "community_single_source_story";
+  if (isSecondarySingleSourceStoryCandidate(candidate)) return "secondary_single_source_story";
   if (!hasMainStreamSignal(candidate, meta, reportDate)) return "not_ai_relevant";
   if (isThinMainStreamCandidate(candidate, meta)) return "thin_candidate_detail";
   if (isUnverifiedHighRiskMainCandidate(candidate)) return "unverified_high_risk_claim";
   return "";
+}
+
+function isTemplatedStoryTitleCandidate(candidate) {
+  const title = String(candidate?.title || "").replace(/\s+/g, "");
+  if (!title) {
+    return false;
+  }
+  return isTemplatedStoryTitleText(title);
+}
+
+function isTemplatedStoryTitleText(value) {
+  const title = String(value || "").replace(/\s+/g, "");
+  if (!title) {
+    return false;
+  }
+  return /更新AI产品、平台或工程实践/u.test(title) ||
+    /披露模型能力和评估方法更新/u.test(title) ||
+    /相关团队更新agent工作流和开发工具能力/u.test(title) ||
+    /updates?AIproducts?,?platforms?orengineeringpractices?/i.test(title) ||
+    /modelcapabilitiesandevaluationmethodupdates?/i.test(title) ||
+    /updates?agentworkflowanddevelopertools?/i.test(title);
+}
+
+function isSecondarySingleSourceStoryCandidate(candidate) {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (sourceLevel !== "intermediary") {
+    return false;
+  }
+  return !hasMultiSourceStoryEvidence(candidate) && !hasPrimaryStoryEvidence(candidate);
+}
+
+function isCommunitySingleSourceStoryCandidate(candidate) {
+  const sourceLevel = String(candidate?.source_level || sourceLevelForCandidate(candidate)).trim();
+  if (sourceLevel !== "community" && sourceLevel !== "original_social") {
+    return false;
+  }
+  return !hasMultiSourceStoryEvidence(candidate) && !hasPrimaryStoryEvidence(candidate);
+}
+
+function hasMultiSourceStoryEvidence(candidate) {
+  if (sourceLevelForCandidate(candidate) === "multi_source" || candidate.verification_status === "multi_source_confirmed") {
+    return true;
+  }
+  const sources = Array.isArray(candidate.verification_sources) ? candidate.verification_sources : [];
+  const urls = new Set(sources.map((url) => normalizeUrl(url)).filter(Boolean));
+  return urls.size >= 2;
+}
+
+function hasPrimaryStoryEvidence(candidate) {
+  if (PRIMARY_STATUSES.has(candidate.verification_status) && TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevelForCandidate(candidate))) {
+    return true;
+  }
+  const primaryUrl = normalizeUrl(candidate.primary_url);
+  const ownUrl = normalizeUrl(candidate.url);
+  return Boolean(primaryUrl && primaryUrl !== ownUrl);
 }
 
 function hasMainStreamSignal(candidate, meta = {}, reportDate = "") {
@@ -4890,6 +5236,13 @@ function displayTitleForCandidate(candidate) {
     decodeCommonHtmlEntities(String(candidate.title || "")).replace(/\s+/g, " ").trim(),
     candidate
   );
+  if (hasChineseText(rawTitle) && isConcreteReaderTitle(rawTitle, candidate)) {
+    return trimText(stripSentenceEnding(rawTitle), 120);
+  }
+  const concreteEnglishTitle = concreteChineseTitleFromEnglish(rawTitle, candidate);
+  if (concreteEnglishTitle) {
+    return trimText(concreteEnglishTitle, 120);
+  }
   const title = chineseLeadForCandidate(candidate) || genericChineseHeadline(candidate);
   if (title) {
     return trimText(title, 120);
@@ -4898,6 +5251,128 @@ function displayTitleForCandidate(candidate) {
     return trimText(stripSentenceEnding(rawTitle), 120);
   }
   return trimText(rawTitle || genericChineseFact(candidate, null) || candidate.title, 120);
+}
+
+function isConcreteReaderTitle(title, candidate = {}) {
+  const text = String(title || "").replace(/\s+/g, " ").trim();
+  if (!text || text.length < 12 || TITLE_MOJIBAKE_RE.test(text)) {
+    return false;
+  }
+  if (isTemplatedStoryTitleText(text)) {
+    return false;
+  }
+  if (/^(?:source|update|report|news|blog|paper|project)\s*[:：-]?\s*$/i.test(text)) {
+    return false;
+  }
+  if (/^(?:[a-z0-9_.-]+\/[a-z0-9_.-]+)$/i.test(text)) {
+    return false;
+  }
+  if (/today entered github trending top 10|appeared on github trending|source:\s*third-party report|sequence\s+\d+/i.test(text)) {
+    return false;
+  }
+  const visibleLetters = (text.match(/[A-Za-z]|\p{Script=Han}/gu) || []).length;
+  if (visibleLetters < 8) {
+    return false;
+  }
+  const context = `${text} ${candidate?.evidence || ""} ${candidate?.summary || ""}`;
+  return AI_RELEVANCE_RE.test(context) ||
+    PRODUCT_PLATFORM_RE.test(context) ||
+    BUILDER_RELEVANCE_RE.test(context) ||
+    /agent|model|llm|copilot|claude|openai|anthropic|google|github|nvidia|microsoft|meta|bytedance|alibaba|qwen|deepseek/i.test(context);
+}
+
+function concreteChineseTitleFromEnglish(rawTitle, candidate = {}) {
+  const title = String(rawTitle || "").replace(/\s+/g, " ").trim();
+  if (!title || hasChineseText(title) || !isConcreteReaderTitle(title, candidate)) {
+    return "";
+  }
+  const lower = title.toLowerCase();
+  const entity = shortEntityForChineseTitle(candidate);
+  const topic = englishConcreteTopic(lower, candidate);
+  if (!topic) {
+    return "";
+  }
+  const verb = englishConcreteVerb(lower);
+  return `${entity}${verb}${topic}`;
+}
+
+function shortEntityForChineseTitle(candidate = {}) {
+  const raw = mainEntity(candidate) || String(candidate.source || "").trim() || "相关团队";
+  const text = raw.replace(/\s+(?:News RSS|RSS|Feed|Research Blog|Developer Blog|Machine Learning Blog|Blog)$/i, "").trim();
+  if (/microsoft/i.test(text)) return "Microsoft";
+  if (/openai/i.test(text)) return "OpenAI";
+  if (/anthropic/i.test(text)) return "Anthropic";
+  if (/google\s*deepmind|deepmind/i.test(text)) return "DeepMind";
+  if (/google/i.test(text)) return "Google";
+  if (/nvidia/i.test(text)) return "NVIDIA";
+  if (/\baws\b|amazon/i.test(text)) return "AWS";
+  if (/qwen/i.test(text)) return "Qwen";
+  if (/alibaba/i.test(text)) return "Alibaba Cloud";
+  if (/example\s*ai/i.test(text)) return "Example AI";
+  return text || "相关团队";
+}
+
+function englishConcreteVerb(lowerTitle) {
+  if (/\b(launches|introduces|unveils|ships|releases|publishes)\b/.test(lowerTitle)) {
+    return "发布";
+  }
+  if (/\b(changes|updates|adds|expands|improves|upgrades)\b/.test(lowerTitle)) {
+    return "更新";
+  }
+  if (/\b(explains|details|summarizes|breaks down|covers|tracks)\b/.test(lowerTitle)) {
+    return "说明";
+  }
+  return "披露";
+}
+
+function englishConcreteTopic(lowerTitle, candidate = {}) {
+  const text = `${lowerTitle} ${candidate?.evidence || ""} ${candidate?.summary || ""}`.toLowerCase();
+  if (/pricing|price|availability|available|rollout/.test(text) && /copilot|github|enterprise/.test(text)) {
+    return " Copilot 与企业可用范围变化";
+  }
+  if (/model weights?|usage guide|hugging\s*face/.test(text)) {
+    return "模型权重和使用说明";
+  }
+  if (/enterprise ai platform/.test(text)) {
+    return "企业 AI 平台";
+  }
+  if (/agent runtime/.test(text)) {
+    return " agent runtime，面向企业团队";
+  }
+  if (/agent workflow|workflow update|developer workflow|developer platform|api workflow/.test(text)) {
+    return "具体的 agent 工作流更新，面向开发团队";
+  }
+  if (/deployment controls?|admin console|enterprise controls?/.test(text)) {
+    return "企业部署控制和管理入口";
+  }
+  if (/ai search|search interface/.test(text)) {
+    return " AI 搜索界面变化";
+  }
+  if (/observability/.test(text)) {
+    return " agent 可观测平台更新";
+  }
+  if (/evaluation practices?|eval loops?|release gates?|rollback/.test(text)) {
+    return " agent 评估实践和发布门禁";
+  }
+  if (/claude code|agent tooling|subagents?|mcp|hooks?|skills?/.test(text)) {
+    return " Claude Code agent 工具工作流";
+  }
+  if (/video|image|creative|creator|game worlds?/.test(text)) {
+    return " AIGC 创作工作流";
+  }
+  if (/security|guardrail|safety|policy|governance/.test(text)) {
+    return "安全治理和平台控制变化";
+  }
+  if (/benchmark|reasoning|evaluation|eval|paper|research/.test(text)) {
+    return "模型评估和研究结果";
+  }
+  if (/agent|workflow|tool|developer|coding|sdk|api|mcp/.test(text)) {
+    return " agent 与开发者工具能力";
+  }
+  if (/model|llm|multimodal|inference/.test(text)) {
+    return "模型能力和推理入口变化";
+  }
+  return "";
 }
 
 function candidateReaderDigest(candidate) {

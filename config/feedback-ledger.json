@@ -1031,6 +1031,32 @@
       }
     },
     {
+      "id": "feedback/p1-story-centered-daily-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Generate the daily main list as deduped edited stories",
+      "problem": "The public daily can become a long source-type report with duplicated URLs, repeated templated summaries, and generic main items such as `OpenAI更新AI 产品、平台或工程实践`, which fails the 3-minute reader goal even when publish succeeds.",
+      "expected_behavior": "The generator builds a main list of edited merged stories: default 8, maximum 12, fewer allowed when fewer qualify; no templated story is used to fill the quota; strong primary single-source stories may enter, secondary/community single-source items default to signal sections; same-day URL/factual duplicates merge into one story with sources; previous-7-report duplicates stay out unless materially updated; GitHub Trending remains a first-class visible Top 5-8 module; summary and trend claims derive from visible stories or signals; quality gates degrade by demoting bad story candidates and block only unusable artifacts, unverifiable main stories, or publish safety failures.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "docs/ai-daily-requirements-reconciliation.md",
+        "docs/ai-daily-story-contract.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/report.js",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "tests/e2e/site.e2e.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "story-centered daily contract is implemented with generator and rendering gates",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-authoritative-retrospectives",
       "severity": "P1",
       "status": "implemented",
