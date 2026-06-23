@@ -16,6 +16,7 @@ import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
 import { normalizeStoryFirstReport } from "./story-first.js";
+import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -763,9 +764,53 @@ function publicReportData(report) {
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
+  result.github_trending = publicGithubTrending(report?.github_trending);
+  result.projects = publicGithubProjects(report?.projects);
   result.source_effectiveness = publicSourceEffectiveness(report?.source_effectiveness);
   result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
   return result;
+}
+
+function publicGithubTrending(items = []) {
+  return arrayValue(items).map((item) => {
+    const result = sanitizePublicValue(item);
+    for (const key of ["readme_summary", "github_readme_summary", "description", "use_case"]) {
+      if (isGenericGithubPublicText(result[key])) {
+        delete result[key];
+      }
+    }
+    if (!String(result.description || "").trim()) {
+      result.description = githubTrendingFactSummary(item);
+    }
+    delete result.readme_summary;
+    delete result.github_readme_summary;
+    return result;
+  });
+}
+
+function publicGithubProjects(items = []) {
+  return arrayValue(items).map((item) => {
+    const result = sanitizePublicValue(item);
+    for (const key of ["description", "use_case", "readme_summary", "github_readme_summary"]) {
+      if (isGenericGithubPublicText(result[key])) {
+        delete result[key];
+      }
+    }
+    return result;
+  });
+}
+
+function isGenericGithubPublicText(value) {
+  return /(?:README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/u.test(String(value || ""));
+}
+
+function githubTrendingFactSummary(item = {}) {
+  const source = String(item.source || "GitHub Trending").trim();
+  const rank = Number.isFinite(Number(item.rank)) ? `#${Number(item.rank)}` : "";
+  const evidence = String(item.evidence || "");
+  const stars = evidence.match(/with\s+([0-9,]+)\s+stars\s+(today|this week)/i);
+  const starsText = stars ? `${stars[2].toLowerCase() === "today" ? "今日" : "本周"} +${stars[1]} stars` : "";
+  return [source, rank, starsText].filter(Boolean).join(" / ");
 }
 
 function publicStories(stories = []) {
@@ -863,6 +908,7 @@ function stripUnpublishableOfficialSnapshots(item) {
     return item;
   }
   const next = structuredClone(item);
+  next.tracking_component_snapshot = sanitizeTrackingComponentSnapshot(next.tracking_component_snapshot);
   stripOfficialSnapshotIfUnpublishable(next.snapshot);
   stripOfficialSnapshotIfUnpublishable(next.tracking_component_snapshot);
   return next;

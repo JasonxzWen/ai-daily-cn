@@ -41,17 +41,18 @@ export function summarizeGithubReadme(input = {}) {
   const deliverables = pickMaturity(source);
   const checkpoints = pickReadmeCheckpoints(source);
   const label = repoDisplayName(repo);
-  const prefix = label ? `${label} README ${ZH.mainlyAbout}` : `README ${ZH.mainlyAbout}`;
-  const summary = `${prefix}${subject}\uff0c${ZH.provides}${deliverables}\u3002${ZH.readFirst}${checkpoints}\u3002`;
-  return clampChineseSummary(summary, maxChars);
+  const projectLabel = label ? `${label} 是` : "该仓库是";
+  const audience = pickAudience(source);
+  const summary = `${projectLabel}面向${audience}的开源项目，README 显示核心能力包括${subject}，并给出${deliverables}。读者应先确认${withMaintenanceCheckpoint(checkpoints)}，再判断是否适合团队试用或接入。`;
+  return finalizeGithubSummary(summary, maxChars);
 }
 
 export function applyGithubReadmeSummary(item = {}, summaryInfo = {}) {
-  const summary = String(summaryInfo.summary || summaryInfo.readme_summary || "").trim();
+  const repo = normalizeRepo(item.repo || item.name || summaryInfo.repo || "");
+  const summary = normalizeGithubReadmeSummary(summaryInfo.summary || summaryInfo.readme_summary || "", repo);
   if (!summary) {
     return { ...item };
   }
-  const repo = normalizeRepo(item.repo || item.name || summaryInfo.repo || "");
   const cacheKey = summaryInfo.cacheKey || githubReadmeCacheKey({
     repo,
     defaultBranch: summaryInfo.defaultBranch,
@@ -70,6 +71,73 @@ export function applyGithubReadmeSummary(item = {}, summaryInfo = {}) {
       source_url: summaryInfo.sourceUrl || summaryInfo.url || ""
     }
   };
+}
+
+export function normalizeGithubReadmeSummary(value, repo = "", maxChars = DEFAULT_MAX_CHARS) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text) {
+    return "";
+  }
+  if (!isLegacyGithubSummary(text)) {
+    return finalizeGithubSummary(text, maxChars);
+  }
+  const parsed = parseLegacyGithubSummary(text);
+  const subject = parsed.subject || ZH.projectFramework;
+  const deliverables = parsed.deliverables || ZH.readmeUsage;
+  const checkpoints = parsed.checkpoints || ZH.defaultChecks;
+  const label = repoDisplayName(repo || parsed.label);
+  const projectLabel = label ? `${label} 是` : "该仓库是";
+  const audience = pickAudienceFromChinese(subject);
+  return finalizeGithubSummary(`${projectLabel}面向${audience}的开源项目，README 显示核心能力包括${subject}，并给出${deliverables}。读者应先确认${withMaintenanceCheckpoint(checkpoints)}，再判断是否适合团队试用或接入。`, maxChars);
+}
+
+function isLegacyGithubSummary(value) {
+  return /README\s*主要围绕|阅读时先看|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时/u.test(String(value || ""));
+}
+
+function parseLegacyGithubSummary(value) {
+  const text = String(value || "").trim();
+  const direct = text.match(/^(?:(.*?)\s+)?README\s*主要围绕(.+?)，提供(.+?)。阅读时先看(.+?)。?$/u);
+  if (direct) {
+    return {
+      label: direct[1] || "",
+      subject: direct[2] || "",
+      deliverables: direct[3] || "",
+      checkpoints: direct[4] || ""
+    };
+  }
+  const positioned = text.match(/^README 将该仓库定位为(.+?)，核心能力集中在(.+?)，并提供(.+?)。/u);
+  if (positioned) {
+    return {
+      label: "",
+      subject: positioned[2] || positioned[1] || "",
+      deliverables: positioned[3] || "",
+      checkpoints: ZH.defaultChecks
+    };
+  }
+  return {
+    label: "",
+    subject: "",
+    deliverables: "",
+    checkpoints: ""
+  };
+}
+
+function pickAudienceFromChinese(subject) {
+  const text = String(subject || "");
+  if (/Agent|工具调用|工作流/u.test(text)) {
+    return "agent 工作流和自动化工程";
+  }
+  if (/评测|回归|测试/u.test(text)) {
+    return "模型评测、回归验证和工程质量控制";
+  }
+  if (/记忆|知识检索|RAG/u.test(text)) {
+    return "知识检索、上下文记忆和 RAG 应用";
+  }
+  if (/API|SDK|适配/u.test(text)) {
+    return "开发者工具、SDK 集成和平台适配";
+  }
+  return "AI 工程实践";
 }
 
 export function normalizeRepo(value) {
@@ -125,6 +193,26 @@ function pickCapability(text) {
   return unique(parts).slice(0, 4).join("\u3001") || ZH.projectFramework;
 }
 
+function pickAudience(text) {
+  const value = String(text || "").toLowerCase();
+  if (/agent|workflow|runner|browser/.test(value)) {
+    return "agent 工作流和自动化工程";
+  }
+  if (/evaluat|benchmark|test|ci/.test(value)) {
+    return "模型评测、回归验证和工程质量控制";
+  }
+  if (/memory|rag|retrieval|knowledge/.test(value)) {
+    return "知识检索、上下文记忆和 RAG 应用";
+  }
+  if (/api|sdk|adapter|package/.test(value)) {
+    return "开发者工具、SDK 集成和平台适配";
+  }
+  if (/model|llm|inference|prompt/.test(value)) {
+    return "模型应用、推理服务和提示词工程";
+  }
+  return "AI 工程实践";
+}
+
 function pickMaturity(text) {
   const value = String(text || "").toLowerCase();
   const parts = [];
@@ -133,6 +221,27 @@ function pickMaturity(text) {
   if (/ci|test|fixture|benchmark|evaluation/.test(value)) parts.push(ZH.testAssets);
   if (/docker|deploy|production/.test(value)) parts.push(ZH.deployDocs);
   return unique(parts).join("\u3001") || ZH.readmeUsage;
+}
+
+function withMaintenanceCheckpoint(value) {
+  const text = String(value || "").trim() || ZH.defaultChecks;
+  return /近期维护/u.test(text) ? text : `${text}、近期维护`;
+}
+
+function finalizeGithubSummary(value, maxChars) {
+  let summary = String(value || "")
+    .replace(/和近期维护和近期维护/g, "和近期维护")
+    .replace(/、近期维护、近期维护/g, "、近期维护")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (chineseCharCount(summary) < 80) {
+    summary = `${summary} 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。`;
+  }
+  return clampChineseSummary(summary, maxChars);
+}
+
+function chineseCharCount(value) {
+  return (String(value || "").match(/[\u4e00-\u9fff]/g) || []).length;
 }
 
 function pickReadmeCheckpoints(text) {

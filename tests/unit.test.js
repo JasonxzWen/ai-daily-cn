@@ -643,7 +643,7 @@ test("interaction input starts with story-first judgment trends and story list",
   const storySection = input.sections.find((section) => section.richId === "story-list");
   assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
   assert.equal(firstSection.richId, "today-judgment");
-  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.title, "今日主线");
   assert.equal(storySection.type, "markdown");
   assert.equal(storySection.collapsed, false);
   assert(mainContent.includes("发生了什么"));
@@ -675,7 +675,7 @@ test("public daily renders story-first sections without compact full list", asyn
   assert(!titles.includes("完整列表"));
   assert(!titles.includes("主体细节"));
   assert.equal(input.sections.filter((section) => section.richId === "story-list").length, 1);
-  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.title, "今日主线");
   assert.equal(storySection.type, "markdown");
   assert.equal(storySection.collapsed, false);
   assert(storySection.content.includes("发生了什么"));
@@ -1601,7 +1601,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   const storySection = input.sections.find((section) => section.richId === "story-list");
   assert.equal(compactMainList, undefined);
   assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
-  assert.equal(storySection?.title, "重点 story");
+  assert.equal(storySection?.title, "今日主线");
   assert.equal(storySection?.type, "markdown");
   assert.equal(storySection?.collapsed, false);
   assert(storySection?.content.includes("发生了什么"));
@@ -4267,7 +4267,8 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(tracking.verification_status, "primary_confirmed");
   assert.equal(tracking.snapshot.top_entries.length, 10);
   assert.equal(tracking.tracking_component_snapshot.component_kind, "artificial_analysis_index");
-  assert.equal(tracking.tracking_component_snapshot.tabs.length, 6);
+  assert.equal(tracking.tracking_component_snapshot.tabs.length, 1);
+  assert.deepEqual(tracking.tracking_component_snapshot.tabs.map((tab) => tab.label), ["Score"]);
   assert(tracking.summary.includes("Claude Opus 4.8"));
   assert(tracking.metrics.some((metric) => metric.label === "#10" && metric.value.includes("54 分")));
 
@@ -4277,7 +4278,8 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   const card = trackingSection.items.find((item) => item.title === "Artificial Analysis");
   assert.equal(card.points.length, 0);
   assert.equal(card.component.kind, "artificial_analysis_index");
-  assert.equal(card.component.tabs.length, 6);
+  assert.equal(card.component.tabs.length, 1);
+  assert.deepEqual(card.component.tabs.map((tab) => tab.label), ["Score"]);
   assert.equal(card.component.officialSnapshot, undefined);
   assert.equal(card.table.rows.length, 10);
   assert(card.bars.rows.length > 0);
@@ -9161,7 +9163,7 @@ test("production daily does not enable PromptLayer-inspired theme or ticket grid
   assert.match(html, /prefers-reduced-motion:\s*reduce/);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /section-story-list|重点 story|今日判断|趋势主题/);
+  assert.match(html, /section-story-list|今日主线|今日判断|趋势主题/);
   assert.doesNotMatch(html, /<link rel="stylesheet"/);
   assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
 
@@ -10477,7 +10479,7 @@ test("interaction input renders AI industry, content track, and selected blog se
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
   const storySection = input.sections.find((section) => section.richId === "story-list");
   assert.equal(compactList, undefined);
-  assert.equal(storySection.title, "重点 story");
+  assert.equal(storySection.title, "今日主线");
   assert.equal(storySection.collapsed, false);
   assert(storySection.content.includes("发生了什么"));
   assert(storySection.content.includes("为什么值得看"));
@@ -11439,7 +11441,7 @@ test("report:draft keeps minor consumer AI feature rollouts out of main_items", 
 
   const titles = drafted.report.main_items.map((item) => item.title);
   assert.equal(titles.length, 1);
-  assert(titles.includes("WhatsApp 披露其拦截了一轮与 NSO 相关的定向钓鱼攻击"));
+  assert(titles.includes("WhatsApp 发布其拦截了一轮与 NSO 相关的定向钓鱼攻击"));
   assert(!titles.some((title) => /NVIDIA|主权 AI|sovereign/i.test(title)));
   assert(!titles.some((title) => /Alexa|merch|Shopping/i.test(title)));
 });
@@ -12429,6 +12431,294 @@ test("public daily IA reset enforces stories original X compact tracking hover a
   assert.deepEqual(meta.source_ids, ["content-meta-ai-blog"]);
   assert.match(meta.notes || "", /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
   assert.match(meta.notes || "", /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
+});
+
+test("public daily followups hide empty Artificial Analysis fallback tabs", () => {
+  const item = {
+    id: "artificial-analysis-intelligence-index",
+    name: "Artificial Analysis",
+    url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    event_date: "2026-06-23",
+    source: "Artificial Analysis Intelligence Index",
+    category: "model_benchmark",
+    importance: "notable",
+    source_level: "primary",
+    verification_status: "primary_confirmed",
+    change_status: "changed",
+    publish_to_public: true,
+    summary: "Artificial Analysis parsed the score table but no cost or scatter tabs were collected.",
+    metrics: [],
+    snapshot: {
+      ...artificialAnalysisSnapshotFixture(),
+      official_component_snapshot: officialComponentSnapshotFixture({
+        componentKind: "artificial_analysis_index",
+        sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+        selectorVersion: "artificial-analysis-index-v1",
+        fixture: artificialAnalysisOfficialComponentFixture()
+      })
+    }
+  };
+
+  const snapshot = buildTrackingComponentSnapshot(item);
+
+  assert.deepEqual(snapshot.tabs.map((tab) => tab.id), ["score"]);
+  assert.deepEqual(snapshot.series.map((series) => series.tab_id), ["score"]);
+  assert(!JSON.stringify(snapshot).includes("source_tab_not_collected"));
+});
+
+test("public daily followups use reader-facing story title and limit disclosure spam", () => {
+  const report = strictPublishReportFixture();
+  report.stories = Array.from({ length: 4 }, (_unused, index) => ({
+    story_id: `disclosure-story-${index + 1}`,
+    title: ["OpenAI披露安全治理变化", "Alibaba Cloud披露 agent 能力", "GitHub Changelog披露开发者工具能力", "AWS披露 agent 工作流"][index],
+    importance: "notable",
+    trend: "agent workflow",
+    event_date: report.report_date,
+    primary_entity: "Example AI",
+    event_type: "update",
+    object: "agent workflow",
+    what_happened: "来源给出了具体产品、平台或治理更新。",
+    why_it_matters: "读者可以据此判断后续试用、迁移或安全复核优先级。",
+    evidence_level: "primary",
+    sources: [{ label: "Official", url: `https://example.com/disclosure-${index + 1}`, type: "official" }]
+  }));
+
+  const input = reportToInteractionInput(report);
+  const storySection = input.sections.find((section) => section.richId === "story-list");
+  const storyText = `${storySection?.title || ""}\n${storySection?.content || ""}`;
+
+  assert(storySection);
+  assert.equal(storySection.title, "今日主线");
+  assert(!storyText.includes("重点 story"));
+  assert((storyText.match(/披露/g) || []).length <= 1);
+});
+
+test("public daily followups open external report links in new tabs", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-external-link-target-"));
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const dataInputDir = path.join(tmp, "reports-data", year, month);
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath,
+    fetchImpl: async () => new Response("", { status: 404 })
+  });
+
+  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
+  const anchors = [...html.matchAll(/<a\b[^>]*href="https?:[^"]+"[^>]*>/g)].map((match) => match[0]);
+
+  assert(anchors.length > 0);
+  for (const anchor of anchors) {
+    assert.match(anchor, /\starget="_blank"/, anchor);
+    assert.match(anchor, /\srel="[^"]*\bnoopener\b[^"]*\bnoreferrer\b[^"]*"/, anchor);
+  }
+});
+
+test("public daily followups reject generic GitHub Trending README summaries", async () => {
+  const badTemplate = "codebase-memory-mcp README 主要围绕Agent 构建、评测与回归、记忆或知识检索，提供可复用包、测试或评估资产。阅读时先看快速开始和运行前提、测试或评测资产。";
+  const badPattern = /README 主要围绕|阅读时先看|提供README 说明和使用入口|适合评估[^。]*README/;
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      candidate_id: "trend-project-codebase-memory-mcp",
+      repo: "DeusData/codebase-memory-mcp",
+      name: "DeusData/codebase-memory-mcp",
+      description: badTemplate,
+      readme_summary: badTemplate,
+      url: "https://github.com/DeusData/codebase-memory-mcp",
+      event_date: report.report_date,
+      source: "GitHub Trending weekly",
+      language: "all",
+      window: "weekly",
+      rank: 1,
+      trend: "new",
+      evidence: "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 7,560 stars this week.",
+      importance: "notable"
+    }
+  ];
+  report.projects = [
+    {
+      candidate_id: "project-codebase-memory-mcp",
+      name: "DeusData/codebase-memory-mcp",
+      editorial_category: "open_source",
+      source_level: "github",
+      verification_status: "primary_confirmed",
+      description: badTemplate,
+      readme_summary: badTemplate,
+      domains: ["agent"],
+      use_case: `适合评估${badTemplate}相关能力是否能复用到现有工具链。`,
+      url: "https://github.com/DeusData/codebase-memory-mcp",
+      event_date: report.report_date,
+      source: "GitHub Trending weekly",
+      signal: "trending",
+      importance: "notable",
+      evidence: "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 7,560 stars this week."
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const githubSection = input.sections.find((section) => String(section.title || "").includes("GitHub Trending"));
+
+  assert(githubSection);
+  assert.doesNotMatch(githubSection.content, badPattern);
+  assert.match(githubSection.content, /codebase-memory-mcp|7,560|GitHub Trending weekly/);
+
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-template-public-"));
+  const [year, month] = report.report_date.split("-");
+  const dataInputDir = path.join(tmp, "reports-data", year, month);
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath,
+    fetchImpl: async () => new Response("", { status: 404 })
+  });
+
+  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
+  const publicJson = await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8");
+  assert.doesNotMatch(`${html}\n${publicJson}`, badPattern);
+  assert.match(`${html}\n${publicJson}`, /codebase-memory-mcp|7,560|GitHub Trending weekly/);
+});
+
+test("public daily followups infer localized X avatars from avatar_url during clean build", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-avatar-"));
+  const outDir = path.join(tmp, "docs");
+  const report = strictPublishReportFixture();
+  report.report_date = "2026-06-23";
+  report.html_path = "reports/2026/06/2026-06-23.html";
+  report.builder_observations = [
+    {
+      candidate_id: "builder-avatar-url-only",
+      author: "Avatar Builder",
+      handle: "avatarbuilder",
+      original_text: "Original X status with a localized avatar asset available.",
+      url: "https://x.com/avatarbuilder/status/2059000000000000002",
+      avatar_url: "https://unavatar.io/x/avatarbuilder",
+      event_date: report.report_date,
+      source: "follow-builders X feed",
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      importance: "notable"
+    }
+  ];
+  const avatarPath = "assets/avatars/2026/06/2026-06-23-avatarbuilder.png";
+  await fs.mkdir(path.join(outDir, "assets/avatars/2026/06"), { recursive: true });
+  await fs.writeFile(path.join(outDir, avatarPath), Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+
+  const input = reportToInteractionInput(report, { assetRootDir: outDir });
+  const card = input.sections.find((section) => section.cardClass === "builder-card")?.items?.[0];
+
+  assert(card);
+  assert.equal(card.titleIcon, "../../../assets/avatars/2026/06/2026-06-23-avatarbuilder.png");
+});
+
+test("public daily followups expose inactive platform and GitHub-watch source contracts without weekly misattribution", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = {
+    source_audit: {
+      wechat_sources: {
+        sources: [{
+          id: "platform-wechat-ai-feed",
+          name: "WeChat AI Feed",
+          url: "https://example.com/ai-daily-cn/platform/wechat.xml",
+          source_kind: "rss",
+          status: "no_signal",
+          parsed_count: 0,
+          notes: "kill_switch_enabled; placeholder_source"
+        }],
+        candidates_found: 0,
+        included: 0
+      },
+      zhihu_sources: {
+        sources: [{
+          id: "platform-zhihu-ai-feed",
+          name: "Zhihu AI Feed",
+          url: "https://example.com/ai-daily-cn/platform/zhihu.xml",
+          source_kind: "rss",
+          status: "no_signal",
+          parsed_count: 0,
+          notes: "kill_switch_enabled; placeholder_source"
+        }],
+        candidates_found: 0,
+        included: 0
+      },
+      content_sources: {
+        sources: [
+          {
+            id: "content-ruanyf-weekly",
+            name: "RuanYF Weekly",
+            url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
+            source_kind: "github_report_markdown",
+            status: "checked",
+            parsed_count: 1,
+            notes: "source-specific markdown contract"
+          },
+          {
+            id: "content-github-openai-org",
+            name: "OpenAI GitHub Organization",
+            url: "https://github.com/openai.atom",
+            source_kind: "github_atom",
+            status: "no_signal",
+            parsed_count: 0,
+            notes: "0 recent repository events parsed"
+          }
+        ],
+        candidates_found: 1,
+        included: 0
+      },
+      github_trending: {
+        sources: [{
+          id: "github-github-trending-weekly",
+          name: "GitHub Trending weekly",
+          url: "https://github.com/trending?since=weekly",
+          status: "checked",
+          parsed_count: 10,
+          notes: "10 repositories parsed"
+        }],
+        candidates_found: 1,
+        included: 1
+      }
+    },
+    github_trending: [{ repo: "example/weekly-project", url: "https://github.com/example/weekly-project", source: "GitHub Trending weekly" }]
+  };
+
+  const rows = buildSourceEffectivenessTable({
+    report,
+    candidates: [
+      {
+        id: "github-weekly-project",
+        source_id: "github-github-trending-weekly",
+        source: "GitHub Trending weekly",
+        url: "https://github.com/example/weekly-project",
+        included_in: "github_trending"
+      }
+    ]
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+
+  assert.equal(byId.get("ruanyf-weekly")?.candidate_count, 0);
+  assert.match(byId.get("wechat-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
+  assert.equal(byId.get("wechat-platform")?.public_included, false);
+  assert.match(byId.get("zhihu-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
+  assert.equal(byId.get("zhihu-platform")?.public_included, false);
+  assert(byId.get("github-org-watch")?.source_ids.includes("content-github-openai-org"));
+  assert.equal(byId.get("github-org-watch")?.public_included, false);
 });
 
 test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: report:draft rewrites OpenAI official English titles", async () => {
@@ -15704,9 +15994,9 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
   assert.equal(artificialAnalysis.tracking_component_snapshot.component_kind, "artificial_analysis_index");
   assert.deepEqual(
     artificialAnalysis.tracking_component_snapshot.tabs.map((tab) => tab.id),
-    ["score", "token-usage", "cost", "score-vs-token-usage", "score-vs-cost", "score-vs-compute"]
+    ["score"]
   );
-  assert(artificialAnalysis.tracking_component_snapshot.tabs.every((tab) => tab.status === "complete" || tab.fallback_reason));
+  assert(artificialAnalysis.tracking_component_snapshot.tabs.every((tab) => tab.status === "complete"));
 
   const input = reportToInteractionInput(validation.value);
   const trackingSection = input.sections.find((section) => section.cardClass === "tracking-card");
@@ -15716,7 +16006,7 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
   assert.equal(openRouterCard.component.tabs.length, 2);
   assert(openRouterCard.component.trace.dataHash.startsWith("sha256:"));
   assert.equal(aaCard.component.kind, "artificial_analysis_index");
-  assert.equal(aaCard.component.tabs.length, 6);
+  assert.equal(aaCard.component.tabs.length, 1);
   assert(aaCard.component.trace.sourceUrl.includes("artificialanalysis.ai"));
 });
 
@@ -15857,7 +16147,7 @@ test("public daily contract renders main items as industry and content-track str
   assert.equal(mainSections.length, 3);
   assert.equal(compactList, undefined);
   assert.deepEqual(mainSections.map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
-  assert.equal(mainSections[2].title, "重点 story");
+  assert.equal(mainSections[2].title, "今日主线");
   assert.equal(mainSections[2].collapsed, false);
   assert(content.includes("发生了什么"));
   assert(content.includes("为什么值得看"));
@@ -16677,8 +16967,8 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(summary.length >= 80, summary);
   assert(summary.length <= 130, summary);
-  assert.doesNotMatch(summary, /README 将|核心能力集中|它的价值在于|具体阅读时/);
-  assert.match(summary, /README 主要围绕/);
+  assert.doesNotMatch(summary, /README 将|主要围绕|阅读时先看|它的价值在于|具体阅读时/);
+  assert.match(summary, /README 显示核心能力包括/);
   assert.match(summary, /Agent 构建|评测|调试|工具调用/);
   assert.doesNotMatch(summary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
 
@@ -16709,11 +16999,21 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
       sourceUrl: `https://raw.githubusercontent.com/${repo}/main/README.md`
     }
   );
-  assert.equal(item.description, summary);
-  assert.equal(item.readme_summary, summary);
+  assert(item.description.startsWith(summary));
+  assert(item.readme_summary.startsWith(summary));
+  assert.match(item.readme_summary, /README 显示核心能力包括/);
   assert.equal(item.readme_cache.key, key);
   assert.equal(item.readme_cache.hit, true);
   assert.equal(item.readme_cache.sha, sha);
+
+  const legacyItem = applyGithubReadmeSummary(
+    { repo, url: `https://github.com/${repo}` },
+    {
+      summary: "agent-workbench README 主要围绕Agent 构建、评测与回归、工具调用和工作流编排，提供可复用包、示例、测试或评估资产。阅读时先看快速开始和运行前提、示例覆盖、测试或评测资产。"
+    }
+  );
+  assert.doesNotMatch(legacyItem.readme_summary, /主要围绕|阅读时先看/);
+  assert.match(legacyItem.readme_summary, /README 显示核心能力包括/);
 });
 
 test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries", () => {
@@ -18872,7 +19172,7 @@ function validDailyContentContractTask({ validationCommands }) {
     "",
     "## Spec",
     "",
-    "A fixture daily content contract task covers REQ-001, REQ-006, REQ-007, REQ-008, REQ-010, GitHub Trending, Builder/X, hot blogs, daily tracking, 每日追踪, 今日判断, 趋势主题, 重点 story, and 精选博客.",
+    "A fixture daily content contract task covers REQ-001, REQ-006, REQ-007, REQ-008, REQ-010, GitHub Trending, Builder/X, hot blogs, daily tracking, 每日追踪, 今日判断, 趋势主题, 今日主线, and 精选博客.",
     "",
     "## Acceptance Criteria",
     "",

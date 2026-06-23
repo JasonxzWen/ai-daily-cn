@@ -118,6 +118,21 @@ export function isTemplatedStoryTitle(value) {
     /updates?agentworkflowanddevelopertools?/i.test(title);
 }
 
+export function readerFacingStoryTitle(value) {
+  let title = cleanText(value);
+  if (!title) {
+    return title;
+  }
+  title = title
+    .replace(/披露\s*(安全治理|治理|政策|风险|安全|平台控制)/gu, "说明$1")
+    .replace(/披露\s*(agent|Agent|开发者|开发工具|工具|工作流|能力|平台能力)/gu, "更新$1")
+    .replace(/披露\s*(模型|评测|基准|benchmark|Benchmark)/gu, "公布$1")
+    .replace(/披露/gu, "发布")
+    .replace(/\s+/g, " ")
+    .trim();
+  return title;
+}
+
 export function canonicalStoryUrl(value) {
   return normalizeUrlIdentity(value);
 }
@@ -167,7 +182,7 @@ function normalizeExistingStory(story, index) {
   const sources = uniqueStorySources(story.sources || [], { allowInvalid: true });
   const rawTitle = cleanText(story.title);
   const title = rawTitle && !isTemplatedStoryTitle(rawTitle)
-    ? rawTitle
+    ? readerFacingStoryTitle(rawTitle)
     : concreteTitleFromSources(sources, index);
   return {
     ...story,
@@ -213,7 +228,7 @@ function concreteStoryTitle(item, index) {
   const rawTitle = cleanText(item?.title);
   const titleWithoutSource = stripSourcePrefix(rawTitle, item?.source || item?.publisher);
   if (titleWithoutSource && !isTemplatedStoryTitle(titleWithoutSource)) {
-    return titleWithoutSource;
+    return readerFacingStoryTitle(titleWithoutSource);
   }
   const slugTitle = titleFromUrl(item?.url);
   const source = cleanText(item?.source || item?.publisher || item?.repo || item?.name);
@@ -222,16 +237,18 @@ function concreteStoryTitle(item, index) {
     return githubTitle;
   }
   if (slugTitle) {
-    return source ? `${source}: ${slugTitle}` : slugTitle;
+    return readerFacingStoryTitle(source ? `${source}: ${slugTitle}` : slugTitle);
   }
   const summaryTitle = firstConcreteSentence([
     item?.summary,
     ...(Array.isArray(item?.bullets) ? item.bullets : [])
   ]);
   if (summaryTitle) {
-    return summaryTitle;
+    return readerFacingStoryTitle(summaryTitle);
   }
-  return titleWithoutSource && !isTemplatedStoryTitle(titleWithoutSource) ? titleWithoutSource : `Story ${index + 1}`;
+  return titleWithoutSource && !isTemplatedStoryTitle(titleWithoutSource)
+    ? readerFacingStoryTitle(titleWithoutSource)
+    : `Story ${index + 1}`;
 }
 
 function titleFromUrl(value) {

@@ -131,7 +131,11 @@ export function cleanGithubTrendDescription(item) {
     .replace(/优先核对 README 示例、许可证、近期维护和本地复现门槛[。；;]?/gu, "")
     .replace(/重点看 README、许可证、近期维护和可复现门槛[。；;]?/gu, "")
     .replace(/，仓库首页当前围绕这条能力展开。?$/u, "观察。");
-  return cleanProjectDescription(translateKnownGithubDescription(withoutRepoPrefix, repo));
+  const translated = translateKnownGithubDescription(withoutRepoPrefix, repo);
+  if (isGenericGithubTrendDescription(raw) || isGenericGithubTrendDescription(translated)) {
+    return "";
+  }
+  return cleanProjectDescription(translated);
 }
 
 function githubTrendDescriptionSource(item = {}) {
@@ -143,6 +147,9 @@ function githubTrendDescriptionSource(item = {}) {
 }
 
 function isGenericGithubTrendDescription(value) {
+  if (/README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README/u.test(String(value || ""))) {
+    return true;
+  }
   return /进入 GitHub Trending Top 10|优先核对 README|重点看 README|可作为[^。；;]*?(?:实现线索|观察)|AI 工程工具方向的开源项目观察/u.test(String(value || ""));
 }
 

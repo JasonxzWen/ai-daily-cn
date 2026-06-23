@@ -61,7 +61,7 @@ export function buildTrackingComponentSnapshot(item, options = {}) {
 }
 
 export function trackingComponentForInteraction(item) {
-  const snapshot = item?.tracking_component_snapshot || buildTrackingComponentSnapshot(item);
+  const snapshot = sanitizeTrackingComponentSnapshot(item?.tracking_component_snapshot || buildTrackingComponentSnapshot(item));
   if (!snapshot || typeof snapshot !== "object") {
     return null;
   }
@@ -103,6 +103,26 @@ export function trackingComponentForInteraction(item) {
       diff: snapshot.public_trace?.diff || snapshot.diff || {}
     }
   };
+}
+
+export function sanitizeTrackingComponentSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") {
+    return snapshot;
+  }
+  if (snapshot.component_kind !== "artificial_analysis_index") {
+    return snapshot;
+  }
+  const next = structuredClone(snapshot);
+  const series = (Array.isArray(next.series) ? next.series : [])
+    .filter((entry) => Array.isArray(entry?.rows) && entry.rows.length > 0)
+    .map((entry) => ({ ...entry, fallback_reason: "" }));
+  const tabIdsWithRows = new Set(series.map((entry) => entry.tab_id).filter(Boolean));
+  const tabs = (Array.isArray(next.tabs) ? next.tabs : [])
+    .filter((entry) => tabIdsWithRows.has(entry?.id))
+    .map((entry) => ({ ...entry, status: entry.status === "fallback" ? "partial" : entry.status, fallback_reason: "" }));
+  next.series = series;
+  next.tabs = tabs;
+  return next;
 }
 
 export function hasInvalidOfficialTrackingSnapshot(item) {
@@ -188,20 +208,24 @@ function buildArtificialAnalysisSnapshot(item, snapshot, options) {
   }));
   const sourceTabs = normalizeArtificialAnalysisSourceTabs(snapshot.component_tabs, scoreRows);
   const hasScoreRows = scoreRows.length > 0;
-  const tabs = AA_TABS.map(([id, label, view], index) => {
-    const sourceRows = rowsForArtificialAnalysisTab(sourceTabs, id, scoreRows);
-    if (sourceRows.length > 0) {
-      return tab(id, label, view, snapshot.snapshot_status === "complete" ? "complete" : "partial", "");
-    }
-    return tab(id, label, view, "fallback", "source_tab_not_collected");
-  });
-  const series = AA_TABS.map(([id, label, view], index) => ({
-    id: `artificial-analysis-${id}`,
-    tab_id: id,
-    label,
-    chart: view,
-    rows: rowsForArtificialAnalysisTab(sourceTabs, id, scoreRows),
-    fallback_reason: rowsForArtificialAnalysisTab(sourceTabs, id, scoreRows).length > 0 ? "" : "source_tab_not_collected"
+  const collectedTabs = AA_TABS
+    .map(([id, label, view]) => ({
+      id,
+      label,
+      view,
+      rows: rowsForArtificialAnalysisTab(sourceTabs, id, scoreRows)
+    }))
+    .filter((entry) => entry.rows.length > 0);
+  const tabs = collectedTabs.map((entry) =>
+    tab(entry.id, entry.label, entry.view, snapshot.snapshot_status === "complete" ? "complete" : "partial", "")
+  );
+  const series = collectedTabs.map((entry) => ({
+    id: `artificial-analysis-${entry.id}`,
+    tab_id: entry.id,
+    label: entry.label,
+    chart: entry.view,
+    rows: entry.rows,
+    fallback_reason: ""
   }));
   const fallbackReason = hasScoreRows ? "" : "artificial_analysis_rows_missing";
   return componentSnapshot({
