@@ -36,11 +36,11 @@
 
 固定信源面的目标是证明“已检查并写入最终 `source_audit`”。公开源在当前环境返回 403/5xx 或抓取失败时，必须保留 `status:"blocked"`、HTTP/error notes 和原始 URL；这可作为 source-surface proof，但不得把 blocked 来源的未核验事实写入正文。
 
-发布质量分两级处理：`blocking_issues` 必须阻断发布，包括 validate 失败、`self_check.automation_revision.git_commit` 未证明来自当前 `origin/main` / `origin_main_sha`、schema 或候选池回指失败、最近 7 天重复旧闻、正文事实缺少一手/可信来源、无法确认远端 `main` 基线、`remote_ahead`、非发布产物会被提交、GitHub API 兜底无法读取 `base_commit_sha` 或 token 权限不足、Pages HTTP 200 验证失败。`degraded_sections` 允许发布但必须公开标注，包括固定信源面部分不可用、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空、模型发布未同步进入主体条目、截图验收受阻但静态校验通过。降级信息必须写入 `quality_status.degraded_sections`，并在公开 HTML 的“发布质量说明”和最终回复中列出。
+发布质量分两级处理：`blocking_issues` 必须阻断发布，包括 validate 失败、`self_check.automation_revision.git_commit` 未证明来自当前 `origin/main` / `origin_main_sha`、schema 或候选池回指失败、最近 7 天重复旧闻、正文事实缺少一手/可信来源、无法确认远端 `main` 基线、`remote_ahead`、非发布产物会被提交、GitHub API 兜底无法读取 `base_commit_sha` 或 token 权限不足、发布前公共页面质量检查失败。`degraded_sections` 允许发布但必须公开标注，包括固定信源面部分不可用、GitHub Trending / Builder X / evidence asset 覆盖不足、某个板块为空、模型发布未同步进入主体条目、截图验收受阻但静态校验通过。若仓库发布已成功但 Pages HTTP 200/date 验证仍受缓存或网络延迟影响，runner 应报告 `published_pending_pages_verification` 并稍后复核，不要重复发布或伪称已确认。降级信息必须写入 `quality_status.degraded_sections`，并在公开 HTML 的“发布质量说明”和最终回复中列出。
 
 真实发布由 runner 在 `--publish` 模式内执行。runner 内部的 `publish:dry-run:daily` 必须证明 `current_dirty_files` 中所有发布器管理文件都出现在 `will_stage_files`；如果出现 `publisher_dirty_outside_publish_plan`，runner 必须停止并报告 blocker。特别确认 `docs/trends.json`、`docs/feed.json`、`docs/index.html`、当日 `docs/data/**`、`docs/reports/**`、`reports-data/**`、日报引用的 `docs/assets/evidence/**` 图片和 Builder 头像 `docs/assets/avatars/**` 都进入本次 stage 计划。如果 clean checkout 已通过验证和 dry-run，但本机 Git 元数据或 Git 传输失败阻塞发布且不存在 `remote_ahead`，runner 可使用 GitHub API 兜底；允许使用 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token`。API 兜底必须通过 GitHub API 读取远端 `main` 的当前 commit/tree，使用 `force:false`，只写 `docs/` 与 `reports-data/`，并在输出中记录 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
 
-发布后必须验证当日 Pages URL 返回 HTTP 200 且包含 `YYYY-MM-DD`。如果同一会话随后要做项目迭代，必须新建 `codex/...` 分支或独立工作树；发布工作树只用于日报发布，不继续写项目改动。
+发布后必须验证当日 Pages URL 返回 HTTP 200 且包含 `YYYY-MM-DD`。如果仓库发布成功但 Pages 仍未刷新，使用 `published_pending_pages_verification` 和 `verify_pages_later` 记录可恢复动作。如果同一会话随后要做项目迭代，必须新建 `codex/...` 分支或独立工作树；发布工作树只用于日报发布，不继续写项目改动。
 
 最终回复必须包含：`.tmp/run-summary-YYYY-MM-DD.json`、HTML 路径、结构化 JSON 路径、`validate` 结果、`publish:dry-run:daily` 结果、真实发布或 API 兜底结果、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要、今日采样与规则差距、最多 3 条提示词或规则迭代建议。
 ```
@@ -133,3 +133,7 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 ## Codex-native runner prompt
 
 定时任务 prompt 应保持很薄：从 launcher worktree 调用 `npm run daily:run -- --date YYYY-MM-DD`，真实发布时调用 `npm run daily:run -- --date YYYY-MM-DD --publish`。runner 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `final_status` 和 `next_action`；当 `next_action.kind` 是 `codex_ai_repair_contract` 时，由 Codex 写 runner 指定 contract 路径，设置 `status:"ready"` 且提供非空 `edits` 后用同一命令继续 runner。`status:"template"` attempt 文件只作空模板，不会被 runner 执行；需要丢弃同日未完成状态时显式加 `--restart`。调度 dry-run 只允许 `publish:dry-run:daily`，旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。
+
+## Daily resilience policy
+
+`config/daily-resilience-policy.json` is the committed retry/fallback/degrade/block contract for daily automation. Any workflow or automation prompt change must pass `npm run resilience:validate`; safe public source/coverage failures may publish as `published_degraded`, while exhausted publish infrastructure is reported as `infrastructure_blocked_after_fallback_exhausted`.

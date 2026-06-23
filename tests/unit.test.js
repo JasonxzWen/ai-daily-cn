@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import { parseDailyMarkdown } from "../src/parser.js";
 import {
@@ -75,6 +75,7 @@ import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
+import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
 import {
   applyPromptLayerInspiredDailyTheme,
@@ -4269,6 +4270,49 @@ test("report:draft shows only an Artificial Analysis source-unavailable note whe
   assert.equal(card.stats, undefined);
 });
 
+test("report:write accepts source-unavailable daily tracking as degraded", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-aa-source-unavailable-write-"));
+  const reportDate = "2026-06-05";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.content_sources.sources.push({
+    name: "Artificial Analysis Intelligence Index",
+    url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    status: "checked",
+    notes: "public_page_snapshot; 10 top models parsed; official_component_snapshot_missing",
+    snapshot: artificialAnalysisSnapshotFixture()
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const written = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: drafted.path,
+    outputDir: path.join(tmp, "reports-data"),
+    candidatePoolPath: drafted.candidatePoolPath,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  const tracking = written.report.daily_tracking.find((item) => item.id === "artificial-analysis-intelligence-index");
+  assert.equal(tracking.publish_to_public, true);
+  assert.equal(tracking.change_status, "blocked");
+  assert.equal(tracking.verification_status, "unverified");
+  assert.match(tracking.source_unavailable_note, /Artificial Analysis|snapshot/i);
+  assert.equal(tracking.tracking_component_snapshot, undefined);
+  assert.equal(written.report.quality_status.status, "degraded");
+  assert(written.report.quality_status.reasons.includes("daily_tracking_source_blocked"));
+  assert(written.report.quality_status.degraded_sections.some((issue) => issue.section === "daily_tracking"));
+});
+
 test("registered source registry covers official company news lanes", async () => {
   const registry = await loadSourceRegistry({
     rootDir,
@@ -5216,6 +5260,42 @@ test("CLI JSON commands can write clean UTF-8 output files", async () => {
   assert(!raw.startsWith("\uFEFF"));
 });
 
+test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
+  const preloadPath = path.join(tmp, "fake-fetch.mjs");
+  await fs.writeFile(preloadPath, [
+    "globalThis.fetch = async () => ({",
+    "  ok: false,",
+    "  status: 404,",
+    "  text: async () => 'not found'",
+    "});",
+    ""
+  ].join("\n"), "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    "--import",
+    pathToFileURL(preloadPath).href,
+    path.join(rootDir, "src/cli.js"),
+    "publish:verify-pages",
+    "--date",
+    "2026-06-04",
+    "--attempts",
+    "1",
+    "--interval-ms",
+    "0"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+  const parsed = JSON.parse(result.stdout);
+
+  assert.equal(parsed.ok, false);
+  assert.equal(parsed.publish_status.error_code, "pages_cache_delay");
+  assert.match(parsed.publish_status.publish_error, /pages_verification_failed/);
+  assert.match(parsed.publish_status.publish_error, /HTTP 404/);
+  assert.equal(parsed.result.pages_verified, false);
+});
+
 test("status:self-check blocks when multiple daily publish automations are active", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-"));
   await writeSelfCheckReportFixture(tmp, "2026-06-04", {
@@ -5451,6 +5531,53 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
+});
+
+test("daily resilience policy validates current runner stages and workflow gates", async () => {
+  const { validateDailyResiliencePolicy } = await import("../src/resilience-policy.js");
+
+  const result = await validateDailyResiliencePolicy({ rootDir });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.policy.name, "daily-resilience-contract");
+  assert(result.policy.terminal_statuses.includes("published_degraded"));
+  assert(result.policy.blocking_whitelist.includes("unsafe_public_content"));
+  assert(result.policy.blocking_whitelist.includes("infrastructure_exhausted"));
+  for (const stageId of [
+    "discover_github_trending",
+    "discover_builders",
+    "report_write",
+    "quality_page_check",
+    "publish_real",
+    "pages_verify"
+  ]) {
+    assert(result.stage_ids.includes(stageId), `missing resilience policy for ${stageId}`);
+  }
+  const reportWrite = result.policy.stages.find((stage) => stage.id === "report_write");
+  assert.equal(reportWrite.fallback.kind, "schema_aware_normalizer");
+  assert.equal(reportWrite.degrade.action, "normalize_public_degraded_fields");
+});
+
+test("daily resilience policy rejects missing required stages", async () => {
+  const { validateDailyResiliencePolicy } = await import("../src/resilience-policy.js");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-resilience-policy-"));
+  await fs.mkdir(path.join(tmp, "config"), { recursive: true });
+  await fs.writeFile(
+    path.join(tmp, "config", "daily-resilience-policy.json"),
+    `${JSON.stringify({
+      schema_version: 1,
+      name: "daily-resilience-contract",
+      terminal_statuses: ["published", "published_degraded", "unsafe_blocked", "infrastructure_blocked_after_fallback_exhausted"],
+      blocking_whitelist: ["unsafe_public_content", "infrastructure_exhausted"],
+      stages: []
+    }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const result = await validateDailyResiliencePolicy({ rootDir: tmp });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("missing required stage")));
 });
 
 test("harness init recreates ignored local state files before validation", async () => {
@@ -6091,6 +6218,52 @@ test("retrospective validation accepts sanitized records and index", async () =>
   assert.equal(parsed.records_checked, 2);
 });
 
+test("retrospective writer preserves degraded daily terminal statuses", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-retrospective-degraded-status-"));
+  await fs.mkdir(path.join(tmp, "schemas"), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "schemas", "retrospective.schema.json"),
+    path.join(tmp, "schemas", "retrospective.schema.json")
+  );
+
+  const written = await writeDailyPublishRetrospective({
+    rootDir: tmp,
+    reportDate: "2026-06-12",
+    status: "generated_degraded",
+    summary: {
+      mode: "dry-run",
+      stages: [
+        {
+          id: "report_write",
+          status: "passed",
+          output: {
+            quality_status: {
+              status: "degraded",
+              degraded_sections: [
+                {
+                  code: "builder_sources_blocked",
+                  section: "builder_observations",
+                  message: "Builder source coverage is degraded."
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    now: () => "2026-06-12T12:00:00.000Z"
+  });
+
+  assert.equal(written.status, "generated_degraded");
+  const record = JSON.parse(await fs.readFile(path.join(tmp, written.record_path), "utf8"));
+  assert.equal(record.status, "generated_degraded");
+  const index = JSON.parse(await fs.readFile(path.join(tmp, "retrospectives", "index.json"), "utf8"));
+  assert.equal(index.records[0].status, "generated_degraded");
+
+  const result = await runRetrospectivesValidate(tmp);
+  assert.equal(result.code, 0, result.stdout || result.stderr);
+});
+
 test("retrospective validation rejects local path leakage", async () => {
   const tmp = await createRetrospectiveFixture({
     mutateRecord(record) {
@@ -6286,6 +6459,386 @@ test("daily runner writes launcher summary and stops before real publish by defa
   assert.equal(saved.final_status, "generated_only");
 });
 
+test("daily runner retries clean worktree preparation according to resilience policy", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-prepare-retry-policy-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  let prepareCalls = 0;
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => {
+      prepareCalls += 1;
+      if (prepareCalls === 1) {
+        const error = new Error("temporary git fetch timeout");
+        error.code = "git_fetch_timeout";
+        throw error;
+      }
+      return {
+        ok: true,
+        next_cwd: cleanRoot,
+        remote_main_sha: "1111111111111111111111111111111111111111"
+      };
+    },
+    runStage: async (stage) => ({ ok: true, output: { stage: stage.id } })
+  });
+
+  assert.equal(result.summary.final_status, "generated_only");
+  assert.equal(prepareCalls, 2);
+  const stage = result.summary.stages.find((item) => item.id === "prepare_clean_worktree");
+  assert.equal(stage.status, "passed");
+  assert.equal(stage.output.attempts, 2);
+  assert.deepEqual(stage.output.retry_attempts.map((attempt) => attempt.ok), [false, true]);
+});
+
+test("daily runner retries transient stage failures according to resilience policy", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retry-policy-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage, context) => {
+      calls.push({ id: stage.id, cwd: context.cleanRoot });
+      const attemptsForStage = calls.filter((call) => call.id === stage.id).length;
+      if (stage.id === "discover_github_trending" && attemptsForStage < 3) {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            error: "network_error"
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_only");
+  assert.equal(calls.filter((call) => call.id === "discover_github_trending").length, 3);
+  const stage = result.summary.stages.find((item) => item.id === "discover_github_trending");
+  assert.equal(stage.status, "passed");
+  assert.equal(stage.output.attempts, 3);
+  assert.equal(stage.output.retry_attempts.length, 3);
+  assert.deepEqual(stage.output.retry_attempts.map((attempt) => attempt.ok), [false, false, true]);
+});
+
+test("daily runner writes degraded discovery artifact after exhausted source failure", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-source-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "discover_github_trending") {
+        const error = new Error("network_error: GitHub Trending fetch failed");
+        error.code = "network_error";
+        throw error;
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_degraded");
+  assert.equal(calls.filter((id) => id === "discover_github_trending").length, 3);
+  assert(calls.includes("report_draft"));
+
+  const recorded = result.summary.stages.find((stage) => stage.id === "discover_github_trending");
+  assert.equal(recorded.status, "degraded");
+  assert.equal(recorded.output.fallback_used, true);
+  assert.equal(recorded.output.degraded, true);
+  assert.equal(recorded.output.fallback_path, ".tmp/github-trending-2026-06-04.json");
+  assert.equal(recorded.output.attempts, 3);
+
+  const fallbackPath = path.join(cleanRoot, ".tmp", "github-trending-2026-06-04.json");
+  const payload = JSON.parse(await fs.readFile(fallbackPath, "utf8"));
+  assert.equal(payload.ok, true);
+  assert.equal(payload.degraded, true);
+  assert.deepEqual(payload.candidates, []);
+  assert.equal(payload.source_audit.github_trending.checked, true);
+  assert.equal(payload.source_audit.github_trending.candidates_found, 0);
+  assert.equal(payload.source_audit.github_trending.sources[0].status, "blocked");
+  assert.match(payload.source_audit.github_trending.blocked_reason, /network_error/);
+});
+
+test("daily runner degraded discovery artifact remains consumable by report draft and write", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-fallback-real-chain-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-06-04";
+
+  await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "discover_builders") {
+        const error = new Error("network_error: builder discovery failed");
+        error.code = "network_error";
+        throw error;
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  const fallbackPath = path.join(cleanRoot, ".tmp", `builders-${reportDate}.json`);
+  const fallbackPayload = JSON.parse(await fs.readFile(fallbackPath, "utf8"));
+  assert.equal(fallbackPayload.degraded, true);
+  assert.equal(fallbackPayload.source_audit.builder_sources.sources[0].status, "blocked");
+
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.builder_sources = {
+    checked: true,
+    sources: [],
+    candidates_found: 0,
+    included: 0,
+    notes: "builder discovery replaced by runner degraded fallback"
+  };
+  discovery.sources = discovery.sources.filter((source) => source.id !== "builder-follow-builders-x-feed");
+  discovery.candidates = discovery.candidates.filter((candidate) =>
+    candidate.category !== "builder_observation" &&
+    candidate.source_id !== "builder-follow-builders-x-feed"
+  );
+  const discoveryPath = path.join(cleanRoot, ".tmp", `normal-discovery-${reportDate}.json`);
+  await fs.mkdir(path.dirname(discoveryPath), { recursive: true });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: cleanRoot,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath, fallbackPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.builder_observations.length, 0);
+  assert(
+    drafted.report.source_audit.builder_sources.sources.some((source) =>
+      source.name === "Builder discovery" &&
+      source.status === "blocked" &&
+      /builder discovery failed/i.test(source.notes || "")
+    )
+  );
+
+  const written = await writeReportDraft({
+    rootDir: cleanRoot,
+    inputPath: drafted.path,
+    outputDir: path.join(cleanRoot, "reports-data"),
+    candidatePoolPath: drafted.candidatePoolPath,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  assert.equal(written.report.quality_status.status, "degraded");
+  assert(written.report.quality_status.reasons.includes("builder_sources_blocked"));
+  assert(written.report.quality_status.affected_sections.includes("builder_observations"));
+  assert(
+    written.report.quality_status.degraded_sections.some((issue) =>
+      issue.section === "builder_observations" &&
+      issue.code === "builder_sources_blocked"
+    )
+  );
+  assert.deepEqual(written.report.quality_status.blocking_issues, []);
+});
+
+test("report:draft degrades missing known discovery input when explicitly allowed", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-draft-missing-input-degrade-"));
+  const reportDate = "2026-06-04";
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.source_audit.builder_sources = {
+    checked: true,
+    sources: [],
+    candidates_found: 0,
+    included: 0,
+    notes: "builder discovery will be supplied by degraded missing-input fallback"
+  };
+  discovery.sources = discovery.sources.filter((source) => source.id !== "builder-follow-builders-x-feed");
+  discovery.candidates = discovery.candidates.filter((candidate) =>
+    candidate.category !== "builder_observation" &&
+    candidate.source_id !== "builder-follow-builders-x-feed"
+  );
+  const discoveryPath = path.join(tmp, "normal-discovery.json");
+  const missingBuilderPath = path.join(tmp, ".tmp", `builders-${reportDate}.json`);
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath, missingBuilderPath],
+    allowDegradedInputs: true,
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.builder_observations.length, 0);
+  assert(
+    drafted.report.source_audit.builder_sources.sources.some((source) =>
+      source.name === "Builder discovery" &&
+      source.status === "blocked" &&
+      /missing/i.test(source.notes || "")
+    )
+  );
+
+  const written = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: drafted.path,
+    outputDir: path.join(tmp, "reports-data"),
+    candidatePoolPath: drafted.candidatePoolPath,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  assert.equal(written.report.quality_status.status, "degraded");
+  assert(written.report.quality_status.reasons.includes("builder_sources_blocked"));
+  assert.deepEqual(written.report.quality_status.blocking_issues, []);
+});
+
+test("report:draft does not degrade unknown missing inputs", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-draft-unknown-input-"));
+  const reportDate = "2026-06-04";
+  const discoveryPath = path.join(tmp, "normal-discovery.json");
+  await fs.writeFile(discoveryPath, `${JSON.stringify(autodraftDiscoveryFixture(reportDate), null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    () => generateReportDraft({
+      rootDir: tmp,
+      reportDate,
+      generatedAt: fixedGeneratedAt,
+      inputPaths: [discoveryPath, path.join(tmp, ".tmp", `unknown-${reportDate}.json`)],
+      allowDegradedInputs: true,
+      cacheEvidence: false
+    }),
+    { code: "ENOENT" }
+  );
+});
+
+test("report:draft does not degrade malformed known discovery input", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-draft-malformed-known-input-"));
+  const reportDate = "2026-06-04";
+  const discoveryPath = path.join(tmp, "normal-discovery.json");
+  const malformedPath = path.join(tmp, ".tmp", `builders-${reportDate}.json`);
+  await fs.mkdir(path.dirname(malformedPath), { recursive: true });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(autodraftDiscoveryFixture(reportDate), null, 2)}\n`, "utf8");
+  await fs.writeFile(malformedPath, "{not-json", "utf8");
+
+  await assert.rejects(
+    () => generateReportDraft({
+      rootDir: tmp,
+      reportDate,
+      generatedAt: fixedGeneratedAt,
+      inputPaths: [discoveryPath, malformedPath],
+      allowDegradedInputs: true,
+      cacheEvidence: false
+    }),
+    SyntaxError
+  );
+});
+
+test("daily runner marks generated output degraded when report_write reports degraded quality", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-report-write-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "report_write") {
+        return {
+          ok: true,
+          output: {
+            ok: true,
+            stage: stage.id,
+            quality_status: {
+              status: "degraded",
+              reasons: ["content_sources_blocked"],
+              degraded_sections: [{ section: "hot_blogs", reason: "content_sources_blocked" }]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_degraded");
+  const reportWrite = result.summary.stages.find((stage) => stage.id === "report_write");
+  assert.equal(reportWrite.status, "passed");
+  assert.equal(reportWrite.output.quality_status.status, "degraded");
+});
+
+test("daily runner blocks safety failures before degraded discovery fallback", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-source-safety-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "discover_content_sources") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            error_code: "unsafe_public_content",
+            error: "unsafe_public_content: public source text failed safety policy"
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
+  assert.equal(result.summary.next_action.stage_id, "discover_content_sources");
+  const recorded = result.summary.stages.find((stage) => stage.id === "discover_content_sources");
+  assert.equal(recorded.status, "failed");
+  assert.equal(recorded.output.fallback_used, undefined);
+  assert.equal(await exists(path.join(cleanRoot, ".tmp", "content-sources-2026-06-04.json")), false);
+  assert(!result.summary.stages.some((stage) => stage.id === "report_draft"));
+});
+
 test("daily runner writes sanitized daily publish retrospective before validation", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retrospective-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -6382,7 +6935,7 @@ test("daily runner finalizes publish retrospectives before real publish", async 
   assert.doesNotMatch(JSON.stringify(record), new RegExp(escapeRegExp(cleanRoot)));
 });
 
-test("daily runner writes blocked correction rollup when publish and fallback fail", async () => {
+test("daily runner writes infrastructure-exhausted correction rollup when publish and fallback fail", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retrospective-correction-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   await fs.mkdir(path.join(cleanRoot, "schemas"), { recursive: true });
@@ -6395,6 +6948,7 @@ test("daily runner writes blocked correction rollup when publish and fallback fa
     launcherRoot,
     reportDate: "2026-06-17",
     publish: true,
+    retryDelayMs: 0,
     prepareCleanWorktree: async () => ({
       ok: true,
       next_cwd: cleanRoot,
@@ -6411,7 +6965,9 @@ test("daily runner writes blocked correction rollup when publish and fallback fa
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "infrastructure_blocked_after_fallback_exhausted");
+  assert.equal(result.summary.next_action.kind, "recover_infrastructure_publish");
+  assert.equal(result.summary.next_action.stage_id, "publish_github_api_fallback");
   assert.equal(result.summary.retrospective_correction.ok, true);
   assert.equal(
     result.summary.retrospective_correction.record_path,
@@ -6424,7 +6980,7 @@ test("daily runner writes blocked correction rollup when publish and fallback fa
     await fs.readFile(path.join(cleanRoot, result.summary.retrospective_correction.record_path), "utf8")
   );
   assert.equal(correction.run_type, "rollup");
-  assert.equal(correction.status, "blocked");
+  assert.equal(correction.status, "infrastructure_blocked_after_fallback_exhausted");
   assert(correction.blockers.some((blocker) => blocker.section === "publish_real"));
   assert(correction.blockers.some((blocker) => blocker.section === "publish_github_api_fallback"));
   assert.doesNotMatch(JSON.stringify(correction), new RegExp(escapeRegExp(launcherRoot)));
@@ -6469,6 +7025,7 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
   assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
+  assert(reportDraft.command.args.includes("--allow-degraded-inputs"));
 });
 
 test("daily runner gives content source discovery enough candidate budget for the fixed source surface", async () => {
@@ -6523,6 +7080,7 @@ test("daily runner hands AI repair back to Codex with publish review budget", as
     launcherRoot,
     reportDate: "2026-06-04",
     publish: true,
+    retryDelayMs: 0,
     prepareCleanWorktree: async () => ({
       ok: true,
       next_cwd: cleanRoot,
@@ -6663,7 +7221,8 @@ test("daily runner resumes from AI repair contract and continues with optimized 
     "sources_phase5_audit",
     "publish_dry_run_daily",
     "retrospective_validate",
-    "publish_real"
+    "publish_real",
+    "pages_verify"
   ]);
   const repairStage = calls.find((stage) => stage.id === "quality_ai_repair");
   assert(repairStage.command.args.includes(contractPath));
@@ -6916,8 +7475,62 @@ test("daily runner blocks non-public-editorial AI repair review failures", async
   assert.equal(result.summary.next_action.stage_id, "quality_ai_repair");
 });
 
-test("daily runner falls back to GitHub API when real publish fails", async () => {
-  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-publish-fallback-"));
+test("daily runner verifies Pages after successful real publish", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pages-real-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+  const pagesUrl = "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-04.html";
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      if (stage.id === "pages_verify") {
+        return { ok: true, output: { ok: true, pages_url: pagesUrl, http_status: 200 } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published");
+  assert.equal(result.summary.next_action.kind, "none");
+  assert.deepEqual(calls.slice(-2).map((stage) => stage.id), ["publish_real", "pages_verify"]);
+  const publishStage = calls.find((stage) => stage.id === "publish_real");
+  assert.deepEqual(publishStage.command.args, [
+    "run",
+    "publish",
+    "--",
+    "confirm-push",
+    "2026-06-04",
+    "--skip-pages-verify"
+  ]);
+  const pagesStage = calls.find((stage) => stage.id === "pages_verify");
+  assert.deepEqual(pagesStage.command.args, [
+    "src/cli.js",
+    "publish:verify-pages",
+    "--date",
+    "2026-06-04",
+    "--attempts",
+    "1",
+    "--interval-ms",
+    "0"
+  ]);
+  const recorded = result.summary.stages.find((stage) => stage.id === "pages_verify");
+  assert.equal(recorded.status, "passed");
+  assert.equal(recorded.output.pages_url, pagesUrl);
+  assert.equal(recorded.output.http_status, 200);
+});
+
+test("daily runner verifies Pages after GitHub API fallback publish", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pages-fallback-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const calls = [];
 
@@ -6925,6 +7538,7 @@ test("daily runner falls back to GitHub API when real publish fails", async () =
     launcherRoot,
     reportDate: "2026-06-04",
     publish: true,
+    retryDelayMs: 0,
     prepareCleanWorktree: async () => ({
       ok: true,
       next_cwd: cleanRoot,
@@ -6949,9 +7563,121 @@ test("daily runner falls back to GitHub API when real publish fails", async () =
 
   assert.equal(result.summary.final_status, "published");
   assert.equal(result.summary.next_action.kind, "none");
-  assert.deepEqual(calls.slice(-2).map((stage) => stage.id), ["publish_real", "publish_github_api_fallback"]);
+  assert.deepEqual(calls.slice(-3).map((stage) => stage.id), [
+    "publish_real",
+    "publish_github_api_fallback",
+    "pages_verify"
+  ]);
   const fallbackStage = calls.find((stage) => stage.id === "publish_github_api_fallback");
-  assert.deepEqual(fallbackStage.command.args, ["run", "publish:github-api", "--", "confirm-push", "2026-06-04"]);
+  assert.deepEqual(fallbackStage.command.args, [
+    "run",
+    "publish:github-api",
+    "--",
+    "confirm-push",
+    "2026-06-04",
+    "--skip-pages-verify"
+  ]);
+});
+
+test("daily runner marks publish pending when Pages verification keeps failing", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pages-pending-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+  const pagesUrl = "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-04.html";
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      if (stage.id === "pages_verify") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            error_code: "pages_cache_delay",
+            pages_url: pagesUrl,
+            publish_status: {
+              pages_url: pagesUrl,
+              error_code: "pages_cache_delay",
+              publish_error: "pages_verification_failed: HTTP 404"
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published_pending_pages_verification");
+  assert.equal(result.summary.next_action.kind, "verify_pages_later");
+  assert.equal(result.summary.next_action.stage_id, "pages_verify");
+  assert.equal(result.summary.next_action.pages_url, pagesUrl);
+  assert.equal(calls.filter((stage) => stage.id === "publish_real").length, 1);
+  assert.equal(calls.filter((stage) => stage.id === "publish_github_api_fallback").length, 0);
+  assert.equal(calls.filter((stage) => stage.id === "pages_verify").length, 5);
+  const recorded = result.summary.stages.find((stage) => stage.id === "pages_verify");
+  assert.equal(recorded.status, "failed");
+  assert.equal(recorded.output.attempts, 5);
+  assert.equal(recorded.output.retry_attempts.length, 5);
+});
+
+test("daily runner falls back to GitHub API when real publish fails", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-publish-fallback-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: true,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage);
+      if (stage.id === "publish_real") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            publish_status: {
+              publish_error: "git_push_failed"
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published");
+  assert.equal(result.summary.next_action.kind, "none");
+  assert.equal(calls.filter((stage) => stage.id === "publish_real").length, 1);
+  assert.deepEqual(calls.slice(-3).map((stage) => stage.id), [
+    "publish_real",
+    "publish_github_api_fallback",
+    "pages_verify"
+  ]);
+  const fallbackStage = calls.find((stage) => stage.id === "publish_github_api_fallback");
+  assert.deepEqual(fallbackStage.command.args, [
+    "run",
+    "publish:github-api",
+    "--",
+    "confirm-push",
+    "2026-06-04",
+    "--skip-pages-verify"
+  ]);
 });
 
 test("daily runner records stdout and stderr from failed publish stages", async () => {
@@ -6979,7 +7705,7 @@ test("daily runner records stdout and stderr from failed publish stages", async 
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "infrastructure_blocked_after_fallback_exhausted");
   const publishStage = result.summary.stages.find((stage) => stage.id === "publish_real");
   const fallbackStage = result.summary.stages.find((stage) => stage.id === "publish_github_api_fallback");
   assert.equal(publishStage.error_code, "ETIMEDOUT");

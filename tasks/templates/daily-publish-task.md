@@ -13,6 +13,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - Use `--restart` only when intentionally discarding same-date runner state.
 - Scheduled dry-run uses `publish:dry-run:daily`.
 - 21:30 status self-check uses `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.
+- Daily resilience policy lives in `config/daily-resilience-policy.json`; changed workflows must pass `npm run resilience:validate`. Safe public source/coverage failures can publish as `published_degraded`; exhausted publish infrastructure reports `infrastructure_blocked_after_fallback_exhausted`.
 
 ## Assumptions
 
@@ -60,11 +61,12 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - If prompt / rule changes are explicitly approved during the run, update `prompts/ai-daily/modules/editorial-authority.md` together with its `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史`.
 - `npm run validate` passes.
 - `npm run publish:dry-run:daily -- --date YYYY-MM-DD` reports the date-scoped publish plan and expected Pages URL.
-- Real publish, when approved, verifies the final Pages URL.
+- Real publish, when approved, verifies the final Pages URL or reports `published_pending_pages_verification` when the repository publish succeeded but Pages is still catching up.
 
 ## Validation commands
 
 - `node scripts/harness-validate.mjs`
+- `npm run resilience:validate`
 - `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`
 - `npm run build`
 - `npm run validate`

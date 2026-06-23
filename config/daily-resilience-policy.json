@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "name": "daily-resilience-contract",
+  "description": "Recoverability-first policy table for the Codex-native daily publishing workflow.",
+  "terminal_statuses": [
+    "published",
+    "published_degraded",
+    "published_pending_pages_verification",
+    "generated_only",
+    "generated_degraded",
+    "needs_ai_repair",
+    "unsafe_blocked",
+    "infrastructure_blocked_after_fallback_exhausted",
+    "blocked"
+  ],
+  "blocking_whitelist": [
+    "unsafe_public_content",
+    "unrecoverable_schema",
+    "unrecoverable_rendering",
+    "internal_leakage",
+    "fake_tracking_component",
+    "high_risk_unverified_fact",
+    "publish_plan_violation",
+    "infrastructure_exhausted"
+  ],
+  "required_workflow_gates": [
+    "npm run resilience:validate",
+    "npm run workflow:validate",
+    "npm run validate"
+  ],
+  "stage_defaults": {
+    "summary_fields": ["stage_id", "status", "attempts", "duration_ms", "outcome", "error_code"],
+    "replay_fixtures": ["daily-runner-stage-summary"]
+  },
+  "stages": [
+    {
+      "id": "prepare_clean_worktree",
+      "description": "Prepare a clean current-origin/main worktree before the daily run.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["git_fetch_timeout", "transient_filesystem_error"] },
+      "fallback": { "kind": "bootstrap_latest_main", "action": "prepare_dedicated_publish_checkout" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "infrastructure_exhausted"] },
+      "summary_fields": ["stage_id", "status", "attempts", "remote_main_sha", "clean_repo_root", "error_code"],
+      "replay_fixtures": ["daily-runner-clean-worktree"]
+    },
+    {
+      "id": "prompt_build",
+      "description": "Build the dated generation prompt from committed prompt modules.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_prompt_contract_error" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "prompt_path", "error_code"],
+      "replay_fixtures": ["daily-runner-prompt-build"]
+    },
+    {
+      "id": "sources_validate",
+      "description": "Validate source registry configuration before discovery.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_invalid_source_config" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "unrecoverable_schema"] },
+      "summary_fields": ["stage_id", "status", "attempts", "checked_files", "error_code"],
+      "replay_fixtures": ["daily-runner-sources-validate"]
+    },
+    {
+      "id": "discover_github_trending",
+      "description": "Collect GitHub Trending candidates from the required weekly language scopes.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
+      "fallback": { "kind": "cached_or_readme_labeled_candidates", "action": "use_recent_cache_or_label_readme_failure" },
+      "degrade": { "allowed": true, "action": "publish_with_degraded_github_trending_lane" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "fallback_used", "degraded_reason"],
+      "replay_fixtures": ["github-trending-timeout", "github-trending-readme-fallback"]
+    },
+    {
+      "id": "discover_huggingface_trending",
+      "description": "Collect Hugging Face trending model candidates.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
+      "fallback": { "kind": "cached_candidates", "action": "use_recent_cache_or_empty_degraded_lane" },
+      "degrade": { "allowed": true, "action": "publish_with_degraded_huggingface_lane" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "fallback_used", "degraded_reason"],
+      "replay_fixtures": ["huggingface-trending-timeout"]
+    },
+    {
+      "id": "discover_builders",
+      "description": "Collect AI builder observations from original posts, feeds, and fallback sources.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
+      "fallback": { "kind": "original_source_backfill", "action": "use_original_status_or_interview_fallbacks" },
+      "degrade": { "allowed": true, "action": "publish_with_builder_lane_degraded_note" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "eligible_after_filter", "selected_count", "degraded_reason"],
+      "replay_fixtures": ["builders-feed-fetch-failed", "builders-original-source-backfill"]
+    },
+    {
+      "id": "discover_china_ai",
+      "description": "Collect China AI source candidates across registered lanes.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
+      "fallback": { "kind": "per_source_partial_results", "action": "keep_successful_sources_and_mark_failed_sources" },
+      "degrade": { "allowed": true, "action": "publish_with_degraded_china_ai_lane" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "source_count", "failed_source_count", "degraded_reason"],
+      "replay_fixtures": ["china-ai-partial-source-outage"]
+    },
+    {
+      "id": "discover_content_sources",
+      "description": "Collect fixed official content source candidates.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "network_error", "feed_parse_error"] },
+      "fallback": { "kind": "registered_source_public_backfill", "action": "use_opened_original_pages_or_mark_source_unavailable" },
+      "degrade": { "allowed": true, "action": "publish_with_source_outage_disclosure" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "checked_source_count", "blocked_source_count", "degraded_reason"],
+      "replay_fixtures": ["content-sources-node-fetch-failed"]
+    },
+    {
+      "id": "discover_statuspage_incidents",
+      "description": "Collect AI service statuspage incidents.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "network_error"] },
+      "fallback": { "kind": "empty_degraded_lane", "action": "publish_without_incident_items_if_source_unavailable" },
+      "degrade": { "allowed": true, "action": "mark_statuspage_lane_degraded" },
+      "block": { "allowed": true, "reasons": ["high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "incident_count", "degraded_reason"],
+      "replay_fixtures": ["statuspage-timeout"]
+    },
+    {
+      "id": "discover_search_news",
+      "description": "Collect search/news candidates from configured providers.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["provider_timeout", "network_error"] },
+      "fallback": { "kind": "per_provider_partial_results", "action": "keep_successful_providers_and_label_failed_providers" },
+      "degrade": { "allowed": true, "action": "publish_with_degraded_search_lane" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "provider_count", "failed_provider_count", "candidate_count"],
+      "replay_fixtures": ["search-news-provider-timeout"]
+    },
+    {
+      "id": "discover_wechat_platform",
+      "description": "Collect WeChat platform candidates when configured.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
+      "fallback": { "kind": "unconfigured_platform_degraded", "action": "emit_public_unconfigured_degraded_note" },
+      "degrade": { "allowed": true, "action": "publish_with_wechat_unconfigured_or_failed_note" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
+      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
+      "replay_fixtures": ["wechat-unconfigured"]
+    },
+    {
+      "id": "discover_zhihu_platform",
+      "description": "Collect Zhihu platform candidates when configured.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
+      "fallback": { "kind": "unconfigured_platform_degraded", "action": "emit_public_unconfigured_degraded_note" },
+      "degrade": { "allowed": true, "action": "publish_with_zhihu_unconfigured_or_failed_note" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
+      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
+      "replay_fixtures": ["zhihu-unconfigured"]
+    },
+    {
+      "id": "discover_reddit_platform",
+      "description": "Collect Reddit platform candidates when configured.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
+      "fallback": { "kind": "empty_degraded_lane", "action": "emit_public_platform_degraded_note" },
+      "degrade": { "allowed": true, "action": "publish_with_reddit_platform_degraded_note" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
+      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
+      "replay_fixtures": ["reddit-platform-timeout"]
+    },
+    {
+      "id": "sources_health",
+      "description": "Run source health checks and expose outages.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
+      "fallback": { "kind": "health_from_discovery_audit", "action": "derive_degraded_health_from_discovery_results" },
+      "degrade": { "allowed": true, "action": "publish_with_source_health_degraded_status" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation"] },
+      "summary_fields": ["stage_id", "status", "attempts", "healthy_count", "blocked_count", "degraded_reason"],
+      "replay_fixtures": ["sources-health-network-wide-outage"]
+    },
+    {
+      "id": "report_draft",
+      "description": "Generate the structured report draft from discovery inputs.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_io", "candidate_pool_read_error"] },
+      "fallback": { "kind": "known_discovery_input_degraded_lane", "action": "replace_missing_known_discovery_input_with_public_degraded_source_audit" },
+      "degrade": { "allowed": true, "action": "draft_with_explicit_degraded_source_lanes" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_schema", "unsafe_public_content", "high_risk_unverified_fact"] },
+      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "degraded_sections", "error_code"],
+      "replay_fixtures": ["report-draft-missing-known-input"]
+    },
+    {
+      "id": "quality_review",
+      "description": "Review public text quality and request AI repair when scoped editorial fixes are needed.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "codex_ai_repair_contract", "action": "create_ready_gated_public_text_repair_template" },
+      "degrade": { "allowed": true, "action": "continue_after_allowed_public_editorial_repairs" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "review_path", "ai_review_tasks", "next_action"],
+      "replay_fixtures": ["quality-review-public-editorial-repair"]
+    },
+    {
+      "id": "quality_ai_repair",
+      "description": "Apply ready-gated AI repair contracts to public text fields only.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "fresh_repair_template", "action": "request_new_contract_when_allowed_edits_are_insufficient" },
+      "degrade": { "allowed": true, "action": "publish_after_zero_rejected_public_editorial_repairs" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "internal_leakage", "unrecoverable_schema"] },
+      "summary_fields": ["stage_id", "status", "attempts", "contract_path", "accepted_edits", "rejected_edits"],
+      "replay_fixtures": ["quality-ai-repair-ready-contract", "quality-ai-repair-template-contract"]
+    },
+    {
+      "id": "report_write",
+      "description": "Normalize and write the public report JSON.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "schema_aware_normalizer", "action": "drop_or_normalize_only_allowlisted_public_degraded_fields" },
+      "degrade": { "allowed": true, "action": "normalize_public_degraded_fields" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_schema", "unsafe_public_content", "fake_tracking_component", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "json_path", "quality_status", "degraded_sections"],
+      "replay_fixtures": ["report-write-daily-tracking-source-unavailable"]
+    },
+    {
+      "id": "build",
+      "description": "Build static public HTML and data artifacts.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_filesystem_error"] },
+      "fallback": { "kind": "none", "action": "block_on_unrenderable_public_artifact" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_rendering", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "html_path", "json_path", "error_code"],
+      "replay_fixtures": ["build-render-error"]
+    },
+    {
+      "id": "quality_page_check",
+      "description": "Check rendered public pages for content, layout, media, and theme regressions.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_public_page_quality_failure" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_rendering", "internal_leakage", "fake_tracking_component", "unsafe_public_content"] },
+      "summary_fields": ["stage_id", "status", "attempts", "page_check_path", "blocking_count", "degraded_count"],
+      "replay_fixtures": ["page-check-promptlayer-layout", "page-check-broad-official-snapshot"]
+    },
+    {
+      "id": "validate",
+      "description": "Run repository validation before any publish attempt.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_validation_failure" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "unrecoverable_schema", "unrecoverable_rendering", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "validation_command", "error_code"],
+      "replay_fixtures": ["repository-validate-failure"]
+    },
+    {
+      "id": "sources_phase5_audit",
+      "description": "Audit recent source coverage and disclose durable source degradation.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_io"] },
+      "fallback": { "kind": "summary_only_degraded_audit", "action": "write_audit_degraded_note_without_blocking_publish" },
+      "degrade": { "allowed": true, "action": "publish_with_sources_phase5_degraded_note" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation"] },
+      "summary_fields": ["stage_id", "status", "attempts", "audit_path", "degraded_reason"],
+      "replay_fixtures": ["sources-phase5-audit-partial-history"]
+    },
+    {
+      "id": "publish_dry_run_daily",
+      "description": "Run the scheduled daily dry-run publish gate before real publish.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_publish_plan_failure" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "dry_run_plan", "will_stage_files", "error_code"],
+      "replay_fixtures": ["publish-dry-run-plan-failure"]
+    },
+    {
+      "id": "publish_real",
+      "description": "Publish through the git-based publish path when publish mode is allowed.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["git_push_timeout", "network_error"] },
+      "fallback": { "kind": "github_api_publish", "action": "try_publish_github_api_fallback" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "infrastructure_exhausted"] },
+      "summary_fields": ["stage_id", "status", "attempts", "publish_plan", "stdout", "stderr", "error_code"],
+      "replay_fixtures": ["publish-real-timeout"]
+    },
+    {
+      "id": "publish_github_api_fallback",
+      "description": "Fallback publish through the GitHub API when git publish fails.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["api_timeout", "network_error"] },
+      "fallback": { "kind": "none", "action": "write_blocked_publish_correction" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["infrastructure_exhausted", "publish_plan_violation"] },
+      "summary_fields": ["stage_id", "status", "attempts", "stdout", "stderr", "error_code", "previous_stage_id"],
+      "replay_fixtures": ["publish-github-api-fallback-failed"]
+    },
+    {
+      "id": "pages_verify",
+      "description": "Verify the published GitHub Pages URL after a successful publish or fallback publish.",
+      "retry": { "max_attempts": 5, "backoff_ms": [0, 10000, 20000, 40000, 60000], "on": ["pages_cache_delay", "network_error"] },
+      "fallback": { "kind": "published_pending_pages_verification", "action": "mark_pending_when_publish_succeeded_but_pages_lags" },
+      "degrade": { "allowed": true, "action": "publish_pending_pages_verification" },
+      "block": { "allowed": true, "reasons": ["infrastructure_exhausted"] },
+      "summary_fields": ["stage_id", "status", "attempts", "pages_url", "http_status", "observed_sha"],
+      "replay_fixtures": ["pages-verify-cache-delay"]
+    },
+    {
+      "id": "retrospective_write",
+      "description": "Write a sanitized generated-only retrospective before validation.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_missing_retrospective_record" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "retrospective_path", "error_code"],
+      "replay_fixtures": ["retrospective-write-missing-index"]
+    },
+    {
+      "id": "retrospective_finalize",
+      "description": "Finalize the retrospective as published immediately before real publish.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_unfinalized_publish_retrospective" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "retrospective_path", "error_code"],
+      "replay_fixtures": ["retrospective-finalize-failure"]
+    },
+    {
+      "id": "retrospective_validate",
+      "description": "Validate retrospective records before real publish.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_retrospective_validation_failure" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "validation_command", "error_code"],
+      "replay_fixtures": ["retrospective-validate-failure"]
+    },
+    {
+      "id": "retrospective_correction_write",
+      "description": "Write a blocked-run correction when publish and fallback both fail.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_with_recovery_action_when_correction_cannot_be_written" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "infrastructure_exhausted"] },
+      "summary_fields": ["stage_id", "status", "attempts", "retrospective_path", "failed_stage_id", "previous_stage_id"],
+      "replay_fixtures": ["retrospective-correction-write"]
+    },
+    {
+      "id": "retrospective_correction_validate",
+      "description": "Validate blocked-run correction records.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "keep_publish_blocked_with_correction_path" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "validation_command", "error_code"],
+      "replay_fixtures": ["retrospective-correction-validate"]
+    }
+  ]
+}

@@ -114,7 +114,19 @@
           "pattern": "^[a-z0-9][a-z0-9-]*$"
         },
         "status": {
-          "enum": ["published", "blocked", "degraded", "completed", "generated_only", "rolled_up"]
+          "enum": [
+            "published",
+            "published_degraded",
+            "published_pending_pages_verification",
+            "blocked",
+            "unsafe_blocked",
+            "infrastructure_blocked_after_fallback_exhausted",
+            "degraded",
+            "completed",
+            "generated_only",
+            "generated_degraded",
+            "rolled_up"
+          ]
         },
         "summary": { "type": "string", "minLength": 1 },
         "evidence": {
@@ -184,7 +196,19 @@
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
         },
         "status": {
-          "enum": ["published", "blocked", "degraded", "completed", "generated_only", "rolled_up"]
+          "enum": [
+            "published",
+            "published_degraded",
+            "published_pending_pages_verification",
+            "blocked",
+            "unsafe_blocked",
+            "infrastructure_blocked_after_fallback_exhausted",
+            "degraded",
+            "completed",
+            "generated_only",
+            "generated_degraded",
+            "rolled_up"
+          ]
         },
         "path": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1 }

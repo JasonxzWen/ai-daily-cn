@@ -29,10 +29,12 @@
     "daily:run": "node src/cli.js daily:run",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
+    "resilience:validate": "node scripts/validate-daily-resilience-policy.mjs",
     "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs"
   },
   "validate_must_include": [
-    "npm run workflow:validate"
+    "npm run workflow:validate",
+    "npm run resilience:validate"
   ],
   "required_markers": [
     {
@@ -45,6 +47,10 @@
         "status:\"ready\"",
         "sources:phase5-audit",
         "status:self-check",
+        "config/daily-resilience-policy.json",
+        "npm run resilience:validate",
+        "published_degraded",
+        "infrastructure_blocked_after_fallback_exhausted",
         "21:30",
         "multiple_active_daily_publish_automations",
         "--restart",
@@ -58,6 +64,10 @@
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
+        "config/daily-resilience-policy.json",
+        "npm run resilience:validate",
+        "published_degraded",
+        "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "next_action",
         "Codex-native runner",
@@ -72,6 +82,10 @@
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
+        "config/daily-resilience-policy.json",
+        "npm run resilience:validate",
+        "published_degraded",
+        "infrastructure_blocked_after_fallback_exhausted",
         "21:30",
         "multiple_active_daily_publish_automations",
         ".tmp/run-summary-YYYY-MM-DD.json",
@@ -87,6 +101,10 @@
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
+        "config/daily-resilience-policy.json",
+        "npm run resilience:validate",
+        "published_degraded",
+        "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "status:\"ready\"",
         "--restart"

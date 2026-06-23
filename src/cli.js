@@ -12,8 +12,10 @@ import {
   preparePublishWorktree,
   publishGeneratedArtifactsViaGitHubApi,
   publishGeneratedArtifacts,
-  resumePublishPush
+  resumePublishPush,
+  verifyPublishedUrl
 } from "./publish.js";
+import { canonicalReportUrl } from "./paths.js";
 import { assemblePrompt } from "./prompt.js";
 import {
   collectBuilderFallbacks,
@@ -237,7 +239,9 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       source_status_history_path: result.sourceStatusHistoryPath,
-      canonical_url: result.report.canonical_url
+      canonical_url: result.report.canonical_url,
+      quality_status: result.report.quality_status || null,
+      degraded_sections: result.report.quality_status?.degraded_sections || []
     });
   } else if (command === "report:draft") {
     const args = parseArgs(argv);
@@ -251,6 +255,7 @@ try {
       inputPaths: draftInputPaths(argv, args, { outputPath, candidateOutputPath }),
       outputPath,
       candidateOutputPath,
+      allowDegradedInputs: Boolean(args["allow-degraded-inputs"]),
       evidenceOutDir: args["evidence-out"] || "docs",
       maxEvidenceAssets: args["max-evidence-assets"] ? Number.parseInt(args["max-evidence-assets"], 10) : undefined,
       cacheEvidence: args["no-evidence-cache"] !== true
@@ -547,7 +552,7 @@ try {
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
       commitMessage: args.message,
-      verifyPages: true
+      verifyPages: args["skip-pages-verify"] !== true
     });
     const publishOk = !result.verification_error;
     printJson({
@@ -580,7 +585,7 @@ try {
       outDir: args.out || "docs",
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"],
-      verifyPages: true
+      verifyPages: args["skip-pages-verify"] !== true
     });
     const publishOk = !result.verification_error;
     printJson({
@@ -598,6 +603,41 @@ try {
     if (!publishOk) {
       process.exitCode = 1;
     }
+  } else if (command === "publish:verify-pages") {
+    const args = parseArgs(argv);
+    const reportDate = args.date || firstPositionalDate(argv);
+    const pagesUrl = args.url || (reportDate ? canonicalReportUrl(args["site-url"] || DEFAULT_SITE.siteUrl, reportDate) : "");
+    if (!pagesUrl) {
+      throw new PublisherError("pages_url_required", "publish:verify-pages requires --url or --date.");
+    }
+    const verification = await verifyPublishedUrl(pagesUrl, {
+      attempts: Number.parseInt(args.attempts || "12", 10),
+      intervalMs: Number.parseInt(args["interval-ms"] || "5000", 10),
+      expectedText: args["expected-text"] || reportDate || "",
+      fetchImpl: globalThis.fetch
+    });
+    const verificationError = verification.ok ? "" : `pages_verification_failed: ${verification.error || "unknown"}`;
+    printJson({
+      ok: Boolean(verification.ok),
+      publish_status: {
+        html_generated: false,
+        repo_updated: false,
+        repo_pushed: false,
+        pages_url: pagesUrl,
+        publish_error: verificationError,
+        error_code: verification.ok ? "" : "pages_cache_delay",
+        publish_mode: "pages-verify"
+      },
+      pages_url: pagesUrl,
+      http_status: verification.status || 0,
+      verification_error: verificationError,
+      result: {
+        pages_url: pagesUrl,
+        pages_verified: Boolean(verification.ok),
+        http_status: verification.status || 0,
+        verification_error: verificationError
+      }
+    });
   } else if (command === "publish:resume-push") {
     const args = parseArgs(argv);
     const positional = positionalArgs(argv);

@@ -1053,6 +1053,56 @@
         "test_name": "daily runner writes sanitized daily publish retrospective before validation",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-degraded-daily-tracking-publishable",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Publish daily tracking source outages as degraded",
+      "problem": "Artificial Analysis or similar daily tracking sources can have official snapshot collection failures. Treating the public source-unavailable note as an unknown schema field blocks the whole daily publish even though the safe behavior is to hide the data card and disclose the source outage.",
+      "expected_behavior": "`daily_tracking` items may carry `source_unavailable_note` when the official component snapshot is unavailable. The public report must keep the tracking item publishable, omit fake or broad snapshot components, mark the item unverified/blocked, and set `quality_status.status` to `degraded` with a daily tracking source outage reason.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "schemas/report.schema.json",
+        "src/draft.js",
+        "src/report.js",
+        "src/quality-status.js",
+        "src/interaction-report.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "report:write accepts source-unavailable daily tracking as degraded",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-daily-resilience-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep daily publish recovery policy executable",
+      "problem": "Recent scheduled daily runs failed for different causes because retry, fallback, degradation, and blocking behavior were scattered across runner code, prompts, runbooks, and automation expectations instead of being checked as one workflow contract.",
+      "expected_behavior": "The repository keeps `config/daily-resilience-policy.json` as the authoritative retry/fallback/degrade/block table for current daily runner stages. Validation must prove required runner stages are covered, terminal status and blocking taxonomies exist, docs/package workflow gates include `npm run resilience:validate`, safe public source or coverage failures can end as degraded publish states, and unsafe content, unrecoverable schema/rendering, internal leakage, fake tracking components, or exhausted publish infrastructure remain blocking.",
+      "scope": [
+        "config/daily-resilience-policy.json",
+        "config/daily-workflow-contract.json",
+        "config/feedback-ledger.json",
+        "docs/codex-automation-setup.md",
+        "docs/feedback-buglist-quick-reference.md",
+        "package.json",
+        "prompts/ai-daily/modules/publish-workflow.md",
+        "scripts/validate-daily-resilience-policy.mjs",
+        "src/resilience-policy.js",
+        "tasks/daily-publish-runbook.md",
+        "tasks/templates/daily-publish-task.md",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "daily resilience policy validates current runner stages and workflow gates",
+        "gate": "npm run validate"
+      }
     }
   ]
 }
