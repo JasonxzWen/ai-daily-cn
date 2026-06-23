@@ -70,7 +70,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "story_first_sections_expanded",
       !compactMainList && storyFirstOk && !promptLayerTheme && ticketCards === 0,
-      "The public page should start with 今日判断, 趋势主题, and 重点 story, without PromptLayer ticket-card layout.",
+      "The public page should start with 今日判断, 趋势主题, and 今日主线, without PromptLayer ticket-card layout.",
       {
         compact_list_present: Boolean(compactMainList),
         today_judgment: Boolean(todayJudgment),
@@ -117,6 +117,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       { label: "这条动态主要围绕", test: () => bodyText.includes("这条动态主要围绕") },
       { label: "完整列表", test: () => bodyText.includes("完整列表") },
       { label: "优先核对 README", test: () => bodyText.includes("优先核对 README") },
+      { label: "README 主要围绕", test: () => bodyText.includes("README 主要围绕") },
+      { label: "阅读时先看", test: () => bodyText.includes("阅读时先看") },
+      { label: "重点 story", test: () => bodyText.includes("重点 story") },
       { label: "可作为 agent 工具方向", test: () => bodyText.includes("可作为 agent 工具方向") },
       { label: "AI 工程工具方向的开源项目观察", test: () => bodyText.includes("AI 工程工具方向的开源项目观察") },
       { label: "今天进入 GitHub Trending Top 10", test: () => bodyText.includes("今天进入 GitHub Trending Top 10") },
@@ -267,6 +270,24 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       trackingScreenshotIssues.length === 0,
       "OpenRouter and Artificial Analysis should render structured table rows and no public screenshot media.",
       { issues: trackingScreenshotIssues }
+    );
+    const artificialAnalysisEmptyFallbackTabs = trackingCards
+      .map((card) => {
+        const title = card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const text = card.textContent?.replace(/\s+/g, " ").trim() || "";
+        if (!/Artificial Analysis/i.test(title)) {
+          return null;
+        }
+        const emptyLabels = ["Score vs. Token Usage", "Score vs. Cost", "Score vs. Compute", "Token Usage", "Cost"]
+          .filter((label) => text.includes(label) && /source_tab_not_collected|fallback/i.test(text));
+        return emptyLabels.length > 0 ? { title, empty_labels: emptyLabels } : null;
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_no_empty_fallback_tabs",
+      artificialAnalysisEmptyFallbackTabs.length === 0,
+      "Artificial Analysis should not expose empty fallback tabs when score/cost/scatter data was not collected.",
+      { issues: artificialAnalysisEmptyFallbackTabs }
     );
     const officialSnapshotLayoutIssues = trackingCards
       .map((card, index) => {
@@ -652,9 +673,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "external_links_rel",
       Array.from(document.querySelectorAll("a[href^='http']")).every((anchor) => {
         const rel = anchor.getAttribute("rel") || "";
-        return rel.includes("noopener") && rel.includes("noreferrer");
+        return rel.includes("noopener") && rel.includes("noreferrer") && anchor.getAttribute("target") === "_blank";
       }),
-      "External links should include noopener noreferrer."
+      "External links should include noopener noreferrer and open in a new tab."
     );
     addCheck(
       "no_horizontal_overflow",

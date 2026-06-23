@@ -866,7 +866,7 @@
       "status": "closed",
       "title": "Superseded must-read hero requirement",
       "problem": "The former three-card must-read contract is no longer the public daily target and would now force an obsolete first-screen layout.",
-      "expected_behavior": "Superseded on 2026-06-23: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract starts with story-first `今日判断`, `趋势主题`, and `重点 story` sections.",
+      "expected_behavior": "Superseded on 2026-06-23: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract starts with story-first `今日判断`, `趋势主题`, and `今日主线` sections.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -890,7 +890,7 @@
       "status": "implemented",
       "title": "Keep public reader sections concrete and dense",
       "problem": "Public AI daily pages could duplicate the main stream with a `完整列表`, leave main details collapsed, show GitHub Trending rows with generic ranking/README boilerplate, render blank or broken X/Twitter cards when optional fields were missing, and reduce community leads to one-line blurbs.",
-      "expected_behavior": "Public interaction input removes `完整列表`, renders story-first `今日判断`, `趋势主题`, and `重点 story` sections without PromptLayer ticket grids, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and keeps community lead bodies dense without internal review notes.",
+      "expected_behavior": "Public interaction input removes `完整列表`, renders story-first `今日判断`, `趋势主题`, and `今日主线` sections without PromptLayer ticket grids, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and keeps community lead bodies dense without internal review notes.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1157,6 +1157,30 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "daily resilience policy validates current runner stages and workflow gates",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-daily-followup-contracts",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Preserve public daily follow-up quality contracts",
+      "problem": "Public daily pages can regress after IA changes: Artificial Analysis can expose empty score/cost/scatter tabs, story labels can use awkward bilingual wording or repeat `披露`, external links can stay in the same tab, GitHub Trending can show template README summaries, X/Twitter avatars can fail to localize, and platform/GitHub-watch source lanes can look ineffective or be misattributed.",
+      "expected_behavior": "Daily public reports hide uncollected Artificial Analysis tabs instead of rendering empty fallback panels; the story list is titled `今日主线`; story titles avoid repeated `披露`; every external report link opens a new tab with `noopener noreferrer`; GitHub Trending rejects `README 主要围绕`/`阅读时先看` template summaries and falls back to source/rank/star facts; Builder/X cards infer downloaded local avatars from `avatar_url`; source effectiveness includes explicit WeChat, Zhihu, and GitHub organization-watch rows and does not attribute GitHub Trending weekly candidates to RuanYF Weekly.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/tracking-components.js",
+        "src/story-first.js",
+        "src/interaction-report.js",
+        "src/presentation.js",
+        "src/page-checklist.js",
+        "src/source-effectiveness.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily followups hide empty Artificial Analysis fallback tabs",
         "gate": "npm run validate"
       }
     }

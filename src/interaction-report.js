@@ -20,7 +20,7 @@ import {
   hasInvalidOfficialTrackingSnapshot,
   trackingComponentForInteraction
 } from "./tracking-components.js";
-import { normalizeStoryFirstReport } from "./story-first.js";
+import { normalizeStoryFirstReport, readerFacingStoryTitle } from "./story-first.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -674,7 +674,24 @@ async function resolveSkillDir(rootDir, requestedSkillDir) {
 }
 
 function normalizePublicHtml(html) {
-  return html.replaceAll('rel="noreferrer"', 'rel="noopener noreferrer"');
+  const normalizedRel = html.replaceAll('rel="noreferrer"', 'rel="noopener noreferrer"');
+  return normalizedRel.replace(/<a\b([^>]*\bhref="https?:\/\/[^"]+"[^>]*)>/gi, (match, attrs) => {
+    let nextAttrs = attrs;
+    if (!/\starget=/i.test(nextAttrs)) {
+      nextAttrs += ' target="_blank"';
+    }
+    if (/\srel="/i.test(nextAttrs)) {
+      nextAttrs = nextAttrs.replace(/\srel="([^"]*)"/i, (_relMatch, value) => {
+        const relTokens = new Set(String(value || "").split(/\s+/).filter(Boolean));
+        relTokens.add("noopener");
+        relTokens.add("noreferrer");
+        return ` rel="${[...relTokens].join(" ")}"`;
+      });
+    } else {
+      nextAttrs += ' rel="noopener noreferrer"';
+    }
+    return `<a${nextAttrs}>`;
+  });
 }
 
 function normalizeTrendAnnotations(value) {
@@ -716,7 +733,7 @@ function formatStoryFirstSections(stories, context = {}) {
     },
     {
       type: "markdown",
-      title: "重点 story",
+      title: "今日主线",
       richId: "story-list",
       group: "main",
       collapsed: false,
@@ -728,9 +745,10 @@ function formatStoryFirstSections(stories, context = {}) {
 function formatTodayJudgment(stories) {
   return stories.slice(0, 5).map((story) => {
     const link = storyPrimaryLink(story);
+    const storyTitle = readerFacingStoryTitle(story.title);
     const title = link
-      ? markdownLink(link.url, story.title, { icon: siteIconForUrl(link.url, link.label || story.title), iconLabel: link.label })
-      : story.title;
+      ? markdownLink(link.url, storyTitle, { icon: siteIconForUrl(link.url, link.label || storyTitle), iconLabel: link.label })
+      : storyTitle;
     return `- **${title}**：${formatDailyInlineText(story.why_it_matters || story.what_happened || "", story)}`;
   }).join("\n");
 }
@@ -745,7 +763,7 @@ function formatTrendThemes(stories) {
     groups.get(trend).push(story);
   }
   return [...groups.entries()].slice(0, 4).map(([trend, items]) => {
-    const titles = items.slice(0, 3).map((story) => story.title).join(" / ");
+    const titles = items.slice(0, 3).map((story) => readerFacingStoryTitle(story.title)).join(" / ");
     return `- **${trend}**：${titles}`;
   }).join("\n");
 }
@@ -753,9 +771,10 @@ function formatTrendThemes(stories) {
 function formatStoryList(stories, context = {}) {
   return stories.map((story, index) => {
     const link = storyPrimaryLink(story);
+    const storyTitle = readerFacingStoryTitle(story.title);
     const title = link
-      ? markdownLink(link.url, story.title, { icon: siteIconForUrl(link.url, link.label || story.title), iconLabel: link.label })
-      : story.title;
+      ? markdownLink(link.url, storyTitle, { icon: siteIconForUrl(link.url, link.label || storyTitle), iconLabel: link.label })
+      : storyTitle;
     const tags = formatHighlightTags([
       importanceTagFor("stories", story),
       storyEvidenceTag(story),
@@ -859,7 +878,7 @@ function formatCompactMainItemSections(items, context = {}) {
   return [
     {
       type: "markdown",
-      title: "重点 story",
+      title: "今日主线",
       richId: "story-list",
       group: "main",
       collapsed: false,
@@ -1055,20 +1074,20 @@ function formatGithubTrendingCards(items, context = {}) {
 function githubTrendCardBody(item, project) {
   const repo = item.repo || item.name || repoFromUrl(item.url);
   const description = stripGithubRepoLead(
-    cleanGithubTrendDescription(item) || cleanProjectDescription(item.description || ""),
+    cleanGithubTrendDescription(item),
     repo
   );
   const projectDetail = stripGithubRepoLead(projectHighlightDetail(project, description), repo);
-  const fallback = stripGithubRepoLead(String(item.description || item.evidence || ""), repo);
+  const fallback = stripGithubRepoLead(String(item.evidence || ""), repo);
   const body = uniqueTextFragments([description, projectDetail, fallback])
     .map((fragment) => cleanGithubTrendCardFragment(fragment))
     .filter((fragment) => !isGenericGithubTrendDescription(fragment))
     .slice(0, 2)
     .join(" ");
-  if (isWeakGithubTrendCardBody(body)) {
+  if (!body || isWeakGithubTrendCardBody(body)) {
     return githubTrendMovementSummary(item);
   }
-  return trimText(body || cleanGithubTrendCardFragment(fallback), 220);
+  return trimText(body, 220);
 }
 
 function isWeakGithubTrendCardBody(value) {
@@ -1082,8 +1101,28 @@ function githubTrendMovementSummary(item) {
   const sourceLabel = source || "GitHub Trending";
   const stars = githubTrendStarsMovement(item);
   const move = githubTrendRankMovement(item);
+  const repo = item?.repo || item?.name || repoFromUrl(item?.url);
+  const intent = githubRepoIntentSummary(repo);
   const facts = [sourceLabel, rank, stars, move].filter(Boolean).join(" / ");
-  return trimText(`${facts}；阅读时先核对 README 的运行入口、示例覆盖、许可证和近期维护。`, 220);
+  return trimText(`${repo ? `${repo}：` : ""}${intent}${facts ? `（${facts}）` : ""}`, 220);
+}
+
+function githubRepoIntentSummary(repo) {
+  const name = String(repo || "").split("/").pop() || "";
+  const normalized = name.toLowerCase().replace(/[-_]+/g, " ");
+  if (/memory|mem0|recall|knowledge|context/.test(normalized) && /mcp|agent|codebase|repo|repository/.test(normalized)) {
+    return "先按代码库记忆、上下文检索或 MCP 集成方向核查可运行入口、权限边界和维护活跃度。";
+  }
+  if (/agent|workflow|tool|browser|automation|eval|bench|test/.test(normalized)) {
+    return "先按 agent 工作流、评测或自动化工具方向核查示例覆盖、运行前提和团队接入成本。";
+  }
+  if (/model|llm|rag|embedding|inference|prompt/.test(normalized)) {
+    return "先按模型应用、检索或推理工具方向核查任务边界、依赖和可复现样例。";
+  }
+  if (/ui|web|app|editor|studio|dashboard/.test(normalized)) {
+    return "先按产品界面或开发者工具方向核查核心场景、部署方式和近期维护。";
+  }
+  return "先核查仓库解决的具体问题、可运行入口、许可证和近期维护，再决定是否进入试用。";
 }
 
 function githubTrendStarsMovement(item) {
@@ -1145,7 +1184,7 @@ function stripGithubRepoLead(value, repo) {
 }
 
 function isGenericGithubTrendDescription(value) {
-  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week)/i.test(String(value || ""));
+  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/i.test(String(value || ""));
 }
 
 function formatHuggingFaceTrending(items, context = {}) {
@@ -1279,14 +1318,14 @@ function projectHighlightDetail(project, baseDescription = "") {
     return "";
   }
   const hasBaseDescription = Boolean(String(baseDescription || "").trim());
-  const projectDescription = cleanProjectDescription(project.description);
+  const projectDescription = isGenericGithubTrendDescription(project.description) ? "" : cleanProjectDescription(project.description);
   const description = hasBaseDescription || isNearDuplicateText(projectDescription, baseDescription) ? "" : projectDescription;
   const hasDomains = Array.isArray(project.domains) && project.domains.length > 0;
   const domains = hasDomains
     ? `领域：${project.domains.join("、")}`
     : "";
   const useCaseText = String(project.use_case || "").trim();
-  const useCase = useCaseText && !(hasBaseDescription && hasDomains) && !isNearDuplicateText(useCaseText, [baseDescription, description].filter(Boolean).join(" "))
+  const useCase = useCaseText && !isGenericGithubTrendDescription(useCaseText) && !(hasBaseDescription && hasDomains) && !isNearDuplicateText(useCaseText, [baseDescription, description].filter(Boolean).join(" "))
     ? `适合：${useCaseText}`
     : "";
   return uniqueTextFragments([description, domains, useCase]).join(" ");
@@ -1884,14 +1923,48 @@ function builderAvatarIcon(report, item, options = {}) {
   if (item?.avatar_data_uri) {
     return item.avatar_data_uri;
   }
-  if (item?.avatar_local_path && report?.html_path) {
+  const localPath = item?.avatar_local_path || inferredBuilderAvatarLocalPath(report, item, options);
+  if (localPath && report?.html_path) {
     const assetRootDir = options.assetRootDir || "";
-    const assetPath = assetRootDir ? path.join(assetRootDir, item.avatar_local_path) : "";
+    const assetPath = assetRootDir ? path.join(assetRootDir, localPath) : "";
     if (!assetRootDir || fsSync.existsSync(assetPath)) {
-      return relativeAssetHref(report.html_path, item.avatar_local_path);
+      return relativeAssetHref(report.html_path, localPath);
     }
   }
   return generatedSiteIcon(siteInitials(item?.author || builderHandle(item) || "Builder"), "#111827", "#ffffff");
+}
+
+function inferredBuilderAvatarLocalPath(report, item, options = {}) {
+  if (!report?.report_date || !item?.avatar_url || !options.assetRootDir) {
+    return "";
+  }
+  try {
+    const url = new URL(String(item.avatar_url || ""));
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return "";
+    }
+    const [year, month] = String(report.report_date).split("-");
+    if (!year || !month) {
+      return "";
+    }
+    const handle = builderHandle(item) || item.author || "builder";
+    const slug = String(handle)
+      .trim()
+      .toLowerCase()
+      .replace(/^@/, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "builder";
+    const extension = avatarExtensionFromUrl(url) || ".png";
+    return `assets/avatars/${year}/${month}/${report.report_date}-${slug}${extension}`;
+  } catch {
+    return "";
+  }
+}
+
+function avatarExtensionFromUrl(url) {
+  const extension = path.extname(url.pathname || "").toLowerCase();
+  return [".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif"].includes(extension) ? extension : "";
 }
 
 function hotBlogPointTexts(itemOrSummary) {

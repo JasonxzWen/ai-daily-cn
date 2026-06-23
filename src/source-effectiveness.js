@@ -71,7 +71,7 @@ const CORE_SOURCE_CONTRACTS = [
     id: "ruanyf-weekly",
     name: "RuanYF Weekly",
     role: "open_source_aggregator",
-    aliases: ["ruanyf weekly", "ruanyf/weekly", "weekly", "阮一峰"]
+    aliases: ["ruanyf weekly", "ruanyf/weekly", "阮一峰"]
   },
   {
     id: "techcrunch-ai",
@@ -110,6 +110,29 @@ const CORE_SOURCE_CONTRACTS = [
     aliases: ["hacker news", "hnrss", "topstories", "hacker-news.firebaseio.com"]
   },
   {
+    id: "wechat-platform",
+    name: "WeChat Platform Sources",
+    role: "platform_signal",
+    requires_real_configuration: true,
+    notes: "WeChat requires a date-scoped article input or an explicitly configured private/self-hosted feed; placeholder and kill-switch rows mean the lane is not active.",
+    aliases: ["wechat_sources", "platform wechat", "platform-wechat", "wechat ai feed", "wechat article input", "mp.weixin", "weixin", "wechat"]
+  },
+  {
+    id: "zhihu-platform",
+    name: "Zhihu Platform Sources",
+    role: "platform_signal",
+    requires_real_configuration: true,
+    notes: "Zhihu requires an explicitly configured feed or platform source; placeholder and kill-switch rows mean the lane is not active.",
+    aliases: ["zhihu_sources", "platform zhihu", "platform-zhihu", "zhihu ai feed", "zhihu.com", "zhihu"]
+  },
+  {
+    id: "github-org-watch",
+    name: "GitHub Organization Watch",
+    role: "github_watch",
+    notes: "Official organization/repository Atom feeds are monitored separately from GitHub Trending and only count when recent parsed repository events produce candidates.",
+    aliases: ["github organization", "github org", "github_atom", "github atom", "content github"]
+  },
+  {
     id: "github-trending",
     name: "GitHub Trending",
     role: "github_trending",
@@ -140,13 +163,19 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
   const auditSources = collectAuditSources(report?.source_audit);
   return CORE_SOURCE_CONTRACTS.map((contract) => {
     const sources = auditSources.filter((source) => sourceMatchesContract(source, contract));
-    const matchedCandidates = Array.isArray(candidates)
-      ? candidates.filter((candidate) => candidateMatchesContract(candidate, contract, sources))
+    const activeSources = contract.requires_real_configuration
+      ? sources.filter((source) => !isInactivePlaceholderSource(source))
+      : sources;
+    const candidateSources = contract.requires_real_configuration ? activeSources : sources;
+    const matchedCandidates = contract.requires_real_configuration && activeSources.length === 0
+      ? []
+      : Array.isArray(candidates)
+      ? candidates.filter((candidate) => candidateMatchesContract(candidate, contract, candidateSources))
       : [];
-    const publicIncluded = sourceIncludedPublicly(report, contract, sources, matchedCandidates);
-    const configured = sources.length > 0;
-    const reachable = sources.some((source) => REACHABLE_STATUSES.has(String(source.status || "")));
-    const parsedRecent = sources.some(sourceHasRecentParsedSignal);
+    const publicIncluded = sourceIncludedPublicly(report, contract, candidateSources, matchedCandidates);
+    const configured = sources.length > 0 && (contract.requires_real_configuration ? activeSources.length > 0 : true);
+    const reachable = configured && activeSources.some((source) => REACHABLE_STATUSES.has(String(source.status || "")));
+    const parsedRecent = configured && activeSources.some(sourceHasRecentParsedSignal);
     const candidateCreated = matchedCandidates.length > 0;
     return {
       id: contract.id,
@@ -163,7 +192,7 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
       statuses: uniqueStrings(sources.map((source) => source.status).filter(Boolean)),
       candidate_count: matchedCandidates.length,
       included_count: matchedCandidates.filter(candidateIncludedPublicly).length,
-      notes: contract.notes || ""
+      notes: sourceEffectivenessNotes(contract, sources)
     };
   });
 }
@@ -287,6 +316,33 @@ function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidat
   return "candidate_not_selected_for_public_page";
 }
 
+function isInactivePlaceholderSource(source = {}) {
+  const text = searchableText([
+    source.id,
+    source.name,
+    source.url,
+    source.notes,
+    source.status
+  ]);
+  return text.includes("example com") ||
+    text.includes("kill switch enabled") ||
+    text.includes("kill switch") ||
+    text.includes("placeholder source") ||
+    text.includes("skipped missing") ||
+    text.includes("skipped manual source") ||
+    text.includes("no date scoped");
+}
+
+function sourceEffectivenessNotes(contract, sources) {
+  const sourceNotes = uniqueStrings(
+    sources
+      .map((source) => String(source?.notes || "").trim())
+      .filter(Boolean)
+      .slice(0, 4)
+  );
+  return [contract.notes || "", ...sourceNotes].filter(Boolean).join("; ");
+}
+
 function searchableText(values) {
   return values.map(normalizeSearchToken).filter(Boolean).join(" ");
 }
@@ -302,10 +358,10 @@ function normalizeSearchToken(value) {
 }
 
 function countValue(value) {
-  const number = Number(value);
-  return Number.isFinite(number) && number > 0 ? number : 0;
+  const count = Number(value);
+  return Number.isFinite(count) ? count : 0;
 }
 
-function uniqueStrings(values) {
-  return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean)));
+function uniqueStrings(items) {
+  return [...new Set(items.map((item) => String(item || "").trim()).filter(Boolean))];
 }
