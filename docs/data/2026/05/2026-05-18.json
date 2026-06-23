@@ -23,7 +23,8 @@
         "工程和产品团队需要关注的是 deployment 形态变化：国家级 AI adoption 项目会把身份资格、课程完成状态、账户发放、隐私告知和服务支持变成同一个交付链路。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流",
@@ -46,7 +47,8 @@
         "Databricks 的生产路径不是直接聊天入口，而是通过 AI Unity Gateway、AgentBricks 和 Agent Supervisor API 编排专门 agent，说明企业 agent 竞争正在转向文档解析、检索监督和多 agent 工作流治理。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点",
@@ -69,7 +71,8 @@
         "这两项放在一起看，Copilot 的企业治理面正在同时处理默认模型、长期支持窗口、个人偏好记忆和组织策略；团队需要把模型 policy、memory settings 和审计口径一起管理。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "xAI 允许 Grok 订阅直接接入 Hermes Agent",
@@ -92,7 +95,8 @@
         "这类 OAuth subscription provider 会改变开源 agent 的部署边界：模型账户、媒体生成、长期记忆、工具调用和本地文件权限集中到一个运行时，权限范围和隔离策略需要更明确。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物",
@@ -115,7 +119,8 @@
         "修复项覆盖 Node 26 OpenAI-compatible streams idle timeout、pnpm global package root、Anthropic stream auto-retry、large markdown rendering、`--resume` 大会话列表 OOM 等，说明 coding agent 的可用性正在被安装、恢复和 TUI 细节拉开差距。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流",
@@ -138,35 +143,15 @@
         "对 AIP/agent 应用来说，这把 LLM-backed workflow 的变更管理接近软件工程的 branch-review-merge 语义；AIP Logic 模型替换、资源审批和数据 lineage 将更容易进入同一套发布治理。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "projects": [
     {
-      "name": "Grok-Hermes OAuth provider",
-      "description": "xAI 与 Hermes Agent 的订阅接入路径，让 Grok 4.3、TTS 和 Imagine 进入开源 agent runtime。",
-      "url": "https://x.ai/news/grok-hermes",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Pi Coding Agent 0.74.1",
-      "description": "Pi coding agent 的 2026-05-16 release，新增 image generation、Together AI 和 Windows ARM64 产物。",
-      "url": "https://pi.dev/news/releases/0.74.1",
-      "domains": [],
-      "importance": "general"
-    },
-    {
       "name": "Copilot Memory user preferences",
       "description": "GitHub Copilot Memory 的早期访问更新，把个人偏好记忆从 repo 维度扩到用户维度。",
       "url": "https://github.blog/changelog/2026-05-15-copilot-memory-supports-user-preferences-for-pro-pro-users/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Palantir Global Branching",
-      "description": "Foundry 跨应用 branch/test/merge 工作流，覆盖 AIP Logic、Ontology、Workshop、Pipeline Builder 等资源。",
-      "url": "https://www.palantir.com/docs/foundry/announcements/2026-05",
       "domains": [],
       "importance": "general"
     }
@@ -198,7 +183,128 @@
   "generated_at": "2026-05-18T03:08:13.972Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-malta-chatgpt-plus-partnership",
+      "title": "OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-16",
+      "primary_entity": "OpenAI News",
+      "event_type": "launch",
+      "object": "OpenAI 与 Malta 推出面向全体公民的 ChatGPT Plus 和 AI literacy 计划",
+      "what_happened": "OpenAI 与 Malta 政府宣布合作，把 ChatGPT Plus 提供给完成 AI literacy 课程的 Maltese citizens；首阶段在 2026 年 5 月启动，由 Malta Digital Innovation Authority 管理分发。",
+      "why_it_matters": "OpenAI 把该项目归入 OpenAI for Countries：不是单一 API 交易，而是把教育、访问权和本地国家优先事项绑定在一起。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News",
+          "url": "https://openai.com/index/malta-chatgpt-plus-partnership/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-databricks",
+      "title": "OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-15",
+      "primary_entity": "OpenAI Customer Story",
+      "event_type": "launch",
+      "object": "OpenAI 披露 Databricks 将 GPT-5.5 用于企业 agent 工作流",
+      "what_happened": "OpenAI 发布 Databricks 案例，说明 GPT-5.5 已通过 AI Unity Gateway 面向 Databricks 客户 agent workflow 使用，并在 OfficeQA Pro 这类复杂企业文档任务上获得新的内部基准结果。",
+      "why_it_matters": "OpenAI 披露 GPT-5.5 在 agent-harness 设置下相对 GPT-5.4 降低错误，并成为首个在 OfficeQA Pro 超过 50% accuracy 的模型；这些数字来自 OpenAI 与 Databricks 公布的同一案例页。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Customer Story",
+          "url": "https://openai.com/index/databricks/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot",
+      "title": "GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-17",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub Copilot 进入用户级记忆和 GPT-5.3-Codex 企业默认模型切换节点",
+      "what_happened": "GitHub 先前公告中的关键日期在 2026-05-17 生效：GPT-5.3-Codex 成为 Copilot Business 和 Copilot Enterprise 的 base model；同一窗口内，Copilot Memory 也开始支持 Pro 和 Pro+ 用户级偏好。",
+      "why_it_matters": "2026-05-15 的 Copilot Memory 更新把记忆从 repository-level 扩到 user-level preferences，可记住 commit style、PR 结构和沟通偏好，并跨 Copilot experiences 使用。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-03-18-gpt-5-3-codex-long-term-support-in-github-copilot/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-grok-hermes",
+      "title": "xAI 允许 Grok 订阅直接接入 Hermes Agent",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-15",
+      "primary_entity": "xAI News",
+      "event_type": "launch",
+      "object": "xAI 允许 Grok 订阅直接接入 Hermes Agent",
+      "what_happened": "xAI 宣布 Grok subscribers 可在 Nous Research 的开源 Hermes Agent 中登录并使用 Grok 4.3、Grok Text-to-Speech 和 Grok Imagine，接入方式是 Hermes 的 xAI Grok OAuth provider。",
+      "why_it_matters": "Hermes Agent 的定位是 persistent、自改进、可连接消息平台并保留长期记忆的本地/服务器 agent；Grok 订阅接入让消费者订阅模型进入开源 agent runtime，而不是只作为官方 App 内能力存在。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "xAI News",
+          "url": "https://x.ai/news/grok-hermes",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-0-74",
+      "title": "Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-16",
+      "primary_entity": "Pi Release Notes",
+      "event_type": "launch",
+      "object": "Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物",
+      "what_happened": "Pi 0.74.1 release notes 显示，该 coding agent 新增图像生成 API 和模型元数据、Together AI provider、Windows ARM64 standalone binaries，并修复多项流式响应、终端渲染和会话恢复问题。",
+      "why_it_matters": "Together AI 成为内置 provider，提供 `/login` API-key auth、默认模型解析和文档入口；Windows ARM64 则获得 standalone release artifacts。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Pi Release Notes",
+          "url": "https://pi.dev/news/releases/0.74.1",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05",
+      "title": "Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-18",
+      "primary_entity": "Palantir Foundry Announcements",
+      "event_type": "update",
+      "object": "Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流",
+      "what_happened": "Palantir 的 2026 年 5 月公告页说明，Global Branching 从 2026-05-18 当周开始面向所有 enrollments GA，让用户在单一 branch 中跨应用修改、测试并合并 Foundry 资源。",
+      "why_it_matters": "分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Palantir Foundry Announcements",
+          "url": "https://www.palantir.com/docs/foundry/announcements/2026-05",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [],

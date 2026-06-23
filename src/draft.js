@@ -24,6 +24,7 @@ import { selectChineseMediaDynamics } from "./chinese-media.js";
 import { selectOfficialOrgUpdates } from "./official-updates.js";
 import { buildTrackingComponentSnapshot } from "./tracking-components.js";
 import { normalizeOfficialComponentSnapshot } from "./official-component-snapshot.js";
+import { normalizeStoryFirstReport } from "./story-first.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -275,7 +276,10 @@ export async function generateReportDraft(options = {}) {
     sourceAudit,
     days: options.sourceStatusWindowDays || 10
   });
-  const reportWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(report, sourceStatusUpdate);
+  const reportWithSourceSuggestions = normalizeStoryFirstReport(
+    appendSourceStatusSuggestionsToDraft(report, sourceStatusUpdate),
+    { preserveExistingStories: true }
+  );
   const sourceStatusHistoryPath = await writeSourceStatusHistory(sourceStatusUpdate);
 
   const outputPath = path.resolve(rootDir, options.outputPath || path.join(".tmp", "daily-report.json"));

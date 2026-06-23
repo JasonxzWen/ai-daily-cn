@@ -8,7 +8,7 @@
 - 对读者有用的判断，但必须落到具体变化，例如“增加 OpenAI-compatible endpoint”“扩展到 2026-05-19 官方发布”。
 - 每条公开正文至少保留 2 个事实锚点：日期、版本号、仓库名、API/模型名、发布方、限制、价格/权限、原始链接或可复现动作。
 - 需要读者一眼看到的实体、变化或限制可用 `**加粗**`；状态、排名变化、关键门槛或结论可用 `==高亮==`。单条最多 1-3 个重点，不要整句高亮。
-- 主体信息目标为 5-30 条；每条只保留约 80-120 中文字的 2-3 句/行事实概括，不展示“为什么重要 / 启示 / 入选条件 / 读者相关性”模板。
+- 主体信息目标为 story-first 主列表，默认 8 条、最多 12 条，允许少于 8；每条保留具体标题、发生了什么、为什么值得看、证据等级和来源链接，不展示“启示 / 入选条件 / 读者相关性”模板。
 - 生产日报的 effective-interact `pre-rendered` 渲染已支持安全 inline Markdown，正文和卡片 body 可以使用 `**...**` 与 `==...==`；不要插入 raw HTML。
 
 删除或改写：
@@ -26,7 +26,7 @@
 
 检查顺序：
 
-1. 先读 `summary`、`main_items[*].bullets`、`hot_blogs[*].summary`、`projects[*].description`、`self_check.notes` 和 `optimization_suggestions`；只有兼容字段非空时才检查 `model_releases[*].summary` 是否已被主体新闻覆盖。
+1. 先读 `summary`、`stories[*].what_happened`、`stories[*].why_it_matters`、兼容 `main_items[*].bullets`、`hot_blogs[*].summary`、`projects[*].description`、`self_check.notes` 和 `optimization_suggestions`；只有兼容字段非空时才检查 `model_releases[*].summary` 是否已被主体新闻覆盖。
 2. 删掉重复解释，只保留会影响读者判断的信息。
 3. 对每条主体信息、博客和项目检查是否有明确重点；不要超过 3 处高亮/加粗，不要整句高亮。
 4. 再运行 `npm run report:write`；如果返回 `plain_language_failed`，按错误路径改写，不要绕过校验。

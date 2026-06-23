@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-23.project_iteration.story-first-daily-layout",
+  "run_type": "project_iteration",
+  "date": "2026-06-23",
+  "title": "Story-first daily layout correction",
+  "status": "completed",
+  "summary": "Project iteration record for moving the public AI daily back from a PromptLayer-inspired visual report toward a story-first dense news product. The implementation adds generation-time story normalization and dedupe, withdraws the production PromptLayer theme, renders today's judgment, trend themes, and key stories first, and keeps project, community, ranking, and source coverage sections compact.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "html": "docs/reports/2026/06/2026-06-23.html",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"2026-06-23 story-first replay|production daily does not enable PromptLayer|story-first interaction input\"",
+      "npm run content:contract:self-test",
+      "npm run test:e2e",
+      "npm run validate",
+      "Playwright desktop/mobile visual check for 2026-06-23 generated report"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Daily news structure has to be generated as merged stories before rendering, not hidden by front-end sections.",
+      "evidence": "The story-first normalizer is called from draft generation, report normalization, and site ingestion, and the 2026-06-23 replay now yields eight source-backed stories with duplicate appendix URLs pruned.",
+      "scope": "daily_story_generation",
+      "persistence": "implemented",
+      "recommended_action": "Keep duplicate suppression and evidence-level promotion rules in generation/write gates, then let the renderer consume only normalized story structures."
+    },
+    {
+      "lesson": "A visual theme can pass rendering checks while still harming the product task.",
+      "evidence": "The PromptLayer-inspired production theme and ticket/card main stream were removed, while effective-interact pre-rendering, self-contained HTML, reduced-motion behavior, source/date/icon handling, and tracking components were retained.",
+      "scope": "public_daily_layout",
+      "persistence": "implemented",
+      "recommended_action": "Evaluate daily layout changes against three-minute scanning density and story distinctness, not only visual polish."
+    },
+    {
+      "lesson": "Navigation helpers must not call vertical scrollIntoView from active-link updates.",
+      "evidence": "Mobile browser validation found that active nav link scrolling could pin the page near the navigation bar; the interaction UI now only adjusts the nav container's horizontal scroll position and the daily override keeps the nav non-sticky.",
+      "scope": "effective_interact_navigation",
+      "persistence": "implemented",
+      "recommended_action": "Keep mobile visual checks that explicitly scroll to the main story list after any navigation or layout changes."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The 2026-06-23 report replay exposed templated headlines, duplicate source URLs across public sections, and a production page shape that looked like a landing/report page instead of a dense daily news page.",
+      "evidence": "Tests now cover story-first replay, PromptLayer production disablement, source URL dedupe, community/secondary source demotion, seven-day duplicate suppression, content contract checks, and mobile story-list reachability.",
+      "module": "src/story-first.js, src/draft.js, src/report.js, src/site.js, src/interaction-report.js, scripts/check-daily-content-contract.mjs, tests/unit.test.js, tests/e2e/site.e2e.js",
+      "suggestion": "Promote story-first normalization to the default daily generation contract and keep low-signal source pools as compact appendices.",
+      "expected_benefit": "Readers can scan a small number of distinct source-backed stories first, while supporting sections remain available without competing with the main news judgment.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in generation, write, site build, content contract, unit tests, e2e tests, and desktop/mobile Playwright validation.",
+      "ledger_links": [
+        "feedback/p1-story-centered-daily-contract",
+        "feedback/p1-effective-interact-production-renderer",
+        "feedback/p1-public-daily-content-contract",
+        "feedback/p1-public-reader-section-quality",
+        "feedback/p1-prepublish-editorial-prune-gate",
+        "feedback/p1-public-internal-report-separation"
+      ],
+      "validation_evidence": [
+        "2026-06-23 story-first replay normalizes legacy report into deduped stories",
+        "production daily does not enable PromptLayer-inspired theme or ticket grids",
+        "story-first generator reserves selected URLs across story and appendix sections",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-main-visible-bullets-no-generic-watch-next",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Replace deterministic fallback story wording with stronger editorial clustering when the generator has richer candidate metadata for same-event multi-source merges.",
+      "owner": "project"
+    }
+  ]
+}

@@ -24,7 +24,8 @@
         "状态页只给聚合可用性指标，不代表每个订阅层级或每种模型路径的体验完全一致。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
@@ -45,7 +46,8 @@
         "对日报来说，这类来源适合进入研究/工具观察，不应和模型发布混写。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施",
@@ -66,7 +68,8 @@
         "这一组更像工程工作流温度计，不等同于官方产品发布。"
       ],
       "image_urls": [],
-      "importance": "notable"
+      "importance": "notable",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [],
@@ -139,7 +142,68 @@
   "generated_at": "2026-05-25T04:35:00.000Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-openai-codex-rate-limit",
+      "title": "OpenAI Codex 速率限制 incident 已恢复",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-23",
+      "primary_entity": "OpenAI Status",
+      "event_type": "update",
+      "object": "OpenAI Codex 速率限制 incident 已恢复",
+      "what_happened": "OpenAI Status 显示 Codex 相关速率限制 incident 已在 2026-05-23 恢复，受影响组件为 Codex。",
+      "why_it_matters": "如果团队最近看到 Codex 任务排队、失败或提前撞限，需要把平台 incident 与本地脚本问题分开排查。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Status",
+          "url": "https://status.openai.com/incidents/01KS88SRADTWQW27NYRAXMBAQN",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-hf-paperswithcode",
+      "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-24",
+      "primary_entity": "Hugging Face Blog",
+      "event_type": "launch",
+      "object": "Hugging Face 社区更新 PapersWithCode 复刻站",
+      "what_happened": "Hugging Face 开源团队成员 Niels Rogge 介绍 paperswithcode.co 的一轮更新，覆盖多指标 leaderboard、外部论文提交、paper lineage、method 页面、leaderboard 截图和约 3k evals。",
+      "why_it_matters": "外部论文和 GitHub repo 也能提交后，非 arXiv 工程成果更容易进入同一检索与评测视图。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-github-agent-tooling",
+      "title": "GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施",
+      "importance": "notable",
+      "trend": "AI industry",
+      "event_date": "2026-05-25",
+      "primary_entity": "GitHub Trending daily",
+      "event_type": "launch",
+      "object": "GitHub 今日趋势偏向 agent 工具、代码上下文和视频生成基础设施",
+      "what_happened": "本轮 GitHub Trending 抓取到 127 个候选。进入项目区的不是单纯热度项，而是额外核对过 release、commit page 或 gh api 元数据的仓库。",
+      "why_it_matters": "anthropics/knowledge-work-plugins 和 NVlabs/LongLive 都有 2026-05-24 之后的仓库活动，分别对应 Claude Cowork 插件目录和 long-video generation infra。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

@@ -161,42 +161,6 @@
       ],
       "importance": "major",
       "image_urls": []
-    },
-    {
-      "title": "亚马逊云接入英伟达长程代理推理模型，重点看多轮任务效率",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-04",
-      "url": "https://aws.amazon.com/blogs/machine-learning/nvidia-nemotron-3-ultra-now-available-on-amazon-sagemaker-jumpstart/",
-      "source": "AWS Machine Learning Blog",
-      "tier": "T0",
-      "entities": [
-        "AWS Machine Learning Blog"
-      ],
-      "summary": "亚马逊云接入英伟达长程代理推理模型，重点看多轮任务效率。这次更值得看的，不是模型名字本身，而是亚马逊云把长程代理推理能力接进现成云入口后，团队能更快验证多轮上下文、工具调用和推理效率",
-      "bullets": [
-        "==变化==：亚马逊云接入英伟达长程代理推理模型，重点看多轮任务效率。",
-        "==落点==：这次更值得看的，不是模型名字本身，而是亚马逊云把长程代理推理能力接进现成云入口后，团队能更快验证多轮上下文、工具调用和推理效率。"
-      ],
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "Google 发布 Gemma 4 QAT 模型，主打移动端和轻量部署",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-05",
-      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/quantization-aware-training-gemma-4/",
-      "source": "Google Keyword Blog",
-      "tier": "T0",
-      "entities": [
-        "Google Keyword Blog"
-      ],
-      "summary": "Google 发布 Gemma 4 QAT 模型，主打移动端和轻量部署。QAT 版本把模型压缩和轻量部署摆到台前，明显冲着手机、笔记本和边缘设备去",
-      "bullets": [
-        "==变化==：Google 发布 Gemma 4 QAT 模型，主打移动端和轻量部署。",
-        "==落点==：QAT 版本把模型压缩和轻量部署摆到台前，明显冲着手机、笔记本和边缘设备去。"
-      ],
-      "importance": "major",
-      "image_urls": []
     }
   ],
   "github_trending": [
@@ -937,7 +901,168 @@
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-06.html",
   "html_path": "reports/2026/06/2026-06-06.html",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-content-github-changelog-gpt-5-2-and-gpt-5-2-codex-deprecated",
+      "title": "GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex",
+      "importance": "notable",
+      "trend": "open source AI",
+      "event_date": "2026-06-05",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex",
+      "what_happened": "GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex。影响范围包括 Copilot Chat、代码补全和 agent 模式，团队需要同步检查默认模型和迁移路径",
+      "why_it_matters": "==落点==：影响范围包括 Copilot Chat、代码补全和 agent 模式，团队需要同步检查默认模型和迁移路径。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-06-05-gpt-5-2-and-gpt-5-2-codex-deprecated",
+          "type": "github"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-github-changelog-enterprise-managed-plugins-in-vs-code-in-public-preview",
+      "title": "VS Code 开始公测企业统一管理插件能力",
+      "importance": "notable",
+      "trend": "open source AI",
+      "event_date": "2026-06-05",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "VS Code 开始公测企业统一管理插件能力",
+      "what_happened": "VS Code 开始公测企业统一管理插件能力。重点不在插件数量，而在企业能否统一控管插件装配、策略和开发环境",
+      "why_it_matters": "==落点==：重点不在插件数量，而在企业能否统一控管插件装配、策略和开发环境。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-06-05-enterprise-managed-plugins-in-vs-code-in-public-preview",
+          "type": "github"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-meta-newsroom-introducing-creator-assistant-plus-more-languages-for-ai-t",
+      "title": "Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-04",
+      "primary_entity": "Meta Newsroom",
+      "event_type": "launch",
+      "object": "Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化",
+      "what_happened": "Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化。信号是创作者运营、跨语言分发和账号增长工具继续往 AI 自动化收口",
+      "why_it_matters": "==落点==：信号是创作者运营、跨语言分发和账号增长工具继续往 AI 自动化收口。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Meta Newsroom",
+          "url": "https://about.fb.com/news/2026/06/creator-assistant-more-languages-for-ai-translations-on-facebook/",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-google-research-unlocking-dependable-responses-with-gemini-enterprise-ag",
+      "title": "Google 拆解 Gemini 企业 Agent 平台里的检索增强方案",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-05",
+      "primary_entity": "Google Research Blog",
+      "event_type": "update",
+      "object": "Google 拆解 Gemini 企业 Agent 平台里的检索增强方案",
+      "what_happened": "Google 拆解 Gemini 企业 Agent 平台里的检索增强方案。文章把重点放在企业知识检索怎样减少幻觉、提高回答稳定性，而不是把 RAG 再包装成一串平台名词",
+      "why_it_matters": "==落点==：文章把重点放在企业知识检索怎样减少幻觉、提高回答稳定性，而不是把 RAG 再包装成一串平台名词。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Research Blog",
+          "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag/",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-github-blog-feed-github-universe-is-back-all-together-now-in-the-agentic",
+      "title": "GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图",
+      "importance": "notable",
+      "trend": "open source AI",
+      "event_date": "2026-06-04",
+      "primary_entity": "GitHub Blog Feed",
+      "event_type": "update",
+      "object": "GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图",
+      "what_happened": "GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图。它更像 GitHub 在年度路线图里给 Copilot 和 agent 抢主舞台，而不是一次普通大会预热",
+      "why_it_matters": "==落点==：它更像 GitHub 在年度路线图里给 Copilot 和 agent 抢主舞台，而不是一次普通大会预热。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Blog Feed",
+          "url": "https://github.blog/news-insights/company-news/github-universe-is-back-all-together-now-in-the-agentic-era/",
+          "type": "github"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-tencent-corporate-ai-tencent-cloud-debuts-productivity-agent-suite-creat",
+      "title": "腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-05",
+      "primary_entity": "Tencent AI Business",
+      "event_type": "update",
+      "object": "腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环",
+      "what_happened": "腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环。",
+      "why_it_matters": "==变化==：腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Tencent AI Business",
+          "url": "https://www.tencent.com/en-us/articles/2202350.html",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-alibaba-cloud-blog-ai-powered-dragonwell-native-acceleration-automatic-d",
+      "title": "阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-05",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈",
+      "what_happened": "阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈。",
+      "why_it_matters": "==变化==：阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-alibaba-cloud-blog-deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi",
+      "title": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-05",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
+      "what_happened": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口。",
+      "why_it_matters": "==变化==：这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221",
+          "type": "official"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "official_org_updates": [],

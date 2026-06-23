@@ -246,8 +246,8 @@
       "severity": "P1",
       "status": "implemented",
       "title": "Public daily content is compact news, not explanations",
-      "problem": "The public daily report could render too few main stories while spending visible space on selection rationale, why-it-matters prose, watch-next advice, and other AI-flavored filler instead of concise source-backed news.",
-      "expected_behavior": "When enough candidates exist, the main stream contains 5-30 compact news items: at least 5 for sparse days, 5-20 as the normal range, and 21-30 accepted as high-signal days rather than oversized. The public daily page does not require a `今日必看` section or first-screen optimized layout. Each visible main item renders only a title, two to three source-grounded factual lines, and source links; explanation metadata such as `why_it_matters`, `reader_relevance`, selection criteria, candidate counts, and watch-next filler stays out of the public page.",
+      "problem": "The public daily report could render too few real main stories while spending visible space on selection rationale, watch-next advice, source-type grids, and other AI-flavored filler instead of concise source-backed news.",
+      "expected_behavior": "The public daily main stream is an edited story-first list, not raw source items: default 8 stories, maximum 12, and fewer are allowed when fewer qualify. Each story has a concrete title, `what_happened`, compact `why_it_matters`, public source links, and an evidence level. Public pages do not require a `今日必看`, `完整列表`, PromptLayer ticket grid, or first-screen optimized landing layout. Internal metadata such as `reader_relevance`, selection criteria, candidate counts, and watch-next filler stays out of the public page.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -262,6 +262,7 @@
         "prompts/ai-daily/modules/effective-interact-output.md",
         "src/report.js",
         "src/draft.js",
+        "src/story-first.js",
         "src/interaction-report.js",
         "src/quality-loop.js",
         "src/quality-status.js",
@@ -865,7 +866,7 @@
       "status": "closed",
       "title": "Superseded must-read hero requirement",
       "problem": "The former three-card must-read contract is no longer the public daily target and would now force an obsolete first-screen layout.",
-      "expected_behavior": "Superseded on 2026-06-15: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract keeps the renamed `重点详情` section expanded by default.",
+      "expected_behavior": "Superseded on 2026-06-23: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract starts with story-first `今日判断`, `趋势主题`, and `重点 story` sections.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -879,7 +880,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "interaction input renders expanded main detail without compact full list",
+        "test_name": "interaction input starts with story-first judgment trends and story list",
         "gate": "npm run validate"
       }
     },
@@ -889,7 +890,7 @@
       "status": "implemented",
       "title": "Keep public reader sections concrete and dense",
       "problem": "Public AI daily pages could duplicate the main stream with a `完整列表`, leave main details collapsed, show GitHub Trending rows with generic ranking/README boilerplate, render blank or broken X/Twitter cards when optional fields were missing, and reduce community leads to one-line blurbs.",
-      "expected_behavior": "Public interaction input removes `完整列表`, keeps a renamed expanded main-detail section, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and expands community lead bodies to around 100 Chinese characters or more without internal review notes.",
+      "expected_behavior": "Public interaction input removes `完整列表`, renders story-first `今日判断`, `趋势主题`, and `重点 story` sections without PromptLayer ticket grids, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and keeps community lead bodies dense without internal review notes.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -903,7 +904,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "public daily renders one expanded renamed main detail section without compact full list",
+        "test_name": "public daily renders story-first sections without compact full list",
         "gate": "npm run validate"
       }
     },    {

@@ -25,7 +25,8 @@
         "工程团队需要关注的不是是否能生成代码，而是 Goal mode 任务边界、插件共享权限、浏览器标注进入需求反馈链路后，如何保留审计和人工确认。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路",
@@ -47,7 +48,8 @@
         "这类功能上线后，企业评估 Claude 不能只看模型分数，还要看日志接入、SIEM/合规工具、误报处理、补救责任和供应商边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族",
@@ -69,7 +71,8 @@
         "对工程团队来说，Fara1.5 值得跟踪的不是单一榜单，而是可在 Foundry/MagenticLite 中如何与 sandbox、日志和人工确认组合。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台",
@@ -93,7 +96,8 @@
         "这说明垂直 SaaS 的 agent 化正在绕开通用聊天界面，直接把模型接进业务对象、审批链和系统记录。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施",
@@ -115,7 +119,8 @@
         "这对工程团队的提示是：生产级 agent 成本和可靠性会越来越取决于执行环境、隔离、冷启动、观测和 RBAC，而不只是模型选择。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "OpenAI 模型给出离散几何单位距离问题的新反例",
@@ -136,23 +141,11 @@
         "工程上的可观察信号是：长链条推理、跨领域概念连接和专家可检查输出，正在从 benchmark 叙述转向真实研究协作案例。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
-  "model_releases": [
-    {
-      "name": "Fara1.5",
-      "provider": "Microsoft Research",
-      "availability": "research_preview",
-      "release_scope": "preview_access",
-      "event_date": "2026-05-21",
-      "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
-      "source": "Microsoft Research",
-      "summary": "面向浏览器计算机使用任务的 4B、9B、27B agentic SLM 模型族；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
-      "image_urls": [],
-      "importance": "notable"
-    }
-  ],
+  "model_releases": [],
   "hot_blogs": [
     {
       "title": "Using Claude Code: The unreasonable effectiveness of HTML",
@@ -166,17 +159,6 @@
       "importance": "notable"
     },
     {
-      "title": "Fara1.5 - A family of frontier computer use agent models",
-      "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
-      "publisher": "Microsoft Research",
-      "author": "Microsoft Research AI Frontiers team",
-      "event_date": "2026-05-21",
-      "topic": "computer use agents / browser agents / evaluation",
-      "summary": "文章系统说明 Fara1.5 的训练数据、合成环境、用户交互 critical points、安全边界和评测结果。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
       "title": "How our partners are putting Opus to work for cybersecurity",
       "url": "https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity",
       "publisher": "Claude Blog",
@@ -184,17 +166,6 @@
       "event_date": "2026-05-21",
       "topic": "AI security operations / Opus / vulnerability remediation",
       "summary": "Anthropic 汇总 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等伙伴如何把 Opus 接入攻防、漏洞验证和补救流程。",
-      "image_urls": [],
-      "importance": "notable"
-    },
-    {
-      "title": "Modal's Series C: Raising $355M at a $4.65B valuation",
-      "url": "https://modal.com/blog/modal-series-c",
-      "publisher": "Modal Blog",
-      "author": "Modal",
-      "event_date": "2026-05-21",
-      "topic": "AI infrastructure / agent runtime / sandboxes",
-      "summary": "Modal 用融资公告解释其 AI workload 基础设施方向：低延迟推理、RL、sandbox、agent runtime 和更细粒度权限控制。",
       "image_urls": [],
       "importance": "notable"
     }
@@ -271,7 +242,128 @@
   "generated_at": "2026-05-22T18:39:07.361Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-10128477-chatggpt-enterprise-edu-release-notes-252525252525252525252525252525252525252525252525252523",
+      "title": "OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "OpenAI Help Center",
+      "event_type": "launch",
+      "object": "OpenAI Codex 企业版更新 Goal mode、浏览器标注和插件共享",
+      "what_happened": "OpenAI 在 ChatGPT Enterprise/Edu release notes 中集中更新 Codex：Goal mode 已覆盖 app、IDE extension 和 CLI，浏览器标注更细，锁屏后远程继续工作、管理员 Codex analytics 和插件共享也进入企业治理面。",
+      "why_it_matters": "OpenAI 2026-05-22 的 Codex 企业采用页面又补充了治理、RBAC、sandbox、workspace audit 和部署形态等叙述，说明 Codex 的竞争点正在从模型能力转向组织级控制面。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/10128477-chatggpt-enterprise-edu-release-notes%25252525252525252525252525252525252525252525252525252523.pdf",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-12138966-release-notes",
+      "title": "Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Claude Release Notes / Claude Blog",
+      "event_type": "launch",
+      "object": "Claude 把合规 API 和 Opus 安全伙伴方案推向企业治理链路",
+      "what_happened": "Claude release notes 显示 Compliance API integrations 已接入更多安全与合规工具；同日 Claude Blog 发布 Opus 在 Wiz、Palo Alto Networks、Accenture、CrowdStrike、Trend Micro 等安全场景中的落地案例。",
+      "why_it_matters": "Opus 安全伙伴文章把能力落在持续渗透测试、漏洞优先级、补救闭环和虚拟补丁等操作面，显示 frontier model 正在进入安全运营系统。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Claude Release Notes / Claude Blog",
+          "url": "https://support.claude.com/en/articles/12138966-release-notes",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-fara1-5-computer-use-agent",
+      "title": "Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Microsoft Research",
+      "event_type": "launch",
+      "object": "Microsoft Research 发布 Fara1.5 计算机使用 agent 模型族",
+      "what_happened": "Microsoft Research 介绍 Fara1.5-4B、9B、27B 三个浏览器计算机使用 agent 模型，并给出 WebVoyager、Online-Mind2Web、WebTailBench 和合成环境评测；Fara1.5-9B 已在 Microsoft Foundry 可用并集成 MagenticLite。",
+      "why_it_matters": "官方文章同时讨论缺失用户信息、任务歧义和不可逆动作前确认等 critical points，说明 CUA 评测已经把可控性纳入模型训练和轨迹筛选。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Microsoft Research",
+          "url": "https://www.microsoft.com/en-us/research/articles/fara1-5-computer-use-agent/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-default",
+      "title": "Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Docusign Press Release",
+      "event_type": "launch",
+      "object": "Docusign 用 Iris、Agent Studio 和 MCP 把合同工作流改造成 agent 平台",
+      "what_happened": "Docusign 在 Momentum conference 发布 AI assistant、agents 和 Agent Studio，围绕协议审阅、审批、义务跟踪、风险标记和业务系统集成构建 agreement work 的 agent 层。",
+      "why_it_matters": "Docusign 明确提到通过开放平台和 MCP 连接 Claude、Gemini、ChatGPT，让自然语言工作流进入合同、CRM、HR、采购和法律系统。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Docusign Press Release",
+          "url": "https://investor.docusign.com/news-and-events/press-releases/news-details/2026/Docusign-Unveils-AI-Assistant-and-Agents-to-Power-the-Next-Era-of-Agreement-Work/default.aspx",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-modal-series-c",
+      "title": "Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-21",
+      "primary_entity": "Modal Blog",
+      "event_type": "update",
+      "object": "Modal 把融资叙事落到 agent runtime、RL 和 sandbox 基础设施",
+      "what_happened": "Modal 宣布 3.55 亿美元 Series C，并把下一阶段重点放在低延迟推理、训练和推理闭环、agent 执行环境以及更细粒度 RBAC。",
+      "why_it_matters": "文章指出 Sandboxes 已成为 agent 运行的关键基础设施，后续会扩展 sandbox surface 和权限控制，给 agent 能力但限制风险。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Modal Blog",
+          "url": "https://modal.com/blog/modal-series-c",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-model-disproves-discrete-geometry-conjecture",
+      "title": "OpenAI 模型给出离散几何单位距离问题的新反例",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-20",
+      "primary_entity": "OpenAI Research",
+      "event_type": "research",
+      "object": "OpenAI 模型给出离散几何单位距离问题的新反例",
+      "what_happened": "OpenAI 称其内部通用推理模型给出单位距离问题长期猜想的反例，并由外部数学家检查证明；这是本轮 48 小时外补入的高信号研究里程碑。",
+      "why_it_matters": "OpenAI 明确强调证明来自新的通用推理模型，不是专门为该数学问题训练或脚手架化搜索的系统。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Research",
+          "url": "https://openai.com/index/model-disproves-discrete-geometry-conjecture/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

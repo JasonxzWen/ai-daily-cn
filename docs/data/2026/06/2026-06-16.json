@@ -168,40 +168,6 @@
       ],
       "importance": "notable",
       "image_urls": []
-    },
-    {
-      "title": "英伟达用 BioNeMo 与 LoRA 演示生物基础模型微调",
-      "editorial_category": "ai_industry",
-      "event_date": "2026-06-15",
-      "url": "https://developer.nvidia.com/blog/fine-tuning-biological-foundation-models-with-lora-using-nvidia-bionemo-recipes/",
-      "source": "NVIDIA Developer Blog",
-      "tier": "T0",
-      "entities": [
-        "NVIDIA Developer Blog"
-      ],
-      "summary": "英伟达开发者博客介绍如何用 BioNeMo Recipes 和 LoRA 微调生物基础模型，面向生物计算场景降低实验门槛。",
-      "bullets": [
-        "**BioNeMo 微调流程**：英伟达展示用 BioNeMo Recipes 与 LoRA 微调生物基础模型，==重点是把领域模型训练流程做成配方==，便于团队复现实验并比较成本。"
-      ],
-      "importance": "major",
-      "image_urls": []
-    },
-    {
-      "title": "GitHub 面向初学者整理 Copilot CLI 常用斜杠命令",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-15",
-      "url": "https://github.blog/ai-and-ml/github-copilot/github-copilot-cli-for-beginners-overview-of-common-slash-commands/",
-      "source": "GitHub Blog Feed",
-      "tier": "T2",
-      "entities": [
-        "GitHub Blog Feed"
-      ],
-      "summary": "GitHub 博客发布 Copilot CLI 初学者指南，集中说明常见斜杠命令和命令行内的使用方式。",
-      "bullets": [
-        "**Copilot CLI 入门**：GitHub 梳理 Copilot CLI 的常用斜杠命令，==重点是把命令行助手的入口讲清楚==，适合团队做开发者启用材料或内部培训。"
-      ],
-      "importance": "notable",
-      "image_urls": []
     }
   ],
   "github_trending": [
@@ -2039,5 +2005,166 @@
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-16.html",
   "html_path": "reports/2026/06/2026-06-16.html",
-  "stories": []
+  "stories": [
+    {
+      "story_id": "main-content-alibaba-cloud-blog-alibaba-cloud-releases-rca-benchmark-the-industry-s-f",
+      "title": "阿里云发布 RCA Benchmark，面向 Agentic Ops 根因分析评测",
+      "importance": "major",
+      "trend": "open source AI",
+      "event_date": "2026-06-15",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "launch",
+      "object": "阿里云发布 RCA Benchmark，面向 Agentic Ops 根因分析评测",
+      "what_happened": "阿里云把 RCA Benchmark 开源，用于评测 agent 在运维根因分析任务中的定位和解释能力。",
+      "why_it_matters": "**阿里云 RCA Benchmark**：阿里云把面向 Agentic Ops 的根因分析评测基准开源，==评测对象是故障定位能力==，适合工程团队对比排障 agent 是否能在真实运维链路里给出可复核原因。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/alibaba-cloud-releases-rca-benchmark-the-industrys-first-open-source-root-cause-analysis-benchmark-system-for-agentic-ops_603252",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-alibaba-cloud-blog-alibaba-cloud-ecs-telegram-openclaw",
+      "title": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-16",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
+      "what_happened": "这篇教程说明如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接入日常协作入口。",
+      "why_it_matters": "**OpenClaw 部署教程**：文章把阿里云 ECS、OpenClaw 和 Telegram 串成一条自托管 coding agent 路径，==重点是协作入口而不只是模型调用==，适合关注内部 agent 落地方式的团队参考。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs-%E4%B8%8A%E3%81%A7-telegram-%E9%80%A3%E6%90%BA%E6%A9%9F%E8%83%BD%E4%BB%98%E3%81%8D%E3%81%AE-openclaw-%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B_603255",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-meta-newsroom-new-ai-tools-to-help-you-make-things-happen-on-facebook",
+      "title": "Meta 在 Facebook 推出新的 AI 创作与行动工具",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-15",
+      "primary_entity": "Meta Newsroom",
+      "event_type": "launch",
+      "object": "Meta 在 Facebook 推出新的 AI 创作与行动工具",
+      "what_happened": "Meta 公布 Facebook 内的新 AI 工具，方向是把内容创作、发现和具体行动放进同一条产品链路。",
+      "why_it_matters": "**Facebook AI 工具**：Meta 把新的 AI 功能放进 Facebook 体验里，==看点是社交内容到行动的链路缩短==，这会影响平台型产品如何设计助手入口和内容分发。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Meta Newsroom",
+          "url": "https://about.fb.com/news/2026/06/new-ai-tools-to-help-you-make-things-happen-on-facebook/",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-huggingface-zai-org-zai-org-scail-2",
+      "title": "Z.ai 在 Hugging Face 上发布 SCAIL-2 模型资源",
+      "importance": "major",
+      "trend": "open source AI",
+      "event_date": "2026-06-15",
+      "primary_entity": "Z.ai Hugging Face Organization",
+      "event_type": "launch",
+      "object": "Z.ai 在 Hugging Face 上发布 SCAIL-2 模型资源",
+      "what_happened": "Z.ai 的 SCAIL-2 出现在 Hugging Face 组织页，属于需要继续核对模型卡、许可和使用边界的模型资源信号。",
+      "why_it_matters": "**SCAIL-2 模型资源**：Z.ai 在 Hugging Face 上提供 SCAIL-2 相关页面，==当前价值在于可追踪的模型入口==，后续应核对模型卡、许可、下载限制和适用任务。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Z.ai Hugging Face Organization",
+          "url": "https://huggingface.co/zai-org/SCAIL-2",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-aws-machine-learning-introducing-gemma-4-models-on-amazon-bedrock",
+      "title": "AWS 在 Bedrock 上线 Gemma 4 模型",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-15",
+      "primary_entity": "AWS Machine Learning Blog",
+      "event_type": "launch",
+      "object": "AWS 在 Bedrock 上线 Gemma 4 模型",
+      "what_happened": "AWS 宣布在 Amazon Bedrock 中提供 Gemma 4 模型，让企业用户通过 Bedrock 的托管模型能力调用这组模型。",
+      "why_it_matters": "**Bedrock 模型入口**：AWS 将 Gemma 4 接入 Amazon Bedrock，==重点是企业托管调用路径==，团队可以在既有权限、计费和治理框架内评估 Gemma 系列模型。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS Machine Learning Blog",
+          "url": "https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-xai-company-news-grok-build-plugin-marketplace",
+      "title": "xAI 推出 Grok Build 插件市场",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-15",
+      "primary_entity": "xAI Company News",
+      "event_type": "launch",
+      "object": "xAI 推出 Grok Build 插件市场",
+      "what_happened": "xAI 公布 Grok Build Plugin Marketplace，把 Grok Build 的扩展能力整理成插件市场入口。",
+      "why_it_matters": "**Grok Build 插件市场**：xAI 给 Grok Build 增加插件市场，==重点是把扩展能力产品化==，这会影响开发者如何为 Grok 生态接入外部工具和工作流。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "xAI Company News",
+          "url": "https://x.ai/news/grok-plugin-marketplace",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-github-changelog-copilot-usage-metrics-now-include-more-of-your-active-u",
+      "title": "GitHub 扩大 Copilot 使用指标的活跃用户统计口径",
+      "importance": "notable",
+      "trend": "open source AI",
+      "event_date": "2026-06-15",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub 扩大 Copilot 使用指标的活跃用户统计口径",
+      "what_happened": "GitHub 更新 Copilot usage metrics，让指标覆盖更多活跃用户，便于组织更完整地观察 Copilot 采用情况。",
+      "why_it_matters": "**Copilot 指标口径**：GitHub 调整 Copilot 使用统计，==更多活跃用户会被纳入指标==，管理者可以更接近真实地评估席位采用、团队覆盖和使用趋势。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-06-15-copilot-usage-metrics-now-include-more-of-your-active-users",
+          "type": "github"
+        }
+      ]
+    },
+    {
+      "story_id": "main-content-github-blog-feed-accelerating-researchers-and-developers-building-multil",
+      "title": "GitHub 开放多语言 AI 数据集，面向研究者和开发者",
+      "importance": "notable",
+      "trend": "open source AI",
+      "event_date": "2026-06-15",
+      "primary_entity": "GitHub Blog Feed",
+      "event_type": "launch",
+      "object": "GitHub 开放多语言 AI 数据集，面向研究者和开发者",
+      "what_happened": "GitHub 发布面向多语言 AI 构建的新开放数据集，目标是帮助研究者和开发者改进跨语言模型与工具。",
+      "why_it_matters": "**多语言开放数据集**：GitHub 提供新的开放数据集支持多语言 AI 研发，==价值在跨语言覆盖与可复用数据==，适合做代码、文档和开发者工具国际化能力评估。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Blog Feed",
+          "url": "https://github.blog/ai-and-ml/llms/accelerating-researchers-and-developers-building-multilingual-ai-with-a-new-open-dataset/",
+          "type": "github"
+        }
+      ]
+    }
+  ]
 }

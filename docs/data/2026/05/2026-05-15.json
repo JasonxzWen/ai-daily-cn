@@ -23,7 +23,8 @@
         "Windows sandbox 工程文章把 Codex 的本地命令执行放回操作系统级约束讨论：默认模式需要在可用性和文件/网络边界之间取平衡，这对团队评估 coding agent 的默认权限模型更直接。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "GitHub 合并推进 Copilot app 与 cloud agent 自动选模",
@@ -45,7 +46,8 @@
         "Cloud agent 的 Auto model selection 会按系统健康和模型表现选择模型，并调整 model multiplier 与 weekly rate limits 规则；团队需要在审计中记录实际选用模型、成本和任务结果。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Anthropic 与 Gates Foundation 建立 2 亿美元合作",
@@ -66,7 +68,8 @@
         "教育和农业方向会产出部分公共品，例如 benchmarks、datasets、knowledge graphs 与农业评测；应用团队要同时关注模型能力、领域数据、评估基准和部署治理。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Google 发布 Genkit Middleware 用于加固 agentic apps",
@@ -88,7 +91,8 @@
         "这类框架能力说明 agentic app 的生产化重点正在从 prompt 本身转向横切控制：重试、回退、人工审批、可观测性和破坏性动作边界。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "AWS SageMaker AI 支持 Qwen3.6 serverless model customization",
@@ -110,7 +114,8 @@
         "可用区域包括 US East (N. Virginia)、US West (Oregon)、Asia Pacific (Tokyo) 和 EU (Ireland)，这会影响跨区数据治理、延迟和企业采购路径。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Hugging Face 解释 continuous batching 的异步化路径",
@@ -132,46 +137,11 @@
         "对自建推理平台而言，这篇文章可作为排查 GPU utilization、request batching 和 serving latency 的工程读物，不需要把它当成模型发布。"
       ],
       "image_urls": [],
-      "importance": "notable"
+      "importance": "notable",
+      "editorial_category": "ai_industry"
     }
   ],
-  "projects": [
-    {
-      "name": "Codex mobile preview",
-      "description": "ChatGPT mobile app 内的 Codex preview，可远程查看和推进仍在主机或 devbox 上运行的 coding agent session。",
-      "url": "https://openai.com/index/work-with-codex-from-anywhere/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "GitHub Copilot app",
-      "description": "GitHub 原生 agentic development 工作台，把 issue、PR、prompt、session、diff、命令和 PR 创建集中在一个界面中。",
-      "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Genkit Middleware",
-      "description": "用于 Genkit generation/tool loop 的 composable middleware，覆盖 retries、fallbacks、approval 和 observability。",
-      "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "SageMaker Qwen3.6 customization",
-      "description": "Amazon SageMaker AI 对 Qwen3.6 27B 支持 serverless SFT/RFT，适合观察云厂商如何产品化开放模型定制。",
-      "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/",
-      "domains": [],
-      "importance": "general"
-    },
-    {
-      "name": "Continuous async batching",
-      "description": "Hugging Face 的推理服务工程文章，聚焦 CPU/GPU 工作负载解耦与 continuous batching 利用率问题。",
-      "url": "https://huggingface.co/blog/continuous_async",
-      "domains": [],
-      "importance": "general"
-    }
-  ],
+  "projects": [],
   "builder_observations": [],
   "community_leads": [
     {
@@ -199,7 +169,128 @@
   "generated_at": "2026-05-15T02:24:41.225Z",
   "hero_highlights": [],
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "story-work-with-codex-from-anywhere",
+      "title": "OpenAI 扩展 Codex 移动端协作和 Windows sandbox",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "OpenAI",
+      "event_type": "update",
+      "object": "OpenAI 扩展 Codex 移动端协作和 Windows sandbox",
+      "what_happened": "OpenAI 宣布 Codex 进入 ChatGPT mobile app preview，让用户在手机上接入仍在 Mac host、remote environment 或 devbox 上运行的 Codex 任务；同日相关工程文章解释 Windows sandbox 的安全边界设计。",
+      "why_it_matters": "OpenAI 同时说明 Hooks 已 generally available，可用于扫描 prompt secrets、运行 validators、记录会话、创建 memories 或按仓库自定义 Codex 行为。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI",
+          "url": "https://openai.com/index/work-with-codex-from-anywhere/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-2026-05-14-github-copilot-app-is-now-available-in-technical-preview",
+      "title": "GitHub 合并推进 Copilot app 与 cloud agent 自动选模",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "update",
+      "object": "GitHub 合并推进 Copilot app 与 cloud agent 自动选模",
+      "what_happened": "GitHub 在同一窗口更新 Copilot agentic development 体验：Copilot app 进入 technical preview，cloud agent 增加 Auto model selection，说明 GitHub 正把任务入口、模型选择和 PR 后续处理收进统一工作台。",
+      "why_it_matters": "Agent Merge 继续覆盖 review comments、失败检查和满足条件后的合并动作，减少开发者在本地、网页和 CLI 之间切换。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-05-14-github-copilot-app-is-now-available-in-technical-preview/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-gates-foundation-partnership",
+      "title": "Anthropic 与 Gates Foundation 建立 2 亿美元合作",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "Anthropic",
+      "event_type": "update",
+      "object": "Anthropic 与 Gates Foundation 建立 2 亿美元合作",
+      "what_happened": "Anthropic 宣布与 Gates Foundation 建立 2 亿美元规模合作，包含 grant funding、Claude usage credits 和技术支持，覆盖全球健康、生命科学、教育和经济流动性项目。",
+      "why_it_matters": "健康方向将围绕 healthcare-intelligence 建 connectors、benchmarks 和 evaluation frameworks，并探索卫生数据决策、疫苗候选筛选、HPV 与子痫前期相关治疗筛查等场景。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic",
+          "url": "https://www.anthropic.com/news/gates-foundation-partnership",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps",
+      "title": "Google 发布 Genkit Middleware 用于加固 agentic apps",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "Google Developers Blog",
+      "event_type": "launch",
+      "object": "Google 发布 Genkit Middleware 用于加固 agentic apps",
+      "what_happened": "Google 为 Genkit 发布 middleware 系统，让开发者在 generation call 和 tool execution loop 中插入 retries、fallbacks、approval、observability 和安全检查。",
+      "why_it_matters": "首批 middleware 能力覆盖 TypeScript、Go 和 Dart，Python support 仍在后续计划中，适合已经用 Genkit 构建 full-stack AI 功能的团队做统一控制面。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Google Developers Blog",
+          "url": "https://developers.googleblog.com/announcing-genkit-middleware-intercept-extend-and-harden-your-agentic-apps/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-amazon-sagemaker-ft-qwen3-6",
+      "title": "AWS SageMaker AI 支持 Qwen3.6 serverless model customization",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "AWS What's New",
+      "event_type": "update",
+      "object": "AWS SageMaker AI 支持 Qwen3.6 serverless model customization",
+      "what_happened": "AWS 宣布 Amazon SageMaker AI 支持对 Qwen3.6 27B parameter model 做 serverless model customization，覆盖 supervised fine-tuning 和 reinforcement fine-tuning。",
+      "why_it_matters": "Serverless customization 由 SageMaker AI 处理 infrastructure provisioning 和 training orchestration，用户按任务使用付费，入口包括 SageMaker Studio Models page 和 SageMaker Python SDK。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS What's New",
+          "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-sagemaker-ft-qwen3-6/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "story-continuous-async",
+      "title": "Hugging Face 解释 continuous batching 的异步化路径",
+      "importance": "notable",
+      "trend": "AI industry",
+      "event_date": "2026-05-14",
+      "primary_entity": "Hugging Face Blog",
+      "event_type": "launch",
+      "object": "Hugging Face 解释 continuous batching 的异步化路径",
+      "what_happened": "Hugging Face 发布 continuous batching 系列第二篇，解释如何拆开 CPU 与 GPU 工作负载，用异步化减少推理服务中的等待和资源浪费。",
+      "why_it_matters": "核心方法是让 CPU 侧准备、调度和 GPU 侧执行尽量解耦，让 GPU 在长时间服务期间更少等待 control plane 工作。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Hugging Face Blog",
+          "url": "https://huggingface.co/blog/continuous_async",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "model_releases": [],
   "hot_blogs": [],

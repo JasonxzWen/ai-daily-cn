@@ -31,7 +31,8 @@
         "Work IQ、remote MCP servers 和 A2A GA 说明 Microsoft 正在把企业上下文、工具接入和多 agent 协作放进同一套 Copilot Studio 低代码平台。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "OpenAI Status 显示 FedRAMP 用户登录问题仍在处理",
@@ -52,7 +53,8 @@
         "如果内部监控只记录应用侧登录失败而没有关联供应商状态页，排障人员容易把外部身份链路问题误判成本地配置或权限变更。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Check Point 把 frontier AI 扫描结果落到安全发布流程",
@@ -73,7 +75,8 @@
         "内部平台团队需要把 AI 发现项接入复现、确认、修复、补偿控制和发布说明，而不是把模型输出直接当成漏洞清单。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -149,7 +152,68 @@
   "html_path": "reports/2026/05/2026-05-27.html",
   "generated_at": "2026-05-27T04:35:00.000Z",
   "github_trending": [],
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-microsoft-copilot-studio-computer-use",
+      "title": "Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "Microsoft Copilot Blog",
+      "event_type": "launch",
+      "object": "Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新",
+      "what_happened": "Microsoft 的 2026-05-26 Copilot Studio 月度更新显示，computer-using agents 已 GA，同时新的 workflows 体验、Work IQ REST API/CLI、remote MCP servers、A2A GA 和实时语音 agent 都有进展。",
+      "why_it_matters": "新的 workflows 体验把 agent node、审批、业务逻辑和 AI-powered actions 放到统一画布，并提供 node-level testing，适合把不确定的 agent 动作放回可审计流程。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Microsoft Copilot Blog",
+          "url": "https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-fedramp-login-status",
+      "title": "OpenAI Status 显示 FedRAMP 用户登录问题仍在处理",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "OpenAI Status",
+      "event_type": "update",
+      "object": "OpenAI Status 显示 FedRAMP 用户登录问题仍在处理",
+      "what_happened": "OpenAI Status 显示一条已定位但仍在缓解中的 incident：最近登出过的 FedRAMP 用户可能遇到登录问题，影响范围标为 ChatGPT 与 FedRAMP。",
+      "why_it_matters": "状态页同屏列出 APIs、ChatGPT、Codex 和 FedRAMP 的可用性，适合作为 incident runbook 中的供应商状态检查入口。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI Status",
+          "url": "https://status.openai.com/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-checkpoint-frontier-ai-readiness",
+      "title": "Check Point 把 frontier AI 扫描结果落到安全发布流程",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-26",
+      "primary_entity": "Check Point Blog",
+      "event_type": "launch",
+      "object": "Check Point 把 frontier AI 扫描结果落到安全发布流程",
+      "what_happened": "Check Point 在 2026-05-26 的安全更新中说明，其 Frontier AI Models Readiness Program 已把大规模 AI-driven code scanning、人工验证、组件加固和补丁发布串到 Jumbo Security Release。",
+      "why_it_matters": "文中提到 BLAST 会按部署条件、可达攻击面、认证要求和现实攻击能力过滤发现项，这比只看扫描器告警数量更接近补丁优先级排序。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Check Point Blog",
+          "url": "https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

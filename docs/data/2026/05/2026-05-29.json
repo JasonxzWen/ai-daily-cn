@@ -187,7 +187,8 @@
         "**上线检查**：接入前要重新跑现有 Claude Code、browser agent、长文档综合任务的回归集；供应商声称更少停滞和更会求助，不等于旧 prompt 与权限策略自动适配。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
@@ -208,7 +209,8 @@
         "**检索补齐**：Search Toolkit 公共预览把 ingestion、retrieval、evaluation 放在同一框架里，适合把 RAG 质量问题从 prompt 调参拆回可测的检索质量。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Bedrock Mantle 的 token 配额进入 Service Quotas，兼容端点开始补生产可观测性",
@@ -230,7 +232,8 @@
         "**区域边界**：AWS 列出美国、亚太、欧洲和南美多个可用区域；多区域 agent 服务要把模型可用性、quota、数据驻留和成本倍率一起建表。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     },
     {
       "title": "Anthropic 调研显示 coding agents 在社科研究中采用率只有 20%，且差异很大",
@@ -251,7 +254,8 @@
         "**读法边界**：Anthropic 明确说生产率差异只是描述性比较，不应读成因果；团队评估研究 agent 时也应分清 adoption、output count 和研究质量。"
       ],
       "image_urls": [],
-      "importance": "major"
+      "importance": "major",
+      "editorial_category": "ai_industry"
     }
   ],
   "model_releases": [
@@ -502,7 +506,88 @@
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-29.html",
   "html_path": "reports/2026/05/2026-05-29.html",
   "generated_at": "2026-05-28T18:48:09.023Z",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-aws-claude-opus-48",
+      "title": "Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-28",
+      "primary_entity": "AWS What's New",
+      "event_type": "policy",
+      "object": "Claude Opus 4.8 当天进入 AWS，企业有 Bedrock 与 Claude Platform on AWS 两条路径",
+      "what_happened": "AWS 在 2026-05-28 宣布 Claude Opus 4.8 可通过 Amazon Bedrock 和 Claude Platform on AWS 使用，把 Anthropic 新 Opus 模型直接放进 AWS 账单、权限和区域治理路径。",
+      "why_it_matters": "**模型定位**：AWS 文案把 Opus 4.8 重点放在 agentic coding、professional knowledge work、long-running autonomous tasks，说明新模型的首要落点仍是长任务与企业工作流。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS What's New",
+          "url": "https://aws.amazon.com/about-aws/whats-new/2026/05/claude-opus-4.8-aws/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-mistral-ai-now-2026",
+      "title": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-28",
+      "primary_entity": "Mistral AI",
+      "event_type": "launch",
+      "object": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
+      "what_happened": "Mistral 的 AI Now Summit 把企业 AI 叙事拆成三个可落地面：工业工程物理模型、长周期 productivity agent Vibe，以及面向 AI 应用的检索工具链。",
+      "why_it_matters": "**Vibe 变化**：Vibe 被描述为横跨 inbox、calendar、deep research、deliverables、代码请求到 PR 的统一 agent；这会把权限、审计、任务恢复和人工验收变成部署重点。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Mistral AI",
+          "url": "https://mistral.ai/news/ai-now-summit-2026/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-bedrock-mantle-quotas",
+      "title": "Bedrock Mantle 的 token 配额进入 Service Quotas，兼容端点开始补生产可观测性",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-27",
+      "primary_entity": "AWS What's New",
+      "event_type": "update",
+      "object": "Bedrock Mantle 的 token 配额进入 Service Quotas，兼容端点开始补生产可观测性",
+      "what_happened": "AWS 让 Bedrock Mantle endpoint 的 inference quotas 进入 Service Quotas，并暴露 per-model input-tokens-per-minute 与 output-tokens-per-minute 限额。",
+      "why_it_matters": "**运维变化**：限额进入 Service Quotas 后，团队可以把 token 上限纳入上线前容量评估、告警和扩容申请，而不是等线上请求被限流才排查。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "AWS What's New",
+          "url": "https://aws.amazon.com/about-aws/whats-new/2026/5/amazon-bedrock-service-quotas/",
+          "type": "source"
+        }
+      ]
+    },
+    {
+      "story_id": "main-anthropic-social-sciences",
+      "title": "Anthropic 调研显示 coding agents 在社科研究中采用率只有 20%，且差异很大",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-05-27",
+      "primary_entity": "Anthropic Research",
+      "event_type": "launch",
+      "object": "Anthropic 调研显示 coding agents 在社科研究中采用率只有 20%，且差异很大",
+      "what_happened": "Anthropic 经济研究团队发布 1,260 名量化社会科学研究者的基线调查：81% 试过 AI chatbot，但每周使用 Claude Code、Codex、Cursor 或 Antigravity 这类命令行 coding agent 的只有 20%。",
+      "why_it_matters": "**用途更窄**：coding agent 用户主要让工具写数据分析代码，97% 报告用于生成代码；真正用来起草论文正文的比例低得多。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic Research",
+          "url": "https://www.anthropic.com/research/coding-agents-social-sciences",
+          "type": "source"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

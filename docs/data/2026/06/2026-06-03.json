@@ -170,118 +170,6 @@
         "**工程影响**：这把 Copilot 从成品工具推进到可集成平台；做内部 DevTool 的团队可以评估 SDK 边界、身份权限、日志留存和成本归因。 ==落地约束== 比发布标题更重要。"
       ],
       "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "editorial_category": "engineering_toolchain",
-      "title": "GitHub Copilot app 技术预览扩大可用范围",
-      "event_date": "2026-06-02",
-      "url": "https://github.blog/changelog/2026-06-02-expanded-technical-preview-availability-for-the-github-copilot-app",
-      "source": "GitHub Changelog",
-      "tier": "T0",
-      "entities": [
-        "GitHub",
-        "Copilot"
-      ],
-      "summary": "GitHub Changelog 表示 Copilot app technical preview 对既有 Copilot Pro、Pro+、Business 和 Enterprise 客户开放。 桌面端 Copilot app 会把 agent 从编辑器扩到本地工作台；团队需要验证它与现有 IDE、CLI、仓库权限和企业策略的冲突点。",
-      "bullets": [
-        "**事实**：GitHub Changelog 表示 Copilot app technical preview 对既有 Copilot Pro、Pro+、Business 和 Enterprise 客户开放。 ==agent 工程化== 是本轮可核验的一手信号。",
-        "**工程影响**：桌面端 Copilot app 会把 agent 从编辑器扩到本地工作台；团队需要验证它与现有 IDE、CLI、仓库权限和企业策略的冲突点。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "editorial_category": "model_release",
-      "title": "GitHub 在 Copilot 体验中弃用 GPT-4.1",
-      "event_date": "2026-06-02",
-      "url": "https://github.blog/changelog/2026-06-02-gpt-4-1-deprecated",
-      "source": "GitHub Changelog",
-      "tier": "T0",
-      "entities": [
-        "GitHub",
-        "Copilot"
-      ],
-      "summary": "GitHub Changelog 称 GPT-4.1 已在 Copilot Chat、inline edits、ask、agent mode、code completions 等体验中 deprecated。 这会影响团队的模型回归基线：如果近期提示词、评测或代码生成质量变化，需把 Copilot 后端模型切换作为变量纳入排查。",
-      "bullets": [
-        "**事实**：GitHub Changelog 称 GPT-4.1 已在 Copilot Chat、inline edits、ask、agent mode、code completions 等体验中 deprecated。 ==模型能力== 是本轮可核验的一手信号。",
-        "**工程影响**：这会影响团队的模型回归基线：如果近期提示词、评测或代码生成质量变化，需把 Copilot 后端模型切换作为变量纳入排查。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "editorial_category": "policy_infra",
-      "title": "NVIDIA 与 Microsoft 推 Windows PC 个人 AI agent 工具链",
-      "event_date": "2026-06-02",
-      "url": "https://developer.nvidia.com/blog/build-personal-ai-agents-on-windows-pcs-with-new-tools-from-microsoft-and-nvidia/",
-      "source": "NVIDIA Developer Blog",
-      "tier": "T0",
-      "entities": [
-        "NVIDIA",
-        "Microsoft"
-      ],
-      "summary": "NVIDIA Developer Blog 介绍面向 Windows PC 的 personal AI agents 新工具，强调本地 PC 上构建、运行和加速 agent 工作流。 端侧 agent 的约束与云端不同：模型体积、GPU/内存、隐私边界和离线可用性会决定体验上限，值得桌面应用团队提前验证。",
-      "bullets": [
-        "**事实**：NVIDIA Developer Blog 介绍面向 Windows PC 的 personal AI agents 新工具，强调本地 PC 上构建、运行和加速 agent 工作流。 ==agent 工程化== 是本轮可核验的一手信号。",
-        "**工程影响**：端侧 agent 的约束与云端不同：模型体积、GPU/内存、隐私边界和离线可用性会决定体验上限，值得桌面应用团队提前验证。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
-    },
-    {
-      "importance": "major",
-      "editorial_category": "model_release",
-      "title": "AWS 详解 Amazon Nova Forge 的超参优化",
-      "event_date": "2026-06-02",
-      "url": "https://aws.amazon.com/blogs/machine-learning/the-art-and-science-of-hyperparameter-optimization-on-amazon-nova-forge/",
-      "source": "AWS Machine Learning Blog",
-      "tier": "T0",
-      "entities": [
-        "AWS",
-        "Amazon Nova"
-      ],
-      "summary": "AWS ML Blog 讨论 Nova Forge 上做 domain-specific customization 时如何平衡特定任务表现与通用能力，图示包含 CPT、SFT、RFT 三阶段。 对企业模型定制来说，重点是把无标注领域数据、标注示例和 reward signals 分开治理；否则局部提升可能带来通用能力退化。",
-      "bullets": [
-        "**事实**：AWS ML Blog 讨论 Nova Forge 上做 domain-specific customization 时如何平衡特定任务表现与通用能力，图示包含 CPT、SFT、RFT 三阶段。 ==模型能力== 是本轮可核验的一手信号。",
-        "**工程影响**：对企业模型定制来说，重点是把无标注领域数据、标注示例和 reward signals 分开治理；否则局部提升可能带来通用能力退化。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "editorial_category": "model_release",
-      "title": "AWS 发布 Nova 2 Lite 目标检测实践",
-      "event_date": "2026-06-02",
-      "url": "https://aws.amazon.com/blogs/machine-learning/object-detection-with-amazon-nova-2-lite/",
-      "source": "AWS Machine Learning Blog",
-      "tier": "T0",
-      "entities": [
-        "AWS"
-      ],
-      "summary": "AWS ML Blog 给出 Amazon Nova 2 Lite 的 object detection 应用实现路径，覆盖部署和检测应用构建。 这说明多模态小模型开始承担更具体的视觉任务；做质检、工单图片和运营审核的团队可把它纳入低成本视觉推理候选。",
-      "bullets": [
-        "**事实**：AWS ML Blog 给出 Amazon Nova 2 Lite 的 object detection 应用实现路径，覆盖部署和检测应用构建。 ==模型能力== 是本轮可核验的一手信号。",
-        "**工程影响**：这说明多模态小模型开始承担更具体的视觉任务；做质检、工单图片和运营审核的团队可把它纳入低成本视觉推理候选。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
-    },
-    {
-      "importance": "notable",
-      "editorial_category": "engineering_toolchain",
-      "title": "Baz 用 Bedrock AgentCore 改进 AI 代码审查准确率",
-      "event_date": "2026-06-02",
-      "url": "https://aws.amazon.com/blogs/machine-learning/how-baz-improved-its-ai-agent-code-review-accuracy-using-amazon-bedrock-agentcore/",
-      "source": "AWS Machine Learning Blog",
-      "tier": "T0",
-      "entities": [
-        "Baz"
-      ],
-      "summary": "AWS ML Blog 介绍 Baz 如何用 Amazon Bedrock 与 Bedrock AgentCore 构建 Spec Review agent，并讲解架构取舍与实现细节。 AI code review 的价值正在从给建议转向围绕 spec 做可追踪审查；团队应关注输入规范、误报控制和与现有 PR 流程的集成。",
-      "bullets": [
-        "**事实**：AWS ML Blog 介绍 Baz 如何用 Amazon Bedrock 与 Bedrock AgentCore 构建 Spec Review agent，并讲解架构取舍与实现细节。 ==agent 工程化== 是本轮可核验的一手信号。",
-        "**工程影响**：AI code review 的价值正在从给建议转向围绕 spec 做可追踪审查；团队应关注输入规范、误报控制和与现有 PR 流程的集成。 ==落地约束== 比发布标题更重要。"
-      ],
-      "image_urls": []
     }
   ],
   "model_releases": [],
@@ -716,7 +604,168 @@
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-03.html",
   "html_path": "reports/2026/06/2026-06-03.html",
   "generated_at": "2026-06-03T13:11:20.271Z",
-  "stories": [],
+  "stories": [
+    {
+      "story_id": "main-anthropic-cyber-threats-mitre",
+      "title": "Anthropic 把一年 AI 网络威胁映射到 MITRE ATT&CK",
+      "importance": "major",
+      "trend": "AI industry",
+      "event_date": "2026-06-03",
+      "primary_entity": "Anthropic News",
+      "event_type": "update",
+      "object": "Anthropic 把一年 AI 网络威胁映射到 MITRE ATT&CK",
+      "what_happened": "Anthropic 把过去一年观察到的 AI-enabled cyber threats 对齐到 MITRE ATT&CK，重点不是模型榜单，而是把攻击链、工具使用和防守检测语言标准化。 安全团队可以把这篇当成 agentic threat modeling 的词表：哪些能力进入攻击流程、哪些环节能观测、哪些只是单点案例，优先转成检测和演练条目。",
+      "why_it_matters": "**工程影响**：安全团队可以把这篇当成 agentic threat modeling 的词表：哪些能力进入攻击流程、哪些环节能观测、哪些只是单点案例，优先转成检测和演练条目。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic News",
+          "url": "https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-alibaba-qwen-vla",
+      "title": "Qwen-VLA 把多模态理解推进到连续动作生成",
+      "importance": "major",
+      "trend": "model releases",
+      "event_date": "2026-06-03",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "research",
+      "object": "Qwen-VLA 把多模态理解推进到连续动作生成",
+      "what_happened": "Alibaba Cloud 官方介绍 Qwen-VLA，定位为 Vision-Language-Action 模型，把视觉、语言、空间推理与动作生成接在同一条链路里。 这类模型对机器人、浏览器控制和桌面自动化的价值在于把 perception 与 action 合并评估；工程团队要重点看数据闭环、动作约束和失败恢复。",
+      "why_it_matters": "**工程影响**：这类模型对机器人、浏览器控制和桌面自动化的价值在于把 perception 与 action 合并评估；工程团队要重点看数据闭环、动作约束和失败恢复。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/qwen-vla-from-understanding-the-world-to-acting-in-it_603209",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-alibaba-qwen3-7-plus",
+      "title": "Qwen3.7-Plus 主打多模态 agent intelligence",
+      "importance": "major",
+      "trend": "model releases",
+      "event_date": "2026-06-03",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "update",
+      "object": "Qwen3.7-Plus 主打多模态 agent intelligence",
+      "what_happened": "Alibaba Cloud 把 Qwen3.7-Plus 定义为统一视觉和语言的 multimodal agent foundation，强调从图片理解、推理到工具/任务执行的连续能力。 对企业应用来说，关键不是多模态宣传，而是能否稳定处理含图表、界面、文档和工具调用的真实工单；后续要看 API、成本和上下文限制。",
+      "why_it_matters": "**工程影响**：对企业应用来说，关键不是多模态宣传，而是能否稳定处理含图表、界面、文档和工具调用的真实工单；后续要看 API、成本和上下文限制。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/qwen3-7-plus-multimodal-agent-intelligence_603206",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-codex-workflow",
+      "title": "OpenAI 扩展 Codex 的插件、站点和批注工作流",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-02",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "launch",
+      "object": "OpenAI 扩展 Codex 的插件、站点和批注工作流",
+      "what_happened": "OpenAI 官方发布 Codex for every role, tool, and workflow，新增 plugins、sites、annotations 等面向非纯编码角色的协作入口。 Codex 正从 IDE 助手变成可嵌入业务工具的 agent runtime；团队需要重新设计权限、审计、制品托管和跨文档反馈流程。",
+      "why_it_matters": "**工程影响**：Codex 正从 IDE 助手变成可嵌入业务工具的 agent runtime；团队需要重新设计权限、审计、制品托管和跨文档反馈流程。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/codex-for-every-role-tool-workflow",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-travelers-claims",
+      "title": "Travelers 将 OpenAI 驱动的理赔助手推广到全美",
+      "importance": "notable",
+      "trend": "AI industry",
+      "event_date": "2026-06-02",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "update",
+      "object": "Travelers 将 OpenAI 驱动的理赔助手推广到全美",
+      "what_happened": "OpenAI 官方案例称 Travelers 用 AI-powered Claim Assistant 引导客户报案、提供 24/7 支持，并在需求高峰时扩展运营能力。 这是保险理赔的生产落地案例，说明企业 AI 项目开始围绕高频流程、峰值容量和客户自助体验优化，而不是只做内部知识问答。",
+      "why_it_matters": "**工程影响**：这是保险理赔的生产落地案例，说明企业 AI 项目开始围绕高频流程、峰值容量和客户自助体验优化，而不是只做内部知识问答。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/travelers",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-openai-youth-safety",
+      "title": "OpenAI 呼吁建立青少年 AI 安全国际机制",
+      "importance": "notable",
+      "trend": "AI policy and infrastructure",
+      "event_date": "2026-06-02",
+      "primary_entity": "OpenAI News RSS",
+      "event_type": "research",
+      "object": "OpenAI 呼吁建立青少年 AI 安全国际机制",
+      "what_happened": "OpenAI 官方提出 youth AI safety 的全球行动方向，包括国际研究/协调机构、保护标准和面向年轻人的机会建设。 政策团队和教育产品要把未成年人保护、默认安全设置、年龄分层和机会公平纳入产品路线；这会影响学校和消费者 AI 工具采购。",
+      "why_it_matters": "**工程影响**：政策团队和教育产品要把未成年人保护、默认安全设置、年龄分层和机会公平纳入产品路线；这会影响学校和消费者 AI 工具采购。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "OpenAI News RSS",
+          "url": "https://openai.com/index/advancing-youth-safety-and-opportunity-through-global-leadership",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-anthropic-glasswing",
+      "title": "Anthropic 扩大 Project Glasswing",
+      "importance": "notable",
+      "trend": "AI policy and infrastructure",
+      "event_date": "2026-06-02",
+      "primary_entity": "Anthropic News",
+      "event_type": "research",
+      "object": "Anthropic 扩大 Project Glasswing",
+      "what_happened": "Anthropic 官方宣布扩展 Project Glasswing，这一项目聚焦 AI 安全、防滥用和社会韧性相关合作。 这类项目会影响政府、学校和公共机构采用 AI 的信任框架；工程团队要关注安全评估、事件响应和外部伙伴协作要求。",
+      "why_it_matters": "**工程影响**：这类项目会影响政府、学校和公共机构采用 AI 的信任框架；工程团队要关注安全评估、事件响应和外部伙伴协作要求。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Anthropic News",
+          "url": "https://www.anthropic.com/news/expanding-project-glasswing",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "main-github-copilot-sdk-ga",
+      "title": "GitHub Copilot SDK 正式 GA",
+      "importance": "major",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-02",
+      "primary_entity": "GitHub Changelog",
+      "event_type": "launch",
+      "object": "GitHub Copilot SDK 正式 GA",
+      "what_happened": "GitHub Changelog 表示 Copilot SDK 已 generally available，开发者可把 Copilot 的 agentic engine 嵌入自己的应用、服务和开发者工具。 这把 Copilot 从成品工具推进到可集成平台；做内部 DevTool 的团队可以评估 SDK 边界、身份权限、日志留存和成本归因。",
+      "why_it_matters": "**工程影响**：这把 Copilot 从成品工具推进到可集成平台；做内部 DevTool 的团队可以评估 SDK 边界、身份权限、日志留存和成本归因。 ==落地约束== 比发布标题更重要。",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "GitHub Changelog",
+          "url": "https://github.blog/changelog/2026-06-02-copilot-sdk-is-now-generally-available",
+          "type": "official"
+        }
+      ]
+    }
+  ],
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "daily_tracking": [],

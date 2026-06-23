@@ -21,8 +21,9 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `source_window`
 - `source_audit`
 - `quality_status`
-- `report_status`：默认 `normal`。仅当全部活跃固定信源都因网络错误阻塞，且没有任何可核验事实可写入主体时，才使用 `empty_due_to_network_outage` 并保持 `main_items: []`。
+- `report_status`：默认 `normal`。仅当全部活跃固定信源都因网络错误阻塞，且没有任何可核验事实可写入主体时，才使用 `empty_due_to_network_outage` 并保持 `stories: []` / `main_items: []`。
 - `github_trending`
+- `stories`
 - `main_items`
 - `model_releases`
 - `hot_blogs`
@@ -37,11 +38,11 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 各内容条目可选但强烈建议填写统一编辑/核验元数据：
 - `editorial_category`：如 `ai_industry`、`engineering_toolchain`、`model_release`、`product_radar`、`open_source`、`viewpoint_analysis`、`podcast`、`x_discussion`、`community_signal`。
 - `source_level`：事实主线优先使用 `primary`、`official`、`paper`、`github` 或 `multi_source`；低风险补位候选可使用 `intermediary`、`community`、`original_social`、`wechat_industry_whitelist` 等，但必须披露边界并通过黑名单过滤。官方/一手/多源影响排序和保留优先级，不是唯一准入门票。
-- `verification_status`：`main_items` 优先使用 `primary_confirmed` 或 `multi_source_confirmed`；低风险补位候选可保留 `intermediary_only` 或 `original_social_only`，但必须写 `verification_note` 或 `risk_note`，且不得承载融资、估值、价格、benchmark、安全事故、监管或模型能力等高风险事实。`model_releases` 仍只接受 `primary_confirmed` 或 `multi_source_confirmed`。
-- `why_it_matters` / `reader_relevance`：历史兼容或内部元数据字段；新草稿不需要填写，公开 HTML 不得把它们渲染成“为什么重要 / 启示 / 读者相关性 / 入选条件”分点。
+- `verification_status`：兼容 `main_items` 优先使用 `primary_confirmed` 或 `multi_source_confirmed`；低风险补位候选可保留 `intermediary_only` 或 `original_social_only`，但必须写 `verification_note` 或 `risk_note`，且不得承载融资、估值、价格、benchmark、安全事故、监管或模型能力等高风险事实。`stories[*].evidence_level` 使用 `primary`、`multi_source`、`secondary` 或 `community_signal`。`model_releases` 仍只接受 `primary_confirmed` 或 `multi_source_confirmed`。
+- `why_it_matters`：story 的公开字段，必须是紧凑、具体、可回源的判断句；`reader_relevance` 是历史兼容或内部元数据字段，新草稿不需要填写，公开 HTML 不得把它渲染成“读者相关性 / 入选条件”分点。
 - `verification_note` / `risk_note` / `watch_next`：用于非一手观点、社区讨论、产品雷达和播客的内部边界记录。公开 HTML 只展示必要的来源层级、待确认边界或具体风险事实；不要把读者画像、后续跟进、watch-next 或风险模板渲染成重复卡片分点。
 
-`main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
+`stories`、`main_items`、`model_releases`、`hot_blogs`、`projects`、`github_trending`、`builder_observations` 和 `community_leads` 的每个入选条目都应填写 `importance`。只能使用：
 
 - `major`：公开页面显示为“重大”。
 - `notable`：公开页面显示为“值得关注”。
@@ -51,18 +52,18 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
-- AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `main_items`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `main_items`。
-- AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Adobe/Unity 等公司产品动作；事实已回源时写入 `main_items` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
-- 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `main_items`。
+- AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `stories`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `stories`。
+- AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Adobe/Unity 等公司产品动作；事实已回源时写入 `stories` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
+- 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `stories`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
 - X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括。
 - 参考用户给定的飞书日报板块结构做覆盖校验：`内容赛道动态` 映射 AIGC/内容产业，`AI行业动态` 映射大厂动作、平台政策、监管、算力和商业化，`观点与分析` 映射博客、播客、Builder/X 原始观点，`今天值得关注的产品` 映射 GitHub Trending、Product Hunt、融资和产品雷达，`今日热点的 Twitter 讨论` 映射 `builder_observations` 与 `community_leads`。这只是栏目契约，不代表直接复用该文档正文。
 
 内容密度目标：
 
-- 新日报目标为 55-75 个公开内容单元，计算口径是 `main_items + hot_blogs + github_trending + project highlights + builder_observations + community_leads`。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
-- `main_items` 目标为 5-30 条；每条公开正文只展示标题、2-3 句/行可追溯事实概括和来源链接。结构化 JSON 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“为什么重要”“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
-- 只有 `report_status:"empty_due_to_network_outage"` 可以让 `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
+- 新日报目标为高密度 story-first 新闻页：`stories` 是主列表，默认 8 条、最多 12 条，允许少于 8；`hot_blogs + github_trending + builder_observations + community_leads` 是紧凑区或线索附录。`model_releases` 只作为结构化索引，不单独渲染公开板块；`projects` 只在 GitHub Trending 中作为 highlights 展示。
+- `stories` 每条公开正文展示具体标题、`what_happened`、紧凑 `why_it_matters`、`evidence_level` 和来源链接。兼容 `main_items` 可用 `summary` 与 `bullets` 承载这些事实，但 bullet 只写该新闻本身的事实、数据、限制、变化和对比；不要写“启示”“入选条件”“日报跟踪口径”“后续跟进”“报道边界”“非技术板块价值”等模板解释。
+- 只有 `report_status:"empty_due_to_network_outage"` 可以让 `stories` / `main_items` 为空；该状态必须对应全源网络阻塞、最终 `source_audit` 已写入 blocked 证据、`quality_status.degraded_sections` 包含 `empty_due_to_network_outage`，并且不得写占位主体条目或未核验事实。
 - `builder_observations` 目标为 5-20 条；当 follow-builders 或固定 Builder 源候选不足 5 条时保留实际数量并公开降级说明，不要用无原始 URL 的热度摘要补数。对于 follow-builders X feed，抓到 feed 后先过滤低信号、非 AI、非科技内容；过滤后合格候选不少于 3 条时，`builder_observations` 不得为 0。允许把英文原帖做确定性中文摘要，但必须保留原帖 URL 和足够原文证据。
 - 低于 45 个内容单元时，`quality_status.status` 应为 `degraded`，并在 `reasons`、`affected_sections`、`degraded_sections`、`public_note` 或 `self_check.notes` 说明缺口。
 - 不为达标伪造内容；候选不足或回源失败时写审计，不写空栏目。
@@ -74,7 +75,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 `evidence_assets` 用于把来源链接里的关键图、表或已转写数据挂到对应日报条目旁边；它不是独立图片展板。每项包含 `type`（`figure` 或 `table`）、`title`、`source_url`、可选 `local_path`、`caption`、`extraction_status` 和可选二维 `data`。只有确实来自原文图表、官方图片或人工转写并能回到 `source_url` 的数据才能填写；不能自动抽取时留空数组，不要臆造。
 
 证据图表拉取与展示规范：
-- 什么时候拉：只有当图表直接支撑已入选的 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或结构化指标时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图、整页截图、浏览器截图和 viewport 截图一律不拉入公开正文。
+- 什么时候拉：只有当图表直接支撑已入选的 `stories`、兼容 `main_items`、`hot_blogs` 或 `projects` 的关键判断，且纯文字转述会丢失比较维度、排名、曲线、表格或结构化指标时才拉；装饰图、logo、人物照、封面图、无信息密度的 hero 图、整页截图、浏览器截图和 viewport 截图一律不拉入公开正文。
 - 拉哪些图：优先拉官方原文中的 benchmark 表、采用率/分布图、架构图、流程图、定价/配额表、实验结果图或其它网页内部语义图片资产；每个来源默认最多 1 张，除非同一条目确实有两个互补证据。所有图片必须保留 `source_url`，且 `source_url` 必须等于对应日报条目的 `url`，这样页面才能把图放回那条报道下面。
 - 主线条目、热门博客和项目都适用同一规则：只有原文图能帮助读者理解能力边界、架构、benchmark、监控链路、工作流或关键对比时才缓存为 `figure`；每个条目最多优先展示 1-2 张最重要图片。每张图的 `source_url` 必须等于对应日报条目的 `url`。模型相关图片必须挂在对应 `main_items` 或 `hot_blogs` 条目下展示；`model_releases` 不再单独渲染公开图片行。
 - 如何展示：公开 HTML 会把证据图表放在匹配条目之后，不生成单独“证据图表”板块。榜单类公开页面优先使用从 DOM、JSON 或页面文本解析出的 `data` 表格，例如排名、模型、供应商、分数/token、周变化；截图最多作为内部或折叠证据，不得作为公开主内容。`title` 必须是短中文图名或表名，`caption` 写清数据/图表来自原文哪个部分。
@@ -147,7 +148,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `category`：`model_platform`、`product_tool`、`china_open_source_community`、`business_policy`、`research_safety` 之一
 - `source_item_ref`：必须回指对应 `main_items[*].candidate_id`；没有 `candidate_id` 时才用对应条目的规范化 URL
 
-禁止写“其余条目见后文”或“本版只保留 N 条”。不要把 `hero_highlights` 当成日报目标形态，主目标始终是 5-30 条短新闻流。
+禁止写“其余条目见后文”或“本版只保留 N 条”。不要把 `hero_highlights` 当成日报目标形态，主目标始终是默认 8、最多 12 的 story-first 主列表。
 
 没有模型发布、热门博客、GitHub Trending、项目、Builder 观察或社区线索时使用空数组，不要猜测内容。空的 `model_releases` 或 `projects` 不应造成公开 HTML 出现空板块；`model_releases` 新草稿默认保持空数组。
 不要让工具猜测事实性内容；`title`、`summary`、`main_items`、来源链接和 `self_check` 必须由采样和判断结果明确给出。
@@ -173,7 +174,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 
 `source_audit.*.sources[].status` 允许 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`、`skipped_manual_source`、`skipped_manual_review_required`。如果某组没有候选，也必须说明检查过哪些源以及为什么未入选。
 
-`main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
+`stories` 通过 `source_item_refs` 回指候选；`main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
 `projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case。公开 HTML 只会把匹配 GitHub Trending Top20 的项目作为对应条目的行内领域、用途和信号说明，不生成单独项目卡片区、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表；未匹配 Top20 的 `projects` 只保留在结构化 JSON 中。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。
 
@@ -187,7 +188,7 @@ AI 开发工具计费、配额、成本归因、usage dashboard、Service Quotas
 
 ## 2026-06-17 内容契约覆盖规则
 
-- `main_items[*].bullets` 必须是新闻形态：至少 2 条，优先写事实、变化、影响和本地相关性；重大科技、社交平台和内容平台新闻可进入“AI/科技/内容平台重要信号”范围。
+- `stories[*]` 必须是新闻形态：有具体标题、发生了什么、为什么值得看、证据等级和来源链接；兼容 `main_items[*].bullets` 至少 2 条，优先写事实、变化、影响和本地相关性。重大科技、社交平台和内容平台新闻可进入“AI/科技/内容平台重要信号”范围。
 - `github_trending` 范围固定为 weekly all-language Top10 + Python/TypeScript/Rust/Go/Java weekly Top10，合并去重后最多 Top20；README 失败时保留榜位、star、trend、语言、窗口，标注 `README拉取失败`，不写猜测描述。
 - `hot_blogs` 公开页面只使用 `summary` 和来源；`summary` 目标 100-200 个中文字符。公开页面不得渲染 `key_points`。
 - `builder_observations` 可从英文原始 X 帖生成确定性中文摘要；follow-builders X feed 过滤后合格候选不少于 3 条时，不能 `selected=0`。

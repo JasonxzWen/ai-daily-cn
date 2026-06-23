@@ -412,7 +412,7 @@ function validateRetrospectivePlanSection(content, failures) {
 
 function validateDailyContentContractTask(content, failures) {
   const normalized = normalizedSectionText(content);
-  const touchesDailyContentContract = /(daily content contract|REQ-00[1678]|REQ-010|GitHub Trending|Builder\/X|hot blogs|daily_tracking|daily tracking|每日追踪|重点详情|精选博客)/i.test(normalized);
+  const touchesDailyContentContract = /(daily content contract|REQ-00[1678]|REQ-010|GitHub Trending|Builder\/X|hot blogs|daily_tracking|daily tracking|每日追踪|今日判断|趋势主题|重点 story|精选博客)/i.test(normalized);
   if (!touchesDailyContentContract) {
     return;
   }

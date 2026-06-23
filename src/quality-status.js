@@ -265,7 +265,7 @@ export function classifyPublishQuality(report, options = {}) {
       section: "main_items",
       count: mainItemCount,
       minimum: mainItemMinimum,
-      remediation: "Use blacklist-based refill to include 5-30 readable main_items when qualified candidates exist, or keep the sparse day degraded with rejection and shortfall evidence."
+      remediation: "Use story-first selection to include up to 8 readable stories when qualified candidates exist, cap at 12, or keep the sparse day degraded with rejection and shortfall evidence."
     });
   }
 
