@@ -2,6 +2,24 @@
 
 This file is the current durable reconciliation layer for user-confirmed ai-daily requirements. It does not claim that every requirement is fully implemented; it maps each requirement to the ledger, test or runtime evidence surface that must be checked before claiming it is stable.
 
+## Story-Centered Contract Addendum
+
+Status: `implemented / publish-run-validation-pending`.
+
+The user confirmed on 2026-06-23 that the next generation target is story-centered, not raw source-item-centered. This addendum is now the controlling product direction where it conflicts with the earlier `main_items` quantity target.
+
+- The main reader list is a set of edited, merged `stories`.
+- Default story count is 8, maximum is 12, and fewer than 8 is acceptable when fewer qualified stories exist.
+- The generator must not fill the main list with templated items such as `OpenAI更新AI 产品、平台或工程实践`.
+- Strong primary single-source stories may enter the main list; secondary or community single-source items default to signal sections.
+- Story merge and dedupe use factual identity and source URLs, not title or summary template similarity.
+- Stories published in the previous 7 reports are excluded from the main list unless there is material new progress.
+- GitHub Trending is a first-class fixed module: Top 5-8 items remain directly visible and are not folded into an appendix.
+- Summary and trend clusters are derived from visible stories, GitHub Trending, or signal items, and must be able to link back to them.
+- Quality gates should degrade by removing or demoting bad story candidates; they block only when publish artifacts are unusable, main stories are unverifiable, or publish safety fails.
+
+The full contract, implementation surfaces, and staged TODO are in `docs/ai-daily-story-contract.md`. Schema, draft generation, report writing, rendering, page checklist, and regression tests are implemented in this branch. Do not claim a specific daily publish succeeded unless that date's run summary also proves `publish:dry-run:daily`, real publish or fallback, Pages verification, and blocking/degraded status.
+
 ## Current Contract
 
 | ID | Requirement | Ledger | Test / Gate | Runtime Evidence Boundary | Current Status |

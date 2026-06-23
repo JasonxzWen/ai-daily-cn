@@ -194,11 +194,12 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       })
       .filter(Boolean);
     addCheck(
-      "github_trending_reader_facing_top20",
-      githubTrendItems.length === 20 && weakGithubTrendRows.length === 0,
-      "GitHub Trending should render exactly Top 20 with README-grounded Chinese reader-facing summaries when README fetch succeeds.",
+      "github_trending_reader_facing_top5_to_8",
+      githubTrendItems.length >= 5 && githubTrendItems.length <= 8 && weakGithubTrendRows.length === 0,
+      "GitHub Trending should render Top 5 to 8 in the public page with README-grounded Chinese reader-facing summaries when README fetch succeeds.",
       {
         count: githubTrendItems.length,
+        expected_count_range: "5..8",
         weak_rows: weakGithubTrendRows
       }
     );

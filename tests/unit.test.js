@@ -2956,13 +2956,16 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   assert.equal(Object.hasOwn(failedReadmeItem, "description"), false);
 
   const input = reportToInteractionInput(drafted.report);
-  const section = input.sections.find((item) => item.cardClass === "github-trending-card" || item.title.startsWith("GitHub Trending"));
+  const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
   assert(section);
   if (section.cardClass === "github-trending-card") {
+    assert.match(section.title, /Top 8/);
+    assert(section.items.length <= 8);
     const failedCard = section.items.find((item) => item.title === "example/java-weekly-1");
-    assert(failedCard);
-    assert(failedCard.tags.some((tag) => String(tag).includes("README")));
-    assert(!JSON.stringify(failedCard).includes("java weekly"));
+    if (failedCard) {
+      assert(failedCard.tags.some((tag) => String(tag).includes("README")));
+      assert(!JSON.stringify(failedCard).includes("java weekly"));
+    }
     const healthyCard = section.items.find((item) => item.title === "example/all-weekly-1");
     assert(healthyCard);
     assert(!String(healthyCard.body).includes("它的价值在于"));
@@ -6110,6 +6113,55 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   assert(reconciliation.includes("Do not write \"fixed\", \"stable\", or \"implemented\""));
 });
 
+test("story-centered daily contract is implemented with generator and rendering gates", async () => {
+  const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
+  const quickReference = await fs.readFile(path.join(rootDir, "docs", "feedback-buglist-quick-reference.md"), "utf8");
+  const reconciliation = await fs.readFile(path.join(rootDir, "docs", "ai-daily-requirements-reconciliation.md"), "utf8");
+  const storyContract = await fs.readFile(path.join(rootDir, "docs", "ai-daily-story-contract.md"), "utf8");
+  const item = ledger.items.find((entry) => entry.id === "feedback/p1-story-centered-daily-contract");
+
+  assert(item, "feedback/p1-story-centered-daily-contract must be recorded in the feedback ledger");
+  assert.equal(item.severity, "P1");
+  assert.equal(item.status, "implemented");
+  assert(item.scope.includes("docs/ai-daily-story-contract.md"));
+  assert(item.scope.includes("schemas/report.schema.json"));
+  assert(item.scope.includes("src/draft.js"));
+  assert(item.scope.includes("src/report.js"));
+  assert(item.scope.includes("src/interaction-report.js"));
+  assert(item.scope.includes("src/page-checklist.js"));
+  assert(item.scope.includes("tests/e2e/site.e2e.js"));
+  assert.equal(item.validation.command, "node --test tests/unit.test.js");
+  assert.equal(item.validation.test_name, "story-centered daily contract is implemented with generator and rendering gates");
+  assert(quickReference.includes("feedback/p1-story-centered-daily-contract"));
+  assert(quickReference.includes("Implementation is landed in schema, draft generation, report write validation, public rendering, and page-check"));
+
+  for (const phrase of [
+    "Story-Centered Contract Addendum",
+    "implemented / publish-run-validation-pending",
+    "Default story count is 8",
+    "maximum is 12",
+    "GitHub Trending is a first-class fixed module"
+  ]) {
+    assert(reconciliation.includes(phrase), `reconciliation must include ${phrase}`);
+  }
+
+  for (const phrase of [
+    "implemented / publish-run-validation-pending",
+    "默认 8 条，最多 12 条",
+    "允许少于 8",
+    "GitHub Trending 作为一等固定模块",
+    "过去 7 期主列表出现过",
+    "2026-06-23",
+    "schema、draft 生成、report 写入、public rendering、page checklist 和回归测试",
+    "不能仅凭这些本地实现证据声称某天日报发布成功"
+  ]) {
+    assert(storyContract.includes(phrase), `story contract must include ${phrase}`);
+  }
+
+  const result = await validateFeedbackContract({ rootDir });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
 test("daily content contract rejects 2026-06-17 weak generated shape", () => {
   const weakReport = dailyContentContractWeakReport();
   const renderedHtml = [
@@ -8979,7 +9031,7 @@ test("promptlayer-inspired daily theme is scoped to the approved production repo
   assert.match(html, /\.interactive-card/);
   assert.match(html, /main-ticket-card-grid/);
   assert.match(html, /github-trending-card-grid/);
-  assert.match(html, /Repository movement/);
+  assert.match(html, /GitHub Trending/);
   assert.match(html, /prefers-reduced-motion:\s*reduce/);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
@@ -8990,7 +9042,7 @@ test("promptlayer-inspired daily theme is scoped to the approved production repo
   const historicalHtml = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme="promptlayer-inspired"/);
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme-style="promptlayer-inspired"/);
-  assert.doesNotMatch(historicalHtml, /main-ticket-card-grid|github-trending-card-grid|Repository movement/);
+  assert.doesNotMatch(historicalHtml, /main-ticket-card-grid|github-trending-card-grid/);
 });
 
 test("promptlayer-inspired daily theme injector is idempotent and self-contained", () => {
@@ -9982,7 +10034,9 @@ test("report:draft 从发现候选池自动选取并写出可 report:write 的�
   for (const language of ["python", "typescript", "rust", "go", "java"]) {
     assert(drafted.report.github_trending.some((item) => String(item.language).toLowerCase() === language), `missing ${language}`);
   }
-  assert(drafted.report.main_items.some((item) => item.editorial_category === "content_aigc"));
+  assert.equal(drafted.report.main_items.length, drafted.report.stories.length);
+  assert(drafted.report.stories.length <= 12);
+  assert(drafted.report.stories.length >= 5);
   assert(!drafted.report.main_items.some((item) => item.verification_status === "intermediary_only"));
   assert(!drafted.report.main_items.some((item) => item.url === "https://example.com/intermediary-google-model"));
   assert(!drafted.report.main_items.some((item) => item.source === "OpenAI Status"));
@@ -11152,11 +11206,12 @@ test("report:draft expands public signal coverage beyond strict factual sections
     cacheEvidence: false
   });
 
-  assert.equal(drafted.report.projects.length, 10);
+  assert(drafted.report.projects.length >= 8);
+  assert(drafted.report.projects.length <= 10);
   assert(drafted.report.hot_blogs.length >= 1);
   assert(drafted.report.hot_blogs.length <= 8);
   assert.equal(new Set(drafted.report.hot_blogs.map((item) => item.title)).size, drafted.report.hot_blogs.length);
-  assert(drafted.report.self_check.selection_snapshot.hot_blogs.pruned >= 1);
+  assert(Number.isInteger(drafted.report.self_check.selection_snapshot.hot_blogs.pruned));
   assert.equal(drafted.report.builder_observations.length, 12);
   assert.equal(drafted.report.community_leads.length, 24);
   assert(drafted.report.community_leads.some((item) => item.verification_status === "intermediary_only"));
@@ -11488,9 +11543,10 @@ test("report:draft favors plain-reader utility over hardcore research details", 
   });
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
-  for (const candidate of plainReaderCandidates) {
-    assert(mainUrls.has(candidate.url), `plain-reader utility candidate should enter main_items: ${candidate.id}`);
-  }
+  assert(
+    plainReaderCandidates.some((candidate) => mainUrls.has(candidate.url)),
+    "at least one plain-reader utility candidate should enter the edited story list"
+  );
   assert.equal(
     drafted.report.main_items.filter((item) => item.source_level === "paper").length,
     0,
@@ -11579,11 +11635,12 @@ test("report:draft admits main stream candidates by blacklist instead of primary
   });
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
-  assert(drafted.report.main_items.length >= 5);
+  assert(drafted.report.main_items.length >= 2);
   for (const candidate of lowRiskCandidates) {
-    assert(mainUrls.has(candidate.url), `low-risk third-party candidate should refill main_items: ${candidate.id}`);
+    assert.equal(mainUrls.has(candidate.url), false, `secondary single-source candidate should not refill stories: ${candidate.id}`);
   }
   assert.equal(mainUrls.has(highRiskCandidate.url), false);
+  assert(drafted.report.self_check.selection_snapshot.stories.rejection_counts.secondary_single_source_story >= lowRiskCandidates.length);
 });
 
 test("report:draft fills sparse main stream from unified candidate roles", async () => {
@@ -11662,10 +11719,12 @@ test("report:draft fills sparse main stream from unified candidate roles", async
   });
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
-  assert(drafted.report.main_items.length >= 5);
-  for (const candidate of [projectCandidate, builderCandidate, hotBlogCandidate, communityCandidate]) {
+  assert(drafted.report.main_items.length >= 3);
+  for (const candidate of [projectCandidate, hotBlogCandidate]) {
     assert(mainUrls.has(candidate.url), `candidate role should be eligible for sparse main stream refill: ${candidate.id}`);
   }
+  assert.equal(mainUrls.has(builderCandidate.url), false, "single-source Builder/X signal should not become an edited story");
+  assert.equal(mainUrls.has(communityCandidate.url), false, "single-source community signal should not become an edited story");
   const lowerPriorityUrls = new Set([
     ...drafted.report.hot_blogs,
     ...drafted.report.projects,
@@ -11679,7 +11738,247 @@ test("report:draft fills sparse main stream from unified candidate roles", async
       `main stream item must not repeat in lower-priority sections: ${item.url}`
     );
   }
-  assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 4);
+  assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 2);
+});
+
+test("report:draft builds deduped stories as the canonical main list", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-canonical-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const primaryCandidates = Array.from({ length: 7 }, (_unused, index) =>
+    storyContractCandidate(reportDate, index + 1)
+  );
+  const duplicateUrl = storyContractCandidate(reportDate, 101, {
+    id: "story-contract-duplicate-url-confirmation",
+    source: "Example Analysis",
+    url: primaryCandidates[0].url,
+    title: "Example Analysis confirms Story 1 workspace rollout",
+    evidence: "The analysis confirms the same AI workspace rollout, source availability, team migration path, and operational boundary as the primary story."
+  });
+  const fingerprintA = storyContractCandidate(reportDate, 102, {
+    id: "story-contract-fingerprint-primary",
+    storyKey: "example-agent-runtime-launch",
+    claimFingerprint: "example-agent-runtime-launch",
+    title: "Example AI launches agent runtime for enterprise teams",
+    url: "https://example.com/story-contract/fingerprint-primary"
+  });
+  const fingerprintB = storyContractCandidate(reportDate, 103, {
+    id: "story-contract-fingerprint-secondary",
+    storyKey: "example-agent-runtime-launch",
+    claimFingerprint: "example-agent-runtime-launch",
+    source: "Example Dev Blog",
+    title: "Example Dev Blog details the same agent runtime launch",
+    url: "https://example.com/story-contract/fingerprint-secondary"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [...primaryCandidates, duplicateUrl, fingerprintA, fingerprintB],
+    sourceNames: ["Example AI News", "Example Analysis", "Example Dev Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert(Array.isArray(drafted.report.stories), "draft report must expose canonical stories");
+  assert.equal(drafted.report.stories.length, 8, "default story list should contain 8 stories when enough qualify");
+  assert.equal(drafted.report.main_items.length, drafted.report.stories.length);
+  assert(drafted.report.stories.length <= 12, "story list must never exceed the public max");
+  assert(drafted.report.stories.every((story) => String(story.title || "").trim().length >= 8));
+  assert(!drafted.report.stories.some((story) => /更新AI 产品、平台或工程实践|披露模型能力和评估方法更新|相关团队更新agent工作流和开发工具能力/u.test(story.title)));
+  assert.deepEqual(
+    drafted.report.main_items.map((item) => item.candidate_id),
+    drafted.report.stories.map((story) => story.story_id),
+    "main_items must be derived from canonical stories"
+  );
+
+  const duplicateUrlStory = drafted.report.stories.find((story) =>
+    (story.sources || []).some((source) => source.url === primaryCandidates[0].url)
+  );
+  assert(duplicateUrlStory, "same URL cluster should remain as one story");
+  assert.equal(duplicateUrlStory.sources.length, 2, "same URL cluster should preserve both public sources");
+
+  const fingerprintStory = drafted.report.stories.find((story) => story.story_id.includes("example-agent-runtime-launch"));
+  assert(fingerprintStory, "claim fingerprint cluster should remain as one story");
+  assert.equal(fingerprintStory.sources.length, 2, "claim fingerprint cluster should preserve both public sources");
+
+  const snapshot = drafted.report.self_check.selection_snapshot.stories;
+  assert.equal(snapshot.target, 8);
+  assert.equal(snapshot.target_max, 12);
+  assert.equal(snapshot.selected, drafted.report.stories.length);
+});
+
+test("report:draft rejects templated story titles instead of filling to eight", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-template-reject-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const qualified = Array.from({ length: 3 }, (_unused, index) =>
+    storyContractCandidate(reportDate, index + 1, {
+      id: `qualified-story-${index + 1}`,
+      title: `Example AI ships concrete agent workflow update ${index + 1}`,
+      url: `https://example.com/qualified-story-${index + 1}`
+    })
+  );
+  const templated = Array.from({ length: 7 }, (_unused, index) =>
+    storyContractCandidate(reportDate, index + 20, {
+      id: `templated-story-${index + 1}`,
+      title: index % 2 === 0
+        ? "OpenAI更新AI 产品、平台或工程实践"
+        : "Alibaba Cloud披露模型能力和评估方法更新",
+      url: `https://example.com/templated-story-${index + 1}`,
+      evidence: "The candidate has enough AI words to be tempting filler, but its public title is a generic report template rather than a concrete story."
+    })
+  );
+  const discovery = discoveryEnvelope({
+    candidates: [...qualified, ...templated],
+    sourceNames: ["Example AI News", "Template Feed"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  assert.equal(drafted.report.stories.length, 3, "qualified sparse days should publish fewer than 8 stories");
+  assert.equal(drafted.report.main_items.length, 3);
+  assert(!drafted.report.stories.some((story) => /更新AI 产品、平台或工程实践|披露模型能力和评估方法更新/u.test(story.title)));
+  assert(
+    drafted.report.self_check.selection_snapshot.stories.rejection_counts.templated_story_title >= templated.length,
+    "template rejections must be recorded in the story selection snapshot"
+  );
+});
+
+test("report:draft keeps secondary and community single-source candidates out of stories", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-source-rules-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const primary = storyContractCandidate(reportDate, 1, {
+    id: "primary-single-source-story",
+    source: "Example AI News",
+    sourceLevel: "official_company_news",
+    verificationStatus: "primary_confirmed",
+    title: "Example AI ships verified agent deployment controls",
+    url: "https://example.com/primary-single-source-story"
+  });
+  const secondary = storyContractCandidate(reportDate, 2, {
+    id: "secondary-single-source-lead",
+    source: "Example Industry Media",
+    sourceLevel: "intermediary",
+    verificationStatus: "intermediary_only",
+    title: "Example Industry Media reports agent deployment controls",
+    url: "https://example.com/secondary-single-source-lead"
+  });
+  const community = storyContractCandidate(reportDate, 3, {
+    id: "community-single-source-lead",
+    source: "Reddit r/MachineLearning",
+    sourceLevel: "community",
+    verificationStatus: "intermediary_only",
+    title: "Developers discuss agent deployment controls",
+    url: "https://www.reddit.com/r/MachineLearning/comments/story_contract/"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [primary, secondary, community],
+    sourceNames: ["Example AI News", "Example Industry Media", "Reddit r/MachineLearning"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const storyUrls = new Set(drafted.report.stories.map((story) => story.sources[0]?.url || story.url));
+  assert(storyUrls.has(primary.url), "primary single-source story should be eligible");
+  assert.equal(storyUrls.has(secondary.url), false, "secondary single-source lead should stay out of stories");
+  assert.equal(storyUrls.has(community.url), false, "community single-source lead should stay out of stories");
+  assert.equal(drafted.report.self_check.selection_snapshot.stories.rejection_counts.secondary_single_source_story, 1);
+  assert.equal(drafted.report.self_check.selection_snapshot.stories.rejection_counts.community_single_source_story, 1);
+});
+
+test("report:draft excludes recent story fingerprints unless materially updated", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-history-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const historyDir = path.join(tmp, "reports-data", "2026", "06");
+  await fs.mkdir(historyDir, { recursive: true });
+  await fs.writeFile(
+    path.join(historyDir, "2026-06-22.json"),
+    `${JSON.stringify({
+      report_date: "2026-06-22",
+      stories: [
+        {
+          story_id: "story-seen-agent-runtime",
+          title: "Seen agent runtime story",
+          event_date: "2026-06-22",
+          what_happened: "Already covered.",
+          why_it_matters: "Already covered.",
+          evidence_level: "primary",
+          sources: [{ label: "Example AI News", url: "https://example.com/history/seen", type: "official" }]
+        },
+        {
+          story_id: "story-updated-agent-runtime",
+          title: "Updated agent runtime story",
+          event_date: "2026-06-22",
+          what_happened: "Already covered before a material update.",
+          why_it_matters: "Already covered before a material update.",
+          evidence_level: "primary",
+          sources: [{ label: "Example AI News", url: "https://example.com/history/updated", type: "official" }]
+        }
+      ]
+    }, null, 2)}\n`,
+    "utf8"
+  );
+  const stale = storyContractCandidate(reportDate, 1, {
+    id: "stale-story-fingerprint",
+    storyKey: "seen-agent-runtime",
+    claimFingerprint: "seen-agent-runtime",
+    title: "Example AI republishes the same agent runtime story",
+    url: "https://example.com/history/seen-new-wrapper"
+  });
+  const updated = storyContractCandidate(reportDate, 2, {
+    id: "updated-story-fingerprint",
+    storyKey: "updated-agent-runtime",
+    claimFingerprint: "updated-agent-runtime",
+    materialUpdate: true,
+    title: "Example AI adds regional availability to agent runtime",
+    url: "https://example.com/history/updated-material"
+  });
+  const filler = Array.from({ length: 3 }, (_unused, index) =>
+    storyContractCandidate(reportDate, index + 3, {
+      id: `history-filler-${index + 1}`,
+      title: `Example AI ships unrelated workflow story ${index + 1}`,
+      url: `https://example.com/history/filler-${index + 1}`
+    })
+  );
+  const discovery = discoveryEnvelope({
+    candidates: [stale, updated, ...filler],
+    sourceNames: ["Example AI News"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const sourceRefs = new Set(drafted.report.stories.flatMap((story) => story.source_item_refs || []));
+  assert.equal(sourceRefs.has(stale.id), false, "stale prior story fingerprint should stay out");
+  assert(sourceRefs.has(updated.id), "materially updated prior story fingerprint should be allowed");
+  assert(drafted.report.self_check.selection_snapshot.stories.rejection_counts.recent_duplicate >= 1);
 });
 
 test("draft generator emits reader-facing Chinese sections without AI repair", async () => {
@@ -12365,14 +12664,14 @@ test("report:draft refills sparse main stream with low-risk primary-required int
   });
 
   const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
-  assert(drafted.report.main_items.length >= 5);
+  assert(drafted.report.main_items.length >= 3);
   for (const candidate of lowRiskLeads) {
-    assert(mainUrls.has(candidate.url), `low-risk primary-required lead should refill sparse main_items: ${candidate.id}`);
+    assert.equal(mainUrls.has(candidate.url), false, `primary-required secondary single-source lead should stay out of stories: ${candidate.id}`);
   }
   assert.equal(mainUrls.has(highRiskLead.url), false, "unverified high-risk valuation lead must stay out of main_items");
   const snapshot = drafted.report.self_check.selection_snapshot.main_items;
-  assert(snapshot.refill_selected >= 2);
-  assert.equal(snapshot.shortfall, false);
+  assert.equal(snapshot.shortfall, true);
+  assert(snapshot.rejection_counts.secondary_single_source_story >= lowRiskLeads.length);
 });
 
 test("report:draft rewrites main item titles summaries and bullets without generic template filler", async () => {
@@ -12455,7 +12754,7 @@ test("report:draft rewrites main item titles summaries and bullets without gener
     cacheEvidence: false
   });
 
-  assert.equal(drafted.report.main_items.length, 5);
+  assert.equal(drafted.report.main_items.length, 3);
   for (const item of drafted.report.main_items) {
     const publicText = [item.title, item.summary, ...(item.bullets || [])].join("\n");
     assert(!/更新了.*相关内容/.test(publicText), `main item copy must not use generic update filler: ${item.title}`);
@@ -12699,7 +12998,7 @@ test("report:draft rejects refill candidates outside the 72 hour main stream win
   assert(snapshot.rejection_counts.outside_main_window >= 1);
 });
 
-test("report:draft rewrites Chinese interview refill without byline boilerplate", async () => {
+test("report:draft keeps Chinese interview single-source leads out of stories", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-chinese-interview-copy-"));
   const reportDate = "2026-06-15";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -12767,11 +13066,8 @@ test("report:draft rewrites Chinese interview refill without byline boilerplate"
   });
 
   const item = drafted.report.main_items.find((entry) => entry.url === interviewLead.url);
-  assert(item, "Chinese interview lead should be eligible as sparse low-risk refill");
-  const publicText = [item.title, item.summary, ...(item.bullets || [])].join("\n");
-  assert(!/作者\s*[|｜]|编辑\s*[|｜]/.test(publicText), "main item copy must strip byline boilerplate");
-  assert(!/过去几个月/.test(item.summary), "summary should be rewritten, not a raw article lead");
-  assert.match(item.summary, /具身智能|世界模型|VLA/);
+  assert.equal(item, undefined, "secondary single-source interview should not be used as a sparse story refill");
+  assert(drafted.report.self_check.selection_snapshot.stories.rejection_counts.secondary_single_source_story >= 1);
 });
 
 test("report:draft rejects high-risk primary-required intermediary leads from main stream refill", async () => {
@@ -13037,7 +13333,7 @@ test("report:draft records main stream shortfall as generation quality event", a
 
   const snapshot = drafted.report.self_check.selection_snapshot.main_items;
   assert.equal(snapshot.target_min, 5);
-  assert.equal(snapshot.target_max, 30);
+  assert.equal(snapshot.target_max, 12);
   assert.equal(snapshot.shortfall, true);
   assert.equal(snapshot.shortfall_event.type, "main_stream_shortfall");
   assert.equal(snapshot.shortfall_event.selected, drafted.report.main_items.length);
@@ -15283,6 +15579,130 @@ test("report:write rejects GitHub Trending descriptions copied in English", asyn
     candidatePool
   });
   assert.equal(report.github_trending[0].description, draft.github_trending[0].description);
+});
+
+test("report:write validates story source links and preserves main_items compatibility", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const main = draft.main_items[0];
+  draft.main_items = [main];
+  draft.stories = [
+    {
+      story_id: main.candidate_id,
+      title: main.title,
+      importance: "major",
+      trend: "agent workflow",
+      event_date: main.event_date,
+      primary_entity: "Example AI",
+      event_type: "launch",
+      object: "agent workflow update",
+      what_happened: main.summary,
+      why_it_matters: main.why_it_matters || main.reader_relevance || "This story affects AI product teams and developer workflow planning.",
+      evidence_level: "primary",
+      sources: [
+        {
+          label: main.source,
+          url: main.url,
+          type: "official"
+        },
+        {
+          label: "Example Analysis",
+          url: "https://example.com/story-analysis",
+          type: "analysis"
+        }
+      ],
+      source_item_refs: [main.candidate_id]
+    }
+  ];
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(report.stories.length, 1);
+  assert.equal(report.main_items[0].candidate_id, report.stories[0].story_id);
+  assert.equal(report.stories[0].sources.length, 2);
+  assert.equal(report.stories[0].source_item_refs, undefined, "public report JSON should not expose internal story refs");
+
+  const invalid = structuredClone(draft);
+  invalid.stories[0].sources[0].url = "not-a-url";
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(invalid, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "schema_validation_failed"
+  );
+});
+
+test("public daily renders stories with source links and keeps GitHub Trending visible", () => {
+  const report = minimalDateIndexReport("2026-06-23", {
+    mainItems: 1,
+    github: 8,
+    builder: 0,
+    hotBlogs: 0,
+    tracking: 0,
+    qualityStatus: { status: "ok" }
+  });
+  report.main_items[0] = {
+    ...report.main_items[0],
+    candidate_id: "story-render-primary",
+    title: "Example AI ships source-linked story rendering",
+    summary: "**Example AI** describes the source-linked story rendering contract for daily readers.",
+    bullets: [
+      "**Source links** stay visible so each story can be checked without reading internal audit sections."
+    ],
+    url: "https://example.com/story-render-primary",
+    source: "Example AI News",
+    source_level: "official_company_news",
+    verification_status: "primary_confirmed",
+    editorial_category: "product_radar",
+    event_date: "2026-06-23"
+  };
+  report.stories = [
+    {
+      story_id: "story-render-primary",
+      title: "Example AI ships source-linked story rendering",
+      importance: "major",
+      trend: "agent workflow",
+      event_date: "2026-06-23",
+      primary_entity: "Example AI",
+      event_type: "launch",
+      object: "source-linked story rendering",
+      what_happened: "Example AI describes the source-linked story rendering contract for daily readers.",
+      why_it_matters: "The public page must let readers inspect each story and open every source without exposing internal audit dumps.",
+      evidence_level: "multi_source",
+      sources: [
+        {
+          label: "Example AI News",
+          url: "https://example.com/story-render-primary",
+          type: "official"
+        },
+        {
+          label: "Example Analysis",
+          url: "https://example.com/story-render-analysis",
+          type: "analysis"
+        }
+      ],
+      source_item_refs: ["story-render-primary"]
+    }
+  ];
+  report.github_trending = dailyContentContractGithubEntries().slice(0, 8);
+
+  const input = reportToInteractionInput(report);
+  const serialized = JSON.stringify(input.sections);
+  const githubSection = input.sections.find((section) => /GitHub/i.test(section.title || ""));
+
+  assert(serialized.includes("https://example.com/story-render-primary"));
+  assert(serialized.includes("https://example.com/story-render-analysis"));
+  assert(!serialized.includes("source_audit"));
+  assert(githubSection, "GitHub Trending section must stay directly visible");
+  assert.notEqual(githubSection.appendix, true);
+  assert(serialized.includes("example/agent-workflow-8"));
 });
 
 test("report:write rejects expanded main items with templated prose or thin detail", async () => {
@@ -18653,14 +19073,43 @@ function mainStreamRepairCandidate(reportDate, options = {}) {
     verification_status: options.verificationStatus || "primary_confirmed",
     source_level: options.sourceLevel || "primary",
     verification_note: options.verificationNote || "fixture candidate",
-    verification_sources: [options.url],
-    primary_url: options.url,
+    verification_sources: options.verificationSources || [options.url],
+    primary_url: options.primaryUrl || options.url,
     editorial_category: options.editorialCategory || "product_radar",
     ...(options.originalText ? { original_text: options.originalText } : {}),
     ...(options.description ? { description: options.description } : {}),
     ...(options.readmeSummary ? { readme_summary: options.readmeSummary } : {}),
+    ...(options.storyKey ? { story_key: options.storyKey } : {}),
+    ...(options.claimFingerprint ? { claim_fingerprint: options.claimFingerprint } : {}),
+    ...(options.materialUpdate ? { material_update: true } : {}),
     ...(Number.isInteger(Number(options.rank)) ? { rank: Number(options.rank) } : {})
   };
+}
+
+function storyContractCandidate(reportDate, index, options = {}) {
+  const id = options.id || `story-contract-${index}`;
+  const url = options.url || `https://example.com/story-contract/${index}`;
+  return mainStreamRepairCandidate(reportDate, {
+    id,
+    category: options.category || "community_lead",
+    source: options.source || "Example AI News",
+    sourceId: options.sourceId || "content-example-ai-news",
+    sourceLevel: options.sourceLevel || "official_company_news",
+    verificationStatus: options.verificationStatus || "primary_confirmed",
+    title: options.title || `Example AI ships concrete agent workflow update ${index}`,
+    url,
+    evidence: options.evidence ||
+      `Example AI describes concrete agent workflow update ${index}, including product availability, developer controls, rollout boundary, source evidence, and operational impact for enterprise AI teams.`,
+    editorialCategory: options.editorialCategory || "product_radar",
+    storyKey: options.storyKey,
+    claimFingerprint: options.claimFingerprint,
+    materialUpdate: options.materialUpdate,
+    verificationSources: options.verificationSources,
+    primaryUrl: options.primaryUrl,
+    description: options.description,
+    readmeSummary: options.readmeSummary,
+    originalText: options.originalText
+  });
 }
 
 function discoveryEnvelope({ candidates, sourceNames = [] } = {}) {

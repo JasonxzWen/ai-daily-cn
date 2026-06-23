@@ -141,6 +141,13 @@
       },
       "default": []
     },
+    "stories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/story"
+      },
+      "default": []
+    },
     "huggingface_trending": {
       "type": "array",
       "items": {
@@ -462,6 +469,94 @@
               ]
             }
           }
+        }
+      }
+    },
+    "story_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "url", "type"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "type": {
+          "enum": ["official", "primary", "paper", "github", "analysis", "media", "community", "social", "source", "other"]
+        }
+      }
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "story_id",
+        "title",
+        "event_date",
+        "what_happened",
+        "why_it_matters",
+        "evidence_level",
+        "sources"
+      ],
+      "properties": {
+        "story_id": {
+          "$ref": "#/$defs/candidate_id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importance": {
+          "$ref": "#/$defs/importance"
+        },
+        "trend": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "primary_entity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_happened": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_it_matters": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_level": {
+          "enum": ["primary", "multi_source", "secondary", "community_signal"]
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/story_source"
+          }
+        },
+        "source_item_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
         }
       }
     },

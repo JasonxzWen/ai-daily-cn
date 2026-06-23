@@ -109,6 +109,7 @@ export function normalizeReportDraft(draft, options = {}) {
     },
     hero_highlights: Array.isArray(draft.hero_highlights) ? draft.hero_highlights : [],
     candidate_pool_path: draft.candidate_pool_path || reportCandidatePoolPublicPath(reportDate),
+    stories: Array.isArray(draft.stories) ? draft.stories : [],
     main_items: Array.isArray(draft.main_items) ? draft.main_items : [],
     github_trending: Array.isArray(draft.github_trending) ? draft.github_trending : [],
     huggingface_trending: Array.isArray(draft.huggingface_trending) ? draft.huggingface_trending : [],
@@ -129,6 +130,7 @@ export function normalizeReportDraft(draft, options = {}) {
   };
 
   for (const sectionName of [
+    "stories",
     "main_items",
     "model_releases",
     "hot_blogs",
@@ -176,6 +178,7 @@ export function normalizeReportDraft(draft, options = {}) {
   requirePlainLanguage(validation.value);
   requireCandidateCoverage(validation.value, options.candidatePool);
   requireEvidenceAssetSelectivity(validation.value);
+  requireStoryContract(validation.value);
   requireExpandedMainItemFormat(validation.value);
   requireHeroHighlightsContract(validation.value);
   requireChineseGithubTrendingDescriptions(validation.value);
@@ -203,6 +206,7 @@ function requirePlatformExemptSections(report) {
 function stripPrivateDisclosureFields(report) {
   const publicReport = structuredClone(report);
   for (const sectionName of [
+    "stories",
     "main_items",
     "model_releases",
     "hot_blogs",
@@ -225,10 +229,52 @@ function stripPrivateDisclosureFields(report) {
       const next = { ...item };
       delete next.verification_note;
       delete next.risk_note;
+      delete next.source_item_refs;
       return next;
     });
   }
   return publicReport;
+}
+
+function requireStoryContract(report) {
+  const stories = Array.isArray(report.stories) ? report.stories : [];
+  if (stories.length === 0) {
+    return;
+  }
+
+  const storyIds = new Set();
+  const errors = [];
+  stories.forEach((story, index) => {
+    const storyId = String(story?.story_id || "").trim();
+    if (!storyId) {
+      errors.push(`stories[${index}].story_id is required`);
+    } else if (storyIds.has(storyId)) {
+      errors.push(`stories[${index}].story_id duplicates ${storyId}`);
+    } else {
+      storyIds.add(storyId);
+    }
+    const sources = Array.isArray(story?.sources) ? story.sources : [];
+    if (sources.length === 0) {
+      errors.push(`stories[${index}].sources must contain at least one public source`);
+    }
+  });
+
+  const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  if (mainItems.length > 0) {
+    const mainIds = mainItems.map((item) => String(item?.candidate_id || "").trim()).filter(Boolean);
+    const missing = mainIds.filter((id) => !storyIds.has(id));
+    if (missing.length > 0) {
+      errors.push(`main_items must be derived from stories; missing story ids: ${missing.slice(0, 5).join(", ")}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new PublisherError(
+      "story_contract_failed",
+      "Story-centered reports must expose source-linked stories and compatible main_items.",
+      { errors }
+    );
+  }
 }
 
 function requireModelReleasesInMainItems(report) {

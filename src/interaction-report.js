@@ -134,6 +134,7 @@ export function reportToInteractionInput(report, options = {}) {
     assetRootDir: options.assetRootDir || options.outDir || ""
   };
   const mainItems = Array.isArray(report.main_items) ? report.main_items : [];
+  const stories = Array.isArray(report.stories) ? report.stories : [];
   const hotBlogs = Array.isArray(report.hot_blogs) ? report.hot_blogs : [];
   const chineseMediaDynamics = Array.isArray(report.chinese_media_dynamics) ? report.chinese_media_dynamics : [];
   const dailyTracking = Array.isArray(report.daily_tracking) ? report.daily_tracking : [];
@@ -173,6 +174,7 @@ export function reportToInteractionInput(report, options = {}) {
     report,
     evidenceByUrl,
     trendAnnotations,
+    storyById: storyIndexById(stories),
     mediaOptions,
     compactMainItems: true,
     promptLayerLayout
@@ -211,9 +213,9 @@ export function reportToInteractionInput(report, options = {}) {
   }
   if (githubTrending.length > 0) {
     sections.push(promptLayerLayout
-      ? {
-          type: "filterable-cards",
-          title: "Repository movement",
+        ? {
+            type: "filterable-cards",
+          title: "GitHub Trending · Top 8",
           group: "projects",
           cardClass: "github-trending-card",
           showFilters: false,
@@ -221,7 +223,7 @@ export function reportToInteractionInput(report, options = {}) {
         }
       : {
           type: "markdown",
-          title: "GitHub Trending · Top 20",
+          title: "GitHub Trending · Top 8",
           group: "projects",
           content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
         });
@@ -813,7 +815,37 @@ function formatMainItem(item, context = {}) {
     ...trendTagsFor(context.trendAnnotations, "main_items", context.originalIndex)
   ].filter(Boolean));
   const evidence = formatInlineEvidenceAssets(context.report, evidenceForUrl(context.evidenceByUrl, item.url), context.mediaOptions);
-  return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}）\n${bullets}${evidence ? `\n\n${evidence}` : ""}`;
+  const storySources = formatStorySources(context.storyById?.get(item.candidate_id), item);
+  return `${context.displayIndex}. **${title}**${trendTags}（${item.event_date}）\n${bullets}${storySources ? `\n${storySources}` : ""}${evidence ? `\n\n${evidence}` : ""}`;
+}
+
+function storyIndexById(stories) {
+  const index = new Map();
+  for (const story of stories) {
+    const id = String(story?.story_id || "").trim();
+    if (id) {
+      index.set(id, story);
+    }
+  }
+  return index;
+}
+
+function formatStorySources(story, item) {
+  const sources = Array.isArray(story?.sources) ? story.sources : [];
+  if (sources.length === 0) {
+    return "";
+  }
+  const links = sources
+    .filter((source) => source?.url)
+    .map((source) => markdownLink(source.url, source.label || source.type || "Source", {
+      icon: siteIconForUrl(source.url, source.label || item?.source || item?.title),
+      iconLabel: source.label || item?.source
+    }))
+    .filter(Boolean);
+  if (links.length === 0) {
+    return "";
+  }
+  return `  - **来源**：${links.join(" / ")}`;
 }
 
 function mainItemPublicFacts(item) {
@@ -864,7 +896,7 @@ function formatGithubTrending(items, context = {}) {
 
   const projectIndex = indexProjects(projects);
   const trendingLines = items
-    .slice(0, 20)
+    .slice(0, 8)
     .map((item, index) => {
       const project = projectForTrend(item, projectIndex);
       const tag = githubTrendStatusHighlightTag(item);
@@ -887,7 +919,7 @@ function formatGithubTrending(items, context = {}) {
 function formatGithubTrendingCards(items, context = {}) {
   const projects = Array.isArray(context.projects) ? context.projects : [];
   const projectIndex = indexProjects(projects);
-  return items.slice(0, 20).map((item, index) => {
+  return items.slice(0, 8).map((item, index) => {
     const project = projectForTrend(item, projectIndex);
     const rank = Number.isFinite(Number(item.rank)) ? `#${Number(item.rank)}` : `#${index + 1}`;
     const repo = item.repo || item.name || repoFromUrl(item.url);
