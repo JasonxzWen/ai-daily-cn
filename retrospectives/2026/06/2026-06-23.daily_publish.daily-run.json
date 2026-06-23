@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-23.daily_publish.daily-run",
+  "run_type": "daily_publish",
+  "date": "2026-06-23",
+  "title": "Daily publish retrospective 2026-06-23",
+  "status": "published_degraded",
+  "summary": "Daily publish publish completed for 2026-06-23 with status published_degraded.",
+  "evidence": {
+    "report_json": "reports-data/2026/06/2026-06-23.json",
+    "html": "docs/reports/2026/06/2026-06-23.html",
+    "validation_commands": [
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Daily publish runs must leave a sanitized project-level retrospective record.",
+      "evidence": "The daily runner generated this record from stage status and repo-relative artifacts only.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Review this record with the generated report and keep follow-up suggestions statused."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": []
+}
