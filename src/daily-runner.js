@@ -22,62 +22,74 @@ const DISCOVERY_DEGRADE_FALLBACKS = {
   discover_github_trending: {
     auditGroup: "github_trending",
     sourceName: "GitHub Trending",
+    sourceUrl: "https://github.com/trending",
     sourceCategory: "github_trending"
   },
   discover_huggingface_trending: {
     auditGroup: "huggingface_trending",
     sourceName: "Hugging Face Trending",
+    sourceUrl: "https://huggingface.co/models?sort=trending",
     sourceCategory: "project"
   },
   discover_builders: {
     auditGroup: "builder_sources",
     sourceName: "Builder discovery",
+    sourceUrl: "https://x.com/",
     sourceCategory: "builder"
   },
   discover_china_ai: {
     auditGroup: "china_ai_sources",
     sourceName: "China AI discovery",
+    sourceUrl: "https://www.qbitai.com/",
     sourceCategory: "community"
   },
   discover_content_sources: {
     auditGroup: "content_sources",
     sourceName: "Content source discovery",
+    sourceUrl: "https://openai.com/news/",
     sourceCategory: "community"
   },
   discover_statuspage_incidents: {
     auditGroup: "content_sources",
     sourceName: "Statuspage incident discovery",
+    sourceUrl: "https://status.openai.com/",
     sourceCategory: "official_release"
   },
   discover_search_news: {
     auditGroup: "search_sources",
     sourceName: "Search/news discovery",
+    sourceUrl: "https://www.google.com/search?q=AI",
     sourceCategory: "community"
   },
   discover_wechat_platform: {
     auditGroup: "wechat_sources",
     sourceName: "WeChat platform discovery",
+    sourceUrl: "https://weixin.qq.com/",
     sourceCategory: "community",
     platform: "wechat"
   },
   discover_zhihu_platform: {
     auditGroup: "zhihu_sources",
     sourceName: "Zhihu platform discovery",
+    sourceUrl: "https://www.zhihu.com/",
     sourceCategory: "community",
     platform: "zhihu"
   },
   discover_reddit_platform: {
     auditGroup: "reddit_sources",
     sourceName: "Reddit platform discovery",
+    sourceUrl: "https://www.reddit.com/r/MachineLearning/",
     sourceCategory: "community",
     platform: "reddit"
   },
   sources_health: {
     auditGroup: "sources_health",
     sourceName: "Source health check",
+    sourceUrl: "https://github.com/JasonxzWen/ai-daily-cn/tree/main/config/sources",
     sourceCategory: "community"
   }
 };
+const SUMMARY_ONLY_DEGRADE_FALLBACK_KINDS = new Set(["summary_only_degraded_audit"]);
 const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
   "public_editorial_rewrite",
   "main_item_editorial_rewrite",
@@ -1308,22 +1320,37 @@ async function applyDegradedStageFallback({ stage, context, stagePolicy, normali
     return null;
   }
   const fallbackSpec = DISCOVERY_DEGRADE_FALLBACKS[stage.id];
-  if (!fallbackSpec) {
-    return null;
-  }
   const outputPath = outputArgValue(stage);
-  if (!outputPath) {
-    return null;
+  if (fallbackSpec) {
+    if (!outputPath) {
+      return null;
+    }
+    return await writeDegradedDiscoveryArtifact({
+      stage,
+      context,
+      fallbackSpec,
+      outputPath,
+      normalized,
+      error,
+      retryAttempts
+    });
   }
-  return await writeDegradedDiscoveryArtifact({
-    stage,
-    context,
-    fallbackSpec,
-    outputPath,
-    normalized,
-    error,
-    retryAttempts
-  });
+  const fallbackKind = String(stagePolicy?.fallback?.kind || "").trim();
+  if (SUMMARY_ONLY_DEGRADE_FALLBACK_KINDS.has(fallbackKind)) {
+    if (!outputPath) {
+      return null;
+    }
+    return await writeSummaryOnlyDegradedArtifact({
+      stage,
+      context,
+      fallbackKind,
+      outputPath,
+      normalized,
+      error,
+      retryAttempts
+    });
+  }
+  return null;
 }
 
 function stageFailureMatchesBlockReason({ stagePolicy, normalized, error }) {
@@ -1351,7 +1378,7 @@ async function writeDegradedDiscoveryArtifact({
   const errorCode = degradedFallbackErrorCode({ normalized, error });
   const reason = degradedFallbackReason({ normalized, error });
   const sourceId = `${fallbackSpec.platform || fallbackSpec.auditGroup}-${slugStageId(fallbackSpec.sourceName) || "source"}`;
-  const sourceUrl = fallbackSpec.sourceUrl || "https://example.com/";
+  const sourceUrl = requireFallbackSourceUrl(fallbackSpec);
   const auditSource = {
     name: fallbackSpec.sourceName,
     url: sourceUrl,
@@ -1409,6 +1436,65 @@ async function writeDegradedDiscoveryArtifact({
       retry_attempts_exhausted: retryAttempts.length
     }
   };
+}
+
+async function writeSummaryOnlyDegradedArtifact({
+  stage,
+  context,
+  fallbackKind,
+  outputPath,
+  normalized,
+  error,
+  retryAttempts
+}) {
+  const generatedAt = typeof context.now === "function" ? context.now() : new Date().toISOString();
+  const errorCode = degradedFallbackErrorCode({ normalized, error });
+  const reason = degradedFallbackReason({ normalized, error });
+  const payload = {
+    ok: true,
+    degraded: true,
+    fallback_used: true,
+    fallback_kind: fallbackKind,
+    stage_id: stage.id,
+    report_date: context.reportDate,
+    generated_at: generatedAt,
+    error_code: errorCode,
+    degraded_reason: reason,
+    retry_attempts_exhausted: retryAttempts.length,
+    audit_status: {
+      status: "degraded",
+      stage_id: stage.id,
+      error_code: errorCode,
+      notes: reason
+    }
+  };
+  const resolvedOutputPath = absoluteCleanPath(context.cleanRoot, outputPath);
+  await fs.mkdir(path.dirname(resolvedOutputPath), { recursive: true });
+  await fs.writeFile(resolvedOutputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  return {
+    output: {
+      ok: true,
+      degraded: true,
+      fallback_used: true,
+      fallback_kind: fallbackKind,
+      fallback_path: stagePath(outputPath, context.cleanRoot),
+      audit_path: stagePath(outputPath, context.cleanRoot),
+      error_code: errorCode,
+      degraded_reason: reason,
+      retry_attempts_exhausted: retryAttempts.length
+    }
+  };
+}
+
+function requireFallbackSourceUrl(fallbackSpec) {
+  const sourceUrl = String(fallbackSpec?.sourceUrl || "").trim();
+  if (!/^https?:\/\//i.test(sourceUrl)) {
+    throw new PublisherError(
+      "degraded_discovery_fallback_missing_source_url",
+      `Degraded discovery fallback for ${fallbackSpec?.sourceName || "source"} must declare a public sourceUrl.`
+    );
+  }
+  return sourceUrl;
 }
 
 function outputArgValue(stage) {

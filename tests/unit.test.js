@@ -6581,6 +6581,123 @@ test("daily runner writes degraded discovery artifact after exhausted source fai
   assert.match(payload.source_audit.github_trending.blocked_reason, /network_error/);
 });
 
+test("daily runner writes degraded discovery artifact with real source URL", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-source-degrade-url-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "discover_github_trending") {
+        const error = new Error("network_error: GitHub Trending fetch failed");
+        error.code = "network_error";
+        throw error;
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  const fallbackPath = path.join(cleanRoot, ".tmp", "github-trending-2026-06-04.json");
+  const payload = JSON.parse(await fs.readFile(fallbackPath, "utf8"));
+  assert.equal(payload.source_audit.github_trending.sources[0].url, "https://github.com/trending");
+  assert.equal(payload.sources[0].url, "https://github.com/trending");
+  assert.notEqual(payload.source_audit.github_trending.sources[0].url, "https://example.com/");
+  assert.notEqual(payload.sources[0].url, "https://example.com/");
+});
+
+test("daily runner degrades sources phase5 audit after exhausted transient failure", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-phase5-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "sources_phase5_audit") {
+        const error = new Error("transient_io: recent source audit history unavailable");
+        error.code = "transient_io";
+        throw error;
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_degraded");
+  assert.equal(calls.filter((id) => id === "sources_phase5_audit").length, 2);
+  assert(calls.includes("publish_dry_run_daily"));
+
+  const recorded = result.summary.stages.find((stage) => stage.id === "sources_phase5_audit");
+  assert.equal(recorded.status, "degraded");
+  assert.equal(recorded.output.fallback_used, true);
+  assert.equal(recorded.output.fallback_kind, "summary_only_degraded_audit");
+  assert.equal(recorded.output.fallback_path, ".tmp/sources-phase5-audit-2026-06-04.json");
+  assert.equal(recorded.output.error_code, "transient_io");
+  assert.equal(recorded.output.attempts, 2);
+
+  const fallbackPath = path.join(cleanRoot, ".tmp", "sources-phase5-audit-2026-06-04.json");
+  const payload = JSON.parse(await fs.readFile(fallbackPath, "utf8"));
+  assert.equal(payload.ok, true);
+  assert.equal(payload.degraded, true);
+  assert.equal(payload.fallback_kind, "summary_only_degraded_audit");
+  assert.equal(payload.stage_id, "sources_phase5_audit");
+  assert.equal(payload.error_code, "transient_io");
+});
+
+test("daily runner blocks sources phase5 audit publish plan violations", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-phase5-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "sources_phase5_audit") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            error_code: "publish_plan_violation",
+            error: "publish_plan_violation: audit output would hide a publish risk"
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
+  assert.equal(result.summary.next_action.stage_id, "sources_phase5_audit");
+  const recorded = result.summary.stages.find((stage) => stage.id === "sources_phase5_audit");
+  assert.equal(recorded.status, "failed");
+  assert.equal(recorded.output.fallback_used, undefined);
+  assert.equal(await exists(path.join(cleanRoot, ".tmp", "sources-phase5-audit-2026-06-04.json")), false);
+});
+
 test("daily runner degraded discovery artifact remains consumable by report draft and write", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-fallback-real-chain-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
