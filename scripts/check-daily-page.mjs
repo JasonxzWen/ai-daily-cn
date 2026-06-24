@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
 import { chromium } from "@playwright/test";
-import { evaluateDailyPageChecklist } from "../src/page-checklist.js";
+import { evaluateDailyPageChecklist, classifyDailyPageCheckResults } from "../src/page-checklist.js";
 
 const args = parseArgs(process.argv.slice(2));
 const positional = positionalArgs(process.argv.slice(2));
@@ -36,8 +36,14 @@ try {
   await new Promise((resolve) => server.close(resolve));
 }
 
+const classification = classifyDailyPageCheckResults(results);
 const payload = {
-  ok: results.every((result) => result.ok),
+  ok: classification.ok,
+  blocking: !classification.ok,
+  degraded: classification.ok && classification.degraded_checks.length > 0,
+  blocking_checks: classification.blocking_checks,
+  degraded_checks: classification.degraded_checks,
+  degraded_sections: classification.degraded_sections,
   report_date: reportDate,
   results
 };

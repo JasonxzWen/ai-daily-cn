@@ -7587,6 +7587,34 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
   assert.equal(result.summary.final_status, "blocked");
 });
 
+test("daily runner degrades instead of blocking on editorial-weak page-check failures", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pagecheck-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "8888888888888888888888888888888888888888"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      if (stage.id === "quality_page_check") {
+        return { ok: true, output: { ok: true, degraded: true, degraded_sections: ["community_leads"] } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_degraded");
+  const pageStage = result.summary.stages.find((stage) => stage.id === "quality_page_check");
+  assert.equal(pageStage.status, "degraded");
+});
+
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-nonedit-block-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");

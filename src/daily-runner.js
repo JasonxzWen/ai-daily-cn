@@ -522,6 +522,21 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    if (
+      stage.id === "quality_page_check" &&
+      !outcome.blocked &&
+      outcome.normalized.ok &&
+      outcome.normalized.output?.degraded === true
+    ) {
+      markStageDegraded(summary, stage.id, {
+        degraded_sections: Array.isArray(outcome.normalized.output.degraded_sections)
+          ? outcome.normalized.output.degraded_sections
+          : [],
+        residual_editorial_tasks: 0
+      });
+      await writeSummary(summaryPath, summary);
+      continue;
+    }
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
