@@ -988,15 +988,13 @@ function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
       // translations of substantial posts still fail the strict check below.
       const originalSubstance = originalText.replace(/https?:\/\/\S+/gi, "").trim();
       const originalShort = originalSubstance.length > 0 && originalSubstance.length <= 40;
-      // Keep retained product names (Claude, Vercel, GPT-5...) but reject
-      // untranslated source words. Two signals: any standalone lowercase run, and
-      // a denylist of common English verbs/nouns/function words left untranslated
-      // even when Title-Cased (e.g. "GPT-6 Launch"). Perfect product-name vs
-      // untranslated-word separation is not feasible heuristically; residual
-      // exotic cases still route through the (degrade-not-block) editorial loop.
+      // Reject untranslated source words via a denylist of common English
+      // verbs/nouns/function words (any case, incl. "Launch"). Do NOT flag bare
+      // lowercase runs: that false-flags legitimate lowercase product names
+      // (gpt-oss, o3-pro, llama.cpp). Fully-English translations are still caught
+      // by the Chinese-char floor below; the denylist handles partial cases.
       const translationText = value.replace(/https?:\/\/\S+/gi, "");
-      const hasUntranslatedEnglishWord =
-        /\b[a-z]{3,}\b/.test(translationText) || UNTRANSLATED_ENGLISH_WORD_RE.test(translationText);
+      const hasUntranslatedEnglishWord = UNTRANSLATED_ENGLISH_WORD_RE.test(translationText);
       const shortOriginalAcceptable =
         originalShort &&
         readerFacing.details.chinese_chars >= 2 &&

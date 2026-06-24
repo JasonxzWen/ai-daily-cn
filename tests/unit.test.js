@@ -8540,6 +8540,33 @@ test("quality review flags short translations that leave untranslated English wo
   assert(weakIssues.length >= 1, "a short translation that leaves an untranslated English word must be flagged");
 });
 
+test("quality review keeps faithful short translations that retain lowercase product names", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Test",
+      handle: "test",
+      original_text: "gpt-oss is here",
+      translation: "gpt-oss 发布。",
+      content: "gpt-oss 发布。",
+      url: "https://x.com/test/status/2"
+    },
+    {
+      author: "Test2",
+      handle: "test2",
+      original_text: "OpenAI o3-pro",
+      translation: "OpenAI o3-pro 上线。",
+      content: "OpenAI o3-pro 上线。",
+      url: "https://x.com/test/status/3"
+    }
+  ];
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const weakIssues = review.issues.filter((issue) => issue.code === "builder_translation_too_weak");
+  assert.deepEqual(weakIssues, [], "lowercase product names in a faithful short translation must not be flagged");
+});
+
 test("quality review rejects templated impact and watch prose in public body", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
