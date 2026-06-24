@@ -522,6 +522,41 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    // Editorial weak-card page-check failures degrade instead of hard-blocking.
+    // quality_page_check runs after build, so to publish WITH disclosure we
+    // annotate the written report and re-render docs (deriveQualityStatus merges
+    // the injected degraded_sections), then mark the run degraded — keeping the
+    // run summary and the public artifact consistent. Structural page-check
+    // failures still exit non-zero and hard-block below.
+    if (
+      stage.id === "quality_page_check" &&
+      !outcome.blocked &&
+      outcome.normalized.ok &&
+      Array.isArray(outcome.normalized.output?.degraded_checks) &&
+      outcome.normalized.output.degraded_checks.length > 0
+    ) {
+      const decision = {
+        degraded_sections: Array.isArray(outcome.normalized.output.degraded_sections)
+          ? outcome.normalized.output.degraded_sections
+          : [],
+        residual_editorial_tasks: 0
+      };
+      const [year, month] = String(reportDate).split("-");
+      await annotateReportDegraded(
+        absoluteCleanPath(summary.clean_repo_root, `reports-data/${year}/${month}/${reportDate}.json`),
+        decision
+      );
+      const rerender = await runAndRecordStage({ stage: npmStage("build_disclosure", ["run", "build"]), context, summary, runStage, now });
+      if (rerender.blocked || !rerender.normalized.ok) {
+        summary.final_status = "blocked";
+        summary.next_action = { kind: "inspect_stage_failure", stage_id: "build_disclosure", summary_path: summaryPath };
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      markStageDegraded(summary, stage.id, decision);
+      await writeSummary(summaryPath, summary);
+      continue;
+    }
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });

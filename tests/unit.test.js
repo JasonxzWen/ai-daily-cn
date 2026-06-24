@@ -7587,6 +7587,44 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
   assert.equal(result.summary.final_status, "blocked");
 });
 
+test("daily runner degrades and re-renders (not block) on editorial-weak page-check failures", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pagecheck-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  let buildRuns = 0;
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "8888888888888888888888888888888888888888"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "build" || stage.id === "build_disclosure") {
+        buildRuns += 1;
+        return { ok: true, output: { stage: stage.id } };
+      }
+      if (stage.id === "quality_review") {
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      if (stage.id === "quality_page_check") {
+        return { ok: true, output: { ok: true, degraded_checks: ["community_cards_reader_facing"], degraded_sections: ["community_leads"] } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  // Publishes (not blocked) AND is consistently labeled degraded, with docs
+  // re-rendered so the artifact can carry the disclosure.
+  assert.notEqual(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_degraded");
+  const pageStage = result.summary.stages.find((stage) => stage.id === "quality_page_check");
+  assert.equal(pageStage.status, "degraded");
+  assert(result.summary.stages.some((stage) => stage.id === "build_disclosure"), "docs must be re-rendered for disclosure");
+  assert.equal(buildRuns, 2, "build runs once normally and once to re-render with disclosure");
+});
+
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-nonedit-block-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");

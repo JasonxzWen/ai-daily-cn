@@ -13,6 +13,41 @@ const PUBLIC_CONTENT_IMAGE_MIN_WIDTH = 240;
 const PUBLIC_CONTENT_IMAGE_MIN_HEIGHT = 160;
 const PUBLIC_CONTENT_IMAGE_MIN_AREA = 80000;
 
+// Page checks whose failure is an editorial weak-signal-card quality issue
+// (text too short / thin reader-facing summary), not a structural defect. These
+// degrade (publish with disclosure) instead of hard-blocking the whole daily;
+// structural checks (layout, hero, nav, sections, images, dates, GitHub
+// Trending coverage) keep the hard block.
+const DEGRADABLE_PAGE_CHECK_IDS = new Set([
+  "community_cards_reader_facing",
+  "hot_blog_cards_reader_facing"
+]);
+const PAGE_CHECK_SECTION_BY_ID = {
+  community_cards_reader_facing: "community_leads",
+  hot_blog_cards_reader_facing: "hot_blogs"
+};
+
+// Pure classifier (importable + unit-testable): split failed page checks across
+// all viewports into blocking vs degradable.
+export function classifyDailyPageCheckResults(results) {
+  const failed = new Set();
+  for (const result of Array.isArray(results) ? results : []) {
+    for (const check of Array.isArray(result?.checks) ? result.checks : []) {
+      if (check && check.ok === false) {
+        failed.add(String(check.id));
+      }
+    }
+  }
+  const blocking = [...failed].filter((id) => !DEGRADABLE_PAGE_CHECK_IDS.has(id));
+  const degraded = [...failed].filter((id) => DEGRADABLE_PAGE_CHECK_IDS.has(id));
+  return {
+    ok: blocking.length === 0,
+    blocking_checks: blocking,
+    degraded_checks: degraded,
+    degraded_sections: degraded.map((id) => PAGE_CHECK_SECTION_BY_ID[id]).filter(Boolean)
+  };
+}
+
 export async function evaluateDailyPageChecklist(page, options = {}) {
   const imageLoad = await eagerLoadPageImages(page, options.imageTimeoutMs || 5000);
   const result = await page.evaluate(({
