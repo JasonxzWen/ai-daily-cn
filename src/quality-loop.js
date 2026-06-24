@@ -983,11 +983,16 @@ function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
       // translations of substantial posts still fail the strict check below.
       const originalSubstance = originalText.replace(/https?:\/\/\S+/gi, "").trim();
       const originalShort = originalSubstance.length > 0 && originalSubstance.length <= 40;
+      // Keep retained product names (Claude, Vercel, GPT-5...) but reject
+      // untranslated source words: a standalone lowercase English run signals
+      // the post was left in English rather than translated.
+      const hasUntranslatedEnglishWord = /\b[a-z]{3,}\b/.test(value.replace(/https?:\/\/\S+/gi, ""));
       const shortOriginalAcceptable =
         originalShort &&
         readerFacing.details.chinese_chars >= 2 &&
         readerFacing.details.chinese_ratio >= 0.15 &&
-        !readerFacing.details.long_english_run;
+        !readerFacing.details.long_english_run &&
+        !hasUntranslatedEnglishWord;
       if (!readerFacing.ok && !shortOriginalAcceptable) {
         issues.push({
           code: "builder_translation_too_weak",

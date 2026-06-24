@@ -7500,6 +7500,9 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
 test("daily runner degrades instead of blocking when only editorial residue remains after the loop budget", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-editorial-degrade-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportFile = path.join(cleanRoot, ".tmp", "daily-report.json");
+  await fs.mkdir(path.dirname(reportFile), { recursive: true });
+  await fs.writeFile(reportFile, JSON.stringify({ report_date: "2026-06-04", stories: [], builder_observations: [] }), "utf8");
   const result = await runDailyWorkflow({
     launcherRoot,
     reportDate: "2026-06-04",
@@ -7520,6 +7523,10 @@ test("daily runner degrades instead of blocking when only editorial residue rema
               ai_review_tasks: [
                 { kind: "public_editorial_rewrite", path: "stories[0].what_happened" },
                 { kind: "builder_translation_rewrite", path: "builder_observations[1].translation" }
+              ],
+              issues: [
+                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: true },
+                { code: "builder_translation_too_weak", severity: "error", path: "builder_observations[1].translation", repairable: true }
               ]
             }
           }
@@ -7536,6 +7543,48 @@ test("daily runner degrades instead of blocking when only editorial residue rema
     reviewStage.output.quality_status.degraded_sections.slice().sort(),
     ["builder_observations", "stories"]
   );
+  const writtenReport = JSON.parse(await fs.readFile(reportFile, "utf8"));
+  assert.equal(writtenReport.quality_status.status, "degraded");
+  assert(
+    writtenReport.quality_status.degraded_sections.some((entry) => entry.code === "residual_editorial_degraded"),
+    "the public report file must carry the residual editorial degradation disclosure"
+  );
+});
+
+test("daily runner keeps the hard block when a non-editorial blocking issue has no AI task", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-noncovered-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    maxReviewRepairLoops: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "7777777777777777777777777777777777777777"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "public_editorial_rewrite", path: "stories[0].what_happened" }],
+              issues: [
+                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: true },
+                { code: "plain_language_stock_phrase", severity: "error", path: "summary", repairable: false }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
 });
 
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
