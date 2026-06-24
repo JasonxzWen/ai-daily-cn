@@ -15,6 +15,7 @@ export function evaluateDailyContentContract(report, options = {}) {
   const html = String(options.html || "");
 
   checkStoryFirst(report, issues);
+  checkStoryNarrative(report, degraded);
   checkMainItems(report, issues);
   checkGitHubTrending(report, issues);
   checkHotBlogs(report, { html }, issues);
@@ -43,6 +44,33 @@ export function evaluateDailyContentContract(report, options = {}) {
       }
     }
   };
+}
+
+// Deterministic story-narrative templates emitted by story-first.js fallback.
+// On a real report these mean the story was not authored from its source; we
+// surface it as DEGRADED (visible, non-blocking) rather than letting the
+// structural contract silently pass templated prose.
+const STORY_TEMPLATE_NARRATIVE_RE = /材料覆盖|材料把[^。]*落到|边界落在落地质量取决于|已披露事实集中在|更新agent\s*工作流和开发工具能力|更新AI\s*产品、平台或工程实践|披露模型能力和评估方法更新/u;
+
+function checkStoryNarrative(report, degraded) {
+  const stories = asArray(report?.stories);
+  const templated = [];
+  stories.forEach((story, index) => {
+    for (const field of ["title", "what_happened", "why_it_matters"]) {
+      const text = textValue(story?.[field]);
+      if (text && STORY_TEMPLATE_NARRATIVE_RE.test(text)) {
+        templated.push(`stories[${index}].${field}`);
+      }
+    }
+  });
+  if (templated.length > 0) {
+    degraded.push(degradedIssue({
+      code: "story_template_narrative",
+      requirement: "REQ-003",
+      section: "stories",
+      message: `${templated.length} story field(s) still use deterministic template prose instead of source-grounded authoring: ${templated.slice(0, 8).join(", ")}.`
+    }));
+  }
 }
 
 function checkStoryFirst(report, issues) {
