@@ -7497,6 +7497,79 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
   assert.equal(result.summary.next_action.remaining_review_repair_loops, 0);
 });
 
+test("daily runner degrades instead of blocking when only editorial residue remains after the loop budget", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-editorial-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    maxReviewRepairLoops: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "5555555555555555555555555555555555555555"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [
+                { kind: "public_editorial_rewrite", path: "stories[0].what_happened" },
+                { kind: "builder_translation_rewrite", path: "builder_observations[1].translation" }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_degraded");
+  const reviewStage = result.summary.stages.find((stage) => stage.id === "quality_review");
+  assert.equal(reviewStage.status, "degraded");
+  assert.deepEqual(
+    reviewStage.output.quality_status.degraded_sections.slice().sort(),
+    ["builder_observations", "stories"]
+  );
+});
+
+test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-nonedit-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-04",
+    publish: false,
+    maxReviewRepairLoops: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "6666666666666666666666666666666666666666"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+});
+
 test("daily runner resumes from AI repair contract and continues with optimized report", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-resume-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
