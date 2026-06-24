@@ -522,21 +522,11 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
-    if (
-      stage.id === "quality_page_check" &&
-      !outcome.blocked &&
-      outcome.normalized.ok &&
-      outcome.normalized.output?.degraded === true
-    ) {
-      markStageDegraded(summary, stage.id, {
-        degraded_sections: Array.isArray(outcome.normalized.output.degraded_sections)
-          ? outcome.normalized.output.degraded_sections
-          : [],
-        residual_editorial_tasks: 0
-      });
-      await writeSummary(summaryPath, summary);
-      continue;
-    }
+    // Note: quality_page_check runs after report_write/build, so an editorial
+    // weak-card degrade cannot be disclosed on the already-rendered artifact
+    // without a re-render. check-daily-page already exits 0 (non-blocking) when
+    // only DEGRADABLE_PAGE_CHECK_IDS fail, so the run publishes normally; the
+    // degraded_checks remain in this stage's recorded output for observability.
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });

@@ -40,7 +40,6 @@ const classification = classifyDailyPageCheckResults(results);
 const payload = {
   ok: classification.ok,
   blocking: !classification.ok,
-  degraded: classification.ok && classification.degraded_checks.length > 0,
   blocking_checks: classification.blocking_checks,
   degraded_checks: classification.degraded_checks,
   degraded_sections: classification.degraded_sections,

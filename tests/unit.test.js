@@ -7587,7 +7587,7 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
   assert.equal(result.summary.final_status, "blocked");
 });
 
-test("daily runner degrades instead of blocking on editorial-weak page-check failures", async () => {
+test("daily runner does not block on editorial-weak page-check failures", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pagecheck-degrade-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const result = await runDailyWorkflow({
@@ -7604,15 +7604,20 @@ test("daily runner degrades instead of blocking on editorial-weak page-check fai
         return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
       }
       if (stage.id === "quality_page_check") {
-        return { ok: true, output: { ok: true, degraded: true, degraded_sections: ["community_leads"] } };
+        return { ok: true, output: { ok: true, degraded_checks: ["community_cards_reader_facing"], degraded_sections: ["community_leads"] } };
       }
       return { ok: true, output: { stage: stage.id } };
     }
   });
 
-  assert.equal(result.summary.final_status, "generated_degraded");
+  // check-daily-page exits 0 on degradable-only failures, so the run completes
+  // and publishes instead of blocking; the weak-check info stays in the stage
+  // output, and the run is NOT falsely labeled degraded (the artifact can't show
+  // a post-render page-check degrade).
+  assert.notEqual(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_only");
   const pageStage = result.summary.stages.find((stage) => stage.id === "quality_page_check");
-  assert.equal(pageStage.status, "degraded");
+  assert.deepEqual(pageStage.output.degraded_checks, ["community_cards_reader_facing"]);
 });
 
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
