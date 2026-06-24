@@ -975,7 +975,20 @@ function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
         });
       }
       const readerFacing = builderTranslationReaderFacingStats(value);
-      if (!readerFacing.ok) {
+      // Decision A: a faithful translation of a genuinely short post is
+      // legitimately short (product names stay in English), so the substantial-
+      // Chinese floor would force padding (slop) and false-block publish. For
+      // short originals accept any translation that has some Chinese, isn't
+      // mostly English, and has no long untranslated English run. Lazy
+      // translations of substantial posts still fail the strict check below.
+      const originalSubstance = originalText.replace(/https?:\/\/\S+/gi, "").trim();
+      const originalShort = originalSubstance.length > 0 && originalSubstance.length <= 40;
+      const shortOriginalAcceptable =
+        originalShort &&
+        readerFacing.details.chinese_chars >= 2 &&
+        readerFacing.details.chinese_ratio >= 0.15 &&
+        !readerFacing.details.long_english_run;
+      if (!readerFacing.ok && !shortOriginalAcceptable) {
         issues.push({
           code: "builder_translation_too_weak",
           severity: "error",
