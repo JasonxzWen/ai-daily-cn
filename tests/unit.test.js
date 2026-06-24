@@ -13211,7 +13211,14 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
   assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
-  assert.deepEqual(review.ai_review_tasks, []);
+  // Generation-first: the deterministic draft's summary/main_items/hot_blogs/
+  // builders must need no repair, but templated story narrative is expected to
+  // route to the LLM editorial loop (public_editorial_rewrite on stories[*]).
+  assert.deepEqual(
+    review.ai_review_tasks.filter((task) => !/^stories\[/.test(String(task.path || ""))),
+    [],
+    JSON.stringify(review.ai_review_tasks, null, 2)
+  );
 });
 
 test("report:draft prunes duplicate and templated hot blogs before quality review", async () => {
@@ -13310,7 +13317,14 @@ test("report:draft prunes duplicate and templated hot blogs before quality revie
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
   assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
-  assert.deepEqual(review.ai_review_tasks, []);
+  // Generation-first: the deterministic draft's summary/main_items/hot_blogs/
+  // builders must need no repair, but templated story narrative is expected to
+  // route to the LLM editorial loop (public_editorial_rewrite on stories[*]).
+  assert.deepEqual(
+    review.ai_review_tasks.filter((task) => !/^stories\[/.test(String(task.path || ""))),
+    [],
+    JSON.stringify(review.ai_review_tasks, null, 2)
+  );
 });
 
 test("quality review flags duplicate or templated hot blogs as prepublish gate failures", () => {
