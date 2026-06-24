@@ -2485,5 +2485,61 @@
         }
       ]
     }
-  ]
+  ],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。",
+    "affected_sections": [
+      "huggingface_trending",
+      "daily_tracking",
+      "wechat_items",
+      "zhihu_items",
+      "reddit_items",
+      "builder_observations"
+    ],
+    "degraded_events": [
+      {
+        "code": "huggingface_trending_blocked",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "daily_tracking_source_blocked",
+        "section": "daily_tracking",
+        "severity": "degraded",
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+      },
+      {
+        "code": "wechat_sources_blocked",
+        "section": "wechat_items",
+        "severity": "degraded",
+        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "zhihu_sources_blocked",
+        "section": "zhihu_items",
+        "severity": "degraded",
+        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "reddit_sources_blocked",
+        "section": "reddit_items",
+        "severity": "degraded",
+        "message": "reddit_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "builder_observations_selection_degraded",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "non_primary_source_disclosure_missing",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+      }
+    ]
+  }
 }

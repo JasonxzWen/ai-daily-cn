@@ -5,6 +5,7 @@ import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./a
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { normalizeUrlIdentity } from "./url.js";
 import { PLATFORM_TO_AUDIT_GROUP } from "./platform-exempt.js";
+import { degradationEventFromAuditGroup } from "./degradation-events.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
 const SOURCE_AVAILABLE_STATUSES = new Set(["checked", "no_signal"]);
@@ -145,6 +146,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
   const reasons = [];
   const affectedSections = [];
   const audit = report?.source_audit || {};
+  const sourceDegradedSections = [];
 
   if (isEmptyNetworkOutageReport(report)) {
     reasons.push("empty_due_to_network_outage");
@@ -152,44 +154,54 @@ export function deriveQualityStatus(report, candidatePool = null) {
   }
 
   addSourceDegradation({
+    auditGroup: "github_trending",
     group: audit.github_trending,
     reason: "github_trending_blocked",
     section: "github_trending",
     currentCount: sectionCount(report, "github_trending"),
     reasons,
-    affectedSections
+    affectedSections,
+    degradedSections: sourceDegradedSections
   });
   addSourceDegradation({
+    auditGroup: "huggingface_trending",
     group: audit.huggingface_trending,
     reason: "huggingface_trending_blocked",
     section: "huggingface_trending",
     currentCount: sectionCount(report, "huggingface_trending"),
     reasons,
-    affectedSections
+    affectedSections,
+    degradedSections: sourceDegradedSections
   });
   addSourceDegradation({
+    auditGroup: "china_ai_sources",
     group: audit.china_ai_sources,
     reason: "china_ai_sources_blocked",
     section: "hot_blogs",
     currentCount: sectionCount(report, "hot_blogs"),
     reasons,
-    affectedSections
+    affectedSections,
+    degradedSections: sourceDegradedSections
   });
   addSourceDegradation({
+    auditGroup: "content_sources",
     group: audit.content_sources,
     reason: "content_sources_blocked",
     section: "hot_blogs",
     currentCount: sectionCount(report, "hot_blogs"),
     reasons,
-    affectedSections
+    affectedSections,
+    degradedSections: sourceDegradedSections
   });
   addSourceDegradation({
+    auditGroup: "builder_sources",
     group: audit.builder_sources,
     reason: "builder_sources_blocked",
     section: "builder_observations",
     currentCount: sectionCount(report, "builder_observations"),
     reasons,
-    affectedSections
+    affectedSections,
+    degradedSections: sourceDegradedSections
   });
   addDailyTrackingDegradation({ report, reasons, affectedSections });
   addPlatformSourceDegradation({ report, reasons, affectedSections });
@@ -207,6 +219,7 @@ export function deriveQualityStatus(report, candidatePool = null) {
   const strictDegradedReasons = strictDegradedSections.map((issue) => issue.code || issue.error_code).filter(Boolean);
   const degradedSections = uniqueQualityIssues([
     ...(explicit?.degraded_sections || []),
+    ...sourceDegradedSections,
     ...degradedSectionsFromReasons(reasons, affectedSections),
     ...strictDegradedSections
   ]);
@@ -981,7 +994,7 @@ function strictModelReleaseIssues(report) {
   ];
 }
 
-function addSourceDegradation({ group, reason, section, currentCount, reasons, affectedSections }) {
+function addSourceDegradation({ auditGroup, group, reason, section, currentCount, reasons, affectedSections, degradedSections }) {
   if (!groupHasBlockingSignal(group)) {
     return;
   }
@@ -990,6 +1003,10 @@ function addSourceDegradation({ group, reason, section, currentCount, reasons, a
   }
   reasons.push(reason);
   affectedSections.push(section);
+  const event = degradationEventFromAuditGroup({ auditGroup, group, code: reason, section });
+  if (event && Array.isArray(degradedSections)) {
+    degradedSections.push(event);
+  }
 }
 
 function addDailyTrackingDegradation({ report, reasons, affectedSections }) {
@@ -1340,8 +1357,31 @@ function normalizeQualityIssue(issue) {
     message: String(issue.message || "").trim() || `${section} is degraded.`,
     remediation: String(issue.remediation || "").trim()
   };
+  if (issue.severity !== undefined) {
+    normalized.severity = String(issue.severity || "").trim() || "degraded";
+  }
+  if (issue.source && typeof issue.source === "object") {
+    const source = {};
+    const sourceName = String(issue.source.name || "").trim();
+    const sourceUrl = String(issue.source.url || "").trim();
+    if (sourceName) {
+      source.name = sourceName;
+    }
+    if (/^https?:\/\//i.test(sourceUrl)) {
+      source.url = sourceUrl;
+    }
+    if (Object.keys(source).length > 0) {
+      normalized.source = source;
+    }
+  }
 
   for (const key of [
+    "source_name",
+    "source_url",
+    "source_status",
+    "fallback_kind",
+    "retry_attempts_exhausted",
+    "stage_id",
     "count",
     "minimum",
     "candidates_found",

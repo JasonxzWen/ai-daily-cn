@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-24.project_iteration.refactor-insight-contracts",
+  "run_type": "project_iteration",
+  "date": "2026-06-24",
+  "title": "Refactor insight contracts",
+  "status": "completed",
+  "summary": "Implemented the accepted refactor sequence from the daily refactor insight review: explicit automation role classification, canonical degraded public events across degraded source artifacts and quality status, and a reader-safe public quality projection for generated docs data.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"automation inventory uses explicit readonly insight role|degraded discovery artifacts carry canonical public degradation events|public report projection preserves sanitized public quality events\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run feedback:validate",
+      "npm run test",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Automation inventory should classify jobs by role before scanning prompt text.",
+      "evidence": "A regression fixture now proves a read-only insight automation that mentions `status:self-check` is not counted as an active self-check job, while the actual self-check fixture remains counted.",
+      "scope": "automation_inventory",
+      "persistence": "implemented",
+      "recommended_action": "Keep role metadata and narrow allowlisted identities ahead of prompt heuristics when adding or renaming scheduled automations."
+    },
+    {
+      "lesson": "Degraded source recovery needs one public event shape, not per-stage ad hoc fields.",
+      "evidence": "Runner and draft degraded discovery payloads now emit `degradation_events`, and report quality keeps the same code, section, severity, source, message, and remediation data.",
+      "scope": "generation_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Use the canonical degradation event helper for future source-lane fallbacks and keep unsafe failures on the blocking path."
+    },
+    {
+      "lesson": "Public quality data can be useful without exposing internal diagnostics.",
+      "evidence": "Public docs data now exposes `quality_status.degraded_events` while tests and privacy validation keep `source_audit`, `self_check`, candidate fields, raw `degraded_sections`, `blocking_issues`, and `remediation` out of public data and HTML.",
+      "scope": "public_projection",
+      "persistence": "implemented",
+      "recommended_action": "Add public projection tests whenever exposing a new reader-facing field derived from internal report state."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Read-only insight automations could be misclassified as status self-check jobs because prompt text mentioned `status:self-check`.",
+      "evidence": "The automation inventory regression checks daily publish, read-only insight, and status self-check fixtures in one inventory.",
+      "module": "src/automation-inventory.js, tests/unit.test.js",
+      "suggestion": "Classify scheduled automations by explicit role metadata or narrow allowlisted identity before prompt heuristics.",
+      "expected_benefit": "Status self-check will not produce false multiple-self-check conflicts when read-only monitoring automations mention related commands.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented with a P1 feedback ledger entry and unit regression.",
+      "ledger_links": [
+        "feedback/p1-automation-role-explicit-contract"
+      ],
+      "validation_evidence": [
+        "automation inventory uses explicit readonly insight role",
+        "npm run feedback:validate"
+      ]
+    },
+    {
+      "status": "implemented",
+      "issue": "Source degraded fallback artifacts and public report quality used related but non-canonical event shapes.",
+      "evidence": "The real-chain degraded discovery test feeds a runner-written Builder fallback through draft and report write, then verifies the canonical quality issue shape.",
+      "module": "src/degradation-events.js, src/daily-runner.js, src/draft.js, src/quality-status.js, tests/unit.test.js",
+      "suggestion": "Keep degraded source events on one helper and project only sanitized fields to public data.",
+      "expected_benefit": "Future fallback work can preserve public disclosure without copying internal diagnostics or inventing per-stage fields.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented with a shared helper, runner/draft usage, quality-status preservation, generated public data, and tests.",
+      "ledger_links": [
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-source-outage-disclosure",
+        "feedback/p1-public-data-minimization"
+      ],
+      "validation_evidence": [
+        "degraded discovery artifacts carry canonical public degradation events",
+        "public report projection preserves sanitized public quality events",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-automation-role-explicit-contract",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "When external automation configs are next edited with explicit user authorization, add matching role metadata there instead of relying only on allowlisted identity.",
+      "owner": "project"
+    }
+  ],
+  "slug": "refactor-insight-contracts"
+}

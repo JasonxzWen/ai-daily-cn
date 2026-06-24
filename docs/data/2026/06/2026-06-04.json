@@ -754,5 +754,60 @@
   "official_org_updates": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Some discovery coverage is degraded; this report may be incomplete.",
+    "affected_sections": [
+      "hot_blogs"
+    ],
+    "degraded_events": [
+      {
+        "code": "github_trending_top10_missing",
+        "section": "github_trending",
+        "severity": "degraded",
+        "message": "GitHub Trending Top 10 or its daily/weekly/language source audit is missing."
+      },
+      {
+        "code": "content_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "Adobe Blog AI",
+          "url": "https://blog.adobe.com/en/topics/ai"
+        }
+      },
+      {
+        "code": "huggingface_trending_below_strict_minimum",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending below strict publish minimum: 0/10."
+      },
+      {
+        "code": "hot_blogs_below_strict_minimum",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs below strict publish minimum: 3/6."
+      },
+      {
+        "code": "projects_below_strict_minimum",
+        "section": "projects",
+        "severity": "degraded",
+        "message": "projects below strict publish minimum: 3/8."
+      },
+      {
+        "code": "builder_observations_below_strict_minimum",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations below strict publish minimum: 6/8."
+      },
+      {
+        "code": "public_evidence_asset_invalid",
+        "section": "evidence_assets",
+        "severity": "degraded",
+        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots."
+      }
+    ]
+  }
 }

@@ -222,5 +222,24 @@
   "evidence_assets": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Some discovery coverage is degraded; this report may be incomplete.",
+    "affected_sections": [
+      "github_trending"
+    ],
+    "degraded_events": [
+      {
+        "code": "github_trending_blocked",
+        "section": "github_trending",
+        "severity": "degraded",
+        "message": "github_trending coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "GitHub Trending discovery command",
+          "url": "https://github.com/trending?since=daily"
+        }
+      }
+    ]
+  }
 }

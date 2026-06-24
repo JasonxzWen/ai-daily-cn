@@ -26,6 +26,7 @@ import { buildTrackingComponentSnapshot } from "./tracking-components.js";
 import { normalizeOfficialComponentSnapshot } from "./official-component-snapshot.js";
 import { normalizeStoryFirstReport } from "./story-first.js";
 import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
+import { createPublicDegradationEvent } from "./degradation-events.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -6610,6 +6611,13 @@ function degradedDiscoveryInputPayload(inputPath, { reportDate, generatedAt, err
   if (spec.platform) {
     auditSource.platform = spec.platform;
   }
+  const degradationEvent = createPublicDegradationEvent({
+    audit_group: spec.auditGroup,
+    source: {
+      name: spec.sourceName,
+      url: spec.sourceUrl
+    }
+  });
   return {
     ok: true,
     degraded: true,
@@ -6639,6 +6647,7 @@ function degradedDiscoveryInputPayload(inputPath, { reportDate, generatedAt, err
         ...(spec.platform ? { platform: spec.platform } : {})
       }
     ],
+    degradation_events: degradationEvent ? [degradationEvent] : [],
     candidates: []
   };
 }

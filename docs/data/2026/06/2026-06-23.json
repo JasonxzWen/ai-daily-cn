@@ -3454,5 +3454,70 @@
   "generated_at": "2026-06-23T08:25:16.734Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-23.html",
-  "html_path": "reports/2026/06/2026-06-23.html"
+  "html_path": "reports/2026/06/2026-06-23.html",
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
+    "affected_sections": [
+      "huggingface_trending",
+      "hot_blogs",
+      "wechat_items",
+      "zhihu_items",
+      "builder_observations"
+    ],
+    "degraded_events": [
+      {
+        "code": "huggingface_trending_blocked",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "china_ai_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "wechat_sources_blocked",
+        "section": "wechat_items",
+        "severity": "degraded",
+        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "zhihu_sources_blocked",
+        "section": "zhihu_items",
+        "severity": "degraded",
+        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "builder_observations_selection_degraded",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "builder_observations_below_strict_minimum",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations below strict publish minimum: 7/8."
+      },
+      {
+        "code": "content_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "DeepSeek News",
+          "url": "https://api-docs.deepseek.com/news"
+        }
+      },
+      {
+        "code": "non_primary_source_disclosure_missing",
+        "section": "main_items",
+        "severity": "degraded",
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+      }
+    ]
+  }
 }

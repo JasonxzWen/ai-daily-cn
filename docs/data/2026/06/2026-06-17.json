@@ -3328,5 +3328,40 @@
         }
       ]
     }
-  ]
+  ],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Some discovery coverage is degraded; this report may be incomplete.",
+    "affected_sections": [
+      "huggingface_trending",
+      "wechat_items",
+      "zhihu_items"
+    ],
+    "degraded_events": [
+      {
+        "code": "huggingface_trending_blocked",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "wechat_sources_blocked",
+        "section": "wechat_items",
+        "severity": "degraded",
+        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "zhihu_sources_blocked",
+        "section": "zhihu_items",
+        "severity": "degraded",
+        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "non_primary_source_disclosure_missing",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+      }
+    ]
+  }
 }

@@ -1183,6 +1183,25 @@
         "test_name": "public daily followups hide empty Artificial Analysis fallback tabs",
         "gate": "npm run validate"
       }
+    },
+    {
+      "id": "feedback/p1-automation-role-explicit-contract",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Classify scheduled automations by explicit role",
+      "problem": "Read-only insight automations can be misclassified as `status:self-check` jobs when their prompt mentions that command as context or a non-goal.",
+      "expected_behavior": "Automation inventory uses explicit role metadata or a narrow allowlisted identity before prompt heuristics, so daily publish, status self-check, and read-only insight jobs are counted separately.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/automation-inventory.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "automation inventory uses explicit readonly insight role",
+        "gate": "npm run validate"
+      }
     }
   ]
 }

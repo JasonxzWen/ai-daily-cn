@@ -595,5 +595,35 @@
   "official_org_updates": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
+    "affected_sections": [
+      "hot_blogs",
+      "builder_observations"
+    ],
+    "degraded_events": [
+      {
+        "code": "content_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "Anthropic News",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8"
+        }
+      },
+      {
+        "code": "builder_sources_blocked",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "follow-builders X feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
+        }
+      }
+    ]
+  }
 }

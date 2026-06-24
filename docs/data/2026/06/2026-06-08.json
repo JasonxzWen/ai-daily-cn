@@ -930,5 +930,69 @@
   "official_org_updates": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
+    "affected_sections": [
+      "hot_blogs",
+      "daily_tracking"
+    ],
+    "degraded_events": [
+      {
+        "code": "content_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "daily_tracking_source_blocked",
+        "section": "daily_tracking",
+        "severity": "degraded",
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+      },
+      {
+        "code": "main_items_below_strict_minimum",
+        "section": "main_items",
+        "severity": "degraded",
+        "message": "main_items below strict publish minimum: 6/8."
+      },
+      {
+        "code": "hot_blogs_below_strict_minimum",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs below strict publish minimum: 0/3."
+      },
+      {
+        "code": "huggingface_trending_below_strict_minimum",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending below strict publish minimum: 0/10."
+      },
+      {
+        "code": "projects_below_strict_minimum",
+        "section": "projects",
+        "severity": "degraded",
+        "message": "projects below strict publish minimum: 3/8."
+      },
+      {
+        "code": "builder_observations_below_strict_minimum",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations below strict publish minimum: 5/8."
+      },
+      {
+        "code": "non_primary_source_disclosure_missing",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+      },
+      {
+        "code": "public_evidence_asset_invalid",
+        "section": "evidence_assets",
+        "severity": "degraded",
+        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots."
+      }
+    ]
+  }
 }

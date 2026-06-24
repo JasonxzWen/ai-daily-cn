@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { PublisherError } from "./errors.js";
 import { prepareCleanPublishWorktree } from "./publish.js";
 import { mergeCommandEnv, npmInvocationForArgs } from "./process-runner.js";
+import { createPublicDegradationEvent } from "./degradation-events.js";
 import {
   writeDailyPublishCorrectionRetrospective,
   writeDailyPublishRetrospective
@@ -1388,6 +1389,13 @@ async function writeDegradedDiscoveryArtifact({
   if (fallbackSpec.platform) {
     auditSource.platform = fallbackSpec.platform;
   }
+  const degradationEvent = createPublicDegradationEvent({
+    audit_group: fallbackSpec.auditGroup,
+    source: {
+      name: fallbackSpec.sourceName,
+      url: sourceUrl
+    }
+  });
   const payload = {
     ok: true,
     degraded: true,
@@ -1417,6 +1425,7 @@ async function writeDegradedDiscoveryArtifact({
         ...(fallbackSpec.platform ? { platform: fallbackSpec.platform } : {})
       }
     ],
+    degradation_events: degradationEvent ? [degradationEvent] : [],
     candidates: []
   };
   const resolvedOutputPath = absoluteCleanPath(context.cleanRoot, outputPath);
@@ -1433,7 +1442,8 @@ async function writeDegradedDiscoveryArtifact({
       candidate_count: 0,
       error_code: errorCode,
       degraded_reason: reason,
-      retry_attempts_exhausted: retryAttempts.length
+      retry_attempts_exhausted: retryAttempts.length,
+      degradation_events: degradationEvent ? [degradationEvent] : []
     }
   };
 }
@@ -1450,6 +1460,14 @@ async function writeSummaryOnlyDegradedArtifact({
   const generatedAt = typeof context.now === "function" ? context.now() : new Date().toISOString();
   const errorCode = degradedFallbackErrorCode({ normalized, error });
   const reason = degradedFallbackReason({ normalized, error });
+  const degradationEvent = createPublicDegradationEvent({
+    code: errorCode,
+    error_code: errorCode,
+    section: stage.id,
+    severity: "degraded",
+    message: reason,
+    remediation: "Review the degraded audit stage output before relying on this lane for public coverage."
+  });
   const payload = {
     ok: true,
     degraded: true,
@@ -1461,6 +1479,7 @@ async function writeSummaryOnlyDegradedArtifact({
     error_code: errorCode,
     degraded_reason: reason,
     retry_attempts_exhausted: retryAttempts.length,
+    degradation_events: degradationEvent ? [degradationEvent] : [],
     audit_status: {
       status: "degraded",
       stage_id: stage.id,
@@ -1481,7 +1500,8 @@ async function writeSummaryOnlyDegradedArtifact({
       audit_path: stagePath(outputPath, context.cleanRoot),
       error_code: errorCode,
       degraded_reason: reason,
-      retry_attempts_exhausted: retryAttempts.length
+      retry_attempts_exhausted: retryAttempts.length,
+      degradation_events: degradationEvent ? [degradationEvent] : []
     }
   };
 }
