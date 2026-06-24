@@ -57,19 +57,28 @@ function parseAutomationToml(text, filePath) {
   const rrule = tomlString(text, "rrule") || "";
   const cwds = tomlStringArray(text, "cwds");
   const active = status.toUpperCase() === "ACTIVE";
-  const statusSelfCheck = /status:self-check|status self-check|状态自检/i.test(text);
+  const role = automationRole({ id, name, text });
+  const statusSelfCheck = role === "status_self_check"
+    ? true
+    : role
+      ? false
+      : /status:self-check|status self-check/i.test(text);
   const legacyFlow = /publish:prepare-worktree|npm run publish:dry-run(?!:daily)|node src\/cli\.js publish:dry-run(?!:daily)/i.test(text);
-  const dailyPublish =
-    !statusSelfCheck &&
-    (/daily:run[\s\S]*--publish/i.test(text) ||
-      /confirm-push|publish:github-api|publish:prepare-worktree/i.test(text) ||
-      (/AI 日报|AI 鏃ユ姤/.test(text) && /GitHub Pages|publish|发布|鍙戝竷/.test(text)));
+  const dailyPublish = role === "daily_publish"
+    ? true
+    : role
+      ? false
+      : !statusSelfCheck &&
+        (/daily:run[\s\S]*--publish/i.test(text) ||
+          /confirm-push|publish:github-api|publish:prepare-worktree/i.test(text) ||
+          (/AI[\s\S]*Daily|AI[\s\S]*daily|AI[\s\S]*日报/i.test(text) && /GitHub Pages|publish|发布/i.test(text)));
   return {
     id,
     name,
     kind,
     status,
     active,
+    role: role || (dailyPublish ? "daily_publish" : statusSelfCheck ? "status_self_check" : ""),
     rrule,
     cwds,
     path: filePath,
@@ -77,6 +86,37 @@ function parseAutomationToml(text, filePath) {
     status_self_check: statusSelfCheck,
     legacy_flow: legacyFlow
   };
+}
+
+function automationRole({ id, name, text }) {
+  const declared = normalizeAutomationRole(
+    tomlString(text, "role") ||
+    tomlString(text, "automation_role") ||
+    tomlString(text, "codex_role")
+  );
+  if (declared) {
+    return declared;
+  }
+  const normalizedId = String(id || "").trim().toLowerCase();
+  const haystack = `${name || ""}\n${text || ""}`;
+  if (normalizedId === "ai-daily-2" || /每日重构洞察|重构洞察|refactor insight|readonly insight/i.test(haystack)) {
+    return "readonly_insight";
+  }
+  return "";
+}
+
+function normalizeAutomationRole(value) {
+  const role = String(value || "").trim().toLowerCase().replace(/[-\s]+/g, "_");
+  if (["daily_publish", "publish", "publisher"].includes(role)) {
+    return "daily_publish";
+  }
+  if (["status_self_check", "self_check", "status_check"].includes(role)) {
+    return "status_self_check";
+  }
+  if (["readonly_insight", "read_only_insight", "refactor_insight", "insight"].includes(role)) {
+    return "readonly_insight";
+  }
+  return "";
 }
 
 function tomlString(text, key) {

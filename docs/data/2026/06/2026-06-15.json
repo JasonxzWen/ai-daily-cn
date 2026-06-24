@@ -1819,5 +1819,91 @@
         }
       ]
     }
-  ]
+  ],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Content source coverage is degraded; some sections may be incomplete.",
+    "affected_sections": [
+      "huggingface_trending",
+      "hot_blogs",
+      "daily_tracking",
+      "wechat_items",
+      "zhihu_items",
+      "reddit_items",
+      "builder_observations",
+      "content_units"
+    ],
+    "degraded_events": [
+      {
+        "code": "huggingface_trending_blocked",
+        "section": "huggingface_trending",
+        "severity": "degraded",
+        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "china_ai_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "daily_tracking_source_blocked",
+        "section": "daily_tracking",
+        "severity": "degraded",
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+      },
+      {
+        "code": "wechat_sources_blocked",
+        "section": "wechat_items",
+        "severity": "degraded",
+        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "zhihu_sources_blocked",
+        "section": "zhihu_items",
+        "severity": "degraded",
+        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "reddit_sources_blocked",
+        "section": "reddit_items",
+        "severity": "degraded",
+        "message": "reddit_items coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "builder_observations_selection_degraded",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "content_units_selection_degraded",
+        "section": "content_units",
+        "severity": "degraded",
+        "message": "content_units coverage is degraded and should be disclosed in the public report."
+      },
+      {
+        "code": "china_ai_no_recent_signal",
+        "section": "source_audit.china_ai_sources",
+        "severity": "degraded",
+        "message": "China AI source lane ran successfully but produced no recent candidates."
+      },
+      {
+        "code": "content_sources_blocked",
+        "section": "hot_blogs",
+        "severity": "degraded",
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "DeepSeek News",
+          "url": "https://api-docs.deepseek.com/news"
+        }
+      },
+      {
+        "code": "non_primary_source_disclosure_missing",
+        "section": "main_items",
+        "severity": "degraded",
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+      }
+    ]
+  }
 }

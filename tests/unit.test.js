@@ -56,6 +56,7 @@ import {
 import { selectChineseMediaDynamics } from "../src/chinese-media.js";
 import { officialOrgUpdateItem, selectOfficialOrgUpdates } from "../src/official-updates.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
+import { inspectAutomationInventory } from "../src/automation-inventory.js";
 import {
   normalizeOptimizationSuggestions,
   validateFeedbackContract
@@ -5467,6 +5468,63 @@ test("status:self-check blocks when multiple daily publish automations are activ
   assert.equal(result.automation.active_publish_automations.length, 2);
 });
 
+test("automation inventory uses explicit readonly insight role", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-automation-role-"));
+  const automationsDir = path.join(tmp, "automations");
+  const projectCwd = "D:\\ai-daily-cn";
+
+  for (const id of ["ai-2", "ai-daily-2", "ai-daily-status-self-check"]) {
+    await fs.mkdir(path.join(automationsDir, id), { recursive: true });
+  }
+  await fs.writeFile(
+    path.join(automationsDir, "ai-2", "automation.toml"),
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'name = "AI Daily publish"',
+      'prompt = "node src/cli.js daily:run --publish"',
+      'status = "ACTIVE"',
+      'role = "daily_publish"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily-2", "automation.toml"),
+    [
+      'id = "ai-daily-2"',
+      'kind = "cron"',
+      'name = "AI Daily readonly refactor insight"',
+      'prompt = "Run readonly insight and mention status:self-check as a non-goal"',
+      'status = "ACTIVE"',
+      'role = "readonly_insight"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
+    [
+      'id = "ai-daily-status-self-check"',
+      'kind = "cron"',
+      'name = "AI Daily status self-check"',
+      'prompt = "node src/cli.js status:self-check"',
+      'status = "ACTIVE"',
+      'role = "status_self_check"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await inspectAutomationInventory({ automationsDir, projectCwds: [projectCwd] });
+
+  assert.deepEqual(result.active_publish_automations.map((automation) => automation.id), ["ai-2"]);
+  assert.deepEqual(result.active_self_check_automations.map((automation) => automation.id), ["ai-daily-status-self-check"]);
+  assert.equal(result.automations.find((automation) => automation.id === "ai-daily-2")?.role, "readonly_insight");
+  assert.equal(result.automations.find((automation) => automation.id === "ai-daily-2")?.status_self_check, false);
+  assert.equal(result.automations.find((automation) => automation.id === "ai-daily-2")?.daily_publish, false);
+});
+
 test("status:self-check reports degraded published state without blocking", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-ok-"));
   await writeSelfCheckReportFixture(tmp, "2026-06-04", {
@@ -6858,7 +6916,7 @@ test("daily runner blocks sources phase5 audit publish plan violations", async (
   assert.equal(await exists(path.join(cleanRoot, ".tmp", "sources-phase5-audit-2026-06-04.json")), false);
 });
 
-test("daily runner degraded discovery artifact remains consumable by report draft and write", async () => {
+test("degraded discovery artifacts carry canonical public degradation events", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-fallback-real-chain-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const reportDate = "2026-06-04";
@@ -6887,6 +6945,19 @@ test("daily runner degraded discovery artifact remains consumable by report draf
   const fallbackPayload = JSON.parse(await fs.readFile(fallbackPath, "utf8"));
   assert.equal(fallbackPayload.degraded, true);
   assert.equal(fallbackPayload.source_audit.builder_sources.sources[0].status, "blocked");
+  assert.equal(fallbackPayload.degradation_events.length, 1);
+  assert.deepEqual(fallbackPayload.degradation_events[0], {
+    code: "builder_sources_blocked",
+    error_code: "quality_degraded",
+    section: "builder_observations",
+    severity: "degraded",
+    source: {
+      name: "Builder discovery",
+      url: "https://x.com/"
+    },
+    message: "builder_observations coverage is degraded and should be disclosed in the public report.",
+    remediation: "Keep the report publishable when facts are verified, but disclose the affected section and fix the source path in a follow-up."
+  });
 
   const discovery = autodraftDiscoveryFixture(reportDate);
   discovery.source_audit.builder_sources = {
@@ -6938,7 +7009,11 @@ test("daily runner degraded discovery artifact remains consumable by report draf
   assert(
     written.report.quality_status.degraded_sections.some((issue) =>
       issue.section === "builder_observations" &&
-      issue.code === "builder_sources_blocked"
+      issue.code === "builder_sources_blocked" &&
+      issue.severity === "degraded" &&
+      issue.source?.name === "Builder discovery" &&
+      issue.source?.url === "https://x.com/" &&
+      /disclosed in the public report/i.test(issue.message || "")
     )
   );
   assert.deepEqual(written.report.quality_status.blocking_issues, []);
@@ -9135,6 +9210,72 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
 
+test("public report projection preserves sanitized public quality events", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-quality-events-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+
+  report.quality_status = {
+    status: "degraded",
+    reasons: ["builder_sources_blocked"],
+    affected_sections: ["builder_observations"],
+    public_note: "Builder discovery was unavailable; the public report omits that lane.",
+    degraded_sections: [
+      {
+        code: "builder_sources_blocked",
+        error_code: "quality_degraded",
+        section: "builder_observations",
+        severity: "degraded",
+        source: {
+          name: "Builder discovery",
+          url: "https://x.com/"
+        },
+        message: "builder_observations coverage is degraded and should be disclosed in the public report.",
+        remediation: "Internal repair note must not be copied to public data.",
+        internal_debug: "private runner detail"
+      }
+    ],
+    blocking_issues: []
+  };
+
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  assert.equal(publicData.quality_status.status, "degraded");
+  assert.equal(publicData.quality_status.public_note, "Builder discovery was unavailable; the public report omits that lane.");
+  assert.deepEqual(publicData.quality_status.affected_sections, ["builder_observations"]);
+  assert.deepEqual(publicData.quality_status.degraded_events, [
+    {
+      code: "builder_sources_blocked",
+      section: "builder_observations",
+      severity: "degraded",
+      message: "builder_observations coverage is degraded and should be disclosed in the public report.",
+      source: {
+        name: "Builder discovery",
+        url: "https://x.com/"
+      }
+    }
+  ]);
+  const qualityKeys = collectJsonKeys(publicData.quality_status);
+  for (const key of ["degraded_sections", "blocking_issues", "remediation", "internal_debug"]) {
+    assert(!qualityKeys.has(key), `${key} must not appear in public quality events`);
+  }
+});
+
 test("production daily does not enable PromptLayer-inspired theme or ticket grids", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-promptlayer-theme-"));
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
@@ -9228,10 +9369,11 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.match(html, /id="section-story-list"/);
   assert.doesNotMatch(html, /main-ticket-card|main-ticket-card-grid|section-main-signal-cards/);
   assert.match(html, /image-lightbox/);
-  for (const key of ["source_audit", "self_check", "candidate_id", "quality_status", "degraded_sections", "remediation"]) {
+  for (const key of ["source_audit", "self_check", "candidate_id", "degraded_sections", "remediation"]) {
     assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
     assert(!html.includes(key), `${key} must not appear in public HTML`);
   }
+  assert(!html.includes("quality_status"), "quality_status must not appear as a raw public HTML field");
   for (const forbidden of forbiddenPublicDailyText()) {
     assert(!html.includes(forbidden), `public HTML must not include ${forbidden}`);
   }

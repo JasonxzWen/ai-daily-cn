@@ -731,5 +731,24 @@
   "official_org_updates": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
+    "affected_sections": [
+      "builder_observations"
+    ],
+    "degraded_events": [
+      {
+        "code": "builder_sources_blocked",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "follow-builders podcast feed",
+          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json"
+        }
+      }
+    ]
+  }
 }

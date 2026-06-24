@@ -170,5 +170,35 @@
   "evidence_assets": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": []
+  "reddit_items": [],
+  "quality_status": {
+    "status": "degraded",
+    "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
+    "affected_sections": [
+      "github_trending",
+      "builder_observations"
+    ],
+    "degraded_events": [
+      {
+        "code": "github_trending_blocked",
+        "section": "github_trending",
+        "severity": "degraded",
+        "message": "github_trending coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "GitHub Trending daily",
+          "url": "https://github.com/trending?since=daily"
+        }
+      },
+      {
+        "code": "builder_sources_blocked",
+        "section": "builder_observations",
+        "severity": "degraded",
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "source": {
+          "name": "follow-builders prepare-digest",
+          "url": "https://github.com/zarazhangrui/follow-builders"
+        }
+      }
+    ]
+  }
 }

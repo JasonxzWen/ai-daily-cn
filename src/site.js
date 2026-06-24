@@ -17,6 +17,7 @@ import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
 import { normalizeStoryFirstReport } from "./story-first.js";
 import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
+import { sanitizePublicDegradationEvent } from "./degradation-events.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -761,6 +762,10 @@ function publicReportData(report) {
   const result = sanitizePublicValue(report);
   result.stories = publicStories(report?.stories);
   result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
+  const qualityStatus = publicQualityStatus(report?.quality_status);
+  if (qualityStatus) {
+    result.quality_status = qualityStatus;
+  }
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
     .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
@@ -930,10 +935,23 @@ function publicQualityStatus(status = {}) {
     return undefined;
   }
   const result = {};
-  for (const key of ["status", "public_note", "affected_sections"]) {
-    if (status[key] !== undefined) {
-      result[key] = sanitizePublicValue(status[key], key);
-    }
+  const statusValue = String(status.status || "").trim();
+  if (statusValue) {
+    result.status = statusValue;
+  }
+  const publicNote = String(status.public_note || "").trim();
+  if (publicNote) {
+    result.public_note = publicNote;
+  }
+  const affectedSections = arrayValue(status.affected_sections).map((item) => String(item || "").trim()).filter(Boolean);
+  if (affectedSections.length > 0) {
+    result.affected_sections = affectedSections;
+  }
+  const degradedEvents = arrayValue(status.degraded_sections)
+    .map(sanitizePublicDegradationEvent)
+    .filter(Boolean);
+  if (degradedEvents.length > 0) {
+    result.degraded_events = degradedEvents;
   }
   return Object.keys(result).length > 0 ? result : undefined;
 }
