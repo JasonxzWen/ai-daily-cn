@@ -239,7 +239,10 @@ export async function runDailyWorkflow(options = {}) {
         maxReviewRepairLoops,
         reportPath: DEFAULT_REPORT_PATH
       });
-      if (repairDecision) {
+      if (repairDecision?.degrade) {
+        markStageDegraded(summary, stage.id, repairDecision);
+        await writeSummary(summaryPath, summary);
+      } else if (repairDecision) {
         summary.final_status = repairDecision.final_status;
         summary.next_action = repairDecision.next_action;
         await writeSummary(summaryPath, summary);
@@ -395,9 +398,15 @@ async function resumeDailyWorkflowFromAiRepair({
           maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
           reportPath: OPTIMIZED_REPORT_PATH
         });
-        if (repairReviewDecision) {
+        if (repairReviewDecision?.degrade) {
+          summary.current_report_path = OPTIMIZED_REPORT_PATH;
+          markStageDegraded(summary, stage.id, repairReviewDecision);
+          await writeSummary(summaryPath, summary);
+        } else if (repairReviewDecision) {
           summary.final_status = repairReviewDecision.final_status;
           summary.next_action = repairReviewDecision.next_action;
+          await writeSummary(summaryPath, summary);
+          return { summary, summaryPath };
         } else {
           summary.final_status = "blocked";
           summary.next_action = {
@@ -405,11 +414,12 @@ async function resumeDailyWorkflowFromAiRepair({
             stage_id: stage.id,
             summary_path: summaryPath
           };
+          await writeSummary(summaryPath, summary);
+          return { summary, summaryPath };
         }
-        await writeSummary(summaryPath, summary);
-        return { summary, summaryPath };
+      } else {
+        summary.current_report_path = OPTIMIZED_REPORT_PATH;
       }
-      summary.current_report_path = OPTIMIZED_REPORT_PATH;
     } else if (stage.id === "quality_review") {
       const repairDecision = classifyQualityReviewResult(outcome.normalized, {
         summary,
@@ -417,13 +427,15 @@ async function resumeDailyWorkflowFromAiRepair({
         maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
         reportPath: OPTIMIZED_REPORT_PATH
       });
-      if (repairDecision) {
+      if (repairDecision?.degrade) {
+        markStageDegraded(summary, stage.id, repairDecision);
+        await writeSummary(summaryPath, summary);
+      } else if (repairDecision) {
         summary.final_status = repairDecision.final_status;
         summary.next_action = repairDecision.next_action;
         await writeSummary(summaryPath, summary);
         return { summary, summaryPath };
-      }
-      if (!outcome.normalized.ok) {
+      } else if (!outcome.normalized.ok) {
         summary.final_status = "blocked";
         summary.next_action = {
           kind: "inspect_stage_failure",
@@ -1643,6 +1655,16 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
     };
   }
 
+  const exhaustedDegradation = residualEditorialDegradation(review);
+  if (exhaustedDegradation) {
+    return {
+      degrade: true,
+      degraded_sections: exhaustedDegradation.degraded_sections,
+      residual_editorial_tasks: exhaustedDegradation.residual_editorial_tasks,
+      max_review_repair_loops: maxReviewRepairLoops
+    };
+  }
+
   return {
     final_status: "blocked",
     next_action: {
@@ -1701,6 +1723,15 @@ async function classifyAiRepairReviewFailure(stageResult, {
     maxReviewRepairLoops
   });
   if (!nextAttempt) {
+    const degradation = residualEditorialDegradation(review);
+    if (degradation) {
+      return {
+        degrade: true,
+        degraded_sections: degradation.degraded_sections,
+        residual_editorial_tasks: degradation.residual_editorial_tasks,
+        max_review_repair_loops: maxReviewRepairLoops
+      };
+    }
     return {
       final_status: "blocked",
       next_action: {
@@ -1743,6 +1774,42 @@ async function classifyAiRepairReviewFailure(stageResult, {
 
 function isPublicEditorialRepairTask(task) {
   return task && PUBLIC_EDITORIAL_REPAIR_TASK_KINDS.has(String(task.kind || ""));
+}
+
+// Phase 3 degrade-not-block: when the review/repair loop is exhausted and EVERY
+// remaining issue is a low-risk public-editorial rewrite (not a fact/link/source
+// or structural failure), publishing degraded with disclosure beats blocking the
+// whole daily. Returns the degraded sections, or null when any residual issue is
+// not safely degradable (then the caller keeps the hard block).
+function residualEditorialDegradation(review) {
+  const tasks = Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : [];
+  if (tasks.length === 0 || !tasks.every(isPublicEditorialRepairTask)) {
+    return null;
+  }
+  const sections = [...new Set(tasks.map((task) => editorialSectionFromPath(task?.path)).filter(Boolean))];
+  return { degraded_sections: sections, residual_editorial_tasks: tasks.length };
+}
+
+function editorialSectionFromPath(pathName) {
+  const text = String(pathName || "");
+  const match = /^([A-Za-z_]+)/.exec(text);
+  return match ? match[1] : null;
+}
+
+function markStageDegraded(summary, stageId, decision) {
+  const stages = Array.isArray(summary?.stages) ? summary.stages : [];
+  for (let index = stages.length - 1; index >= 0; index -= 1) {
+    if (stages[index]?.id === stageId) {
+      stages[index].status = "degraded";
+      const output = stages[index].output && typeof stages[index].output === "object" ? stages[index].output : {};
+      output.degraded = true;
+      output.quality_status = { status: "degraded", degraded_sections: decision?.degraded_sections || [] };
+      output.residual_editorial_tasks = decision?.residual_editorial_tasks || 0;
+      stages[index].output = output;
+      return true;
+    }
+  }
+  return false;
 }
 
 async function nextAiRepairAttempt({ launcherRoot, reportDate, startAttempt, maxReviewRepairLoops }) {
