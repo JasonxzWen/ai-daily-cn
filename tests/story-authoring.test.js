@@ -62,3 +62,57 @@ test("applier still refuses to touch story facts/links", () => {
   assert.equal(result.applied.length, 0);
   assert.equal(result.rejected[0].code, "path_not_allowed");
 });
+
+test("full loop: every templated story is flagged, authored, and cleared", () => {
+  const report = {
+    report_date: "2026-06-24",
+    summary: "今日 AI 主线。",
+    stories: [
+      {
+        story_id: "s1",
+        title: "Alibaba Cloud发布 AIGC 创作工作流",
+        what_happened: "Alibaba Cloud更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
+        why_it_matters: "内容侧价值集中在素材生成",
+        sources: [{ label: "Alibaba Cloud Blog", url: "https://www.alibabacloud.com/blog/a" }]
+      },
+      {
+        story_id: "s2",
+        title: "OpenAI公布模型评估和研究结果",
+        what_happened: "OpenAI披露模型能力和评估方法更新，材料覆盖能力边界、评估设置、数据来源、使用场景和限制说明，已披露事实集中在模型能力。",
+        why_it_matters: "研究价值集中在评测设置",
+        sources: [{ label: "OpenAI News", url: "https://openai.com/index/b" }]
+      },
+      {
+        story_id: "s3",
+        title: "Microsoft更新agent 可观测平台更新",
+        what_happened: "微软研究院发布生产 agent 观测面板，材料覆盖工具调用轨迹、事故时间线、成本归因、回滚状态和发布健康度，边界落在观测价值取决于能否把失败记录、成本和发布状态串进同一条链路。",
+        why_it_matters: "工程侧价值集中在 agent",
+        sources: [{ label: "Microsoft Blog", url: "https://blogs.microsoft.com/c" }]
+      }
+    ],
+    main_items: [],
+    builder_observations: []
+  };
+
+  // 1) every templated story narrative is routed to the authoring loop
+  const review = reviewReportQuality(report);
+  const storyTasks = review.ai_review_tasks.filter(
+    (t) => /^stories\[\d+\]\.what_happened$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
+  );
+  assert.equal(storyTasks.length, 3, "all three templated stories must be flagged for authoring");
+
+  // 2) author them (the codex role) and apply through the real applier
+  const authored = [
+    "阿里云升级视频生成模型 HappyHorse 的动作表现力与跨帧一致性。",
+    "OpenAI 介绍 GPT-5 如何协助免疫学家解决一个悬置三年的难题。",
+    "微软提出 agentic observability，把工具调用轨迹、事故时间线与发布健康度串成同一条链路。"
+  ];
+  const edits = storyTasks.map((t, i) => ({ path: t.path, value: authored[i], reason: "author from source" }));
+  const result = applyQualityRepairContract(report, { schema_version: 1, report_date: "2026-06-24", edits });
+  assert.deepEqual(result.rejected, []);
+  assert.equal(result.applied.length, 3);
+
+  // 3) after authoring, no story narrative remains in the loop
+  const remaining = reviewReportQuality(result.report).ai_review_tasks.filter((t) => /^stories\[/.test(String(t.path || "")));
+  assert.equal(remaining.length, 0, "no story tasks should remain after authoring");
+});
