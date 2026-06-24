@@ -98,6 +98,16 @@ const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
   "builder_translation_rewrite"
 ]);
 
+// Error-severity issues that must keep the hard block even if they share a path
+// with an editorial task — they are not safely degradable editorial residue.
+const NON_DEGRADABLE_ISSUE_CODES = new Set([
+  "plain_language_stock_phrase",
+  "builder_translation_missing",
+  "builder_content_translation_mismatch",
+  "candidate_pool_not_checked",
+  "candidate_pool_reference_invalid"
+]);
+
 export async function runDailyWorkflow(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const launcherRoot = path.resolve(options.launcherRoot || options.repoRoot || process.cwd());
@@ -1789,16 +1799,21 @@ function residualEditorialDegradation(review) {
   if (tasks.length === 0 || !tasks.every(isPublicEditorialRepairTask)) {
     return null;
   }
-  // Every blocking (error-severity) issue must also be a repairable editorial
-  // issue covered by one of those tasks. A non-editorial blocking issue with no
-  // AI task (e.g. plain_language_stock_phrase, candidate_pool_*) must keep the
-  // hard block rather than ride the editorial degrade path.
+  // Every blocking (error-severity) issue must be COVERED by one of those
+  // editorial tasks (same path) and not a known hard-fail code. Coverage — not
+  // the issue's own `repairable` flag — is the low-risk signal: hot-blog/main-
+  // item editorial residue legitimately carries repairable:false issues paired
+  // with editorial rewrite tasks, while non-editorial blockers
+  // (plain_language_stock_phrase, candidate_pool_*, missing/mismatched builder
+  // translation) keep the hard block.
   const editorialPaths = new Set(tasks.map((task) => String(task?.path || "")));
   const blockingIssues = (Array.isArray(review?.issues) ? review.issues : []).filter(
     (issue) => String(issue?.severity) === "error"
   );
   const allBlockingEditorial = blockingIssues.every(
-    (issue) => issue?.repairable === true && editorialPaths.has(String(issue?.path || ""))
+    (issue) =>
+      !NON_DEGRADABLE_ISSUE_CODES.has(String(issue?.code || "")) &&
+      editorialPaths.has(String(issue?.path || ""))
   );
   if (!allBlockingEditorial) {
     return null;

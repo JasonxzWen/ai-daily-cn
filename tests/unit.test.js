@@ -7525,8 +7525,8 @@ test("daily runner degrades instead of blocking when only editorial residue rema
                 { kind: "builder_translation_rewrite", path: "builder_observations[1].translation" }
               ],
               issues: [
-                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: true },
-                { code: "builder_translation_too_weak", severity: "error", path: "builder_observations[1].translation", repairable: true }
+                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: false },
+                { code: "builder_translation_too_weak", severity: "error", path: "builder_observations[1].translation", repairable: false }
               ]
             }
           }
@@ -7573,8 +7573,8 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
               ok: false,
               ai_review_tasks: [{ kind: "public_editorial_rewrite", path: "stories[0].what_happened" }],
               issues: [
-                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: true },
-                { code: "plain_language_stock_phrase", severity: "error", path: "summary", repairable: false }
+                { code: "public_template_body", severity: "error", path: "stories[0].what_happened", repairable: false },
+                { code: "plain_language_stock_phrase", severity: "error", path: "stories[0].what_happened", repairable: false }
               ]
             }
           }
