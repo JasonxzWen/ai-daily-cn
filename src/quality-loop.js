@@ -55,7 +55,7 @@ const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Build
 // Common English verbs/nouns/function words that, left untranslated (in any
 // case, incl. Title-Case like "Launch"), signal a short Builder card was not
 // actually translated. Product names (Claude, Vercel, GPT-6, OpenAI) are not here.
-const UNTRANSLATED_ENGLISH_WORD_RE = /\b(?:launch(?:es|ed|ing)?|release(?:s|d)?|update(?:s|d)?|announce(?:s|d|ment)?|introduc(?:e|es|ing|tion)?|ship(?:s|ped|ping)?|available|availability|preview|beta|coming|soon|now|new|today|tomorrow|everyone|everything|the|for|with|and|are|is|this|that|your|our|how|what|why|when|here|see|check|read|more|just|will|can|use|using|build|building|feature|features|support)\b/i;
+const UNTRANSLATED_ENGLISH_WORD_RE = /\b(?:launch(?:es|ed|ing)?|release(?:s|d)?|update(?:s|d)?|announce(?:s|d|ment)?|introduc(?:e|es|ing|tion)?|available|availability|coming|soon|today|tomorrow|everyone|everything|the|for|with|and|are|this|that|your|our|how|what|why|when)\b/i;
 
 const PUBLIC_SOURCE_PREFIX_RE = /^(?:\*\*)?[A-Z][A-Za-z0-9 .&+/’'()|-]{1,80}(?:Blog|Changelog|Press Releases|Investor Relations|Newsroom|News|Research|RSS|Feed|Status|Docs|Documentation|Release Notes|Company News|Keyword Blog|Model Card|Hugging Face|GitHub)(?:\*\*)?\s*[：:]\s*/u;
 const PUBLIC_INTERNAL_REVIEW_LANGUAGE_RE = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;

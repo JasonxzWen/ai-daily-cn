@@ -1875,7 +1875,10 @@ async function annotateReportDegraded(reportAbsPath, decision) {
     status: "degraded",
     reasons: [...new Set([...(Array.isArray(existing.reasons) ? existing.reasons : []), "residual_editorial_degraded"])],
     affected_sections: [...new Set([...(Array.isArray(existing.affected_sections) ? existing.affected_sections : []), ...sections])],
-    degraded_sections: [...(Array.isArray(existing.degraded_sections) ? existing.degraded_sections : []), ...entries]
+    degraded_sections: [...(Array.isArray(existing.degraded_sections) ? existing.degraded_sections : []), ...entries],
+    public_note: existing.public_note
+      ? `${existing.public_note} 另有部分公开文案在多轮编辑修复后仍有残留，已按降级披露发布。`
+      : "部分公开文案在多轮编辑修复后仍有残留，已按降级披露发布。"
   };
   try {
     await fs.writeFile(reportAbsPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
