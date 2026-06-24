@@ -8357,12 +8357,12 @@ test("quality review rejects builder translations that are too weak for rendered
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
     {
-      author: "Boris Cherny",
-      handle: "bcherny",
-      original_text: "Hello from Code with Claude Tokyo!!",
-      translation: "来自 Code with Claude Tokyo 的问候。",
-      content: "来自 Code with Claude Tokyo 的问候。",
-      url: "https://x.com/bcherny/status/2064885111477219664"
+      author: "Aaron Levie",
+      handle: "levie",
+      original_text: "Almost all AI model and agent progress is downstream from evals. Open weights post training for specific domains comes down to evals, and applied agent improvement is all about evals across the whole stack.",
+      translation: "评测。",
+      content: "评测。",
+      url: "https://x.com/levie/status/2069228335255949775"
     }
   ];
   report.self_check.builder_observations = report.builder_observations.length;
@@ -8378,6 +8378,25 @@ test("quality review rejects builder translations that are too weak for rendered
   assert(weakIssues.every((issue) => issue.details.chinese_chars < 10));
   assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite" && task.path === "builder_observations[0].translation"));
   assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
+});
+
+test("quality review accepts a faithful short translation of a short builder post", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Guillermo Rauch",
+      handle: "rauchg",
+      original_text: "Claude Design → Vercel, in one click https://t.co/Btq9hFk7OB",
+      translation: "Claude Design 一键接入 Vercel。",
+      content: "Claude Design 一键接入 Vercel。",
+      url: "https://x.com/rauchg/status/2069219190834127276"
+    }
+  ];
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const weakIssues = review.issues.filter((issue) => issue.code === "builder_translation_too_weak");
+  assert.deepEqual(weakIssues, [], "a faithful short translation of a short post must not be flagged too weak");
 });
 
 test("quality review rejects templated impact and watch prose in public body", async () => {
