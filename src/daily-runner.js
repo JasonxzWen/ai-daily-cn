@@ -98,6 +98,16 @@ const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
   "builder_translation_rewrite"
 ]);
 
+// Error-severity issues that must keep the hard block even if they share a path
+// with an editorial task — they are not safely degradable editorial residue.
+const NON_DEGRADABLE_ISSUE_CODES = new Set([
+  "plain_language_stock_phrase",
+  "builder_translation_missing",
+  "builder_content_translation_mismatch",
+  "candidate_pool_not_checked",
+  "candidate_pool_reference_invalid"
+]);
+
 export async function runDailyWorkflow(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const launcherRoot = path.resolve(options.launcherRoot || options.repoRoot || process.cwd());
@@ -241,6 +251,7 @@ export async function runDailyWorkflow(options = {}) {
       });
       if (repairDecision?.degrade) {
         markStageDegraded(summary, stage.id, repairDecision);
+        await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, DEFAULT_REPORT_PATH), repairDecision);
         await writeSummary(summaryPath, summary);
       } else if (repairDecision) {
         summary.final_status = repairDecision.final_status;
@@ -401,6 +412,7 @@ async function resumeDailyWorkflowFromAiRepair({
         if (repairReviewDecision?.degrade) {
           summary.current_report_path = OPTIMIZED_REPORT_PATH;
           markStageDegraded(summary, stage.id, repairReviewDecision);
+          await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, OPTIMIZED_REPORT_PATH), repairReviewDecision);
           await writeSummary(summaryPath, summary);
         } else if (repairReviewDecision) {
           summary.final_status = repairReviewDecision.final_status;
@@ -429,6 +441,7 @@ async function resumeDailyWorkflowFromAiRepair({
       });
       if (repairDecision?.degrade) {
         markStageDegraded(summary, stage.id, repairDecision);
+        await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, summary.current_report_path || OPTIMIZED_REPORT_PATH), repairDecision);
         await writeSummary(summaryPath, summary);
       } else if (repairDecision) {
         summary.final_status = repairDecision.final_status;
@@ -1786,6 +1799,25 @@ function residualEditorialDegradation(review) {
   if (tasks.length === 0 || !tasks.every(isPublicEditorialRepairTask)) {
     return null;
   }
+  // Every blocking (error-severity) issue must be COVERED by one of those
+  // editorial tasks (same path) and not a known hard-fail code. Coverage — not
+  // the issue's own `repairable` flag — is the low-risk signal: hot-blog/main-
+  // item editorial residue legitimately carries repairable:false issues paired
+  // with editorial rewrite tasks, while non-editorial blockers
+  // (plain_language_stock_phrase, candidate_pool_*, missing/mismatched builder
+  // translation) keep the hard block.
+  const editorialPaths = new Set(tasks.map((task) => String(task?.path || "")));
+  const blockingIssues = (Array.isArray(review?.issues) ? review.issues : []).filter(
+    (issue) => String(issue?.severity) === "error"
+  );
+  const allBlockingEditorial = blockingIssues.every(
+    (issue) =>
+      !NON_DEGRADABLE_ISSUE_CODES.has(String(issue?.code || "")) &&
+      editorialPaths.has(String(issue?.path || ""))
+  );
+  if (!allBlockingEditorial) {
+    return null;
+  }
   const sections = [...new Set(tasks.map((task) => editorialSectionFromPath(task?.path)).filter(Boolean))];
   return { degraded_sections: sections, residual_editorial_tasks: tasks.length };
 }
@@ -1810,6 +1842,49 @@ function markStageDegraded(summary, stageId, decision) {
     }
   }
   return false;
+}
+
+// Persist the editorial degradation into the report file that report:write will
+// consume, so the public page carries a "发布质量说明" rather than only the run
+// summary. deriveQualityStatus merges explicit.degraded_sections, so these
+// survive the recompute. Tolerant: if the report file is absent (e.g. unit
+// harness), the summary-level degrade still stands.
+async function annotateReportDegraded(reportAbsPath, decision) {
+  if (!reportAbsPath) {
+    return;
+  }
+  let report;
+  try {
+    report = JSON.parse(await fs.readFile(reportAbsPath, "utf8"));
+  } catch {
+    return;
+  }
+  const sections = Array.isArray(decision?.degraded_sections) ? decision.degraded_sections : [];
+  const existing = report.quality_status && typeof report.quality_status === "object" ? report.quality_status : {};
+  if (existing.status === "blocked") {
+    return;
+  }
+  const entries = sections.map((section) => ({
+    code: "residual_editorial_degraded",
+    error_code: "residual_editorial_degraded",
+    section,
+    message: "公开文案在多轮编辑修复后仍有残留，已按降级披露发布。"
+  }));
+  report.quality_status = {
+    ...existing,
+    status: "degraded",
+    reasons: [...new Set([...(Array.isArray(existing.reasons) ? existing.reasons : []), "residual_editorial_degraded"])],
+    affected_sections: [...new Set([...(Array.isArray(existing.affected_sections) ? existing.affected_sections : []), ...sections])],
+    degraded_sections: [...(Array.isArray(existing.degraded_sections) ? existing.degraded_sections : []), ...entries],
+    public_note: existing.public_note
+      ? `${existing.public_note} 另有部分公开文案在多轮编辑修复后仍有残留，已按降级披露发布。`
+      : "部分公开文案在多轮编辑修复后仍有残留，已按降级披露发布。"
+  };
+  try {
+    await fs.writeFile(reportAbsPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  } catch {
+    // tolerant: summary-level degrade already applied
+  }
 }
 
 async function nextAiRepairAttempt({ launcherRoot, reportDate, startAttempt, maxReviewRepairLoops }) {
