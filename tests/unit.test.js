@@ -8521,6 +8521,25 @@ test("quality review accepts a faithful short translation of a short builder pos
   assert.deepEqual(weakIssues, [], "a faithful short translation of a short post must not be flagged too weak");
 });
 
+test("quality review flags short translations that leave untranslated English words", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.builder_observations = [
+    {
+      author: "Test",
+      handle: "test",
+      original_text: "GPT-6 Launch",
+      translation: "GPT-6 Launch 上线。",
+      content: "GPT-6 Launch 上线。",
+      url: "https://x.com/test/status/1"
+    }
+  ];
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const weakIssues = review.issues.filter((issue) => issue.code === "builder_translation_too_weak");
+  assert(weakIssues.length >= 1, "a short translation that leaves an untranslated English word must be flagged");
+});
+
 test("quality review rejects templated impact and watch prose in public body", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items[0] = {
