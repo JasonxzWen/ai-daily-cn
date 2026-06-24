@@ -7587,9 +7587,10 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
   assert.equal(result.summary.final_status, "blocked");
 });
 
-test("daily runner does not block on editorial-weak page-check failures", async () => {
+test("daily runner degrades and re-renders (not block) on editorial-weak page-check failures", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pagecheck-degrade-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  let buildRuns = 0;
   const result = await runDailyWorkflow({
     launcherRoot,
     reportDate: "2026-06-04",
@@ -7600,6 +7601,10 @@ test("daily runner does not block on editorial-weak page-check failures", async 
       remote_main_sha: "8888888888888888888888888888888888888888"
     }),
     runStage: async (stage) => {
+      if (stage.id === "build" || stage.id === "build_disclosure") {
+        buildRuns += 1;
+        return { ok: true, output: { stage: stage.id } };
+      }
       if (stage.id === "quality_review") {
         return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
       }
@@ -7610,14 +7615,14 @@ test("daily runner does not block on editorial-weak page-check failures", async 
     }
   });
 
-  // check-daily-page exits 0 on degradable-only failures, so the run completes
-  // and publishes instead of blocking; the weak-check info stays in the stage
-  // output, and the run is NOT falsely labeled degraded (the artifact can't show
-  // a post-render page-check degrade).
+  // Publishes (not blocked) AND is consistently labeled degraded, with docs
+  // re-rendered so the artifact can carry the disclosure.
   assert.notEqual(result.summary.final_status, "blocked");
-  assert.equal(result.summary.final_status, "generated_only");
+  assert.equal(result.summary.final_status, "generated_degraded");
   const pageStage = result.summary.stages.find((stage) => stage.id === "quality_page_check");
-  assert.deepEqual(pageStage.output.degraded_checks, ["community_cards_reader_facing"]);
+  assert.equal(pageStage.status, "degraded");
+  assert(result.summary.stages.some((stage) => stage.id === "build_disclosure"), "docs must be re-rendered for disclosure");
+  assert.equal(buildRuns, 2, "build runs once normally and once to re-render with disclosure");
 });
 
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
