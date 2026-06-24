@@ -15,7 +15,7 @@
     "daily:run": "node src/cli.js daily:run",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "build": "node src/cli.js build --data-input reports-data --input reports-source --out docs",
-    "test": "node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js",
+    "test": "node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js tests/story-authoring.test.js tests/generation-first.test.js",
     "test:e2e": "node scripts/run-e2e.mjs",
     "harness:init": "node scripts/harness-init.mjs",
     "harness:validate": "node scripts/harness-validate.mjs",

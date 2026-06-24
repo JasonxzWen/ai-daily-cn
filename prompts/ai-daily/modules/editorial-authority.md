@@ -135,6 +135,7 @@
 - `2026-06-15`：明确不能绕过 effective-interact 组件体系；严格点前移到生成和 interaction input 边界，公开页用 effective-interact 展示干净读者内容，事后校验只挡事故级泄漏和视觉破损。
 - `2026-06-15`：主体准入从官方/一手白名单改为黑名单剔除；官方/一手/多源用于排序和保留优先级。GitHub、Builder/X、热门博客、社区弱信号和白名单公众号等候选可按低风险边界参与主体补位，但融资、估值、价格、benchmark、安全事故、监管和模型能力等高风险事实仍需官方/一手或多源确认。
 - `2026-06-17`：将用户反馈固化为发布前内容契约门。主线详情必须是新闻形态的事实/影响/相关性分点；GitHub Trending 范围固定为 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重到 Top20；热门博客公开页只展示 100-200 字文章概括和来源，不再渲染 key_points；follow-builders X feed 过滤后合格候选不少于 3 条时 Builder/X 不得为 0；OpenRouter / Artificial Analysis 必须使用 sanitized official snapshot 或解析数据，REQ-010 可 degraded 但不能渲染 fake component。
+- `2026-06-24`：generation-first。`stories` 是公开页渲染主单位，但其 `title`/`what_happened`/`why_it_matters` 由 `story-first.js` 确定性模板生成，从未进入编辑回写环（builder 翻译已进入，故只有 builder 像人写）。本轮把 `stories[*].(title|what_happened|why_it_matters)` 纳入 `quality-loop.js` 的 `REPAIRABLE_PUBLIC_TEXT_PATTERNS`，并新增 `collectStoryNarrativeIssues`：命中模板族（材料覆盖、边界落在落地质量取决于、更新agent工作流和开发工具能力 等）或与其它 story 重复的叙事，发 `public_editorial_rewrite` 任务，走与 builder 相同的 LLM 编辑环；事实/链接/日期仍禁止改写。验收以真实 `reports-data` 为准（`tests/generation-first.test.js`、`tests/story-authoring.test.js`），不再只跑 self-test。后续：让 runner 的 repair contract 每次运行真正回填 story 叙事，并逐步退役 `main_items` 模板别名。
 
 ### 工作流约束
 
