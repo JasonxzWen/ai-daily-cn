@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T08:32:16.778Z",
+  "generated_at": "2026-06-25T18:42:59.841Z",
   "window_days": 7,
   "source": {
-    "report_count": 37,
-    "date_from": "2026-06-19",
-    "date_to": "2026-06-25"
+    "report_count": 38,
+    "date_from": "2026-06-20",
+    "date_to": "2026-06-26"
   },
   "thresholds": {
     "watching": {
@@ -31,9 +31,9 @@
     {
       "id": "coding-agent",
       "label": "coding agent",
-      "status": "active",
-      "occurrences": 9,
-      "active_days": 3,
+      "status": "hot",
+      "occurrences": 10,
+      "active_days": 4,
       "sections": [
         "builder_observations",
         "main_items"
@@ -45,20 +45,22 @@
       "dates": [
         "2026-06-23",
         "2026-06-24",
-        "2026-06-25"
+        "2026-06-25",
+        "2026-06-26"
       ],
       "related_reports": [
         "2026-06-23",
         "2026-06-24",
-        "2026-06-25"
+        "2026-06-25",
+        "2026-06-26"
       ]
     },
     {
       "id": "mcp",
       "label": "MCP",
-      "status": "active",
-      "occurrences": 6,
-      "active_days": 3,
+      "status": "hot",
+      "occurrences": 8,
+      "active_days": 4,
       "sections": [
         "github_trending",
         "projects"
@@ -69,134 +71,136 @@
       "dates": [
         "2026-06-23",
         "2026-06-24",
-        "2026-06-25"
+        "2026-06-25",
+        "2026-06-26"
       ],
       "related_reports": [
         "2026-06-23",
         "2026-06-24",
-        "2026-06-25"
+        "2026-06-25",
+        "2026-06-26"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "with",
-      "occurrences": 97,
-      "active_days": 3,
+      "occurrences": 129,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "this",
-      "occurrences": 94,
-      "active_days": 3,
+      "occurrences": 127,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "github",
-      "occurrences": 93,
-      "active_days": 3,
+      "occurrences": 123,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "week",
-      "occurrences": 91,
-      "active_days": 3,
+      "occurrences": 122,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "appeared",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "appeared github",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "github trending",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "stars",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "stars this",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "this week",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "trending",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "weekly",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "weekly with",
-      "occurrences": 90,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "with stars",
-      "occurrences": 90,
-      "active_days": 3,
-      "display": false
-    },
-    {
-      "term": "再判断是否适合团队试用或接入",
-      "occurrences": 87,
-      "active_days": 3,
+      "occurrences": 120,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "readme",
-      "occurrences": 87,
-      "active_days": 3,
+      "occurrences": 117,
+      "active_days": 4,
+      "display": false
+    },
+    {
+      "term": "再判断是否适合团队试用或接入",
+      "occurrences": 116,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "trending weekly",
-      "occurrences": 66,
-      "active_days": 3,
+      "occurrences": 88,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 64,
-      "active_days": 3,
+      "occurrences": 86,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 64,
-      "active_days": 3,
+      "occurrences": 86,
+      "active_days": 4,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 64,
-      "active_days": 3,
+      "occurrences": 86,
+      "active_days": 4,
       "display": false
     }
   ],
@@ -1694,6 +1698,28 @@
               "window_days": 7,
               "occurrences": 6,
               "active_days": 3,
+              "entities": [
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-06-26": {
+      "main_items": [],
+      "github_trending": [
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 8x/4d",
+              "window_days": 7,
+              "occurrences": 8,
+              "active_days": 4,
               "entities": [
                 "GitHub"
               ]
