@@ -191,7 +191,7 @@
       "candidates_found": 22,
       "included": 8,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-25T18:32:29.792Z",
+      "last_successful_feed_at": "2026-06-25T18:46:54.312Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -351,7 +351,7 @@
         "html_index": 10
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-25T18:32:33.675Z",
+      "last_successful_feed_at": "2026-06-25T18:46:57.272Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "content_sources": {
@@ -1535,7 +1535,7 @@
           "verification_policy": "primary_required",
           "requires_original_url": false,
           "parsed_count": 50,
-          "notes": "50 recent product/project entries parsed; 2 product cross-checks confirmed; 1 unresolved"
+          "notes": "50 recent product/project entries parsed; 3 product cross-checks confirmed"
         },
         {
           "name": "Product Hunt Developer Tools Feed",
@@ -1754,7 +1754,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+            "snapshot_as_of": "2026-06-25T18:47:02.575Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -1833,7 +1833,7 @@
               "source": "official_dom",
               "component_kind": "openrouter_rankings",
               "source_url": "https://openrouter.ai/rankings",
-              "captured_at": "2026-06-25T18:32:39.134Z",
+              "captured_at": "2026-06-25T18:47:02.575Z",
               "selector_version": "openrouter-rankings-v1",
               "source_selector": "[data-openrouter-rankings]",
               "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
@@ -1854,7 +1854,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+            "snapshot_as_of": "2026-06-25T18:47:02.575Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -2029,7 +2029,7 @@
               "source": "official_dom",
               "component_kind": "artificial_analysis_index",
               "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-              "captured_at": "2026-06-25T18:32:39.134Z",
+              "captured_at": "2026-06-25T18:47:02.575Z",
               "selector_version": "artificial-analysis-index-v1",
               "source_selector": "[data-artificial-analysis-index]",
               "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -2050,7 +2050,7 @@
             "type": "swe_bench_pro_public_page",
             "collection_method": "public_page_static",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+            "snapshot_as_of": "2026-06-25T18:47:02.575Z",
             "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
             "top_entries": [
               {
@@ -2129,7 +2129,7 @@
               "source": "official_dom",
               "component_kind": "swe_bench_pro",
               "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-              "captured_at": "2026-06-25T18:32:39.134Z",
+              "captured_at": "2026-06-25T18:47:02.575Z",
               "selector_version": "swe-bench-pro-v1",
               "source_selector": "[data-swe-bench-pro-leaderboard]",
               "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -2208,8 +2208,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 45,
-          "notes": "45 recent intermediary lead entries parsed"
+          "parsed_count": 46,
+          "notes": "46 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2740,11 +2740,11 @@
           "enablement": "optional",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 2,
-          "notes": "2 recent intermediary lead entries parsed"
+          "parsed_count": 3,
+          "notes": "3 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 176,
+      "candidates_found": 177,
       "included": 19,
       "sources_checked": 146,
       "enablement_counts": {
@@ -2767,7 +2767,7 @@
         "swe_bench_pro_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-25T18:32:39.134Z",
+      "last_successful_feed_at": "2026-06-25T18:47:02.575Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2796,12 +2796,12 @@
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 47190,
-        "openalex": 22943,
-        "arxiv": 10148
+        "gdelt": 63132,
+        "openalex": 23858,
+        "arxiv": 917
       },
       "provider_cost_units": {
-        "gdelt": 2,
+        "gdelt": 3,
         "openalex": 15,
         "arxiv": 15
       },
@@ -4546,9 +4546,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 19,
+          "recent_48h_entries": 17,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 19 within 48h"
+          "notes": "20 feed entries parsed; 17 within 48h"
         },
         {
           "name": "Google News AI RSS",
@@ -4580,9 +4580,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 10,
+          "recent_48h_entries": 9,
           "original_url_count": null,
-          "notes": "50 feed entries parsed; 10 within 48h"
+          "notes": "49 feed entries parsed; 9 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4667,7 +4667,7 @@
           "feed_like": true,
           "recent_48h_entries": 20,
           "original_url_count": null,
-          "notes": "38 feed entries parsed; 20 within 48h"
+          "notes": "39 feed entries parsed; 20 within 48h"
         },
         {
           "name": "36Kr",
@@ -5485,7 +5485,7 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-25T18:36:12.498Z",
+      "last_successful_feed_at": "2026-06-25T18:50:37.991Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
@@ -5911,7 +5911,7 @@
       ],
       "candidate_count": 6,
       "included_count": 0,
-      "notes": "11 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; 20 feed entries parsed; 19 within 48h"
+      "notes": "11 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; 20 feed entries parsed; 17 within 48h"
     },
     {
       "id": "wechat-platform",
@@ -7205,7 +7205,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+        "snapshot_as_of": "2026-06-25T18:47:02.575Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -7284,7 +7284,7 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
           "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
@@ -7299,10 +7299,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-25T18:32:39.134Z",
+        "collected_at": "2026-06-25T18:47:02.575Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:45b0f3a5e57a4d04471d3d17e49b8be23b3ea31961b66b235213902a19cb6ae1",
-        "data_hash": "sha256:ff99e7d5df024f2f7fd004a32a103e88012196b6db2f72c4fc5aca7c99f26059",
+        "data_hash": "sha256:20061c4836fbc29acb2cffdffc34117312f8f02f435bdd68c051556b7290f89e",
         "tabs": [
           {
             "id": "top-models",
@@ -7606,7 +7606,7 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
           "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
@@ -7616,9 +7616,9 @@
         },
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-25T18:32:39.134Z",
+          "collected_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:ff99e7d5df024f2f7fd004a32a103e88012196b6db2f72c4fc5aca7c99f26059",
+          "data_hash": "sha256:20061c4836fbc29acb2cffdffc34117312f8f02f435bdd68c051556b7290f89e",
           "top_rows": [
             {
               "rank": 1,
@@ -7800,7 +7800,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+        "snapshot_as_of": "2026-06-25T18:47:02.575Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -7975,7 +7975,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -7990,10 +7990,10 @@
         "source": "Artificial Analysis",
         "component_kind": "artificial_analysis_index",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-25T18:32:39.134Z",
+        "collected_at": "2026-06-25T18:47:02.575Z",
         "selector_version": "artificial-analysis-index-v1",
         "raw_dom_hash": "sha256:caa7d33c2116c5495c0ff87bb3af671e33346e063be109cb1e5beccdf50e227a",
-        "data_hash": "sha256:e27c2692219ff0a3ec4f3372da73e5bb04431dbdef1f4729766aac5b231fb695",
+        "data_hash": "sha256:dbd6895ed015b47e1d1bcfc36f99c2f41e1e2b0e846919b27e590b0772105c45",
         "tabs": [
           {
             "id": "score",
@@ -8221,7 +8221,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -8231,9 +8231,9 @@
         },
         "public_trace": {
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-25T18:32:39.134Z",
+          "collected_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:e27c2692219ff0a3ec4f3372da73e5bb04431dbdef1f4729766aac5b231fb695",
+          "data_hash": "sha256:dbd6895ed015b47e1d1bcfc36f99c2f41e1e2b0e846919b27e590b0772105c45",
           "top_rows": [
             {
               "rank": 1,
@@ -8415,7 +8415,7 @@
         "type": "swe_bench_pro_public_page",
         "collection_method": "public_page_static",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-25T18:32:39.134Z",
+        "snapshot_as_of": "2026-06-25T18:47:02.575Z",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
         "top_entries": [
           {
@@ -8494,7 +8494,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8509,10 +8509,10 @@
         "source": "Scale Labs SWE-Bench Pro",
         "component_kind": "swe_bench_pro",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-        "collected_at": "2026-06-25T18:32:39.134Z",
+        "collected_at": "2026-06-25T18:47:02.575Z",
         "selector_version": "swe-bench-pro-v1",
         "raw_dom_hash": "sha256:2d5ebf88219cf9ca3b8537c2a99a9339988bd6f4b8cb73e80b37c9c1e786a9a9",
-        "data_hash": "sha256:40adf75c2768300b9672b42c6eeeabab4d1d4f8c925241ba9facdce0d31be140",
+        "data_hash": "sha256:dedd8d3924b450b3dc94ace3f5b4bf62c2a79a92873b3ae57daf667b53d70db8",
         "tabs": [
           {
             "id": "leaderboard",
@@ -8740,7 +8740,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-25T18:32:39.134Z",
+          "captured_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8750,9 +8750,9 @@
         },
         "public_trace": {
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "collected_at": "2026-06-25T18:32:39.134Z",
+          "collected_at": "2026-06-25T18:47:02.575Z",
           "selector_version": "swe-bench-pro-v1",
-          "data_hash": "sha256:40adf75c2768300b9672b42c6eeeabab4d1d4f8c925241ba9facdce0d31be140",
+          "data_hash": "sha256:dedd8d3924b450b3dc94ace3f5b4bf62c2a79a92873b3ae57daf667b53d70db8",
           "top_rows": [
             {
               "rank": 1,
@@ -9373,7 +9373,7 @@
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 33,
+        "eligible_candidates": 34,
         "selected": 8,
         "strict_selected": 8,
         "refill_selected": 0,
@@ -9384,16 +9384,16 @@
         "rejection_counts": {
           "recent_duplicate": 38,
           "generic_github_trending_text": 27,
-          "missing_reader_visible_title": 13,
+          "missing_reader_visible_title": 11,
           "builder_low_signal": 12,
-          "low_value": 9,
+          "low_value": 10,
           "not_ai_relevant": 2,
           "low_signal_vendor_partnership": 1,
           "not_main_refill_material": 3,
           "generic_hot_blog_announcement": 4,
           "thin_candidate_detail": 1,
           "primary_required_intermediary_lead": 46,
-          "secondary_single_source_story": 20,
+          "secondary_single_source_story": 21,
           "outside_main_window": 6,
           "hardcore_research_only": 5,
           "unverified_aggregator_lead": 30,
@@ -9403,8 +9403,8 @@
         }
       },
       "stories": {
-        "eligible_candidates": 33,
-        "eligible_story_clusters": 31,
+        "eligible_candidates": 34,
+        "eligible_story_clusters": 32,
         "selected": 8,
         "target_min": 1,
         "target": 8,
@@ -9413,16 +9413,16 @@
         "rejection_counts": {
           "recent_duplicate": 38,
           "generic_github_trending_text": 27,
-          "missing_reader_visible_title": 13,
+          "missing_reader_visible_title": 11,
           "builder_low_signal": 12,
-          "low_value": 9,
+          "low_value": 10,
           "not_ai_relevant": 2,
           "low_signal_vendor_partnership": 1,
           "not_main_refill_material": 3,
           "generic_hot_blog_announcement": 4,
           "thin_candidate_detail": 1,
           "primary_required_intermediary_lead": 46,
-          "secondary_single_source_story": 20,
+          "secondary_single_source_story": 21,
           "outside_main_window": 6,
           "hardcore_research_only": 5,
           "unverified_aggregator_lead": 30,
@@ -9493,11 +9493,11 @@
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "13880acf7e38f23033122c53d6d46d620e70ebcd",
-      "git_commit_short": "13880acf7e38",
+      "git_commit": "8daa8b29dcc7681ea1333eaa6e9fa9cf15aeef57",
+      "git_commit_short": "8daa8b29dcc7",
       "git_branch": "main",
-      "origin_main_sha": "13880acf7e38f23033122c53d6d46d620e70ebcd",
-      "origin_main_short": "13880acf7e38",
+      "origin_main_sha": "8daa8b29dcc7681ea1333eaa6e9fa9cf15aeef57",
+      "origin_main_short": "8daa8b29dcc7",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -9531,7 +9531,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-25T18:37:48.825Z",
+  "generated_at": "2026-06-25T18:52:21.727Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-26.html",
   "html_path": "reports/2026/06/2026-06-26.html",
