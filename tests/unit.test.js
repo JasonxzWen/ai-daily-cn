@@ -16616,10 +16616,10 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
   const aaCard = trackingSection.items.find((item) => item.title === "Artificial Analysis");
   assert.equal(openRouterCard.component.kind, "openrouter_rankings");
   assert.equal(openRouterCard.component.tabs.length, 2);
-  assert(openRouterCard.component.trace.dataHash.startsWith("sha256:"));
+  assert.equal(openRouterCard.component.trace, undefined);
   assert.equal(aaCard.component.kind, "artificial_analysis_index");
   assert.equal(aaCard.component.tabs.length, 1);
-  assert(aaCard.component.trace.sourceUrl.includes("artificialanalysis.ai"));
+  assert.equal(aaCard.component.trace, undefined);
 });
 
 test("tracking component snapshots attach deterministically to daily tracking items", () => {

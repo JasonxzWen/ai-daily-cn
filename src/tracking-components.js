@@ -91,17 +91,6 @@ export function trackingComponentForInteraction(item) {
       rows: (series.rows || []).map(rowForInteraction)
     })),
     rows: (snapshot.rows || []).map(rowForInteraction),
-    trace: {
-      sourceUrl: snapshot.public_trace?.source_url || snapshot.source_url,
-      collectedAt: snapshot.public_trace?.collected_at || snapshot.collected_at,
-      selectorVersion: snapshot.public_trace?.selector_version || snapshot.selector_version,
-      dataHash: snapshot.public_trace?.data_hash || snapshot.data_hash,
-      rawDomHash: snapshot.raw_dom_hash,
-      cacheStatus: snapshot.public_trace?.cache_status || "live",
-      fallbackReason: snapshot.public_trace?.fallback_reason || snapshot.fallback_reason || "",
-      topRows: (snapshot.public_trace?.top_rows || snapshot.rows || []).map(rowForInteraction),
-      diff: snapshot.public_trace?.diff || snapshot.diff || {}
-    }
   };
 }
 

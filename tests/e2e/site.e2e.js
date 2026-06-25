@@ -447,8 +447,7 @@ try {
   assert.equal(await trackingComponent.locator("[data-tab]").nth(1).getAttribute("aria-selected"), "true");
   const trackingTooltip = await trackingComponent.locator("[data-tracking-tooltip]").first().getAttribute("data-tracking-tooltip");
   assert.match(trackingTooltip || "", /DeepSeek V4 Flash/);
-  assert.equal(await trackingComponent.locator("[data-tracking-trace]").count(), 1);
-  assert.doesNotMatch(await trackingComponent.locator("[data-tracking-trace]").textContent(), /raw_dom/i);
+  assert.equal(await trackingComponent.locator("[data-tracking-trace]").count(), 0);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   await imageLightboxOpensAndCloses(page, ".builder-card .card-media-grid img");
   await imageLightboxOpensAndCloses(page, ".community-card .card-media-grid img");
