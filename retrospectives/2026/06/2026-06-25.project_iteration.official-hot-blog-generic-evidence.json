@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-25.project_iteration.official-hot-blog-generic-evidence",
+  "run_type": "project_iteration",
+  "date": "2026-06-25",
+  "title": "Official hot blog generic evidence admission",
+  "status": "completed",
+  "summary": "Fixed a main-stream admission false negative where primary-confirmed official technical blogs from sources such as Google Research, Google DeepMind, and Hugging Face could be rejected as generic hot blog announcements when feed discovery only supplied a generic blog/interview evidence sentence.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"report:draft admits official technical hot blogs with generic feed evidence\" tests/unit.test.js",
+      "node --test --test-name-pattern \"report:draft admission scoring|report:draft admits official technical hot blogs\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Thin feed evidence should not erase a specific primary-confirmed official technical blog.",
+      "evidence": "The new draft test failed before implementation because a Google Research URL with a specific technical title and generic feed evidence did not enter main_items; after the fix Google Research, DeepMind, and Hugging Face examples enter the main stream.",
+      "scope": "main_stream_admission",
+      "persistence": "implemented",
+      "recommended_action": "When hot-blog evidence is generic, fall back to source, URL, and title specificity only for trusted official technical blog surfaces."
+    },
+    {
+      "lesson": "The generic hot-blog filter still needs a negative fixture.",
+      "evidence": "The same test keeps a generic title-only hot blog rejected with main_reject_reason=generic_hot_blog_announcement.",
+      "scope": "hot_blog_quality_gate",
+      "persistence": "implemented",
+      "recommended_action": "Do not widen the official technical blog exemption without retaining a generic announcement rejection case."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "Official technical blog candidates can still arrive with generic feed evidence.",
+      "evidence": "This iteration added a safe title/source/URL fallback for primary-confirmed official technical blogs, but the stronger fix is to extract article-specific evidence during discovery.",
+      "module": "src/discovery.js",
+      "suggestion": "Improve content discovery extraction so official blog candidates carry article-specific evidence instead of relying on title and URL fallback.",
+      "expected_benefit": "Future drafts can rank and summarize official technical blogs from source evidence rather than from title/URL heuristics.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Open a follow-up project_iteration with red tests for official blog evidence extraction."
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Run a real dated non-publish draft after this lands and inspect whether official research/engineering blog candidates are selected as stories without needing AI repair.",
+      "owner": "project"
+    }
+  ],
+  "slug": "official-hot-blog-generic-evidence"
+}

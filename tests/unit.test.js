@@ -14059,6 +14059,237 @@ test("report:draft rewrites main item titles summaries and bullets without gener
   }
 });
 
+test("report:draft admission scoring promotes lab engineering deep-dives over vendor availability PR", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-admission-lab-deep-dive-"));
+  const reportDate = "2026-06-25";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const labDeepDiveUrl = "https://www.anthropic.com/engineering/building-effective-agents";
+  const vendorAvailabilityUrl = "https://aws.amazon.com/blogs/machine-learning/claude-models-now-available-on-amazon-bedrock/";
+  const labDeepDive = mainStreamRepairCandidate(reportDate, {
+    id: "anthropic-engineering-agent-harness-deep-dive",
+    category: "hot_blog",
+    source: "Anthropic Engineering",
+    sourceId: "content-anthropic-engineering",
+    sourceLevel: "primary",
+    verificationStatus: "primary_confirmed",
+    title: "Building effective agents",
+    url: labDeepDiveUrl,
+    evidence:
+      "Anthropic's engineering team explains agent harness design, workflow decomposition, tool-use boundaries, evaluation loops, and deployment practices for long-running AI agents.",
+    editorialCategory: "engineering_toolchain"
+  });
+  const vendorAvailability = mainStreamRepairCandidate(reportDate, {
+    id: "aws-bedrock-claude-availability-pr",
+    category: "community_lead",
+    source: "AWS Machine Learning Blog",
+    sourceId: "content-aws-machine-learning-blog",
+    sourceLevel: "official",
+    verificationStatus: "primary_confirmed",
+    title: "Anthropic Claude models are now available on Amazon Bedrock",
+    url: vendorAvailabilityUrl,
+    evidence:
+      "AWS says Anthropic Claude models are now available on Amazon Bedrock in selected regions, with standard API access, enterprise deployment notes, and partner availability language.",
+    editorialCategory: "product_radar"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      labDeepDive,
+      vendorAvailability,
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-admission-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-admission-control",
+        title: "OpenAI updates an API workflow control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-admission-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-admission-control/",
+        title: "Google updates AI developer workflow controls",
+        evidence: "Google describes AI developer workflow controls, release behavior, and product availability details."
+      })
+    ],
+    sourceNames: ["Anthropic Engineering", "AWS Machine Learning Blog", "OpenAI News RSS", "Google AI Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = drafted.report.main_items.map((item) => item.url);
+  assert(mainUrls.includes(labDeepDiveUrl), "high-authority lab engineering deep-dive must enter the main stream");
+  assert(mainUrls.includes(vendorAvailabilityUrl), "fixture should include the vendor PR so ordering is meaningful");
+  assert(
+    mainUrls.indexOf(labDeepDiveUrl) < mainUrls.indexOf(vendorAvailabilityUrl),
+    `lab deep-dive should outrank vendor availability PR, got: ${mainUrls.join(" | ")}`
+  );
+});
+
+test("report:draft admission scoring preserves primary lab URL behind intermediary discovery source", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-admission-primary-url-"));
+  const reportDate = "2026-06-25";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const primaryLabUrl = "https://www.anthropic.com/research/tracing-agent-failures";
+  const aggregatedLabDeepDive = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "hn-anthropic-research-agent-tracing",
+      category: "hot_blog",
+      source: "Hacker News Topstories API",
+      sourceId: "hnrss-anthropic-research",
+      sourceLevel: "primary",
+      verificationStatus: "primary_confirmed",
+      title: "Tracing agent failures in long-running tool workflows",
+      url: primaryLabUrl,
+      evidence:
+        "Anthropic Research describes a technical study of long-running agent failures, tool traces, evaluation harnesses, intervention points, and deployment lessons.",
+      editorialCategory: "ai_industry"
+    }),
+    primary_url: primaryLabUrl,
+    verification_sources: [primaryLabUrl],
+    intermediary_url: "https://news.ycombinator.com/item?id=424242",
+    notes: "discovered_via=hn; primary_url=https://www.anthropic.com/research/tracing-agent-failures"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      aggregatedLabDeepDive,
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-primary-url-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-primary-url-control",
+        title: "OpenAI ships an API workflow update for primary URL control",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-primary-url-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-primary-url-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      })
+    ],
+    sourceNames: ["Hacker News Topstories API", "OpenAI News RSS", "Meta AI Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = drafted.report.main_items.map((item) => item.url);
+  assert(mainUrls.includes(primaryLabUrl), `primary lab URL discovered through an intermediary should enter main stream: ${mainUrls.join(" | ")}`);
+  const selected = drafted.report.main_items.find((item) => item.url === primaryLabUrl);
+  assert.notEqual(selected?.source_level, "intermediary", "primary lab URL must not be downgraded to intermediary");
+});
+
+test("report:draft admits official technical hot blogs with generic feed evidence", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-hot-blog-generic-evidence-"));
+  const reportDate = "2026-06-25";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const googleResearchUrl = "https://research.google/blog/thinking-to-recall-how-reasoning-unlocks-parametric-knowledge-in-llms/";
+  const deepMindUrl = "https://deepmind.google/blog/introducing-computer-use-in-gemini-3-5-flash/";
+  const huggingFaceUrl = "https://huggingface.co/blog/ibm-research/cuga-apps";
+  const genericOfficialHotBlogs = [
+    mainStreamRepairCandidate(reportDate, {
+      id: "content-google-research-thinking-to-recall",
+      category: "hot_blog",
+      source: "Google Research Blog",
+      sourceId: "content-google-research",
+      sourceLevel: "official",
+      verificationStatus: "primary_confirmed",
+      title: "Thinking to recall: How reasoning unlocks parametric knowledge in LLMs",
+      url: googleResearchUrl,
+      evidence: "Google Research Blog published this blog/interview entry.",
+      editorialCategory: "ai_industry"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "content-google-deepmind-computer-use",
+      category: "hot_blog",
+      source: "Google DeepMind RSS",
+      sourceId: "content-google-deepmind-rss",
+      sourceLevel: "official",
+      verificationStatus: "primary_confirmed",
+      title: "Introducing computer use in Gemini 3.5 Flash",
+      url: deepMindUrl,
+      evidence: "Google DeepMind RSS published this blog/interview entry.",
+      editorialCategory: "ai_industry"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "content-hugging-face-cuga-apps",
+      category: "hot_blog",
+      source: "Hugging Face Blog",
+      sourceId: "content-hugging-face-blog",
+      sourceLevel: "primary",
+      verificationStatus: "primary_confirmed",
+      title: "Build real agentic apps using CUGA: two dozen working examples on a lightweight harness",
+      url: huggingFaceUrl,
+      evidence: "Hugging Face Blog published this blog/interview entry.",
+      editorialCategory: "engineering_toolchain"
+    })
+  ];
+  const genericFillerHotBlog = mainStreamRepairCandidate(reportDate, {
+    id: "content-generic-ai-blog-update",
+    category: "hot_blog",
+    source: "Example Blog",
+    sourceId: "content-example-blog",
+    sourceLevel: "primary",
+    verificationStatus: "primary_confirmed",
+    title: "Latest AI platform update",
+    url: "https://example.com/blog/latest-ai-platform-update",
+    evidence: "Example Blog published this blog/interview entry.",
+    editorialCategory: "product_radar"
+  });
+  const discovery = discoveryEnvelope({
+    candidates: [
+      ...genericOfficialHotBlogs,
+      genericFillerHotBlog,
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-official-generic-hot-blog-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-generic-hot-blog-control",
+        title: "OpenAI updates an API workflow control for enterprise teams",
+        evidence: "OpenAI describes an API workflow update, enterprise controls, availability details, and developer migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-official-generic-hot-blog-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-generic-hot-blog-control/",
+        title: "Meta updates AI developer release controls",
+        evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
+      })
+    ],
+    sourceNames: ["Google Research Blog", "Google DeepMind RSS", "Hugging Face Blog", "Example Blog", "OpenAI News RSS", "Meta AI Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const mainUrls = new Set(drafted.report.main_items.map((item) => item.url));
+  for (const candidate of genericOfficialHotBlogs) {
+    assert(mainUrls.has(candidate.url), `official technical blog should survive generic feed evidence: ${candidate.id}`);
+    const poolCandidate = drafted.candidatePool.candidates.find((item) => item.id === candidate.id || item.candidate_id === candidate.id);
+    assert.notEqual(poolCandidate?.main_reject_reason, "generic_hot_blog_announcement", `${candidate.id} must not be rejected as generic`);
+  }
+  assert(!mainUrls.has(genericFillerHotBlog.url), "generic title-only hot blog should not enter main stream");
+  const fillerPoolCandidate = drafted.candidatePool.candidates.find((item) => item.id === genericFillerHotBlog.id || item.candidate_id === genericFillerHotBlog.id);
+  assert.equal(fillerPoolCandidate?.main_reject_reason, "generic_hot_blog_announcement");
+});
+
 test("report:draft rejects title-only self-media discovery leads from main stream refill", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-title-only-self-media-"));
   const reportDate = "2026-06-15";

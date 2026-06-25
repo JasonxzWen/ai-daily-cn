@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-25.project_iteration.admission-scoring-primary-url",
+  "run_type": "project_iteration",
+  "date": "2026-06-25",
+  "title": "Admission scoring primary URL correction",
+  "status": "completed",
+  "summary": "Continued the Stage B admission-scoring work from the prior Claude Code session. The fix keeps verified strategic lab URLs from being downgraded to intermediary when discovery came through HN or another aggregator, so primary-confirmed Anthropic/OpenAI/DeepMind-style engineering or research items can reach the main stream.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"report:draft admission scoring\" tests/unit.test.js",
+      "node --test tests/unit.test.js tests/source-coverage.test.js tests/story-authoring.test.js tests/generation-first.test.js",
+      "node scripts/check-daily-content-contract.mjs --self-test --json",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Aggregator discovery should not erase a primary-confirmed strategic lab URL.",
+      "evidence": "The new admission scoring test failed before implementation because an Anthropic research URL discovered via a Hacker News-labeled source stayed out of the main stream; after the fix it enters the main stream and is not downgraded to intermediary.",
+      "scope": "main_stream_admission",
+      "persistence": "implemented",
+      "recommended_action": "When source authority is inferred, check verified primary URLs before applying broad intermediary-source regexes."
+    },
+    {
+      "lesson": "Direct Anthropic Engineering deep-dive ordering was already acceptable, so the implementation should stay focused.",
+      "evidence": "The direct lab deep-dive versus AWS Bedrock availability fixture was green before source-level changes, while the aggregator-primary-URL fixture was red.",
+      "scope": "main_stream_scoring",
+      "persistence": "session_note",
+      "recommended_action": "Avoid large score-weight rewrites until real draft outputs prove direct lab deep-dives are still being suppressed."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Run a real dated draft with the new Anthropic engineering and research sources, then inspect whether the selected stories include the expected high-authority deep-dives.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Defer broader score-weight changes until a real artifact shows direct lab deep-dives losing to vendor availability or partnership PR after this source-level fix.",
+      "owner": "project"
+    }
+  ],
+  "slug": "admission-scoring-primary-url"
+}

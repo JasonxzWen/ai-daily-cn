@@ -156,6 +156,10 @@ const PUBLIC_AI_HEADLINE_ENTITY_RE = /\b(openai|google|deepmind|anthropic|meta|n
 const STRATEGIC_CORE_SOURCE_RE = /\b(openai|anthropic|claude|deepmind|google research|google keyword|meta ai|meta llama|microsoft|zhipu|z\.ai|zai-org|glm|智谱|minimax|moonshot|kimi|deepseek|bytedance|byte\s*dance|seed\.bytedance|tencent|hunyuan|qwen|alibaba|meituan)\b|openai\.com|anthropic\.com|deepmind\.google|research\.google|blog\.google|ai\.meta\.com|about\.fb\.com|microsoft\.com|zhipuai\.cn|minimax\.io|kimi\.com|platform\.kimi\.com|deepseek\.com|bytedance\.com|seed\.bytedance\.com|tencent\.com|hunyuan\.tencent\.com|qwen\.ai|alibabagroup\.com|alibabacloud\.com|meituan\.com|github\.com\/(?:openai|anthropics|google-deepmind|meta-llama|deepseek-ai|qwenlm|moonshotai|minimax-ai|tencent-hunyuan|tencent|bytedance|alibaba|meituan|microsoft)\b|huggingface\.co\/(?:openai|anthropic|deepseek-ai|minimaxai|qwen|zai-org|bytedance-seed|moonshotai|meta-llama|microsoft)\b/i;
 const OVERREPRESENTED_INFRA_VENDOR_SOURCE_RE = /\b(nvidia|aws|amazon web services|amazon bedrock|sagemaker)\b|developer\.nvidia\.com|nvidianews\.nvidia\.com|blogs\.nvidia\.com|aws\.amazon\.com|aboutamazon\.com/i;
 const GENERIC_HOT_BLOG_EVIDENCE_RE = /published this blog\/interview entry\.?$/i;
+const OFFICIAL_TECHNICAL_BLOG_SOURCE_RE = /\b(anthropic engineering|anthropic research|google research|google deepmind|deepmind rss|hugging face blog|microsoft research|apple machine learning|openai blog|openai research|meta ai blog)\b|anthropic\.com\/(?:engineering|research)|research\.google|deepmind\.google\/blog|huggingface\.co\/blog|microsoft\.com\/en-us\/research|machinelearning\.apple\.com\/research|ai\.meta\.com\/blog|openai\.com\/(?:research|index)/i;
+const HUGGING_FACE_ORG_TECHNICAL_BLOG_URL_RE = /huggingface\.co\/blog\/[a-z0-9-]*(?:research|labs?|ai|deepmind|qwen|openai|microsoft|ibm|nvidia|meta)[a-z0-9-]*\//i;
+const SPECIFIC_TECHNICAL_BLOG_SURFACE_RE = /\b(agentic?|agents?|llms?|large language models?|reasoning|inference|benchmark|leaderboard|fine[-\s]?tuning|transformers?|workflow|harness|computer use|gemini|claude|gpt|qwen|deepmind|research|developer|architecture|evaluation|eval|rag|retrieval|open[-\s]?source|github|hugging face|cuga|asr|tool use|tools?|memory|context|token|tokens?|model|models?)\b|模型|推理|评测|基准|智能体|开发者|工作流|架构|研究|检索|上下文|多模态/u;
+const GENERIC_TECHNICAL_BLOG_TITLE_RE = /^(?:latest|official|new)\s+ai\s+(?:platform|product|model|research|blog)\s+update\b|^ai\s+(?:platform|product|model)\s+update$/i;
 const TITLE_MOJIBAKE_RE = /�|锟|喔|鈥|峄|岷|箞|鑳|€/u;
 const LOW_VALUE_MAIN_RE = /amazon in the community|service,\s*community,\s*and commitment at hq2|friday night baseball|apple arcade|family feud pocket|prime video|spinoff|ari[a]?nespace launch|deploy more satellites|vought rising|here'?s what'?s happening in seattle|hq2|july.*baseball|mini football legends|the latest ai news we announced in/i;
 const LOW_VALUE_AI_PR_RE = /doosan group collaborate|multiyear technology partnership|advance memory for ai factories|advance physical ai and ai factory infrastructure|build ai infrastructure to power|expands ai infrastructure with nvidia/i;
@@ -3619,6 +3623,9 @@ function isPublicFillerMainCandidate(candidate, meta = {}) {
   if (!hasFiller) {
     return false;
   }
+  if (hasSpecificOfficialTechnicalHotBlogSurface(candidate)) {
+    return false;
+  }
   const detailText = [
     candidate.evidence,
     candidate.notes,
@@ -4451,6 +4458,9 @@ function hasConcreteHotBlogMaterial(candidate) {
   if (hotBlogSpecificSummary(candidate)) {
     return true;
   }
+  if (hasSpecificOfficialTechnicalHotBlogSurface(candidate)) {
+    return true;
+  }
   const evidence = String(candidate.evidence || "").trim();
   if (!evidence || GENERIC_HOT_BLOG_EVIDENCE_RE.test(evidence)) {
     return false;
@@ -4461,8 +4471,61 @@ function hasConcreteHotBlogMaterial(candidate) {
   return /\b(introduces|explains|shows|details|describes|breaks down|designed|workflows?|sessions?|distributed|enterprise|ontology|dependency|methods?|case studies?|benchmarks?|architecture|implementation)\b/i.test(evidence);
 }
 
+function hasSpecificOfficialTechnicalHotBlogSurface(candidate) {
+  if (!candidate || candidate.category !== "hot_blog") {
+    return false;
+  }
+  if (candidate.verification_status && !PRIMARY_STATUSES.has(candidate.verification_status)) {
+    return false;
+  }
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (!TRUSTED_PRIMARY_SOURCE_LEVELS.has(sourceLevel)) {
+    return false;
+  }
+  if (!isBlogLikeCandidate(candidate) || !hasReaderVisibleTitle(candidate)) {
+    return false;
+  }
+  if (isStatuspageCandidate(candidate) || isSearchShadowCandidate(candidate)) {
+    return false;
+  }
+  if (isLowValueMainCandidate(candidate) || isLowSignalVendorPartnership(candidate) || isMinorConsumerAiFeatureCandidate(candidate)) {
+    return false;
+  }
+  const sourceText = candidateSourceOwnerText(candidate);
+  if (!OFFICIAL_TECHNICAL_BLOG_SOURCE_RE.test(sourceText)) {
+    return false;
+  }
+  if (/hugging\s*face blog|huggingface\.co\/blog/i.test(sourceText) && !HUGGING_FACE_ORG_TECHNICAL_BLOG_URL_RE.test(sourceText)) {
+    return false;
+  }
+  const title = String(candidate.title || "").replace(/\s+/g, " ").trim();
+  if (GENERIC_TECHNICAL_BLOG_TITLE_RE.test(title)) {
+    return false;
+  }
+  const surface = [
+    title,
+    candidate.url,
+    candidate.source,
+    candidate.source_id
+  ].filter(Boolean).join(" ");
+  return AI_RELEVANCE_RE.test(surface) && SPECIFIC_TECHNICAL_BLOG_SURFACE_RE.test(surface);
+}
+
 function isKnownIntermediaryCandidate(candidate) {
   return INTERMEDIARY_SOURCE_RE.test(`${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""}`);
+}
+
+function verifiedStrategicPrimaryUrlText(candidate) {
+  if (!PRIMARY_STATUSES.has(candidate?.verification_status)) {
+    return "";
+  }
+  const verificationSources = Array.isArray(candidate?.verification_sources) ? candidate.verification_sources : [];
+  const urlText = [
+    candidate?.primary_url,
+    candidate?.url,
+    ...verificationSources
+  ].filter(Boolean).join(" ").toLowerCase();
+  return STRATEGIC_CORE_SOURCE_RE.test(urlText) ? urlText : "";
 }
 
 function isSearchShadowCandidate(candidate) {
@@ -4490,8 +4553,12 @@ function inferredEditorialCategory(candidate) {
 
 function sourceLevelForCandidate(candidate) {
   const text = `${candidate.source || ""} ${candidate.url || ""} ${candidate.source_id || ""}`.toLowerCase();
-  if (isKnownIntermediaryCandidate(candidate)) return "intermediary";
+  const hasVerifiedStrategicPrimaryUrl = Boolean(verifiedStrategicPrimaryUrlText(candidate));
+  if (isKnownIntermediaryCandidate(candidate)) {
+    return hasVerifiedStrategicPrimaryUrl ? "official" : "intermediary";
+  }
   if (candidate.source_level) return candidate.source_level;
+  if (hasVerifiedStrategicPrimaryUrl) return "official";
   if (text.includes("github")) return "github";
   if (text.includes("arxiv")) return "paper";
   if (/reddit|hacker news|hnrss|wechat|36kr|qbitai|leiphone|infoq|techcrunch|verge|venturebeat|fast company|google news/i.test(text)) {
