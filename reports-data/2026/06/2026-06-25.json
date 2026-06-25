@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-25",
   "title": "AI 日报 2026-06-25",
-  "summary": "今天最值得看的主线有 微软研究院更新AI 产品、平台或工程实践；Alibaba Cloud披露 agent 与开发者工具能力；Qwen 团队更新agent 工作流和开发工具能力；热门博客这轮主要看 agent 和开发工具的落地边界。",
+  "summary": "今天最值得看的主线有 Meta Newsroom披露 Claude Code agent 工具工作流；Alibaba Cloud披露 agent 与开发者工具能力；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。",
   "source_window": {
     "date_from": "2026-06-23",
     "date_to": "2026-06-25",
@@ -20,22 +20,22 @@
       "source_item_ref": "story-content-google-keyword-introducing-computer-use-in-gemini-3-5-flash"
     },
     {
-      "title": "微软研究院更新agent 工作流和开发工具能力",
-      "url": "https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/",
-      "reason": "信号集中在 AI 产品、模型或平台策略的实际变化",
-      "what_happened": "微软研究院更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性",
-      "why_watch": "信号集中在 AI 产品、模型或平台策略的实际变化",
+      "title": "Meta 在亚太推出小企业 AI 与数字技能增长学院",
+      "url": "https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/",
+      "reason": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "what_happened": "Meta Newsroom更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性",
+      "why_watch": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "category": "product_tool",
-      "source_item_ref": "story-content-microsoft-official-blog-inside-microsoft-s-two-decade-push-to-cut-water"
+      "source_item_ref": "story-content-meta-newsroom-launch-of-meta-s-small-business-growth-academy-across-asia"
     },
     {
-      "title": "微软研究院更新AI 产品、平台或工程实践",
-      "url": "https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/",
-      "reason": "工程价值集中在代码、权重、示例和生态复用条件",
-      "what_happened": "微软研究院更新AI 产品、平台或工程实践，材料覆盖功能变化、使用场景、接入方式、限制条件和后续部署边界，边界落在公开材料仍需要回到原文核对入口、权限、价格和适用范围",
-      "why_watch": "工程价值集中在代码、权重、示例和生态复用条件",
+      "title": "Alibaba Cloud披露 agent 与开发者工具能力",
+      "url": "https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304",
+      "reason": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "what_happened": "Qwen 团队更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性",
+      "why_watch": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "category": "china_open_source_community",
-      "source_item_ref": "story-content-microsoft-research-talos-scaling-rare-disease-diagnosis-with-automated-i"
+      "source_item_ref": "story-content-alibaba-cloud-blog-qwen-agentworld-language-world-models-for-general-age"
     }
   ],
   "source_audit": {
@@ -155,13 +155,13 @@
           "name": "follow-builders X feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
           "status": "checked",
-          "notes": "41 recent original entries parsed"
+          "notes": "29 recent original entries parsed"
         },
         {
           "name": "follow-builders podcast feed",
           "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json",
-          "status": "no_signal",
-          "notes": "0 recent original entries parsed"
+          "status": "checked",
+          "notes": "1 recent original entries parsed"
         },
         {
           "name": "follow-builders blog feed",
@@ -173,7 +173,7 @@
           "name": "Simon Willison Weblog",
           "url": "https://simonwillison.net/atom/everything/",
           "status": "checked",
-          "notes": "3 recent original entries parsed"
+          "notes": "4 recent original entries parsed"
         },
         {
           "name": "Chip Huyen Blog",
@@ -188,10 +188,10 @@
           "notes": "0 recent original entries parsed"
         }
       ],
-      "candidates_found": 23,
-      "included": 11,
+      "candidates_found": 24,
+      "included": 8,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-24T18:34:07.084Z",
+      "last_successful_feed_at": "2026-06-25T08:21:20.308Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -208,8 +208,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         },
         {
           "name": "Alibaba Group News CN",
@@ -337,8 +337,8 @@
           "notes": "0 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 1,
-      "included": 1,
+      "candidates_found": 2,
+      "included": 2,
       "sources_checked": 10,
       "enablement_counts": {
         "core": 8,
@@ -351,7 +351,7 @@
         "html_index": 10
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-24T18:34:10.575Z",
+      "last_successful_feed_at": "2026-06-25T08:21:23.467Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "content_sources": {
@@ -374,8 +374,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         },
         {
           "name": "Alibaba Group News CN",
@@ -555,8 +555,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         },
         {
           "name": "Amazon News",
@@ -569,8 +569,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 7,
-          "notes": "7 recent intermediary lead entries parsed"
+          "parsed_count": 9,
+          "notes": "9 recent intermediary lead entries parsed"
         },
         {
           "name": "NVIDIA Newsroom RSS",
@@ -631,7 +631,7 @@
         {
           "name": "xAI Company News",
           "url": "https://x.ai/news",
-          "status": "no_signal",
+          "status": "checked",
           "id": "content-xai-company-news",
           "source_kind": "html_index",
           "tier": "T0",
@@ -639,8 +639,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "parsed_count": 1,
+          "notes": "1 recent intermediary lead entries parsed"
         },
         {
           "name": "Tencent Media Center",
@@ -653,8 +653,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         },
         {
           "name": "Huawei Newsroom",
@@ -729,7 +729,7 @@
         {
           "name": "JD.com Investor News",
           "url": "https://ir.jd.com/news-releases/",
-          "status": "no_signal",
+          "status": "blocked",
           "id": "content-jd-investor-news",
           "source_kind": "html_index",
           "tier": "T1",
@@ -737,8 +737,7 @@
           "enablement": "optional",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent intermediary lead entries parsed"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
         },
         {
           "name": "NetEase Company News",
@@ -895,6 +894,62 @@
           "notes": "1 recent blog/interview entries parsed"
         },
         {
+          "name": "Anthropic Engineering",
+          "url": "https://www.anthropic.com/engineering",
+          "status": "no_signal",
+          "id": "content-anthropic-engineering",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "parsed_count": 0,
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Anthropic Research",
+          "url": "https://www.anthropic.com/research",
+          "status": "no_signal",
+          "id": "content-anthropic-research",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "parsed_count": 0,
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Simon Willison's Weblog",
+          "url": "https://simonwillison.net/atom/everything/",
+          "status": "checked",
+          "id": "content-builder-simon-willison",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "parsed_count": 4,
+          "notes": "4 recent blog/interview entries parsed"
+        },
+        {
+          "name": "Lil'Log (Lilian Weng)",
+          "url": "https://lilianweng.github.io/index.xml",
+          "status": "no_signal",
+          "id": "content-builder-lilian-weng",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "parsed_count": 0,
+          "notes": "0 recent blog/interview entries parsed"
+        },
+        {
           "name": "Hugging Face Blog",
           "url": "https://huggingface.co/blog/feed.xml",
           "status": "checked",
@@ -919,8 +974,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 7,
-          "notes": "7 recent blog/interview entries parsed"
+          "parsed_count": 8,
+          "notes": "8 recent blog/interview entries parsed"
         },
         {
           "name": "Google Research Blog",
@@ -1065,7 +1120,7 @@
         {
           "name": "xAI News",
           "url": "https://x.ai/news",
-          "status": "no_signal",
+          "status": "checked",
           "id": "content-xai-news",
           "source_kind": "html_index",
           "tier": "T0",
@@ -1073,8 +1128,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 0,
-          "notes": "0 recent blog/interview entries parsed"
+          "parsed_count": 1,
+          "notes": "1 recent blog/interview entries parsed"
         },
         {
           "name": "ByteDance Seed Tech Blog",
@@ -1324,8 +1379,8 @@
           "enablement": "core",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 5,
-          "notes": "5 recent intermediary lead entries parsed"
+          "parsed_count": 8,
+          "notes": "8 recent intermediary lead entries parsed"
         },
         {
           "name": "TechCrunch AI",
@@ -1338,8 +1393,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 11,
-          "notes": "11 recent intermediary lead entries parsed"
+          "parsed_count": 18,
+          "notes": "18 recent intermediary lead entries parsed"
         },
         {
           "name": "The Verge AI",
@@ -1394,8 +1449,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 19,
-          "notes": "19 recent intermediary lead entries parsed"
+          "parsed_count": 20,
+          "notes": "20 recent intermediary lead entries parsed"
         },
         {
           "name": "MIT Technology Review",
@@ -1506,8 +1561,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 2,
-          "notes": "2 recent intermediary lead entries parsed"
+          "parsed_count": 4,
+          "notes": "4 recent intermediary lead entries parsed"
         },
         {
           "name": "arXiv cs.AI",
@@ -1589,8 +1644,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 2,
+          "notes": "2 recent intermediary lead entries parsed"
         },
         {
           "name": "AI News Archive",
@@ -1698,78 +1753,78 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+            "snapshot_as_of": "2026-06-25T08:21:29.470Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
                 "rank": 1,
                 "model": "DeepSeek V4 Flash",
                 "provider": "deepseek",
-                "tokens": "4.94T tokens",
-                "change": "12%"
+                "tokens": "4.97T tokens",
+                "change": "10%"
               },
               {
                 "rank": 2,
                 "model": "MiMo-V2.5",
                 "provider": "xiaomi",
-                "tokens": "4.28T tokens",
-                "change": "17%"
+                "tokens": "4.36T tokens",
+                "change": "18%"
               },
               {
                 "rank": 3,
                 "model": "MiniMax M3",
                 "provider": "minimax",
-                "tokens": "3.76T tokens",
+                "tokens": "3.75T tokens",
                 "change": "19%"
               },
               {
                 "rank": 4,
                 "model": "Hy3 preview",
                 "provider": "tencent",
-                "tokens": "3.6T tokens",
-                "change": "6%"
+                "tokens": "3.44T tokens",
+                "change": "7%"
               },
               {
                 "rank": 5,
                 "model": "Owl Alpha",
                 "provider": "openrouter",
-                "tokens": "2.78T tokens",
-                "change": "14%"
+                "tokens": "2.92T tokens",
+                "change": "19%"
               },
               {
                 "rank": 6,
                 "model": "Claude Opus 4.7",
                 "provider": "anthropic",
-                "tokens": "2.48T tokens",
-                "change": "8%"
+                "tokens": "2.54T tokens",
+                "change": "11%"
               },
               {
                 "rank": 7,
                 "model": "DeepSeek V4 Pro",
                 "provider": "deepseek",
-                "tokens": "2.34T tokens",
-                "change": "19%"
+                "tokens": "2.19T tokens",
+                "change": "0%"
               },
               {
                 "rank": 8,
                 "model": "Claude Opus 4.8",
                 "provider": "anthropic",
-                "tokens": "1.82T tokens",
-                "change": "43%"
+                "tokens": "1.87T tokens",
+                "change": "37%"
               },
               {
                 "rank": 9,
                 "model": "GLM 5.2",
                 "provider": "z-ai",
-                "tokens": "1.77T tokens",
-                "change": ">999%"
+                "tokens": "1.8T tokens",
+                "change": "523%"
               },
               {
                 "rank": 10,
                 "model": "Claude Sonnet 4.6",
                 "provider": "anthropic",
-                "tokens": "1.52T tokens",
-                "change": "19%"
+                "tokens": "1.49T tokens",
+                "change": "17%"
               }
             ],
             "official_component_snapshot": {
@@ -1777,12 +1832,12 @@
               "source": "official_dom",
               "component_kind": "openrouter_rankings",
               "source_url": "https://openrouter.ai/rankings",
-              "captured_at": "2026-06-24T18:34:17.964Z",
+              "captured_at": "2026-06-25T08:21:29.470Z",
               "selector_version": "openrouter-rankings-v1",
               "source_selector": "[data-openrouter-rankings]",
-              "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.94T tokens</td><td>12%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.28T tokens</td><td>17%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.76T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.6T tokens</td><td>6%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.78T tokens</td><td>14%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.48T tokens</td><td>8%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.34T tokens</td><td>19%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.82T tokens</td><td>43%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.77T tokens</td><td>&gt;999%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.52T tokens</td><td>19%</td></tr></tbody>\n        </table>\n      </section>",
+              "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
               "sanitized_css": ".openrouter-rankings-card { border: 1px solid currentColor; padding: 16px; }\n      .openrouter-rankings-card table { width: 100%; border-collapse: collapse; }\n      .openrouter-rankings-card th, .openrouter-rankings-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
-              "dom_hash": "sha256:b39404be1b1edf86703b974d4225c6cb10ebb9101b7cbd4cc089d7d103de56ec",
+              "dom_hash": "sha256:fcf92c555b37c8ecaa37e4127fcab1600853fb8d7cd4cbc9d4a000fe59a334dc",
               "css_hash": "sha256:e5df3dc0e07de42f5c2ca4021bbf59258d47d1ef0fa569d55d98b09876618e43"
             },
             "notes": "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof.",
@@ -1798,7 +1853,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+            "snapshot_as_of": "2026-06-25T08:21:29.470Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -1973,7 +2028,7 @@
               "source": "official_dom",
               "component_kind": "artificial_analysis_index",
               "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-              "captured_at": "2026-06-24T18:34:17.964Z",
+              "captured_at": "2026-06-25T08:21:29.470Z",
               "selector_version": "artificial-analysis-index-v1",
               "source_selector": "[data-artificial-analysis-index]",
               "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -1994,7 +2049,7 @@
             "type": "swe_bench_pro_public_page",
             "collection_method": "public_page_static",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+            "snapshot_as_of": "2026-06-25T08:21:29.470Z",
             "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
             "top_entries": [
               {
@@ -2073,7 +2128,7 @@
               "source": "official_dom",
               "component_kind": "swe_bench_pro",
               "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-              "captured_at": "2026-06-24T18:34:17.964Z",
+              "captured_at": "2026-06-25T08:21:29.470Z",
               "selector_version": "swe-bench-pro-v1",
               "source_selector": "[data-swe-bench-pro-leaderboard]",
               "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -2124,8 +2179,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 41,
-          "notes": "41 recent intermediary lead entries parsed"
+          "parsed_count": 49,
+          "notes": "49 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -2138,8 +2193,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 42,
-          "notes": "42 recent intermediary lead entries parsed"
+          "parsed_count": 46,
+          "notes": "46 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -2152,8 +2207,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 44,
-          "notes": "44 recent intermediary lead entries parsed"
+          "parsed_count": 48,
+          "notes": "48 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2194,8 +2249,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 23,
-          "notes": "23 recent intermediary lead entries parsed"
+          "parsed_count": 35,
+          "notes": "35 recent intermediary lead entries parsed"
         },
         {
           "name": "36Kr",
@@ -2278,8 +2333,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 8,
-          "notes": "8 recent intermediary lead entries parsed"
+          "parsed_count": 10,
+          "notes": "10 recent intermediary lead entries parsed"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -2578,7 +2633,7 @@
         {
           "name": "Qwen Hugging Face Organization",
           "url": "https://huggingface.co/Qwen",
-          "status": "checked",
+          "status": "no_signal",
           "id": "content-huggingface-qwen",
           "source_kind": "html_index",
           "tier": "T1",
@@ -2586,8 +2641,8 @@
           "enablement": "optional",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "parsed_count": 1,
-          "notes": "1 recent intermediary lead entries parsed"
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Z.ai Hugging Face Organization",
@@ -2688,22 +2743,22 @@
           "notes": "3 recent intermediary lead entries parsed"
         }
       ],
-      "candidates_found": 188,
+      "candidates_found": 199,
       "included": 16,
-      "sources_checked": 142,
+      "sources_checked": 146,
       "enablement_counts": {
-        "core": 65,
-        "optional": 76
+        "core": 67,
+        "optional": 78
       },
       "tier_counts": {
-        "T0": 67,
-        "T1": 32,
+        "T0": 69,
+        "T1": 34,
         "T2": 18,
         "T3": 24
       },
       "source_kind_counts": {
-        "html_index": 64,
-        "rss": 67,
+        "html_index": 66,
+        "rss": 69,
         "github_report_markdown": 3,
         "search_api": 4,
         "openrouter_rankings_public_playwright": 1,
@@ -2711,7 +2766,7 @@
         "swe_bench_pro_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-24T18:34:17.964Z",
+      "last_successful_feed_at": "2026-06-25T08:21:29.470Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2740,9 +2795,9 @@
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 50988,
-        "openalex": 22415,
-        "arxiv": 11511
+        "gdelt": 54880,
+        "openalex": 11780,
+        "arxiv": 13745
       },
       "provider_cost_units": {
         "gdelt": 3,
@@ -3004,9 +3059,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 3,
+          "recent_48h_entries": 5,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 3 within 48h"
+          "notes": "10 feed entries parsed; 5 within 48h"
         },
         {
           "name": "NVIDIA Newsroom RSS",
@@ -3164,7 +3219,7 @@
         {
           "name": "Baidu Press Releases",
           "url": "https://ir.baidu.com/index.php/press-releases",
-          "status": "checked",
+          "status": "blocked",
           "id": "content-baidu-press-releases",
           "source_kind": "html_index",
           "tier": "T0",
@@ -3172,11 +3227,10 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": 200,
+          "http_status": null,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "html_index source is reachable; feed_like=false"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError"
         },
         {
           "name": "Xiaomi Investor Relations",
@@ -3232,7 +3286,7 @@
         {
           "name": "Kuaishou Company News",
           "url": "https://kuaishou.gcs-web.com/news-events/company-news",
-          "status": "checked",
+          "status": "blocked",
           "id": "content-kuaishou-company-news",
           "source_kind": "html_index",
           "tier": "T1",
@@ -3240,11 +3294,10 @@
           "enablement": "optional",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": 200,
+          "http_status": null,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "original_url_count": null,
-          "notes": "html_index source is reachable; feed_like=false"
+          "notes": "The operation was aborted due to timeout; name=TimeoutError"
         },
         {
           "name": "Meituan Investor Relations",
@@ -3400,6 +3453,74 @@
           "notes": "html_index source is reachable; feed_like=false"
         },
         {
+          "name": "Anthropic Engineering",
+          "url": "https://www.anthropic.com/engineering",
+          "status": "checked",
+          "id": "content-anthropic-engineering",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Anthropic Research",
+          "url": "https://www.anthropic.com/research",
+          "status": "checked",
+          "id": "content-anthropic-research",
+          "source_kind": "html_index",
+          "tier": "T0",
+          "authority": "primary",
+          "enablement": "core",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": false,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
+        },
+        {
+          "name": "Simon Willison's Weblog",
+          "url": "https://simonwillison.net/atom/everything/",
+          "status": "checked",
+          "id": "content-builder-simon-willison",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 2,
+          "original_url_count": null,
+          "notes": "30 feed entries parsed; 2 within 48h"
+        },
+        {
+          "name": "Lil'Log (Lilian Weng)",
+          "url": "https://lilianweng.github.io/index.xml",
+          "status": "no_signal",
+          "id": "content-builder-lilian-weng",
+          "source_kind": "rss",
+          "tier": "T1",
+          "authority": "secondary",
+          "enablement": "optional",
+          "verification_policy": "primary_allowed",
+          "requires_original_url": false,
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 0,
+          "original_url_count": null,
+          "notes": "51 feed entries parsed; 0 within 48h"
+        },
+        {
           "name": "Hugging Face Blog",
           "url": "https://huggingface.co/blog/feed.xml",
           "status": "checked",
@@ -3429,9 +3550,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 1,
+          "recent_48h_entries": 2,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 1 within 48h"
+          "notes": "10 feed entries parsed; 2 within 48h"
         },
         {
           "name": "Google Research Blog",
@@ -3538,7 +3659,7 @@
         {
           "name": "NVIDIA Developer Blog",
           "url": "https://developer.nvidia.com/blog/feed/",
-          "status": "no_signal",
+          "status": "checked",
           "id": "content-nvidia-developer-blog",
           "source_kind": "rss",
           "tier": "T0",
@@ -3548,9 +3669,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 0,
+          "recent_48h_entries": 1,
           "original_url_count": null,
-          "notes": "100 feed entries parsed; 0 within 48h"
+          "notes": "100 feed entries parsed; 1 within 48h"
         },
         {
           "name": "AWS Machine Learning Blog",
@@ -3921,9 +4042,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 1,
+          "recent_48h_entries": 4,
           "original_url_count": null,
-          "notes": "30 feed entries parsed; 1 within 48h"
+          "notes": "30 feed entries parsed; 4 within 48h"
         },
         {
           "name": "TechCrunch AI",
@@ -3938,9 +4059,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 5,
+          "recent_48h_entries": 12,
           "original_url_count": null,
-          "notes": "19 feed entries parsed; 5 within 48h"
+          "notes": "19 feed entries parsed; 12 within 48h"
         },
         {
           "name": "The Verge AI",
@@ -3955,9 +4076,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 5,
+          "recent_48h_entries": 6,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 5 within 48h"
+          "notes": "10 feed entries parsed; 6 within 48h"
         },
         {
           "name": "TechCrunch Enterprise",
@@ -4006,9 +4127,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 7,
+          "recent_48h_entries": 16,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 7 within 48h"
+          "notes": "20 feed entries parsed; 16 within 48h"
         },
         {
           "name": "MIT Technology Review",
@@ -4139,9 +4260,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 1,
+          "recent_48h_entries": 3,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 1 within 48h"
+          "notes": "20 feed entries parsed; 3 within 48h"
         },
         {
           "name": "arXiv cs.AI",
@@ -4227,7 +4348,7 @@
         {
           "name": "Smol AI News",
           "url": "https://news.smol.ai/rss.xml",
-          "status": "no_signal",
+          "status": "checked",
           "id": "content-smol-ai-news",
           "source_kind": "rss",
           "tier": "T2",
@@ -4237,9 +4358,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 0,
+          "recent_48h_entries": 1,
           "original_url_count": null,
-          "notes": "661 feed entries parsed; 0 within 48h"
+          "notes": "662 feed entries parsed; 1 within 48h"
         },
         {
           "name": "AI News Archive",
@@ -4355,9 +4476,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 29,
+          "recent_48h_entries": 48,
           "original_url_count": null,
-          "notes": "50 feed entries parsed; 29 within 48h"
+          "notes": "50 feed entries parsed; 48 within 48h"
         },
         {
           "name": "OpenRouter Rankings",
@@ -4439,9 +4560,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 99,
+          "recent_48h_entries": 100,
           "original_url_count": null,
-          "notes": "100 feed entries parsed; 99 within 48h"
+          "notes": "100 feed entries parsed; 100 within 48h"
         },
         {
           "name": "Google News AI Policy RSS",
@@ -4456,9 +4577,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 11,
+          "recent_48h_entries": 24,
           "original_url_count": null,
-          "notes": "43 feed entries parsed; 11 within 48h"
+          "notes": "49 feed entries parsed; 24 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4473,9 +4594,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 22,
+          "recent_48h_entries": 34,
           "original_url_count": null,
-          "notes": "48 feed entries parsed; 22 within 48h"
+          "notes": "46 feed entries parsed; 34 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -4490,9 +4611,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 21,
+          "recent_48h_entries": 28,
           "original_url_count": null,
-          "notes": "49 feed entries parsed; 21 within 48h"
+          "notes": "48 feed entries parsed; 28 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -4541,9 +4662,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 12,
+          "recent_48h_entries": 20,
           "original_url_count": null,
-          "notes": "35 feed entries parsed; 12 within 48h"
+          "notes": "35 feed entries parsed; 20 within 48h"
         },
         {
           "name": "36Kr",
@@ -4609,9 +4730,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 13,
+          "recent_48h_entries": 20,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 13 within 48h"
+          "notes": "20 feed entries parsed; 20 within 48h"
         },
         {
           "name": "InfoQ CN",
@@ -4626,9 +4747,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 9,
+          "recent_48h_entries": 18,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 9 within 48h"
+          "notes": "20 feed entries parsed; 18 within 48h"
         },
         {
           "name": "SSPAI",
@@ -4643,9 +4764,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 3,
+          "recent_48h_entries": 6,
           "original_url_count": null,
-          "notes": "10 feed entries parsed; 3 within 48h"
+          "notes": "10 feed entries parsed; 6 within 48h"
         },
         {
           "name": "iFanr",
@@ -4660,9 +4781,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 5,
+          "recent_48h_entries": 9,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 5 within 48h"
+          "notes": "20 feed entries parsed; 9 within 48h"
         },
         {
           "name": "OpenAI GitHub Organization",
@@ -5171,9 +5292,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 22,
+          "recent_48h_entries": 24,
           "original_url_count": null,
-          "notes": "25 feed entries parsed; 22 within 48h"
+          "notes": "25 feed entries parsed; 24 within 48h"
         },
         {
           "name": "WeChat Platform AI Feed",
@@ -5344,8 +5465,8 @@
           "enablement": "manual",
           "verification_policy": "platform_signal_exempt",
           "platform": "reddit",
-          "parsed_count": 18,
-          "notes": "18 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=4, include_keywords_not_matched=2"
+          "parsed_count": 16,
+          "notes": "16 recent platform signal entries parsed。platform_rejections: exclude_keywords_matched=7, include_keywords_not_matched=1"
         }
       ],
       "candidates_found": 3,
@@ -5361,7 +5482,7 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-24T18:38:02.323Z",
+      "last_successful_feed_at": "2026-06-25T08:25:56.082Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
@@ -5507,7 +5628,7 @@
       "statuses": [
         "checked"
       ],
-      "candidate_count": 4,
+      "candidate_count": 3,
       "included_count": 3,
       "notes": "6 recent blog/interview entries parsed; 20 feed entries parsed; 4 within 48h"
     },
@@ -5575,8 +5696,8 @@
         "no_signal"
       ],
       "candidate_count": 20,
-      "included_count": 12,
-      "notes": "41 recent original entries parsed; 0 recent original entries parsed"
+      "included_count": 8,
+      "notes": "29 recent original entries parsed; 1 recent original entries parsed; 0 recent original entries parsed"
     },
     {
       "id": "ml-papers-week",
@@ -5655,8 +5776,8 @@
       "reachable": true,
       "parsed_recent": true,
       "candidate_created": true,
-      "public_included": true,
-      "not_included_reason": "",
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
       "source_ids": [
         "content-techcrunch-ai"
       ],
@@ -5667,8 +5788,8 @@
         "checked"
       ],
       "candidate_count": 3,
-      "included_count": 1,
-      "notes": "11 recent intermediary lead entries parsed; 19 feed entries parsed; 5 within 48h"
+      "included_count": 0,
+      "notes": "18 recent intermediary lead entries parsed; 19 feed entries parsed; 12 within 48h"
     },
     {
       "id": "the-verge",
@@ -5692,7 +5813,7 @@
       ],
       "candidate_count": 6,
       "included_count": 0,
-      "notes": "10 recent intermediary lead entries parsed; 10 feed entries parsed; 5 within 48h; 10 feed entries parsed; 10 within 48h"
+      "notes": "10 recent intermediary lead entries parsed; 10 feed entries parsed; 6 within 48h; 10 feed entries parsed; 10 within 48h"
     },
     {
       "id": "mit-technology-review",
@@ -5738,7 +5859,7 @@
       ],
       "candidate_count": 3,
       "included_count": 0,
-      "notes": "19 recent intermediary lead entries parsed; 20 feed entries parsed; 7 within 48h"
+      "notes": "20 recent intermediary lead entries parsed; 20 feed entries parsed; 16 within 48h"
     },
     {
       "id": "venturebeat-ai",
@@ -5883,7 +6004,7 @@
       ],
       "candidate_count": 5,
       "included_count": 1,
-      "notes": "Official organization/repository Atom feeds are monitored separately from GitHub Trending and only count when recent parsed repository events produce candidates.; 2 recent intermediary lead entries parsed; 7 recent blog/interview entries parsed; 0 recent intermediary lead entries parsed"
+      "notes": "Official organization/repository Atom feeds are monitored separately from GitHub Trending and only count when recent parsed repository events produce candidates.; 2 recent intermediary lead entries parsed; 8 recent blog/interview entries parsed; 0 recent intermediary lead entries parsed"
     },
     {
       "id": "github-trending",
@@ -5907,15 +6028,55 @@
   ],
   "stories": [
     {
+      "story_id": "story-content-meta-newsroom-launch-of-meta-s-small-business-growth-academy-across-asia",
+      "title": "Meta Newsroom发布 Claude Code agent 工具工作流",
+      "importance": "general",
+      "trend": "AI products and developer workflow",
+      "event_date": "2026-06-23",
+      "primary_entity": "Meta Newsroom",
+      "event_type": "launch",
+      "object": "Meta Newsroom披露 Claude Code agent 工具工作流",
+      "what_happened": "Meta 6 月 23 日宣布在亚太推出 Small Business Growth Academy，面向小企业提供 AI 工具、广告和跨境增长培训，目标是帮助商家提升数字技能并扩大业务。",
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Meta Newsroom",
+          "url": "https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "story_id": "story-content-alibaba-cloud-blog-qwen-agentworld-language-world-models-for-general-age",
+      "title": "Alibaba Cloud更新agent 与开发者工具能力",
+      "importance": "general",
+      "trend": "AI industry",
+      "event_date": "2026-06-25",
+      "primary_entity": "Alibaba Cloud Blog",
+      "event_type": "launch",
+      "object": "Alibaba Cloud披露 agent 与开发者工具能力",
+      "what_happened": "阿里云 Qwen 团队 6 月 25 日发布 Qwen-AgentWorld，这是一个用语言模拟 agent 环境的 world model，覆盖七个领域，用来支持通用 agent 的训练和评估。",
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "evidence_level": "primary",
+      "sources": [
+        {
+          "label": "Alibaba Cloud Blog",
+          "url": "https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304",
+          "type": "official"
+        }
+      ]
+    },
+    {
       "story_id": "story-content-microsoft-research-talos-scaling-rare-disease-diagnosis-with-automated-i",
-      "title": "Microsoft Research Blog: Talos Scaling Rare Disease Diagnosis With Automated Iterative Genomic Reanalysis",
+      "title": "微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-24",
       "primary_entity": "Microsoft Research Blog",
       "event_type": "research",
       "object": "微软研究院更新AI 产品、平台或工程实践",
-      "what_happened": "微软研究院介绍了开源系统 Talos，用自动、迭代的基因组重分析缓解罕见病诊断中的人工审阅瓶颈。文中披露，Talos 在范围内诊断中恢复了 90%，同时每名患者只向专家呈现约 1.3 个候选变异供复核。",
+      "what_happened": "微软研究院介绍 Talos，用自动化、迭代的基因组再分析缓解罕见病诊断中的人工审阅瓶颈；公开材料称它在范围内诊断中恢复了 90%，平均每位患者只向专家呈现 1.3 个候选变异。",
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "evidence_level": "primary",
       "sources": [
@@ -5935,7 +6096,7 @@
       "primary_entity": "Alibaba Cloud Blog",
       "event_type": "signal",
       "object": "Alibaba Cloud披露 agent 与开发者工具能力",
-      "what_happened": "阿里云介绍了全托管 PolarDB-X Mem0 服务，目标是为 AI agent 提供长期记忆。公开材料强调它用统一的双通道架构同时处理语义数据和结构化数据，方便 agent 在后端服务中复用上下文。",
+      "what_happened": "阿里云介绍全托管 PolarDB-X Mem0 服务，为 AI agent 提供长期记忆，采用语义数据和结构化数据的双通道架构，面向记忆扩展与双用途集成场景。",
       "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "evidence_level": "primary",
       "sources": [
@@ -5947,35 +6108,15 @@
       ]
     },
     {
-      "story_id": "story-content-huggingface-qwen-qwen-agentworldbench",
-      "title": "Qwen Hugging Face Organization: AgentWorldBench",
-      "importance": "general",
-      "trend": "open source AI",
-      "event_date": "2026-06-23",
-      "primary_entity": "Qwen Hugging Face Organization",
-      "event_type": "signal",
-      "object": "Qwen 团队更新agent 工作流和开发工具能力",
-      "what_happened": "Qwen 在 Hugging Face 更新了 AgentWorldBench 数据集入口，为智能体世界任务评测提供公开数据集页面。当前可见信息主要是数据集入口和更新时间，具体任务定义、许可和使用方式仍需要回到 Hugging Face 页面核对。",
-      "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "Qwen Hugging Face Organization",
-          "url": "https://huggingface.co/datasets/Qwen/AgentWorldBench",
-          "type": "official"
-        }
-      ]
-    },
-    {
       "story_id": "story-content-google-keyword-introducing-computer-use-in-gemini-3-5-flash",
-      "title": "Google Keyword Blog: Introducing Computer Use Gemini 3 5 Flash",
+      "title": "Google 为 Gemini 模型新增电脑操作能力",
       "importance": "general",
       "trend": "AI industry",
       "event_date": "2026-06-24",
       "primary_entity": "Google Keyword Blog",
       "event_type": "signal",
       "object": "Google Keyword更新AI 产品、平台或工程实践",
-      "what_happened": "Google 在 Keyword Blog 发布了 Gemini 3.5 Flash 的计算机使用能力介绍，指向让模型处理界面或浏览器操作的产品入口。公开页需要继续核对可用范围、权限边界、失败处理和开发者接入方式。",
+      "what_happened": "Google 在 Keyword 博客介绍 Gemini 3.5 Flash 的 computer use 能力，公开入口指向模型在网页和工具操作类任务中的使用方式；具体可用范围、权限和限制仍需要回到原文核对。",
       "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "evidence_level": "primary",
       "sources": [
@@ -5987,41 +6128,21 @@
       ]
     },
     {
-      "story_id": "story-content-alibaba-cloud-blog-agenticdb-born-from-alibaba-cloud-analyticdb-built-fo",
+      "story_id": "story-content-alibaba-cloud-blog-the-constraint-infrastructure-growing-on-alibaba-clou",
       "title": "Alibaba Cloud更新agent 与开发者工具能力",
       "importance": "general",
       "trend": "AI products and developer workflow",
-      "event_date": "2026-06-24",
+      "event_date": "2026-06-25",
       "primary_entity": "Alibaba Cloud Blog",
       "event_type": "signal",
       "object": "Alibaba Cloud披露 agent 与开发者工具能力",
-      "what_happened": "阿里云介绍了 AgenticDB，把它定位为基于 AnalyticDB 构建的 AI-native 数据底座，用于管理 AI agent 的上下文和后端服务。它和 Mem0 服务同属 agent 数据基础设施方向，但这条 story 的重点是数据库底座而不是长期记忆服务。",
+      "what_happened": "阿里云介绍 Agent Infra 上的约束基础设施，强调让 AI agent 的运行时行为可控、可观测并持续演进，用于约束和监控 agent 执行过程。",
       "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "evidence_level": "primary",
       "sources": [
         {
           "label": "Alibaba Cloud Blog",
-          "url": "https://www.alibabacloud.com/blog/agenticdb-born-from-alibaba-cloud-analyticdb-built-for-ai-native-enterprises_603302",
-          "type": "official"
-        }
-      ]
-    },
-    {
-      "story_id": "story-content-alibaba-cloud-blog-polardb-x-optimizer-tips-incremental-prediction-of-ti",
-      "title": "Alibaba Cloud Blog: Polardb X Optimizer Tips Incremental Prediction Of Time Columns In Statistics 603301",
-      "importance": "general",
-      "trend": "AI industry",
-      "event_date": "2026-06-24",
-      "primary_entity": "Alibaba Cloud Blog",
-      "event_type": "signal",
-      "object": "Alibaba Cloud更新AI 产品、平台或工程实践",
-      "what_happened": "阿里云发布 PolarDB-X 优化器技巧文章，介绍如何对时间列统计信息做增量预测，以优化查询执行计划并减少慢查询风险。它更偏数据库执行计划和统计信息维护，不是通用 AI 产品发布。",
-      "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "Alibaba Cloud Blog",
-          "url": "https://www.alibabacloud.com/blog/polardb-x-optimizer-tips-%7C-incremental-prediction-of-time-columns-in-statistics_603301",
+          "url": "https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305",
           "type": "official"
         }
       ]
@@ -6035,7 +6156,7 @@
       "primary_entity": "OpenAI News RSS",
       "event_type": "launch",
       "object": "OpenAI披露模型能力和推理入口变化",
-      "what_happened": "OpenAI 和 Broadcom 公布 Jalapeño，这是一款面向 LLM 推理优化的定制 AI 芯片。公开说明强调它用于提升 AI 系统的性能、效率和规模化能力，后续需要继续观察实际部署范围和供应链节奏。",
+      "what_happened": "OpenAI 与 Broadcom 介绍面向 LLM 推理优化的定制 AI 芯片 Jalapeno，目标是提升 AI 系统的性能、效率和规模化能力。",
       "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "evidence_level": "multi_source",
       "sources": [
@@ -6058,14 +6179,14 @@
     },
     {
       "story_id": "story-content-microsoft-official-blog-inside-microsoft-s-two-decade-push-to-cut-water",
-      "title": "Official Microsoft Blog: Inside Microsofts Two Decade Push To Cut Water Intensity While Scaling For Growth",
+      "title": "微软回顾降低数据中心用水强度的长期工程实践",
       "importance": "general",
       "trend": "AI products and developer workflow",
       "event_date": "2026-06-24",
       "primary_entity": "Official Microsoft Blog",
       "event_type": "signal",
       "object": "微软研究院更新agent 工作流和开发工具能力",
-      "what_happened": "微软在官方博客中解释，随着云和 AI 服务需求增长，数据中心对基础设施更关键，也让社区更关注本地水资源影响。文章回顾微软二十年来降低用水强度的做法，并把节水目标放到数据中心扩张背景下说明。",
+      "what_happened": "微软官方博客回顾在云和 AI 服务需求增长下减少数据中心用水强度的长期工程实践，并解释基础设施扩张与本地水资源影响之间的关系。",
       "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
       "evidence_level": "primary",
       "sources": [
@@ -6079,7 +6200,55 @@
   ],
   "main_items": [
     {
-      "title": "Microsoft Research Blog: Talos Scaling Rare Disease Diagnosis With Automated Iterative Genomic Reanalysis",
+      "title": "Meta Newsroom发布 Claude Code agent 工具工作流",
+      "candidate_id": "story-content-meta-newsroom-launch-of-meta-s-small-business-growth-academy-across-asia",
+      "editorial_category": "engineering_toolchain",
+      "source_level": "primary",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-23",
+      "url": "https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/",
+      "source": "Meta Newsroom",
+      "tier": "T0",
+      "entities": [
+        "Meta Newsroom"
+      ],
+      "summary": "Meta Newsroom更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
+      "bullets": [
+        "**Meta Newsroom披露 Claude Code**：材料把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，已披露事实集中在agent 工作流、开发工具入口、权限控制和工程集成。",
+        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。",
+        "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本。"
+      ],
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "Alibaba Cloud更新agent 与开发者工具能力",
+      "candidate_id": "story-content-alibaba-cloud-blog-qwen-agentworld-language-world-models-for-general-age",
+      "editorial_category": "ai_industry",
+      "source_level": "official",
+      "verification_status": "primary_confirmed",
+      "event_date": "2026-06-25",
+      "url": "https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304",
+      "source": "Alibaba Cloud Blog",
+      "tier": "T0",
+      "entities": [
+        "Alibaba Cloud Blog"
+      ],
+      "summary": "Qwen 团队更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
+      "bullets": [
+        "**Alibaba Cloud披露 agent 与开发者工**：材料把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，已披露事实集中在agent 工作流、开发工具入口、权限控制和工程集成。",
+        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。",
+        "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本。"
+      ],
+      "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
+      "importance": "general",
+      "image_urls": []
+    },
+    {
+      "title": "微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断",
       "candidate_id": "story-content-microsoft-research-talos-scaling-rare-disease-diagnosis-with-automated-i",
       "editorial_category": "open_source",
       "source_level": "official",
@@ -6127,31 +6296,7 @@
       "image_urls": []
     },
     {
-      "title": "Qwen Hugging Face Organization: AgentWorldBench",
-      "candidate_id": "story-content-huggingface-qwen-qwen-agentworldbench",
-      "editorial_category": "open_source",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-23",
-      "url": "https://huggingface.co/datasets/Qwen/AgentWorldBench",
-      "source": "Qwen Hugging Face Organization",
-      "tier": "T0",
-      "entities": [
-        "Qwen Hugging Face Organization"
-      ],
-      "summary": "Qwen 团队更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
-      "bullets": [
-        "**Qwen 团队更新agent 工作流和开发工具能力**：材料把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，已披露事实集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
-      ],
-      "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
-      "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "Google Keyword Blog: Introducing Computer Use Gemini 3 5 Flash",
+      "title": "Google 为 Gemini 模型新增电脑操作能力",
       "candidate_id": "story-content-google-keyword-introducing-computer-use-in-gemini-3-5-flash",
       "editorial_category": "ai_industry",
       "source_level": "official",
@@ -6176,12 +6321,12 @@
     },
     {
       "title": "Alibaba Cloud更新agent 与开发者工具能力",
-      "candidate_id": "story-content-alibaba-cloud-blog-agenticdb-born-from-alibaba-cloud-analyticdb-built-fo",
+      "candidate_id": "story-content-alibaba-cloud-blog-the-constraint-infrastructure-growing-on-alibaba-clou",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
       "verification_status": "primary_confirmed",
-      "event_date": "2026-06-24",
-      "url": "https://www.alibabacloud.com/blog/agenticdb-born-from-alibaba-cloud-analyticdb-built-for-ai-native-enterprises_603302",
+      "event_date": "2026-06-25",
+      "url": "https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305",
       "source": "Alibaba Cloud Blog",
       "tier": "T0",
       "entities": [
@@ -6195,30 +6340,6 @@
       ],
       "why_it_matters": "工程侧价值集中在 agent、开发工具和自动化工作流接入",
       "reader_relevance": "适合研发团队评估 agent 平台、开发工具和自动化流程的迁移窗口",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "Alibaba Cloud Blog: Polardb X Optimizer Tips Incremental Prediction Of Time Columns In Statistics 603301",
-      "candidate_id": "story-content-alibaba-cloud-blog-polardb-x-optimizer-tips-incremental-prediction-of-ti",
-      "editorial_category": "ai_industry",
-      "source_level": "official",
-      "verification_status": "primary_confirmed",
-      "event_date": "2026-06-24",
-      "url": "https://www.alibabacloud.com/blog/polardb-x-optimizer-tips-%7C-incremental-prediction-of-time-columns-in-statistics_603301",
-      "source": "Alibaba Cloud Blog",
-      "tier": "T0",
-      "entities": [
-        "Alibaba Cloud Blog"
-      ],
-      "summary": "Alibaba Cloud更新AI 产品、平台或工程实践，材料覆盖功能变化、使用场景、接入方式、限制条件和后续部署边界，边界落在公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
-      "bullets": [
-        "**Alibaba Cloud更新AI 产品、平台或工程实践**：材料把AI 产品、平台或工程实践落到功能变化、使用场景、接入方式、限制条件和后续部署边界，已披露事实集中在功能变化、适用场景、接入方式和限制条件。",
-        "已披露细节覆盖适用对象、证据来源、执行安排、后续时间表和风险边界。",
-        "这会影响产品团队判断路线优先级、接入时机、资源投入和后续风险预案。"
-      ],
-      "why_it_matters": "信号集中在 AI 产品、模型或平台策略的实际变化",
-      "reader_relevance": "适合产品和工程团队复盘选型、试点范围和内部风险提示",
       "importance": "general",
       "image_urls": []
     },
@@ -6247,7 +6368,7 @@
       "image_urls": []
     },
     {
-      "title": "Official Microsoft Blog: Inside Microsofts Two Decade Push To Cut Water Intensity While Scaling For Growth",
+      "title": "微软回顾降低数据中心用水强度的长期工程实践",
       "candidate_id": "story-content-microsoft-official-blog-inside-microsoft-s-two-decade-push-to-cut-water",
       "editorial_category": "engineering_toolchain",
       "source_level": "official",
@@ -6298,7 +6419,7 @@
       "previous_rank": 2,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "calesthio/OpenMontage appeared on GitHub Trending weekly with 9,410 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "calesthio/OpenMontage appeared on GitHub Trending weekly with 12,948 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -6327,7 +6448,7 @@
       "previous_rank": 1,
       "rank_delta": -1,
       "trend": "down",
-      "evidence": "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 8,536 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 9,589 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6356,7 +6477,7 @@
       "previous_rank": 3,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "google-research/timesfm appeared on GitHub Trending weekly with 4,376 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "google-research/timesfm appeared on GitHub Trending weekly with 3,915 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6385,7 +6506,7 @@
       "previous_rank": 5,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "n0-computer/iroh appeared on GitHub Trending weekly with 1,531 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "n0-computer/iroh appeared on GitHub Trending weekly with 1,196 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6414,7 +6535,7 @@
       "previous_rank": 7,
       "rank_delta": 2,
       "trend": "up",
-      "evidence": "koala73/worldmonitor appeared on GitHub Trending weekly with 2,309 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "koala73/worldmonitor appeared on GitHub Trending weekly with 2,899 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6443,7 +6564,7 @@
       "previous_rank": 6,
       "rank_delta": 0,
       "trend": "same",
-      "evidence": "asgeirtj/system_prompts_leaks appeared on GitHub Trending weekly with 2,681 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "asgeirtj/system_prompts_leaks appeared on GitHub Trending weekly with 2,662 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6472,7 +6593,7 @@
       "previous_rank": 4,
       "rank_delta": -3,
       "trend": "down",
-      "evidence": "Panniantong/Agent-Reach appeared on GitHub Trending weekly with 6,915 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "Panniantong/Agent-Reach appeared on GitHub Trending weekly with 6,752 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6501,7 +6622,7 @@
       "previous_rank": 9,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "penpot/penpot appeared on GitHub Trending weekly with 3,423 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "penpot/penpot appeared on GitHub Trending weekly with 3,593 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6530,7 +6651,7 @@
       "previous_rank": 10,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "withastro/flue appeared on GitHub Trending weekly with 1,489 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "withastro/flue appeared on GitHub Trending weekly with 1,415 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6559,7 +6680,7 @@
       "previous_rank": 17,
       "rank_delta": 7,
       "trend": "up",
-      "evidence": "jamiepine/voicebox appeared on GitHub Trending weekly with 2,883 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "jamiepine/voicebox appeared on GitHub Trending weekly with 3,583 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6588,7 +6709,7 @@
       "previous_rank": 11,
       "rank_delta": 3,
       "trend": "up",
-      "evidence": "LMCache/LMCache appeared on GitHub Trending Python weekly with 537 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "LMCache/LMCache appeared on GitHub Trending Python weekly with 551 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6617,7 +6738,7 @@
       "previous_rank": 11,
       "rank_delta": 2,
       "trend": "up",
-      "evidence": "continuedev/continue appeared on GitHub Trending TypeScript weekly with 620 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "continuedev/continue appeared on GitHub Trending TypeScript weekly with 627 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6646,7 +6767,7 @@
       "previous_rank": 13,
       "rank_delta": 11,
       "trend": "up",
-      "evidence": "tursodatabase/turso appeared on GitHub Trending Rust weekly with 2,660 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "tursodatabase/turso appeared on GitHub Trending Rust weekly with 2,861 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6675,7 +6796,7 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "Tencent/WeKnora appeared on GitHub Trending Go weekly with 735 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "Tencent/WeKnora appeared on GitHub Trending Go weekly with 748 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "general"
     },
     {
@@ -6704,7 +6825,7 @@
       "previous_rank": 15,
       "rank_delta": 13,
       "trend": "up",
-      "evidence": "AutoMQ/automq appeared on GitHub Trending Java weekly with 78 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "AutoMQ/automq appeared on GitHub Trending Java weekly with 83 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6733,7 +6854,7 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "interviewstreet/hiring-agent appeared on GitHub Trending Python weekly with 671 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "interviewstreet/hiring-agent appeared on GitHub Trending Python weekly with 902 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "general"
     },
     {
@@ -6762,7 +6883,7 @@
       "previous_rank": 17,
       "rank_delta": 7,
       "trend": "up",
-      "evidence": "Kilo-Org/kilocode appeared on GitHub Trending TypeScript weekly with 4,206 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "Kilo-Org/kilocode appeared on GitHub Trending TypeScript weekly with 3,676 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6791,7 +6912,7 @@
       "previous_rank": 4,
       "rank_delta": 1,
       "trend": "up",
-      "evidence": "1jehuang/jcode appeared on GitHub Trending Rust weekly with 586 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "1jehuang/jcode appeared on GitHub Trending Rust weekly with 638 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6811,7 +6932,7 @@
       "previous_rank": 14,
       "rank_delta": 12,
       "trend": "up",
-      "evidence": "cilium/cilium appeared on GitHub Trending Go weekly with 76 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "cilium/cilium appeared on GitHub Trending Go weekly with 72 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "general"
     },
     {
@@ -6840,7 +6961,7 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "evidence": "apache/nifi appeared on GitHub Trending Java weekly with 16 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "evidence": "apache/nifi appeared on GitHub Trending Java weekly with 17 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "importance": "general"
     }
   ],
@@ -6880,7 +7001,7 @@
       "image_urls": []
     },
     {
-      "title": "Apple 研究用 LLM 评审面板检验评估一致性",
+      "title": "Apple 研究指出 LLM 评审团的相关错误会削弱多评委投票价值",
       "candidate_id": "content-apple-machine-learning-nine-judges-two-effective-votes-correlated-errors",
       "editorial_category": "viewpoint_analysis",
       "source_level": "official",
@@ -6979,7 +7100,103 @@
       "image_urls": []
     }
   ],
-  "chinese_media_dynamics": [],
+  "chinese_media_dynamics": [
+    {
+      "candidate_id": "intermediary-qbitai-claude-nature",
+      "title": "跟Claude谈个恋爱怎么了？Nature最新研究：真能给人聊傻了",
+      "url": "https://www.qbitai.com/2026/06/438365.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-25",
+      "topic": "中文 AI 媒体动态",
+      "summary": "跟Claude谈个恋爱怎么了？Nature最新研究：真能给人聊傻了：Claude已经，俨然成为了新一代电子老公。",
+      "key_points": [
+        "跟Claude谈个恋爱怎么了",
+        "Nature最新研究：真能给人聊傻了：Claude已经，俨然成为了新一代电子老公",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-qbitai-ai-3-arr",
+      "title": "不靠单款爆款吃红利，中国AI应用首现3亿ARR独角兽！腾讯顺为红杉继续加码",
+      "url": "https://www.qbitai.com/2026/06/438336.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-25",
+      "topic": "中文 AI 媒体动态",
+      "summary": "不靠单款爆款吃红利，中国AI应用首现3亿ARR独角兽！腾讯顺为红杉继续加码：中国AI应用公司并没有停留在追赶全球浪潮。",
+      "key_points": [
+        "不靠单款爆款吃红利，中国AI应用首现3亿ARR独角兽",
+        "腾讯顺为红杉继续加码：中国AI应用公司并没有停留在追赶全球浪潮",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-qbitai-gw-token-6-30",
+      "title": "聚焦GW级Token工厂，解码下一代算力底座｜6月30日，深圳",
+      "url": "https://www.qbitai.com/2026/06/438297.html",
+      "publisher": "QbitAI",
+      "author": "QbitAI",
+      "event_date": "2026-06-25",
+      "topic": "中文 AI 媒体动态",
+      "summary": "聚焦GW级Token工厂，解码下一代算力底座｜6月30日，深圳：谁将定义下一代算力基础设施？谁又能在Token时代占据产业制高点？",
+      "key_points": [
+        "聚焦GW级Token工厂，解码下一代算力底座｜6月30日，深圳：谁将定义下一代算力基础设施",
+        "谁又能在Token时代占据产业制高点",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-sspai",
+      "title": "风暖鸟声碎，日高花影重：我的昆明与腾冲行记",
+      "url": "https://sspai.com/post/111349",
+      "publisher": "SSPAI",
+      "author": "SSPAI",
+      "event_date": "2026-06-25",
+      "topic": "中文 AI 媒体动态",
+      "summary": "风暖鸟声碎，日高花影重：我的昆明与腾冲行记：云南气候实在是太好了，昆明海拔将近两千，每次出门都有一种凉爽感包裹全身。而腾冲太适合旅居了，既有中高端的酒店可供享受奢靡之风，也有历史文化供我们反思来时的路，更好的去面对未来，还有拿上衣服就可以随地大小泡的温泉，美哉！ 查看全文。This is an intermediary/self-media lead; t。",
+      "key_points": [
+        "风暖鸟声碎，日高花影重：我的昆明与腾冲行记：云南气候实在是太好了，昆明海拔将近两千，每次出门都有一种凉爽感包裹全身",
+        "而腾冲太适合旅居了，既有中高端的酒店可供享受奢靡之风，也有历史文化供我们反思来时的路，更好的去面对未来，还有拿上衣服就可以随地大小泡的温泉，美哉",
+        "查看全文"
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "candidate_id": "intermediary-sspai-gta-vi",
+      "title": "派早报：豆包推出专业版、GTA VI 开启预售等",
+      "url": "https://sspai.com/post/111476",
+      "publisher": "SSPAI",
+      "author": "SSPAI",
+      "event_date": "2026-06-25",
+      "topic": "中文 AI 媒体动态",
+      "summary": "派早报：豆包推出专业版、GTA VI 开启预售等：OpenAI 发布 AI 推理芯片 Jalapeño、Goodram 推出 SD 存储卡 PRO S6B0 等。 查看全文。",
+      "key_points": [
+        "派早报：豆包推出专业版、GTA VI 开启预售等：OpenAI 发布 AI 推理芯片 Jalapeño、Goodram 推出 SD 存储卡 PRO S6B0 等",
+        "查看全文",
+        "This is an intermediary/self-media lead; trace it to a primary source before treating it as"
+      ],
+      "source_level": "intermediary",
+      "verification_status": "intermediary_only",
+      "importance": "notable",
+      "image_urls": []
+    }
+  ],
   "daily_tracking": [
     {
       "id": "openrouter-rankings",
@@ -6992,11 +7209,11 @@
       "source_level": "primary",
       "verification_status": "primary_confirmed",
       "change_status": "changed",
-      "change_summary": "OpenRouter 本周 Top 10 已解析：#1 DeepSeek V4 Flash 4.94T tokens；#2 MiMo-V2.5 4.28T tokens；#3 MiniMax M3 3.76T tokens；Claude Opus 4.8 周变化 43%。",
+      "change_summary": "OpenRouter 本周 Top 10 已解析：#1 DeepSeek V4 Flash 4.97T tokens；#2 MiMo-V2.5 4.36T tokens；#3 MiniMax M3 3.75T tokens；GLM 5.2 周变化 523%。",
       "publish_to_public": true,
-      "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，4.94T tokens，周变化 12%）。 Top 10 供应商分布为 anthropic 3、deepseek 2、minimax 1、openrouter 1、tencent 1、xiaomi 1、z-ai 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
+      "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，4.97T tokens，周变化 10%）。 Top 10 供应商分布为 anthropic 3、deepseek 2、minimax 1、openrouter 1、tencent 1、xiaomi 1、z-ai 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
       "watch_points": [
-        "Claude Opus 4.8 的周变化为 43%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。",
+        "GLM 5.2 的周变化为 523%，需要结合发布、价格、免费额度和上下文窗口变化判断原因。",
         "若没有新进榜，重点看榜首和供应商份额是否迁移。",
         "OpenRouter 用量是平台内需求信号；生产选型仍需回到延迟、价格、上下文长度和自有任务复测。"
       ],
@@ -7013,52 +7230,52 @@
         },
         {
           "label": "#1",
-          "value": "DeepSeek V4 Flash（deepseek）：4.94T tokens，周变化 12%",
+          "value": "DeepSeek V4 Flash（deepseek）：4.97T tokens，周变化 10%",
           "trend": "up"
         },
         {
           "label": "#2",
-          "value": "MiMo-V2.5（xiaomi）：4.28T tokens，周变化 17%",
+          "value": "MiMo-V2.5（xiaomi）：4.36T tokens，周变化 18%",
           "trend": "up"
         },
         {
           "label": "#3",
-          "value": "MiniMax M3（minimax）：3.76T tokens，周变化 19%",
+          "value": "MiniMax M3（minimax）：3.75T tokens，周变化 19%",
           "trend": "up"
         },
         {
           "label": "#4",
-          "value": "Hy3 preview（tencent）：3.6T tokens，周变化 6%",
+          "value": "Hy3 preview（tencent）：3.44T tokens，周变化 7%",
           "trend": "up"
         },
         {
           "label": "#5",
-          "value": "Owl Alpha（openrouter）：2.78T tokens，周变化 14%",
+          "value": "Owl Alpha（openrouter）：2.92T tokens，周变化 19%",
           "trend": "up"
         },
         {
           "label": "#6",
-          "value": "Claude Opus 4.7（anthropic）：2.48T tokens，周变化 8%",
+          "value": "Claude Opus 4.7（anthropic）：2.54T tokens，周变化 11%",
           "trend": "up"
         },
         {
           "label": "#7",
-          "value": "DeepSeek V4 Pro（deepseek）：2.34T tokens，周变化 19%",
-          "trend": "up"
+          "value": "DeepSeek V4 Pro（deepseek）：2.19T tokens，周变化 0%",
+          "trend": "same"
         },
         {
           "label": "#8",
-          "value": "Claude Opus 4.8（anthropic）：1.82T tokens，周变化 43%",
+          "value": "Claude Opus 4.8（anthropic）：1.87T tokens，周变化 37%",
           "trend": "up"
         },
         {
           "label": "#9",
-          "value": "GLM 5.2（z-ai）：1.77T tokens，周变化 >999%",
-          "trend": "unknown"
+          "value": "GLM 5.2（z-ai）：1.8T tokens，周变化 523%",
+          "trend": "up"
         },
         {
           "label": "#10",
-          "value": "Claude Sonnet 4.6（anthropic）：1.52T tokens，周变化 19%",
+          "value": "Claude Sonnet 4.6（anthropic）：1.49T tokens，周变化 17%",
           "trend": "up"
         }
       ],
@@ -7068,78 +7285,78 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+        "snapshot_as_of": "2026-06-25T08:21:29.470Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
             "rank": 1,
             "model": "DeepSeek V4 Flash",
             "provider": "deepseek",
-            "tokens": "4.94T tokens",
-            "change": "12%"
+            "tokens": "4.97T tokens",
+            "change": "10%"
           },
           {
             "rank": 2,
             "model": "MiMo-V2.5",
             "provider": "xiaomi",
-            "tokens": "4.28T tokens",
-            "change": "17%"
+            "tokens": "4.36T tokens",
+            "change": "18%"
           },
           {
             "rank": 3,
             "model": "MiniMax M3",
             "provider": "minimax",
-            "tokens": "3.76T tokens",
+            "tokens": "3.75T tokens",
             "change": "19%"
           },
           {
             "rank": 4,
             "model": "Hy3 preview",
             "provider": "tencent",
-            "tokens": "3.6T tokens",
-            "change": "6%"
+            "tokens": "3.44T tokens",
+            "change": "7%"
           },
           {
             "rank": 5,
             "model": "Owl Alpha",
             "provider": "openrouter",
-            "tokens": "2.78T tokens",
-            "change": "14%"
+            "tokens": "2.92T tokens",
+            "change": "19%"
           },
           {
             "rank": 6,
             "model": "Claude Opus 4.7",
             "provider": "anthropic",
-            "tokens": "2.48T tokens",
-            "change": "8%"
+            "tokens": "2.54T tokens",
+            "change": "11%"
           },
           {
             "rank": 7,
             "model": "DeepSeek V4 Pro",
             "provider": "deepseek",
-            "tokens": "2.34T tokens",
-            "change": "19%"
+            "tokens": "2.19T tokens",
+            "change": "0%"
           },
           {
             "rank": 8,
             "model": "Claude Opus 4.8",
             "provider": "anthropic",
-            "tokens": "1.82T tokens",
-            "change": "43%"
+            "tokens": "1.87T tokens",
+            "change": "37%"
           },
           {
             "rank": 9,
             "model": "GLM 5.2",
             "provider": "z-ai",
-            "tokens": "1.77T tokens",
-            "change": ">999%"
+            "tokens": "1.8T tokens",
+            "change": "523%"
           },
           {
             "rank": 10,
             "model": "Claude Sonnet 4.6",
             "provider": "anthropic",
-            "tokens": "1.52T tokens",
-            "change": "19%"
+            "tokens": "1.49T tokens",
+            "change": "17%"
           }
         ],
         "official_component_snapshot": {
@@ -7147,12 +7364,12 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
-          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.94T tokens</td><td>12%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.28T tokens</td><td>17%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.76T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.6T tokens</td><td>6%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.78T tokens</td><td>14%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.48T tokens</td><td>8%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.34T tokens</td><td>19%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.82T tokens</td><td>43%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.77T tokens</td><td>&gt;999%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.52T tokens</td><td>19%</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
           "sanitized_css": ".openrouter-rankings-card { border: 1px solid currentColor; padding: 16px; }\n      .openrouter-rankings-card table { width: 100%; border-collapse: collapse; }\n      .openrouter-rankings-card th, .openrouter-rankings-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
-          "dom_hash": "sha256:b39404be1b1edf86703b974d4225c6cb10ebb9101b7cbd4cc089d7d103de56ec",
+          "dom_hash": "sha256:fcf92c555b37c8ecaa37e4127fcab1600853fb8d7cd4cbc9d4a000fe59a334dc",
           "css_hash": "sha256:e5df3dc0e07de42f5c2ca4021bbf59258d47d1ef0fa569d55d98b09876618e43"
         },
         "notes": "Public OpenRouter rankings page snapshot; use as platform usage signal, not market share or capability proof.",
@@ -7162,10 +7379,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-24T18:34:17.964Z",
+        "collected_at": "2026-06-25T08:21:29.470Z",
         "selector_version": "openrouter-rankings-v1",
-        "raw_dom_hash": "sha256:0ed9a75c24b28fec5199ed263b166efd637f6357c112cc5e04f49896fa8d695f",
-        "data_hash": "sha256:0759d132e7d58083fc420b93267c42e35e31d55b4cdf6455a3083de9f1e7f071",
+        "raw_dom_hash": "sha256:45b0f3a5e57a4d04471d3d17e49b8be23b3ea31961b66b235213902a19cb6ae1",
+        "data_hash": "sha256:9ebd0fa95d74ad7d3c50675d5c69b527167fc824d18bd0b3a5448c597273e9a0",
         "tabs": [
           {
             "id": "top-models",
@@ -7193,81 +7410,81 @@
                 "rank": 1,
                 "model": "DeepSeek V4 Flash",
                 "provider": "deepseek",
-                "value": 4940000000000,
-                "value_label": "4.94T tokens",
-                "change": "12%"
+                "value": 4970000000000,
+                "value_label": "4.97T tokens",
+                "change": "10%"
               },
               {
                 "rank": 2,
                 "model": "MiMo-V2.5",
                 "provider": "xiaomi",
-                "value": 4280000000000.0005,
-                "value_label": "4.28T tokens",
-                "change": "17%"
+                "value": 4360000000000.0005,
+                "value_label": "4.36T tokens",
+                "change": "18%"
               },
               {
                 "rank": 3,
                 "model": "MiniMax M3",
                 "provider": "minimax",
-                "value": 3760000000000,
-                "value_label": "3.76T tokens",
+                "value": 3750000000000,
+                "value_label": "3.75T tokens",
                 "change": "19%"
               },
               {
                 "rank": 4,
                 "model": "Hy3 preview",
                 "provider": "tencent",
-                "value": 3600000000000,
-                "value_label": "3.6T tokens",
-                "change": "6%"
+                "value": 3440000000000,
+                "value_label": "3.44T tokens",
+                "change": "7%"
               },
               {
                 "rank": 5,
                 "model": "Owl Alpha",
                 "provider": "openrouter",
-                "value": 2780000000000,
-                "value_label": "2.78T tokens",
-                "change": "14%"
+                "value": 2920000000000,
+                "value_label": "2.92T tokens",
+                "change": "19%"
               },
               {
                 "rank": 6,
                 "model": "Claude Opus 4.7",
                 "provider": "anthropic",
-                "value": 2480000000000,
-                "value_label": "2.48T tokens",
-                "change": "8%"
+                "value": 2540000000000,
+                "value_label": "2.54T tokens",
+                "change": "11%"
               },
               {
                 "rank": 7,
                 "model": "DeepSeek V4 Pro",
                 "provider": "deepseek",
-                "value": 2340000000000,
-                "value_label": "2.34T tokens",
-                "change": "19%"
+                "value": 2190000000000,
+                "value_label": "2.19T tokens",
+                "change": "0%"
               },
               {
                 "rank": 8,
                 "model": "Claude Opus 4.8",
                 "provider": "anthropic",
-                "value": 1820000000000,
-                "value_label": "1.82T tokens",
-                "change": "43%"
+                "value": 1870000000000,
+                "value_label": "1.87T tokens",
+                "change": "37%"
               },
               {
                 "rank": 9,
                 "model": "GLM 5.2",
                 "provider": "z-ai",
-                "value": 1770000000000,
-                "value_label": "1.77T tokens",
-                "change": ">999%"
+                "value": 1800000000000,
+                "value_label": "1.8T tokens",
+                "change": "523%"
               },
               {
                 "rank": 10,
                 "model": "Claude Sonnet 4.6",
                 "provider": "anthropic",
-                "value": 1520000000000,
-                "value_label": "1.52T tokens",
-                "change": "19%"
+                "value": 1490000000000,
+                "value_label": "1.49T tokens",
+                "change": "17%"
               }
             ],
             "fallback_reason": ""
@@ -7282,81 +7499,81 @@
                 "rank": 1,
                 "model": "DeepSeek V4 Flash",
                 "provider": "deepseek",
-                "value": 4940000000000,
-                "value_label": "4.94T tokens",
-                "change": "12%"
+                "value": 4970000000000,
+                "value_label": "4.97T tokens",
+                "change": "10%"
               },
               {
                 "rank": 2,
                 "model": "MiMo-V2.5",
                 "provider": "xiaomi",
-                "value": 4280000000000.0005,
-                "value_label": "4.28T tokens",
-                "change": "17%"
+                "value": 4360000000000.0005,
+                "value_label": "4.36T tokens",
+                "change": "18%"
               },
               {
                 "rank": 3,
                 "model": "MiniMax M3",
                 "provider": "minimax",
-                "value": 3760000000000,
-                "value_label": "3.76T tokens",
+                "value": 3750000000000,
+                "value_label": "3.75T tokens",
                 "change": "19%"
               },
               {
                 "rank": 4,
                 "model": "Hy3 preview",
                 "provider": "tencent",
-                "value": 3600000000000,
-                "value_label": "3.6T tokens",
-                "change": "6%"
+                "value": 3440000000000,
+                "value_label": "3.44T tokens",
+                "change": "7%"
               },
               {
                 "rank": 5,
                 "model": "Owl Alpha",
                 "provider": "openrouter",
-                "value": 2780000000000,
-                "value_label": "2.78T tokens",
-                "change": "14%"
+                "value": 2920000000000,
+                "value_label": "2.92T tokens",
+                "change": "19%"
               },
               {
                 "rank": 6,
                 "model": "Claude Opus 4.7",
                 "provider": "anthropic",
-                "value": 2480000000000,
-                "value_label": "2.48T tokens",
-                "change": "8%"
+                "value": 2540000000000,
+                "value_label": "2.54T tokens",
+                "change": "11%"
               },
               {
                 "rank": 7,
                 "model": "DeepSeek V4 Pro",
                 "provider": "deepseek",
-                "value": 2340000000000,
-                "value_label": "2.34T tokens",
-                "change": "19%"
+                "value": 2190000000000,
+                "value_label": "2.19T tokens",
+                "change": "0%"
               },
               {
                 "rank": 8,
                 "model": "Claude Opus 4.8",
                 "provider": "anthropic",
-                "value": 1820000000000,
-                "value_label": "1.82T tokens",
-                "change": "43%"
+                "value": 1870000000000,
+                "value_label": "1.87T tokens",
+                "change": "37%"
               },
               {
                 "rank": 9,
                 "model": "GLM 5.2",
                 "provider": "z-ai",
-                "value": 1770000000000,
-                "value_label": "1.77T tokens",
-                "change": ">999%"
+                "value": 1800000000000,
+                "value_label": "1.8T tokens",
+                "change": "523%"
               },
               {
                 "rank": 10,
                 "model": "Claude Sonnet 4.6",
                 "provider": "anthropic",
-                "value": 1520000000000,
-                "value_label": "1.52T tokens",
-                "change": "19%"
+                "value": 1490000000000,
+                "value_label": "1.49T tokens",
+                "change": "17%"
               }
             ],
             "fallback_reason": ""
@@ -7367,81 +7584,81 @@
             "rank": 1,
             "model": "DeepSeek V4 Flash",
             "provider": "deepseek",
-            "value": 4940000000000,
-            "value_label": "4.94T tokens",
-            "change": "12%"
+            "value": 4970000000000,
+            "value_label": "4.97T tokens",
+            "change": "10%"
           },
           {
             "rank": 2,
             "model": "MiMo-V2.5",
             "provider": "xiaomi",
-            "value": 4280000000000.0005,
-            "value_label": "4.28T tokens",
-            "change": "17%"
+            "value": 4360000000000.0005,
+            "value_label": "4.36T tokens",
+            "change": "18%"
           },
           {
             "rank": 3,
             "model": "MiniMax M3",
             "provider": "minimax",
-            "value": 3760000000000,
-            "value_label": "3.76T tokens",
+            "value": 3750000000000,
+            "value_label": "3.75T tokens",
             "change": "19%"
           },
           {
             "rank": 4,
             "model": "Hy3 preview",
             "provider": "tencent",
-            "value": 3600000000000,
-            "value_label": "3.6T tokens",
-            "change": "6%"
+            "value": 3440000000000,
+            "value_label": "3.44T tokens",
+            "change": "7%"
           },
           {
             "rank": 5,
             "model": "Owl Alpha",
             "provider": "openrouter",
-            "value": 2780000000000,
-            "value_label": "2.78T tokens",
-            "change": "14%"
+            "value": 2920000000000,
+            "value_label": "2.92T tokens",
+            "change": "19%"
           },
           {
             "rank": 6,
             "model": "Claude Opus 4.7",
             "provider": "anthropic",
-            "value": 2480000000000,
-            "value_label": "2.48T tokens",
-            "change": "8%"
+            "value": 2540000000000,
+            "value_label": "2.54T tokens",
+            "change": "11%"
           },
           {
             "rank": 7,
             "model": "DeepSeek V4 Pro",
             "provider": "deepseek",
-            "value": 2340000000000,
-            "value_label": "2.34T tokens",
-            "change": "19%"
+            "value": 2190000000000,
+            "value_label": "2.19T tokens",
+            "change": "0%"
           },
           {
             "rank": 8,
             "model": "Claude Opus 4.8",
             "provider": "anthropic",
-            "value": 1820000000000,
-            "value_label": "1.82T tokens",
-            "change": "43%"
+            "value": 1870000000000,
+            "value_label": "1.87T tokens",
+            "change": "37%"
           },
           {
             "rank": 9,
             "model": "GLM 5.2",
             "provider": "z-ai",
-            "value": 1770000000000,
-            "value_label": "1.77T tokens",
-            "change": ">999%"
+            "value": 1800000000000,
+            "value_label": "1.8T tokens",
+            "change": "523%"
           },
           {
             "rank": 10,
             "model": "Claude Sonnet 4.6",
             "provider": "anthropic",
-            "value": 1520000000000,
-            "value_label": "1.52T tokens",
-            "change": "19%"
+            "value": 1490000000000,
+            "value_label": "1.49T tokens",
+            "change": "17%"
           }
         ],
         "previous_snapshot": null,
@@ -7469,89 +7686,89 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
-          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.94T tokens</td><td>12%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.28T tokens</td><td>17%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.76T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.6T tokens</td><td>6%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.78T tokens</td><td>14%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.48T tokens</td><td>8%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.34T tokens</td><td>19%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.82T tokens</td><td>43%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.77T tokens</td><td>&gt;999%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.52T tokens</td><td>19%</td></tr></tbody>\n        </table>\n      </section>",
+          "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.97T tokens</td><td>10%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.36T tokens</td><td>18%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.75T tokens</td><td>19%</td></tr>\n        <tr><td>#4</td><td>Hy3 preview</td><td>tencent</td><td>3.44T tokens</td><td>7%</td></tr>\n        <tr><td>#5</td><td>Owl Alpha</td><td>openrouter</td><td>2.92T tokens</td><td>19%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.54T tokens</td><td>11%</td></tr>\n        <tr><td>#7</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.19T tokens</td><td>0%</td></tr>\n        <tr><td>#8</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.87T tokens</td><td>37%</td></tr>\n        <tr><td>#9</td><td>GLM 5.2</td><td>z-ai</td><td>1.8T tokens</td><td>523%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.49T tokens</td><td>17%</td></tr></tbody>\n        </table>\n      </section>",
           "sanitized_css": ".openrouter-rankings-card { border: 1px solid currentColor; padding: 16px; }\n      .openrouter-rankings-card table { width: 100%; border-collapse: collapse; }\n      .openrouter-rankings-card th, .openrouter-rankings-card td { padding: 8px; border-top: 1px solid currentColor; text-align: left; }",
-          "dom_hash": "sha256:b39404be1b1edf86703b974d4225c6cb10ebb9101b7cbd4cc089d7d103de56ec",
+          "dom_hash": "sha256:fcf92c555b37c8ecaa37e4127fcab1600853fb8d7cd4cbc9d4a000fe59a334dc",
           "css_hash": "sha256:e5df3dc0e07de42f5c2ca4021bbf59258d47d1ef0fa569d55d98b09876618e43"
         },
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-24T18:34:17.964Z",
+          "collected_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:0759d132e7d58083fc420b93267c42e35e31d55b4cdf6455a3083de9f1e7f071",
+          "data_hash": "sha256:9ebd0fa95d74ad7d3c50675d5c69b527167fc824d18bd0b3a5448c597273e9a0",
           "top_rows": [
             {
               "rank": 1,
               "model": "DeepSeek V4 Flash",
               "provider": "deepseek",
-              "value_label": "4.94T tokens",
-              "change": "12%"
+              "value_label": "4.97T tokens",
+              "change": "10%"
             },
             {
               "rank": 2,
               "model": "MiMo-V2.5",
               "provider": "xiaomi",
-              "value_label": "4.28T tokens",
-              "change": "17%"
+              "value_label": "4.36T tokens",
+              "change": "18%"
             },
             {
               "rank": 3,
               "model": "MiniMax M3",
               "provider": "minimax",
-              "value_label": "3.76T tokens",
+              "value_label": "3.75T tokens",
               "change": "19%"
             },
             {
               "rank": 4,
               "model": "Hy3 preview",
               "provider": "tencent",
-              "value_label": "3.6T tokens",
-              "change": "6%"
+              "value_label": "3.44T tokens",
+              "change": "7%"
             },
             {
               "rank": 5,
               "model": "Owl Alpha",
               "provider": "openrouter",
-              "value_label": "2.78T tokens",
-              "change": "14%"
+              "value_label": "2.92T tokens",
+              "change": "19%"
             },
             {
               "rank": 6,
               "model": "Claude Opus 4.7",
               "provider": "anthropic",
-              "value_label": "2.48T tokens",
-              "change": "8%"
+              "value_label": "2.54T tokens",
+              "change": "11%"
             },
             {
               "rank": 7,
               "model": "DeepSeek V4 Pro",
               "provider": "deepseek",
-              "value_label": "2.34T tokens",
-              "change": "19%"
+              "value_label": "2.19T tokens",
+              "change": "0%"
             },
             {
               "rank": 8,
               "model": "Claude Opus 4.8",
               "provider": "anthropic",
-              "value_label": "1.82T tokens",
-              "change": "43%"
+              "value_label": "1.87T tokens",
+              "change": "37%"
             },
             {
               "rank": 9,
               "model": "GLM 5.2",
               "provider": "z-ai",
-              "value_label": "1.77T tokens",
-              "change": ">999%"
+              "value_label": "1.8T tokens",
+              "change": "523%"
             },
             {
               "rank": 10,
               "model": "Claude Sonnet 4.6",
               "provider": "anthropic",
-              "value_label": "1.52T tokens",
-              "change": "19%"
+              "value_label": "1.49T tokens",
+              "change": "17%"
             }
           ],
           "diff": {
@@ -7663,7 +7880,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+        "snapshot_as_of": "2026-06-25T08:21:29.470Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -7838,7 +8055,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -7853,10 +8070,10 @@
         "source": "Artificial Analysis",
         "component_kind": "artificial_analysis_index",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-24T18:34:17.964Z",
+        "collected_at": "2026-06-25T08:21:29.470Z",
         "selector_version": "artificial-analysis-index-v1",
         "raw_dom_hash": "sha256:caa7d33c2116c5495c0ff87bb3af671e33346e063be109cb1e5beccdf50e227a",
-        "data_hash": "sha256:9db827e64c152b047348dd34b10aa02d60623e0b805fa740870e3a0efedc23c6",
+        "data_hash": "sha256:c0f66bded6ca2a1e6361d355c46babc9e49a66ec72240230883f603b87777009",
         "tabs": [
           {
             "id": "score",
@@ -8084,7 +8301,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -8094,9 +8311,9 @@
         },
         "public_trace": {
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-24T18:34:17.964Z",
+          "collected_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:9db827e64c152b047348dd34b10aa02d60623e0b805fa740870e3a0efedc23c6",
+          "data_hash": "sha256:c0f66bded6ca2a1e6361d355c46babc9e49a66ec72240230883f603b87777009",
           "top_rows": [
             {
               "rank": 1,
@@ -8278,7 +8495,7 @@
         "type": "swe_bench_pro_public_page",
         "collection_method": "public_page_static",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-24T18:34:17.964Z",
+        "snapshot_as_of": "2026-06-25T08:21:29.470Z",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
         "top_entries": [
           {
@@ -8357,7 +8574,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8372,10 +8589,10 @@
         "source": "Scale Labs SWE-Bench Pro",
         "component_kind": "swe_bench_pro",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-        "collected_at": "2026-06-24T18:34:17.964Z",
+        "collected_at": "2026-06-25T08:21:29.470Z",
         "selector_version": "swe-bench-pro-v1",
         "raw_dom_hash": "sha256:2d5ebf88219cf9ca3b8537c2a99a9339988bd6f4b8cb73e80b37c9c1e786a9a9",
-        "data_hash": "sha256:005439d17ecbb06a46bdb1ce8338f39bcdf2682edd3466be4b18fdf6247627be",
+        "data_hash": "sha256:f9d92bad51d79847d104988b266c973b76b03d4fcdd9eeccd4c2cb2e3a4b3cf4",
         "tabs": [
           {
             "id": "leaderboard",
@@ -8603,7 +8820,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-24T18:34:17.964Z",
+          "captured_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8613,9 +8830,9 @@
         },
         "public_trace": {
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "collected_at": "2026-06-24T18:34:17.964Z",
+          "collected_at": "2026-06-25T08:21:29.470Z",
           "selector_version": "swe-bench-pro-v1",
-          "data_hash": "sha256:005439d17ecbb06a46bdb1ce8338f39bcdf2682edd3466be4b18fdf6247627be",
+          "data_hash": "sha256:f9d92bad51d79847d104988b266c973b76b03d4fcdd9eeccd4c2cb2e3a4b3cf4",
           "top_rows": [
             {
               "rank": 1,
@@ -8728,7 +8945,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "calesthio/OpenMontage appeared on GitHub Trending weekly with 9,410 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "calesthio/OpenMontage appeared on GitHub Trending weekly with 12,948 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8747,7 +8964,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 8,536 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "DeusData/codebase-memory-mcp appeared on GitHub Trending weekly with 9,589 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8766,7 +8983,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "google-research/timesfm appeared on GitHub Trending weekly with 4,376 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "google-research/timesfm appeared on GitHub Trending weekly with 3,915 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8785,7 +9002,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "n0-computer/iroh appeared on GitHub Trending weekly with 1,531 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "n0-computer/iroh appeared on GitHub Trending weekly with 1,196 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8804,7 +9021,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "koala73/worldmonitor appeared on GitHub Trending weekly with 2,309 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "koala73/worldmonitor appeared on GitHub Trending weekly with 2,899 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8823,7 +9040,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "asgeirtj/system_prompts_leaks appeared on GitHub Trending weekly with 2,681 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "asgeirtj/system_prompts_leaks appeared on GitHub Trending weekly with 2,662 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8842,7 +9059,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "Panniantong/Agent-Reach appeared on GitHub Trending weekly with 6,915 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "Panniantong/Agent-Reach appeared on GitHub Trending weekly with 6,752 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8861,7 +9078,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "penpot/penpot appeared on GitHub Trending weekly with 3,423 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "penpot/penpot appeared on GitHub Trending weekly with 3,593 stars this week. 近 7 天本地记录曾在 2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8880,7 +9097,7 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "withastro/flue appeared on GitHub Trending weekly with 1,489 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "withastro/flue appeared on GitHub Trending weekly with 1,415 stars this week. 近 7 天本地记录曾在 2026-06-23、2026-06-24 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     },
     {
@@ -8899,236 +9116,160 @@
       "event_date": "2026-06-25",
       "source": "GitHub Trending weekly",
       "signal": "trending",
-      "evidence": "jamiepine/voicebox appeared on GitHub Trending weekly with 2,883 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "evidence": "jamiepine/voicebox appeared on GitHub Trending weekly with 3,583 stars this week. 近 7 天本地记录曾在 2026-06-23 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "importance": "notable"
     }
   ],
   "builder_observations": [
     {
-      "author": "Madhu Guru",
-      "handle": "realmadhuguru",
-      "candidate_id": "follow-builders-x-madhu-guru-i-ve-had-the-chance-to-see-this-ecosystem-from-the",
+      "author": "Aaron Levie",
+      "handle": "levie",
+      "candidate_id": "follow-builders-x-aaron-levie-there-are-some-subtleties-in-this-launch-that-are",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "Madhu Guru 认为，围绕 token 定价的争论本质上是在讨论价值最终沉淀在哪一层：模型、应用、分发或其他环节。企业、agent 创业公司、数据提供商和实验室都还在实时摸索商业模式、护城河、价值交换和执行打法，因此各方会用很强的立场影响叙事。",
-      "original_text": "I’ve had the chance to see this ecosystem from the different sides - enterprises, agent startups, data providers, labs. The core tension here is that the business models, moats, value exchange, execution playbooks for all players are being figured out in real time. This debate around token pricing is really a debate over where value will accrue - models, application layer, distribution or other layers. Expect a lot of strong opinions from the different sides to shape the narrative in their favo...",
-      "translation": "Madhu Guru 认为，围绕 token 定价的争论本质上是在讨论价值最终沉淀在哪一层：模型、应用、分发或其他环节。企业、agent 创业公司、数据提供商和实验室都还在实时摸索商业模式、护城河、价值交换和执行打法，因此各方会用很强的立场影响叙事。",
-      "avatar_url": "https://unavatar.io/x/realmadhuguru",
-      "url": "https://x.com/realmadhuguru/status/2069455097193697393",
+      "content": "Aaron Levie 提醒，Claude 通过 Slack 接入时不只是单人一对一聊天，而是团队中任何人都能共享调用的协作式 agent；这种模式已经出现在部分 coding agent 中，推广到通用知识工作会继续推动 agent 成为团队工作流里的独立协作者。",
+      "original_text": "There are some subtleties in this launch that are very important in practice. This isn’t just you interacting with Claude in a 1:1 format via Slack. In this case, Claude acts as a coworker that any user can tap into in a shared way. We’ve already seen some agentic coding systems start to adopt this pattern (as well as OpenClaw and Hermes), and doing it for general purpose knowledge work continues to push the idea forward. As a result, what this means is that this agentic coworker needs its own ...",
+      "translation": "Aaron Levie 提醒，Claude 通过 Slack 接入时不只是单人一对一聊天，而是团队中任何人都能共享调用的协作式 agent；这种模式已经出现在部分 coding agent 中，推广到通用知识工作会继续推动 agent 成为团队工作流里的独立协作者。",
+      "avatar_url": "https://unavatar.io/x/levie",
+      "url": "https://x.com/levie/status/2069975251476422664",
       "role": "builder",
-      "event_date": "2026-06-23",
+      "event_date": "2026-06-25",
       "source": "follow-builders X feed",
-      "evidence": "I’ve had the chance to see this ecosystem from the different sides - enterprises, agent startups, data providers, labs. The core tension here is that the business models, moats, value exchange, execution playbooks for all players are being",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Thibault Sottiaux",
-      "handle": "thsottiaux",
-      "candidate_id": "follow-builders-x-thibault-sottiaux-if-you-are-at-openai-you-would-know-that-thi",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Thibault Sottiaux 调侃说，如果你在 OpenAI，就会知道这种安静几乎不会发生；他要去庆祝这五分钟的平静。",
-      "original_text": "If you are at OpenAI, you would know that this never happens. Be right back celebrating 5 minutes of peace. https://t.co/kxMOXFsg8s",
-      "translation": "Thibault Sottiaux 调侃说，如果你在 OpenAI，就会知道这种安静几乎不会发生；他要去庆祝这五分钟的平静。",
-      "avatar_url": "https://unavatar.io/x/thsottiaux",
-      "url": "https://x.com/thsottiaux/status/2069624530960838914",
-      "role": "builder",
-      "event_date": "2026-06-24",
-      "source": "follow-builders X feed",
-      "evidence": "If you are at OpenAI, you would know that this never happens. Be right back celebrating 5 minutes of peace. https://t.co/kxMOXFsg8s",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Cat Wu",
-      "handle": "_catwu",
-      "candidate_id": "follow-builders-x-cat-wu-claude-tag-is-a-paradigm-shift-in-how-we-ship-products",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Cat Wu 称 Claude Tag 改变了 Anthropic 发布产品的方式：内部版本已经合并 65% 的产品 PR，也是 Anthropic 首个原生多人协作、主动式的产品；她邀请用户试用并反馈。",
-      "original_text": "Claude Tag is a paradigm shift in how we ship products at Anthropic. Our internal version merges 65% of product PRs and this is our first product that is natively multi-player and proactive. We're excited for you to try this out. Let us know your feedback! https://t.co/YOENq4hDSt",
-      "translation": "Cat Wu 称 Claude Tag 改变了 Anthropic 发布产品的方式：内部版本已经合并 65% 的产品 PR，也是 Anthropic 首个原生多人协作、主动式的产品；她邀请用户试用并反馈。",
-      "avatar_url": "https://unavatar.io/x/_catwu",
-      "url": "https://x.com/_catwu/status/2069473118742331608",
-      "role": "builder",
-      "event_date": "2026-06-23",
-      "source": "follow-builders X feed",
-      "evidence": "Claude Tag is a paradigm shift in how we ship products at Anthropic. Our internal version merges 65% of product PRs and this is our first product that is natively multi-player and proactive. We're excited for you to try this out. Let us kno",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Swyx",
-      "handle": "swyx",
-      "candidate_id": "follow-builders-x-swyx-btw-zai-ipo-ed-in-jan-at-hk-120-a-share-when-i-first-met",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Swyx 回顾 Zai 今年 1 月以每股 HK$120 IPO，并称当初很少有人在用 GLM，如今其开放模型已在一些评价中超过 DeepSeek、被视为顶尖开放模型；他提到团队将回到旧金山 AI Engineer 活动交流。",
-      "original_text": "btw Zai IPO'ed in Jan at HK$120 a share. when I first met @louszbd nobody really knew anyone using GLM's. now they have beat deepseek with the world's undisputed top open model and in some respects (see @ml_angelopoulos) say top model period, and are returning to SF @aidotengineer on top of the world and open for business! excited for @Thom_Wolf and @ZixuanLi_ to chat onstage!",
-      "translation": "Swyx 回顾 Zai 今年 1 月以每股 HK$120 IPO，并称当初很少有人在用 GLM，如今其开放模型已在一些评价中超过 DeepSeek、被视为顶尖开放模型；他提到团队将回到旧金山 AI Engineer 活动交流。",
-      "avatar_url": "https://unavatar.io/x/swyx",
-      "url": "https://x.com/swyx/status/2069598378191941835",
-      "role": "builder",
-      "event_date": "2026-06-24",
-      "source": "follow-builders X feed",
-      "evidence": "btw Zai IPO'ed in Jan at HK$120 a share. when I first met @louszbd nobody really knew anyone using GLM's. now they have beat deepseek with the world's undisputed top open model and in some respects (see @ml_angelopoulos) say top model perio",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Andrej Karpathy",
-      "handle": "karpathy",
-      "candidate_id": "follow-builders-x-andrej-karpathy-this-is-a-new-paradigm-for-interacting-with-cl",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Andrej Karpathy 认为，Claude Tag 把 Claude 更内嵌到组织日常协作中；在工具、集成、计算环境、记忆和安全等底层工程打通后，Claude 可以像团队成员一样被对话调用并处理多种工作负载。他把这看作 LLM UI/UX 的第三次重要重设计。",
-      "original_text": "This is a new paradigm for interacting with Claude that is significantly more \"inline\" with all the other human activity org-wide. Once you do all of the under the hood engineering work to make this \"just work\" (e.g. across tools, integrations, compute environments, memory, security, etc.), Claude basically joins the team in a seamless way - you can talk to it as you would talk to a person and it can help with a very large variety of workloads. Imo this is the 3rd major redesign of LLM UIUX. Th...",
-      "translation": "Andrej Karpathy 认为，Claude Tag 把 Claude 更内嵌到组织日常协作中；在工具、集成、计算环境、记忆和安全等底层工程打通后，Claude 可以像团队成员一样被对话调用并处理多种工作负载。他把这看作 LLM UI/UX 的第三次重要重设计。",
-      "avatar_url": "https://unavatar.io/x/karpathy",
-      "url": "https://x.com/karpathy/status/2069547676849557725",
-      "role": "builder",
-      "event_date": "2026-06-23",
-      "source": "follow-builders X feed",
-      "evidence": "This is a new paradigm for interacting with Claude that is significantly more \"inline\" with all the other human activity org-wide. Once you do all of the under the hood engineering work to make this \"just work\" (e.g. across tools, integrati",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Boris Cherny",
-      "handle": "bcherny",
-      "candidate_id": "follow-builders-x-boris-cherny-that-s-it-point-it-at-a-channel-give-it-a-task-an",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Boris Cherny 说，使用方式就是把 Claude 指向一个频道、交给它任务，然后让它工作；该能力今天面向 Claude Enterprise 和 Team 客户在 Slack 中开放 beta，后续还会扩展到更多界面。",
-      "original_text": "That's it. Point it at a channel, give it a task, and let it work. It's in beta on Slack today for Claude Enterprise and Team customers. More surfaces coming soon! Learn more: https://t.co/tcvNSCANlf",
-      "translation": "Boris Cherny 说，使用方式就是把 Claude 指向一个频道、交给它任务，然后让它工作；该能力今天面向 Claude Enterprise 和 Team 客户在 Slack 中开放 beta，后续还会扩展到更多界面。",
-      "avatar_url": "https://unavatar.io/x/bcherny",
-      "url": "https://x.com/bcherny/status/2069474691010707486",
-      "role": "builder",
-      "event_date": "2026-06-23",
-      "source": "follow-builders X feed",
-      "evidence": "That's it. Point it at a channel, give it a task, and let it work. It's in beta on Slack today for Claude Enterprise and Team customers. More surfaces coming soon! Learn more: https://t.co/tcvNSCANlf",
-      "importance": "notable",
-      "image_urls": []
-    },
-    {
-      "author": "Thibault Sottiaux",
-      "handle": "thsottiaux",
-      "candidate_id": "follow-builders-x-thibault-sottiaux-codex-had-a-bug-fixed-more-feedback-better-p",
-      "editorial_category": "x_discussion",
-      "source_level": "primary",
-      "verification_status": "original_social_only",
-      "content": "Thibault Sottiaux 表示 Codex 曾经有一个 bug，现在已经修复；他希望继续收到更多反馈，用反馈把产品做得更好。",
-      "original_text": "Codex **had** a bug. Fixed. More feedback. Better product. Keep it coming. https://t.co/hopJLfcDxd",
-      "translation": "Thibault Sottiaux 表示 Codex 曾经有一个 bug，现在已经修复；他希望继续收到更多反馈，用反馈把产品做得更好。",
-      "avatar_url": "https://unavatar.io/x/thsottiaux",
-      "url": "https://x.com/thsottiaux/status/2069579993588625574",
-      "role": "builder",
-      "event_date": "2026-06-24",
-      "source": "follow-builders X feed",
-      "evidence": "Codex **had** a bug. Fixed. More feedback. Better product. Keep it coming. https://t.co/hopJLfcDxd",
+      "evidence": "There are some subtleties in this launch that are very important in practice. This isn’t just you interacting with Claude in a 1:1 format via Slack. In this case, Claude acts as a coworker that any user can tap into in a shared way. We’ve a",
       "importance": "notable",
       "image_urls": []
     },
     {
       "author": "Peter Yang",
       "handle": "petergyang",
-      "candidate_id": "follow-builders-x-peter-yang-what-is-design-if-what-s-accessing-your-product-is",
+      "candidate_id": "follow-builders-x-peter-yang-claude-design-is-pretty-great-i-gave-it-a-repo-for",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "Peter Yang 提出一个产品设计问题：如果访问产品的是一个只在寻找 API 或 CLI 的 agent，那么设计本身应该意味着什么？",
-      "original_text": "What is design if what’s accessing your product is just an agent looking for an api or CLI?",
-      "translation": "Peter Yang 提出一个产品设计问题：如果访问产品的是一个只在寻找 API 或 CLI 的 agent，那么设计本身应该意味着什么？",
+      "content": "Peter Yang 说 Claude Design 接收他的移动应用 repo 后，几乎完整复刻了应用屏幕；但只过一个提示就开始提醒节省 token，说明设计生成效果之外，上下文和成本消耗仍会影响产品体验。",
+      "original_text": "Claude Design is pretty great. I gave it a repo for a mobile app I'm building and it reproduced the screens perfectly. Except after one prompt it's telling me to save tokens already 😅 https://t.co/k6hQ53zmFN",
+      "translation": "Peter Yang 说 Claude Design 接收他的移动应用 repo 后，几乎完整复刻了应用屏幕；但只过一个提示就开始提醒节省 token，说明设计生成效果之外，上下文和成本消耗仍会影响产品体验。",
       "avatar_url": "https://unavatar.io/x/petergyang",
-      "url": "https://x.com/petergyang/status/2069603490524254473",
+      "url": "https://x.com/petergyang/status/2069992268963135897",
       "role": "builder",
-      "event_date": "2026-06-24",
+      "event_date": "2026-06-25",
       "source": "follow-builders X feed",
-      "evidence": "What is design if what’s accessing your product is just an agent looking for an api or CLI?",
+      "evidence": "Claude Design is pretty great. I gave it a repo for a mobile app I'm building and it reproduced the screens perfectly. Except after one prompt it's telling me to save tokens already 😅 https://t.co/k6hQ53zmFN",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Cat Wu",
-      "handle": "_catwu",
-      "candidate_id": "follow-builders-x-cat-wu-there-are-100s-of-ways-you-can-customize-claude-tag-for",
+      "author": "Google Labs",
+      "handle": "GoogleLabs",
+      "candidate_id": "follow-builders-x-google-labs-we-are-honored-to-share-that-project-genie-has-won",
       "editorial_category": "x_discussion",
-      "source_level": "primary",
+      "source_level": "official",
       "verification_status": "original_social_only",
-      "content": "Cat Wu 称 Claude Tag 可以按数百种方式定制到不同用例中，并列出六个在内部用户和外部设计伙伴中反响较好的常见流程。",
-      "original_text": "There are 100s of ways you can customize Claude Tag for any use case. Here are 6 common flows that have resonated with our internal users and external design partners: https://t.co/eMw8xdDZOZ",
-      "translation": "Cat Wu 称 Claude Tag 可以按数百种方式定制到不同用例中，并列出六个在内部用户和外部设计伙伴中反响较好的常见流程。",
-      "avatar_url": "https://unavatar.io/x/_catwu",
-      "url": "https://x.com/_catwu/status/2069486403696869555",
+      "content": "Google Labs 表示 Project Genie 获得 Cannes Lions 的 AI Craft Grand Prix，并感谢 Labs 社区一路参与；这是一条项目认可度和社区信号，不应被解读成单独的模型能力评测。",
+      "original_text": "We are honored to share that Project Genie has won the Cannes Lions Grand Prix for AI Craft! 🏆 To our awesome Labs community, thank you for being on this journey with us! https://t.co/FN5nx19g68",
+      "translation": "Google Labs 表示 Project Genie 获得 Cannes Lions 的 AI Craft Grand Prix，并感谢 Labs 社区一路参与；这是一条项目认可度和社区信号，不应被解读成单独的模型能力评测。",
+      "avatar_url": "https://unavatar.io/x/GoogleLabs",
+      "url": "https://x.com/GoogleLabs/status/2069827839826809042",
       "role": "builder",
-      "event_date": "2026-06-23",
+      "event_date": "2026-06-24",
       "source": "follow-builders X feed",
-      "evidence": "There are 100s of ways you can customize Claude Tag for any use case. Here are 6 common flows that have resonated with our internal users and external design partners: https://t.co/eMw8xdDZOZ",
+      "evidence": "We are honored to share that Project Genie has won the Cannes Lions Grand Prix for AI Craft! 🏆 To our awesome Labs community, thank you for being on this journey with us! https://t.co/FN5nx19g68",
       "importance": "notable",
       "image_urls": []
     },
     {
       "author": "Swyx",
       "handle": "swyx",
-      "candidate_id": "follow-builders-x-swyx-litfellows-also-a-great-related-event-for-women-in-ai-t-c",
+      "candidate_id": "follow-builders-x-swyx-lots-of-alpha-in-this-pod-why-databricks-beat-snowflake-a",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "Swyx 补充说，LitFellows 还有一个与 Women in AI 相关的活动。",
-      "original_text": "@LitFellows also a great related event for Women in AI https://t.co/AULDW3dUtA",
-      "translation": "Swyx 补充说，LitFellows 还有一个与 Women in AI 相关的活动。",
+      "content": "Swyx 推荐一期信息密度很高的播客，话题包括 Databricks 为何胜过 Snowflake、为什么团队都在做 metaharness、Neon 数据库的价值、LTAP 与 HTAP、MosaicML 和 DBRX 的后续，以及大公司如何保持研究和创业文化。",
+      "original_text": "LOTS of alpha in this pod: - Why Databricks beat Snowflake (! a straight answer!) - Why everyone is building a metaharness now - Why the @neondatabase made so much sense (so much @nikitabase glazing its not even funny) - How LTAP solves the HTAP dream I discussed with @ankrgyl in our @braintrust pod - What happened to @MosaicML + DBRX - How to maintain research/startup culture in a $175B megacorp - What's more important knowledge/experience in the race to the agent cloud: databases, operating s...",
+      "translation": "Swyx 推荐一期信息密度很高的播客，话题包括 Databricks 为何胜过 Snowflake、为什么团队都在做 metaharness、Neon 数据库的价值、LTAP 与 HTAP、MosaicML 和 DBRX 的后续，以及大公司如何保持研究和创业文化。",
       "avatar_url": "https://unavatar.io/x/swyx",
-      "url": "https://x.com/swyx/status/2069665232822366577",
+      "url": "https://x.com/swyx/status/2069864073202905501",
       "role": "builder",
       "event_date": "2026-06-24",
       "source": "follow-builders X feed",
-      "evidence": "@LitFellows also a great related event for Women in AI https://t.co/AULDW3dUtA",
+      "evidence": "LOTS of alpha in this pod: - Why Databricks beat Snowflake (! a straight answer!) - Why everyone is building a metaharness now - Why the @neondatabase made so much sense (so much @nikitabase glazing its not even funny) - How LTAP solves the",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Boris Cherny",
-      "handle": "bcherny",
-      "candidate_id": "follow-builders-x-boris-cherny-tag-claude-in-a-channel-it-spins-up-an-instance-w",
+      "author": "Swyx",
+      "handle": "swyx",
+      "candidate_id": "follow-builders-x-swyx-lots-of-folks-prepping-talks-next-week-congrats-some-thou",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "Boris Cherny 解释说，在频道里提到 Claude 后，它会启动一个带独立沙箱的实例；这个实例可以克隆仓库、写代码、运行测试和编译，任务结束后沙箱会被丢弃。每个线程对应一个实例，并按频道拥有自己的记忆和权限。",
-      "original_text": "Tag Claude in a channel, it spins up an instance with its own sandbox. It clones repos, writes code, tests, compiles all in that isolated environment and the sandbox gets thrown away when it's done. One instance per thread, its own memory and permissions per channel.",
-      "translation": "Boris Cherny 解释说，在频道里提到 Claude 后，它会启动一个带独立沙箱的实例；这个实例可以克隆仓库、写代码、运行测试和编译，任务结束后沙箱会被丢弃。每个线程对应一个实例，并按频道拥有自己的记忆和权限。",
-      "avatar_url": "https://unavatar.io/x/bcherny",
-      "url": "https://x.com/bcherny/status/2069474689819480394",
+      "content": "Swyx 给准备工程和研究演讲的人提建议：幻灯片里 AI 生成 SVG 通常比 AI 图片更有用，AI 图片要少用；演讲最好聚焦一个尖锐观点、配上具体例子，并把代码放到屏幕上。",
+      "original_text": "lots of folks prepping talks next week (congrats!). Some thoughts from RLing on thousands of hours of engineer- and researcher- focused talks: - AI generated svgs > AI generated imgs. MAXIMUM 4 ai slop images in your slides, I don't care how pretty your mom thinks they are (exception ofc if your talk is ABOUT imagegen) - Be pointy. Better to have 1 message with 5 surprising applications, than 5 messages with no concrete examples. - Put code on screen. Engineers like to see code. Especially if t...",
+      "translation": "Swyx 给准备工程和研究演讲的人提建议：幻灯片里 AI 生成 SVG 通常比 AI 图片更有用，AI 图片要少用；演讲最好聚焦一个尖锐观点、配上具体例子，并把代码放到屏幕上。",
+      "avatar_url": "https://unavatar.io/x/swyx",
+      "url": "https://x.com/swyx/status/2069964772003770673",
       "role": "builder",
-      "event_date": "2026-06-23",
+      "event_date": "2026-06-25",
       "source": "follow-builders X feed",
-      "evidence": "Tag Claude in a channel, it spins up an instance with its own sandbox. It clones repos, writes code, tests, compiles all in that isolated environment and the sandbox gets thrown away when it's done. One instance per thread, its own memory a",
+      "evidence": "lots of folks prepping talks next week (congrats!). Some thoughts from RLing on thousands of hours of engineer- and researcher- focused talks: - AI generated svgs > AI generated imgs. MAXIMUM 4 ai slop images in your slides, I don't care ho",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "author": "Boris Cherny",
-      "handle": "bcherny",
-      "candidate_id": "follow-builders-x-boris-cherny-i-also-have-claude-monitoring-slack-channels-to-p",
+      "author": "Guillermo Rauch",
+      "handle": "rauchg",
+      "candidate_id": "follow-builders-x-guillermo-rauch-ai-will-bring-forth-an-unprecedented-surge-in",
       "editorial_category": "x_discussion",
       "source_level": "primary",
       "verification_status": "original_social_only",
-      "content": "Boris Cherny 还说，他让 Claude 监控 Slack 频道，主动回答问题、起草 PR，并在问题解决后用特定表情做出反应。设置方式是把 Claude 加到频道里，再用自然语言告诉它要做什么。",
-      "original_text": "I also have Claude monitoring Slack channels to proactively respond to people to answer their questions and draft PRs, and to react with specific emojis like ✅❌ when a thread is resolved. To set it up, just add @.Claude to a channel and ask it to do this^, in natural language.",
-      "translation": "Boris Cherny 还说，他让 Claude 监控 Slack 频道，主动回答问题、起草 PR，并在问题解决后用特定表情做出反应。设置方式是把 Claude 加到频道里，再用自然语言告诉它要做什么。",
-      "avatar_url": "https://unavatar.io/x/bcherny",
-      "url": "https://x.com/bcherny/status/2069474688619958517",
+      "content": "Guillermo Rauch 判断 AI 会带来一轮前所未有的创业潮，从一人公司、中小企业复兴，到新一代大型公司都会受益；他的核心判断是 AI 会成为这些业务的基础层。",
+      "original_text": "AI will bring forth an unprecedented surge in entrepreneurship. From 'solopreneurs,' to the revitalization of the small &amp; medium business segment, to the emergence of the largest companies of our times… providing the foundation of it all.",
+      "translation": "Guillermo Rauch 判断 AI 会带来一轮前所未有的创业潮，从一人公司、中小企业复兴，到新一代大型公司都会受益；他的核心判断是 AI 会成为这些业务的基础层。",
+      "avatar_url": "https://unavatar.io/x/rauchg",
+      "url": "https://x.com/rauchg/status/2070001110866354345",
       "role": "builder",
-      "event_date": "2026-06-23",
+      "event_date": "2026-06-25",
       "source": "follow-builders X feed",
-      "evidence": "I also have Claude monitoring Slack channels to proactively respond to people to answer their questions and draft PRs, and to react with specific emojis like ✅❌ when a thread is resolved. To set it up, just add @.Claude to a channel and ask",
+      "evidence": "AI will bring forth an unprecedented surge in entrepreneurship. From 'solopreneurs,' to the revitalization of the small & medium business segment, to the emergence of the largest companies of our times… providing the foundation of it all.",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Guillermo Rauch",
+      "handle": "rauchg",
+      "candidate_id": "follow-builders-x-guillermo-rauch-the-data-of-tokens-and-uptime-recovered-by-ver",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "Guillermo Rauch 称 Vercel AI Gateway 在恢复 token 和 uptime 方面的数据非常惊人；这是一条关于 AI 网关可靠性和成本收益的线索，仍需要结合官方数据核验。",
+      "original_text": "The data of tokens and uptime recovered by @vercel AI Gateway is truly astonishing https://t.co/kKzZWtdELa",
+      "translation": "Guillermo Rauch 称 Vercel AI Gateway 在恢复 token 和 uptime 方面的数据非常惊人；这是一条关于 AI 网关可靠性和成本收益的线索，仍需要结合官方数据核验。",
+      "avatar_url": "https://unavatar.io/x/rauchg",
+      "url": "https://x.com/rauchg/status/2069819652365242765",
+      "role": "builder",
+      "event_date": "2026-06-24",
+      "source": "follow-builders X feed",
+      "evidence": "The data of tokens and uptime recovered by @vercel AI Gateway is truly astonishing https://t.co/kKzZWtdELa",
+      "importance": "notable",
+      "image_urls": []
+    },
+    {
+      "author": "Ryo Lu",
+      "handle": "ryolu_",
+      "candidate_id": "follow-builders-x-ryo-lu-use-cursor-in-notion-use-notion-in-cursor-t-co-3q36oyzw",
+      "editorial_category": "x_discussion",
+      "source_level": "primary",
+      "verification_status": "original_social_only",
+      "content": "Ryo Lu 用“在 Notion 里用 Cursor、在 Cursor 里用 Notion”概括两个产品入口互相嵌入的工作流，关注点是知识库和代码编辑器之间的双向协作。",
+      "original_text": "use cursor in notion use notion in cursor https://t.co/3q36oyzwu0",
+      "translation": "Ryo Lu 用“在 Notion 里用 Cursor、在 Cursor 里用 Notion”概括两个产品入口互相嵌入的工作流，关注点是知识库和代码编辑器之间的双向协作。",
+      "avatar_url": "https://unavatar.io/x/ryolu_",
+      "url": "https://x.com/ryolu_/status/2069830172354986418",
+      "role": "builder",
+      "event_date": "2026-06-24",
+      "source": "follow-builders X feed",
+      "evidence": "use cursor in notion use notion in cursor https://t.co/3q36oyzwu0",
       "importance": "notable",
       "image_urls": []
     }
@@ -9150,13 +9291,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-36kr-hyper3d-3d-36",
-      "title": "完成数亿元新融资，影眸科技 Hyper3D 让 3D 生成进入“思考时代”丨36氪首发",
-      "content": "文｜王欣逸 编辑｜张雨忻 2026 年开年来，3D 生成模型方向相当热闹。 今年第一季度，影眸科技发布首个 3D 编辑模型 Rodin Gen-2 Edit，让 AI 3D 模型第一次可编辑；今年 6 月，VAST 官宣了新一轮融资，Meshy 也紧随其后，宣称自己发布了全球首款 3D AI Agent。 近日，影眸科技——这支扎根学术...",
-      "url": "https://36kr.com/p/3865060112438533?f=rss",
-      "event_date": "2026-06-24",
+      "candidate_id": "intermediary-36kr-roboscience-visics",
+      "title": "RoboScience机器科学发布Visics通用具身大模型，实现跨本体、跨物体、跨任务｜最前线",
+      "content": "发布，首次完整披露自研Visics大模型的技术架构VLOA（Vision-Language-Object-Action），并展示了模型在家具拼装、灵巧抓取、动态流水线等多项真实场景的应用。 大语言模型有标准的文本Token，自动驾驶有统一的视觉或点云表征，这些基础格式的确定，让数据和模型可以在不同场景之间复用。但具身智能至今没有一个被行...",
+      "url": "https://36kr.com/p/3868276479710466?f=rss",
+      "event_date": "2026-06-25",
       "source": "36Kr",
-      "evidence": "文｜王欣逸 编辑｜张雨忻 2026 年开年来，3D 生成模型方向相当热闹。 今年第一季度，影眸科技发布首个 3D 编辑模型 Rodin Gen-2 Edit，让 AI 3D 模型第一次可编辑；今年 6 月，VAST 官宣了新一轮融资，Meshy 也紧随其后，宣称自己发布了全球首款 3D AI Agent。 近日，影眸科技——这支扎根学术圈、创业早、年轻的 3D 模型团队，带着最新的技术研究成果，以及新一轮融资，再添了一把火。 这支团队创立于 2020 年，创始人兼 CEO 吴。..",
+      "evidence": "发布，首次完整披露自研Visics大模型的技术架构VLOA（Vision-Language-Object-Action），并展示了模型在家具拼装、灵巧抓取、动态流水线等多项真实场景的应用。 大语言模型有标准的文本Token，自动驾驶有统一的视觉或点云表征，这些基础格式的确定，让数据和模型可以在不同场景之间复用。但具身智能至今没有一个被行业公认的基础表征单元，其决定了数据如何采、模。..",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -9164,41 +9305,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-leiphone-token-plan-glm-5-2",
-      "title": "百度智能云发布百度千帆Token Plan企业版，提供GLM-5.2等模型",
-      "content": "6月24日消息，百度智能云正式发布企业级AI生产力订阅服务——百度千帆Token Plan企业版，面向企业提供统一采购、统一管理、统一运营的AI资源服务，帮助企业以固定预算、统一管理的方式高效使用AI能力，加速AI在组织内部的规模化落地。 据介绍，百度千帆已率先完成智谱GLM-5.2适配并接入Token Plan企业版服务体系，企业用户...",
-      "url": "https://www.leiphone.com/category/industrynews/He2ajsw4G5vP9m2R.html",
-      "event_date": "2026-06-24",
+      "candidate_id": "intermediary-leiphone-grok-build-0-2-60-agent-runtime",
+      "title": "马斯克悄悄改了战场：Grok Build 0.2.60 剑指 Agent Runtime",
+      "content": "Grok Build CLI：一次不炫技、但很关键的更新。 作者丨 樊天骄、郑佳美 编辑丨 郑佳美 2026 年 6 月 21 日，Grok Build 悄悄发布了 0.2.60 版本更新。消息最早由 X 平台技术博主 Mark Kretschmann 披露。 与常见的大版本发布不同，这次更新既没有推出新的模型能力，也没有刷新任何 Be...",
+      "url": "https://www.leiphone.com/category/ai/9NVnWMuqKHrViS35.html",
+      "event_date": "2026-06-25",
       "source": "Leiphone",
-      "evidence": "6月24日消息，百度智能云正式发布企业级AI生产力订阅服务——百度千帆Token Plan企业版，面向企业提供统一采购、统一管理、统一运营的AI资源服务，帮助企业以固定预算、统一管理的方式高效使用AI能力，加速AI在组织内部的规模化落地。 据介绍，百度千帆已率先完成智谱GLM-5.2适配并接入Token Plan企业版服务体系，企业用户和开发者无需复杂部署与调优，即可在长程任务处理、复杂推理、Coding等场景中便捷调用该模型。 随着大模型能力持续演进，AI正从少数技术团队使。..",
-      "editorial_category": "community_signal",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "content-techcrunch-ai-facebook-rolls-out-an-ai-companion-app-for-creators",
-      "title": "Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被...",
-      "content": "Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化。",
-      "url": "https://techcrunch.com/2026/06/24/facebook-rolls-out-an-ai-companion-app-for-creators/",
-      "event_date": "2026-06-24",
-      "source": "TechCrunch AI",
-      "evidence": "The new app, which is currently being tested with select creators, will have Facebook's recently launched AI creator assistant built into it.",
-      "editorial_category": "content_aigc",
-      "source_level": "intermediary",
-      "verification_status": "intermediary_only",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "candidate_id": "intermediary-leiphone-ai-reddit-ai",
-      "title": "别让 AI 碰生产环境！Reddit 火爆血泪贴，痛诉 AI 如何一刀切断数据库生命线",
-      "content": "雷锋网转述 Reddit LocalLLaMA 社区中的一篇警示帖：一位数据工程师认为，本地 LLM 或 agent 一旦拿到生产数据库权限，可能在上下文和权限边界不清时执行破坏性操作。这条线索适合用来复盘生产环境隔离、只读凭据、审批门和审计日志；具体案例细节仍应回到原 Reddit 讨论核对。",
-      "url": "https://www.leiphone.com/category/yanxishe/oG2mZO3y4nGNbORu.html",
-      "event_date": "2026-06-24",
-      "source": "Leiphone",
-      "evidence": "AI 提效有多爽，炸库就有多痛。 作者丨高允毅 编辑丨马晓宁 “别再盲信AI了！你以为是资深专家，其实是炸库高手！” 6月22日，全球极客聚集的 Reddit的 LocalLLaMA 板块，一位资深数据工程师发了一篇血泪帖《A Cautionary Note on Local LLMs, Especially in Agentic Contexts》（关于本地大语言模型的警示，尤其是在 Agent 智能体场景中），控诉 AI 的“伪装”已经进化到了人类肉眼难以察觉的危险地步。..",
+      "evidence": "Grok Build CLI：一次不炫技、但很关键的更新。 作者丨 樊天骄、郑佳美 编辑丨 郑佳美 2026 年 6 月 21 日，Grok Build 悄悄发布了 0.2.60 版本更新。消息最早由 X 平台技术博主 Mark Kretschmann 披露。 与常见的大版本发布不同，这次更新既没有推出新的模型能力，也没有刷新任何 Benchmark，而是将重心放在会话恢复、上下文压缩、MCP 工具输出等一系列 Runtime 细节上。 这些改动或许不如模型升级那样引人注目，。..",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -9210,27 +9323,26 @@
   "zhihu_items": [],
   "reddit_items": [
     {
-      "candidate_id": "platform-reddit-local-llama-feed-unlimited-ocr-is-now-on-modelscope-a-3-3b-multi",
+      "candidate_id": "platform-reddit-local-llama-feed-anthropic-accuses-alibaba-of-campaign-to-brazen",
       "platform": "reddit",
       "source_id": "platform-reddit-local-llama-feed",
       "rule_id": "platform-reddit-local-llama-feed",
-      "title": "Reddit LocalLLaMA Platform披露 AIGC 创作工作流",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ue51uk/unlimitedocr_is_now_on_modelscope_a_33b/",
-      "event_date": "2026-06-24",
+      "title": "Reddit LocalLLaMA Platform披露模型能力和推理入口变化",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ueyl2i/anthropic_accuses_alibaba_of_campaign_to_brazenly/",
+      "event_date": "2026-06-25",
       "source": "Reddit LocalLLaMA Platform Feed",
       "source_level": "platform_exempt_signal",
       "verification_status": "platform_exempt_unverified",
-      "claim_text": "Full-document parsing instead of cropped-region OCR 32K output length for long OCR sequences Base and gundam image modes for different document layouts Transformers inference + SGLang serving with OpenAI-compatible streaming requests Built to push DeepSeek-OCR-style document parsing further. source: https://x.com/ModelScope2022/status/2069335055965491525 https://github.com/baidu/Unlimited-OCR submitted by /u/Sporeboss [link] [comments]",
+      "claim_text": "https://www.cnbc.com/2026/06/24/anthropic-alibaba-distillation-campaign.html https://www.bloomberg.com/news/articles/2026-06-24/anthropic-accuses-alibaba-of-illicitly-accessing-its-ai-models submitted by /u/External_Mood4719 [link] [comments]",
       "why_watch": "这是一条平台讨论弱信号，可用于观察后续是否出现一手来源。",
       "disclosure": "平台内扩散发现，未做一手回源核验。",
       "matched_terms": [
         "AI",
-        "model",
-        "inference"
+        "model"
       ],
       "exemption_policy": "platform_signal_exempt",
       "published_by_gate": "deterministic_platform_gate",
-      "summary": "Full-document parsing instead of cropped-region OCR 32K output length for long OCR sequences Base and gundam image modes for different document layouts Transformers inference + SGLang serving with OpenAI-compatible streaming requests Built",
+      "summary": "https://www.cnbc.com/2026/06/24/anthropic-alibaba-distillation-campaign.html https://www.bloomberg.com/news/articles/2026-06-24/anthropic-accuses-alibaba-of-illicitly-accessing-its-ai-models submitted by /u/External_Mood4719 [link] [comment",
       "risk_label": "medium",
       "importance": "general"
     }
@@ -9240,13 +9352,13 @@
     "report_date": "2026-06-25",
     "stories": 8,
     "main_items": 8,
-    "builder_observations": 12,
+    "builder_observations": 8,
     "builder_skill_used": [
       "candidate-pool-autodraft"
     ],
     "selection_snapshot": {
       "main_items": {
-        "eligible_candidates": 32,
+        "eligible_candidates": 31,
         "selected": 8,
         "strict_selected": 8,
         "refill_selected": 0,
@@ -9257,29 +9369,28 @@
         "rejection_counts": {
           "recent_duplicate": 38,
           "generic_github_trending_text": 27,
-          "unverified_high_risk_claim": 3,
-          "not_main_refill_material": 13,
-          "builder_low_signal": 4,
-          "low_value": 14,
-          "not_ai_relevant": 1,
+          "builder_low_signal": 12,
+          "unverified_high_risk_claim": 1,
+          "not_main_refill_material": 10,
+          "low_value": 18,
+          "not_ai_relevant": 2,
           "low_signal_vendor_partnership": 1,
-          "generic_hot_blog_announcement": 6,
-          "primary_required_intermediary_lead": 48,
-          "minor_consumer_ai_feature": 2,
-          "secondary_single_source_story": 21,
+          "generic_hot_blog_announcement": 7,
+          "statuspage": 10,
+          "primary_required_intermediary_lead": 51,
+          "secondary_single_source_story": 24,
           "outside_main_window": 6,
           "missing_reader_visible_title": 9,
-          "low_value_product_hunt_project": 3,
-          "hardcore_research_only": 4,
+          "low_value_product_hunt_project": 1,
+          "hardcore_research_only": 5,
           "unverified_aggregator_lead": 30,
-          "statuspage": 8,
           "search_shadow": 6,
           "future_dated": 34
         }
       },
       "stories": {
-        "eligible_candidates": 32,
-        "eligible_story_clusters": 30,
+        "eligible_candidates": 31,
+        "eligible_story_clusters": 29,
         "selected": 8,
         "target_min": 1,
         "target": 8,
@@ -9288,22 +9399,21 @@
         "rejection_counts": {
           "recent_duplicate": 38,
           "generic_github_trending_text": 27,
-          "unverified_high_risk_claim": 3,
-          "not_main_refill_material": 13,
-          "builder_low_signal": 4,
-          "low_value": 14,
-          "not_ai_relevant": 1,
+          "builder_low_signal": 12,
+          "unverified_high_risk_claim": 1,
+          "not_main_refill_material": 10,
+          "low_value": 18,
+          "not_ai_relevant": 2,
           "low_signal_vendor_partnership": 1,
-          "generic_hot_blog_announcement": 6,
-          "primary_required_intermediary_lead": 48,
-          "minor_consumer_ai_feature": 2,
-          "secondary_single_source_story": 21,
+          "generic_hot_blog_announcement": 7,
+          "statuspage": 10,
+          "primary_required_intermediary_lead": 51,
+          "secondary_single_source_story": 24,
           "outside_main_window": 6,
           "missing_reader_visible_title": 9,
-          "low_value_product_hunt_project": 3,
-          "hardcore_research_only": 4,
+          "low_value_product_hunt_project": 1,
+          "hardcore_research_only": 5,
           "unverified_aggregator_lead": 30,
-          "statuspage": 8,
           "search_shadow": 6,
           "future_dated": 34
         },
@@ -9318,7 +9428,7 @@
         "selected": 0
       },
       "hot_blogs": {
-        "eligible_candidates": 10,
+        "eligible_candidates": 8,
         "target": 8,
         "selected_before_prune": 8,
         "selected": 8,
@@ -9326,17 +9436,17 @@
         "prune_reasons": {}
       },
       "chinese_media_dynamics": {
-        "eligible_candidates": 0,
-        "selected": 0
+        "eligible_candidates": 5,
+        "selected": 5
       },
       "projects": {
         "eligible_candidates": 10,
         "selected": 10
       },
       "builder_observations": {
-        "eligible_candidates": 16,
-        "eligible_after_filter": 16,
-        "selected": 12
+        "eligible_candidates": 8,
+        "eligible_after_filter": 8,
+        "selected": 8
       },
       "official_org_updates": {
         "eligible_candidates": 0,
@@ -9363,18 +9473,18 @@
     "optimization_suggestions": [],
     "source_status_history": {
       "path": "source-status-history.json",
-      "tracked_sources": 311,
-      "no_signal_or_blocked": 126,
+      "tracked_sources": 319,
+      "no_signal_or_blocked": 128,
       "stale_sources": 0,
       "window_days": 10
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "e9ef3be3287f57f03e06502079ffea66c38e3545",
-      "git_commit_short": "e9ef3be3287f",
+      "git_commit": "d6aa681ec69c31b22250b06b2af0e6ab10a29707",
+      "git_commit_short": "d6aa681ec69c",
       "git_branch": "main",
-      "origin_main_sha": "e9ef3be3287f57f03e06502079ffea66c38e3545",
-      "origin_main_short": "e9ef3be3287f",
+      "origin_main_sha": "d6aa681ec69c31b22250b06b2af0e6ab10a29707",
+      "origin_main_short": "d6aa681ec69c",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -9393,10 +9503,10 @@
         "reflection-loop.md",
         "editorial-authority.md"
       ],
-      "source_registry_count": 148,
+      "source_registry_count": 152,
       "source_registry_enablement_counts": {
-        "core": 65,
-        "optional": 76,
+        "core": 67,
+        "optional": 78,
         "manual": 7
       },
       "rules": [
@@ -9408,7 +9518,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-24T18:39:36.334Z",
+  "generated_at": "2026-06-25T08:28:18.774Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-25.html",
   "html_path": "reports/2026/06/2026-06-25.html",
