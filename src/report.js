@@ -34,6 +34,9 @@ import {
 import { attachTrackingComponentSnapshots } from "./tracking-components.js";
 import { isTemplatedStoryTitle, normalizeStoryFirstReport, STORY_FIRST_MAX } from "./story-first.js";
 
+const PUBLIC_PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
+const PUBLIC_NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const outputDir = path.resolve(rootDir, options.outputDir || "reports-data");
@@ -235,13 +238,26 @@ function stripPrivateDisclosureFields(report) {
         return item;
       }
       const next = { ...item };
-      delete next.verification_note;
-      delete next.risk_note;
+      if (!requiresPublicDisclosureFields(next)) {
+        delete next.verification_note;
+        delete next.risk_note;
+      }
       delete next.source_item_refs;
       return next;
     });
   }
   return publicReport;
+}
+
+function requiresPublicDisclosureFields(item = {}) {
+  const status = String(item?.verification_status || "").trim();
+  const sourceLevel = String(item?.source_level || "").trim();
+  return Boolean(
+    item?.intermediary_url ||
+      item?.original_url ||
+      PUBLIC_NON_PRIMARY_VERIFICATION_STATUSES.has(status) ||
+      (sourceLevel && !PUBLIC_PRIMARY_SOURCE_LEVELS.has(sourceLevel))
+  );
 }
 
 function requireStoryContract(report) {

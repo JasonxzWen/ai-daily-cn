@@ -15913,6 +15913,84 @@ test("publish quality accepts strict daily reports with full source proof", () =
   assert.deepEqual(findPublishQualityIssues(report, strictPublishOptionsFixture()), []);
 });
 
+test("report normalization preserves Builder non-primary disclosure for idempotent report write", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const builderUrl = "https://x.com/strictbuilder/status/2059000000000000000";
+  const builderDisclosure = {
+    verification_note: "Original X status collected from follow-builders.",
+    risk_note: "Treat as practitioner observation rather than confirmed product fact."
+  };
+
+  draft.builder_observations = [
+    {
+      candidate_id: "strict-builder-x",
+      author: "Strict Builder",
+      role: "builder",
+      original_text: "Original X status about agent workflow practice.",
+      translation: "Original X status about agent workflow practice.",
+      content: "Original X status about agent workflow practice.",
+      url: builderUrl,
+      event_date: "2026-05-16",
+      source: "follow-builders X feed",
+      evidence: "Fixture X status.",
+      editorial_category: "x_discussion",
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      ...builderDisclosure
+    }
+  ];
+  draft.self_check.builder_observations = 1;
+  draft.source_audit.builder_sources.candidates_found = 1;
+  draft.source_audit.builder_sources.included = 1;
+  candidatePool.sources.push({
+    id: "source-builder-x",
+    name: "follow-builders X feed",
+    url: "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json",
+    category: "builder",
+    status: "checked",
+    checked_at: fixedGeneratedAt,
+    notes: "fixture"
+  });
+  candidatePool.candidates.push({
+    id: "strict-builder-x",
+    source_id: "source-builder-x",
+    category: "builder_observation",
+    title: "Strict Builder X status",
+    url: builderUrl,
+    source: "follow-builders X feed",
+    event_date: "2026-05-16",
+    status: "included",
+    included_in: "builder_observations",
+    evidence: "Fixture X status.",
+    editorial_category: "x_discussion",
+    source_level: "original_social",
+    verification_status: "original_social_only",
+    original_url: builderUrl,
+    verification_sources: [],
+    ...builderDisclosure
+  });
+
+  const normalized = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+  const normalizedAgain = normalizeReportDraft(normalized, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool,
+    automationRevision: strictAutomationRevisionFixture()
+  });
+
+  const normalizedBuilder = normalizedAgain.builder_observations.find((item) => item.candidate_id === "strict-builder-x");
+  assert.equal(normalizedBuilder.verification_status, "original_social_only");
+  assert.equal(normalizedBuilder.source_level, "original_social");
+  assert.equal(normalizedBuilder.verification_note, builderDisclosure.verification_note);
+  assert.equal(normalizedBuilder.risk_note, builderDisclosure.risk_note);
+});
+
 test("publish quality degrades strict daily reports whose summary reads like a generation log", () => {
   const report = strictPublishReportFixture();
   report.summary = "今天用最新 main 重新生成，扩展为 10 条主体信息和 26 个内容单元。";
@@ -17533,8 +17611,8 @@ test("report:write allows disclosed intermediary leads in viewpoint sections", a
 
   assert.equal(report.hot_blogs[0].candidate_id, "hot-blog-intermediary");
   assert.equal(report.hot_blogs[0].source_level, "intermediary");
-  assert(!("verification_note" in report.hot_blogs[0]));
-  assert(!("risk_note" in report.hot_blogs[0]));
+  assert.equal(report.hot_blogs[0].verification_note, candidatePool.candidates.at(-1).verification_note);
+  assert.equal(report.hot_blogs[0].risk_note, candidatePool.candidates.at(-1).risk_note);
 });
 
 test("icon resolver uses link domain icons and records fallback metadata", () => {
