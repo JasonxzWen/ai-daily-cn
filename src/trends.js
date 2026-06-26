@@ -68,6 +68,7 @@ export function normalizeTrendConfig(config) {
         min_occurrences: positiveInteger(thresholds.hot?.min_occurrences, 5),
         min_active_days: positiveInteger(thresholds.hot?.min_active_days, 4),
         min_entities: positiveInteger(thresholds.hot?.min_entities, 3),
+        min_sections: positiveInteger(thresholds.hot?.min_sections, 3),
         evidence_sections: Array.isArray(thresholds.hot?.evidence_sections)
           ? [...thresholds.hot.evidence_sections].filter(Boolean).sort()
           : ["builder_observations", "github_trending"]
@@ -219,10 +220,13 @@ function summarizeWindow(occurrences, dateTo, config) {
 
 function topicStatus(summary, thresholds) {
   const hasHotEvidence = summary.sections.some((section) => thresholds.hot.evidence_sections.includes(section));
+  // Cross-source breadth: a concept sustained across several distinct lanes is a
+  // hot signal even without github/builder evidence or 3+ named entities.
+  const hasCrossSourceBreadth = summary.sections.length >= thresholds.hot.min_sections;
   if (
     summary.occurrences >= thresholds.hot.min_occurrences &&
     summary.activeDays >= thresholds.hot.min_active_days &&
-    (summary.entities.length >= thresholds.hot.min_entities || hasHotEvidence)
+    (summary.entities.length >= thresholds.hot.min_entities || hasHotEvidence || hasCrossSourceBreadth)
   ) {
     return "hot";
   }

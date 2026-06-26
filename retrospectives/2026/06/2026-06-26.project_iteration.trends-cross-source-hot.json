@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.trends-cross-source-hot",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Trends cross-source breadth promotes hot",
+  "status": "completed",
+  "summary": "First of the queued #3 trend enhancements. The trend engine already counts controlled-vocabulary occurrences across lanes, but the hot tier could only be reached via 3+ named entities or github_trending/builder_observations evidence, so an emerging concept sustained across other lanes (main_items, hot_blogs, projects) never reached hot. Added a configurable hot.min_sections threshold and a cross-source-breadth path to topicStatus so a topic with enough occurrences and active days spanning that many distinct lanes is promoted to hot without requiring the specific evidence sections. Vocabulary and thresholds stay in config/trends.json; the change is additive (it only adds an OR path to the existing hot rule).",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/trends.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The hot trend tier was unreachable for cross-lane concepts; breadth is a legitimate hot signal.",
+      "evidence": "A topic appearing five times over five days across main_items/hot_blogs/projects (no github/builder evidence, fewer than three entities) stayed active before and reaches hot after adding the breadth path.",
+      "scope": "trend_scoring",
+      "persistence": "implemented",
+      "recommended_action": "Keep trend thresholds in config/trends.json and prefer additive OR paths over lowering existing thresholds when adding a new signal."
+    },
+    {
+      "lesson": "A sub-pixel boundingBox assertion in the Stage D mobile-scroll e2e was too strict.",
+      "evidence": "After scrollIntoView the first track heading reported y of about -0.17 (sub-pixel), failing a y >= 0 assertion; relaxed to y >= -2.",
+      "scope": "e2e_robustness",
+      "persistence": "implemented",
+      "recommended_action": "Tolerate sub-pixel offsets in post-scroll boundingBox assertions."
+    },
+    {
+      "lesson": "The live daily publisher is the ai-2 automation, not ai-daily.",
+      "evidence": "workflow:validate flagged two active daily-publish automations after ai-daily was unpaused; ai-2 (clean prompt) is already ACTIVE and is the real publisher, while ai-daily is a paused mojibake duplicate.",
+      "scope": "automation_topology",
+      "persistence": "session_note",
+      "recommended_action": "Treat ai-2 as the authoritative daily publish automation; keep ai-daily/ai-daily-2 paused to satisfy the exactly-one-active contract."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Remaining queued #3 work: GitHub Trending API field enrichment (topics/star-velocity/license) and a curated first-party X handle ingestion path.",
+      "owner": "project"
+    }
+  ],
+  "slug": "trends-cross-source-hot"
+}

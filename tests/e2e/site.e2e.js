@@ -503,7 +503,7 @@ try {
   await page.waitForTimeout(120);
   const trackHeadingBox = await firstTrackHeading.boundingBox();
   assert(
-    trackHeadingBox && trackHeadingBox.y >= 0 && trackHeadingBox.y < 240,
+    trackHeadingBox && trackHeadingBox.y >= -2 && trackHeadingBox.y < 240,
     JSON.stringify(trackHeadingBox)
   );
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
