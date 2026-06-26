@@ -78,6 +78,7 @@ import { runStatusSelfCheck } from "../src/status-self-check.js";
 import { npmInvocationForArgs } from "../src/process-runner.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
+import { checkWorktreePreflight } from "../src/worktree-preflight.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
@@ -6770,6 +6771,95 @@ test("OpenSpec removed from active package workflow", async () => {
   assert.equal(await exists(path.join(rootDir, "openspec")), false);
 });
 
+test("worktree preflight accepts clean branch based on origin main", async () => {
+  const result = await checkWorktreePreflight({
+    repoRoot: "C:/repo",
+    env: { GH_TOKEN: "redacted" },
+    commandRunner: createWorktreePreflightRunner({
+      "git remote get-url origin": { stdout: "https://user:secret@github.com/owner/repo.git\n" },
+      "git worktree list --porcelain": {
+        stdout: [
+          "worktree C:/repo-main",
+          "HEAD 1111111",
+          "branch refs/heads/main",
+          "",
+          "worktree C:/repo",
+          "HEAD 2222222",
+          "branch refs/heads/codex/preflight-validation-tiers",
+          ""
+        ].join("\n")
+      }
+    })
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.branch, "codex/preflight-validation-tiers");
+  assert.equal(result.dirty, false);
+  assert.equal(result.remote_url, "https://github.com/owner/repo.git");
+  assert.doesNotMatch(JSON.stringify(result), /secret|redacted/);
+  assert.deepEqual(result.failures, []);
+  assert.equal(result.base.includes_origin_main, true);
+  assert.equal(result.github_cli.env_token_present, true);
+  assert(result.warnings.some((warning) => warning.code === "main_checked_out_elsewhere"));
+  assert(result.warnings.some((warning) => warning.code === "github_token_env_present"));
+});
+
+test("worktree preflight fails detached HEAD", async () => {
+  const result = await checkWorktreePreflight({
+    repoRoot: "C:/repo",
+    commandRunner: createWorktreePreflightRunner({
+      "git rev-parse --abbrev-ref HEAD": { stdout: "HEAD\n" }
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.code === "detached_head"));
+});
+
+test("worktree preflight fails dirty worktree", async () => {
+  const result = await checkWorktreePreflight({
+    repoRoot: "C:/repo",
+    commandRunner: createWorktreePreflightRunner({
+      "git status --porcelain": { stdout: " M README.md\n?? scratch.txt\n" }
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.dirty, true);
+  assert(result.failures.some((failure) => failure.code === "dirty_worktree"));
+});
+
+test("worktree preflight fails branch that is stale behind origin main", async () => {
+  const result = await checkWorktreePreflight({
+    repoRoot: "C:/repo",
+    commandRunner: createWorktreePreflightRunner({
+      "git merge-base --is-ancestor origin/main HEAD": { exitCode: 1 }
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.base.includes_origin_main, false);
+  assert(result.failures.some((failure) => failure.code === "stale_origin_main"));
+});
+
+test("worktree preflight warns for missing upstream and already merged branch", async () => {
+  const result = await checkWorktreePreflight({
+    repoRoot: "C:/repo",
+    commandRunner: createWorktreePreflightRunner({
+      "git rev-parse --abbrev-ref --symbolic-full-name @{u}": {
+        exitCode: 128,
+        stderr: "fatal: no upstream configured\n"
+      },
+      "git merge-base --is-ancestor HEAD origin/main": { exitCode: 0 }
+    })
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.upstream, "");
+  assert(result.warnings.some((warning) => warning.code === "missing_upstream"));
+  assert(result.warnings.some((warning) => warning.code === "branch_already_in_origin_main"));
+});
+
 test("build clean check reports only files dirtied by the build", async () => {
   const { findBuildIntroducedDirtyFiles } = await import("../scripts/check-build-clean.mjs");
   const result = findBuildIntroducedDirtyFiles({
@@ -6791,6 +6881,59 @@ test("validate uses build clean check wrapper", async () => {
   assert.match(scripts.validate || "", /npm run build:check-clean/);
   assert.doesNotMatch(scripts.validate || "", /npm run build &&/);
 });
+
+test("package exposes worktree preflight and docs validation tiers", async () => {
+  const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
+  const scripts = manifest.scripts || {};
+
+  assert.equal(scripts["preflight:worktree"], "node src/cli.js preflight:worktree");
+  assert.match(scripts["validate:docs"] || "", /npm run harness:init/);
+  assert.match(scripts["validate:docs"] || "", /npm run harness:validate/);
+  assert.match(scripts["validate:docs"] || "", /npm run retrospectives:validate/);
+  assert.match(scripts["validate:docs"] || "", /npm run privacy:validate/);
+  assert.match(scripts["validate:docs"] || "", /git diff --check/);
+  assert.match(scripts.validate || "", /npm run test:e2e/);
+});
+
+function createWorktreePreflightRunner(overrides = {}) {
+  const defaults = {
+    "git rev-parse --show-toplevel": { stdout: "C:/repo\n" },
+    "git fetch origin main --prune": { stdout: "" },
+    "git rev-parse --abbrev-ref HEAD": { stdout: "codex/preflight-validation-tiers\n" },
+    "git rev-parse HEAD": { stdout: "2222222222222222222222222222222222222222\n" },
+    "git status --porcelain": { stdout: "" },
+    "git rev-parse --abbrev-ref --symbolic-full-name @{u}": {
+      stdout: "origin/codex/preflight-validation-tiers\n"
+    },
+    "git remote get-url origin": { stdout: "git@github.com:owner/repo.git\n" },
+    "git rev-parse origin/main": { stdout: "1111111111111111111111111111111111111111\n" },
+    "git merge-base --is-ancestor origin/main HEAD": { exitCode: 0 },
+    "git merge-base --is-ancestor HEAD origin/main": { exitCode: 1 },
+    "git rev-list --left-right --count origin/main...HEAD": { stdout: "0\t2\n" },
+    "git worktree list --porcelain": {
+      stdout: [
+        "worktree C:/repo",
+        "HEAD 2222222",
+        "branch refs/heads/codex/preflight-validation-tiers",
+        ""
+      ].join("\n")
+    },
+    "gh auth status": { exitCode: 0, stdout: "Logged in to github.com\n" }
+  };
+
+  return async (command, args) => {
+    const key = [command, ...args].join(" ");
+    const result = overrides[key] || defaults[key];
+    if (!result) {
+      throw new Error(`Unexpected command: ${key}`);
+    }
+    return {
+      stdout: result.stdout || "",
+      stderr: result.stderr || "",
+      exitCode: Number.isInteger(result.exitCode) ? result.exitCode : 0
+    };
+  };
+}
 
 test("daily runner writes launcher summary and stops before real publish by default", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-launcher-"));
@@ -19984,6 +20127,7 @@ async function createHarnessFixture(options = {}) {
         "prompt:build": "node src/cli.js prompt:build",
         "report:write": "node src/cli.js report:write",
         build: "node src/cli.js build --data-input reports-data --input reports-source --out docs",
+        "preflight:worktree": "node src/cli.js preflight:worktree",
         test: "node --test tests/unit.test.js",
         "test:e2e": "node scripts/run-e2e.mjs",
         "harness:init": "node scripts/harness-init.mjs",
@@ -19991,6 +20135,7 @@ async function createHarnessFixture(options = {}) {
         "retrospectives:validate": "node scripts/validate-retrospectives.mjs",
         "content:contract": "node scripts/check-daily-content-contract.mjs",
         "content:contract:self-test": "node scripts/check-daily-content-contract.mjs --self-test --json",
+        "validate:docs": "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run privacy:validate && git diff --check",
         validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract && npm run content:contract:self-test && npm run test && npm run build && npm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",

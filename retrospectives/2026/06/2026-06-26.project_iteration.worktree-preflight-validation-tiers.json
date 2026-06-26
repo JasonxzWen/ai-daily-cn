@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.worktree-preflight-validation-tiers",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Worktree preflight and docs validation tier",
+  "status": "completed",
+  "summary": "This iteration separates day-to-day branch hygiene checks from publish-only preflight checks. The new worktree preflight command reports branch freshness, dirty state, upstream state, sibling main worktree ownership, and GitHub CLI auth observations as JSON, while validate:docs adds a lighter documentation/process gate without weakening the full npm run validate release gate.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"worktree preflight\" tests/unit.test.js",
+      "node src/cli.js preflight:worktree --allow-dirty",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate:docs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Feature-branch readiness should not reuse publish-only checks that assume main is checked out and ready to push.",
+      "evidence": "publish:preflight remains scoped to publishing, while preflight:worktree now checks origin/main ancestry, detached HEAD, dirty files, upstream state, sibling worktrees, and GitHub CLI auth as a separate JSON contract.",
+      "scope": "worktree_preflight",
+      "persistence": "implemented",
+      "recommended_action": "Run preflight:worktree before PR and merge-follow-up work, and keep publish:preflight reserved for publishing paths."
+    },
+    {
+      "lesson": "Documentation-only changes need a durable fast gate, but the full gate must remain authoritative before shipping.",
+      "evidence": "validate:docs runs harness, retrospective, privacy, and whitespace checks; npm run validate still runs the broader content, source, unit, build, privacy, and browser checks.",
+      "scope": "validation_tiers",
+      "persistence": "implemented",
+      "recommended_action": "Use validate:docs for quick docs/process feedback and npm run validate for final delivery."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ledger-validation-binding"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After this branch is merged, run preflight:worktree on the next fresh task branch to confirm it catches stale origin/main and token-environment warnings before implementation starts.",
+      "owner": "project"
+    }
+  ],
+  "slug": "worktree-preflight-validation-tiers"
+}
