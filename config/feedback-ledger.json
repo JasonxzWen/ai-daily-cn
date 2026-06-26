@@ -280,7 +280,7 @@
       "status": "confirmed",
       "title": "Refill sparse main stream from a blacklist-filtered unified pool",
       "problem": "The daily generator treated `main_items` as an official/primary whitelist pool, so days with many usable GitHub, Builder, blog, community, and weak-signal candidates could still publish only a few main stories; later patches then tried to compensate with hard post-generation gates and public filler.",
-      "expected_behavior": "`main_items` admission is blacklist-based: source authority affects ranking and dedupe priority, not basic eligibility. When strict main candidates are fewer than 5, the generator refills from qualified GitHub/project, Builder/X, hot blog, official update, community, 72-hour window-fill, and low-risk weak-signal candidates up to the 5-item minimum, while rejecting generic trending text, missing-source items, recent duplicates, non-AI items, public filler, and unverified high-risk facts. Every evaluated candidate records a `main_selection_stage` or `main_reject_reason`, plus duplicate/merge/window-fill details where applicable. The generator records selected/refill counts, target boundaries, shortfall events, source-health impacts, and rejection reason counts before rendering; post-generation gates only catch accidents.",
+      "expected_behavior": "`main_items` admission is blacklist-based: source authority affects ranking and dedupe priority, not basic eligibility. When strict main candidates are fewer than 5, the generator refills from qualified GitHub/project, Builder/X, hot blog, official update, community, 72-hour window-fill, and low-risk weak-signal candidates up to the 5-item minimum, while rejecting generic trending text, missing-source items, recent duplicates, non-AI items, public filler, low-value vendor model availability PRs, and unverified high-risk facts. Every evaluated candidate records a `main_selection_stage` or `main_reject_reason`, plus duplicate/merge/window-fill details where applicable; vendor channel availability PRs for another provider's model use `main_reject_reason:\"low_value_vendor_availability_pr\"`. The generator records selected/refill counts, target boundaries, shortfall events, source-health impacts, and rejection reason counts before rendering; post-generation gates only catch accidents.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -657,10 +657,11 @@
       "status": "implemented",
       "title": "Map durable ai-daily requirements to runtime evidence",
       "problem": "The user repeatedly confirmed ai-daily requirements, but prior fixes could mark items implemented without proving that the generated daily report, index page, tests, and runtime evidence actually satisfied them.",
-      "expected_behavior": "Every durable ai-daily requirement is listed in `docs/ai-daily-requirements-reconciliation.md` with a requirement ID, linked feedback ledger item, test or gate, runtime evidence boundary, and current implementation status. The repo must not claim a requirement is stable unless the handoff cites generated artifacts and validation evidence.",
+      "expected_behavior": "Every durable ai-daily requirement is listed in `docs/ai-daily-requirements-reconciliation.md` with a requirement ID, linked feedback ledger item, test or gate, runtime evidence boundary, and current implementation status. Cross-agent Codex/Claude Code diagnosis that changes implementation priority is promoted into a repository roadmap before downstream work is claimed accepted. The repo must not claim a requirement is stable unless the handoff cites generated artifacts and validation evidence.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
+        "docs/ai-daily-cross-agent-iteration-roadmap.md",
         "docs/ai-daily-requirements-reconciliation.md",
         "tests/unit.test.js",
         "tasks/current-task.md"
@@ -992,7 +993,7 @@
       "status": "implemented",
       "title": "Gate daily content quality before publish",
       "problem": "The 2026-06-17 run exposed weak generated content that structural checks did not reject: one-bullet main details, filler-heavy hot blog text, shallow GitHub Trending descriptions, zero Builder/X selections despite enough eligible X feed candidates, and fake simplified tracking components.",
-      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements.",
+      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `npm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1008,8 +1009,8 @@
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "daily content contract rejects 2026-06-17 weak generated shape",
+        "command": "npm run content:contract",
+        "test_name": "real artifact content contract scans report directory and surfaces blocking issues",
         "gate": "npm run validate"
       }
     },

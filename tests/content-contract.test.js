@@ -10,10 +10,11 @@
 
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
+import { evaluateDailyContentContract, evaluateRealArtifactContentContract } from "../scripts/check-daily-content-contract.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = path.join(__dirname, "..", "reports-data");
@@ -41,6 +42,31 @@ test("content contract is clean for authored story narrative", () => {
   const report = storyFixture("阿里云公布视频生成模型 HappyHorse 的新版本，提升人物动作表现力、跨帧生成一致性和整体画面质量。");
   const result = evaluateDailyContentContract(report);
   assert.equal(result.degraded.filter((d) => d.code === "story_template_narrative").length, 0);
+});
+
+test("real artifact content contract scans report directory and surfaces blocking issues", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-"));
+  const dataDir = path.join(tmp, "reports-data", "2026", "06");
+  const htmlDir = path.join(tmp, "docs", "reports", "2026", "06");
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.mkdirSync(htmlDir, { recursive: true });
+  const realTemplatedReport = JSON.parse(fs.readFileSync(path.join(REPORTS_DIR, "2026", "06", "2026-06-24.json"), "utf8"));
+  realTemplatedReport.github_trending = [];
+  fs.writeFileSync(path.join(dataDir, "2026-06-26.json"), JSON.stringify(realTemplatedReport), "utf8");
+  fs.writeFileSync(path.join(htmlDir, "2026-06-26.html"), "<html><body><section id=\"story-list\"></section></body></html>", "utf8");
+
+  const result = await evaluateRealArtifactContentContract({
+    rootDir: tmp,
+    dataInput: "reports-data",
+    htmlInput: path.join("docs", "reports"),
+    latest: 1
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.summary.artifacts_checked, 1);
+  assert(result.issues.some((issue) => issue.code === "github_trending_top20_missing"));
+  assert(result.issues.some((issue) => issue.report_path === "reports-data/2026/06/2026-06-26.json"));
+  assert(result.degraded.some((issue) => issue.code === "story_template_narrative"));
 });
 
 test("latest committed report carries no BLOCKING content-contract issues", () => {

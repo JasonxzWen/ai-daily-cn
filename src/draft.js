@@ -163,6 +163,9 @@ const GENERIC_TECHNICAL_BLOG_TITLE_RE = /^(?:latest|official|new)\s+ai\s+(?:plat
 const TITLE_MOJIBAKE_RE = /�|锟|喔|鈥|峄|岷|箞|鑳|€/u;
 const LOW_VALUE_MAIN_RE = /amazon in the community|service,\s*community,\s*and commitment at hq2|friday night baseball|apple arcade|family feud pocket|prime video|spinoff|ari[a]?nespace launch|deploy more satellites|vought rising|here'?s what'?s happening in seattle|hq2|july.*baseball|mini football legends|the latest ai news we announced in/i;
 const LOW_VALUE_AI_PR_RE = /doosan group collaborate|multiyear technology partnership|advance memory for ai factories|advance physical ai and ai factory infrastructure|build ai infrastructure to power|expands ai infrastructure with nvidia/i;
+const VENDOR_MODEL_AVAILABILITY_SOURCE_RE = /\b(aws|amazon web services|amazon bedrock|bedrock|sagemaker|microsoft foundry|azure ai|github copilot|github changelog|google cloud|vertex ai|openrouter)\b|aws\.amazon\.com|devblogs\.microsoft\.com\/foundry|github\.blog\/changelog|cloud\.google\.com|openrouter\.ai/i;
+const VENDOR_MODEL_AVAILABILITY_TEXT_RE = /\b(now available|available on|available in|is available|are available|availability|model access|selected regions?|standard api access|comes to|launches in|on amazon bedrock|in amazon bedrock|in microsoft foundry|in github copilot|on vertex|in vertex|on azure|in azure|on openrouter|in openrouter)\b/i;
+const THIRD_PARTY_MODEL_NAME_RE = /\b(claude|anthropic|gpt-|openai|gemini|llama|qwen|mistral|deepseek|fable|mythos|frontier model|foundation model)\b/i;
 const TRUSTED_PRIMARY_SOURCE_LEVELS = new Set([
   "primary",
   "official",
@@ -3526,6 +3529,7 @@ function mainRejectReason(candidate, options = {}) {
   if (isGenericHotBlogAnnouncementCandidate(candidate)) return "generic_hot_blog_announcement";
   if (isPublicFillerMainCandidate(candidate, meta)) return "public_filler_text";
   if (isLowValueProductHuntMainCandidate(candidate)) return "low_value_product_hunt_project";
+  if (isLowValueVendorAvailabilityPrCandidate(candidate)) return "low_value_vendor_availability_pr";
   if (isLowValueMainCandidate(candidate)) return "low_value";
   if (isLowValueEventGuideCandidate(candidate)) return "low_value_event_guide";
   if (isLowValueProfileCandidate(candidate)) return "low_value_profile";
@@ -4191,6 +4195,30 @@ function isLowValueMainCandidate(candidate) {
     return true;
   }
   return false;
+}
+
+function isLowValueVendorAvailabilityPrCandidate(candidate) {
+  if (!candidate || typeof candidate !== "object") {
+    return false;
+  }
+  if (isOriginalModelLaunchCandidate(candidate)) {
+    return false;
+  }
+  const ownerText = candidateSourceOwnerText(candidate);
+  if (!VENDOR_MODEL_AVAILABILITY_SOURCE_RE.test(ownerText)) {
+    return false;
+  }
+  if (isStrategicCoreOfficialCandidate(candidate)) {
+    return false;
+  }
+  const text = candidateText(candidate);
+  if (!THIRD_PARTY_MODEL_NAME_RE.test(text)) {
+    return false;
+  }
+  if (!VENDOR_MODEL_AVAILABILITY_TEXT_RE.test(text)) {
+    return false;
+  }
+  return true;
 }
 
 function strategicCoreOfficialScore(candidate) {

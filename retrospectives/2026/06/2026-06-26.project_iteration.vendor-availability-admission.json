@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.vendor-availability-admission",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Vendor availability admission rejection",
+  "status": "completed",
+  "summary": "Implemented a focused admission/scoring slice: low-value third-party channel availability PRs for another provider's model no longer occupy `main_items`; they are audited with `main_reject_reason:\"low_value_vendor_availability_pr\"` before authoring or repair can make them look more important.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"report:draft rejects low-value vendor availability PRs from main admission\" tests/unit.test.js",
+      "node --test --test-name-pattern \"admission scoring|Fable/Mythos|unified candidate roles|rejection reason counts\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "node scripts/validate-feedback-contract.mjs",
+      "npm run content:contract",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Admission should reject low-value channel availability PRs explicitly, not rely on prose quality or score ordering.",
+      "evidence": "The focused red test failed because an AWS Bedrock-style Claude availability PR still entered `main_items`; after the fix the candidate is absent from `main_items` and records `low_value_vendor_availability_pr`.",
+      "scope": "main_stream_admission",
+      "persistence": "implemented",
+      "recommended_action": "Keep adding admission fixtures for low-value but structurally complete candidates before broad authoring changes."
+    },
+    {
+      "lesson": "This is still a narrow slice, not a complete admission rewrite.",
+      "evidence": "The change only covers third-party model channel availability announcements and does not alter discovery, source lanes, authoring, rendering, or automation.",
+      "scope": "admission_scoring",
+      "persistence": "session_note",
+      "recommended_action": "Next admission work should add fixtures for vendor partnership PRs, generic availability copy, and high-value official model/provider releases from real dated drafts."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Vendor availability announcements could occupy main-story slots because they looked official and structurally complete.",
+      "evidence": "The new test fixture uses an AWS Bedrock-style Claude availability PR; the candidate now receives `main_reject_reason:\"low_value_vendor_availability_pr\"`.",
+      "module": "admission_scoring",
+      "suggestion": "Reject low-value third-party model channel availability PRs at admission time and keep them out of `main_items`.",
+      "expected_benefit": "Better first-pass selection: authoring no longer spends effort making low-value channel PRs sound like main stories.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in `src/draft.js`, unit tests, feedback ledger, quick reference, requirements reconciliation, and roadmap evidence text.",
+      "ledger_links": [
+        "feedback/p1-main-stream-blacklist-refill",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility"
+      ],
+      "validation_evidence": [
+        "node --test --test-name-pattern \"report:draft rejects low-value vendor availability PRs from main admission\" tests/unit.test.js"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Run a real dated draft and inspect whether remaining low-signal vendor/platform items are excluded, merged into original stories, or demoted to signal sections.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Continue admission/scoring with fixtures for generic vendor partnerships and source-health-aware selection before starting broad LLM authoring work.",
+      "owner": "project"
+    }
+  ],
+  "slug": "vendor-availability-admission"
+}

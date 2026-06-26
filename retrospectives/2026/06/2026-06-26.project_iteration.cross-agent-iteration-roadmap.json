@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.cross-agent-iteration-roadmap",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Cross-agent iteration roadmap normalization",
+  "status": "completed",
+  "summary": "Promoted the cross-agent Codex and Claude Code diagnosis into repository-owned planning norms before downstream implementation. The roadmap records user intent, current bottlenecks, dependency order, independently verifiable slices, and explicit non-goals so future agents do not depend on chat memory.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node -e \"const fs=require('fs'); const p='docs/ai-daily-cross-agent-iteration-roadmap.md'; if(!fs.existsSync(p)){console.error('missing cross-agent iteration roadmap'); process.exit(1)} const s=fs.readFileSync(p,'utf8'); for (const phrase of ['Highest Priority','Dependency Order','Independently Verifiable','Not In This Phase']) { if(!s.includes(phrase)){ console.error('missing '+phrase); process.exit(1) } }\"",
+      "node --test --test-name-pattern \"cross-agent iteration roadmap\" tests/unit.test.js",
+      "npm run content:contract:self-test",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "node scripts/validate-feedback-contract.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Cross-agent diagnosis must be promoted into repository-owned norms before it can steer implementation.",
+      "evidence": "The new roadmap is linked from requirements reconciliation, ledger scope, quick reference, unit tests, and this retrospective.",
+      "scope": "iteration_memory",
+      "persistence": "implemented",
+      "recommended_action": "Begin future ai-daily improvement work by reviewing the roadmap dependency order before editing generation, source, publish, or rendering code."
+    },
+    {
+      "lesson": "The next implementation slices need dependency-aware validation, not another flat ROI list.",
+      "evidence": "The roadmap separates real artifact validation, admission/scoring, authoring, GitHub Trending, source lanes, automation observability, and frontend IA by dependency and independent verification boundary.",
+      "scope": "implementation_planning",
+      "persistence": "implemented",
+      "recommended_action": "Implement the next slices one at a time, starting with real artifact validation before broader generation changes."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "accepted",
+      "issue": "Cross-agent intent and project diagnosis can be lost when they remain only in chat or local memory.",
+      "evidence": "The user explicitly reprioritized the prior recommendation so repository-owned memory and norms become the first step.",
+      "module": "docs",
+      "suggestion": "Keep `docs/ai-daily-cross-agent-iteration-roadmap.md` as the durable planning entry point for ai-daily improvement work.",
+      "expected_benefit": "Future iterations should start from accepted dependency order and verification boundaries instead of rediscovering the same project pain.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Already promoted through REQ-013, ledger scope, quick reference, unit tests, and retrospective index.",
+      "ledger_links": [
+        "feedback/p1-ai-daily-requirements-reconciliation",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "node --test --test-name-pattern \"cross-agent iteration roadmap\" tests/unit.test.js"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-github-readme-enrichment",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-ai-quality-review-loop"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement the real artifact validation slice before admission, authoring, source, or frontend changes.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Treat frontend IA as dependent on content/admission improvements unless the user explicitly asks for a visual-only pass.",
+      "owner": "project"
+    }
+  ],
+  "slug": "cross-agent-iteration-roadmap"
+}
