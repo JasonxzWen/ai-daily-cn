@@ -38,6 +38,21 @@
       "default": false,
       "description": "When true, expose the runtime dependency manifest as a visible report section. The manifest remains machine-readable but hidden by default."
     },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional durability metadata for HTML handoffs. Use repo-relative paths and commands so generated reports can be regenerated without leaking host-local paths.",
+      "properties": {
+        "sourcePath": {
+          "type": "string",
+          "description": "Repo-relative durable JSON input path used to regenerate the artifact."
+        },
+        "regenerationCommand": {
+          "type": "string",
+          "description": "Exact repo-root command that regenerates the artifact from sourcePath."
+        }
+      }
+    },
     "intent": {
       "type": "object",
       "additionalProperties": false,

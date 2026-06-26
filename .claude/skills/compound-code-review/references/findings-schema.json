@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Compound Code Review Findings",
+  "type": "object",
+  "required": ["reviewer", "findings", "residual_risks", "testing_gaps"],
+  "properties": {
+    "reviewer": {
+      "type": "string",
+      "description": "Reviewer lens such as correctness, testing, maintainability, security, or api-contract."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "severity",
+          "file",
+          "line",
+          "why_it_matters",
+          "autofix_class",
+          "owner",
+          "requires_verification",
+          "confidence",
+          "evidence",
+          "pre_existing"
+        ],
+        "properties": {
+          "title": { "type": "string", "maxLength": 100 },
+          "severity": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "why_it_matters": { "type": "string" },
+          "autofix_class": {
+            "type": "string",
+            "enum": ["safe_auto", "gated_auto", "manual", "advisory"]
+          },
+          "owner": {
+            "type": "string",
+            "enum": ["review-fixer", "downstream-resolver", "human", "release"]
+          },
+          "requires_verification": { "type": "boolean" },
+          "suggested_fix": { "type": ["string", "null"] },
+          "confidence": {
+            "type": "integer",
+            "enum": [0, 25, 50, 75, 100]
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "pre_existing": { "type": "boolean" }
+        }
+      }
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "testing_gaps": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "confidence_anchors": {
+    "0": "False positive or unrelated pre-existing issue.",
+    "25": "Speculative and not verified from available evidence.",
+    "50": "Real but minor, style-oriented, or uncertain impact.",
+    "75": "Clearly actionable and likely to affect users, callers, tests, or runtime behavior.",
+    "100": "Verifiable from code alone, such as a compile error, type mismatch, definitive logic bug, or explicit project-rule violation."
+  }
+}

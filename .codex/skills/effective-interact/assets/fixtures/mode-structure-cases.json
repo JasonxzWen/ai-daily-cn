@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "description": "Mode-structure execution cases for non-HTML Effective Interact outputs.",
+  "cases": [
+    {
+      "id": "plain-brief-direct-answer",
+      "mode": "plain-brief",
+      "shouldWarn": false,
+      "expectedStructures": [],
+      "content": "Recommendation: take path A. It is the smallest fix, preserves the current contract, and avoids widening trigger noise."
+    },
+    {
+      "id": "structured-markdown-linear-paragraphs",
+      "mode": "structured-markdown",
+      "shouldWarn": true,
+      "expectedStructures": [],
+      "content": "# Conclusion\nThis update changed the trigger boundary, the tests, and the routing notes, but the report still explains everything as two long paragraphs without a table, grouped list, or source list.\n\nThe reader can only scan prose, so the structure contract is not satisfied."
+    },
+    {
+      "id": "structured-markdown-grouped-list",
+      "mode": "structured-markdown",
+      "shouldWarn": false,
+      "expectedStructures": ["grouped-list"],
+      "content": "# Conclusion\n- **Evidence:** `skill-activation-check.mjs` now selects `effective-interact` for wide repo explainers.\n- **Risk:** Broad but simple summaries may still need fixture tuning.\n- **Next:** Watch false-positive warnings before upgrading any case to fail."
+    },
+    {
+      "id": "visual-markdown-bullets-only",
+      "mode": "visual-markdown",
+      "shouldWarn": true,
+      "expectedStructures": ["grouped-list"],
+      "content": "# Flow\n- **Step:** classify the prompt.\n- **Step:** explain the risks.\n- **Step:** hand off the recommendation."
+    },
+    {
+      "id": "visual-markdown-mermaid",
+      "mode": "visual-markdown",
+      "shouldWarn": false,
+      "expectedStructures": ["mermaid"],
+      "content": "# Flow\n```mermaid\nflowchart LR\n  Prompt --> Route --> Visual\n```\n\n- **Risk:** Keep HTML optional when one diagram is enough."
+    },
+    {
+      "id": "visual-markdown-source-anchors",
+      "mode": "visual-markdown",
+      "shouldWarn": false,
+      "expectedStructures": ["source-anchor-list"],
+      "content": "# Evidence map\n- [SKILL.md](C:/repo/skills/effective-interact/SKILL.md:29)\n- [interaction-patterns.md](C:/repo/skills/effective-interact/references/interaction-patterns.md:75)"
+    }
+  ]
+}

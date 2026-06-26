@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.harness-hub-020-sync",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Harness Hub 0.2.0 sync and host compatibility",
+  "status": "completed",
+  "summary": "Updated the local Harness Hub source checkout to origin/main at 8ac264bed8a06fc6bf954a88ad92330e13e63e03, refreshed the Codex skill aggregation, curated the new harness-quality-check and insight capabilities for Claude Code, and promoted .claude/skills from local ignored state to a tracked repository artifact while preserving local Codex overlays.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "commits": [
+      "8ac264bed8a06fc6bf954a88ad92330e13e63e03"
+    ],
+    "validation_commands": [
+      "node -e \"const fs=require('fs'); const p=['.codex/skills/insight/SKILL.md','.claude/skills/insight/SKILL.md','.codex/skills/harness-quality-check/SKILL.md','.claude/skills/harness-quality-check/SKILL.md']; const missing=p.filter((x)=>!fs.existsSync(x)); if (missing.length){ console.error('missing '+missing.join(',')); process.exit(1); }\"",
+      "node -e \"const fs=require('fs'); const manifest=JSON.parse(fs.readFileSync('.codex/harness-hub-aggregation.json','utf8')); for (const skill of ['insight','harness-quality-check']) if (!manifest.importedSkills.includes(skill)) { console.error('manifest missing '+skill); process.exit(1); } console.log(manifest.source.commit);\"",
+      "node --test tests/skills.test.js",
+      "node .codex/skills/insight/scripts/collect-insight-events.mjs --help",
+      "node .claude/skills/insight/scripts/collect-insight-events.mjs --help",
+      "node scripts/harness-validate.mjs",
+      "git ls-files .claude/skills/README.md .claude/skills/insight/SKILL.md .claude/skills/harness-quality-check/SKILL.md"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Harness Hub skill sync needs a separate Claude Code curation pass.",
+      "evidence": "The existing update script refreshed .codex/skills and the aggregation manifest, but .claude/skills stayed outside the tracked aggregation path and had to be curated from the active Codex skill tree.",
+      "scope": "harness_hub_sync",
+      "persistence": "session_note",
+      "recommended_action": "Keep Claude Code compatibility checks in the maintenance validation checklist whenever Harness Hub imports or updates standard skills."
+    },
+    {
+      "lesson": "PowerShell Copy-Item with -LiteralPath does not expand wildcard source paths.",
+      "evidence": "The first Claude curation attempt created empty insight and harness-quality-check directories; the targeted skills test failed until Copy-Item used -Path for wildcard expansion.",
+      "scope": "windows_file_operations",
+      "persistence": "session_note",
+      "recommended_action": "Use explicit directory copy commands or -Path wildcard expansion for mechanical curation, then run file-existence tests before handoff."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Claude Code curated skills are maintained as local ignored state rather than the lock-backed Codex aggregation.",
+      "evidence": "The user confirmed .claude should be tracked; the local .git/info/exclude entry was removed, .claude/skills files were staged, and tests/skills.test.js now asserts representative Claude Code curated skill files are returned by git ls-files.",
+      "module": ".claude/skills",
+      "suggestion": "Keep Claude Code curated skills as tracked repository artifacts and validate representative tracked files in the skill test suite.",
+      "expected_benefit": "Future Harness Hub updates would have a deterministic Codex and Claude Code compatibility path instead of relying on manual local curation.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in this project_iteration by tracking .claude/skills and adding a git ls-files regression test.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "node --test tests/skills.test.js",
+        "git ls-files .claude/skills/README.md .claude/skills/insight/SKILL.md .claude/skills/harness-quality-check/SKILL.md"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ledger-validation-binding",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "implemented",
+      "action": "Promote .claude/skills to a tracked sync surface with representative git ls-files validation.",
+      "owner": "project"
+    }
+  ],
+  "slug": "harness-hub-020-sync"
+}

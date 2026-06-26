@@ -170,6 +170,34 @@ function collectRichContentOpportunityWarnings(documentMarkup) {
   return warnings;
 }
 
+function collectVisualStructureWarnings(documentMarkup) {
+  const warnings = [];
+  const structuredTypes = new Set([
+    "summary-cards",
+    "data-table",
+    "mermaid",
+    "code",
+    "diff",
+    "timeline",
+    "evidence",
+    "decision-matrix",
+    "tabs",
+    "filterable-cards",
+    "chart"
+  ]);
+  const sectionTypes = [...String(documentMarkup || "").matchAll(/data-section-type="([^"]+)"/gi)]
+    .map((match) => String(match[1] || "").trim())
+    .filter(Boolean);
+  const hasStructuredSection = sectionTypes.some((type) => structuredTypes.has(type));
+  const hasRenderedTable = /<table\b/i.test(documentMarkup);
+
+  if (!hasStructuredSection && !hasRenderedTable) {
+    warnings.push("advisory: visual structure gate: unless the report is intentionally plain-brief, add at least one visible structure such as cards, a table, matrix, timeline, flow, source-linked code/evidence, or filterable layout");
+  }
+
+  return warnings;
+}
+
 function collectRichRenderWarnings(html, mode) {
   const warnings = [];
   const value = String(html || "");
@@ -244,6 +272,27 @@ function collectAestheticPreflightWarnings(html, documentMarkup) {
 function attrValue(tag, name) {
   const match = String(tag || "").match(new RegExp(`${name}="([^"]*)"`, "i"));
   return match ? match[1] : "";
+}
+
+function metaContent(documentMarkup, name) {
+  const pattern = new RegExp(`<meta\\b(?=[^>]*name="${name}")[^>]*>`, "i");
+  const tag = String(documentMarkup || "").match(pattern)?.[0] || "";
+  return attrValue(tag, "content");
+}
+
+function collectHandoffDurabilityWarnings(documentMarkup) {
+  const htmlTag = String(documentMarkup || "").match(/<html\b[^>]*>/i)?.[0] || "";
+  const hero = String(documentMarkup || "").match(/<header\b(?=[^>]*report-hero)[\s\S]*?<\/header>/i)?.[0] || "";
+  const template = attrValue(htmlTag, "data-template");
+  const artifactKind = attrValue(hero, "data-artifact-kind") || attrValue(String(documentMarkup || ""), "data-artifact-kind");
+  const durableKinds = new Set(["handoff", "review", "status", "research", "decision", "explainer"]);
+  const durableTemplates = new Set(["implementation-handoff", "conclusion-dashboard", "review-findings", "research-explainer", "decision-matrix", "implementation-plan"]);
+  const shouldHaveDurability = durableKinds.has(artifactKind) || durableTemplates.has(template);
+  const sourcePath = attrValue(htmlTag, "data-handoff-source-path") || metaContent(documentMarkup, "handoff-source-path");
+  const regenerationCommand = attrValue(htmlTag, "data-handoff-regeneration-command") || metaContent(documentMarkup, "handoff-regeneration-command");
+
+  if (!shouldHaveDurability || (sourcePath && regenerationCommand)) return [];
+  return ["advisory: handoff durability: add data-handoff-source-path and data-handoff-regeneration-command so ignored HTML artifacts can be regenerated"];
 }
 
 function normalizeFragmentId(value) {
@@ -356,9 +405,11 @@ function validateStatic(html) {
   const hasInteractiveControls = /<(button|input|select)[^>]+data-(filter-target|tab-group|copy-from|copy-text|search-for)/.test(documentMarkup);
   const warnings = collectReadabilityWarnings(documentMarkup);
   warnings.push(...collectDecisionBriefWarnings(documentMarkup));
+  warnings.push(...collectVisualStructureWarnings(documentMarkup));
   warnings.push(...collectRichContentOpportunityWarnings(documentMarkup));
   warnings.push(...collectRichRenderWarnings(html, mode));
   warnings.push(...collectAestheticPreflightWarnings(html, documentMarkup));
+  warnings.push(...collectHandoffDurabilityWarnings(documentMarkup));
 
   add(checks, "report-root", html.includes("data-html-work-report"), "missing data-html-work-report root", issues);
   add(checks, "render-mode", ["runtime-cdn", "pre-rendered", "fallback-only"].includes(mode), `unexpected render mode: ${mode}`, issues);
@@ -371,6 +422,7 @@ function validateStatic(html) {
   const navigationOrderIssues = collectNavigationOrderIssues(documentMarkup);
   add(checks, "navigation-order", navigationOrderIssues.length === 0, navigationOrderIssues.join("; "), issues);
   checks.push("decision-brief-scan");
+  checks.push("visual-structure-gate-scan");
   checks.push("rich-content-opportunity-scan");
   checks.push("aesthetic-preflight-scan");
   add(checks, "section-groups", html.includes("data-section-group="), "sections lack group metadata", issues);

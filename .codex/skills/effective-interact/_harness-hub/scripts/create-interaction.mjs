@@ -254,6 +254,38 @@ function safeLink(rawHref) {
   }
 }
 
+function hasHostLocalPath(value) {
+  return /file:\/\/\/|[A-Za-z]:[\\/]|\/(?:Users|home)\//i.test(String(value ?? ""));
+}
+
+function normalizeHandoffMetadata(handoff) {
+  if (!handoff || typeof handoff !== "object") return { sourcePath: "", regenerationCommand: "" };
+  return {
+    sourcePath: String(handoff.sourcePath || "").trim().replaceAll("\\", "/"),
+    regenerationCommand: String(handoff.regenerationCommand || "").trim()
+  };
+}
+
+function hasParentPathSegment(value) {
+  return String(value || "").split("/").includes("..");
+}
+
+function renderHandoffAttributes(handoff) {
+  const normalized = normalizeHandoffMetadata(handoff);
+  const attrs = [];
+  if (normalized.sourcePath) attrs.push(`data-handoff-source-path="${escapeAttr(normalized.sourcePath)}"`);
+  if (normalized.regenerationCommand) attrs.push(`data-handoff-regeneration-command="${escapeAttr(normalized.regenerationCommand)}"`);
+  return attrs.length ? ` ${attrs.join(" ")}` : "";
+}
+
+function renderHandoffMetaTags(handoff) {
+  const normalized = normalizeHandoffMetadata(handoff);
+  const tags = [];
+  if (normalized.sourcePath) tags.push(`  <meta name="handoff-source-path" content="${escapeAttr(normalized.sourcePath)}">`);
+  if (normalized.regenerationCommand) tags.push(`  <meta name="handoff-regeneration-command" content="${escapeAttr(normalized.regenerationCommand)}">`);
+  return tags.length ? `${tags.join("\n")}\n` : "";
+}
+
 function normalizeRenderMode(mode) {
   if (!mode) return { mode: "pre-rendered", compatibility: "" };
   if (mode === "runtime") return { mode: "runtime-cdn", compatibility: "legacy-runtime-alias" };
@@ -1248,6 +1280,16 @@ function validateInput(input) {
   if (input.evidence !== undefined && !Array.isArray(input.evidence)) errors.push("evidence must be an array when provided.");
   if (input.verification !== undefined && !Array.isArray(input.verification)) errors.push("verification must be an array when provided.");
   if (input.nextActions !== undefined && !Array.isArray(input.nextActions)) errors.push("nextActions must be an array when provided.");
+  if (input.handoff !== undefined && (!input.handoff || typeof input.handoff !== "object" || Array.isArray(input.handoff))) errors.push("handoff must be an object when provided.");
+  if (input.handoff !== undefined) {
+    const { sourcePath, regenerationCommand } = normalizeHandoffMetadata(input.handoff);
+    if (sourcePath && (path.isAbsolute(sourcePath) || hasParentPathSegment(sourcePath) || hasHostLocalPath(sourcePath))) {
+      errors.push("handoff.sourcePath must be a repo-relative path without host-local or parent-directory segments.");
+    }
+    if (regenerationCommand && hasHostLocalPath(regenerationCommand)) {
+      errors.push("handoff.regenerationCommand must not contain host-local absolute paths or file URLs.");
+    }
+  }
   if (input.renderMode && !renderModes.includes(input.renderMode)) errors.push("renderMode must be runtime-cdn, pre-rendered, fallback-only, or runtime alias.");
   if (input.template && !templateMeta[input.template]) errors.push(`Unknown template: ${input.template}`);
   if (hasLikelyMojibakeInValue(input)) errors.push("Input contains likely mojibake. Write report JSON as UTF-8 and regenerate; continuous half-width question marks are not acceptable.");
@@ -1305,6 +1347,8 @@ async function createInteraction(input, options = {}) {
   const heroStats = renderHeroStats(input, normalizedSections.length + extras.length);
   const heroDecisionGrid = renderHeroDecisionGrid(intent);
   const compatibilityBadge = compatibility ? `<span class="status-pill status-warn" data-render-compatibility="${escapeAttr(compatibility)}">${escapeHtml(compatibility)}</span>` : "";
+  const handoffAttributes = renderHandoffAttributes(input.handoff);
+  const handoffMetaTags = renderHandoffMetaTags(input.handoff);
   const claimsSection = (input.claims || []).length > 0
     ? `<section class="panel supplemental-panel" id="claims" data-section-type="claims" data-section-group="claims" data-report-region="claims">${renderSupplementalHeading({ group: "claims", title: "关键判断", summary: "每条判断都保留证据入口和可信度。", status: "info" })}${renderClaims(input.claims || [])}</section>`
     : "";
@@ -1319,14 +1363,14 @@ async function createInteraction(input, options = {}) {
     : "";
 
   return stripTrailingWhitespace(`<!doctype html>
-<html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-template="${escapeAttr(template)}" data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
+<html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-template="${escapeAttr(template)}"${handoffAttributes} data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="effective-interact create-interaction.mjs">
   <meta name="generated-at" content="${escapeAttr(generatedAt)}">
   <meta name="render-mode" content="${escapeAttr(mode)}">
-  <title>${escapeHtml(input.title)}</title>
+${handoffMetaTags}  <title>${escapeHtml(input.title)}</title>
   <style>${css}</style>
 </head>
 <body>

@@ -60,11 +60,16 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
   assert.equal(manifest.source.path, "D:/harness-hub");
   assert(manifest.importedSkills.includes("workflow-router"));
   assert(manifest.importedSkills.includes("karpathy-guidelines"));
+  assert(manifest.importedSkills.includes("harness-quality-check"));
+  assert(manifest.importedSkills.includes("insight"));
   assert(manifest.localOnlySkills.includes("html-work-reports"));
   assert(manifest.overlappingSkills.includes("tdd-workflow"));
 
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "karpathy-guidelines", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "harness-quality-check", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "insight", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "insight", "scripts", "collect-insight-events.mjs")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "html-work-reports", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "agents", "openai.yaml")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "_harness-hub", "SKILL.md")), true);
@@ -72,6 +77,79 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
     fs.existsSync(path.join(rootDir, ".codex", "skills", "effective-interact", "_harness-hub", "scripts", "create-interaction.mjs")),
     true
   );
+});
+
+test("Claude Code curated skills expose Harness Hub additions without Codex scaffolding", async () => {
+  const claudeSkillsRoot = path.join(rootDir, ".claude", "skills");
+  const requiredFiles = [
+    path.join(claudeSkillsRoot, "harness-quality-check", "SKILL.md"),
+    path.join(claudeSkillsRoot, "harness-quality-check", "assets", "fixtures", "advisory-html-report.json"),
+    path.join(claudeSkillsRoot, "insight", "SKILL.md"),
+    path.join(claudeSkillsRoot, "insight", "references", "host-adapters.md"),
+    path.join(claudeSkillsRoot, "insight", "scripts", "collect-insight-events.mjs"),
+    path.join(claudeSkillsRoot, "insight", "scripts", "build-insight-report.mjs")
+  ];
+
+  for (const file of requiredFiles) {
+    assert.equal(fs.existsSync(file), true, `${file} should exist`);
+  }
+
+  const readme = await fsp.readFile(path.join(claudeSkillsRoot, "README.md"), "utf8");
+  assert.match(readme, /Included \(17\)/);
+  assert.match(readme, /harness-quality-check/);
+  assert.match(readme, /insight/);
+  assert.match(readme, /\.claude-plugin/);
+
+  const claudeWebappTesting = await fsp.readFile(path.join(claudeSkillsRoot, "webapp-testing", "SKILL.md"), "utf8");
+  const codexWebappTesting = await fsp.readFile(path.join(rootDir, ".codex", "skills", "webapp-testing", "SKILL.md"), "utf8");
+  assert.equal(claudeWebappTesting, codexWebappTesting);
+
+  const forbidden = [];
+  function visit(dirPath) {
+    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+      const entryPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === "_harness-hub" || entry.name === "agents") {
+          forbidden.push(entryPath);
+          continue;
+        }
+        visit(entryPath);
+      } else if (entry.isFile() && entry.name === "openai.yaml") {
+        forbidden.push(entryPath);
+      }
+    }
+  }
+  visit(claudeSkillsRoot);
+  assert.deepEqual(forbidden, []);
+});
+
+test("Claude Code curated skills are tracked repository artifacts", () => {
+  const trackedResult = spawnSync(
+    "git",
+    [
+      "ls-files",
+      "--",
+      ".claude/skills/README.md",
+      ".claude/skills/insight/SKILL.md",
+      ".claude/skills/harness-quality-check/SKILL.md"
+    ],
+    {
+      cwd: rootDir,
+      encoding: "utf8"
+    }
+  );
+
+  assert.equal(trackedResult.status, 0, trackedResult.stderr || trackedResult.stdout);
+  const trackedFiles = new Set(trackedResult.stdout.trim().split(/\r?\n/).filter(Boolean));
+  assert(trackedFiles.has(".claude/skills/README.md"));
+  assert(trackedFiles.has(".claude/skills/insight/SKILL.md"));
+  assert(trackedFiles.has(".claude/skills/harness-quality-check/SKILL.md"));
+
+  const ignoredResult = spawnSync("git", ["check-ignore", "-q", "--", ".claude/skills/README.md"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(ignoredResult.status, 1, ".claude/skills/README.md must not be ignored");
 });
 
 test("Harness Hub source commit matches local source HEAD when strict source check is enabled", async (t) => {
@@ -112,6 +190,28 @@ test("Harness Hub version sniff prompt routes to package-release-sniffer", () =>
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.selectedSkill, "package-release-sniffer");
+});
+
+test("Workflow router treats Harness Hub update adaptation as maintenance", () => {
+  const scriptPath = path.join(rootDir, ".codex", "skills", "workflow-router", "scripts", "route-intent.mjs");
+  const result = spawnSync(
+    process.execPath,
+    [
+      scriptPath,
+      "--prompt",
+      "检查一下harness-hub的更新，把全部新特性、新功能都适配过来，codex和claude code都要兼容下",
+      "--json"
+    ],
+    {
+      cwd: rootDir,
+      encoding: "utf8"
+    }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.state, "harness-hub-maintenance");
+  assert.equal(payload.owner, "hub-maintenance-workflow");
 });
 
 test("Harness Hub updater preserves local overlays while refreshing upstream copies", async () => {

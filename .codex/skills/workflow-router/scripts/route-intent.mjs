@@ -20,7 +20,7 @@ const STATE_CONFIG = Object.freeze({
     mutationAllowed: false,
     requiredGates: ['gather-required-material', 'deliver-report'],
     nextGate: 'Gather required material and answer from evidence.',
-    helpers: ['documentation-lookup'],
+    helpers: ['documentation-lookup', 'package-release-sniffer'],
     effectiveInteract: 'default-consider',
     expectedOutputMode: null,
   },
@@ -143,6 +143,7 @@ const SIGNALS = Object.freeze({
     'can it',
     'can this',
     'compare',
+    'describe',
     'explain',
     'look up',
     'what is',
@@ -153,7 +154,10 @@ const SIGNALS = Object.freeze({
     '\u80fd\u5426',
     '\u53ef\u4ee5\u5417',
     '\u5bf9\u6bd4',
+    '\u63cf\u8ff0',
     '\u89e3\u91ca',
+    '\u4ecb\u7ecd',
+    '\u68b3\u7406',
     '\u67e5\u4e00\u4e0b',
     '\u8bc1\u636e',
     '\u8bf4\u660e',
@@ -195,6 +199,9 @@ const SIGNALS = Object.freeze({
     '\u52a0\u5165',
     '\u8865\u9f50',
     '\u6536\u655b',
+    '\u9002\u914d',
+    '\u540c\u6b65',
+    '\u62c9\u9f50',
     '\u89c4\u8303\u5316',
     '\u7edf\u4e00',
     '\u6539\u6210',
@@ -416,6 +423,9 @@ const SIGNALS = Object.freeze({
     '\u6536\u655b',
     '\u8865\u9f50',
     '\u7ef4\u62a4',
+    '\u9002\u914d',
+    '\u540c\u6b65',
+    '\u62c9\u9f50',
     '\u8bc4\u4f30',
     '\u5bfc\u5165',
     '\u66f4\u65b0\u8def\u7531',
@@ -442,6 +452,54 @@ function normalize(value) {
 
 function includesAny(text, values) {
   return values.some((value) => matchesSignal(text, value.toLowerCase()));
+}
+
+function hasPackageReleaseDiscoverySignal(text) {
+  return (
+    includesAny(text, [
+      'new package',
+      'new packages',
+      'new version',
+      'newly published',
+      'package release',
+      'package releases',
+      'published package',
+      'registry feed',
+      'release feed',
+      'release feeds',
+      'release sniff',
+      'release sniffing',
+      'version sniff',
+      'version sniffing',
+      '\u7248\u672c\u55c5\u63a2',
+      '\u53d1\u5e03\u55c5\u63a2',
+      '\u65b0\u5305',
+      '\u65b0\u7248\u672c',
+      '\u5305\u53d1\u5e03',
+      '\u7248\u672c\u53d1\u5e03',
+      '\u65b0\u53d1\u5e03',
+      '\u521a\u53d1\u5e03',
+    ]) || (
+      includesAny(text, ['npm', 'pypi', 'registry', 'registries', 'package', 'packages', '\u5305', '\u6a21\u578b\u5305'])
+      && includesAny(text, [
+        'latest version',
+        'new release',
+        'new version',
+        'published',
+        'release',
+        'releases',
+        'sniff',
+        '\u55c5\u63a2',
+        '\u6700\u65b0\u7248\u672c',
+        '\u65b0\u7248\u672c',
+        '\u53d1\u5e03',
+        '\u66f4\u65b0',
+      ])
+    ) || (
+      includesAny(text, ['sniff', '\u55c5\u63a2'])
+      && includesAny(text, ['release', 'version', 'package', 'registry', 'npm', 'pypi', '\u7248\u672c', '\u53d1\u5e03', '\u5305'])
+    )
+  );
 }
 
 function matchesSignal(text, value) {
@@ -508,7 +566,24 @@ export function classifyIntent(prompt) {
   const hubSignal = includesAny(text, SIGNALS.hubMaintenance);
   const hubActionSignal = includesAny(text, SIGNALS.hubMaintenanceAction);
   const hubChangeTargetSignal = includesAny(text, SIGNALS.hubMaintenanceChangeTarget);
+  const packageReleaseDiscoverySignal = hasPackageReleaseDiscoverySignal(text);
   const explicitOwner = hasExplicitOwner(text);
+  const broadRepoExplainerSignal = (
+    includesAny(text, [
+      'describe this repo',
+      'describe this repository',
+      'describe the repo',
+      'describe the repository',
+      'codebase overview',
+      'repo capability map',
+      'repository capability map',
+    ]) || (
+      includesAny(text, ['describe', '\u63cf\u8ff0', '\u8bf4\u660e', '\u89e3\u91ca', '\u4ecb\u7ecd', '\u68b3\u7406'])
+      && includesAny(text, ['repo', 'repository', 'codebase', '\u672c\u4ed3\u5e93', '\u8fd9\u4e2a\u4ed3\u5e93', '\u4ed3\u5e93', '\u4ee3\u7801\u5e93'])
+      && includesAny(text, ['capability', 'capabilities', 'structure', 'function', 'functions', 'implementation', 'architecture', '\u80fd\u529b', '\u7ed3\u6784', '\u529f\u80fd', '\u5b9e\u73b0', '\u67b6\u6784'])
+      && includesAny(text, ['structure', 'implementation', '\u7ed3\u6784', '\u5b9e\u73b0'])
+    )
+  );
 
   if (includesAny(text, SIGNALS.vagueNext) && !changeSignal && !explicitOwner) {
     return makeResult('clarify', 'medium', 'The request references prior work but does not say whether to review, plan, or implement.', {
@@ -518,6 +593,17 @@ export function classifyIntent(prompt) {
 
   if (noMutation && (reviewSignal || questionSignal)) {
     return makeResult(reviewSignal ? 'review' : 'question', 'high', 'The user requested evidence or review and explicitly blocked mutation.');
+  }
+
+  if (packageReleaseDiscoverySignal && !changeSignal && !reviewSignal && !diagnosisSignal) {
+    return makeResult('question', 'high', 'The request is read-only package or model-package release discovery.');
+  }
+
+  if (broadRepoExplainerSignal) {
+    return makeResult('question', 'high', 'The user asked for a broad read-only repository explainer where a navigable visual report lowers interpretation cost.', {
+      effectiveInteract: 'required',
+      expectedOutputMode: 'html-artifact',
+    });
   }
 
   if (hubSignal && hubActionSignal) {

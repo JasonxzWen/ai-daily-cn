@@ -82,8 +82,11 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'complex communication',
     'copyable action items',
     'copyable prompt',
+    'codebase overview',
     'dependency map',
     'design system',
+    'describe this repo',
+    'describe this repository',
     'effective interaction',
     'effective report',
     'effective-report',
@@ -118,6 +121,8 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'visual language',
     'visual markdown',
   ]) || matchesAny(text, [
+    /(?:\u63cf\u8ff0|\u8bf4\u660e|\u89e3\u91ca|\u4ecb\u7ecd|\u68b3\u7406).*(?:\u672c\u4ed3\u5e93|\u8fd9\u4e2a\u4ed3\u5e93|\u4ed3\u5e93|repo|repository|codebase).*(?:\u80fd\u529b|\u7ed3\u6784|\u529f\u80fd|\u5b9e\u73b0|\u67b6\u6784)/,
+    /(?:\u672c\u4ed3\u5e93|\u8fd9\u4e2a\u4ed3\u5e93|\u4ed3\u5e93|repo|repository|codebase).*(?:\u80fd\u529b|\u7ed3\u6784).*(?:\u529f\u80fd|\u5b9e\u73b0|\u67b6\u6784)/,
     /\u72b6\u6001/,
     /html\s*[\u6c47\u62a5\u544a\u4ea4\u4ed8]+/,
     /[\u751f\u6210\u8f93\u51fa\u5236\u4f5c].*html.*\u6c47\u62a5/,
@@ -140,12 +145,14 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     includesAny(text, [
       'before completion',
       'before declaring',
+      'artifact validation',
       'branch is ready',
       'build, typecheck',
       'final build',
       'final validation',
       'lint',
       'open the pr',
+      'smoke checks',
       'tests, validation',
       'typecheck',
       'validation commands',
@@ -296,15 +303,49 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     includesAny(text, [
       'new package',
       'new packages',
+      'new release',
+      'new version',
       'newly published',
       'package release',
       'package releases',
       'published package',
       'registry feed',
+      'release feed',
       'release feeds',
+      'release sniff',
+      'release sniffing',
+      'version sniff',
+      'version sniffing',
+      '\u7248\u672c\u55c5\u63a2',
+      '\u53d1\u5e03\u55c5\u63a2',
+      '\u65b0\u5305',
+      '\u65b0\u7248\u672c',
+      '\u5305\u53d1\u5e03',
+      '\u7248\u672c\u53d1\u5e03',
+      '\u65b0\u53d1\u5e03',
+      '\u521a\u53d1\u5e03',
     ]) || (
-      includesAny(text, ['npm', 'pypi', 'registry', 'registries'])
-      && includesAny(text, ['ai', 'developer-tool', 'package', 'packages', 'release', 'sniff'])
+      includesAny(text, ['npm', 'pypi', 'registry', 'registries', 'package', 'packages', '\u5305', '\u6a21\u578b\u5305'])
+      && includesAny(text, [
+        'ai',
+        'developer-tool',
+        'latest version',
+        'new release',
+        'new version',
+        'package',
+        'packages',
+        'published',
+        'release',
+        'sniff',
+        '\u55c5\u63a2',
+        '\u6700\u65b0\u7248\u672c',
+        '\u65b0\u7248\u672c',
+        '\u53d1\u5e03',
+        '\u66f4\u65b0',
+      ])
+    ) || (
+      includesAny(text, ['sniff', '\u55c5\u63a2'])
+      && includesAny(text, ['release', 'version', 'package', 'registry', 'npm', 'pypi', '\u7248\u672c', '\u53d1\u5e03', '\u5305'])
     )
   ) && !documentationLookupSignal;
   const webArtifactsSignal = includesAny(text, [
@@ -440,6 +481,31 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'effective-interact summary',
     'repo should change',
   ]);
+  const insightSignal = (
+    includesAny(text, [
+      'agent task profile',
+      'collaboration bottleneck',
+      'cross-session codex',
+      'cross-session claude code',
+      'human-agent collaboration',
+      'interaction insight audit',
+      'project interaction audit',
+      'repository interaction audit',
+      'tool-call decision audit',
+      'work trace review',
+    ]) || matchesAny(text, [
+      /\bhuman-agent\b.*\b(?:audit|bottleneck|collaboration|interaction|trace)\b/,
+      /\b(?:codex|claude code)\b.*\b(?:session|trace|work history)\b.*\b(?:audit|review|profile)\b/,
+      /\b(?:agent|tool-call)\b.*\b(?:decision|trace)\b.*\b(?:audit|review)\b/,
+      /(?:\u4eba\u673a\u4ea4\u4e92|\u4eba\u673a\u534f\u4f5c).*(?:\u590d\u76d8|\u5ba1\u8ba1|\u5361\u70b9|\u753b\u50cf)/,
+      /(?:\u4f1a\u8bdd\u8bb0\u5f55|\u5de5\u4f5c\u8bb0\u5f55).*(?:codex|claude code).*(?:\u68b3\u7406|\u590d\u76d8|\u5ba1\u8ba1)/,
+    ])
+  ) && !sourceToInsightBlogSignal && !includesAny(text, [
+    'external article',
+    'public blog',
+    'source-backed blog',
+    'source-backed insight blog',
+  ]);
   const docCoauthoringSignal = includesAny(text, [
     'collaboratively draft',
     'decision record',
@@ -491,6 +557,30 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'cross-project code quality',
     'layering conventions',
   ]);
+  const harnessQualityCheckSignal = (
+    includesAny(text, [
+      'harness quality audit',
+      'harness quality check',
+      'harness-quality-check',
+      'harness readiness audit',
+      'quality readiness check',
+      'quality/readiness check',
+      'target repo harness quality',
+    ]) || (
+      includesAny(text, ['harness hub', 'harness-hub', 'hub checkout', 'target repo', 'target repository'])
+      && includesAny(text, [
+        'advisory',
+        'agent readiness',
+        'audit',
+        'quality',
+        'readiness',
+        'self-check',
+        'skill-quality',
+        'validate-harness',
+      ])
+      && includesAny(text, ['findings', 'html', 'report'])
+    )
+  ) && !finalGateSignal && !codingStandardsSignal && !skillCreatorSignal;
   const karpathyGuidelinesSignal = includesAny(text, [
     'avoid overcomplication',
     'coding behavior baseline',
@@ -525,6 +615,10 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'with tests',
   ]) || matchesAny(text, [/\bimplement(?:ed|ing)?\b/]);
 
+  if (harnessQualityCheckSignal && canLoad(metadata, 'harness-quality-check', ['harness quality', 'advisory HTML'])) {
+    return 'harness-quality-check';
+  }
+
   if (effectiveInteractSignal && canLoad(metadata, 'effective-interact', ['complex communication', 'handoff'])) {
     return 'effective-interact';
   }
@@ -543,6 +637,10 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
 
   if (hubMaintenanceSignal) {
     return null;
+  }
+
+  if (insightSignal && canLoad(metadata, 'insight', ['interaction insight audit', 'claude code'])) {
+    return 'insight';
   }
 
   if (agentSignal && canLoad(metadata, 'agent-introspection-debugging', ['agent run', 'harness/tool'])) {

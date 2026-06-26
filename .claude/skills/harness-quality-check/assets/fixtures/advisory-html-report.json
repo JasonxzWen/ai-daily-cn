@@ -1,0 +1,195 @@
+{
+  "title": "Harness quality check advisory report",
+  "summary": "Advisory-only audit orchestration smoke: existing Harness Hub checks are composed into a local HTML report without remote side effects.",
+  "status": "review",
+  "template": "review-findings",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-06-12T00:00:00.000Z",
+  "intent": {
+    "audience": "Harness Hub maintainer",
+    "primaryQuestion": "Can the harness-quality-check skill compose existing checks into an advisory HTML report?",
+    "decision": "Review advisory findings and choose follow-up work; no enforcement happens in this report.",
+    "timeBudget": "2m",
+    "artifactKind": "review",
+    "successCriteria": [
+      "Scope is explicit.",
+      "Commands and evidence coverage are visible.",
+      "Findings, next actions, and coverage gaps are separated.",
+      "Advisory-only and no-remote-side-effect boundaries are visible."
+    ]
+  },
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "Scope and boundary",
+      "group": "overview",
+      "status": "review",
+      "content": "- Scope: Harness Hub source checkout and target repository.\n- Advisory-only: findings are triage guidance, not enforcement.\n- No remote writes, schedules, hooks, commits, pushes, or enforcement changes were performed.\n- No remote side effects: this smoke covers a local HTML report only."
+    },
+    {
+      "type": "data-table",
+      "title": "Command evidence coverage",
+      "group": "evidence",
+      "status": "ready",
+      "summary": "Fixture summaries stand in for the commands the skill should compose during a live audit.",
+      "columns": [
+        { "key": "command", "label": "Command" },
+        { "key": "status", "label": "Status" },
+        { "key": "evidence", "label": "Evidence summary" },
+        { "key": "coverage", "label": "Coverage" }
+      ],
+      "rows": [
+        {
+          "command": "harness-hub self-check <target> --json",
+          "status": "simulated pass",
+          "evidence": "CLI health and managed component freshness are represented.",
+          "coverage": "Startup and local lifecycle guidance."
+        },
+        {
+          "command": "harness-hub analyze <target> --agent-readiness --harness --json",
+          "status": "simulated warn",
+          "evidence": "Agent readiness, harness gaps, automation risk, and verification readiness are summarized.",
+          "coverage": "Target repository readiness and harness shape."
+        },
+        {
+          "command": "harness-hub validate-harness <target> --json",
+          "status": "simulated pass",
+          "evidence": "Required harness files and state templates are represented.",
+          "coverage": "Initialized target harness structure."
+        },
+        {
+          "command": "bun ./scripts/skill-quality-inventory.ts --json",
+          "status": "simulated warn",
+          "evidence": "Skill metadata, trigger hygiene, source records, and routing-sensitive descriptions are summarized.",
+          "coverage": "Harness Hub source skill set."
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "Advisory findings",
+      "group": "findings",
+      "status": "review",
+      "columns": [
+        { "key": "severity", "label": "Severity" },
+        { "key": "category", "label": "Category" },
+        { "key": "finding", "label": "Finding" },
+        { "key": "evidence", "label": "Evidence anchor" },
+        { "key": "next", "label": "Suggested next action" }
+      ],
+      "rows": [
+        {
+          "severity": "high",
+          "category": "Task contract quality",
+          "finding": "Target task state lacks acceptance criteria or validation commands.",
+          "evidence": "analyze --agent-readiness --harness summary",
+          "next": "Fill current-task.md before product edits."
+        },
+        {
+          "severity": "medium",
+          "category": "Skill routing health",
+          "finding": "A routing-sensitive description changed without matching fixture coverage.",
+          "evidence": "skill-quality-inventory summary",
+          "next": "Add positive and boundary routing cases."
+        },
+        {
+          "severity": "low",
+          "category": "Learning capture",
+          "finding": "Quality snapshot exists but does not name the follow-up owner.",
+          "evidence": "analyze learning-capture summary",
+          "next": "Record an owner or defer explicitly."
+        },
+        {
+          "severity": "info",
+          "category": "Boundary",
+          "finding": "This report is advisory-only and did not alter hooks, remotes, credentials, commits, pushes, or schedules.",
+          "evidence": "Scope and boundary section",
+          "next": "Keep enforcement separate from the advisory report."
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "title": "Coverage gaps",
+      "group": "risks",
+      "status": "warn",
+      "content": "- This fixture uses simulated command summaries, so it proves report orchestration rather than live target correctness.\n- It does not prove downstream quality improvement, reviewer behavior, or defect reduction.\n- Browser validation is skipped in the smoke test; artifact structure is still validated deterministically."
+    },
+    {
+      "type": "actions",
+      "title": "Next actions",
+      "group": "next",
+      "status": "ready",
+      "items": [
+        "Review high and medium advisory findings.",
+        "Decide whether to run live target commands for freshness evidence.",
+        "Keep enforcement, hooks, schedules, commits, pushes, and remote writes outside this advisory skill."
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-self-check",
+      "kind": "command",
+      "label": "Self-check summary",
+      "status": "pass",
+      "command": "harness-hub self-check <target> --json",
+      "value": "Simulated local CLI and managed component health summary.",
+      "trustLevel": "trusted-generated"
+    },
+    {
+      "id": "evidence-agent-readiness",
+      "kind": "command",
+      "label": "Agent readiness and harness analysis summary",
+      "status": "warn",
+      "command": "harness-hub analyze <target> --agent-readiness --harness --json",
+      "value": "Simulated readiness summary with advisory gaps.",
+      "trustLevel": "trusted-generated"
+    },
+    {
+      "id": "evidence-validate-harness",
+      "kind": "command",
+      "label": "Harness validation summary",
+      "status": "pass",
+      "command": "harness-hub validate-harness <target> --json",
+      "value": "Simulated required-file and state-template validation summary.",
+      "trustLevel": "trusted-generated"
+    },
+    {
+      "id": "evidence-skill-inventory",
+      "kind": "command",
+      "label": "Skill quality inventory summary",
+      "status": "warn",
+      "command": "bun ./scripts/skill-quality-inventory.ts --json",
+      "value": "Simulated skill metadata and routing hygiene summary.",
+      "trustLevel": "trusted-generated"
+    },
+    {
+      "id": "evidence-skill-body",
+      "kind": "file",
+      "label": "Harness quality check skill body",
+      "status": "info",
+      "filePath": "skills/harness-quality-check/SKILL.md",
+      "line": 1,
+      "value": "The skill defines advisory HTML reporting boundaries.",
+      "trustLevel": "trusted-generated"
+    }
+  ],
+  "verification": [
+    {
+      "label": "Fixture generation",
+      "status": "pass",
+      "detail": "create-interaction.mjs can render this advisory report fixture."
+    },
+    {
+      "label": "HTML validation",
+      "status": "pass",
+      "detail": "validate-interaction.mjs accepts the generated HTML with skip-browser in the smoke test."
+    }
+  ],
+  "nextActions": [
+    "Review high and medium advisory findings.",
+    "Run live target commands before treating findings as current.",
+    "Keep enforcement separate from advisory reporting."
+  ]
+}

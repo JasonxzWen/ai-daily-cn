@@ -1,0 +1,419 @@
+{
+  "title": "把五篇材料讲清楚：从技能评测到技能进化",
+  "summary": "Status: Build skill utility gates before self-evolving skills.",
+  "status": "complete",
+  "template": "research-explainer",
+  "renderMode": "pre-rendered",
+  "handoff": {
+    "sourcePath": "skills/effective-interact/assets/fixtures/skill-research-report-readable.json",
+    "regenerationCommand": "node skills/effective-interact/scripts/create-interaction.mjs --input skills/effective-interact/assets/fixtures/skill-research-report-readable.json --slug skill-research-report-20260608 --json"
+  },
+  "intent": {
+    "audience": "Harness Hub 维护者",
+    "primaryQuestion": "这几篇论文和仓库到底是什么关系？它们对 Harness Hub 有什么用？",
+    "decision": "先建设技能效用评测闭环，再做受控的 skill optimizer 原型。",
+    "timeBudget": "8m",
+    "artifactKind": "research",
+    "successCriteria": [
+      "先用普通语言说明大图，再进入论文细节。",
+      "把 GEPA 和 SkillOpt 的算法步骤讲成可执行流程。",
+      "明确哪些启示能马上落到 Harness Hub，哪些还只是实验方向。"
+    ]
+  },
+  "sections": [
+    {
+      "type": "summary-cards",
+      "title": "先看大图",
+      "group": "summary",
+      "summary": "这五个对象其实在回答同一个问题：经验怎么变成可复用、可验证、可改进的技能。",
+      "cards": [
+        { "label": "问题", "value": "Agent 做过任务后，经验会散在日志里。" },
+        { "label": "SkillLens", "value": "先判断什么样的经验写成技能后真的有用。" },
+        { "label": "GEPA", "value": "把 prompt / policy 文本当成可进化资产。" },
+        { "label": "SkillOpt", "value": "把这种进化方法专门用来训练 SKILL.md。" },
+        { "label": "达尔文.skill / autoresearch", "value": "把论文思路落成工程里的 keep / discard 循环。" },
+        { "label": "Harness Hub", "value": "现在最缺的是评测闭环，不是更多技能条目。" }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "材料地图：它们不是同一类东西",
+      "group": "main",
+      "summary": "先分清每个对象站在哪一层，后面的算法才容易理解。",
+      "columns": [
+        { "key": "layer", "label": "层级" },
+        { "key": "item", "label": "材料" },
+        { "key": "plain", "label": "一句话理解" },
+        { "key": "question", "label": "它在回答的问题" },
+        { "key": "hub", "label": "对 Harness Hub 的启发" }
+      ],
+      "rows": [
+        {
+          "layer": "评测研究",
+          "item": "SkillLens / 2605.23899",
+          "plain": "研究什么技能真的有用。",
+          "question": "模型写出来的 skill，什么时候会帮忙，什么时候会添乱？",
+          "hub": "不要只看 skill 文本漂亮，要测 downstream utility。"
+        },
+        {
+          "layer": "文本进化算法",
+          "item": "GEPA",
+          "plain": "用任务轨迹反思来改 prompt / policy。",
+          "question": "不训练模型权重，能不能把文本策略越改越好？",
+          "hub": "可以把失败轨迹转成更好的路由、规则和技能候选。"
+        },
+        {
+          "layer": "技能优化器",
+          "item": "SkillOpt / 2605.23904",
+          "plain": "把 GEPA 式循环用到 SKILL.md。",
+          "question": "一个冻结的 agent，能不能靠改 skill 文档持续变强？",
+          "hub": "候选改动必须过验证门，失败改动要进负例记忆。"
+        },
+        {
+          "layer": "工程实现",
+          "item": "达尔文.skill",
+          "plain": "有人把 SkillLens + SkillOpt 做成了 skill 优化工作流。",
+          "question": "真实 SKILL.md 要怎么评审、改写、测试、保留？",
+          "hub": "默认保留人审更适合分发型仓库。"
+        },
+        {
+          "layer": "母模式",
+          "item": "autoresearch",
+          "plain": "把自动研究压缩成单文件、单指标、keep/discard。",
+          "question": "自治改代码怎样才不会失控？",
+          "hub": "先收窄资产、指标和预算，再谈自动循环。"
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "title": "最少术语",
+      "group": "main",
+      "summary": "读懂这份报告只需要先记住六个词。",
+      "content": "- **Skill**：给 agent 看的操作手册，不是模型权重。\n- **Rollout**：让 agent 跑一次任务，并保留完整过程。\n- **Utility**：这个 skill 是否真的让任务结果变好。\n- **Gate**：候选改动必须通过的验证门。\n- **Rejected buffer**：失败改动的记忆库，防止重复犯错。\n- **ASI**：GEPA 里的文本诊断反馈，可以理解成“下一次该怎么改”的线索。"
+    },
+    {
+      "type": "tabs",
+      "title": "逐篇讲人话",
+      "group": "main",
+      "summary": "每个材料只保留最该记住的部分。",
+      "tabs": [
+        {
+          "label": "SkillLens",
+          "content": "### 它是什么\nSkillLens 是一篇评测研究。它不负责自动优化 skill，而是问：模型生成的 skill 到底什么时候有用？\n\n### 最重要的发现\n漂亮、完整、像专家写的 skill，不一定真的提升任务结果。论文发现，未经引导的 judge 对高差距 skill pair 的判断准确率只有 46.4%。加入 validated rubric 后，准确率到 73.8%。\n\n### 你该记住\nSkill 的质量标准必须和真实任务收益绑定。对 Harness Hub 来说，结构检查只是底线，不是效用证明。"
+        },
+        {
+          "label": "SkillOpt",
+          "content": "### 它是什么\nSkillOpt 是一个 skill 文档优化器。模型本身冻结不动，只改 SKILL.md。\n\n### 它怎么改\n先让 agent 用旧 skill 跑任务。再让模型看成功和失败轨迹，提出小改动。候选 skill 必须在 held-out validation 上变好，才会晋升。\n\n### 你该记住\nSkillOpt 的核心不是“自动改写”，而是 validation gate。没有 gate，自动改写只是更流畅的猜测。"
+        },
+        {
+          "label": "GEPA",
+          "content": "### 它是什么\nGEPA 是反思式 prompt 进化算法。它优化的是文本参数，比如 prompt、代码片段、策略文本。\n\n### 它为什么重要\n普通 RL 经常只给一个分数。GEPA 会保留完整轨迹，让模型写出可执行诊断，再用诊断改文本。\n\n### 你该记住\nGEPA 的价值在于把“失败过程”榨成学习信号。它适合昂贵 rollout、少样本、API-only 模型。"
+        },
+        {
+          "label": "达尔文.skill",
+          "content": "### 它是什么\n达尔文.skill 是一个把 skill 自动进化落到工程流程里的仓库。README 说明 v2.0 吸收了 SkillLens 和 SkillOpt。\n\n### 它做了什么工程取舍\n它保留 9 维 rubric、多评委审查、早停和人工暂停点。这说明真实 skill 优化不能只靠一个分数。\n\n### 你该记住\n它比论文更接近 Harness Hub 的现实场景，因为分发型仓库需要治理边界。"
+        },
+        {
+          "label": "autoresearch",
+          "content": "### 它是什么\nautoresearch 是 Karpathy 的极简自治研究实验。目标资产是 train.py，指标是 val_bpb，预算固定 5 分钟。\n\n### 它为什么相关\n它展示了一个强约束循环：修改、运行、比较、保留或丢弃。\n\n### 你该记住\n自治循环能成立，是因为问题被收得很窄。Harness Hub 如果要做自优化，也应先从单个 skill 和固定 benchmark 开始。"
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "GEPA 算法到底怎么跑",
+      "group": "details",
+      "summary": "把 GEPA 当成一个五步循环，而不是先记论文术语。",
+      "columns": [
+        { "key": "step", "label": "步骤" },
+        { "key": "plain", "label": "普通说法" },
+        { "key": "input", "label": "输入" },
+        { "key": "output", "label": "输出" },
+        { "key": "hub_example", "label": "换成 Harness Hub 的例子" }
+      ],
+      "rows": [
+        {
+          "step": "1. 选候选",
+          "plain": "从当前表现好的文本版本里选一个。",
+          "input": "已有 prompt / policy / skill",
+          "output": "本轮要测试的候选",
+          "hub_example": "选一个 workflow-router 描述或 SKILL.md 版本。"
+        },
+        {
+          "step": "2. 跑任务",
+          "plain": "让候选在一小批任务上实际运行。",
+          "input": "任务样本和候选文本",
+          "output": "成功、失败、工具调用、回答轨迹",
+          "hub_example": "跑 20 个路由 case，看哪些误触发。"
+        },
+        {
+          "step": "3. 写反思",
+          "plain": "让模型看轨迹，说明为什么错。",
+          "input": "完整轨迹和评分",
+          "output": "Actionable Side Information",
+          "hub_example": "指出“description 太宽，导致 review 被误路由”。"
+        },
+        {
+          "step": "4. 改文本",
+          "plain": "根据反思生成一个小改动。",
+          "input": "旧文本和诊断",
+          "output": "候选 diff",
+          "hub_example": "收窄某个 skill 的触发句。"
+        },
+        {
+          "step": "5. 过门",
+          "plain": "只保留验证集上更好的版本。",
+          "input": "候选 diff 和 held-out cases",
+          "output": "keep 或 reject",
+          "hub_example": "通过路由测试才允许进入正式 skills。"
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "SkillOpt 和 GEPA 的关系",
+      "group": "details",
+      "summary": "GEPA 是更通用的文本进化思想，SkillOpt 把它约束到 skill 文档训练。",
+      "columns": [
+        { "key": "dimension", "label": "维度" },
+        { "key": "gepa", "label": "GEPA" },
+        { "key": "skillopt", "label": "SkillOpt" },
+        { "key": "why", "label": "为什么这点重要" }
+      ],
+      "rows": [
+        {
+          "dimension": "优化对象",
+          "gepa": "prompt、代码、策略文本",
+          "skillopt": "SKILL.md",
+          "why": "SkillOpt 是 GEPA 思路在 agent skill 上的专门化。"
+        },
+        {
+          "dimension": "学习信号",
+          "gepa": "轨迹反思和 ASI",
+          "skillopt": "rollout evidence、score、反思",
+          "why": "它们都不只依赖一个最终分数。"
+        },
+        {
+          "dimension": "保留机制",
+          "gepa": "进入 candidate pool / Pareto frontier",
+          "skillopt": "held-out validation 变好才晋升",
+          "why": "没有保留机制，系统会被听起来合理的改动带偏。"
+        },
+        {
+          "dimension": "失败记忆",
+          "gepa": "祖先经验和反思轨迹",
+          "skillopt": "rejected-edit buffer",
+          "why": "失败不是垃圾数据，而是下一轮别再犯错的边界。"
+        }
+      ]
+    },
+    {
+      "type": "data-table",
+      "title": "对 Harness Hub 的建议",
+      "group": "impact",
+      "summary": "按能不能立刻变成仓库任务来排序。",
+      "columns": [
+        { "key": "priority", "label": "优先级" },
+        { "key": "do", "label": "该做什么" },
+        { "key": "reason", "label": "为什么" },
+        { "key": "first_step", "label": "第一步" }
+      ],
+      "rows": [
+        {
+          "priority": "P0",
+          "do": "建一个最小 skill benchmark。",
+          "reason": "没有任务集，就无法判断 skill 是否真的更好。",
+          "first_step": "先写 20 个固定 case，覆盖 question / change / review / delivery。"
+        },
+        {
+          "priority": "P0",
+          "do": "把 SkillLens 三维 rubric 变成 report-only 检查。",
+          "reason": "它直接指向真实 utility，而不是文风。",
+          "first_step": "检查 Failure Mechanism、Actionable Specificity、High-Risk Blacklist。"
+        },
+        {
+          "priority": "P1",
+          "do": "记录 rejected-change memory。",
+          "reason": "失败改动会反复出现，必须变成负例资产。",
+          "first_step": "先放 ignored ledger，记录坏 diff、失败原因和触发 case。"
+        },
+        {
+          "priority": "P1",
+          "do": "补 target-aware compatibility。",
+          "reason": "SkillLens 证明 skill consumption 是 target-specific。",
+          "first_step": "在 source records 或 capability metadata 里记录 Codex / Claude Code / chat 的消费差异。"
+        },
+        {
+          "priority": "P2",
+          "do": "做 opt-in skillopt-lite 实验。",
+          "reason": "自动优化有潜力，但不该直接进入默认分发链。",
+          "first_step": "只优化单个 skill，只输出候选 diff 和验证结果。"
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "title": "最容易误解的点",
+      "group": "risks",
+      "summary": "这些边界如果搞错，后续实现会偏。",
+      "content": "- **GEPA 不是 RL 的通用替代品**：它适合文本参数和可解释轨迹。\n- **SkillOpt 不是让 agent 随便改自己**：它靠验证门和失败记忆控制漂移。\n- **SkillLens 不是又一个 rubric 清单**：它强调 rubric 要能预测真实 utility。\n- **达尔文.skill 的项目分数要谨慎看**：README 自述不等于独立复现。\n- **Harness Hub 不该默认自进化**：更稳的路线是自动提案、自动评测、人工晋升。"
+    },
+    {
+      "type": "actions",
+      "title": "下一轮最小落地清单",
+      "group": "next",
+      "summary": "这五件事可以直接拆成下一轮 Harness Hub 任务。",
+      "items": [
+        "设计 20 个最小 benchmark case。",
+        "定义每个 case 的 expected owner、allowed helpers、failure mode。",
+        "把 SkillLens 三维 rubric 加进 report-only skill quality 检查。",
+        "新增 rejected-change ledger 原型。",
+        "写一个只产出候选 diff 的 skillopt-lite 实验 spec。"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-utility-first",
+      "statement": "Harness Hub 当前最该补的是可验证的 skill utility loop，而不是继续扩大 skill 数量。",
+      "kind": "conclusion",
+      "evidenceIds": ["skilllens-paper", "skillopt-paper", "harness-hub-readme"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim-gate-first",
+      "statement": "任何 skill 自优化都应先经过 held-out validation gate，再考虑晋升到正式分发面。",
+      "kind": "recommendation",
+      "evidenceIds": ["skillopt-paper", "skillopt-repo", "gepa-repo"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim-human-review",
+      "statement": "对分发型仓库，默认人工晋升比默认全自动自改更符合治理边界。",
+      "kind": "recommendation",
+      "evidenceIds": ["darwin-skill-readme", "harness-hub-sources"],
+      "confidence": "high"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "skilllens-paper",
+      "kind": "source",
+      "label": "SkillLens 论文",
+      "value": "研究 model-generated skill 的生成、抽取、消费；强调 utility-grounded evaluation。",
+      "status": "info",
+      "sourceUrl": "https://arxiv.org/html/2605.23899v1",
+      "sourceTitle": "From Raw Experience to Skill Consumption: A Systematic Study of Model-Generated Agent Skills",
+      "sourceType": "arXiv HTML",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "skillopt-paper",
+      "kind": "source",
+      "label": "SkillOpt 论文",
+      "value": "把 skill document 视为 frozen agent 的可训练外部状态；使用 validation gate 和 rejected buffer。",
+      "status": "info",
+      "sourceUrl": "https://arxiv.org/html/2605.23904v2",
+      "sourceTitle": "SkillOpt: Executive Strategy for Self-Evolving Agent Skills",
+      "sourceType": "arXiv HTML",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "skillopt-repo",
+      "kind": "source",
+      "label": "SkillOpt 官方仓库 README",
+      "value": "说明 SkillOpt 的训练 loop、跨 harness 结果和 darwin-skill 集成记录。",
+      "status": "info",
+      "sourceUrl": "https://github.com/microsoft/SkillOpt/blob/main/README.md",
+      "sourceTitle": "microsoft/SkillOpt README",
+      "sourceType": "GitHub README",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "gepa-paper",
+      "kind": "source",
+      "label": "GEPA 论文",
+      "value": "提出 reflective prompt evolution，并报告在多任务上优于 GRPO 与 MIPROv2。",
+      "status": "info",
+      "sourceUrl": "https://arxiv.org/abs/2507.19457",
+      "sourceTitle": "GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning",
+      "sourceType": "arXiv abstract",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "gepa-repo",
+      "kind": "source",
+      "label": "GEPA 官方仓库 README",
+      "value": "解释 Pareto selection、trajectory reflection、mutation、candidate pool 等工作流。",
+      "status": "info",
+      "sourceUrl": "https://github.com/gepa-ai/gepa",
+      "sourceTitle": "gepa-ai/gepa README",
+      "sourceType": "GitHub README",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "darwin-skill-readme",
+      "kind": "source",
+      "label": "达尔文.skill README",
+      "value": "v2.0 说明吸收 SkillLens 与 SkillOpt，并保留 human-in-the-loop checkpoints。",
+      "status": "info",
+      "sourceUrl": "https://github.com/alchaincyf/darwin-skill",
+      "sourceTitle": "alchaincyf/darwin-skill README",
+      "sourceType": "GitHub README",
+      "accessedAt": "2026-06-10",
+      "knownLimits": [
+        "README 中的分数提升属于项目自述，不等同于独立复现实验。"
+      ]
+    },
+    {
+      "id": "autoresearch-readme",
+      "kind": "source",
+      "label": "autoresearch README",
+      "value": "展示单文件、单指标、固定预算、keep/discard 的自治实验循环。",
+      "status": "info",
+      "sourceUrl": "https://github.com/karpathy/autoresearch",
+      "sourceTitle": "karpathy/autoresearch README",
+      "sourceType": "GitHub README",
+      "accessedAt": "2026-06-10"
+    },
+    {
+      "id": "harness-hub-readme",
+      "kind": "file",
+      "label": "Harness Hub README",
+      "value": "本仓库主责是 routing、source records、harness lifecycle 与安全分发。",
+      "status": "info",
+      "filePath": "README.md"
+    },
+    {
+      "id": "harness-hub-sources",
+      "kind": "file",
+      "label": "Harness Hub 外部来源记录",
+      "value": "本仓库采用 source records 和 selective adaptation，而不是 wholesale import。",
+      "status": "info",
+      "filePath": "docs/source-projects.md"
+    }
+  ],
+  "verification": [
+    {
+      "label": "报告 source",
+      "status": "pass",
+      "detail": "本 JSON fixture 是可重建源，生成 HTML 仍放在 ignored artifacts。"
+    },
+    {
+      "label": "HTML 生成",
+      "status": "pass",
+      "detail": "已从 tracked fixture 重新生成 ignored HTML。"
+    },
+    {
+      "label": "HTML 浏览器校验",
+      "status": "pass",
+      "detail": "已运行 validate-interaction.mjs --require-browser；浏览器校验通过。"
+    }
+  ],
+  "nextActions": [
+    "刷新当前浏览器或打开 localhost URL。",
+    "后续如 HTML 丢失，从该 fixture 重新生成。",
+    "下一轮从最小 benchmark case 开始。"
+  ]
+}

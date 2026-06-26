@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-08T07:25:15.571Z",
+  "generatedAt": "2026-06-26T03:32:48.496Z",
   "source": {
     "path": "D:/harness-hub",
     "branch": "main",
-    "commit": "b8a5d87ed9c5ad07b594feeea52de1a0b05759d3",
+    "commit": "8ac264bed8a06fc6bf954a88ad92330e13e63e03",
     "status": "## main...origin/main"
   },
   "target": {
-    "path": "C:/Users/Admin/.codex/worktrees/84e4/ai-daily-cn",
+    "path": "D:/ai-daily-cn",
     "skillsRoot": ".codex/skills"
   },
   "policy": {
@@ -21,14 +21,14 @@
     "baseline": "Original local skills are computed from tracked .codex/skills/*/SKILL.md files before this aggregation."
   },
   "counts": {
-    "hubSkills": 45,
+    "hubSkills": 47,
     "localSkillsBefore": 12,
-    "importedSkills": 34,
+    "importedSkills": 36,
     "overlappingSkills": 11,
     "localOnlySkills": 1,
-    "copiedFiles": 109,
-    "preservedConflicts": 26,
-    "identicalFiles": 35,
+    "copiedFiles": 122,
+    "preservedConflicts": 29,
+    "identicalFiles": 32,
     "localOnlyFilesKept": 10
   },
   "importedSkills": [
@@ -45,7 +45,9 @@
     "frontend-patterns",
     "frontend-slides",
     "handoff",
+    "harness-quality-check",
     "hub-maintenance-workflow",
+    "insight",
     "internal-comms",
     "karpathy-guidelines",
     "mcp-builder",
@@ -220,8 +222,53 @@
       "strategy": "imported-skill"
     },
     {
+      "skill": "harness-quality-check",
+      "path": "SKILL.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "harness-quality-check",
+      "path": "assets/fixtures/advisory-html-report.json",
+      "strategy": "imported-skill"
+    },
+    {
       "skill": "hub-maintenance-workflow",
       "path": "SKILL.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "SKILL.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "references/analysis-rubric.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "references/data-sources.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "references/host-adapters.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "references/report-shape.md",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "scripts/build-insight-report.mjs",
+      "strategy": "imported-skill"
+    },
+    {
+      "skill": "insight",
+      "path": "scripts/collect-insight-events.mjs",
       "strategy": "imported-skill"
     },
     {
@@ -628,6 +675,26 @@
       "skill": "workflow-router",
       "path": "scripts/workflow-check.mjs",
       "strategy": "imported-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/mode-structure-cases.json",
+      "strategy": "hub-only-file"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/skill-research-report-readable.json",
+      "strategy": "hub-only-file"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "scripts/check-mode-structure.mjs",
+      "strategy": "hub-only-file"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "scripts/serve-artifact.mjs",
+      "strategy": "hub-only-file"
     }
   ],
   "preservedConflicts": [
@@ -681,7 +748,7 @@
       "path": "SKILL.md",
       "active": ".codex/skills/effective-interact/SKILL.md",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/SKILL.md",
-      "sourceSha256": "2749d0a8b826f31a83cbc81d3e65b7138cb603739426cb8a07babefdad341230",
+      "sourceSha256": "f183c6ad5cbe338a63220e12046fcb1d46f36ee98943a61e47091743cf9a2f1f",
       "activeSha256": "e150ce3c0fff75e2f0d81952e21ec1acaa9617da4a60f095dda09dfc374a6916",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
@@ -691,7 +758,7 @@
       "active": ".codex/skills/effective-interact/assets/components/interaction-ui.css",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css",
       "sourceSha256": "57b744136c24fe5e457b9549fdb7f128976334596291c97fac51cacd331723ba",
-      "activeSha256": "fa016697e5f411444b18bf01723dc1d7937346bbd676d1b6b30a02cc9b166c08",
+      "activeSha256": "07c64027284cb0b0367cbbb5c15823f2dbb2b38ad75c382bfaa2484b9bbaa0f9",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -700,7 +767,7 @@
       "active": ".codex/skills/effective-interact/assets/components/interaction-ui.js",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.js",
       "sourceSha256": "c3072948eb9275b730f50a8be5b1f38f60586d1b8e61393b6c7019008fdf7c31",
-      "activeSha256": "c13bc7821507c1b0d45504e266187148d04e6c6748ba066d268a04bd172b81cf",
+      "activeSha256": "079bc19907c8a0a5b8b05963b59903c672be82c38dda5ee61e486ba23e6d17ad",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -723,11 +790,29 @@
     },
     {
       "skill": "effective-interact",
+      "path": "assets/fixtures/communication-mode-cases.json",
+      "active": ".codex/skills/effective-interact/assets/fixtures/communication-mode-cases.json",
+      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/communication-mode-cases.json",
+      "sourceSha256": "2d8f6fe4fa8319e47a773c71adf372084d6275989f10355167af9afb08ffd48a",
+      "activeSha256": "297c65447173984c23e3c52466a0b8dfebd2519b9f008fc50903f9233d9b856b",
+      "strategy": "active-local-kept-hub-copy-preserved"
+    },
+    {
+      "skill": "effective-interact",
       "path": "assets/fixtures/decision-brief-self-check-report.json",
       "active": ".codex/skills/effective-interact/assets/fixtures/decision-brief-self-check-report.json",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/decision-brief-self-check-report.json",
       "sourceSha256": "bbff7a8f45b57d4282d809a93534ad5b69590e14615398221de6b9570feb8961",
       "activeSha256": "1474baf587c2e2a00d6bbcff1537f88c2b6e339895625b16be1caa0aec4434fd",
+      "strategy": "active-local-kept-hub-copy-preserved"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/harness-vocabulary-explainer-report.json",
+      "active": ".codex/skills/effective-interact/assets/fixtures/harness-vocabulary-explainer-report.json",
+      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/harness-vocabulary-explainer-report.json",
+      "sourceSha256": "47d930cf06822c3e579fe766a361151161a1df9557ed5bbbddc02b35151d794c",
+      "activeSha256": "3b19df5fb4b0e127680474427af3f80e48461298b71d1d7bcd92b9f783ad183f",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -759,6 +844,15 @@
     },
     {
       "skill": "effective-interact",
+      "path": "evals/routing-cases.json",
+      "active": ".codex/skills/effective-interact/evals/routing-cases.json",
+      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/evals/routing-cases.json",
+      "sourceSha256": "53ce9639f0d4bdb24ffbace3864565e1f370f61fbfbf843bed56282762ac4311",
+      "activeSha256": "b4158f0d38a9de553890f0002802af43a1b896ee038ba571fa8f7cb05ec63d1d",
+      "strategy": "active-local-kept-hub-copy-preserved"
+    },
+    {
+      "skill": "effective-interact",
       "path": "references/html-aesthetic-preflight.md",
       "active": ".codex/skills/effective-interact/references/html-aesthetic-preflight.md",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/html-aesthetic-preflight.md",
@@ -780,7 +874,7 @@
       "path": "references/interaction-input-schema.json",
       "active": ".codex/skills/effective-interact/references/interaction-input-schema.json",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/interaction-input-schema.json",
-      "sourceSha256": "fc181c7a6e9d7cc13b767010b44bd6cbfe2fd8932a4987e63d7eff3d811b41c7",
+      "sourceSha256": "ce47ea5c47bd801043f4f34bee26277e06691f9a50916531ddcf746a7907dca1",
       "activeSha256": "2692360e72d72564ac8c8abd157b117c35c1d0f84f07d428ad139d87231fe7ed",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
@@ -789,7 +883,7 @@
       "path": "references/interaction-patterns.md",
       "active": ".codex/skills/effective-interact/references/interaction-patterns.md",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/interaction-patterns.md",
-      "sourceSha256": "c3d219de8b60b7ab8647c549612b4d88fffec2278c35591d04f6ae4a21ff62e7",
+      "sourceSha256": "8ec468a18756c843873baf88d21a71401253c1841446708983288823d048daff",
       "activeSha256": "553bbccd1281297f4ad767388740971b13fc493131313ec7f6edae4e5ec8bc76",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
@@ -807,8 +901,8 @@
       "path": "scripts/create-interaction.mjs",
       "active": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/scripts/create-interaction.mjs",
-      "sourceSha256": "ed7eecd5d6cc63c719f51b611fbab5204c0a952ffb3630f12fd2c74b0730b25c",
-      "activeSha256": "e2805c1a2397fb7a4cf10a463272cf33842faa2eee4959557166b0268c0f2028",
+      "sourceSha256": "07546ba8fc14e626aa7275c632bd59abfc91e6d8e5c41dd4a0c7987938c50eba",
+      "activeSha256": "4dd669045439a092fd4dddb1af1774af7cbc6a4348d9b4e2d03cb8771221578e",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -816,7 +910,7 @@
       "path": "scripts/validate-interaction.mjs",
       "active": ".codex/skills/effective-interact/scripts/validate-interaction.mjs",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/scripts/validate-interaction.mjs",
-      "sourceSha256": "b6ed52e71408738c8df3c44401199638fd3d6a33e4d2707c8758f2d8eb077682",
+      "sourceSha256": "962dcf6f601e7e221bef5d6884730e6ac1d275e3119be08e6f511a740340cc35",
       "activeSha256": "da4a19671ebd9c6b03a48157b8beb9f20c95a675b2dec15b68cacb533c5f4444",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
@@ -897,10 +991,6 @@
     },
     {
       "skill": "effective-interact",
-      "path": "assets/fixtures/communication-mode-cases.json"
-    },
-    {
-      "skill": "effective-interact",
       "path": "assets/fixtures/concise-handoff-report.json"
     },
     {
@@ -914,10 +1004,6 @@
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/disposable-export-editor-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/harness-vocabulary-explainer-report.json"
     },
     {
       "skill": "effective-interact",
@@ -978,10 +1064,6 @@
     {
       "skill": "effective-interact",
       "path": "assets/templates/visual-exploration.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "evals/routing-cases.json"
     },
     {
       "skill": "prototype",
