@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.curated-x-handles",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Curated first-party X handle allowlist",
+  "status": "completed",
+  "summary": "Third and final queued #3 enhancement. Added a curated first-party X handle allowlist (config/curated-x-handles.json) covering builders/researchers such as Andrej Karpathy, Simon Willison, Chip Huyen and others, plus a tested helper (loadCuratedXHandles + markCuratedXHandles) that tags builder_observation candidates whose handle matches as curated_first_party. The builders collection applies the tag before returning, so when a curated handle surfaces in the follow-builders feed or builder search it is marked as first-party signal for prioritization. This is the canonical curated list the diagnosis said was missing and the extension point for the future; it is honest about the platform limit: X has no free API, so feed-less handles (a researcher X timeline that never appears in the aggregated feed) are not magically ingested by this change. Their blogs are already covered by the builder fallback RSS sources.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"curated X handles|markCuratedXHandles\" tests/unit.test.js",
+      "node --test tests/unit.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A curated first-party handle list is an allowlist plus prioritization, not an ingestion path on a platform with no free API.",
+      "evidence": "The builder candidate already carries a handle from the aggregated feed; tagging matched handles as curated_first_party is deterministic and testable, while actually pulling a feed-less handle's timeline still requires a paid API or a maintained scraper.",
+      "scope": "builder_curation",
+      "persistence": "implemented",
+      "recommended_action": "Keep the curated list in config and tag matching candidates; add a per-handle feed_url only when a reliable feed exists, and do not claim timeline ingestion without an API."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Let selection prioritize curated_first_party builder candidates (keep them above low-signal builders), and surface enriched GitHub Trending topics/license tags in the public cards.",
+      "owner": "project"
+    }
+  ],
+  "slug": "curated-x-handles"
+}

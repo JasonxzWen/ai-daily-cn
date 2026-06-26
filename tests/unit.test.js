@@ -16,6 +16,8 @@ import {
   DEFAULT_HUGGINGFACE_TRENDING_SOURCE,
   collectGitHubTrending,
   enrichGithubTrendingApiFields,
+  loadCuratedXHandles,
+  markCuratedXHandles,
   collectHuggingFaceTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml,
@@ -21166,6 +21168,34 @@ function jsonResponse(value, status = 200) {
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+test("curated X handles config includes first-party builders", async () => {
+  const handles = await loadCuratedXHandles({ rootDir: rootDir });
+  assert.ok(handles instanceof Set);
+  assert.ok(handles.has("karpathy"), "curated list should include karpathy");
+  assert.ok(handles.has("simonw"), "curated list should include simonw");
+});
+
+test("markCuratedXHandles tags first-party builder candidates only", () => {
+  const handleSet = new Set(["karpathy", "simonw"]);
+  const candidates = [
+    { category: "builder_observation", handle: "karpathy", author: "Andrej Karpathy", url: "https://x.com/karpathy/status/1" },
+    { category: "builder_observation", handle: "randomdev", author: "Random Dev", url: "https://x.com/randomdev/status/2" },
+    { category: "builder_observation", author: "Simon Willison", original_url: "https://x.com/simonw/status/3" },
+    { category: "project", name: "x/repo" }
+  ];
+  const marked = markCuratedXHandles(candidates, handleSet);
+  assert.equal(marked[0].curated_first_party, true, "karpathy tagged");
+  assert.equal(marked[1].curated_first_party, undefined, "non-curated not tagged");
+  assert.equal(marked[2].curated_first_party, true, "handle derived from status URL is tagged");
+  assert.equal(marked[3].curated_first_party, undefined, "non-builder candidate untouched");
+});
+
+test("markCuratedXHandles is a no-op for an empty curated set", () => {
+  const candidates = [{ category: "builder_observation", handle: "karpathy" }];
+  const marked = markCuratedXHandles(candidates, new Set());
+  assert.equal(marked[0].curated_first_party, undefined);
+});
 
 test("github trending API enrichment attaches topics, license, stars, pushed_at", async () => {
   const candidate = { repo: "owner/repo", name: "owner/repo", url: "https://github.com/owner/repo" };

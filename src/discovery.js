@@ -1230,6 +1230,9 @@ export async function collectBuilderFallbacks(options = {}) {
     }
   }
 
+  const curatedXHandleSet = await loadCuratedXHandles(options);
+  const taggedCandidates = markCuratedXHandles(candidates, curatedXHandleSet);
+
   return {
     source_audit: {
       builder_sources: {
@@ -1245,7 +1248,7 @@ export async function collectBuilderFallbacks(options = {}) {
       }
     },
     sources: candidateSources,
-    candidates: candidates.slice(0, limit)
+    candidates: taggedCandidates.slice(0, limit)
   };
 }
 
@@ -3122,6 +3125,60 @@ function xStatusHandle(value) {
 function normalizeXHandle(value) {
   const handle = String(value || "").trim().replace(/^@/, "");
   return /^[A-Za-z0-9_]{1,32}$/.test(handle) ? handle : "";
+}
+
+// Curated first-party X handles: the canonical allowlist of builders/researchers
+// whose posts should be prioritized as first-party signal. X has no free API, so
+// this does not by itself ingest feed-less handles; it tags builder candidates
+// that already surfaced (via follow-builders or builder search) so selection can
+// prioritize them. A handle may carry an optional feed_url for future ingestion.
+export async function loadCuratedXHandles(options = {}) {
+  if (Array.isArray(options.curatedXHandles)) {
+    return curatedHandleSet(options.curatedXHandles);
+  }
+  const rootDir = options.rootDir || process.cwd();
+  const configPath = path.resolve(rootDir, options.curatedXHandlesPath || "config/curated-x-handles.json");
+  try {
+    const parsed = JSON.parse(await fs.readFile(configPath, "utf8"));
+    return curatedHandleSet(parsed?.handles || []);
+  } catch {
+    return new Set();
+  }
+}
+
+function curatedHandleSet(handles) {
+  const set = new Set();
+  for (const entry of Array.isArray(handles) ? handles : []) {
+    const normalized = normalizeXHandle(typeof entry === "string" ? entry : entry?.handle);
+    if (normalized) {
+      set.add(normalized.toLowerCase());
+    }
+  }
+  return set;
+}
+
+function candidateXHandle(candidate) {
+  return (
+    normalizeXHandle(candidate?.handle) ||
+    xStatusHandle(candidate?.original_url || candidate?.url || "") ||
+    normalizeXHandle(String(candidate?.author || "").replace(/^@/, ""))
+  );
+}
+
+export function markCuratedXHandles(candidates, handleSet) {
+  if (!(handleSet instanceof Set) || handleSet.size === 0) {
+    return Array.isArray(candidates) ? candidates : [];
+  }
+  return (Array.isArray(candidates) ? candidates : []).map((candidate) => {
+    if (!candidate || candidate.category !== "builder_observation") {
+      return candidate;
+    }
+    const handle = candidateXHandle(candidate);
+    if (handle && handleSet.has(handle.toLowerCase())) {
+      return { ...candidate, curated_first_party: true };
+    }
+    return candidate;
+  });
 }
 
 function builderAvatarUrl(builder, handle) {
