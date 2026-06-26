@@ -4968,6 +4968,7 @@ function isRedditSource(sourceInfo = {}) {
 function parseHtmlIndexEntries(html, sourceInfo = {}) {
   const entries = [];
   const seenUrls = new Set();
+  const structuredMetadata = htmlIndexStructuredMetadata(html, sourceInfo.url);
   const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
 
   for (const match of html.matchAll(anchorPattern)) {
@@ -4979,24 +4980,100 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
 
     const forwardBlock = html.slice(match.index, Math.min(html.length, match.index + 1800));
     const surroundingBlock = html.slice(Math.max(0, match.index - 600), Math.min(html.length, match.index + 1800));
-    const title = extractHtmlTitle(match[4]) || extractHtmlTitle(forwardBlock);
-    const eventDate = extractHtmlDate(forwardBlock) || extractHtmlDate(surroundingBlock);
+    const metadata = structuredMetadata.get(htmlIndexMetadataKey(url));
+    const anchorTitle = extractHtmlTitle(match[4]);
+    const title = genericHtmlAnchorTitle(anchorTitle)
+      ? metadata?.title || extractHtmlTitle(forwardBlock)
+      : anchorTitle || metadata?.title || extractHtmlTitle(forwardBlock);
+    const eventDate = extractHtmlDate(forwardBlock) || extractHtmlDate(surroundingBlock) || metadata?.event_date;
     if (!title || !eventDate) {
       continue;
     }
 
-    const imageUrl = extractHtmlImageUrl(forwardBlock, url);
+    const imageUrl = extractHtmlImageUrl(forwardBlock, url) || metadata?.image_url || "";
     seenUrls.add(url);
     entries.push({
       title,
       url,
       event_date: eventDate,
-      summary: extractHtmlSummary(forwardBlock),
+      summary: metadata?.summary || extractHtmlSummary(forwardBlock),
       ...(imageUrl ? { image_url: imageUrl, image_source: "html_index" } : {})
     });
   }
 
   return entries;
+}
+
+function htmlIndexStructuredMetadata(html, baseUrl) {
+  const byUrl = new Map();
+  for (const item of jsonLdObjects(html)) {
+    const url = absoluteUrl(firstString(
+      item.url,
+      item["@id"],
+      item.mainEntityOfPage?.url,
+      item.mainEntityOfPage?.["@id"]
+    ), baseUrl);
+    const key = htmlIndexMetadataKey(url);
+    if (!key) {
+      continue;
+    }
+    const title = cleanText(firstString(item.headline, item.title, item.name));
+    const eventDate = dateOnly(firstString(item.datePublished, item.dateCreated, item.dateModified, item.uploadDate));
+    const summary = cleanText(firstString(item.description, item.abstract, item.summary));
+    const imageUrl = structuredImageUrl(item.image, baseUrl);
+    const previous = byUrl.get(key) || {};
+    byUrl.set(key, {
+      title: previous.title || title,
+      event_date: previous.event_date || eventDate,
+      summary: previous.summary || summary,
+      image_url: previous.image_url || imageUrl
+    });
+  }
+  return byUrl;
+}
+
+function genericHtmlAnchorTitle(value) {
+  return /^(read\s+more|learn\s+more|view\s+more|more|details?|continue\s+reading|阅读全文|阅读更多|了解更多)$/i.test(cleanText(value));
+}
+
+function jsonLdObjects(html) {
+  const objects = [];
+  const scriptPattern = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  for (const match of String(html || "").matchAll(scriptPattern)) {
+    try {
+      objects.push(...flattenJsonLd(JSON.parse(decodeXml(match[1]).trim())));
+    } catch {
+      continue;
+    }
+  }
+  return objects;
+}
+
+function flattenJsonLd(value) {
+  if (Array.isArray(value)) {
+    return value.flatMap(flattenJsonLd);
+  }
+  if (!value || typeof value !== "object") {
+    return [];
+  }
+  const nested = [
+    value["@graph"],
+    value.itemListElement,
+    value.item,
+    value.mainEntity,
+    value.mainEntityOfPage
+  ].flatMap(flattenJsonLd);
+  return [value, ...nested];
+}
+
+function structuredImageUrl(value, baseUrl) {
+  if (Array.isArray(value)) {
+    return value.map((item) => structuredImageUrl(item, baseUrl)).find(Boolean) || "";
+  }
+  if (value && typeof value === "object") {
+    return normalizeImageUrl(firstString(value.url, value.contentUrl, value["@id"]), baseUrl);
+  }
+  return normalizeImageUrl(value, baseUrl);
 }
 
 function parseAtomEntry(block) {
@@ -5325,6 +5402,16 @@ function extractTrendingStarCount(block) {
 function absoluteUrl(value, baseUrl) {
   try {
     return new URL(value, baseUrl).toString();
+  } catch {
+    return "";
+  }
+}
+
+function htmlIndexMetadataKey(value) {
+  try {
+    const url = new URL(String(value || ""));
+    url.hash = "";
+    return url.toString().replace(/\/$/, "");
   } catch {
     return "";
   }

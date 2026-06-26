@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "platform-jike-rsshub-ai-topic",
+      "name": "RSSHub Jike AI Topic",
+      "url": "https://rsshub.example.invalid/jike/topic/ai",
+      "source_kind": "rsshub",
+      "candidate_category": "community_lead",
+      "tier": "T3",
+      "authority": "community",
+      "enablement": "manual",
+      "verification_policy": "community_only",
+      "requires_original_url": false,
+      "max_items_per_run": 3,
+      "lookback_days": 2,
+      "timeout_ms": 15000,
+      "source_level": "community_platform_signal",
+      "base_url_env": "AI_DAILY_RSSHUB_BASE_URL",
+      "route_path": "/jike/topic/ai",
+      "notes": "Optional self-hosted RSSHub Jike topic route. Replace the placeholder topic segment with a reviewed AI topic route before enabling."
+    }
+  ]
+}
