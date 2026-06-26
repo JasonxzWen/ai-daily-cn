@@ -15,6 +15,8 @@ import {
   DEFAULT_GITHUB_TRENDING_SOURCES,
   DEFAULT_HUGGINGFACE_TRENDING_SOURCE,
   collectGitHubTrending,
+  contentSourceRequestUrl,
+  contentSourceSkipReason,
   enrichGithubTrendingApiFields,
   loadCuratedXHandles,
   markCuratedXHandles,
@@ -4985,6 +4987,79 @@ test("content source discovery parses company news HTML with dotted dates before
   assert.equal(collected.candidates[0].verification_status, "primary_confirmed");
   assert.equal(collected.candidates[0].url, "https://kuaishou.example.com/news-releases/news-release-details/kuaishou-reports-quarterly-results");
   assert(!collected.candidates[0].evidence.includes("<img"));
+});
+
+test("handoff source plan parses html_index entries with JSON-LD metadata fallback", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-26",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-anthropic-news",
+        name: "Anthropic News",
+        url: "https://www.anthropic.com/news",
+        source_kind: "html_index",
+        candidate_category: "hot_blog",
+        authority: "primary",
+        verification_policy: "primary_allowed",
+        format: "html_index",
+        linkPattern: "/news/",
+        source_level: "official_company_news"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <html>
+        <head>
+          <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": {
+                    "@type": "NewsArticle",
+                    "url": "https://www.anthropic.com/news/agent-safety-evals",
+                    "headline": "Anthropic publishes agent safety evals",
+                    "datePublished": "2026-06-26T09:00:00Z",
+                    "description": "Anthropic describes new agent safety evaluations for enterprise deployment."
+                  }
+                }
+              ]
+            }
+          </script>
+        </head>
+        <body>
+          <a href="/news/agent-safety-evals">Read more</a>
+        </body>
+      </html>
+    `)
+  });
+
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.source_audit.content_sources.candidates_found, 1);
+  assert.equal(collected.candidates[0].source_id, "content-anthropic-news");
+  assert.equal(collected.candidates[0].title, "Anthropic publishes agent safety evals");
+  assert.equal(collected.candidates[0].event_date, "2026-06-26");
+  assert.equal(collected.candidates[0].url, "https://www.anthropic.com/news/agent-safety-evals");
+  assert.match(collected.candidates[0].evidence, /agent safety evaluations/i);
+});
+
+test("handoff source plan keeps RSSHub routes skipped until base URL is configured", () => {
+  const source = {
+    id: "platform-zhihu-rsshub-hotlist",
+    name: "RSSHub Zhihu Hotlist",
+    url: "https://rsshub.example.invalid/zhihu/hotlist",
+    source_kind: "rsshub",
+    base_url_env: "AI_DAILY_RSSHUB_BASE_URL",
+    route_path: "/zhihu/hotlist"
+  };
+
+  assert.equal(contentSourceSkipReason(source, {}), "skipped_missing_base_url");
+  assert.equal(
+    contentSourceRequestUrl(source, { AI_DAILY_RSSHUB_BASE_URL: "https://rsshub.internal.example" }),
+    "https://rsshub.internal.example/zhihu/hotlist"
+  );
 });
 
 test("content source discovery parses JSON API sources", async () => {

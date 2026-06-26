@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.handoff-source-coverage",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Handoff source coverage completion",
+  "status": "completed",
+  "summary": "This iteration completed the repository-local part of the previous handoff plan by adding RSSHub-ready platform source slots, guarding existing official GitHub organization Atom feeds, and making HTML index discovery parse recent candidates from structured JSON-LD metadata when visible anchor blocks do not carry title/date text.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"handoff source plan\" tests/source-coverage.test.js tests/unit.test.js",
+      "node --test tests/source-coverage.test.js tests/unit.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "RSSHub-dependent sources should be explicit in the registry even before infrastructure exists.",
+      "evidence": "The new platform route entries remain manual and skipped until a base URL is configured, so validation can prove the intended routes without making publish depend on unavailable infrastructure.",
+      "scope": "source_registry",
+      "persistence": "implemented",
+      "recommended_action": "Keep platform routes gated and document the external infrastructure requirement separately from repository-local source contracts."
+    },
+    {
+      "lesson": "HTML indexes can expose article links while hiding dates and headlines in JSON-LD metadata.",
+      "evidence": "The focused test reproduced an Anthropic-style index where the anchor text was only a generic call to action. JSON-LD now supplies title, date, and summary for the matched URL.",
+      "scope": "content_discovery",
+      "persistence": "implemented",
+      "recommended_action": "Prefer URL-keyed structured metadata as a fallback, while still requiring the configured link pattern to match before admitting a candidate."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-data-minimization"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After a real RSSHub base URL is available, replace placeholder route segments with reviewed production routes and run a daily discovery dry run.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Use the next scheduled run to verify that source_effectiveness shows candidate_created for the newly productive source classes.",
+      "owner": "project"
+    }
+  ],
+  "slug": "handoff-source-coverage"
+}
