@@ -641,12 +641,13 @@ test("interaction input starts with story-first judgment trends and story list",
   assert(input.heroLinks.length >= 2);
   assert.equal(input.sections.some((section) => section.richId === "today-must-read"), false);
   assert.equal(input.sections.some((section) => section.richId === "compact-main-list"), false);
-  const storySection = input.sections.find((section) => section.richId === "story-list");
-  assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
-  assert.equal(firstSection.richId, "today-judgment");
-  assert.equal(storySection.title, "今日主线");
-  assert.equal(storySection.type, "markdown");
-  assert.equal(storySection.collapsed, false);
+  const trackSections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
+  assert.equal(input.sections.some((section) => ["today-judgment", "trend-themes", "story-list"].includes(section.richId)), false);
+  assert(/^track-/.test(firstSection.richId || ""), "body should start with an editorial track section");
+  assert(trackSections.length >= 1, "at least one editorial track section");
+  assert(storyDetailSections.length >= 1, "per-story collapsible sections exist");
+  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
   assert(mainContent.includes("发生了什么"));
   assert(mainContent.includes("为什么值得看"));
 });
@@ -671,15 +672,16 @@ test("public daily renders story-first sections without compact full list", asyn
 
   const input = reportToInteractionInput(report);
   const titles = input.sections.map((section) => section.title);
-  const storySection = input.sections.find((section) => section.richId === "story-list");
+  const trackSections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
 
   assert(!titles.includes("完整列表"));
   assert(!titles.includes("主体细节"));
-  assert.equal(input.sections.filter((section) => section.richId === "story-list").length, 1);
-  assert.equal(storySection.title, "今日主线");
-  assert.equal(storySection.type, "markdown");
-  assert.equal(storySection.collapsed, false);
-  assert(storySection.content.includes("发生了什么"));
+  assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
+  assert(trackSections.length >= 1);
+  assert(storyDetailSections.length >= 1);
+  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
+  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
 });
 
 function openRouterRankingsSampleText(rows = 10) {
@@ -1599,13 +1601,15 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!JSON.stringify(input.sections).includes("主体信息"));
   assert(JSON.stringify(input.sections).includes("主线条目："));
   const compactMainList = input.sections.find((section) => section.richId === "compact-main-list");
-  const storySection = input.sections.find((section) => section.richId === "story-list");
+  const trackSections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
   assert.equal(compactMainList, undefined);
-  assert.deepEqual(input.sections.slice(0, 3).map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
-  assert.equal(storySection?.title, "今日主线");
-  assert.equal(storySection?.type, "markdown");
-  assert.equal(storySection?.collapsed, false);
-  assert(storySection?.content.includes("发生了什么"));
+  assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
+  assert(/^track-/.test(input.sections[0].richId || ""));
+  assert(trackSections.length >= 1);
+  assert(storyDetailSections.length >= 1);
+  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
+  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
@@ -1667,7 +1671,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
   assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
-  assert(storySection.content.includes("Example Agent Platform GA"));
+  assert(storyDetailSections.some((section) => section.content.includes("Example Agent Platform GA")));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -9567,7 +9571,8 @@ test("production daily does not enable PromptLayer-inspired theme or ticket grid
   assert.match(html, /prefers-reduced-motion:\s*reduce/);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /section-story-list|今日主线|今日判断|趋势主题/);
+  assert.match(html, /id="section-track-/);
+  assert.doesNotMatch(html, /id="section-story-list"|id="section-today-judgment"|id="section-trend-themes"/);
   assert.doesNotMatch(html, /<link rel="stylesheet"/);
   assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
 
@@ -9627,9 +9632,11 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.match(html, /data-section-type="filterable-cards"/);
   assert.doesNotMatch(html, /id="section-today-must-read"/);
   assert.doesNotMatch(html, /id="section-compact-main-list"/);
-  assert.match(html, /id="section-today-judgment"/);
-  assert.match(html, /id="section-trend-themes"/);
-  assert.match(html, /id="section-story-list"/);
+  assert.doesNotMatch(html, /id="section-today-judgment"/);
+  assert.doesNotMatch(html, /id="section-trend-themes"/);
+  assert.doesNotMatch(html, /id="section-story-list"/);
+  assert.match(html, /id="section-track-/);
+  assert.match(html, /id="section-story-\d+"/);
   assert.doesNotMatch(html, /main-ticket-card|main-ticket-card-grid|section-main-signal-cards/);
   assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "degraded_sections", "remediation"]) {
@@ -10882,12 +10889,16 @@ test("interaction input renders AI industry, content track, and selected blog se
   const input = reportToInteractionInput(report);
   const titles = input.sections.map((section) => section.title);
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
-  const storySection = input.sections.find((section) => section.richId === "story-list");
+  const trackTitles = input.sections.filter((section) => /^track-/.test(section.richId || "")).map((section) => section.title);
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
   assert.equal(compactList, undefined);
-  assert.equal(storySection.title, "今日主线");
-  assert.equal(storySection.collapsed, false);
-  assert(storySection.content.includes("发生了什么"));
-  assert(storySection.content.includes("为什么值得看"));
+  assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
+  assert(trackTitles.includes("AI 行业动态"));
+  assert(trackTitles.includes("内容赛道动态"));
+  assert(storyDetailSections.length >= 2);
+  assert(storyDetailSections.every((section) => section.collapsed === true && section.open === false));
+  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
+  assert(storyDetailSections.some((section) => section.content.includes("为什么值得看")));
   assert(titles.includes("精选博客更新"));
   assert(!titles.includes("AI 资讯"));
   assert(!titles.includes("热门博客"));
@@ -12889,11 +12900,13 @@ test("public daily followups use reader-facing story title and limit disclosure 
   }));
 
   const input = reportToInteractionInput(report);
-  const storySection = input.sections.find((section) => section.richId === "story-list");
-  const storyText = `${storySection?.title || ""}\n${storySection?.content || ""}`;
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
+  const storyText = storyDetailSections
+    .map((section) => `${section.title || ""}\n${section.summary || ""}\n${section.content || ""}`)
+    .join("\n");
 
-  assert(storySection);
-  assert.equal(storySection.title, "今日主线");
+  assert(storyDetailSections.length >= 1);
+  assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(!storyText.includes("重点 story"));
   assert((storyText.match(/披露/g) || []).length <= 1);
 });
@@ -13216,14 +13229,16 @@ test("story-first interaction input starts with judgment trends and story list",
   }));
 
   const input = reportToInteractionInput(report);
-  const firstThree = input.sections.slice(0, 3).map((section) => section.richId);
+  const trackSections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
 
-  assert.deepEqual(firstThree, ["today-judgment", "trend-themes", "story-list"]);
+  assert(/^track-/.test(input.sections[0].richId || ""));
+  assert(trackSections.length >= 1);
   assert.equal(input.sections.some((section) => section.richId === "main-signal-cards"), false);
   assert.equal(input.sections.some((section) => section.cardClass === "main-ticket-card"), false);
-  const storySection = input.sections.find((section) => section.richId === "story-list");
-  assert(storySection.content.includes("Concrete story 1"));
-  assert(storySection.content.includes("Why story 1 matters"));
+  const storyContent = storyDetailSections.map((section) => section.content).join("\n");
+  assert(storyContent.includes("Concrete story 1"));
+  assert(storyContent.includes("Why story 1 matters"));
 });
 
 test("story-first generator reserves selected URLs across story and appendix sections", async () => {
@@ -16869,21 +16884,20 @@ test("public daily contract renders main items as industry and content-track str
   const input = reportToInteractionInput(report);
   const mainSections = input.sections.filter((section) => section.group === "main" && section.type === "markdown");
   const compactList = input.sections.find((section) => section.richId === "compact-main-list");
+  const trackTitles = input.sections.filter((section) => /^track-/.test(section.richId || "")).map((section) => section.title);
+  const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
   const content = mainSections.map((section) => section.content || "").join("\n");
 
-  assert.equal(mainSections.length, 3);
   assert.equal(compactList, undefined);
-  assert.deepEqual(mainSections.map((section) => section.richId), ["today-judgment", "trend-themes", "story-list"]);
-  assert.equal(mainSections[2].title, "今日主线");
-  assert.equal(mainSections[2].collapsed, false);
+  assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
+  assert(trackTitles.includes("AI 行业动态"));
+  assert(trackTitles.includes("内容赛道动态"));
+  assert(storyDetailSections.length >= 1);
+  assert(storyDetailSections.every((section) => section.collapsed === true && section.open === false));
   assert(content.includes("发生了什么"));
   assert(content.includes("为什么值得看"));
-  assert(content.includes("1. **["));
-  assert(content.includes(`${report.main_items.length}. **[`));
-  for (const item of report.main_items) {
-    assert(content.includes(item.title));
-  }
-  assert(!input.sections.some((section) => ["AI 资讯", "大厂与政策", "产品与开源", "AIGC 动态"].includes(section.title)));
+  assert(storyDetailSections.every((section) => section.content.includes("**[")));
+  assert(!input.sections.some((section) => ["AI 资讯", "大厂与政策", "产品与开源", "AIGC 动态", "今日判断", "趋势主题", "今日主线"].includes(section.title)));
 });
 
 test("public daily contract replays 2026-06-09 bad media and short-main regression", async () => {

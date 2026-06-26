@@ -416,10 +416,18 @@ try {
   assert.equal(desktopChecklist.checks.find((check) => check.id === "story_first_sections_expanded")?.ok, true);
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
-  assert.equal(await page.locator("#section-today-judgment").evaluate((node) => node.tagName), "SECTION");
-  assert.equal(await page.locator("#section-trend-themes").evaluate((node) => node.tagName), "SECTION");
-  assert.equal(await page.locator("#section-story-list").evaluate((node) => node.tagName), "SECTION");
-  assert.match(await page.locator("#section-story-list").textContent(), /发生了什么|为什么值得看/);
+  assert(await page.locator("[id^='section-track-']").count() >= 1, "editorial track sections render");
+  const firstTrackSection = page.locator("[id^='section-track-']").first();
+  assert.equal(await firstTrackSection.evaluate((node) => node.tagName), "SECTION");
+  const storyPanels = page.locator("details.collapsible-panel[id^='section-story-']");
+  assert(await storyPanels.count() >= 1, "per-story collapsible panels render");
+  assert.equal(await storyPanels.first().evaluate((node) => node.tagName), "DETAILS");
+  assert.equal(await storyPanels.first().evaluate((node) => node.open), false);
+  assert(await storyPanels.first().locator(".collapsible-subtitle").count() >= 1, "collapsed story shows a teaser");
+  assert.equal(await page.locator("#section-today-judgment, #section-trend-themes, #section-story-list").count(), 0);
+  await storyPanels.first().locator("summary").click();
+  assert.equal(await storyPanels.first().evaluate((node) => node.open), true);
+  assert.match(await storyPanels.first().textContent(), /发生了什么|为什么值得看/);
   assert.equal(await page.locator('section[data-section-type="filterable-cards"]').count() > 0, true);
   assert.doesNotMatch(reportBody, /模型发布|ExampleModel 2|信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id|quality_status|degraded_sections|remediation/);
   assert.match(reportBody, /精选博客更新/);
@@ -454,6 +462,16 @@ try {
   assert.equal(await page.locator(".project-card-grid").count(), 0);
   assert.equal(await allExternalLinksHaveRel(page), true);
 
+  // Stage D: left-rail layout on desktop (vertical nav rail beside the content stack).
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const desktopLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
+  assert.equal(desktopLayoutColumns.trim().split(/\s+/).length, 2, `report-layout should be two columns on desktop, got: ${desktopLayoutColumns}`);
+  assert.equal(await page.locator("nav.report-nav").evaluate((node) => getComputedStyle(node).flexDirection), "column");
+  const railBox = await page.locator("nav.report-nav").boundingBox();
+  const contentBox = await page.locator(".report-section-stack").boundingBox();
+  assert(railBox && contentBox && railBox.x < contentBox.x, "nav rail should sit left of the content stack");
+  assert.equal(await hasHorizontalOverflow(page), false);
+
   await page.evaluate(() => {
     const section = document.createElement("section");
     section.setAttribute("data-test-public-engineering-term", "ledger");
@@ -476,14 +494,17 @@ try {
   await page.setViewportSize({ width: 375, height: 812 });
   const mobileChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
-  await page.locator("#section-story-list h2").evaluate((node) => {
+  const mobileLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
+  assert.equal(mobileLayoutColumns.trim().split(/\s+/).length, 1, `report-layout should collapse to one column on mobile, got: ${mobileLayoutColumns}`);
+  const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
+  await firstTrackHeading.evaluate((node) => {
     node.scrollIntoView({ block: "start", behavior: "instant" });
   });
   await page.waitForTimeout(120);
-  const storyListHeadingBox = await page.locator("#section-story-list h2").boundingBox();
+  const trackHeadingBox = await firstTrackHeading.boundingBox();
   assert(
-    storyListHeadingBox && storyListHeadingBox.y >= 0 && storyListHeadingBox.y < 240,
-    JSON.stringify(storyListHeadingBox)
+    trackHeadingBox && trackHeadingBox.y >= 0 && trackHeadingBox.y < 240,
+    JSON.stringify(trackHeadingBox)
   );
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   assert.equal(await hasHorizontalOverflow(page), false);
