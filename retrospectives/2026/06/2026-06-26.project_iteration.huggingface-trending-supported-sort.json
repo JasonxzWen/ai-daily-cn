@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.huggingface-trending-supported-sort",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Hugging Face Trending supported sort",
+  "status": "completed",
+  "summary": "Restored the Hugging Face model/project lane by replacing an upstream-rejected `sort=trending` API request with a supported unauthenticated model ranking request. The lane keeps its existing output contract while avoiding the HTTP 400 failure that made Hugging Face discovery always empty. The branch also carries the generated trends artifact drift exposed by the clean-build gate on latest main.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"Hugging Face Trending default source uses supported API sort|Hugging Face Trending parses supported model API response\" tests/unit.test.js",
+      "node src/cli.js discover:huggingface-trending --date 2026-06-26 --limit 5 --fetch-retries 0 --retry-delay-ms 0",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source-lane health can fail from upstream parameter drift even when network access is healthy.",
+      "evidence": "The old Hugging Face API URL returned an invalid-sort response, while supported sort parameters returned model records from the same host.",
+      "scope": "huggingface_trending_discovery",
+      "persistence": "implemented",
+      "recommended_action": "Keep a focused unit test on the default Hugging Face source URL so unsupported upstream sort parameters do not silently re-enter the runner."
+    },
+    {
+      "lesson": "When the exact upstream trending primitive is no longer available, audit wording should describe the recovered lane as a ranked model lane rather than an official trending API.",
+      "evidence": "Discovery evidence now says ranked model entries while preserving the existing `huggingface_trending` schema group for compatibility.",
+      "scope": "source_audit_wording",
+      "persistence": "implemented",
+      "recommended_action": "If a true Hugging Face trending endpoint becomes available later, switch the source URL and wording together under a focused test."
+    },
+    {
+      "lesson": "Clean-build gates can reveal missing generated artifacts from already-merged adjacent work.",
+      "evidence": "Full validation on latest main exposed a build-introduced `docs/trends.json` change for the cross-source hot threshold metadata.",
+      "scope": "generated_artifact_reproducibility",
+      "persistence": "implemented",
+      "recommended_action": "Keep generated public data artifacts in the same PR as behavior changes that alter their build output."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The Hugging Face Trending lane returned zero candidates because the default API URL used an unsupported `sort=trending` parameter.",
+      "evidence": "The focused tests cover the supported default sort and successful API response parsing; the live CLI probe returned checked source status and five candidates.",
+      "module": "source_discovery",
+      "suggestion": "Use a supported unauthenticated Hugging Face model ranking endpoint and keep output fields compatible with the existing lane.",
+      "expected_benefit": "Daily runs can include Hugging Face model/project candidates again instead of reporting a blocked lane caused by a stale API contract.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in `src/discovery.js`, unit tests, and this retrospective record.",
+      "ledger_links": [
+        "feedback/p1-huggingface-trending-section",
+        "feedback/p1-public-daily-ia-source-effectiveness-reset",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "node --test --test-name-pattern \"Hugging Face Trending default source uses supported API sort|Hugging Face Trending parses supported model API response\" tests/unit.test.js",
+        "node src/cli.js discover:huggingface-trending --date 2026-06-26 --limit 5 --fetch-retries 0 --retry-delay-ms 0"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-huggingface-trending-section",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Decide whether WeChat and Zhihu should remain explicitly degraded placeholders or receive real feed/input configuration.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Evaluate whether Hugging Face provides a newer first-party trending endpoint before renaming the public lane.",
+      "owner": "codex"
+    }
+  ],
+  "slug": "huggingface-trending-supported-sort"
+}

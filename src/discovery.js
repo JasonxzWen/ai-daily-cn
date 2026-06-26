@@ -482,7 +482,7 @@ export const DEFAULT_STATUSPAGE_SOURCES = [
 export const DEFAULT_HUGGINGFACE_TRENDING_SOURCE = {
   id: "huggingface-trending-models",
   name: "Hugging Face Trending Models",
-  url: "https://huggingface.co/api/models?sort=trending&direction=-1&limit=50",
+  url: "https://huggingface.co/api/models?sort=likes&direction=-1&limit=50",
   category: "huggingface_trending"
 };
 
@@ -825,7 +825,7 @@ export async function collectHuggingFaceTrending(options = {}) {
       });
     }
     const status = entries.length > 0 ? "checked" : "no_signal";
-    const notes = withRetryNote(`${entries.length} trending models parsed`, response);
+    const notes = withRetryNote(`${entries.length} ranked models parsed`, response);
     markSource(candidateSources[0], status, notes);
     sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes, { parsed_count: entries.length }));
   } catch (error) {
@@ -848,7 +848,7 @@ function huggingFaceTrendingResult(sourceResults, candidateSources, candidates) 
         sources_checked: sourceResults.length,
         blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? new Date().toISOString() : null,
-        notes: "Hugging Face public model trending is tracked as a separate model/project lane, not as GitHub Trending."
+        notes: "Hugging Face public model ranking is tracked as a separate model/project lane, not as GitHub Trending."
       }
     },
     sources: candidateSources,
@@ -930,7 +930,7 @@ function huggingFaceTrendingEvidence(entry) {
     entry.likes ? `likes=${entry.likes}` : "",
     entry.downloads ? `downloads=${entry.downloads}` : ""
   ].filter(Boolean).join("; ");
-  return `Hugging Face trending model entry${metrics ? `; ${metrics}` : ""}.`;
+  return `Hugging Face ranked model entry${metrics ? `; ${metrics}` : ""}.`;
 }
 
 async function collectGitHubTrendingFromBrowserExport(options = {}) {
