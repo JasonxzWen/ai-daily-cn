@@ -235,6 +235,20 @@ export async function runDailyWorkflow(options = {}) {
 
   for (const stage of buildInitialWorkflowStages({ reportDate })) {
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    const remoteAheadAction = remoteAheadRestartNextAction({
+      outcome,
+      stage,
+      context,
+      summary,
+      summaryPath,
+      reportDate
+    });
+    if (remoteAheadAction) {
+      summary.final_status = "blocked";
+      summary.next_action = remoteAheadAction;
+      await writeSummary(summaryPath, summary);
+      return { summary, summaryPath };
+    }
     if (outcome.blocked) {
       summary.final_status = "blocked";
       summary.next_action = blockedNextAction(outcome.error);
@@ -522,6 +536,20 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    const remoteAheadAction = remoteAheadRestartNextAction({
+      outcome,
+      stage,
+      context,
+      summary,
+      summaryPath,
+      reportDate
+    });
+    if (remoteAheadAction) {
+      summary.final_status = "blocked";
+      summary.next_action = remoteAheadAction;
+      await writeSummary(summaryPath, summary);
+      return { summary, summaryPath };
+    }
     // Editorial weak-card page-check failures degrade instead of hard-blocking.
     // quality_page_check runs after build, so to publish WITH disclosure we
     // annotate the written report and re-render docs (deriveQualityStatus merges
@@ -2181,6 +2209,84 @@ function pagesVerifyPendingNextAction({ outcome, summaryPath }) {
     pages_url: pagesUrl,
     message
   };
+}
+
+function remoteAheadRestartNextAction({ outcome, stage, context, summary, summaryPath, reportDate }) {
+  if (!isRemoteAheadOutcome(outcome)) {
+    return null;
+  }
+  const output = stageOutcomeOutput(outcome);
+  const mode = context.mode || summary.mode || "dry-run";
+  const publishFlag = mode === "publish" ? " --publish" : "";
+  return {
+    kind: "restart_latest_main",
+    stage_id: stage.id,
+    summary_path: summaryPath,
+    launcher_root: context.launcherRoot || summary.launcher_root || "",
+    clean_repo_root: context.cleanRoot || summary.clean_repo_root || "",
+    report_date: reportDate,
+    mode,
+    remote: remoteAheadDetails(output, outcome?.error),
+    command: `npm run daily:run -- --date ${reportDate}${publishFlag} --restart`,
+    message: "Remote origin/main advanced after this run started. Restart daily:run from the latest origin/main clean checkout; do not use GitHub API fallback for remote_ahead."
+  };
+}
+
+function isRemoteAheadOutcome(outcome) {
+  const signalText = retrySignalText({
+    normalized: outcome?.normalized,
+    error: outcome?.error
+  });
+  return /\bremote[_ -]?ahead\b|远端.+领先/i.test(signalText);
+}
+
+function stageOutcomeOutput(outcome) {
+  const output = outcome?.normalized?.output;
+  return output && typeof output === "object" && !Array.isArray(output) ? output : {};
+}
+
+function remoteAheadDetails(output, error) {
+  const errorDetails = error?.details && typeof error.details === "object" ? error.details : {};
+  const outputDetails = output.details && typeof output.details === "object" ? output.details : {};
+  const details = { ...errorDetails, ...outputDetails };
+  const remote = output.remote && typeof output.remote === "object" ? output.remote : {};
+  const publishStatus = output.publish_status && typeof output.publish_status === "object"
+    ? output.publish_status
+    : {};
+  const remoteAhead = firstFiniteNumber([
+    details.remoteAhead,
+    details.remote_ahead,
+    remote.remoteAhead,
+    remote.remote_ahead,
+    output.remoteAhead,
+    output.remote_ahead,
+    publishStatus.remoteAhead,
+    publishStatus.remote_ahead
+  ]);
+  return {
+    upstream:
+      stringValue(details.upstream) ||
+      stringValue(remote.upstream) ||
+      stringValue(output.upstream) ||
+      stringValue(publishStatus.upstream) ||
+      "origin/main",
+    remoteAhead,
+    error_code: stringValue(output.error_code) || stringValue(output.code) || stringValue(error?.code) || "remote_ahead"
+  };
+}
+
+function firstFiniteNumber(values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number)) {
+      return number;
+    }
+  }
+  return 0;
+}
+
+function stringValue(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : "";
 }
 
 function infrastructurePublishRecoveryNextAction({ outcome, stageId, previousStageId, summaryPath }) {
