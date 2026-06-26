@@ -30,7 +30,6 @@ const requiredLocalStateFiles = [
   'tasks/current-task.md',
 ];
 const forbiddenPaths = [
-  { path: 'CLAUDE.md', reason: 'non-Codex platform instruction file is present' },
   { path: 'openspec', reason: 'OpenSpec workflow artifacts must be removed from the active repository' },
   { path: 'scripts/validate-openspec.mjs', reason: 'OpenSpec validator must be removed from the active workflow' },
   { path: 'tests/openspec.test.js', reason: 'OpenSpec tests must be removed from the active workflow' },

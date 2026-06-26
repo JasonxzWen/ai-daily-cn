@@ -116,6 +116,7 @@
 - 把 OpenRouter、Artificial Analysis 或类似网页整页截图直接放进正文，导致手机端不可读。
 - 为了凑图展示 favicon、logo、头像、小图标、装饰图或不可读截图。
 - 把 `source_audit`、`self_check`、`candidate_id`、`quality_status`、`remediation`、`parsed_count` 或“来源 第三方报道 / 今天进入 GitHub Trending / 这条动态主要围绕 / 序号 1”这类生成痕迹写入公开页。
+- 把 `X更新agent 与开发者工具能力`、`X公布模型能力和…变化` 这类“实体+通用动词+通用 AI 名词”的模板腔 story 标题或叙事直接发布；每条 story 的 `title`/`what_happened`/`why_it_matters` 必须基于该条自身来源改写成具体、可回溯的编辑稿。命中模板族的标题/叙事会被 review 标为 `public_editorial_rewrite` 必改任务，由 cron coding agent 改写后再发布。
 
 ### Forbidden Case
 
@@ -136,6 +137,7 @@
 - `2026-06-15`：主体准入从官方/一手白名单改为黑名单剔除；官方/一手/多源用于排序和保留优先级。GitHub、Builder/X、热门博客、社区弱信号和白名单公众号等候选可按低风险边界参与主体补位，但融资、估值、价格、benchmark、安全事故、监管和模型能力等高风险事实仍需官方/一手或多源确认。
 - `2026-06-17`：将用户反馈固化为发布前内容契约门。主线详情必须是新闻形态的事实/影响/相关性分点；GitHub Trending 范围固定为 weekly all-language + Python/TypeScript/Rust/Go/Java Top10 合并去重到 Top20；热门博客公开页只展示 100-200 字文章概括和来源，不再渲染 key_points；follow-builders X feed 过滤后合格候选不少于 3 条时 Builder/X 不得为 0；OpenRouter / Artificial Analysis 必须使用 sanitized official snapshot 或解析数据，REQ-010 可 degraded 但不能渲染 fake component。
 - `2026-06-24`：generation-first。`stories` 是公开页渲染主单位，但其 `title`/`what_happened`/`why_it_matters` 由 `story-first.js` 确定性模板生成，从未进入编辑回写环（builder 翻译已进入，故只有 builder 像人写）。本轮把 `stories[*].(title|what_happened|why_it_matters)` 纳入 `quality-loop.js` 的 `REPAIRABLE_PUBLIC_TEXT_PATTERNS`，并新增 `collectStoryNarrativeIssues`：命中模板族（材料覆盖、边界落在落地质量取决于、更新agent工作流和开发工具能力 等）或与其它 story 重复的叙事，发 `public_editorial_rewrite` 任务，走与 builder 相同的 LLM 编辑环；事实/链接/日期仍禁止改写。验收以真实 `reports-data` 为准（`tests/generation-first.test.js`、`tests/story-authoring.test.js`），不再只跑 self-test。后续：让 runner 的 repair contract 每次运行真正回填 story 叙事，并逐步退役 `main_items` 模板别名。
+- `2026-06-26`：Stage D 公开页改为飞书式 track section + per-story 折叠后，story 标题的模板族变体（如 `更新agent 与开发者工具能力`、`公布模型能力和…变化`）会绕过既有短语正则、直接发布成通用腔标题。本轮把这些标题族补进 `quality-loop.js` 的 `STORY_TEMPLATE_NARRATIVE_RE`，review 会把命中的 `stories[*].title` 路由到 `public_editorial_rewrite`，由 cron coding agent（环境无 LLM API，撰写经 review→`codex_ai_repair_contract`→`quality:repair` 受限回写）改写为具体编辑稿；不动选题层 `isTemplatedStoryTitle`，事实/链接/日期仍禁止改。同轮在 `config/trends.json` 增补 `harness-engineering`（harness engineering / agent harness / context engineering / long-running agent 等）受控词，使新兴工程概念在 main_items/hot_blogs/builder_observations/github_trending 跨板块出现时形成趋势压力（趋势引擎已做跨源计数，仅补词表，不改阈值）。验收：`tests/story-authoring.test.js`、`tests/trends.test.js`。后续：runner 每次运行真正回填 story 叙事、跨源 co-occurrence 引擎、GitHub Trending API 字段增强、curated 一手 X handle。
 
 ### 工作流约束
 
