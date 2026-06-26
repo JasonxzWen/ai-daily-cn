@@ -13,6 +13,7 @@ import {
   collectContentSources,
   DEFAULT_CONTENT_SOURCES,
   DEFAULT_GITHUB_TRENDING_SOURCES,
+  DEFAULT_HUGGINGFACE_TRENDING_SOURCE,
   collectGitHubTrending,
   collectHuggingFaceTrending,
   collectStatuspageIncidents,
@@ -3153,6 +3154,42 @@ test("GitHub trending discovery falls back to OSSInsight API", async () => {
   assert.equal(collected.candidates[0].repo, "example/agent-runtime");
   assert.equal(collected.candidates[0].category, "project");
   assert.equal(collected.candidates[0].event_date, "2026-05-26");
+});
+
+test("Hugging Face Trending default source uses supported API sort", () => {
+  const url = new URL(DEFAULT_HUGGINGFACE_TRENDING_SOURCE.url);
+  const sort = url.searchParams.get("sort");
+
+  assert.notEqual(sort, "trending");
+  assert(["likes", "downloads", "lastModified"].includes(sort));
+});
+
+test("Hugging Face Trending parses supported model API response", async () => {
+  const collected = await collectHuggingFaceTrending({
+    reportDate: "2026-06-11",
+    limit: 1,
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([["content-type", "application/json"]]),
+      text: async () => JSON.stringify([
+        {
+          modelId: "Qwen/Qwen3-235B-A22B",
+          pipeline_tag: "text-generation",
+          downloads: 12345,
+          likes: 678,
+          tags: ["text-generation", "qwen"]
+        }
+      ])
+    })
+  });
+
+  assert.equal(collected.source_audit.huggingface_trending.sources[0].status, "checked");
+  assert.equal(collected.source_audit.huggingface_trending.sources[0].parsed_count, 1);
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].title, "Qwen/Qwen3-235B-A22B");
+  assert.equal(collected.candidates[0].rank, 1);
+  assert.match(collected.candidates[0].evidence, /ranked model entry/);
 });
 
 test("huggingface trending discovery and public section", async () => {
@@ -19297,9 +19334,9 @@ function strictPublishReportFixture() {
         sources: [
           {
             name: "Hugging Face Trending Models",
-            url: "https://huggingface.co/api/models?sort=trending&direction=-1&limit=50",
+            url: "https://huggingface.co/api/models?sort=likes&direction=-1&limit=50",
             status: "checked",
-            notes: "10 trending models parsed",
+            notes: "10 ranked models parsed",
             parsed_count: 10
           }
         ],
