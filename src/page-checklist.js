@@ -86,14 +86,22 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     );
     const mustReadSection = document.querySelector("#section-today-must-read");
     const compactMainList = document.querySelector("#section-compact-main-list");
-    const todayJudgment = document.querySelector("#section-today-judgment");
-    const trendThemes = document.querySelector("#section-trend-themes");
-    const storyList = document.querySelector("#section-story-list");
+    const legacyTriple = document.querySelector("#section-today-judgment, #section-trend-themes, #section-story-list");
+    const trackSections = Array.from(document.querySelectorAll("[id^='section-track-']"));
+    const storyPanels = Array.from(document.querySelectorAll("details.collapsible-panel[id^='section-story-']"));
+    const collapsedStoryPanels = storyPanels.filter((panel) => !panel.open);
+    const storyPanelWithTeaser = storyPanels.some((panel) =>
+      Boolean(panel.querySelector(".collapsible-subtitle")?.textContent?.trim())
+    );
+    const trackText = trackSections.map((node) => (node.textContent || "").trim()).join("");
     const promptLayerTheme = document.documentElement.getAttribute("data-ai-daily-theme") === "promptlayer-inspired";
     const ticketCards = document.querySelectorAll(".main-ticket-card, .main-ticket-card-grid, #section-main-signal-cards").length;
-    const storyFirstOk = Boolean(todayJudgment && trendThemes && storyList) &&
-      Boolean((storyList.textContent || "").trim()) &&
-      (storyList.tagName !== "DETAILS" || storyList.open);
+    const storyFirstOk = trackSections.length >= 1 &&
+      Boolean(trackText) &&
+      storyPanels.length >= 1 &&
+      collapsedStoryPanels.length >= 1 &&
+      storyPanelWithTeaser &&
+      !legacyTriple;
     addCheck(
       "today_must_read_not_required",
       !mustReadSection,
@@ -105,12 +113,14 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "story_first_sections_expanded",
       !compactMainList && storyFirstOk && !promptLayerTheme && ticketCards === 0,
-      "The public page should start with 今日判断, 趋势主题, and 今日主线, without PromptLayer ticket-card layout.",
+      "The public page should group stories into editorial track sections with per-story collapsible detail, not the legacy 今日判断/趋势主题/今日主线 triple.",
       {
         compact_list_present: Boolean(compactMainList),
-        today_judgment: Boolean(todayJudgment),
-        trend_themes: Boolean(trendThemes),
-        story_list: Boolean(storyList),
+        legacy_triple_present: Boolean(legacyTriple),
+        track_sections: trackSections.length,
+        story_panels: storyPanels.length,
+        collapsed_story_panels: collapsedStoryPanels.length,
+        story_panel_with_teaser: storyPanelWithTeaser,
         promptlayer_theme: promptLayerTheme,
         ticket_cards: ticketCards
       }

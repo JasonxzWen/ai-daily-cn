@@ -710,91 +710,137 @@ function trendTagsFor(annotations, section, index) {
   return match.tags.map((tag) => tag.text || tag.label).filter(Boolean);
 }
 
+const STORY_TRACKS = [
+  {
+    key: "industry",
+    title: "AI 行业动态",
+    intro: "模型、公司、政策与基础设施层面的行业动向。",
+    categories: new Set(["ai_industry", "model_release", "headline", "company_business", "policy_infra", "funding"]),
+    trend: /行业|industry|company|business|policy|infra|model\s*release/i
+  },
+  {
+    key: "content",
+    title: "内容赛道动态",
+    intro: "AIGC 内容生产与创作工作流相关动态。",
+    categories: new Set(["content_aigc"]),
+    trend: /content|aigc|内容|创作/i
+  },
+  {
+    key: "engineering",
+    title: "工程与开发者动态",
+    intro: "面向开发者的产品、工具与工程实践更新。",
+    categories: new Set(["engineering_toolchain", "product_radar"]),
+    trend: /product|developer|workflow|tool|engineering|开发者|工程|产品|工作流/i
+  },
+  {
+    key: "opensource",
+    title: "开源动态",
+    intro: "值得关注的开源模型与项目动态。",
+    categories: new Set(["open_source"]),
+    trend: /open[\s-]?source|开源/i
+  }
+];
+const DEFAULT_STORY_TRACK_KEY = "industry";
+const STORY_TRACK_MAX_ITEMS = 10;
+
+// Story-first sections render as a Feishu-style dense doc: stories are grouped
+// into editorial tracks, and each story is its own collapsed panel whose summary
+// is a ~100-char teaser (collapsed) and whose content is the full read (expanded).
 function formatStoryFirstSections(stories, context = {}) {
   if (!Array.isArray(stories) || stories.length === 0) {
     return formatMainItemSections([], context);
   }
-  return [
-    {
-      type: "markdown",
-      title: "今日判断",
-      richId: "today-judgment",
-      group: "main",
-      collapsed: false,
-      content: formatTodayJudgment(stories)
-    },
-    {
-      type: "markdown",
-      title: "趋势主题",
-      richId: "trend-themes",
-      group: "main",
-      collapsed: false,
-      content: formatTrendThemes(stories)
-    },
-    {
-      type: "markdown",
-      title: "今日主线",
-      richId: "story-list",
-      group: "main",
-      collapsed: false,
-      content: formatStoryList(stories, context)
+  const mainItems = Array.isArray(context.report?.main_items) ? context.report.main_items : [];
+  const mainById = mainItemByCandidateId(mainItems);
+  const buckets = new Map(STORY_TRACKS.map((track) => [track.key, []]));
+  stories.forEach((story, index) => {
+    const mainItem = mainById.get(String(story?.story_id || "").trim()) || mainItems[index] || null;
+    const key = storyTrackKey(story, mainItem);
+    (buckets.get(key) || buckets.get(DEFAULT_STORY_TRACK_KEY)).push({ story, index });
+  });
+  const sections = [];
+  for (const track of STORY_TRACKS) {
+    const entries = (buckets.get(track.key) || []).slice(0, STORY_TRACK_MAX_ITEMS);
+    if (entries.length === 0) {
+      continue;
     }
-  ];
-}
-
-function formatTodayJudgment(stories) {
-  return stories.slice(0, 5).map((story) => {
-    const link = storyPrimaryLink(story);
-    const storyTitle = readerFacingStoryTitle(story.title);
-    const title = link
-      ? markdownLink(link.url, storyTitle, { icon: siteIconForUrl(link.url, link.label || storyTitle), iconLabel: link.label })
-      : storyTitle;
-    return `- **${title}**：${formatDailyInlineText(story.why_it_matters || story.what_happened || "", story)}`;
-  }).join("\n");
-}
-
-function formatTrendThemes(stories) {
-  const groups = new Map();
-  for (const story of stories) {
-    const trend = String(story?.trend || "AI industry").trim();
-    if (!groups.has(trend)) {
-      groups.set(trend, []);
+    sections.push({
+      type: "markdown",
+      title: track.title,
+      richId: `track-${track.key}`,
+      group: "main",
+      collapsed: false,
+      content: `${track.intro}（本日 ${entries.length} 条）`
+    });
+    for (const { story, index } of entries) {
+      sections.push(formatStoryDetailSection(story, index, context));
     }
-    groups.get(trend).push(story);
   }
-  return [...groups.entries()].slice(0, 4).map(([trend, items]) => {
-    const titles = items.slice(0, 3).map((story) => readerFacingStoryTitle(story.title)).join(" / ");
-    return `- **${trend}**：${titles}`;
-  }).join("\n");
+  return sections.length > 0 ? sections : formatMainItemSections([], context);
 }
 
-function formatStoryList(stories, context = {}) {
-  return stories.map((story, index) => {
-    const link = storyPrimaryLink(story);
-    const storyTitle = readerFacingStoryTitle(story.title);
-    const title = link
-      ? markdownLink(link.url, storyTitle, { icon: siteIconForUrl(link.url, link.label || storyTitle), iconLabel: link.label })
-      : storyTitle;
-    const tags = formatHighlightTags([
-      importanceTagFor("stories", story),
-      storyEvidenceTag(story),
-      ...trendTagsFor(context.trendAnnotations, "stories", index),
-      ...trendTagsFor(context.trendAnnotations, "main_items", index)
-    ].filter(Boolean));
-    const sources = formatStorySourceLinks(story);
-    const evidence = formatInlineEvidenceAssets(
-      context.report,
-      evidenceForUrl(context.evidenceByUrl, link?.url),
-      context.mediaOptions
-    );
-    return [
-      `${index + 1}. **${title}**${tags}`,
-      `  - 发生了什么：${formatDailyInlineText(story.what_happened || "", story)}`,
-      `  - 为什么值得看：${formatDailyInlineText(story.why_it_matters || "", story)}`,
-      sources ? `  - 来源：${sources}` : "",
-      evidence ? `\n${evidence}` : ""
-    ].filter(Boolean).join("\n");
-  }).join("\n\n");
+function mainItemByCandidateId(mainItems) {
+  const byId = new Map();
+  for (const item of mainItems) {
+    const id = String(item?.candidate_id || "").trim();
+    if (id && !byId.has(id)) {
+      byId.set(id, item);
+    }
+  }
+  return byId;
+}
+
+function storyTrackKey(story, mainItem) {
+  const category = String(mainItem?.editorial_category || "").trim();
+  if (category) {
+    const matched = STORY_TRACKS.find((track) => track.categories.has(category));
+    return matched ? matched.key : DEFAULT_STORY_TRACK_KEY;
+  }
+  const trend = String(story?.trend || "");
+  const matched = STORY_TRACKS.find((track) => track.trend.test(trend));
+  return matched ? matched.key : DEFAULT_STORY_TRACK_KEY;
+}
+
+function formatStoryDetailSection(story, index, context = {}) {
+  const link = storyPrimaryLink(story);
+  const storyTitle = readerFacingStoryTitle(story.title);
+  const titleMarkdown = link
+    ? markdownLink(link.url, storyTitle, { icon: siteIconForUrl(link.url, link.label || storyTitle), iconLabel: link.label })
+    : storyTitle;
+  const tags = formatHighlightTags([
+    importanceTagFor("stories", story),
+    storyEvidenceTag(story),
+    ...trendTagsFor(context.trendAnnotations, "stories", index),
+    ...trendTagsFor(context.trendAnnotations, "main_items", index)
+  ].filter(Boolean));
+  const sources = formatStorySourceLinks(story);
+  const evidence = formatInlineEvidenceAssets(
+    context.report,
+    evidenceForUrl(context.evidenceByUrl, link?.url),
+    context.mediaOptions
+  );
+  const content = [
+    `**${titleMarkdown}**${tags}`,
+    `- 发生了什么：${formatDailyInlineText(story.what_happened || "", story)}`,
+    `- 为什么值得看：${formatDailyInlineText(story.why_it_matters || "", story)}`,
+    sources ? `- 来源：${sources}` : "",
+    evidence ? `\n${evidence}` : ""
+  ].filter(Boolean).join("\n");
+  return {
+    type: "markdown",
+    title: storyTitle,
+    richId: `story-${index + 1}`,
+    group: "main",
+    collapsed: true,
+    open: false,
+    summary: storyTeaser(story),
+    content
+  };
+}
+
+function storyTeaser(story) {
+  const raw = String(story?.why_it_matters || story?.what_happened || "").replace(/\s+/g, " ").trim();
+  return trimText(stripPublicBodySourcePrefix(raw, story), 100);
 }
 
 function storyPrimaryLink(story) {

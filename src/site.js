@@ -64,11 +64,62 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
 const NON_PUBLIC_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "thumbnail"]);
 const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page[_-]?capture)/i;
 const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
-.report-nav {
-  position: static;
-  top: auto;
-  z-index: auto;
-  backdrop-filter: none;
+/* Stage D: denser collapsible panels at every width. */
+.report-section-stack .collapsible-panel {
+  margin: 0;
+}
+
+.report-section-stack .collapsible-summary {
+  padding: 8px 12px;
+}
+
+.collapsible-subtitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--muted);
+}
+
+/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
+   the engine's horizontal nav so the per-story TOC stays contained). */
+@media (min-width: 761px) {
+  .report-layout {
+    grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .report-nav {
+    position: sticky;
+    top: 12px;
+    z-index: 3;
+    flex-direction: column;
+    align-items: stretch;
+    max-height: calc(100vh - 24px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    backdrop-filter: none;
+  }
+
+  .report-nav-group {
+    flex-direction: column;
+    align-items: stretch;
+    overflow: visible;
+  }
+
+  .report-nav a {
+    white-space: normal;
+    border-radius: 6px;
+  }
+
+  .report-nav a + a {
+    border-left-color: transparent;
+  }
+
+  .report-nav a span {
+    overflow: visible;
+    white-space: normal;
+  }
 }
 
 @media (max-width: 760px) {

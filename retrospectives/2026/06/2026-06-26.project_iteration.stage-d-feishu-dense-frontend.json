@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.stage-d-feishu-dense-frontend",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Stage D Feishu-style dense daily frontend",
+  "status": "completed",
+  "summary": "Reshaped the public daily report from three panels that restated the same stories (今日判断 / 趋势主题 / 今日主线) into a Feishu-style dense document. Stories are regrouped into four data-backed editorial tracks (AI 行业动态 / 内容赛道动态 / 工程与开发者动态 / 开源动态) keyed off the joined main_item.editorial_category, and each story renders as its own native collapsible panel whose collapsed summary is a ~100-character teaser. A desktop left-rail table of contents and panel density are added through the existing site.js CSS override seam, leaving the shared effective-interact engine untouched. The story_first page-check contract and the affected unit and e2e tests were rewritten in lockstep.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js",
+      "node scripts/check-daily-page.mjs --date 2026-06-25 --out <built-docs>",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Per-story progressive disclosure must use the render engine's native collapsible-section primitive, because the markdown renderer strips raw HTML.",
+      "evidence": "renderMarkdown calls stripRawHtml first, so embedded <details> in markdown content never survives; each story therefore becomes its own collapsed markdown section, which also makes every story a navigation anchor.",
+      "scope": "daily_frontend_rendering",
+      "persistence": "implemented",
+      "recommended_action": "Compose daily presentation from engine section primitives plus the site.js CSS override; do not edit the shared effective-interact engine for a single consumer."
+    },
+    {
+      "lesson": "Editorial track grouping must be driven by main_item.editorial_category, not by story-level fields.",
+      "evidence": "In real reports stories[].importance is uniformly 'general' and stories[].editorial_category is undefined, while the joined main_item.editorial_category carries the five stable values used for grouping; funding has no data source, so a 融资 track was deliberately omitted to avoid an empty daily section.",
+      "scope": "daily_frontend_grouping",
+      "persistence": "implemented",
+      "recommended_action": "Join stories to main_items (by candidate_id with index fallback on the normalized parallel arrays) before assigning tracks; fold funding into the industry track until a funding feed exists."
+    },
+    {
+      "lesson": "A desktop-only layout override leaked into mobile and caused horizontal overflow.",
+      "evidence": "A global '.report-nav-group { overflow: visible }' added for the vertical rail defeated the engine's mobile horizontal-scroll containment, so roughly twenty per-story navigation links overflowed the page at 375px (scroll width about 2700). Scoping every left-rail rule to '@media (min-width: 761px)' fixed it while keeping the engine's working mobile nav.",
+      "scope": "daily_frontend_layout",
+      "persistence": "implemented",
+      "recommended_action": "Gate desktop-only layout overrides behind a min-width media query and rely on the Playwright no_horizontal_overflow check at 375px to catch leakage."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-ai-quality-review-loop"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "The left-rail table of contents is a flat list; nested per-track sub-headers would require changing the engine's renderGroupedNav and are deferred to a separate, scoped engine change.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Remaining content stages (trends vocabulary expansion, GitHub Trending API enrichment, curated first-party X handles, and OpenAI/DeepMind research fetching) are not part of this frontend stage.",
+      "owner": "project"
+    }
+  ],
+  "slug": "stage-d-feishu-dense-frontend"
+}
