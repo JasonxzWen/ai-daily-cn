@@ -2233,11 +2233,38 @@ function remoteAheadRestartNextAction({ outcome, stage, context, summary, summar
 }
 
 function isRemoteAheadOutcome(outcome) {
+  const output = stageOutcomeOutput(outcome);
+  const remote = remoteAheadDetails(output, outcome?.error);
+  if (remote.remoteAhead > 0) {
+    return true;
+  }
+  if (!isFailedStageOutcome(outcome)) {
+    return false;
+  }
+  if (hasRemoteAheadCode(output, outcome?.error)) {
+    return true;
+  }
   const signalText = retrySignalText({
     normalized: outcome?.normalized,
     error: outcome?.error
   });
   return /\bremote[_ -]?ahead\b|远端.+领先/i.test(signalText);
+}
+
+function isFailedStageOutcome(outcome) {
+  return Boolean(outcome?.blocked || outcome?.error || outcome?.normalized?.ok === false);
+}
+
+function hasRemoteAheadCode(output, error) {
+  const publishStatus = output.publish_status && typeof output.publish_status === "object"
+    ? output.publish_status
+    : {};
+  return [
+    output.error_code,
+    output.code,
+    publishStatus.error_code,
+    error?.code
+  ].some((value) => String(value || "").toLowerCase() === "remote_ahead");
 }
 
 function stageOutcomeOutput(outcome) {

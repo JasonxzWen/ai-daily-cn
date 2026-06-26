@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.remote-ahead-boundary-and-cross-agent-audit",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Remote-ahead boundary and cross-agent audit",
+  "status": "completed",
+  "summary": "Tightened the daily runner remote_ahead detection boundary after a manual run started from PR #124 and PR #125 landed before publish completion. The runner still blocks true stale-baseline publishing, but successful stages that merely print remote_ahead policy text no longer produce restart_latest_main. This iteration also audited the merged Codex and Claude Code PR series through PR #126 so this branch is based on current origin/main and does not drop either side's changes.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "prs": [
+      "#116",
+      "#117",
+      "#118",
+      "#119",
+      "#120",
+      "#121",
+      "#122",
+      "#123",
+      "#124",
+      "#125",
+      "#126"
+    ],
+    "validation_commands": [
+      "node --test --test-name-pattern \"daily runner ignores incidental remote ahead text from successful stages|daily runner turns remote ahead publish dry-run into restart latest main action\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "remote_ahead restart actions need a failure boundary, not only text matching.",
+      "evidence": "A successful validation-like stage that printed remote_ahead policy text previously caused final_status blocked; the new regression test keeps the run generated_only with next_action none.",
+      "scope": "daily_runner_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Only treat remote_ahead as a restart signal when the stage failed or when structured remote details prove a positive remoteAhead count."
+    },
+    {
+      "lesson": "Cross-agent merge safety should be checked from the current main tip before editing shared files.",
+      "evidence": "The branch was recreated from origin/main after PR #126, and the audit compares Codex PRs #116/#120/#121/#123 with Claude Code PRs #117/#118/#119/#122/#124/#125/#126 before handoff.",
+      "scope": "cross_agent_coordination",
+      "persistence": "session_note",
+      "recommended_action": "When Codex and Claude Code both touch shared files such as src/discovery.js, tests/unit.test.js, and retrospectives/index.json, branch from the latest origin/main and audit merged file presence before continuing."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After this fix is merged, rerun the manual daily task from latest origin/main and confirm the summary points to the actual remote-ahead stage with positive remoteAhead when another PR lands mid-run.",
+      "owner": "project"
+    }
+  ],
+  "slug": "remote-ahead-boundary-and-cross-agent-audit"
+}
