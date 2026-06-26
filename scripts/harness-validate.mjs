@@ -131,7 +131,7 @@ const requiredPackageScripts = {
   'retrospectives:validate': ['scripts/validate-retrospectives.mjs'],
   'content:contract': ['scripts/check-daily-content-contract.mjs'],
   'content:contract:self-test': ['scripts/check-daily-content-contract.mjs', '--self-test'],
-  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run content:contract:self-test', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
+  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run content:contract && npm run content:contract:self-test', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
   'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
   'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
   'publish:preflight': ['src/cli.js', 'publish:preflight'],

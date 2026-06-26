@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.real-artifact-content-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Real artifact content contract gate",
+  "status": "completed",
+  "summary": "Moved the daily content contract from self-test-only validation to a real-artifact gate. `npm run content:contract` now scans recent `reports-data` reports and matching public HTML when available; `npm run validate` runs that real gate before the synthetic self-test fixture.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node -e \"const fs=require('fs'); const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); if(!pkg.scripts.validate.includes('npm run content:contract && npm run content:contract:self-test')){ console.error('validate does not run real content:contract before self-test'); process.exit(1) }\"",
+      "node --test tests/content-contract.test.js",
+      "npm run content:contract",
+      "npm run content:contract:self-test",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "node scripts/validate-feedback-contract.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "story_template_narrative",
+      "section": "stories",
+      "message": "`npm run content:contract` checked the latest three real report artifacts and surfaced story template narrative degradation for 2026-06-23 and 2026-06-24."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "Content validation must exercise real reports before downstream generation rewrites.",
+      "evidence": "`npm run content:contract` now scans recent real artifacts and reports blocking/degraded counts instead of requiring an explicit `--report` path.",
+      "scope": "content_contract_validation",
+      "persistence": "implemented",
+      "recommended_action": "Use the real-artifact gate as the red/green signal before admission/scoring and authoring changes."
+    },
+    {
+      "lesson": "Current real artifacts still contain degraded template narrative even when there are no blocking contract issues.",
+      "evidence": "The new gate reports degraded story template narrative for 2026-06-23 and 2026-06-24 while exiting successfully because there are no blocking issues.",
+      "scope": "generation_quality",
+      "persistence": "ledger_candidate",
+      "recommended_action": "Next slice should decide whether REQ-003 story template narrative remains degraded or becomes blocking after authoring/admission improvements land."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "accepted",
+      "issue": "Validation could previously pass by checking only synthetic content-contract fixtures.",
+      "evidence": "The red test failed because `npm run validate` only ran `content:contract:self-test`; after the change it runs `content:contract` before `content:contract:self-test`.",
+      "module": "validation",
+      "suggestion": "Keep real-artifact content-contract validation in `npm run validate` and use self-test only as a secondary smoke check.",
+      "expected_benefit": "Future generation, admission, and authoring changes can no longer avoid the latest real reports during standard validation.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through package scripts, content-contract CLI, tests, ledger, quick reference, and requirements reconciliation.",
+      "ledger_links": [
+        "feedback/p1-daily-content-contract-hard-gate",
+        "feedback/p1-ai-daily-requirements-reconciliation",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "node --test tests/content-contract.test.js",
+        "npm run content:contract"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement the admission/scoring rewrite next, using the real-artifact content-contract output as the regression signal.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "After authoring improves real reports, consider making `story_template_narrative` blocking instead of degraded.",
+      "owner": "project"
+    }
+  ],
+  "slug": "real-artifact-content-contract"
+}

@@ -6084,7 +6084,7 @@ test("harness requires content contract validation for daily content contract ta
   const acceptedRoot = await createHarnessFixture({
     currentTask: validDailyContentContractTask({
       validationCommands: [
-        "- `node scripts/check-daily-content-contract.mjs --self-test --json`",
+        "- `npm run content:contract`",
         "- `node scripts/harness-validate.mjs`"
       ]
     })
@@ -6244,13 +6244,14 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   assert.equal(item.severity, "P1");
   assert.equal(item.status, "implemented");
   assert(item.scope.includes("docs/ai-daily-requirements-reconciliation.md"));
+  assert(item.scope.includes("docs/ai-daily-cross-agent-iteration-roadmap.md"));
   assert.equal(item.validation.command, "node --test tests/unit.test.js");
   assert.equal(item.validation.test_name, "ai daily requirements reconciliation maps user requirements to ledger tests and runtime evidence");
   assert(quickReference.includes("feedback/p1-ai-daily-requirements-reconciliation"));
 
   const rows = reconciliation.split(/\r?\n/).filter((line) => /^\| REQ-\d{3} \|/.test(line));
-  assert.equal(rows.length, 12);
-  for (let index = 1; index <= 12; index += 1) {
+  assert.equal(rows.length, 13);
+  for (let index = 1; index <= 13; index += 1) {
     const id = `REQ-${String(index).padStart(3, "0")}`;
     const row = rows.find((line) => line.includes(`| ${id} |`));
     assert(row, `${id} must be listed`);
@@ -6261,6 +6262,7 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   for (const phrase of [
     "8 story-first main list",
     "public AI/tech importance",
+    "low-value third-party model availability PRs",
     "post-generation gates only catch regressions",
     "OpenAI, Anthropic, Google/DeepMind, Meta, Microsoft, Hugging Face",
     "GitHub Trending",
@@ -6270,13 +6272,49 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
     "WeChat, Zhihu, and Reddit",
     "OpenRouter and Artificial Analysis",
     "semantic assets",
+    "Cross-Agent Iteration Roadmap Addendum",
+    "docs/ai-daily-cross-agent-iteration-roadmap.md",
     "Runtime Evidence Boundary"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation must include ${phrase}`);
   }
   assert(reconciliation.includes("| partial |"));
-  assert(reconciliation.includes("| missing |"));
   assert(reconciliation.includes("Do not write \"fixed\", \"stable\", or \"implemented\""));
+});
+
+test("cross-agent iteration roadmap maps dependencies and verification boundaries", async () => {
+  const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
+  const quickReference = await fs.readFile(path.join(rootDir, "docs", "feedback-buglist-quick-reference.md"), "utf8");
+  const reconciliation = await fs.readFile(path.join(rootDir, "docs", "ai-daily-requirements-reconciliation.md"), "utf8");
+  const roadmap = await fs.readFile(path.join(rootDir, "docs", "ai-daily-cross-agent-iteration-roadmap.md"), "utf8");
+  const item = ledger.items.find((entry) => entry.id === "feedback/p1-ai-daily-requirements-reconciliation");
+
+  assert(item, "feedback/p1-ai-daily-requirements-reconciliation must cover cross-agent roadmap work");
+  assert(item.scope.includes("docs/ai-daily-cross-agent-iteration-roadmap.md"));
+  assert(quickReference.includes("docs/ai-daily-cross-agent-iteration-roadmap.md"));
+  assert(reconciliation.includes("| REQ-013 | Cross-agent Codex/Claude Code diagnosis"));
+  assert(reconciliation.includes("cross-agent iteration roadmap maps dependencies and verification boundaries"));
+
+  for (const phrase of [
+    "Highest Priority",
+    "Dependency Order",
+    "Independently Verifiable",
+    "Recommended Sequence",
+    "Scope Rules",
+    "Not In This Phase",
+    "real artifact validation",
+    "Admission and scoring rewrite",
+    "LLM authoring before repair",
+    "GitHub Trending enrichment",
+    "Source lane health repair",
+    "Automation observability cleanup",
+    "Frontend information architecture"
+  ]) {
+    assert(roadmap.includes(phrase), `roadmap must include ${phrase}`);
+  }
+
+  const result = await validateFeedbackContract({ rootDir });
+  assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
 test("story-centered daily contract is implemented with generator and rendering gates", async () => {
@@ -14059,7 +14097,7 @@ test("report:draft rewrites main item titles summaries and bullets without gener
   }
 });
 
-test("report:draft admission scoring promotes lab engineering deep-dives over vendor availability PR", async () => {
+test("report:draft rejects low-value vendor availability PRs from main admission", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-admission-lab-deep-dive-"));
   const reportDate = "2026-06-25";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -14123,12 +14161,11 @@ test("report:draft admission scoring promotes lab engineering deep-dives over ve
   });
 
   const mainUrls = drafted.report.main_items.map((item) => item.url);
+  const vendorPoolEntry = drafted.candidatePool.candidates.find((candidate) => candidate.id === "aws-bedrock-claude-availability-pr");
   assert(mainUrls.includes(labDeepDiveUrl), "high-authority lab engineering deep-dive must enter the main stream");
-  assert(mainUrls.includes(vendorAvailabilityUrl), "fixture should include the vendor PR so ordering is meaningful");
-  assert(
-    mainUrls.indexOf(labDeepDiveUrl) < mainUrls.indexOf(vendorAvailabilityUrl),
-    `lab deep-dive should outrank vendor availability PR, got: ${mainUrls.join(" | ")}`
-  );
+  assert.equal(mainUrls.includes(vendorAvailabilityUrl), false, "low-value vendor availability PR must not occupy main_items");
+  assert.equal(vendorPoolEntry?.main_reject_reason, "low_value_vendor_availability_pr");
+  assert.equal(vendorPoolEntry?.main_selection_stage || "", "");
 });
 
 test("report:draft admission scoring preserves primary lab URL behind intermediary discovery source", async () => {
@@ -19752,7 +19789,7 @@ async function createHarnessFixture(options = {}) {
         "retrospectives:validate": "node scripts/validate-retrospectives.mjs",
         "content:contract": "node scripts/check-daily-content-contract.mjs",
         "content:contract:self-test": "node scripts/check-daily-content-contract.mjs --self-test --json",
-        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract:self-test && npm run test && npm run build && npm run test:e2e && git diff --check",
+        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract && npm run content:contract:self-test && npm run test && npm run build && npm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
         "publish:preflight": "node src/cli.js publish:preflight",

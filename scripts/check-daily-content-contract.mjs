@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { canonicalStoryUrl, isTemplatedStoryTitle, STORY_FIRST_MAX } from "../src/story-first.js";
 
 const REQUIRED_GITHUB_LANGUAGES = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
+const DEFAULT_DATA_INPUT = "reports-data";
+const DEFAULT_HTML_INPUT = path.join("docs", "reports");
+const DEFAULT_LATEST_COUNT = 3;
 const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核对|可继续关注|本轮材料|信息较为有限|公开描述提到|需要结合/i;
 const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本文可作为|信息较为有限|后续观察|可继续关注|材料覆盖/i;
 const GITHUB_FILLER_PATTERN = /公开描述提到|进入 GitHub Trending|需要结合仓库页面确认|优先核对 README|实现线索|值得关注的项目/i;
@@ -44,6 +48,140 @@ export function evaluateDailyContentContract(report, options = {}) {
       }
     }
   };
+}
+
+export async function evaluateRealArtifactContentContract(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const dataInput = options.dataInput || DEFAULT_DATA_INPUT;
+  const htmlInput = options.htmlInput || DEFAULT_HTML_INPUT;
+  const latest = normalizeLatestCount(options.latest);
+  const artifacts = await discoverReportArtifacts({ rootDir, dataInput, htmlInput, latest });
+
+  if (artifacts.length === 0) {
+    const issue = blockingIssue({
+      code: "real_artifact_reports_missing",
+      requirement: "REQ-003",
+      section: "reports-data",
+      message: `No real report JSON artifacts found under ${dataInput}.`
+    });
+    return {
+      ok: false,
+      blocking: true,
+      issues: [issue],
+      degraded: [],
+      reports: [],
+      summary: {
+        mode: "real-artifacts",
+        data_input: dataInput,
+        html_input: htmlInput,
+        latest,
+        artifacts_checked: 0,
+        blocking_reports: 0,
+        degraded_reports: 0
+      }
+    };
+  }
+
+  const reports = [];
+  const issues = [];
+  const degraded = [];
+
+  for (const artifact of artifacts) {
+    const report = JSON.parse(await fs.readFile(artifact.reportPath, "utf8"));
+    const html = artifact.htmlPath ? await readOptionalText(artifact.htmlPath) : "";
+    const result = evaluateDailyContentContract(report, { html });
+    const reportEntry = {
+      report_date: artifact.reportDate,
+      report_path: normalizePath(path.relative(rootDir, artifact.reportPath)),
+      html_path: artifact.htmlPath ? normalizePath(path.relative(rootDir, artifact.htmlPath)) : null,
+      ok: result.ok,
+      blocking: result.blocking,
+      issue_count: result.issues.length,
+      degraded_count: result.degraded.length,
+      issues: result.issues,
+      degraded: result.degraded,
+      summary: result.summary
+    };
+    reports.push(reportEntry);
+    for (const issue of result.issues) {
+      issues.push({ report_date: artifact.reportDate, report_path: reportEntry.report_path, ...issue });
+    }
+    for (const issue of result.degraded) {
+      degraded.push({ report_date: artifact.reportDate, report_path: reportEntry.report_path, ...issue });
+    }
+  }
+
+  return {
+    ok: issues.length === 0,
+    blocking: issues.length > 0,
+    issues,
+    degraded,
+    reports,
+    summary: {
+      mode: "real-artifacts",
+      data_input: dataInput,
+      html_input: htmlInput,
+      latest,
+      artifacts_checked: reports.length,
+      blocking_reports: reports.filter((report) => report.issue_count > 0).length,
+      degraded_reports: reports.filter((report) => report.degraded_count > 0).length
+    }
+  };
+}
+
+async function discoverReportArtifacts(options) {
+  const rootDir = options.rootDir || process.cwd();
+  const dataRoot = path.resolve(rootDir, options.dataInput || DEFAULT_DATA_INPUT);
+  const htmlRoot = path.resolve(rootDir, options.htmlInput || DEFAULT_HTML_INPUT);
+  const files = [];
+  await collectReportJsonFiles(dataRoot, files);
+  files.sort((a, b) => a.reportDate.localeCompare(b.reportDate) || a.reportPath.localeCompare(b.reportPath));
+  return files.slice(-normalizeLatestCount(options.latest)).map((artifact) => ({
+    ...artifact,
+    htmlPath: matchingHtmlPath(htmlRoot, artifact.reportDate)
+  }));
+}
+
+async function collectReportJsonFiles(dir, files) {
+  let entries;
+  try {
+    entries = await fs.readdir(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const absolutePath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await collectReportJsonFiles(absolutePath, files);
+      continue;
+    }
+    const match = entry.name.match(/^(\d{4}-\d{2}-\d{2})\.json$/);
+    if (!match) {
+      continue;
+    }
+    files.push({ reportDate: match[1], reportPath: absolutePath });
+  }
+}
+
+function matchingHtmlPath(htmlRoot, reportDate) {
+  const [year, month] = reportDate.split("-");
+  return path.join(htmlRoot, year, month, `${reportDate}.html`);
+}
+
+async function readOptionalText(filePath) {
+  try {
+    return await fs.readFile(filePath, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+function normalizeLatestCount(value) {
+  const number = Number(value ?? DEFAULT_LATEST_COUNT);
+  if (!Number.isFinite(number) || number < 1) {
+    return DEFAULT_LATEST_COUNT;
+  }
+  return Math.floor(number);
 }
 
 // Deterministic story-narrative templates emitted by story-first.js fallback.
@@ -507,6 +645,10 @@ function textValue(value) {
   return String(value ?? "").trim();
 }
 
+function normalizePath(value) {
+  return String(value || "").replace(/\\/g, "/");
+}
+
 function itemUrls(item) {
   return [
     item?.url,
@@ -544,6 +686,20 @@ async function runCli(argv) {
     return 0;
   }
 
+  if (!args.selfTest && !args.report) {
+    const result = await evaluateRealArtifactContentContract({
+      dataInput: args.dataInput,
+      htmlInput: args.htmlInput,
+      latest: args.latest
+    });
+    if (args.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      printHumanResult(result);
+    }
+    return result.ok ? 0 : 1;
+  }
+
   let report;
   let html = "";
   if (args.selfTest) {
@@ -576,6 +732,12 @@ function parseArgs(argv) {
       args.report = argv[++index];
     } else if (arg === "--html") {
       args.html = argv[++index];
+    } else if (arg === "--data-input") {
+      args.dataInput = argv[++index];
+    } else if (arg === "--html-input") {
+      args.htmlInput = argv[++index];
+    } else if (arg === "--latest") {
+      args.latest = argv[++index];
     } else if (arg === "--json") {
       args.json = true;
     } else if (arg === "--self-test") {
@@ -592,6 +754,7 @@ function parseArgs(argv) {
 function printUsage() {
   console.log([
     "Usage:",
+    "  node scripts/check-daily-content-contract.mjs [--data-input reports-data] [--html-input docs/reports] [--latest 3] [--json]",
     "  node scripts/check-daily-content-contract.mjs --report <report.json> [--html <report.html>] [--json]",
     "  node scripts/check-daily-content-contract.mjs --self-test [--json]"
   ].join("\n"));
@@ -600,11 +763,16 @@ function printUsage() {
 function printHumanResult(result) {
   const status = result.ok ? "passed" : "failed";
   console.log(`Daily content contract ${status}.`);
+  if (result.summary?.mode === "real-artifacts") {
+    console.log(`Checked ${result.summary.artifacts_checked} real report artifact(s); blocking reports: ${result.summary.blocking_reports}; degraded reports: ${result.summary.degraded_reports}.`);
+  }
   for (const issue of result.issues) {
-    console.log(`BLOCKING ${issue.requirement} ${issue.code}: ${issue.message}`);
+    const prefix = issue.report_date ? `${issue.report_date} ` : "";
+    console.log(`BLOCKING ${prefix}${issue.requirement} ${issue.code}: ${issue.message}`);
   }
   for (const issue of result.degraded) {
-    console.log(`DEGRADED ${issue.requirement} ${issue.code}: ${issue.message}`);
+    const prefix = issue.report_date ? `${issue.report_date} ` : "";
+    console.log(`DEGRADED ${prefix}${issue.requirement} ${issue.code}: ${issue.message}`);
   }
 }
 
