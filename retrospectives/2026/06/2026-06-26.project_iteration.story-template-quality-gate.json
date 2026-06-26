@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.story-template-quality-gate",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Story template quality gate",
+  "status": "completed",
+  "summary": "The published 2026-06-26 report proved that widening the story-template detector was not enough: template signatures in story titles and why_it_matters could still be emitted as warnings while repeated generic story titles stayed unclassified. This iteration makes templated story narrative and duplicate generic story titles blocking quality-review issues, routes both through the existing public editorial rewrite task, and updates generation tests so non-story public copy remains clean while story templates require repair before publish completion.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"quality review flags templated story titles and narrative copy\" tests/unit.test.js",
+      "node --test --test-name-pattern \"draft generator emits reader-facing Chinese sections without AI repair|report:draft prunes duplicate and templated hot blogs before quality review|quality review flags duplicate or templated hot blogs as prepublish gate failures|quality review flags templated story titles and narrative copy\" tests/unit.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A quality review warning with an AI repair task is not a publish gate if review.ok only considers errors.",
+      "evidence": "The focused regression first failed because story_template_narrative was emitted with severity warning, so duplicated template story copy could still avoid a needs_repair status.",
+      "scope": "quality_review",
+      "persistence": "implemented",
+      "recommended_action": "Use error severity for public story-copy defects that must enter the editorial repair loop before publish completion."
+    },
+    {
+      "lesson": "Template detection must check repeated generic headlines, not only story body fields.",
+      "evidence": "The 2026-06-26 report repeated titles such as Alibaba Cloud updating agent and developer-tool capability; adding story_duplicate_generic_title captures this visible failure separately from narrative boilerplate.",
+      "scope": "story_authoring_gate",
+      "persistence": "implemented",
+      "recommended_action": "Keep story title duplicate checks tied to normalized generic/template titles and route them to source-specific headline rewrite tasks."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Run the next daily publish after merge and verify that story template repair either succeeds or blocks before public publish instead of shipping generic story copy.",
+      "owner": "project"
+    }
+  ],
+  "slug": "story-template-quality-gate"
+}

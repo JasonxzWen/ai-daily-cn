@@ -13819,10 +13819,16 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
   }
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
-  assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
+  const nonStoryBlockingIssues = review.issues.filter((issue) =>
+    issue.severity === "error" && !/^stories\[/.test(String(issue.path || ""))
+  );
+  assert.equal(review.ok, false, JSON.stringify(review.issues, null, 2));
+  assert.equal(review.status, "needs_repair");
+  assert.deepEqual(nonStoryBlockingIssues, [], JSON.stringify(review.issues, null, 2));
   // Generation-first: the deterministic draft's summary/main_items/hot_blogs/
   // builders must need no repair, but templated story narrative is expected to
   // route to the LLM editorial loop (public_editorial_rewrite on stories[*]).
+  assert(review.ai_review_tasks.some((task) => /^stories\[/.test(String(task.path || ""))));
   assert.deepEqual(
     review.ai_review_tasks.filter((task) => !/^stories\[/.test(String(task.path || ""))),
     [],
@@ -13925,10 +13931,16 @@ test("report:draft prunes duplicate and templated hot blogs before quality revie
   }
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
-  assert.equal(review.ok, true, JSON.stringify(review.issues, null, 2));
+  const nonStoryBlockingIssues = review.issues.filter((issue) =>
+    issue.severity === "error" && !/^stories\[/.test(String(issue.path || ""))
+  );
+  assert.equal(review.ok, false, JSON.stringify(review.issues, null, 2));
+  assert.equal(review.status, "needs_repair");
+  assert.deepEqual(nonStoryBlockingIssues, [], JSON.stringify(review.issues, null, 2));
   // Generation-first: the deterministic draft's summary/main_items/hot_blogs/
   // builders must need no repair, but templated story narrative is expected to
   // route to the LLM editorial loop (public_editorial_rewrite on stories[*]).
+  assert(review.ai_review_tasks.some((task) => /^stories\[/.test(String(task.path || ""))));
   assert.deepEqual(
     review.ai_review_tasks.filter((task) => !/^stories\[/.test(String(task.path || ""))),
     [],
@@ -13991,6 +14003,65 @@ test("quality review flags duplicate or templated hot blogs as prepublish gate f
   assert(codes.includes("hot_blog_duplicate_title"), JSON.stringify(review.issues, null, 2));
   assert(codes.includes("hot_blog_template_repeated"), JSON.stringify(review.issues, null, 2));
   assert(!review.ai_review_tasks.some((task) => task.kind === "hot_blog_editorial_rewrite"));
+});
+
+test("quality review flags templated story titles and narrative copy", () => {
+  const report = strictPublishReportFixture();
+  report.stories = [
+    {
+      story_id: "story-template-alibaba-snapshot",
+      title: "Alibaba Cloud更新agent 与开发者工具能力",
+      importance: "major",
+      trend: "agent workflow",
+      event_date: report.report_date,
+      primary_entity: "Alibaba Cloud",
+      event_type: "engineering_update",
+      object: "PolarDB-X snapshots",
+      what_happened: "Alibaba Cloud described PolarDB-X snapshots as a rollback control for agent-operated databases.",
+      why_it_matters: "工程侧价值集中在 agent、开发工具和自动化工作流接入",
+      evidence_level: "primary",
+      sources: [
+        {
+          label: "Alibaba Cloud Blog",
+          url: "https://www.alibabacloud.com/blog/polardb-x-snapshots-the-undo-button-for-agent-operated-data_603306",
+          type: "official"
+        }
+      ],
+      source_item_refs: ["story-template-alibaba-snapshot"]
+    },
+    {
+      story_id: "story-template-alibaba-rdsclaw",
+      title: "Alibaba Cloud更新agent 与开发者工具能力",
+      importance: "major",
+      trend: "agent workflow",
+      event_date: report.report_date,
+      primary_entity: "Alibaba Cloud",
+      event_type: "engineering_update",
+      object: "RDSClaw database management",
+      what_happened: "Alibaba Cloud explained how RDSClaw constrains database-management agents with permission and audit boundaries.",
+      why_it_matters: "信号集中在大厂资源投入、组织重心和商业优先级变化",
+      evidence_level: "primary",
+      sources: [
+        {
+          label: "Alibaba Cloud Blog",
+          url: "https://www.alibabacloud.com/blog/rdsclaw-database-management-let-ai-agent-securely-take-over-database_603307",
+          type: "official"
+        }
+      ],
+      source_item_refs: ["story-template-alibaba-rdsclaw"]
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const storyIssues = review.issues.filter((issue) => /^stories\[\d+\]/.test(String(issue.path || "")));
+  const codes = storyIssues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false, JSON.stringify(review.issues, null, 2));
+  assert.equal(review.status, "needs_repair");
+  assert(storyIssues.some((issue) => issue.code === "story_template_narrative" && issue.severity === "error"), JSON.stringify(storyIssues, null, 2));
+  assert(codes.includes("story_duplicate_generic_title"), JSON.stringify(storyIssues, null, 2));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite" && task.path === "stories[0].why_it_matters"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite" && task.path === "stories[1].title"));
 });
 
 test("report:draft does not fill main stream with generic GitHub trending text", async () => {
