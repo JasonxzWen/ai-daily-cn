@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.github-trending-api-enrichment",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "GitHub Trending API field enrichment",
+  "status": "completed",
+  "summary": "Second of the queued #3 enhancements. GitHub Trending candidates were scraped (rank, weekly star velocity, README summary) but lacked the slower-moving repository facts. Added an opt-in, resilient GitHub REST enrichment pass (enrichGithubTrendingApiFields) that attaches topics, license, total stargazers, and last-push timestamp from the repository endpoint. It runs only when a token or explicit flag is supplied (so offline tests and the HTML-only path are unaffected) and never blocks: a failed call keeps the scraped candidate and records a fetch status. The daily CLI passes the ambient environment through so the scheduled run (which provides a GitHub token) enables it, while tests stay isolated because the discovery function reads the token from its own options rather than the ambient environment. Also committed the rebuilt public trends index that the prior cross-source-hot change left stale, to satisfy the new clean-build reproducibility gate.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"github trending API enrichment\" tests/unit.test.js",
+      "node --test tests/unit.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Network enrichment in discovery must be opt-in via explicit options, not the ambient environment, to keep tests isolated.",
+      "evidence": "A GitHub token is present in the ambient environment, so gating enrichment on it would have made every existing GitHub Trending test issue live API calls. Reading the token from explicit options keeps offline tests unchanged while the CLI passes the environment through for the scheduled run.",
+      "scope": "discovery_enrichment",
+      "persistence": "implemented",
+      "recommended_action": "Gate optional network enrichment on explicit options; let the CLI/runner pass the environment, and keep the enrichment resilient so a failed call preserves the scraped candidate."
+    },
+    {
+      "lesson": "The clean-build reproducibility gate requires rebuilt docs to be committed with the code that changes them.",
+      "evidence": "A prior code-only trends change left the public trends index stale, so the build dirtied it and the clean-build check failed; committing the rebuilt file resolved it.",
+      "scope": "build_reproducibility",
+      "persistence": "implemented",
+      "recommended_action": "When a change alters build output, commit the regenerated docs in the same PR instead of restoring them."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Surface enriched topics and license tags in the public GitHub Trending cards, and add a curated first-party X handle ingestion path (the remaining #3 item).",
+      "owner": "project"
+    }
+  ],
+  "slug": "github-trending-api-enrichment"
+}

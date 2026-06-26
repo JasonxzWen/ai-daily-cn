@@ -15,6 +15,7 @@ import {
   DEFAULT_GITHUB_TRENDING_SOURCES,
   DEFAULT_HUGGINGFACE_TRENDING_SOURCE,
   collectGitHubTrending,
+  enrichGithubTrendingApiFields,
   collectHuggingFaceTrending,
   collectStatuspageIncidents,
   parseGitHubTrendingHtml,
@@ -21165,3 +21166,50 @@ function jsonResponse(value, status = 200) {
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+test("github trending API enrichment attaches topics, license, stars, pushed_at", async () => {
+  const candidate = { repo: "owner/repo", name: "owner/repo", url: "https://github.com/owner/repo" };
+  const fetchImpl = async (url) => {
+    if (url === "https://api.github.com/repos/owner/repo") {
+      return {
+        ok: true,
+        status: 200,
+        async json() {
+          return {
+            topics: ["agent", "llm", "harness"],
+            license: { spdx_id: "MIT", key: "mit" },
+            stargazers_count: 12345,
+            pushed_at: "2026-06-25T10:00:00Z",
+            default_branch: "main"
+          };
+        }
+      };
+    }
+    throw new Error("unexpected url " + url);
+  };
+  const [enriched] = await enrichGithubTrendingApiFields([candidate], { fetchImpl, enabled: true, token: "x" });
+  assert.deepEqual(enriched.topics, ["agent", "llm", "harness"]);
+  assert.equal(enriched.license, "MIT");
+  assert.equal(enriched.stargazers_total, 12345);
+  assert.equal(enriched.pushed_at, "2026-06-25T10:00:00Z");
+  assert.equal(enriched.api_fetch_status, "ok");
+});
+
+test("github trending API enrichment is opt-in and resilient", async () => {
+  const candidate = { repo: "owner/repo" };
+  // Off by default (no enabled flag / no token) -> candidate untouched.
+  const [asis] = await enrichGithubTrendingApiFields([candidate], {
+    fetchImpl: async () => ({ ok: true, async json() { return {}; } })
+  });
+  assert.equal(asis.api_fetch_status, undefined);
+  assert.equal(asis.topics, undefined);
+  // Enabled but the API call fails -> candidate preserved, status failed.
+  const [failed] = await enrichGithubTrendingApiFields([candidate], {
+    enabled: true,
+    fetchImpl: async () => {
+      throw new Error("network down");
+    }
+  });
+  assert.equal(failed.api_fetch_status, "failed");
+  assert.equal(failed.repo, "owner/repo");
+});

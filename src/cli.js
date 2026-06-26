@@ -359,7 +359,8 @@ try {
       historyRoot: args["history-root"],
       historyLookbackDays: Number.parseInt(args["history-lookback-days"] || "7", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
-      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10),
+      env: process.env
     });
     printJson({
       ok: true,
