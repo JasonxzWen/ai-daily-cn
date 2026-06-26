@@ -42,7 +42,7 @@ import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draf
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite } from "../src/site.js";
-import { validateFeed, validateReport } from "../src/schema.js";
+import { validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
@@ -111,6 +111,49 @@ test("schema allows OpenRouter snapshot on a source audit source", async () => {
   const source = validation.value.source_audit.content_sources.sources.find((item) => item.name === "OpenRouter Rankings");
   assert.equal(source.snapshot.snapshot_status, "complete");
   assert.equal(source.snapshot.top_entries.length, 10);
+});
+
+test("candidate pool schema accepts curated first-party builder candidates", () => {
+  const candidatePool = {
+    schema_version: 1,
+    report_date: "2026-06-26",
+    generated_at: "2026-06-26T08:00:00.000Z",
+    sources: [
+      {
+        id: "follow-builders-x",
+        name: "Follow Builders X",
+        url: "https://example.com/follow-builders-x",
+        category: "builder",
+        status: "checked"
+      }
+    ],
+    candidates: [
+      {
+        id: "follow-builders-x-swyx-1",
+        source_id: "follow-builders-x",
+        category: "builder_observation",
+        title: "Swyx shares a builder note",
+        url: "https://x.com/swyx/status/1800000000000000000",
+        source: "Follow Builders X",
+        event_date: "2026-06-26",
+        status: "excluded",
+        author: "Swyx",
+        handle: "swyx",
+        original_text: "A builder observation from a curated first-party handle.",
+        original_url: "https://x.com/swyx/status/1800000000000000000",
+        verification_status: "original_social_only",
+        verification_sources: ["https://x.com/swyx/status/1800000000000000000"],
+        source_level: "original_social",
+        editorial_category: "ai_industry",
+        curated_first_party: true,
+        main_reject_reason: "builder_low_signal"
+      }
+    ]
+  };
+
+  const validation = validateCandidatePool(candidatePool);
+
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 });
 
 function mainMarkdownSections(input) {
