@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.strict-readme-security-guidance",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "English README and repository metadata correction",
+  "status": "completed",
+  "summary": "Rewrote the repository README in English, removed mistakenly generated public About and Tags pages, and prepared paste-ready GitHub repository metadata without changing remote settings.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node -e \"const fs=require('fs'); const readme=fs.readFileSync('README.md','utf8'); const bad=/[\\\\u4e00-\\\\u9fff]|AGENTS|harness|ledger|SDD|current-task|Regression|Retrospective|Red Test/.test(readme); const hasAbout=fs.existsSync('docs/about.html') || fs.existsSync('docs/tags.html'); if (bad || hasAbout) process.exit(1);\"",
+      "node --test --test-name-pattern \"buildSite 写入 docs/reports、docs/data、index 和 feed\" tests/unit.test.js",
+      "npm run build",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A repository README for this project must serve readers and ordinary contributors first; internal operating contracts belong in dedicated maintainer documents.",
+      "evidence": "The first README draft overfit to internal agent and maintainer workflow details, and was corrected to focus on project purpose, public site usage, local build, data layout, contribution, and security reporting.",
+      "scope": "repository_onboarding",
+      "persistence": "implemented",
+      "recommended_action": "Keep the README focused on public project usage; link or leave internal workflow details to maintainer-only documents."
+    },
+    {
+      "lesson": "GitHub repository About and Topics are repository metadata, not static site pages.",
+      "evidence": "The user clarified that About and Tags referred to the GitHub sidebar controls. The generated `docs/about.html` and `docs/tags.html` pages and their build hooks were removed.",
+      "scope": "repository_metadata",
+      "persistence": "session_note",
+      "recommended_action": "When the user references repository sidebar fields, provide paste-ready metadata text unless they explicitly ask for site pages."
+    },
+    {
+      "lesson": "Security-setting recommendations should not silently mutate remote repository configuration.",
+      "evidence": "The user asked which Advanced Security settings to enable; the delivery keeps this as guidance and does not change GitHub remote settings.",
+      "scope": "repository_security",
+      "persistence": "session_note",
+      "recommended_action": "If the owner wants durable enforcement, add the corresponding config files or repository settings in a separately scoped change."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "Dependabot version updates can create noisy PRs if enabled without a scoped update policy.",
+      "evidence": "This repository has a small npm dependency surface but a large validation gate, so unbounded version-update PRs may consume maintenance time.",
+      "module": "repository_security",
+      "suggestion": "Enable version updates only with a weekly `.github/dependabot.yml` that limits open PRs and groups npm updates.",
+      "expected_benefit": "Keeps dependency freshness visible without flooding the worktree with low-priority update branches.",
+      "requires_user_confirmation": true,
+      "promotion_path": "Future scoped change to `.github/dependabot.yml` after repository owner approval.",
+      "ledger_links": [],
+      "validation_evidence": []
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-ledger-validation-binding",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-media-contract",
+    "feedback/p1-official-snapshot-layout-containment"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a scoped `.github/dependabot.yml` if the owner enables Dependabot version updates.",
+      "owner": "repository_owner"
+    },
+    {
+      "status": "recommended",
+      "action": "Add a `SECURITY.md` if private vulnerability reports should include a maintained disclosure policy.",
+      "owner": "repository_owner"
+    }
+  ],
+  "slug": "strict-readme-security-guidance"
+}
