@@ -305,6 +305,7 @@ export function applyQualityRepairContract(report, contract = {}) {
 function collectStoryNarrativeIssues(report, issues, aiReviewTasks) {
   const stories = Array.isArray(report?.stories) ? report.stories : [];
   const whatHappenedSeen = new Map();
+  const titleSeen = new Map();
   stories.forEach((story, index) => {
     const fields = [
       ["what_happened", story?.what_happened],
@@ -319,7 +320,7 @@ function collectStoryNarrativeIssues(report, issues, aiReviewTasks) {
       const path = `stories[${index}].${field}`;
       issues.push({
         code: "story_template_narrative",
-        severity: "warning",
+        severity: "error",
         path,
         message: "Story text is deterministic template prose; it must be authored from the story's own sources.",
         repairable: true
@@ -328,8 +329,29 @@ function collectStoryNarrativeIssues(report, issues, aiReviewTasks) {
         kind: "public_editorial_rewrite",
         path,
         instruction:
-          "Rewrite this story field as concrete, source-grounded text about what actually happened and why it matters. Use only this story's own sources/evidence. Do not change facts, links, dates, or candidate IDs, and never emit scaffolding such as 材料把/材料覆盖/已披露事实集中在/边界落在落地质量取决于/这会影响…团队."
+          "Rewrite this story field as concrete, source-grounded text about what actually happened and why it matters. Use only this story's own sources/evidence. Do not change facts, links, dates, or candidate IDs, and never emit scaffolding such as 材料把/材料覆盖/已披露事实集中在/价值集中在/信号集中在/边界落在落地质量取决于/这会影响…团队."
       });
+    }
+    const title = String(story?.title || "").trim();
+    const titleKey = publicStoryTitleKey(title);
+    if (titleKey) {
+      if (titleSeen.has(titleKey)) {
+        const path = `stories[${index}].title`;
+        issues.push({
+          code: "story_duplicate_generic_title",
+          severity: "error",
+          path,
+          message: "Story title repeats another generic story title; each main story needs a source-specific headline.",
+          repairable: true
+        });
+        aiReviewTasks.push({
+          kind: "public_editorial_rewrite",
+          path,
+          instruction: "Rewrite this story title as a concrete, source-specific headline. Keep the facts and source identity, but remove generic labels such as 更新agent 与开发者工具能力 or 公布模型评估和研究结果."
+        });
+      } else {
+        titleSeen.set(titleKey, index);
+      }
     }
     const whatHappened = String(story?.what_happened || "").trim();
     if (!whatHappened) {
@@ -339,7 +361,7 @@ function collectStoryNarrativeIssues(report, issues, aiReviewTasks) {
       const path = `stories[${index}].what_happened`;
       issues.push({
         code: "story_duplicate_narrative",
-        severity: "warning",
+        severity: "error",
         path,
         message: "Story shares an identical what_happened with another story; each story needs its own narrative.",
         repairable: true
@@ -353,6 +375,18 @@ function collectStoryNarrativeIssues(report, issues, aiReviewTasks) {
       whatHappenedSeen.set(whatHappened, index);
     }
   });
+}
+
+function publicStoryTitleKey(value) {
+  const title = String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/[：:，,。；;、|｜\s]+/g, "")
+    .trim()
+    .toLowerCase();
+  if (!title || !STORY_TEMPLATE_NARRATIVE_RE.test(title)) {
+    return "";
+  }
+  return title;
 }
 
 function collectPublicTextEntries(report) {
