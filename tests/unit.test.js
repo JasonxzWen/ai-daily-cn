@@ -6684,6 +6684,28 @@ test("OpenSpec removed from active package workflow", async () => {
   assert.equal(await exists(path.join(rootDir, "openspec")), false);
 });
 
+test("build clean check reports only files dirtied by the build", async () => {
+  const { findBuildIntroducedDirtyFiles } = await import("../scripts/check-build-clean.mjs");
+  const result = findBuildIntroducedDirtyFiles({
+    before: " M docs/index.html\n?? docs/reports/2026/06/2026-06-26.html\n",
+    after: " M docs/index.html\n M docs/reports/2026/06/2026-06-24.html\n?? docs/reports/2026/06/2026-06-26.html\n?? docs/data/2026/06/2026-06-26.json\n"
+  });
+
+  assert.deepEqual(result, [
+    "docs/data/2026/06/2026-06-26.json",
+    "docs/reports/2026/06/2026-06-24.html"
+  ]);
+});
+
+test("validate uses build clean check wrapper", async () => {
+  const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
+  const scripts = manifest.scripts || {};
+
+  assert.equal(scripts["build:check-clean"], "node scripts/check-build-clean.mjs");
+  assert.match(scripts.validate || "", /npm run build:check-clean/);
+  assert.doesNotMatch(scripts.validate || "", /npm run build &&/);
+});
+
 test("daily runner writes launcher summary and stops before real publish by default", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-launcher-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
