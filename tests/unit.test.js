@@ -38,7 +38,7 @@ import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderIndexHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
-import { generateReportDraft } from "../src/draft.js";
+import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite } from "../src/site.js";
@@ -21195,6 +21195,80 @@ test("markCuratedXHandles is a no-op for an empty curated set", () => {
   const candidates = [{ category: "builder_observation", handle: "karpathy" }];
   const marked = markCuratedXHandles(candidates, new Set());
   assert.equal(marked[0].curated_first_party, undefined);
+});
+
+test("curated first-party builders bypass the low-signal/relevance gate", () => {
+  // Readable Chinese, but no AI-relevance term -> a normal builder is dropped.
+  const base = {
+    category: "builder_observation",
+    url: "https://x.com/karpathy/status/1",
+    original_url: "https://x.com/karpathy/status/1",
+    handle: "karpathy",
+    author: "Andrej Karpathy",
+    original_text: "今天发布了一个小工具，周末愉快，去海边走走。"
+  };
+  assert.equal(canPromoteToBuilderObservation({ ...base }), false, "non-curated, no AI relevance -> dropped");
+  assert.equal(canPromoteToBuilderObservation({ ...base, curated_first_party: true }), true, "curated bypasses the gate");
+  // Curation does not override basic validity (must have an original URL).
+  assert.equal(
+    canPromoteToBuilderObservation({ ...base, curated_first_party: true, url: "", original_url: "" }),
+    false,
+    "curated still requires an original URL"
+  );
+});
+
+test("report:draft ranks curated_first_party builders ahead of stronger non-curated posts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-curated-builder-rank-"));
+  const reportDate = "2026-06-17";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates = discovery.candidates.filter((candidate) => candidate.category !== "builder_observation");
+  discovery.candidates.push({
+    id: "builder-noncurated-strong",
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: "@randomdev on agent evals",
+    url: "https://x.com/randomdev/status/3001",
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    author: "Random Dev",
+    handle: "randomdev",
+    original_text: "我们开源了一个 agent 评测 harness，覆盖工具调用、回放和回归对比，欢迎试用并提交反馈。",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: "https://x.com/randomdev/status/3001"
+  });
+  discovery.candidates.push({
+    id: "builder-curated-karpathy",
+    source_id: "builder-follow-builders-x-feed",
+    category: "builder_observation",
+    title: "@karpathy on training",
+    url: "https://x.com/karpathy/status/3002",
+    source: "follow-builders X feed",
+    event_date: reportDate,
+    author: "Andrej Karpathy",
+    handle: "karpathy",
+    curated_first_party: true,
+    original_text: "记录一个关于模型训练和推理的小观察。",
+    evidence: "Original X status collected by follow-builders.",
+    verification_status: "original_social_only",
+    source_level: "original_social",
+    original_url: "https://x.com/karpathy/status/3002"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const builders = drafted.report.builder_observations;
+  assert(builders.length >= 2, "both builder posts should be selected");
+  assert.equal(builders[0].candidate_id, "builder-curated-karpathy", "curated first-party builder must rank first");
 });
 
 test("github trending API enrichment attaches topics, license, stars, pushed_at", async () => {

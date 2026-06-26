@@ -516,7 +516,11 @@ function selectReportItems(merged, options = {}) {
   const builderSeeds = candidates
     .filter((candidate) => candidate.category === "builder_observation" && !selectedIds.has(candidate.id))
     .filter((candidate) => canPromoteToBuilderObservation(candidate))
-    .sort((left, right) => candidateScore(right) - candidateScore(left))
+    .sort((left, right) => {
+      const curatedDelta = (right.curated_first_party === true ? 1 : 0) - (left.curated_first_party === true ? 1 : 0);
+      if (curatedDelta !== 0) return curatedDelta;
+      return candidateScore(right) - candidateScore(left);
+    })
     .slice(0, BUILDER_OBSERVATION_TARGET);
   const builderObservations = builderSeeds.map((candidate) => {
     const builderCandidate = markIncludedCandidate(candidate, "builder_observation", "builder_observations");
@@ -3012,7 +3016,8 @@ function normalizeCandidate(rawCandidate, context) {
     ...(rawCandidate.disclosure ? { disclosure: trimText(rawCandidate.disclosure, 300) } : {}),
     ...(Array.isArray(rawCandidate.matched_terms) ? { matched_terms: rawCandidate.matched_terms.map((term) => String(term || "").trim()).filter(Boolean).slice(0, 12) } : {}),
     ...(rawCandidate.exemption_policy ? { exemption_policy: rawCandidate.exemption_policy } : {}),
-    ...(rawCandidate.published_by_gate ? { published_by_gate: rawCandidate.published_by_gate } : {})
+    ...(rawCandidate.published_by_gate ? { published_by_gate: rawCandidate.published_by_gate } : {}),
+    ...(rawCandidate.curated_first_party === true ? { curated_first_party: true } : {})
   };
   const editorialCategory = rawCandidate.editorial_category || inferredEditorialCategory(candidate);
   if (editorialCategory) {
@@ -4364,14 +4369,20 @@ function publicImportanceScore(candidate) {
   return score;
 }
 
-function canPromoteToBuilderObservation(candidate) {
+export function canPromoteToBuilderObservation(candidate) {
   const text = candidateText(candidate);
   if (!text || BUILDER_IRRELEVANT_RE.test(text)) return false;
-  if (BUILDER_LOW_SIGNAL_RE.test(text)) return false;
   if (!candidate.url && !candidate.original_url) return false;
-  if (!BUILDER_RELEVANCE_RE.test(text)) return false;
   const originalText = sanitizeBuilderOriginalText(candidate);
-  return hasChineseText(originalText) || Boolean(builderReadableSummary(originalText));
+  const readable = hasChineseText(originalText) || Boolean(builderReadableSummary(originalText));
+  if (!readable) return false;
+  // Curated first-party handles bypass the low-signal and broad-relevance gates
+  // (they are noteworthy by curation); basic validity — not spam, has an
+  // original URL, and readable text — is still required.
+  if (candidate.curated_first_party === true) return true;
+  if (BUILDER_LOW_SIGNAL_RE.test(text)) return false;
+  if (!BUILDER_RELEVANCE_RE.test(text)) return false;
+  return true;
 }
 
 function canPromoteToHotBlog(candidate, reportDate = "") {
