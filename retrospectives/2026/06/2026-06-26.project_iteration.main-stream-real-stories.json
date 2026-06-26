@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.main-stream-real-stories",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Main stream real stories: drop HF registry, force authoring",
+  "status": "completed",
+  "summary": "Grounded in the real scheduled run, which ended blocked/restart and whose main stream was 100% Hugging Face model-registry entries with templated why_it_matters and a duplicated summary, while the final review passed with zero authoring tasks. Three fixes so the main stream becomes real, agent-authored stories: (1) reject huggingface_trending candidates from the main story stream in mainRejectReason so model-registry popularity signals stay only in their own section and stop filling main; (2) broaden the main-refill operational-signal matcher to admit consumer, business and content-AI news (funding, acquisition, revenue, short-form video, image/video generation, creator economy) so real news can fill main instead of registry noise; (3) extend the review template detector to the deterministic reader-impact boilerplate signature (价值集中在 / 信号集中在) so templated story why_it_matters is routed to the editorial loop for the coding agent to rewrite, instead of passing review untouched. On budget exhaustion the existing degrade-with-disclosure path still publishes. IA unchanged this round (reference sources like X/WeChat/Jike/podcasts are not capturable without new ingestion).",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js tests/story-authoring.test.js tests/content-contract.test.js",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Section-lane candidates can double-dip into the main stream if main evaluation does not exclude them by category.",
+      "evidence": "Hugging Face trending model-registry candidates carry category huggingface_trending and are selected into their section, but the main evaluator re-scored all candidates and they filled every main slot; rejecting that category from main fixed it and let real news rise.",
+      "scope": "main_admission",
+      "persistence": "implemented",
+      "recommended_action": "Exclude dedicated-lane categories from main eligibility, and verify the main stream against a real run rather than the self-test."
+    },
+    {
+      "lesson": "The review gate's template detection was a phrase list that missed the dominant boilerplate, so a fully templated report passed with zero authoring tasks.",
+      "evidence": "The scheduled run's stories all shared the reader-impact boilerplate (价值集中在 / 信号集中在), which was not in the detector; review returned ok with no tasks. Binding the detector to that generator signature forces the authoring loop.",
+      "scope": "authoring_gate",
+      "persistence": "implemented",
+      "recommended_action": "Bind template detection to the deterministic generator's output signature, not to ad-hoc phrases, so new template families cannot slip through."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-ai-quality-review-loop"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Fix no_signal source parsers (Anthropic and big-tech org feeds), add missing sources, and self-host an RSSHub instance to ingest Zhihu and WeChat; only then consider aligning the section IA to the reference daily.",
+      "owner": "project"
+    }
+  ],
+  "slug": "main-stream-real-stories"
+}

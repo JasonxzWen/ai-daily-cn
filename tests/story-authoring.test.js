@@ -101,16 +101,19 @@ test("full loop: every templated story is flagged, authored, and cleared", () =>
   );
   assert.equal(storyTasks.length, 3, "all three templated stories must be flagged for authoring");
 
-  // 2) author them (the codex role) and apply through the real applier
-  const authored = [
-    "阿里云升级视频生成模型 HappyHorse 的动作表现力与跨帧一致性。",
-    "OpenAI 介绍 GPT-5 如何协助免疫学家解决一个悬置三年的难题。",
-    "微软提出 agentic observability，把工具调用轨迹、事故时间线与发布健康度串成同一条链路。"
-  ];
-  const edits = storyTasks.map((t, i) => ({ path: t.path, value: authored[i], reason: "author from source" }));
+  // 2) author EVERY flagged story field (what_happened and why_it_matters) and
+  // apply through the real applier
+  const allStoryTasks = review.ai_review_tasks.filter(
+    (t) => /^stories\[\d+\]\.(what_happened|why_it_matters|title)$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
+  );
+  const edits = allStoryTasks.map((t, i) => ({
+    path: t.path,
+    value: `编辑已根据原始来源改写的具体事实与读者影响片段 ${i + 1}。`,
+    reason: "author from source"
+  }));
   const result = applyQualityRepairContract(report, { schema_version: 1, report_date: "2026-06-24", edits });
   assert.deepEqual(result.rejected, []);
-  assert.equal(result.applied.length, 3);
+  assert.equal(result.applied.length, allStoryTasks.length);
 
   // 3) after authoring, no story narrative remains in the loop
   const remaining = reviewReportQuality(result.report).ai_review_tasks.filter((t) => /^stories\[/.test(String(t.path || "")));
@@ -175,4 +178,36 @@ test("review keeps a concrete story title out of the editorial loop", () => {
     (t) => /^stories\[\d+\]\.title$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
   );
   assert.equal(titleTasks.length, 0, "a concrete story title must not be flagged as template prose");
+});
+
+test("review flags deterministic boilerplate why_it_matters (价值/信号集中在)", () => {
+  // The exact reader-impact boilerplate from draft.js that escaped the gate and
+  // shipped as flat facts. It must now route to the editorial loop.
+  const report = {
+    report_date: "2026-06-26",
+    summary: "今日 AI 主线。",
+    stories: [
+      {
+        story_id: "b1",
+        title: "某开源模型登上热门榜",
+        what_happened: "该模型在社区榜单热度靠前，下载量与点赞数较高。",
+        why_it_matters: "工程价值集中在代码、权重、示例和生态复用条件",
+        sources: [{ label: "Source", url: "https://example.com/b1" }]
+      },
+      {
+        story_id: "b2",
+        title: "另一模型进入榜单",
+        what_happened: "另一模型出现在文本生成热门列表。",
+        why_it_matters: "信号集中在 AI 产品、模型或平台策略的实际变化",
+        sources: [{ label: "Source", url: "https://example.com/b2" }]
+      }
+    ],
+    main_items: [],
+    builder_observations: []
+  };
+  const review = reviewReportQuality(report);
+  const tasks = review.ai_review_tasks.filter(
+    (t) => /^stories\[\d+\]\.why_it_matters$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
+  );
+  assert.equal(tasks.length, 2, "both boilerplate why_it_matters must route to authoring, got: " + JSON.stringify(review.ai_review_tasks));
 });
