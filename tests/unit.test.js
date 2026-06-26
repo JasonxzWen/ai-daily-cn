@@ -21351,3 +21351,34 @@ test("github trending API enrichment is opt-in and resilient", async () => {
   assert.equal(failed.api_fetch_status, "failed");
   assert.equal(failed.repo, "owner/repo");
 });
+
+test("report:draft keeps Hugging Face model-registry entries out of the main stream", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hf-main-kick-"));
+  const reportDate = "2026-06-26";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates.push({
+    id: "huggingface-trending-models-openai-gpt-oss-120b",
+    source_id: "huggingface-trending-models",
+    category: "huggingface_trending",
+    title: "openai/gpt-oss-120b",
+    url: "https://huggingface.co/openai/gpt-oss-120b",
+    source: "Hugging Face Trending Models",
+    event_date: reportDate,
+    evidence: "Hugging Face trending models list shows openai/gpt-oss-120b with 4917 likes and 4053657 downloads.",
+    likes: 4917,
+    downloads: 4053657
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const inMain = drafted.report.main_items.some(
+    (m) => /hugging\s*face trending models/i.test(String(m.source || "")) || /gpt-oss-120b/i.test(String(m.url || ""))
+  );
+  assert.equal(inMain, false, "HF model-registry entries must not fill the main stream");
+});

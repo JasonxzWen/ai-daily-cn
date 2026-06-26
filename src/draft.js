@@ -3493,7 +3493,7 @@ function isChineseInterviewMainRefill(candidate) {
 
 function hasMainRefillOperationalSignal(candidate, meta = {}) {
   const text = mainRefillText(candidate, meta);
-  return /\b(agent|agents|workflow|workflows|tool|tools|tooling|developer|developers|engineering|architecture|integration|sdk|api|mcp|hook|hooks|skill|skills|subagent|subagents|eval|evaluation|observability|trace|traces|rollback|release gate|release gates|terminal|guide|practice|practices|example|examples|productivity|deployment|model weights?|usage limits?|enterprise|platform|launch|rollout|availability)\b|智能体|工作流|工具|开发者|工程|架构|集成|评测|观测|链路|回滚|发布门|终端|指南|实践|示例|部署|模型权重|企业|平台|上线|可用/u.test(text);
+  return /\b(agent|agents|workflow|workflows|tool|tools|tooling|developer|developers|engineering|architecture|integration|sdk|api|mcp|hook|hooks|skill|skills|subagent|subagents|eval|evaluation|observability|trace|traces|rollback|release gate|release gates|terminal|guide|practice|practices|example|examples|productivity|deployment|model weights?|usage limits?|enterprise|platform|launch|rollout|availability|funding|raises?|acquisition|acquires?|revenue|valuation|monetization|monetisation|partnership|lawsuit|regulation|video generation|image generation|text[-\s]?to[-\s]?video)\b|智能体|工作流|工具|开发者|工程|架构|集成|评测|观测|链路|回滚|发布门|终端|指南|实践|示例|部署|模型权重|企业|平台|上线|可用|融资|收购|营收|估值|商业化|变现|合作|诉讼|监管|开源|短剧|短视频|视频生成|图像生成|创作者|内容生产/u.test(text);
 }
 
 function hasSubstantialMainRefillEvidence(candidate, meta = {}) {
@@ -3528,6 +3528,10 @@ function mainRejectReason(candidate, options = {}) {
   if (!isFreshForMainItems(candidate, recentMainUrlHistory)) return "recent_duplicate";
   if (isStatuspageCandidate(candidate)) return "statuspage";
   if (isSearchShadowCandidate(candidate)) return "search_shadow";
+  // Hugging Face model-registry trending entries belong only to the
+  // huggingface_trending section; they are repository-popularity signals, not
+  // news, and must never fill the main story stream.
+  if (candidate.category === "huggingface_trending") return "huggingface_trending_lane";
   if (isUnresolvedAggregatorMainCandidate(candidate)) return "unverified_aggregator_lead";
   if (isPrimaryRequiredIntermediaryMainCandidate(candidate) && !canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta)) return "primary_required_intermediary_lead";
   if (isGenericGithubTrendingTextCandidate(candidate, meta)) return "generic_github_trending_text";

@@ -134,7 +134,7 @@ const REPAIRABLE_PUBLIC_TEXT_PATTERNS = [
 // These are the reader-facing "machine tone" the user repeatedly rejects; when a
 // story narrative matches them it has NOT been authored from its source and must
 // be routed to the LLM editorial loop (same path builders already use).
-const STORY_TEMPLATE_NARRATIVE_RE = /材料覆盖|材料把[^。]*落到|边界落在落地质量取决于|已披露事实集中在|已披露细节覆盖|更新agent\s*工作流和开发工具能力|更新agent\s*[与和][^，。]{0,8}(?:工具能力|开发工具|开发者工具|工作流)|(?:公布|披露|更新|新增)模型能力(?:和|与)[^，。]{0,12}(?:变化|更新|入口)|更新AI\s*产品、平台或工程实践|披露模型能力和评估方法更新|这会影响产品团队判断路线优先级|这会影响研发团队安排\s*agent|这会改变模型和平台团队对能力边界/u;
+const STORY_TEMPLATE_NARRATIVE_RE = /材料覆盖|材料把[^。]*落到|边界落在落地质量取决于|已披露事实集中在|已披露细节覆盖|(?:价值|信号)集中在|更新agent\s*工作流和开发工具能力|更新agent\s*[与和][^，。]{0,8}(?:工具能力|开发工具|开发者工具|工作流)|(?:公布|披露|更新|新增)模型能力(?:和|与)[^，。]{0,12}(?:变化|更新|入口)|更新AI\s*产品、平台或工程实践|披露模型能力和评估方法更新|这会影响产品团队判断路线优先级|这会影响研发团队安排\s*agent|这会改变模型和平台团队对能力边界/u;
 
 export function reviewReportQuality(report, options = {}) {
   const limits = { ...DEFAULT_HIGHLIGHT_LIMITS, ...(options.highlightLimits || {}) };
