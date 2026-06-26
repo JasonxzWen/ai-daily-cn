@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.curated-candidate-schema",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Curated candidate schema contract",
+  "status": "completed",
+  "summary": "The latest-main manual publish session 019f0314-d59a-7f31-87fe-f55967f334b0 reached report_write and failed candidate-pool validation after curated builder candidates were tagged with curated_first_party. The marker was already produced and consumed by discovery/draft code, but the candidate pool schema still rejected it as an additional property. This iteration adds a focused regression test and declares curated_first_party as a boolean candidate property while keeping additionalProperties false.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"candidate pool schema accepts curated first-party builder candidates\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "When a durable marker is added to generated candidate data, the persisted candidate-pool schema must be updated in the same slice.",
+      "evidence": "report_write uses validateCandidatePool before writing reports-data; curated_first_party reached candidates 70-72 and was rejected as an undeclared additional property.",
+      "scope": "candidate_pool_schema",
+      "persistence": "implemented",
+      "recommended_action": "Keep generated candidate fields schema-bound and add focused candidate-pool validation tests for every new persisted marker."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ledger-validation-binding"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After this branch is merged, rerun the manual daily task and verify it advances past report_write into build, page-check, validation, and publish/dry-run stages.",
+      "owner": "project"
+    }
+  ],
+  "slug": "curated-candidate-schema"
+}
