@@ -665,7 +665,13 @@ export async function collectGitHubTrending(options = {}) {
     disabled: options.readmeEnrichment === false,
     maxCandidates: options.readmeLimit
   });
-  const candidates = annotateGitHubTrendingCandidates(enrichedCandidates, history);
+  const apiEnrichedCandidates = await enrichGithubTrendingApiFields(enrichedCandidates, {
+    fetchImpl,
+    enabled: options.apiEnrichment === true || Boolean(githubTrendingApiToken(options)),
+    token: githubTrendingApiToken(options),
+    maxCandidates: options.apiEnrichmentLimit
+  });
+  const candidates = annotateGitHubTrendingCandidates(apiEnrichedCandidates, history);
   return {
     source_audit: {
       github_trending: {
@@ -763,6 +769,74 @@ function markGithubReadmeFetchFailed(candidate, error) {
     readme_fetch_status: "failed",
     readme_error: String(error || "readme_unavailable")
   };
+}
+
+// Opt-in GitHub REST enrichment: topics, license, total stargazers and last
+// push timestamp. Off unless a token/flag is supplied (so offline tests and the
+// HTML-only path are unaffected), and resilient — a failed call keeps the
+// scraped candidate and only records api_fetch_status. The trending HTML scrape
+// already carries the weekly star velocity; this adds the slower-moving fields.
+export async function enrichGithubTrendingApiFields(candidates, options = {}) {
+  const list = Array.isArray(candidates) ? candidates : [];
+  const fetchImpl = options.fetchImpl;
+  const token = options.token || "";
+  const enabled = options.enabled === true || Boolean(token);
+  if (!enabled || typeof fetchImpl !== "function") {
+    return list;
+  }
+  const maxCandidates = Number.isInteger(options.maxCandidates) && options.maxCandidates > 0
+    ? options.maxCandidates
+    : list.length;
+  const enriched = [];
+  for (const candidate of list) {
+    if (enriched.length >= maxCandidates) {
+      enriched.push(candidate);
+      continue;
+    }
+    enriched.push(await enrichGithubTrendingApiField(candidate, fetchImpl, token));
+  }
+  return enriched;
+}
+
+async function enrichGithubTrendingApiField(candidate, fetchImpl, token) {
+  const repo = normalizeRepo(candidate.repo || candidate.name || candidate.url || "");
+  if (!repo || repo.split("/").length !== 2) {
+    return { ...candidate, api_fetch_status: "failed", api_error: "invalid_repo" };
+  }
+  const headers = {
+    "user-agent": "ai-daily-cn-static-publisher",
+    accept: "application/vnd.github+json",
+    "x-github-api-version": "2022-11-28"
+  };
+  if (token) {
+    headers.authorization = `Bearer ${token}`;
+  }
+  try {
+    const response = await fetchImpl(`https://api.github.com/repos/${repo}`, { headers });
+    if (!response?.ok) {
+      return { ...candidate, api_fetch_status: "failed", api_error: `HTTP ${response?.status || 0}` };
+    }
+    const data = await response.json();
+    const topics = Array.isArray(data?.topics) ? data.topics.filter(Boolean).slice(0, 12) : [];
+    const license = data?.license?.spdx_id || data?.license?.key || candidate.license || null;
+    const stars = Number.isFinite(data?.stargazers_count) ? data.stargazers_count : (candidate.stargazers_total ?? null);
+    return {
+      ...candidate,
+      topics: topics.length > 0 ? topics : (Array.isArray(candidate.topics) ? candidate.topics : []),
+      license: license && license !== "NOASSERTION" ? license : (candidate.license || null),
+      stargazers_total: stars,
+      pushed_at: data?.pushed_at || candidate.pushed_at || null,
+      api_default_branch: data?.default_branch || candidate.default_branch || null,
+      api_fetch_status: "ok"
+    };
+  } catch (error) {
+    return { ...candidate, api_fetch_status: "failed", api_error: formatDiscoveryErrorNote(error) };
+  }
+}
+
+function githubTrendingApiToken(options = {}) {
+  const env = options.env || {};
+  return options.githubToken || env.GH_TOKEN || env.GITHUB_TOKEN || "";
 }
 
 function unique(values) {
