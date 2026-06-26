@@ -21,6 +21,7 @@
     "fake_tracking_component",
     "high_risk_unverified_fact",
     "publish_plan_violation",
+    "remote_ahead",
     "infrastructure_exhausted"
   ],
   "required_workflow_gates": [
@@ -257,19 +258,19 @@
       "id": "publish_dry_run_daily",
       "description": "Run the scheduled daily dry-run publish gate before real publish.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
-      "fallback": { "kind": "none", "action": "block_on_publish_plan_failure" },
+      "fallback": { "kind": "restart_latest_main", "action": "rerun_daily_workflow_from_current_origin_main" },
       "degrade": { "allowed": false, "action": "none" },
-      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
-      "summary_fields": ["stage_id", "status", "attempts", "dry_run_plan", "will_stage_files", "error_code"],
-      "replay_fixtures": ["publish-dry-run-plan-failure"]
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "remote_ahead", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "dry_run_plan", "will_stage_files", "remote_ahead", "restart_command", "error_code"],
+      "replay_fixtures": ["publish-dry-run-plan-failure", "publish-dry-run-remote-ahead-restart"]
     },
     {
       "id": "publish_real",
       "description": "Publish through the git-based publish path when publish mode is allowed.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["git_push_timeout", "network_error"] },
-      "fallback": { "kind": "github_api_publish", "action": "try_publish_github_api_fallback" },
+      "fallback": { "kind": "github_api_publish", "action": "try_publish_github_api_fallback_for_transport_errors_only" },
       "degrade": { "allowed": false, "action": "none" },
-      "block": { "allowed": true, "reasons": ["publish_plan_violation", "infrastructure_exhausted"] },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "remote_ahead", "infrastructure_exhausted"] },
       "summary_fields": ["stage_id", "status", "attempts", "publish_plan", "stdout", "stderr", "error_code"],
       "replay_fixtures": ["publish-real-timeout"]
     },

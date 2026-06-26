@@ -80,6 +80,13 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 
 - `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
 - For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, report generation commit not proving latest `origin/main` through `origin_main_sha`, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or pre-publish public page quality failures. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but the JSON and public HTML must disclose them in `quality_status`. If repository publish succeeds but GitHub Pages has not refreshed after retries, report `published_pending_pages_verification` and verify the URL later instead of repeating publish.
+- If `daily:run` ends with `next_action.kind:"restart_latest_main"` after `publish_dry_run_daily` or `publish_real`, do not reuse the stale generated artifacts. Re-run from the launcher worktree so `publish:prepare-clean-worktree` fetches the current `origin/main` and the report is regenerated against that baseline:
+
+```powershell
+npm run daily:run -- --date YYYY-MM-DD --restart
+```
+
+  Add `--publish` only when the original run was an explicitly approved real publish run.
 - Also for reports dated `2026-06-02` or later, enforce the long-form engineer daily gate: public `summary` must be an editorial lead, not a generation log; every `main_items` entry must include `why_it_matters` or `reader_relevance`; `main_items` must use primary, official, paper, GitHub, or multi-source confirmed evidence; non-primary leads may only appear in viewpoint/product/Builder/community sections with `source_level`, `verification_status`, and `verification_note` or `risk_note`; keep `model_releases` empty for new drafts unless preserving legacy data.
 - A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
 - If multiple fixed source groups are mostly `blocked` with `fetch failed`, treat it as a likely scheduled-task network outage. The public `quality_status.degraded_sections` must include `source_discovery_network_unavailable`, and the final response must tell the user to check `config.toml` or Codex settings and enable network access for workspace-write sandbox mode: `[sandbox_workspace_write] network_access = true`, also shown in the UI as `当沙盒设置为工作区写入时允许网络访问`.
@@ -199,7 +206,7 @@ npm run publish -- confirm-push YYYY-MM-DD
 
 ## GitHub API Fallback
 
-- Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`:
+- Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`; the runner reports `next_action.kind:"restart_latest_main"` for that case and the correct recovery is to regenerate from current `origin/main`:
 
 ```powershell
 npm run publish:github-api -- confirm-push YYYY-MM-DD

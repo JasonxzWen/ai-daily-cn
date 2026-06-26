@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.remote-ahead-restart-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Remote-ahead restart contract",
+  "status": "completed",
+  "summary": "Implemented a runner recovery contract for `remote_ahead`: daily runs remain blocked when the remote main baseline advances, but the run summary now returns `next_action.kind:\"restart_latest_main\"` with an explicit `npm run daily:run -- --date YYYY-MM-DD --restart` command instead of a generic stage-inspection action.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"daily runner turns remote ahead publish dry-run into restart latest main action\" tests/unit.test.js",
+      "node --test --test-name-pattern \"daily resilience policy validates current runner stages and workflow gates|daily runner writes launcher summary and stops before real publish by default|daily runner turns remote ahead publish dry-run into restart latest main action\" tests/unit.test.js",
+      "npm run resilience:validate",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A `remote_ahead` block is a stale-baseline recovery problem, not a content degradation or GitHub API fallback problem.",
+      "evidence": "The focused red test initially returned `inspect_stage_failure`; after the fix, `publish_dry_run_daily` produces `restart_latest_main` while keeping `final_status:\"blocked\"`.",
+      "scope": "daily_runner_recovery",
+      "persistence": "implemented",
+      "recommended_action": "Keep `remote_ahead` recovery tied to regenerating from current `origin/main` rather than reusing stale artifacts."
+    },
+    {
+      "lesson": "Parallel agent work makes stale-baseline blocks more likely even when every earlier generation and validation stage passes.",
+      "evidence": "The traced 2026-06-26 run completed quality repair, build, page check, validation, and source audit, then stopped only because `origin/main` advanced before publish dry-run.",
+      "scope": "cross_agent_coordination",
+      "persistence": "session_note",
+      "recommended_action": "After this slice, prioritize a clean-build reproducibility gate and keep Claude-owned quality-loop/trends work out of this branch."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Daily runs that hit `remote_ahead` ended with a generic action, forcing the operator to infer that the correct recovery was a fresh latest-main run.",
+      "evidence": "The new runner test asserts `next_action.kind:\"restart_latest_main\"`, `remote.remoteAhead`, the clean repo root, and the restart command.",
+      "module": "daily_runner_recovery",
+      "suggestion": "Classify `remote_ahead` as an explicit restart-from-latest-main action in the runner summary and resilience policy.",
+      "expected_benefit": "Manual and scheduled operators get a deterministic next step, reducing wasted reruns and avoiding unsafe fallback publish attempts.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in `src/daily-runner.js`, `config/daily-resilience-policy.json`, `tasks/daily-publish-runbook.md`, and unit tests.",
+      "ledger_links": [
+        "feedback/p1-origin-main-baseline",
+        "feedback/p1-clean-publish-checkout",
+        "feedback/p1-daily-resilience-contract"
+      ],
+      "validation_evidence": [
+        "node --test --test-name-pattern \"daily runner turns remote ahead publish dry-run into restart latest main action\" tests/unit.test.js",
+        "npm run resilience:validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-clean-publish-checkout",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a clean-build reproducibility gate so `npm run build` cannot rewrite historical `docs/reports` artifacts without an explicit fixture/update path.",
+      "owner": "codex"
+    },
+    {
+      "status": "recommended",
+      "action": "Diagnose Hugging Face, WeChat, and Zhihu source-lane health with live/source-specific checks after runner recovery is merged.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Wait for Claude Code's trends and generation-first authoring branch before implementing GitHub Trending API enrichment or curated X handles.",
+      "owner": "project"
+    }
+  ],
+  "slug": "remote-ahead-restart-contract"
+}

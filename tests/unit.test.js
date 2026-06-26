@@ -5729,6 +5729,9 @@ test("daily resilience policy validates current runner stages and workflow gates
   const reportWrite = result.policy.stages.find((stage) => stage.id === "report_write");
   assert.equal(reportWrite.fallback.kind, "schema_aware_normalizer");
   assert.equal(reportWrite.degrade.action, "normalize_public_degraded_fields");
+  const publishDryRun = result.policy.stages.find((stage) => stage.id === "publish_dry_run_daily");
+  assert.equal(publishDryRun.fallback.kind, "restart_latest_main");
+  assert(publishDryRun.block.reasons.includes("remote_ahead"));
 });
 
 test("daily resilience policy rejects missing required stages", async () => {
@@ -6717,6 +6720,52 @@ test("daily runner writes launcher summary and stops before real publish by defa
 
   const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
   assert.equal(saved.final_status, "generated_only");
+});
+
+test("daily runner turns remote ahead publish dry-run into restart latest main action", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-remote-ahead-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-06-26";
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "publish_dry_run_daily") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            error_code: "remote_ahead",
+            error: "remote origin/main is ahead of the generated baseline",
+            details: {
+              upstream: "origin/main",
+              remoteAhead: 2
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.next_action.kind, "restart_latest_main");
+  assert.equal(result.summary.next_action.stage_id, "publish_dry_run_daily");
+  assert.equal(result.summary.next_action.report_date, reportDate);
+  assert.equal(result.summary.next_action.mode, "dry-run");
+  assert.equal(result.summary.next_action.clean_repo_root, cleanRoot);
+  assert.equal(result.summary.next_action.summary_path, result.summaryPath);
+  assert.equal(result.summary.next_action.remote.upstream, "origin/main");
+  assert.equal(result.summary.next_action.remote.remoteAhead, 2);
+  assert.match(result.summary.next_action.command, /npm run daily:run -- --date 2026-06-26 --restart/);
+  assert.match(result.summary.next_action.message, /latest origin\/main/i);
 });
 
 test("daily runner retries clean worktree preparation according to resilience policy", async () => {
