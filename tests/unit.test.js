@@ -6830,6 +6830,40 @@ test("daily runner turns remote ahead publish dry-run into restart latest main a
   assert.match(result.summary.next_action.message, /latest origin\/main/i);
 });
 
+test("daily runner ignores incidental remote ahead text from successful stages", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-remote-ahead-text-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-06-26",
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "validate") {
+        return {
+          ok: true,
+          output: {
+            ok: true,
+            stage: stage.id,
+            stdout: 'daily resilience policy includes "remote_ahead" in the blocking whitelist'
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_only");
+  assert.equal(result.summary.next_action.kind, "none");
+  const validateStage = result.summary.stages.find((stage) => stage.id === "validate");
+  assert.equal(validateStage.status, "passed");
+});
+
 test("daily runner retries clean worktree preparation according to resilience policy", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-prepare-retry-policy-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
