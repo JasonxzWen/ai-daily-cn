@@ -116,3 +116,63 @@ test("full loop: every templated story is flagged, authored, and cleared", () =>
   const remaining = reviewReportQuality(result.report).ai_review_tasks.filter((t) => /^stories\[/.test(String(t.path || "")));
   assert.equal(remaining.length, 0, "no story tasks should remain after authoring");
 });
+
+test("review routes deterministic templated story TITLE to the editorial loop", () => {
+  const report = {
+    report_date: "2026-06-26",
+    summary: "今日 AI 主线。",
+    stories: [
+      {
+        story_id: "t1",
+        // Generic, deterministic-template title that escaped the prior phrase list.
+        title: "Alibaba Cloud更新agent 与开发者工具能力",
+        // Concrete narrative so the test isolates TITLE routing.
+        what_happened: "阿里云为视频生成模型 HappyHorse 升级动作表现力与跨帧一致性。",
+        why_it_matters: "为 AIGC 创作工作流提供更稳定的画面输出，降低重渲染成本。",
+        sources: [{ label: "Alibaba Cloud Blog", url: "https://www.alibabacloud.com/blog/happyhorse" }]
+      },
+      {
+        story_id: "t2",
+        title: "OpenAI公布模型能力和推理入口变化",
+        what_happened: "OpenAI 宣布企业 API 增加新的推理控制开关并调整可用区域。",
+        why_it_matters: "影响企业团队的接入方式与迁移节奏。",
+        sources: [{ label: "OpenAI News", url: "https://openai.com/index/inference" }]
+      }
+    ],
+    main_items: [],
+    builder_observations: []
+  };
+  const review = reviewReportQuality(report);
+  const titleTasks = review.ai_review_tasks.filter(
+    (t) => /^stories\[\d+\]\.title$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
+  );
+  assert.equal(
+    titleTasks.length,
+    2,
+    "both deterministic templated story titles must be routed to authoring, got: " +
+      JSON.stringify(review.ai_review_tasks)
+  );
+});
+
+test("review keeps a concrete story title out of the editorial loop", () => {
+  const report = {
+    report_date: "2026-06-26",
+    summary: "今日 AI 主线。",
+    stories: [
+      {
+        story_id: "c1",
+        title: "Google 为 Gemini 3.5 Flash 新增电脑操作能力",
+        what_happened: "Google 让 Gemini 3.5 Flash 可以直接操作浏览器与桌面完成任务。",
+        why_it_matters: "把 computer-use 能力下放到更轻量的模型，降低自动化门槛。",
+        sources: [{ label: "Google Blog", url: "https://blog.google/technology/ai/gemini-computer-use" }]
+      }
+    ],
+    main_items: [],
+    builder_observations: []
+  };
+  const review = reviewReportQuality(report);
+  const titleTasks = review.ai_review_tasks.filter(
+    (t) => /^stories\[\d+\]\.title$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
+  );
+  assert.equal(titleTasks.length, 0, "a concrete story title must not be flagged as template prose");
+});

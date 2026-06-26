@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.generation-first-title-and-trends-vocab",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Generation-first story-title authoring and trends vocabulary",
+  "status": "completed",
+  "summary": "Two content-quality increments that the cron coding agent (Codex/Claude Code) relies on, since the environment has no usable LLM API and authoring happens through the report:draft to quality:review to repair-contract loop. First, after Stage D moved the public unit to per-story collapsibles, deterministic templated story-title variants such as the entity-plus-generic-verb-plus-generic-noun shape were escaping both the selection-time templated-title predicate and the review phrase list, so they shipped as boilerplate. The review template-narrative detector now covers those title families and routes them to public_editorial_rewrite so the agent authors them from each story's own sources; facts, links, and dates stay protected. Second, the trend engine already counts controlled-vocabulary occurrences across sections, so emerging engineering concepts produced no trend pressure purely from a vocabulary gap; a harness-engineering controlled topic was added so harness/context-engineering/long-running-agent terms register across sections without any engine or threshold change. The single authoritative editorial asset records the generation-first authoring directive as a Bad Case and history entry.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/trends.test.js tests/story-authoring.test.js",
+      "node --test tests/unit.test.js tests/story-authoring.test.js tests/content-contract.test.js tests/page-check-tiering.test.js tests/source-coverage.test.js tests/trends.test.js",
+      "node scripts/harness-validate.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Story authoring coverage was a brittle phrase list; deterministic templated titles escaped it after the Stage D layout change.",
+      "evidence": "A story titled with the generic update-agent-and-developer-tools template produced no public_editorial_rewrite task before the change; after extending the review template-narrative detector to those title families, both observed variants route to authoring while a concrete title stays out.",
+      "scope": "daily_story_authoring",
+      "persistence": "implemented",
+      "recommended_action": "When the public rendering unit changes, re-check that the deterministic generator's prose families are still routed to the agent authoring loop, not just a fixed phrase list."
+    },
+    {
+      "lesson": "Emerging trend topics failed to surface because of a vocabulary gap, not an engine limit.",
+      "evidence": "The trend engine already counts occurrences across main_items, hot_blogs, builder_observations, and github_trending; adding a harness-engineering controlled topic made the concept register across sources with no threshold change.",
+      "scope": "trend_vocabulary",
+      "persistence": "implemented",
+      "recommended_action": "Treat missing trend pressure on a known-hot concept as a controlled-vocabulary gap first; extend config/trends.json before touching the scoring engine."
+    },
+    {
+      "lesson": "The harness task-file validator strips inline code before checking required sections.",
+      "evidence": "Feedback Ledger Review and Retrospective Plan failed validation because their trigger tokens were inside backticks; moving the keywords into plain prose passed the gate.",
+      "scope": "harness_task_contract",
+      "persistence": "session_note",
+      "recommended_action": "Put required section trigger words (feedback-ledger, project_iteration, retrospectives index) in plain text, not inline code, in tasks/current-task.md."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Have the daily runner repair-contract step actually backfill authored story narrative on every run, so generation-first prose ships without manual agent intervention.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Deferred this round: cross-source co-occurrence scoring, GitHub Trending API field enrichment, and a curated first-party X handle list.",
+      "owner": "project"
+    }
+  ],
+  "slug": "generation-first-title-and-trends-vocab"
+}
