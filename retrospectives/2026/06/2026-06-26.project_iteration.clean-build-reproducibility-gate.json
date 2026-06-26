@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-26.project_iteration.clean-build-reproducibility-gate",
+  "run_type": "project_iteration",
+  "date": "2026-06-26",
+  "title": "Clean build reproducibility gate",
+  "status": "completed",
+  "summary": "Added a validation wrapper that runs the existing site build and fails when the build introduces new dirty files that were not already dirty before validation. This keeps clean repository validation reproducible without blocking daily publish flows that intentionally enter validation with pre-existing publisher-managed artifacts.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"build clean check reports only files dirtied by the build|validate uses build clean check wrapper\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run build:check-clean",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Clean-build drift should be caught by comparing dirty files before and after the build, not by forbidding all dirty files after validation.",
+      "evidence": "Daily publish validation may already have intended publisher-managed artifacts dirty before full validation; the new classifier only reports files introduced by the build step.",
+      "scope": "build_validation",
+      "persistence": "implemented",
+      "recommended_action": "Keep `npm run validate` on the wrapper so future renderer or artifact drift fails in clean repo validation."
+    },
+    {
+      "lesson": "After the Stage D republish, the latest main branch can run build with no generated report diffs.",
+      "evidence": "`npm run validate` on the rebased branch reported build `written_files: []` before this clean-build gate slice started.",
+      "scope": "artifact_reproducibility",
+      "persistence": "session_note",
+      "recommended_action": "If future branches reintroduce historical `docs/reports` diffs, update fixtures or report artifacts deliberately instead of letting validation pass silently."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "`npm run validate` could pass even if `npm run build` rewrote tracked public artifacts, because the final `git diff --check` only detects whitespace errors.",
+      "evidence": "The new focused tests cover the dirty-file classifier and package validate wiring.",
+      "module": "build_validation",
+      "suggestion": "Route validation through a build clean-check wrapper that fails on newly introduced dirty files.",
+      "expected_benefit": "Unexpected static artifact drift becomes a hard validation failure while daily publish reruns with pre-existing dirty artifacts remain possible.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented in `scripts/check-build-clean.mjs`, `package.json`, unit tests, and this retrospective record.",
+      "ledger_links": [
+        "feedback/p1-public-daily-ia-source-effectiveness-reset",
+        "feedback/p1-daily-resilience-contract",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "node --test --test-name-pattern \"build clean check reports only files dirtied by the build|validate uses build clean check wrapper\" tests/unit.test.js"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Run source-lane health diagnosis for Hugging Face, WeChat, and Zhihu now that build drift is gated.",
+      "owner": "codex"
+    },
+    {
+      "status": "recommended",
+      "action": "Keep GitHub Trending API enrichment and curated X handles behind a fresh coordination check with Claude Code's merged trends work.",
+      "owner": "project"
+    }
+  ],
+  "slug": "clean-build-reproducibility-gate"
+}
