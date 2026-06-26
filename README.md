@@ -51,7 +51,9 @@ You can also open `docs/index.html` directly in a browser.
 
 | Command | Purpose |
 | --- | --- |
+| `npm run preflight:worktree` | Check branch, dirty state, `origin/main` freshness, sibling worktrees, and GitHub CLI auth before PR work. |
 | `npm run build` | Build the static site from `reports-data/` and `reports-source/`. |
+| `npm run validate:docs` | Run the faster documentation and process checks for docs-only changes. |
 | `npm run validate` | Run the full validation suite before shipping changes. |
 | `npm test` | Run the Node.js test suite. |
 | `npm run test:e2e` | Run browser-level checks. |

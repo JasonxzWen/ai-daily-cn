@@ -33,6 +33,7 @@ import { generateReportDraft } from "./draft.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
+import { checkWorktreePreflight } from "./worktree-preflight.js";
 import {
   applyQualityRepairContract,
   repairReportQuality,
@@ -152,6 +153,19 @@ try {
     });
     printJson(result);
     if (result.status === "blocked") {
+      process.exitCode = 1;
+    }
+  } else if (command === "preflight:worktree") {
+    const args = parseArgs(argv);
+    const result = await checkWorktreePreflight({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      remote: args.remote || "origin",
+      baseBranch: args["base-branch"] || "main",
+      allowDirty: Boolean(args["allow-dirty"]),
+      fetchRemote: !args["no-fetch"]
+    });
+    printJson(result);
+    if (!result.ok) {
       process.exitCode = 1;
     }
   } else if (command === "publish:preflight") {
