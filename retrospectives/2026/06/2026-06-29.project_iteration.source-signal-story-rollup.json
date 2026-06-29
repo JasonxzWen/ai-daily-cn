@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-signal-story-rollup",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source signal story rollup",
+  "status": "completed",
+  "summary": "This iteration adds a deterministic reader-facing source signal story before the source metrics dashboard. The rollup turns public source_effectiveness rows, visible story topics, included source names, updated-but-not-selected sources, and explicit source gaps into one concise section while preserving the fixed-order full source inventory and avoiding internal audit data exposure.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source signal story rollup\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source-first IA dashboard|source-first IA status focus|source inventory|source signal story rollup\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Playwright visual check: desktop 1280x900 and mobile 390x844 on docs/reports/2026/06/2026-06-29.html; screenshots .tmp/phase12-source-signal-story-desktop.png and .tmp/phase12-source-signal-story-mobile.png",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A source-first daily page needs a reader-facing source narrative before operational metrics so source coverage is perceived as the main content rather than a backstage audit.",
+      "evidence": "`reportToInteractionInput()` now emits `source-signal-story` before `source-first-dashboard`, and unit/E2E checks assert that ordering and content.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep future first-screen source summaries deterministic and derived from public `source_effectiveness`, `stories`, and `main_items` fields unless a separate public editorial generation contract is added."
+    },
+    {
+      "lesson": "Public source summaries must name both productive sources and gaps without reintroducing private collection internals.",
+      "evidence": "The new rollup lists included, updated-not-selected, blocked, and not-configured/skipped source names, while tests reject `source_audit`, candidate, snapshot, env var, debug, and private-note leakage.",
+      "scope": "privacy_and_source_visibility",
+      "persistence": "implemented",
+      "recommended_action": "For every future source summary field, add one positive assertion for reader-visible value and one negative assertion for internal field leakage."
+    },
+    {
+      "lesson": "The source story should complement, not replace, fixed-order source proof surfaces.",
+      "evidence": "Generated HTML keeps `source-first-dashboard`, `source-status-focus`, `source-inventory`, inventory finder behavior, and all 154 source rows after adding the story rollup.",
+      "scope": "source_inventory_contract",
+      "persistence": "implemented",
+      "recommended_action": "Treat the story rollup as the short lead-in; keep detailed status, map, and inventory sections as the audit trail for source availability."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Refine first-viewport hierarchy after user review by deciding how much of the story rollup should appear above the fold versus behind source navigation anchors.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-signal-story-rollup"
+}

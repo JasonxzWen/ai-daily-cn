@@ -172,6 +172,10 @@ export function reportToInteractionInput(report, options = {}) {
     })
   ];
   const sections = [];
+  const sourceSignalStory = formatSourceSignalStorySection(sourceEffectivenessRows, { stories, mainItems });
+  if (sourceSignalStory) {
+    sections.push(sourceSignalStory);
+  }
   const sourceDashboard = formatSourceFirstDashboardSection(sourceEffectivenessRows);
   if (sourceDashboard) {
     sections.push(sourceDashboard);
@@ -3067,6 +3071,88 @@ function formatSourceAudit(audit) {
     audit.zhihu_sources ? formatAuditGroup(platformItemLabel("zhihu"), audit.zhihu_sources) : "",
     audit.reddit_sources ? formatAuditGroup(platformItemLabel("reddit"), audit.reddit_sources) : ""
   ].filter(Boolean).join("\n\n");
+}
+
+function formatSourceSignalStorySection(rows = [], options = {}) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+  const metrics = sourceFirstMetrics(rows);
+  const validSignals = metrics.included + metrics.updatedNotSelected;
+  const storyTitles = sourceSignalStoryTitles(options.stories, options.mainItems);
+  const includedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "included", 4);
+  const updatedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "updated_not_selected", 3);
+  const blockedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "blocked", 3);
+  const skippedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "not_configured_or_skipped", 3);
+  const noSignalCount = metrics.noRecentUpdate + metrics.parsedNotCandidate;
+  const lines = [
+    "### 今日信源故事",
+    "",
+    `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}，低信号 ${noSignalCount}，阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+    storyTitles.length > 0
+      ? `今日主线来自这些可见 story：${storyTitles.map(escapeMarkdownText).join("；")}。`
+      : "今日没有足够清晰的公开 story，本页保留信源运行状态，不强行扩写。",
+    includedNames.length > 0
+      ? `有效信源：${includedNames.map(escapeMarkdownText).join("、")}。`
+      : "有效信源：今天没有信源进入公开页。",
+    updatedNames.length > 0
+      ? `旁路更新：${updatedNames.map(escapeMarkdownText).join("、")} 有更新但未进入公开页。`
+      : "旁路更新：今天没有额外的有更新未入选信源。",
+    sourceSignalGapSentence(blockedNames, skippedNames, metrics),
+    "",
+    `继续查看：[信源运行概况](#section-source-first-dashboard) · [状态焦点](#section-source-status-focus) · [全量信源清单](#section-source-inventory)`
+  ];
+  return {
+    type: "markdown",
+    title: "今日信源故事",
+    richId: "source-signal-story",
+    group: "main",
+    collapsed: false,
+    summary: `${validSignals}/${metrics.total} 个信源提供有效公开信号；阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+    content: lines.filter(Boolean).join("\n")
+  };
+}
+
+function sourceSignalStoryTitles(stories = [], mainItems = []) {
+  const source = Array.isArray(stories) && stories.length > 0 ? stories : mainItems;
+  return uniqueSourceSignalStrings(
+    (Array.isArray(source) ? source : [])
+      .map((item) => item?.title || item?.object || item?.summary)
+      .map((title) => trimText(title, 42))
+  ).slice(0, 4);
+}
+
+function sourceSignalSourceNames(rows = [], predicate, limit) {
+  return uniqueSourceSignalStrings(rows.filter(predicate).map((row) => row.name || row.id))
+    .slice(0, limit);
+}
+
+function sourceSignalGapSentence(blockedNames = [], skippedNames = [], metrics = {}) {
+  const parts = [];
+  if (blockedNames.length > 0) {
+    parts.push(`阻塞信源：${blockedNames.map(escapeMarkdownText).join("、")}`);
+  }
+  if (skippedNames.length > 0) {
+    parts.push(`未配置或跳过：${skippedNames.map(escapeMarkdownText).join("、")}`);
+  }
+  if (parts.length === 0) {
+    return "覆盖提醒：今天没有阻塞或未配置的信源影响公开判断。";
+  }
+  return `覆盖提醒：${parts.join("；")}；这些缺口已经计入阻塞 ${metrics.blocked || 0}、未配置或跳过 ${metrics.skipped || 0}，不会从固定清单中消失。`;
+}
+
+function uniqueSourceSignalStrings(values = []) {
+  const result = [];
+  const seen = new Set();
+  for (const value of values) {
+    const text = String(value || "").replace(/\s+/g, " ").trim();
+    if (!text || seen.has(text)) {
+      continue;
+    }
+    seen.add(text);
+    result.push(text);
+  }
+  return result;
 }
 
 function formatSourceFirstDashboardSection(rows = []) {

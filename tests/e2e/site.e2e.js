@@ -502,10 +502,19 @@ try {
     ["候选信源", "1"],
     ["阻塞信源", "1"]
   ]);
+  assert.equal(await page.locator("#section-source-signal-story").count(), 1);
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
   assert.equal(await page.locator("#section-source-status-focus").count(), 1);
   assert.equal(await page.locator("#section-source-map").count(), 1);
   assert.equal(await page.locator("#section-source-inventory").count(), 1);
+  const sourceSignalStoryText = await page.locator("#section-source-signal-story").textContent();
+  assert.match(sourceSignalStoryText, /今日信源故事/);
+  assert.match(sourceSignalStoryText, /有效信源|公开入选/);
+  assert.match(sourceSignalStoryText, /Hugging Face Blog/);
+  assert.match(sourceSignalStoryText, /WeChat Platform/);
+  assert.match(sourceSignalStoryText, /信源运行概况/);
+  assert.match(sourceSignalStoryText, /全量信源清单/);
+  assert.doesNotMatch(sourceSignalStoryText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
   assert.match(await page.locator("#section-source-first-dashboard").textContent(), /全部逻辑信源|公开入选|未配置或跳过/);
   const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
   assert.match(sourceFocusText, /需处理/);
@@ -612,7 +621,9 @@ try {
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );
+  assert(publicSectionOrder.indexOf("section-source-signal-story") >= 0, JSON.stringify(publicSectionOrder));
   assert(publicSectionOrder.indexOf("section-source-first-dashboard") >= 0, JSON.stringify(publicSectionOrder));
+  assert(publicSectionOrder.indexOf("section-source-signal-story") < publicSectionOrder.indexOf("section-source-first-dashboard"), JSON.stringify(publicSectionOrder));
   assert(publicSectionOrder.indexOf("section-source-status-focus") > publicSectionOrder.indexOf("section-source-first-dashboard"));
   assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-status-focus"));
   const sourceMapGroupIndexes = publicSectionOrder
