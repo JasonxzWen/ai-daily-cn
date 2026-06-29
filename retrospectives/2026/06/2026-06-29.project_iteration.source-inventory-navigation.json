@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-navigation",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory navigation",
+  "status": "completed",
+  "summary": "This iteration turns the all-source inventory from a single long detail block into a source-first navigation surface. The public page now keeps the `source-inventory` section as a fixed-order scan index, then renders every registered collection entry in separate `source-inventory-group-*` sections that mirror the governed source display order. The detail groups remain expanded by default, preserve the 154-entry inventory, and keep story sections after the complete source area.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory navigation\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory navigation|source inventory panel\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source map scan index|source-first IA dashboard|source-first IA status focus|source inventory panel|source inventory navigation\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Playwright desktop/mobile visual check for docs/reports/2026/06/2026-06-29.html; source-inventory overview and representative detail groups were visible without horizontal overflow",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A complete source list still needs a compact first pass.",
+      "evidence": "The overview now contains zero detail rows and links to fixed `source-inventory-group-*` anchors, while the expanded detail groups still account for all 154 registered collection entries.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep `source-inventory` as a scan index, and add new collection entries only through the governed fixed section order so navigation remains stable."
+    },
+    {
+      "lesson": "Inventory navigation should preserve story precedence rules.",
+      "evidence": "Unit and E2E checks assert the order dashboard, status focus, logical source map, inventory index, inventory detail groups, then story sections.",
+      "scope": "public_daily_layout",
+      "persistence": "implemented",
+      "recommended_action": "When changing public daily layout, test both section order and representative desktop/mobile visibility before publishing."
+    },
+    {
+      "lesson": "Reader-safe source metadata can be made visible without exposing operational configuration.",
+      "evidence": "The overview and detail groups continue to reject secret-looking env names, raw URLs, notes, audit snapshots, candidate pools, scoring fields, and debug fields.",
+      "scope": "public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Map operational source metadata to public-safe tokens before rendering any new inventory fields."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the source display handbook as the insertion manual for future collection entries, then rerun the inventory navigation unit and E2E checks to confirm each entry lands in the intended fixed section.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-navigation"
+}
