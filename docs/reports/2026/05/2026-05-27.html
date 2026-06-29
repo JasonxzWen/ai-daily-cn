@@ -2068,6 +2068,90 @@ body.lightbox-open {
   opacity: 0.42;
 }
 
+.source-inventory-finder {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel-soft));
+}
+
+.source-inventory-finder__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-inventory-finder__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-inventory-finder input[type="search"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.source-inventory-finder input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.source-inventory-finder button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 720;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.source-inventory-finder button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #8a3b1e;
+}
+
+.source-inventory-finder button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.source-inventory-finder__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-match {
+  margin-left: -4px;
+  padding: 2px 6px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #fff7ed;
+  scroll-margin-top: 96px;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-active-match {
+  background: #fee2d8;
+  box-shadow: inset 0 0 0 2px rgba(217, 119, 87, 0.34);
+}
+
 .chip,
 .status-pill,
 .file-chip,
@@ -3135,6 +3219,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</p></div>
     <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</template>
   </section>
@@ -3148,6 +3234,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Copilot Blog" decoding="async"> Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">MCP: 7d 11x/4d</mark> <mark class="text-highlight daily-tag daily-tag-topic">enterprise agent governance: 7d 5x/3d</mark></p>
 <ul><li>发生了什么：Microsoft 的 2026-05-26 Copilot Studio 月度更新显示，computer-using agents 已 GA，同时新的 workflows 体验、Work IQ REST API/CLI、remote MCP servers、A2A GA 和实时语音 agent 都有进展。</li><li>为什么值得看：新的 workflows 体验把 agent node、审批、业务逻辑和 AI-powered actions 放到统一画布，并提供 node-level testing，适合把不确定的 agent 动作放回可审计流程。</li><li>来源：<a href="https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Copilot Blog" decoding="async"> Microsoft Copilot Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Microsoft Copilot Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) Microsoft Copilot Studio 发布 computer-using agents GA 与工作流更新](https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/new-and-improved-computer-using-agents-a-new-workflows-experience-and-real-time-voice-experiences/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|MCP: 7d 11x/4d== ==tag-topic|enterprise agent governance: 7d 5x/3d==
@@ -3165,6 +3252,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://status.openai.com/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Status" decoding="async"> OpenAI Status 显示 FedRAMP 用户登录问题仍在处理</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 29x/5d</mark></p>
 <ul><li>发生了什么：OpenAI Status 显示一条已定位但仍在缓解中的 incident：最近登出过的 FedRAMP 用户可能遇到登录问题，影响范围标为 ChatGPT 与 FedRAMP。</li><li>为什么值得看：状态页同屏列出 APIs、ChatGPT、Codex 和 FedRAMP 的可用性，适合作为 incident runbook 中的供应商状态检查入口。</li><li>来源：<a href="https://status.openai.com/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Status" decoding="async"> OpenAI Status</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI Status](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Status 显示 FedRAMP 用户登录问题仍在处理](https://status.openai.com/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 29x/5d==
@@ -3182,6 +3270,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNQPC90ZXh0Pjwvc3ZnPg==" alt="Check Point Blog" decoding="async"> Check Point 把 frontier AI 扫描结果落到安全发布流程</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Check Point 在 2026-05-26 的安全更新中说明，其 Frontier AI Models Readiness Program 已把大规模 AI-driven code scanning、人工验证、组件加固和补丁发布串到 Jumbo Security Release。</li><li>为什么值得看：文中提到 BLAST 会按部署条件、可达攻击面、认证要求和现实攻击能力过滤发现项，这比只看扫描器告警数量更接近补丁优先级排序。</li><li>来源：<a href="https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNQPC90ZXh0Pjwvc3ZnPg==" alt="Check Point Blog" decoding="async"> Check Point Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Check Point Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNQPC90ZXh0Pjwvc3ZnPg==) Check Point 把 frontier AI 扫描结果落到安全发布流程](https://blog.checkpoint.com/security/check-point-frontier-ai-models-readiness-program-security-update/)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3248,6 +3337,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 <p><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 8 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 7 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
 <p>GitHub Trending <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 2 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 1 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
@@ -3432,6 +3523,104 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
       item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
     });
+  }
+
+  function sourceInventoryRows(root) {
+    if (!root) return [];
+    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
+    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
+      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
+      .reduce(function (rows, section) {
+        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
+      }, [])
+      .filter(function (row) { return Boolean(row.querySelector("strong")); });
+  }
+
+  function sourceInventoryTotal(root, rows) {
+    var configured = Number(root.getAttribute("data-source-inventory-total"));
+    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
+  }
+
+  function setSourceInventoryStatus(root, text) {
+    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
+    if (status) status.textContent = text;
+  }
+
+  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
+    var next = root.querySelector("[data-source-inventory-next]");
+    var clear = root.querySelector("[data-source-inventory-clear]");
+    if (next) next.disabled = matchCount === 0;
+    if (clear) clear.disabled = !hasQuery;
+  }
+
+  function clearSourceInventoryHighlights(rows) {
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-match", "source-inventory-active-match");
+    });
+  }
+
+  function resetSourceInventoryFinder(root) {
+    var rows = sourceInventoryRows(root);
+    clearSourceInventoryHighlights(rows);
+    root.setAttribute("data-source-inventory-active-index", "-1");
+    root.setAttribute("data-source-inventory-match-count", "0");
+    updateSourceInventoryButtons(root, false, 0);
+    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+  }
+
+  function applySourceInventoryFinder(input) {
+    var root = input.closest("[data-source-inventory-finder]");
+    if (!root) return;
+    var rows = sourceInventoryRows(root);
+    var query = input.value.trim();
+    var normalized = query.toLowerCase();
+    var matches = [];
+
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
+      row.classList.toggle("source-inventory-match", matched);
+      if (matched) matches.push(row);
+    });
+
+    var activeIndex = matches.length > 0 ? 0 : -1;
+    if (activeIndex >= 0) {
+      matches[activeIndex].classList.add("source-inventory-active-match");
+    }
+    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
+    root.setAttribute("data-source-inventory-match-count", String(matches.length));
+    updateSourceInventoryButtons(root, Boolean(query), matches.length);
+
+    if (!query) {
+      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+      return;
+    }
+    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
+  }
+
+  function activateSourceInventoryMatch(root, direction) {
+    var matches = sourceInventoryRows(root).filter(function (row) {
+      return row.classList.contains("source-inventory-match");
+    });
+    if (matches.length === 0) {
+      updateSourceInventoryButtons(root, true, 0);
+      return;
+    }
+    var current = Number(root.getAttribute("data-source-inventory-active-index"));
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    var nextIndex = (current + direction + matches.length) % matches.length;
+    matches.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+    });
+    matches[nextIndex].classList.add("source-inventory-active-match");
+    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
+    if (matches[nextIndex].scrollIntoView) {
+      try {
+        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
+      } catch (_) {
+        matches[nextIndex].scrollIntoView();
+      }
+    }
   }
 
   function updateEvidenceSpotlight(card, event) {
@@ -3666,6 +3855,21 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     var button = event.target.closest("button");
     if (!button) return;
 
+    if (button.matches("[data-source-inventory-next]")) {
+      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
+      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
+      return;
+    }
+
+    if (button.matches("[data-source-inventory-clear]")) {
+      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
+      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
+      if (sourceInventoryInput) sourceInventoryInput.value = "";
+      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
+      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
+      return;
+    }
+
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
     }
@@ -3701,6 +3905,11 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
   });
 
   document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-source-inventory-search]")) {
+      applySourceInventoryFinder(event.target);
+      return;
+    }
+
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }

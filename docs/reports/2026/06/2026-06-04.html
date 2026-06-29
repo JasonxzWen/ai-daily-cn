@@ -2068,6 +2068,90 @@ body.lightbox-open {
   opacity: 0.42;
 }
 
+.source-inventory-finder {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel-soft));
+}
+
+.source-inventory-finder__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-inventory-finder__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-inventory-finder input[type="search"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.source-inventory-finder input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.source-inventory-finder button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 720;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.source-inventory-finder button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #8a3b1e;
+}
+
+.source-inventory-finder button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.source-inventory-finder__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-match {
+  margin-left: -4px;
+  padding: 2px 6px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #fff7ed;
+  scroll-margin-top: 96px;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-active-match {
+  background: #fee2d8;
+  box-shadow: inset 0 0 0 2px rgba(217, 119, 87, 0.34);
+}
+
 .chip,
 .status-pill,
 .file-chip,
@@ -3142,6 +3226,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 7 条）</p></div>
     <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 7 条）</template>
   </section>
@@ -3155,6 +3241,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAADN0lEQVQ4jZ2US2icVRTHf+d+r3k0GZXYGAwzbRBFlDYQcCNIFbFUUExLXVTqA6QI3SSFUlAQEXQjqbgtWVSkokELPgo2YhMEpWIXQZSWWkiMFpOaNI/JZOab7373uJgkbZKRUg/czeF/fpz/PedeoUnooZ6AP/K9pGYv0I3QBSYGueZMdN6QniGOh2R01G6slU2w/Y/0kngDWLONenBDpgLigwQ4L0TFjGPkiP/VZ1/8J1Bfe+g4sd9HHMBSCPWwAVJpSCUEE64CQTxAXvG/PPXhKsOswT7YOkDbch9hCq0xZBPwLKgDtAJcRxzKutJhbzH49OamDICeDZ/jnmo/7VXIptBWg9Z6max7G9/bLsMjLTL8XRth1CFijoEsgDvjRcmzMnqyts6yDuHRGl1hISxxLd+wWon+ZCq7SwZ/GW86tGf2F+m48285cSLZNBT9OXoaK1+zbGA+gGW/TlV2yKGZy81gtwqfIDiA78AHwgRmdVAOLv4vGICvWn8Y8RFfIAfYdLCZsPtddc3yRh1uZVkyWu8z6upFFBCDGoHOysXb6cghII0Tm6BkNimqhdztAJEbq+wwvg9MovaOVJU6ik3TB4Efm5SOKgqkgNdgQRdQXH0fAtN+Cr86Z3fUcCwqVFQPNAOOvS5PbMztfMedFqG4llAmjHN8PK9Qdo45VWZUXv3kp+j+Wzl94L3qduvFe6xYEhPjcE6Eb0WH8M4XuTKtlCoqJPhcVX/y93ph18nHpyaawToHf7vLxuZsKtITJVsI0wxRkj938Vj2SSPPk6rQDzCjhnHn8Y8GxVmTH9t57tE37x3Z07lGGnlrS3j6/RdmspculPN/9cTh4ppZMfrGyj02YuAHMzDpcv3zRCxohsu2iyXNs0QLqYZl6/LXnYYlTQpQ64SkgNhWgqRArtoxMHX4vqPrgAD7vm8/vqi5viVyXLUl6uSINYNiUDxSF6JpHhe3g22BtAWJt360fPCplxFRuOn7Avj8sekjVc3sm3MtExYh1nBleAZVQcRiTA0RC+rPitQOL7+4+6VV2KYOV6PnQk8wPretN5XcXpBukC7AojKFRmMuLXxTNnefYvfRysbafwFOiFhxqOMpZwAAAABJRU5ErkJggg==" alt="Google Research Blog" decoding="async"> The next chapter in flood resilience: Open sourcing Google’s hydrology framework</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Google Research Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Climate &amp; Sustainability</li><li>为什么值得看：Google Research Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Climate &amp; Sustainability；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://research.google/blog/the-next-chapter-in-flood-resilience-open-sourcing-googles-hydrology-framework/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAADN0lEQVQ4jZ2US2icVRTHf+d+r3k0GZXYGAwzbRBFlDYQcCNIFbFUUExLXVTqA6QI3SSFUlAQEXQjqbgtWVSkokELPgo2YhMEpWIXQZSWWkiMFpOaNI/JZOab7373uJgkbZKRUg/czeF/fpz/PedeoUnooZ6AP/K9pGYv0I3QBSYGueZMdN6QniGOh2R01G6slU2w/Y/0kngDWLONenBDpgLigwQ4L0TFjGPkiP/VZ1/8J1Bfe+g4sd9HHMBSCPWwAVJpSCUEE64CQTxAXvG/PPXhKsOswT7YOkDbch9hCq0xZBPwLKgDtAJcRxzKutJhbzH49OamDICeDZ/jnmo/7VXIptBWg9Z6max7G9/bLsMjLTL8XRth1CFijoEsgDvjRcmzMnqyts6yDuHRGl1hISxxLd+wWon+ZCq7SwZ/GW86tGf2F+m48285cSLZNBT9OXoaK1+zbGA+gGW/TlV2yKGZy81gtwqfIDiA78AHwgRmdVAOLv4vGICvWn8Y8RFfIAfYdLCZsPtddc3yRh1uZVkyWu8z6upFFBCDGoHOysXb6cghII0Tm6BkNimqhdztAJEbq+wwvg9MovaOVJU6ik3TB4Efm5SOKgqkgNdgQRdQXH0fAtN+Cr86Z3fUcCwqVFQPNAOOvS5PbMztfMedFqG4llAmjHN8PK9Qdo45VWZUXv3kp+j+Wzl94L3qduvFe6xYEhPjcE6Eb0WH8M4XuTKtlCoqJPhcVX/y93ph18nHpyaawToHf7vLxuZsKtITJVsI0wxRkj938Vj2SSPPk6rQDzCjhnHn8Y8GxVmTH9t57tE37x3Z07lGGnlrS3j6/RdmspculPN/9cTh4ppZMfrGyj02YuAHMzDpcv3zRCxohsu2iyXNs0QLqYZl6/LXnYYlTQpQ64SkgNhWgqRArtoxMHX4vqPrgAD7vm8/vqi5viVyXLUl6uSINYNiUDxSF6JpHhe3g22BtAWJt360fPCplxFRuOn7Avj8sekjVc3sm3MtExYh1nBleAZVQcRiTA0RC+rPitQOL7+4+6VV2KYOV6PnQk8wPretN5XcXpBukC7AojKFRmMuLXxTNnefYvfRysbafwFOiFhxqOMpZwAAAABJRU5ErkJggg==" alt="Google Research Blog" decoding="async"> Google Research Blog</a></li></ul>
 <p><img class="markdown-image" src="../../../assets/evidence/the-next-chapter-in-flood-resilience-open-sourcing-google-s-hydrology-framework-2026-06-04.png" alt="The next chapter in flood resilience: Open sourcing Google’s hydrology framework" loading="lazy" data-lightbox-image="true" data-lightbox-caption="The next chapter in flood resilience: Open sourcing Google’s hydrology framework" role="button" tabindex="0" aria-label="点击放大图片：The next chapter in flood resilience: Open sourcing Google’s hydrology framework" decoding="async"></p>
@@ -3178,6 +3265,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/endava-frontiers" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> How Endava is redesigning software delivery around AI agents</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 35x/7d</mark></p>
 <ul><li>发生了什么：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to accelerate software delivery, automate workflows,...</li><li>为什么值得看：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Learn how Endava is using AI agents, ChatGPT Enterprise, and Codex to accelerate s...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://openai.com/index/endava-frontiers" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI News RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) How Endava is redesigning software delivery around AI agents](https://openai.com/index/endava-frontiers)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 35x/7d==
@@ -3195,6 +3283,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> Introducing new capabilities to GPT-Rosalind</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；GPT-Rosalind advances life sciences research with enhanced biological reasoning, medicinal chemistry expertise, genomic...</li><li>为什么值得看：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；GPT-Rosalind advances life sciences research with enhanced biological reasoning, m...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI News RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) Introducing new capabilities to GPT-Rosalind](https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3212,6 +3301,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/wasmer" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> How Wasmer used Codex to build a Node.js runtime for the edge</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 35x/7d</mark></p>
 <ul><li>发生了什么：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；See how Wasmer used Codex with GPT-5.5 to build a Node.js runtime for the edge, accelerating development 10x to 20x and...</li><li>为什么值得看：OpenAI News RSS 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；See how Wasmer used Codex with GPT-5.5 to build a Node.js runtime for the edge, ac...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://openai.com/index/wasmer" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI News RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) How Wasmer used Codex to build a Node.js runtime for the edge](https://openai.com/index/wasmer)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 35x/7d==
@@ -3229,6 +3319,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.anthropic.com/news/services-track-partner-hub" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> Introducing the Services Track and Partner Hub of the Claude Partner Network</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Anthropic News 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Claude Partner Network Jun 3, 2026 Poli...</li><li>为什么值得看：Anthropic News 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Cla...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://www.anthropic.com/news/services-track-partner-hub" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> Anthropic News</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Anthropic News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Introducing the Services Track and Partner Hub of the Claude Partner Network](https://www.anthropic.com/news/services-track-partner-hub)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3246,6 +3337,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/alibaba-cloud-data-security-center_603202" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Data Security Center</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；CloudSecurity June 3, 2026</li><li>为什么值得看：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；CloudSecurity June 3, 2026；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://www.alibabacloud.com/blog/alibaba-cloud-data-security-center_603202" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Data Security Center](https://www.alibabacloud.com/blog/alibaba-cloud-data-security-center_603202)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3263,6 +3355,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/when-duckdb-embraces-mysql-in-the-ai-era_603217" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> When DuckDB Embraces MySQL in the AI Era</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；AliSQL enhances MySQL with DuckDB-powered analytical instances for high-performance HTAP capabilities while maintaining...</li><li>为什么值得看：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；AliSQL enhances MySQL with DuckDB-powered analytical instances for high-perform...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://www.alibabacloud.com/blog/when-duckdb-embraces-mysql-in-the-ai-era_603217" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) When DuckDB Embraces MySQL in the AI Era](https://www.alibabacloud.com/blog/when-duckdb-embraces-mysql-in-the-ai-era_603217)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3278,6 +3371,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 1 条）</p></div>
     <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 1 条）</template>
   </section>
@@ -3291,6 +3386,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/deep-dive-into-source-code-how-hermes-agent-achieves-self-improving_603216" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Deep Dive into Source Code: How Hermes Agent Achieves Self-Improving</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；This article dissects Hermes&#39;s source code to see exactly how this Self-Improving loop works. At the end, we&#39;ll also di...</li><li>为什么值得看：Alibaba Cloud Blog 释放与 AI 产品、模型、工程工具链或行业策略相关的可信信号；This article dissects Hermes&#39;s source code to see exactly how this Self-Improvi...；<strong class="text-keyword keyword-major">重点看它对能力边界、集成路径或运营策略的具体影响</strong>。</li><li>来源：<a href="https://www.alibabacloud.com/blog/deep-dive-into-source-code-how-hermes-agent-achieves-self-improving_603216" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Deep Dive into Source Code: How Hermes Agent Achieves Self-Improving](https://www.alibabacloud.com/blog/deep-dive-into-source-code-how-hermes-agent-achieves-self-improving_603216)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3345,6 +3441,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/chopratejas/headroom" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="chopratejas/headroom" decoding="async"> chopratejas/headroom</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-same">SAME</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +3,530 stars</mark>: #1，较前一日持平</li><li><strong><a href="https://github.com/harry0703/MoneyPrinterTurbo" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="harry0703/MoneyPrinterTurbo" decoding="async"> harry0703/MoneyPrinterTurbo</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +3</mark> <mark class="text-highlight daily-tag daily-tag-stars">本周 +18,553 stars</mark>: 利用 AI 大模型一键生成高清短视频。；#1，较前一日上升 3 位</li><li><strong><a href="https://github.com/affaan-m/ECC" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="affaan-m/ECC" decoding="async"> affaan-m/ECC</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +1</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +2,141 stars</mark>: 面向 Claude Code、Codex、opencode、Cursor 等工具的 agent harness 性能优化体系，覆盖 skills、memory、安全和研究优先开发流程。；#2，较前一日上升 1 位</li><li><strong><a href="https://github.com/heygen-com/hyperframes" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="heygen-com/hyperframes" decoding="async"> heygen-com/hyperframes</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +393 stars</mark>: #2，较前一日持平</li><li><strong><a href="https://github.com/JuliusBrussee/caveman" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="JuliusBrussee/caveman" decoding="async"> JuliusBrussee/caveman</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +471 stars</mark>: #3，较前一日持平</li><li><strong><a href="https://github.com/TanStack/query" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="TanStack/query" decoding="async"> TanStack/query</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +25 stars</mark>: #3，较前一日持平</li><li><strong><a href="https://github.com/aquasecurity/trivy" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="aquasecurity/trivy" decoding="async"> aquasecurity/trivy</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +24 stars</mark>: #4，较前一日持平</li><li><strong><a href="https://github.com/Lum1104/Understand-Anything" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Lum1104/Understand-Anything" decoding="async"> Lum1104/Understand-Anything</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -2</mark>: 把代码转换成可探索、可搜索、可提问的交互式知识图谱，支持 Claude Code、Codex、Cursor、Copilot、Gemini CLI 等工具。；#4，较前一日下降 2 位</li></ol></div>
     <template data-rich-source data-source-fallback>1. **[![chopratejas/headroom](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) chopratejas/headroom](https://github.com/chopratejas/headroom)** ==tag-general|一般== ==trend-same|SAME== ==tag-stars|今日 +3,530 stars==: #1，较前一日持平
 1. **[![harry0703/MoneyPrinterTurbo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)** ==tag-notable|值得关注== ==trend-up|↑ UP +3== ==tag-stars|本周 +18,553 stars==: 利用 AI 大模型一键生成高清短视频。；#1，较前一日上升 3 位
@@ -3429,6 +3527,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 <p><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 103 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 46 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 13 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 3</p>
 <p>GitHub Trending <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 10 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
@@ -3650,6 +3750,104 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
     document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
       item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
     });
+  }
+
+  function sourceInventoryRows(root) {
+    if (!root) return [];
+    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
+    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
+      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
+      .reduce(function (rows, section) {
+        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
+      }, [])
+      .filter(function (row) { return Boolean(row.querySelector("strong")); });
+  }
+
+  function sourceInventoryTotal(root, rows) {
+    var configured = Number(root.getAttribute("data-source-inventory-total"));
+    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
+  }
+
+  function setSourceInventoryStatus(root, text) {
+    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
+    if (status) status.textContent = text;
+  }
+
+  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
+    var next = root.querySelector("[data-source-inventory-next]");
+    var clear = root.querySelector("[data-source-inventory-clear]");
+    if (next) next.disabled = matchCount === 0;
+    if (clear) clear.disabled = !hasQuery;
+  }
+
+  function clearSourceInventoryHighlights(rows) {
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-match", "source-inventory-active-match");
+    });
+  }
+
+  function resetSourceInventoryFinder(root) {
+    var rows = sourceInventoryRows(root);
+    clearSourceInventoryHighlights(rows);
+    root.setAttribute("data-source-inventory-active-index", "-1");
+    root.setAttribute("data-source-inventory-match-count", "0");
+    updateSourceInventoryButtons(root, false, 0);
+    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+  }
+
+  function applySourceInventoryFinder(input) {
+    var root = input.closest("[data-source-inventory-finder]");
+    if (!root) return;
+    var rows = sourceInventoryRows(root);
+    var query = input.value.trim();
+    var normalized = query.toLowerCase();
+    var matches = [];
+
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
+      row.classList.toggle("source-inventory-match", matched);
+      if (matched) matches.push(row);
+    });
+
+    var activeIndex = matches.length > 0 ? 0 : -1;
+    if (activeIndex >= 0) {
+      matches[activeIndex].classList.add("source-inventory-active-match");
+    }
+    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
+    root.setAttribute("data-source-inventory-match-count", String(matches.length));
+    updateSourceInventoryButtons(root, Boolean(query), matches.length);
+
+    if (!query) {
+      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+      return;
+    }
+    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
+  }
+
+  function activateSourceInventoryMatch(root, direction) {
+    var matches = sourceInventoryRows(root).filter(function (row) {
+      return row.classList.contains("source-inventory-match");
+    });
+    if (matches.length === 0) {
+      updateSourceInventoryButtons(root, true, 0);
+      return;
+    }
+    var current = Number(root.getAttribute("data-source-inventory-active-index"));
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    var nextIndex = (current + direction + matches.length) % matches.length;
+    matches.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+    });
+    matches[nextIndex].classList.add("source-inventory-active-match");
+    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
+    if (matches[nextIndex].scrollIntoView) {
+      try {
+        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
+      } catch (_) {
+        matches[nextIndex].scrollIntoView();
+      }
+    }
   }
 
   function updateEvidenceSpotlight(card, event) {
@@ -3884,6 +4082,21 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
     var button = event.target.closest("button");
     if (!button) return;
 
+    if (button.matches("[data-source-inventory-next]")) {
+      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
+      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
+      return;
+    }
+
+    if (button.matches("[data-source-inventory-clear]")) {
+      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
+      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
+      if (sourceInventoryInput) sourceInventoryInput.value = "";
+      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
+      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
+      return;
+    }
+
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
     }
@@ -3919,6 +4132,11 @@ Builder 原始源 ==tag-status-checked|checked== 3 ==tag-status-no-signal|no_sig
   });
 
   document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-source-inventory-search]")) {
+      applySourceInventoryFinder(event.target);
+      return;
+    }
+
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }

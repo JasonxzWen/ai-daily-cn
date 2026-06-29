@@ -2068,6 +2068,90 @@ body.lightbox-open {
   opacity: 0.42;
 }
 
+.source-inventory-finder {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel-soft));
+}
+
+.source-inventory-finder__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-inventory-finder__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-inventory-finder input[type="search"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.source-inventory-finder input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.source-inventory-finder button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 720;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.source-inventory-finder button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #8a3b1e;
+}
+
+.source-inventory-finder button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.source-inventory-finder__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-match {
+  margin-left: -4px;
+  padding: 2px 6px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #fff7ed;
+  scroll-margin-top: 96px;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-active-match {
+  background: #fee2d8;
+  box-shadow: inset 0 0 0 2px rgba(217, 119, 87, 0.34);
+}
+
 .chip,
 .status-pill,
 .file-chip,
@@ -3147,6 +3231,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 4 条）</p></div>
     <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 4 条）</template>
   </section>
@@ -3160,6 +3246,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.anthropic.com/news/dxc-anthropic-alliance" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> DXC 将 Claude 接入银行、航空和公共服务系统</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Anthropic 与 DXC 宣布合作，DXC 将把 Claude 集成进其服务银行、航空、公共部门等客户的系统和工作流，重点在企业级交付、合规治理和复杂系统集成。</li><li>为什么值得看：<strong>行业场景</strong>：公告点名银行、航空、公共服务等系统复杂、合规要求高的客户群，说明 Claude 正进入大型 IT 服务商的实施渠道。</li><li>来源：<a href="https://www.anthropic.com/news/dxc-anthropic-alliance" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> Anthropic News</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Anthropic News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) DXC 将 Claude 接入银行、航空和公共服务系统](https://www.anthropic.com/news/dxc-anthropic-alliance)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3177,6 +3264,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> 阿里云发布 2026 年 5 月大数据与 AI 平台月报</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：阿里云月报汇总大数据与 AI 平台的 5 月产品更新，覆盖数据处理、模型开发和平台工程能力。</li><li>为什么值得看：<strong>平台更新</strong>：这份月报把阿里云大数据与 AI 平台近期变化集中到一处，便于企业团队评估云上数据和模型工程能力。</li><li>来源：<a href="https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) 阿里云发布 2026 年 5 月大数据与 AI 平台月报](https://www.alibabacloud.com/blog/big-data-%26-ai-platform-monthly-newsletter%E2%80%94may-2026_603242)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3194,6 +3282,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.anthropic.com/news/claude-corps" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> Anthropic 推出 Claude Corps 项目</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Anthropic 介绍 Claude Corps 项目，继续围绕 Claude 的应用生态、组织协作和外部项目场景扩大投入。</li><li>为什么值得看：<strong>生态项目</strong>：Claude Corps 是 Anthropic 围绕 Claude 使用场景推出的项目级更新，重点在组织、用户和应用场景的连接。</li><li>来源：<a href="https://www.anthropic.com/news/claude-corps" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic News" decoding="async"> Anthropic News</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Anthropic News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic 推出 Claude Corps 项目](https://www.anthropic.com/news/claude-corps)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3211,6 +3300,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,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" alt="Google DeepMind RSS" decoding="async"> Google DeepMind 投入多智能体 AI 安全研究</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Google DeepMind 说明将投入多智能体 AI 安全研究，关注多个智能体交互时的风险、评测和治理问题。</li><li>为什么值得看：<strong>安全研究</strong>：多智能体系统会带来协作、竞争、权限和失控风险，DeepMind 的投入表明安全研究正在从单模型扩展到系统层。</li><li>来源：<a href="https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,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" alt="Google DeepMind RSS" decoding="async"> Google DeepMind RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Google DeepMind RSS](data:image/png;base64,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) Google DeepMind 投入多智能体 AI 安全研究](https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research/)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3226,6 +3316,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 4 条）</p></div>
     <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 4 条）</template>
   </section>
@@ -3239,6 +3331,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/preply" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> Preply 用 AI 和真人教师组合做个性化语言学习</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：OpenAI 展示 Preply 将 AI 练习、内容生成和反馈能力与真人教师辅导结合，用于个性化语言学习。</li><li>为什么值得看：<strong>教学组合</strong>：Preply 把 AI 用在课前练习、个性化反馈和学习内容生成上，真人教师继续负责辅导、纠错和学习节奏。</li><li>来源：<a href="https://openai.com/index/preply" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI News RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) Preply 用 AI 和真人教师组合做个性化语言学习](https://openai.com/index/preply)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3256,6 +3349,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/say-goodbye-to-goldfish-memory-polardb-mem0-gives-ai-agents-long-term-memory_603241" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> PolarDB Mem0 为 AI Agent 提供长期记忆方案</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：阿里云介绍 PolarDB Mem0 如何为 AI Agent 提供长期记忆能力，把历史上下文持久化到可检索、可管理的数据层。</li><li>为什么值得看：<strong>长期记忆</strong>：PolarDB Mem0 的价值在于把 Agent 记忆从短上下文补丁推进到可持久化、可检索、可治理的数据库能力。</li><li>来源：<a href="https://www.alibabacloud.com/blog/say-goodbye-to-goldfish-memory-polardb-mem0-gives-ai-agents-long-term-memory_603241" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) PolarDB Mem0 为 AI Agent 提供长期记忆方案](https://www.alibabacloud.com/blog/say-goodbye-to-goldfish-memory-polardb-mem0-gives-ai-agents-long-term-memory_603241)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3273,6 +3367,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/code-harness-or-natural-language-harnesses_603240" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> 阿里云讨论代码 Harness 与自然语言 Harness 的取舍</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：阿里云文章讨论代码式 Harness 和自然语言 Harness 在 AI 应用测试、约束表达和执行流程中的差异。</li><li>为什么值得看：<strong>工程取舍</strong>：代码式 Harness 更强调可执行约束和自动化断言，自然语言 Harness 更强调任务描述与适配，团队需要按任务复杂度选择。</li><li>来源：<a href="https://www.alibabacloud.com/blog/code-harness-or-natural-language-harnesses_603240" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) 阿里云讨论代码 Harness 与自然语言 Harness 的取舍](https://www.alibabacloud.com/blog/code-harness-or-natural-language-harnesses_603240)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3290,6 +3385,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI 支持欧洲可信 AI 生态建设</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：OpenAI 说明其支持欧洲推进可信 AI 生态的工作，重点在治理、合作和区域化落地条件。</li><li>为什么值得看：<strong>可信生态</strong>：这类更新显示 AI 公司正在把合规、区域合作和治理议题放进产品与政策沟通中。</li><li>来源：<a href="https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" decoding="async"> OpenAI News RSS</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 支持欧洲可信 AI 生态建设](https://openai.com/index/supporting-eu-trustworthy-ai-ecosystem)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3907,6 +4003,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/apple/container" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="apple/container" decoding="async"> apple/container</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +2,430 stars</mark>: #1，较前一日持平</li><li><strong><a href="https://github.com/addyosmani/agent-skills" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="addyosmani/agent-skills" decoding="async"> addyosmani/agent-skills</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -1</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +3,278 stars</mark>: #2，较前一日下降 1 位</li><li><strong><a href="https://github.com/maziyarpanahi/openmed" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="maziyarpanahi/openmed" decoding="async"> maziyarpanahi/openmed</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +7</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +426 stars</mark>: #3，较前一日上升 7 位</li><li><strong><a href="https://github.com/phuryn/pm-skills" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="phuryn/pm-skills" decoding="async"> phuryn/pm-skills</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,978 stars</mark>: #4，较前一日下降 2 位</li><li><strong><a href="https://github.com/NVIDIA/SkillSpector" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="NVIDIA/SkillSpector" decoding="async"> NVIDIA/SkillSpector</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +319 stars</mark>: #5，较前一日持平</li><li><strong><a href="https://github.com/soxoj/maigret" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="soxoj/maigret" decoding="async"> soxoj/maigret</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -1</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +661 stars</mark>: #6，较前一日下降 1 位</li><li><strong><a href="https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="x1xhlol/system-prompts-and-models-of-ai-tools" decoding="async"> x1xhlol/system-prompts-and-models-of-ai-tools</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -1</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +368 stars</mark>: #7，较前一日下降 1 位</li><li><strong><a href="https://github.com/refactoringhq/tolaria" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="refactoringhq/tolaria" decoding="async"> refactoringhq/tolaria</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -5</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +604 stars</mark>: #8，较前一日下降 5 位</li></ol></div>
     <template data-rich-source data-source-fallback>1. **[![apple/container](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) apple/container](https://github.com/apple/container)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +2,430 stars==: #1，较前一日持平
 2. **[![addyosmani/agent-skills](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)** ==tag-general|一般== ==trend-down|↓ DOWN -1== ==tag-stars|今日 +3,278 stars==: #2，较前一日下降 1 位
@@ -4213,6 +4311,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 <p><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 171 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 125 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 22 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 5</p>
 <p>GitHub Trending <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 10 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
@@ -4485,6 +4585,104 @@ Reddit 线索 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_signal=
     });
   }
 
+  function sourceInventoryRows(root) {
+    if (!root) return [];
+    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
+    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
+      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
+      .reduce(function (rows, section) {
+        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
+      }, [])
+      .filter(function (row) { return Boolean(row.querySelector("strong")); });
+  }
+
+  function sourceInventoryTotal(root, rows) {
+    var configured = Number(root.getAttribute("data-source-inventory-total"));
+    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
+  }
+
+  function setSourceInventoryStatus(root, text) {
+    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
+    if (status) status.textContent = text;
+  }
+
+  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
+    var next = root.querySelector("[data-source-inventory-next]");
+    var clear = root.querySelector("[data-source-inventory-clear]");
+    if (next) next.disabled = matchCount === 0;
+    if (clear) clear.disabled = !hasQuery;
+  }
+
+  function clearSourceInventoryHighlights(rows) {
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-match", "source-inventory-active-match");
+    });
+  }
+
+  function resetSourceInventoryFinder(root) {
+    var rows = sourceInventoryRows(root);
+    clearSourceInventoryHighlights(rows);
+    root.setAttribute("data-source-inventory-active-index", "-1");
+    root.setAttribute("data-source-inventory-match-count", "0");
+    updateSourceInventoryButtons(root, false, 0);
+    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+  }
+
+  function applySourceInventoryFinder(input) {
+    var root = input.closest("[data-source-inventory-finder]");
+    if (!root) return;
+    var rows = sourceInventoryRows(root);
+    var query = input.value.trim();
+    var normalized = query.toLowerCase();
+    var matches = [];
+
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
+      row.classList.toggle("source-inventory-match", matched);
+      if (matched) matches.push(row);
+    });
+
+    var activeIndex = matches.length > 0 ? 0 : -1;
+    if (activeIndex >= 0) {
+      matches[activeIndex].classList.add("source-inventory-active-match");
+    }
+    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
+    root.setAttribute("data-source-inventory-match-count", String(matches.length));
+    updateSourceInventoryButtons(root, Boolean(query), matches.length);
+
+    if (!query) {
+      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+      return;
+    }
+    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
+  }
+
+  function activateSourceInventoryMatch(root, direction) {
+    var matches = sourceInventoryRows(root).filter(function (row) {
+      return row.classList.contains("source-inventory-match");
+    });
+    if (matches.length === 0) {
+      updateSourceInventoryButtons(root, true, 0);
+      return;
+    }
+    var current = Number(root.getAttribute("data-source-inventory-active-index"));
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    var nextIndex = (current + direction + matches.length) % matches.length;
+    matches.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+    });
+    matches[nextIndex].classList.add("source-inventory-active-match");
+    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
+    if (matches[nextIndex].scrollIntoView) {
+      try {
+        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
+      } catch (_) {
+        matches[nextIndex].scrollIntoView();
+      }
+    }
+  }
+
   function updateEvidenceSpotlight(card, event) {
     var rect = card.getBoundingClientRect();
     card.style.setProperty("--spotlight-x", event.clientX - rect.left + "px");
@@ -4717,6 +4915,21 @@ Reddit 线索 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_signal=
     var button = event.target.closest("button");
     if (!button) return;
 
+    if (button.matches("[data-source-inventory-next]")) {
+      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
+      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
+      return;
+    }
+
+    if (button.matches("[data-source-inventory-clear]")) {
+      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
+      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
+      if (sourceInventoryInput) sourceInventoryInput.value = "";
+      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
+      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
+      return;
+    }
+
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
     }
@@ -4752,6 +4965,11 @@ Reddit 线索 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_signal=
   });
 
   document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-source-inventory-search]")) {
+      applySourceInventoryFinder(event.target);
+      return;
+    }
+
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }

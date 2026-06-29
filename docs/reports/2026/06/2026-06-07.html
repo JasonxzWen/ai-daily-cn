@@ -2068,6 +2068,90 @@ body.lightbox-open {
   opacity: 0.42;
 }
 
+.source-inventory-finder {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel-soft));
+}
+
+.source-inventory-finder__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-inventory-finder__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-inventory-finder input[type="search"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.source-inventory-finder input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.source-inventory-finder button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 720;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.source-inventory-finder button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #8a3b1e;
+}
+
+.source-inventory-finder button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.source-inventory-finder__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-match {
+  margin-left: -4px;
+  padding: 2px 6px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #fff7ed;
+  scroll-margin-top: 96px;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-active-match {
+  background: #fee2d8;
+  box-shadow: inset 0 0 0 2px rgba(217, 119, 87, 0.34);
+}
+
 .chip,
 .status-pill,
 .file-chip,
@@ -3137,6 +3221,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 1 条）</p></div>
     <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 1 条）</template>
   </section>
@@ -3150,6 +3236,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" decoding="async"> Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本。它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢</li><li>为什么值得看：<strong class="text-keyword keyword-major">落点</strong>：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。</li><li>来源：<a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" decoding="async"> Cloudflare Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Cloudflare Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==) Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本](https://blog.cloudflare.com/ai-gateway-spend-limits/)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3537,6 +3624,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/mvanhorn/last30days-skill" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="mvanhorn/last30days-skill" decoding="async"> mvanhorn/last30days-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,111 stars</mark>: #1，较前一日持平</li><li><strong><a href="https://github.com/opencv/opencv" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="opencv/opencv" decoding="async"> opencv/opencv</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +65 stars</mark>: #2，较前一日持平</li><li><strong><a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Leonxlnx/taste-skill" decoding="async"> Leonxlnx/taste-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,103 stars</mark>: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。；#3，较前一日持平</li><li><strong><a href="https://github.com/NousResearch/hermes-agent" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="NousResearch/hermes-agent" decoding="async"> NousResearch/hermes-agent</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,112 stars</mark>: #4，较前一日下降 2 位</li><li><strong><a href="https://github.com/lfnovo/open-notebook" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="lfnovo/open-notebook" decoding="async"> lfnovo/open-notebook</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +554 stars</mark>: #5，较前一日上升 2 位</li><li><strong><a href="https://github.com/yikart/AiToEarn" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="yikart/AiToEarn" decoding="async"> yikart/AiToEarn</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +183 stars</mark>: #6，较前一日持平</li><li><strong><a href="https://github.com/aaif-goose/goose" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="aaif-goose/goose" decoding="async"> aaif-goose/goose</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +322 stars</mark>: #7，较前一日持平</li><li><strong><a href="https://github.com/Crosstalk-Solutions/project-nomad" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Crosstalk-Solutions/project-nomad" decoding="async"> Crosstalk-Solutions/project-nomad</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +309 stars</mark>: #8，较前一日持平</li></ol></div>
     <template data-rich-source data-source-fallback>1. **[![mvanhorn/last30days-skill](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +1,111 stars==: #1，较前一日持平
 2. **[![opencv/opencv](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) opencv/opencv](https://github.com/opencv/opencv)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +65 stars==: #2，较前一日持平
@@ -3705,6 +3794,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 <p><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 124 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 134 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 18 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 3</p>
 <p>GitHub Trending <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 10 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
@@ -3926,6 +4017,104 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
       item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
     });
+  }
+
+  function sourceInventoryRows(root) {
+    if (!root) return [];
+    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
+    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
+      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
+      .reduce(function (rows, section) {
+        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
+      }, [])
+      .filter(function (row) { return Boolean(row.querySelector("strong")); });
+  }
+
+  function sourceInventoryTotal(root, rows) {
+    var configured = Number(root.getAttribute("data-source-inventory-total"));
+    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
+  }
+
+  function setSourceInventoryStatus(root, text) {
+    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
+    if (status) status.textContent = text;
+  }
+
+  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
+    var next = root.querySelector("[data-source-inventory-next]");
+    var clear = root.querySelector("[data-source-inventory-clear]");
+    if (next) next.disabled = matchCount === 0;
+    if (clear) clear.disabled = !hasQuery;
+  }
+
+  function clearSourceInventoryHighlights(rows) {
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-match", "source-inventory-active-match");
+    });
+  }
+
+  function resetSourceInventoryFinder(root) {
+    var rows = sourceInventoryRows(root);
+    clearSourceInventoryHighlights(rows);
+    root.setAttribute("data-source-inventory-active-index", "-1");
+    root.setAttribute("data-source-inventory-match-count", "0");
+    updateSourceInventoryButtons(root, false, 0);
+    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+  }
+
+  function applySourceInventoryFinder(input) {
+    var root = input.closest("[data-source-inventory-finder]");
+    if (!root) return;
+    var rows = sourceInventoryRows(root);
+    var query = input.value.trim();
+    var normalized = query.toLowerCase();
+    var matches = [];
+
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
+      row.classList.toggle("source-inventory-match", matched);
+      if (matched) matches.push(row);
+    });
+
+    var activeIndex = matches.length > 0 ? 0 : -1;
+    if (activeIndex >= 0) {
+      matches[activeIndex].classList.add("source-inventory-active-match");
+    }
+    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
+    root.setAttribute("data-source-inventory-match-count", String(matches.length));
+    updateSourceInventoryButtons(root, Boolean(query), matches.length);
+
+    if (!query) {
+      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+      return;
+    }
+    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
+  }
+
+  function activateSourceInventoryMatch(root, direction) {
+    var matches = sourceInventoryRows(root).filter(function (row) {
+      return row.classList.contains("source-inventory-match");
+    });
+    if (matches.length === 0) {
+      updateSourceInventoryButtons(root, true, 0);
+      return;
+    }
+    var current = Number(root.getAttribute("data-source-inventory-active-index"));
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    var nextIndex = (current + direction + matches.length) % matches.length;
+    matches.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+    });
+    matches[nextIndex].classList.add("source-inventory-active-match");
+    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
+    if (matches[nextIndex].scrollIntoView) {
+      try {
+        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
+      } catch (_) {
+        matches[nextIndex].scrollIntoView();
+      }
+    }
   }
 
   function updateEvidenceSpotlight(card, event) {
@@ -4160,6 +4349,21 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     var button = event.target.closest("button");
     if (!button) return;
 
+    if (button.matches("[data-source-inventory-next]")) {
+      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
+      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
+      return;
+    }
+
+    if (button.matches("[data-source-inventory-clear]")) {
+      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
+      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
+      if (sourceInventoryInput) sourceInventoryInput.value = "";
+      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
+      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
+      return;
+    }
+
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
     }
@@ -4195,6 +4399,11 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
   });
 
   document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-source-inventory-search]")) {
+      applySourceInventoryFinder(event.target);
+      return;
+    }
+
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }

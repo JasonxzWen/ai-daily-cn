@@ -2068,6 +2068,90 @@ body.lightbox-open {
   opacity: 0.42;
 }
 
+.source-inventory-finder {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel-soft));
+}
+
+.source-inventory-finder__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-inventory-finder__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-inventory-finder input[type="search"] {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.source-inventory-finder input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus);
+}
+
+.source-inventory-finder button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 720;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.source-inventory-finder button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #8a3b1e;
+}
+
+.source-inventory-finder button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.source-inventory-finder__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-match {
+  margin-left: -4px;
+  padding: 2px 6px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #fff7ed;
+  scroll-margin-top: 96px;
+}
+
+[id^="section-source-inventory-group-"] li.source-inventory-active-match {
+  background: #fee2d8;
+  box-shadow: inset 0 0 0 2px rgba(217, 119, 87, 0.34);
+}
+
 .chip,
 .status-pill,
 .file-chip,
@@ -3146,6 +3230,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 1 条）</p></div>
     <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 1 条）</template>
   </section>
@@ -3159,6 +3245,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAADN0lEQVQ4jZ2US2icVRTHf+d+r3k0GZXYGAwzbRBFlDYQcCNIFbFUUExLXVTqA6QI3SSFUlAQEXQjqbgtWVSkokELPgo2YhMEpWIXQZSWWkiMFpOaNI/JZOab7373uJgkbZKRUg/czeF/fpz/PedeoUnooZ6AP/K9pGYv0I3QBSYGueZMdN6QniGOh2R01G6slU2w/Y/0kngDWLONenBDpgLigwQ4L0TFjGPkiP/VZ1/8J1Bfe+g4sd9HHMBSCPWwAVJpSCUEE64CQTxAXvG/PPXhKsOswT7YOkDbch9hCq0xZBPwLKgDtAJcRxzKutJhbzH49OamDICeDZ/jnmo/7VXIptBWg9Z6max7G9/bLsMjLTL8XRth1CFijoEsgDvjRcmzMnqyts6yDuHRGl1hISxxLd+wWon+ZCq7SwZ/GW86tGf2F+m48285cSLZNBT9OXoaK1+zbGA+gGW/TlV2yKGZy81gtwqfIDiA78AHwgRmdVAOLv4vGICvWn8Y8RFfIAfYdLCZsPtddc3yRh1uZVkyWu8z6upFFBCDGoHOysXb6cghII0Tm6BkNimqhdztAJEbq+wwvg9MovaOVJU6ik3TB4Efm5SOKgqkgNdgQRdQXH0fAtN+Cr86Z3fUcCwqVFQPNAOOvS5PbMztfMedFqG4llAmjHN8PK9Qdo45VWZUXv3kp+j+Wzl94L3qduvFe6xYEhPjcE6Eb0WH8M4XuTKtlCoqJPhcVX/y93ph18nHpyaawToHf7vLxuZsKtITJVsI0wxRkj938Vj2SSPPk6rQDzCjhnHn8Y8GxVmTH9t57tE37x3Z07lGGnlrS3j6/RdmspculPN/9cTh4ppZMfrGyj02YuAHMzDpcv3zRCxohsu2iyXNs0QLqYZl6/LXnYYlTQpQ64SkgNhWgqRArtoxMHX4vqPrgAD7vm8/vqi5viVyXLUl6uSINYNiUDxSF6JpHhe3g22BtAWJt360fPCplxFRuOn7Avj8sekjVc3sm3MtExYh1nBleAZVQcRiTA0RC+rPitQOL7+4+6VV2KYOV6PnQk8wPretN5XcXpBukC7AojKFRmMuLXxTNnefYvfRysbafwFOiFhxqOMpZwAAAABJRU5ErkJggg==" alt="Google Research Blog" decoding="async"> Google 拆解 Gemini 企业 Agent 平台里的检索增强方案</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Google 拆解 Gemini 企业 Agent 平台里的检索增强方案。文章把重点放在企业知识检索怎样减少幻觉、提高回答稳定性，而不是把 RAG 再包装成一串平台名词</li><li>为什么值得看：<strong class="text-keyword keyword-major">落点</strong>：文章把重点放在企业知识检索怎样减少幻觉、提高回答稳定性，而不是把 RAG 再包装成一串平台名词。</li><li>来源：<a href="https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAADN0lEQVQ4jZ2US2icVRTHf+d+r3k0GZXYGAwzbRBFlDYQcCNIFbFUUExLXVTqA6QI3SSFUlAQEXQjqbgtWVSkokELPgo2YhMEpWIXQZSWWkiMFpOaNI/JZOab7373uJgkbZKRUg/czeF/fpz/PedeoUnooZ6AP/K9pGYv0I3QBSYGueZMdN6QniGOh2R01G6slU2w/Y/0kngDWLONenBDpgLigwQ4L0TFjGPkiP/VZ1/8J1Bfe+g4sd9HHMBSCPWwAVJpSCUEE64CQTxAXvG/PPXhKsOswT7YOkDbch9hCq0xZBPwLKgDtAJcRxzKutJhbzH49OamDICeDZ/jnmo/7VXIptBWg9Z6max7G9/bLsMjLTL8XRth1CFijoEsgDvjRcmzMnqyts6yDuHRGl1hISxxLd+wWon+ZCq7SwZ/GW86tGf2F+m48285cSLZNBT9OXoaK1+zbGA+gGW/TlV2yKGZy81gtwqfIDiA78AHwgRmdVAOLv4vGICvWn8Y8RFfIAfYdLCZsPtddc3yRh1uZVkyWu8z6upFFBCDGoHOysXb6cghII0Tm6BkNimqhdztAJEbq+wwvg9MovaOVJU6ik3TB4Efm5SOKgqkgNdgQRdQXH0fAtN+Cr86Z3fUcCwqVFQPNAOOvS5PbMztfMedFqG4llAmjHN8PK9Qdo45VWZUXv3kp+j+Wzl94L3qduvFe6xYEhPjcE6Eb0WH8M4XuTKtlCoqJPhcVX/y93ph18nHpyaawToHf7vLxuZsKtITJVsI0wxRkj938Vj2SSPPk6rQDzCjhnHn8Y8GxVmTH9t57tE37x3Z07lGGnlrS3j6/RdmspculPN/9cTh4ppZMfrGyj02YuAHMzDpcv3zRCxohsu2iyXNs0QLqYZl6/LXnYYlTQpQ64SkgNhWgqRArtoxMHX4vqPrgAD7vm8/vqi5viVyXLUl6uSINYNiUDxSF6JpHhe3g22BtAWJt360fPCplxFRuOn7Avj8sekjVc3sm3MtExYh1nBleAZVQcRiTA0RC+rPitQOL7+4+6VV2KYOV6PnQk8wPretN5XcXpBukC7AojKFRmMuLXxTNnefYvfRysbafwFOiFhxqOMpZwAAAABJRU5ErkJggg==" alt="Google Research Blog" decoding="async"> Google Research Blog</a></li></ul>
 <p><img class="markdown-image" src="../../../assets/evidence/unlocking-dependable-responses-with-gemini-enterprise-agent-platform-s-agentic-rag-2026-06-06.png" alt="Unlocking dependable responses with Gemini Enterprise Agent Platform’s Agentic ..." loading="lazy" data-lightbox-image="true" data-lightbox-caption="Unlocking dependable responses with Gemini Enterprise Agent Platform’s Agentic ..." role="button" tabindex="0" aria-label="点击放大图片：Unlocking dependable responses with Gemini Enterprise Agent Platform’s Agentic ..." decoding="async"></p>
@@ -3180,6 +3267,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 4 条）</p></div>
     <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 4 条）</template>
   </section>
@@ -3193,6 +3282,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://about.fb.com/news/2026/06/creator-assistant-more-languages-for-ai-translations-on-facebook/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" decoding="async"> Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：Meta 推出 Creator Assistant 并扩展 Facebook AI Translations 语言覆盖，重点是创作者运营和跨语言内容分发能否被自动化。信号是创作者运营、跨语言分发和账号增长工具继续往 AI 自动化收口</li><li>为什么值得看：<strong class="text-keyword keyword-major">落点</strong>：信号是创作者运营、跨语言分发和账号增长工具继续往 AI 自动化收口。</li><li>来源：<a href="https://about.fb.com/news/2026/06/creator-assistant-more-languages-for-ai-translations-on-facebook/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" decoding="async"> Meta Newsroom</a></li></ul>
 <p><img class="markdown-image" src="../../../assets/evidence/introducing-creator-assistant-plus-more-languages-for-ai-translations-on-facebook-2026-06-06.webp" alt="Introducing Creator Assistant, Plus More Languages For AI Translations on Faceb..." loading="lazy" data-lightbox-image="true" data-lightbox-caption="Introducing Creator Assistant, Plus More Languages For AI Translations on Faceb..." role="button" tabindex="0" aria-label="点击放大图片：Introducing Creator Assistant, Plus More Languages For AI Translations on Faceb..." decoding="async"></p>
@@ -3216,6 +3306,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.tencent.com/en-us/articles/2202350.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVRYhe3WvWsVQRTG4SdRhIDhQhorESxchNhY+EUqEQTtps5/YCMiKCgpxUYQwcLKIohWU1mItR+pRMFmLCSNkIA2Cn6EEC3ixZsLO9mdzWrj2yzLe2bOb8+ZmR1KFNIDIR0tGjumiYLkB7CMddzGglh9KwWYLBhz7vdzNy7jrZDO/E2A82PvB/FUSPeFNNN2snYtCGkKnzBVE7GKi2L1qOmUbStwOpMc9uGhkB4LaX+TCTcrENITnG0Js52+4BruitVGXdCwAldQG1SoadzBMyHN1gX9WQMhLWJ+hyGGWsNN3BCrH6PG6Bq4ji3mDmoPFvBaSHOjxtZdENItXOoJYqgN3MNVsfo8DjCD9xj0DAEfcKH5ORDSPBZr3O8YiNVaW4o258BcxntVkrwtwImM96IkeXOAkPaidi/3D8Ax7Mr4L/sGyPV/WaxW+gbI9f95afJmACFN4Hgmorj8zQA4hNxFY6lvgFz/v+JN3wAnM96SWK33DZBbgJ3Kvz1ASAMc/ncAnMrE/NRxBzQByJX/nVh97BsgtwA7f30eIKRJm/+AOnXufx6AI/I3o05H8H8N9QvBN1ueI2C4wgAAAABJRU5ErkJggg==" alt="Tencent AI Business" decoding="async"> 腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环。</li><li>为什么值得看：<strong class="text-keyword keyword-major">变化</strong>：腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环。</li><li>来源：<a href="https://www.tencent.com/en-us/articles/2202350.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVRYhe3WvWsVQRTG4SdRhIDhQhorESxchNhY+EUqEQTtps5/YCMiKCgpxUYQwcLKIohWU1mItR+pRMFmLCSNkIA2Cn6EEC3ixZsLO9mdzWrj2yzLe2bOb8+ZmR1KFNIDIR0tGjumiYLkB7CMddzGglh9KwWYLBhz7vdzNy7jrZDO/E2A82PvB/FUSPeFNNN2snYtCGkKnzBVE7GKi2L1qOmUbStwOpMc9uGhkB4LaX+TCTcrENITnG0Js52+4BruitVGXdCwAldQG1SoadzBMyHN1gX9WQMhLWJ+hyGGWsNN3BCrH6PG6Bq4ji3mDmoPFvBaSHOjxtZdENItXOoJYqgN3MNVsfo8DjCD9xj0DAEfcKH5ORDSPBZr3O8YiNVaW4o258BcxntVkrwtwImM96IkeXOAkPaidi/3D8Ax7Mr4L/sGyPV/WaxW+gbI9f95afJmACFN4Hgmorj8zQA4hNxFY6lvgFz/v+JN3wAnM96SWK33DZBbgJ3Kvz1ASAMc/ncAnMrE/NRxBzQByJX/nVh97BsgtwA7f30eIKRJm/+AOnXufx6AI/I3o05H8H8N9QvBN1ueI2C4wgAAAABJRU5ErkJggg==" alt="Tencent AI Business" decoding="async"> Tencent AI Business</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Tencent AI Business](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABtElEQVRYhe3WvWsVQRTG4SdRhIDhQhorESxchNhY+EUqEQTtps5/YCMiKCgpxUYQwcLKIohWU1mItR+pRMFmLCSNkIA2Cn6EEC3ixZsLO9mdzWrj2yzLe2bOb8+ZmR1KFNIDIR0tGjumiYLkB7CMddzGglh9KwWYLBhz7vdzNy7jrZDO/E2A82PvB/FUSPeFNNN2snYtCGkKnzBVE7GKi2L1qOmUbStwOpMc9uGhkB4LaX+TCTcrENITnG0Js52+4BruitVGXdCwAldQG1SoadzBMyHN1gX9WQMhLWJ+hyGGWsNN3BCrH6PG6Bq4ji3mDmoPFvBaSHOjxtZdENItXOoJYqgN3MNVsfo8DjCD9xj0DAEfcKH5ORDSPBZr3O8YiNVaW4o258BcxntVkrwtwImM96IkeXOAkPaidi/3D8Ax7Mr4L/sGyPV/WaxW+gbI9f95afJmACFN4Hgmorj8zQA4hNxFY6lvgFz/v+JN3wAnM96SWK33DZBbgJ3Kvz1ASAMc/ncAnMrE/NRxBzQByJX/nVh97BsgtwA7f30eIKRJm/+AOnXufx6AI/I3o05H8H8N9QvBN1ueI2C4wgAAAABJRU5ErkJggg==) 腾讯云把 Productivity Agent Suite 当成企业接入 AI 的统一入口，重点看 agent、模型和业务流程能否在一个套件里闭环](https://www.tencent.com/en-us/articles/2202350.html)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3233,6 +3324,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> 阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈。</li><li>为什么值得看：<strong class="text-keyword keyword-major">变化</strong>：阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈。</li><li>来源：<a href="https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) 阿里云这篇文章展示用 AI 性能分析系统给 Java / Scala 应用找加速空间，核心是自动发现真正值得改的性能瓶颈](https://www.alibabacloud.com/blog/ai-powered-dragonwell-native-acceleration-automatic-discovery-of-10x-performance-improvement-opportunities_603222)** ==tag-major|重大== ==tag-topic|topic|primary==
@@ -3250,6 +3342,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> 这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口</a></strong> <mark class="text-highlight daily-tag daily-tag-major">重大</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 33x/7d</mark></p>
 <ul><li>发生了什么：这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口。</li><li>为什么值得看：<strong class="text-keyword keyword-major">变化</strong>：这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口。</li><li>来源：<a href="https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" decoding="async"> Alibaba Cloud Blog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) 这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口](https://www.alibabacloud.com/blog/deploy-openclaw-di-alibaba-cloud-ecs-dengan-integrasi-telegram_603221)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 33x/7d==
@@ -3265,6 +3358,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>值得关注的开源模型与项目动态。（本日 3 条）</p></div>
     <template data-rich-source data-source-fallback>值得关注的开源模型与项目动态。（本日 3 条）</template>
   </section>
@@ -3278,6 +3373,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://github.blog/changelog/2026-06-05-gpt-5-2-and-gpt-5-2-codex-deprecated" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark> <mark class="text-highlight daily-tag daily-tag-topic">coding agent: 7d 33x/7d</mark></p>
 <ul><li>发生了什么：GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex。影响范围包括 Copilot Chat、代码补全和 agent 模式，团队需要同步检查默认模型和迁移路径</li><li>为什么值得看：<strong class="text-keyword keyword-notable">落点</strong>：影响范围包括 Copilot Chat、代码补全和 agent 模式，团队需要同步检查默认模型和迁移路径。</li><li>来源：<a href="https://github.blog/changelog/2026-06-05-gpt-5-2-and-gpt-5-2-codex-deprecated" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> GitHub Changelog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub 在 Copilot 多个体验里弃用 GPT-5.2 与 GPT-5.2-Codex](https://github.blog/changelog/2026-06-05-gpt-5-2-and-gpt-5-2-codex-deprecated)** ==tag-notable|值得关注== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 33x/7d==
@@ -3295,6 +3391,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://github.blog/changelog/2026-06-05-enterprise-managed-plugins-in-vs-code-in-public-preview" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> VS Code 开始公测企业统一管理插件能力</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：VS Code 开始公测企业统一管理插件能力。重点不在插件数量，而在企业能否统一控管插件装配、策略和开发环境</li><li>为什么值得看：<strong class="text-keyword keyword-notable">落点</strong>：重点不在插件数量，而在企业能否统一控管插件装配、策略和开发环境。</li><li>来源：<a href="https://github.blog/changelog/2026-06-05-enterprise-managed-plugins-in-vs-code-in-public-preview" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" decoding="async"> GitHub Changelog</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) VS Code 开始公测企业统一管理插件能力](https://github.blog/changelog/2026-06-05-enterprise-managed-plugins-in-vs-code-in-public-preview)** ==tag-notable|值得关注== ==tag-topic|topic|primary==
@@ -3312,6 +3409,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
     </summary>
     <div class="collapsible-content">
+
     <div class="rendered-markdown"><p><strong><a href="https://github.blog/news-insights/company-news/github-universe-is-back-all-together-now-in-the-agentic-era/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
 <ul><li>发生了什么：GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图。它更像 GitHub 在年度路线图里给 Copilot 和 agent 抢主舞台，而不是一次普通大会预热</li><li>为什么值得看：<strong class="text-keyword keyword-notable">落点</strong>：它更像 GitHub 在年度路线图里给 Copilot 和 agent 抢主舞台，而不是一次普通大会预热。</li><li>来源：<a href="https://github.blog/news-insights/company-news/github-universe-is-back-all-together-now-in-the-agentic-era/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Blog Feed" decoding="async"> GitHub Blog Feed</a></li></ul></div>
     <template data-rich-source data-source-fallback>**[![GitHub Blog Feed](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Universe 2026 回归，主题转向 agentic era，重点是开发者平台如何围绕 Copilot、agent 和协作工作流组织年度路线图](https://github.blog/news-insights/company-news/github-universe-is-back-all-together-now-in-the-agentic-era/)** ==tag-notable|值得关注== ==tag-topic|topic|primary==
@@ -3699,6 +3797,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><ol><li><strong><a href="https://github.com/mvanhorn/last30days-skill" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="mvanhorn/last30days-skill" decoding="async"> mvanhorn/last30days-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,111 stars</mark>: #1，较前一日持平</li><li><strong><a href="https://github.com/opencv/opencv" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="opencv/opencv" decoding="async"> opencv/opencv</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +65 stars</mark>: #2，较前一日持平</li><li><strong><a href="https://github.com/Leonxlnx/taste-skill" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Leonxlnx/taste-skill" decoding="async"> Leonxlnx/taste-skill</a></strong> <mark class="text-highlight daily-tag daily-tag-notable">值得关注</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +3</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,103 stars</mark>: 用于约束 AI 输出风格、减少空泛生成的 skill 文件。；#3，较前一日上升 3 位</li><li><strong><a href="https://github.com/NousResearch/hermes-agent" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="NousResearch/hermes-agent" decoding="async"> NousResearch/hermes-agent</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +1,112 stars</mark>: #4，较前一日下降 2 位</li><li><strong><a href="https://github.com/lfnovo/open-notebook" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="lfnovo/open-notebook" decoding="async"> lfnovo/open-notebook</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP +2</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +554 stars</mark>: #5，较前一日上升 2 位</li><li><strong><a href="https://github.com/yikart/AiToEarn" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="yikart/AiToEarn" decoding="async"> yikart/AiToEarn</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +183 stars</mark>: #6，较前一日持平</li><li><strong><a href="https://github.com/aaif-goose/goose" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="aaif-goose/goose" decoding="async"> aaif-goose/goose</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +322 stars</mark>: #7，较前一日持平</li><li><strong><a href="https://github.com/Crosstalk-Solutions/project-nomad" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="Crosstalk-Solutions/project-nomad" decoding="async"> Crosstalk-Solutions/project-nomad</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag trend-status trend-status-new">NEW</mark> <mark class="text-highlight daily-tag daily-tag-stars">今日 +309 stars</mark>: #8，较前一日持平</li></ol></div>
     <template data-rich-source data-source-fallback>1. **[![mvanhorn/last30days-skill](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +1,111 stars==: #1，较前一日持平
 2. **[![opencv/opencv](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) opencv/opencv](https://github.com/opencv/opencv)** ==tag-notable|值得关注== ==trend-new|NEW== ==tag-stars|今日 +65 stars==: #2，较前一日持平
@@ -3867,6 +3967,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
+
+
     <div class="rendered-markdown"><p>本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 <p><mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 136 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 121 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 20 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 3</p>
 <p>GitHub Trending <mark class="text-highlight daily-tag daily-tag-status-checked">checked</mark> 10 <mark class="text-highlight daily-tag daily-tag-status-no-signal">no_signal</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">skipped</mark> 0</p>
@@ -4089,6 +4191,104 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
       item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
     });
+  }
+
+  function sourceInventoryRows(root) {
+    if (!root) return [];
+    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
+    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
+      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
+      .reduce(function (rows, section) {
+        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
+      }, [])
+      .filter(function (row) { return Boolean(row.querySelector("strong")); });
+  }
+
+  function sourceInventoryTotal(root, rows) {
+    var configured = Number(root.getAttribute("data-source-inventory-total"));
+    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
+  }
+
+  function setSourceInventoryStatus(root, text) {
+    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
+    if (status) status.textContent = text;
+  }
+
+  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
+    var next = root.querySelector("[data-source-inventory-next]");
+    var clear = root.querySelector("[data-source-inventory-clear]");
+    if (next) next.disabled = matchCount === 0;
+    if (clear) clear.disabled = !hasQuery;
+  }
+
+  function clearSourceInventoryHighlights(rows) {
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-match", "source-inventory-active-match");
+    });
+  }
+
+  function resetSourceInventoryFinder(root) {
+    var rows = sourceInventoryRows(root);
+    clearSourceInventoryHighlights(rows);
+    root.setAttribute("data-source-inventory-active-index", "-1");
+    root.setAttribute("data-source-inventory-match-count", "0");
+    updateSourceInventoryButtons(root, false, 0);
+    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+  }
+
+  function applySourceInventoryFinder(input) {
+    var root = input.closest("[data-source-inventory-finder]");
+    if (!root) return;
+    var rows = sourceInventoryRows(root);
+    var query = input.value.trim();
+    var normalized = query.toLowerCase();
+    var matches = [];
+
+    rows.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
+      row.classList.toggle("source-inventory-match", matched);
+      if (matched) matches.push(row);
+    });
+
+    var activeIndex = matches.length > 0 ? 0 : -1;
+    if (activeIndex >= 0) {
+      matches[activeIndex].classList.add("source-inventory-active-match");
+    }
+    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
+    root.setAttribute("data-source-inventory-match-count", String(matches.length));
+    updateSourceInventoryButtons(root, Boolean(query), matches.length);
+
+    if (!query) {
+      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
+      return;
+    }
+    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
+  }
+
+  function activateSourceInventoryMatch(root, direction) {
+    var matches = sourceInventoryRows(root).filter(function (row) {
+      return row.classList.contains("source-inventory-match");
+    });
+    if (matches.length === 0) {
+      updateSourceInventoryButtons(root, true, 0);
+      return;
+    }
+    var current = Number(root.getAttribute("data-source-inventory-active-index"));
+    if (!Number.isFinite(current) || current < 0) current = 0;
+    var nextIndex = (current + direction + matches.length) % matches.length;
+    matches.forEach(function (row) {
+      row.classList.remove("source-inventory-active-match");
+    });
+    matches[nextIndex].classList.add("source-inventory-active-match");
+    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
+    if (matches[nextIndex].scrollIntoView) {
+      try {
+        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
+      } catch (_) {
+        matches[nextIndex].scrollIntoView();
+      }
+    }
   }
 
   function updateEvidenceSpotlight(card, event) {
@@ -4323,6 +4523,21 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
     var button = event.target.closest("button");
     if (!button) return;
 
+    if (button.matches("[data-source-inventory-next]")) {
+      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
+      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
+      return;
+    }
+
+    if (button.matches("[data-source-inventory-clear]")) {
+      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
+      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
+      if (sourceInventoryInput) sourceInventoryInput.value = "";
+      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
+      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
+      return;
+    }
+
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
     }
@@ -4358,6 +4573,11 @@ Builder 原始源 ==tag-status-checked|checked== 2 ==tag-status-no-signal|no_sig
   });
 
   document.addEventListener("input", function (event) {
+    if (event.target.matches("[data-source-inventory-search]")) {
+      applySourceInventoryFinder(event.target);
+      return;
+    }
+
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }

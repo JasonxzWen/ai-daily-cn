@@ -549,6 +549,8 @@ try {
   assert.doesNotMatch(sourceInventoryText, /\|---|---:/);
   assert.equal(await sourceInventoryGroupLocator.count() >= 7, true);
   assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
+  assert.equal(await page.locator("#section-source-inventory [data-source-inventory-finder]").count(), 1);
+  assert.equal(await page.locator("#section-source-inventory [data-source-inventory-search]").count(), 1);
   const sourceInventoryDetails = sourceInventoryDetailText.join("\n");
   assert.match(sourceInventoryText, /快速定位/);
   assert.match(sourceInventoryText, /启用层级快速定位/);
@@ -570,6 +572,43 @@ try {
     `${sourceInventoryText}\n${sourceInventoryDetails}`,
     /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i
   );
+  const sourceInventorySearch = page.locator("#section-source-inventory [data-source-inventory-search]");
+  await sourceInventorySearch.fill("WeChat");
+  const wechatFinderState = await page.evaluate(() => {
+    const rows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"));
+    return {
+      total: rows.length,
+      hidden: rows.filter((row) => row.hidden || row.getAttribute("aria-hidden") === "true" || getComputedStyle(row).display === "none").length,
+      matches: rows.filter((row) => row.classList.contains("source-inventory-match")).length,
+      active: rows.filter((row) => row.classList.contains("source-inventory-active-match")).length,
+      status: document.querySelector("#section-source-inventory [data-source-inventory-status]")?.textContent || ""
+    };
+  });
+  assert.equal(wechatFinderState.total, 154);
+  assert.equal(wechatFinderState.hidden, 0);
+  assert(wechatFinderState.matches >= 1, JSON.stringify(wechatFinderState));
+  assert.equal(wechatFinderState.active, 1, JSON.stringify(wechatFinderState));
+  assert.match(wechatFinderState.status, /154/);
+  assert.match(wechatFinderState.status, /WeChat/i);
+  await page.locator("#section-source-inventory [data-source-inventory-next]").click();
+  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li.source-inventory-active-match").count(), 1);
+  await page.locator("#section-source-inventory [data-source-inventory-clear]").click();
+  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li.source-inventory-match").count(), 0);
+  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
+  await sourceInventorySearch.fill("no-such-source-xyz");
+  const emptyFinderState = await page.evaluate(() => {
+    const rows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"));
+    return {
+      total: rows.length,
+      hidden: rows.filter((row) => row.hidden || row.getAttribute("aria-hidden") === "true" || getComputedStyle(row).display === "none").length,
+      matches: rows.filter((row) => row.classList.contains("source-inventory-match")).length,
+      status: document.querySelector("#section-source-inventory [data-source-inventory-status]")?.textContent || ""
+    };
+  });
+  assert.equal(emptyFinderState.total, 154);
+  assert.equal(emptyFinderState.hidden, 0);
+  assert.equal(emptyFinderState.matches, 0);
+  assert.match(emptyFinderState.status, /0\/154/);
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );

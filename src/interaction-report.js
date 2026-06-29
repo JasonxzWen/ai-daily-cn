@@ -3178,6 +3178,8 @@ function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
     richId: "source-inventory",
     group: "main",
     collapsed: false,
+    sourceInventoryFinder: true,
+    sourceInventoryFinderTotal: rows.length,
     summary: `${rows.length} 个注册采集入口，按固定信源板块展开。`,
     content: [
       `共 ${rows.length} 个注册采集入口；这里是固定顺序导航，完整明细在下方各板块全部展开，今日状态不会改变排序。`,

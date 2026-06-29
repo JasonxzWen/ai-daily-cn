@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-finder-highlight",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory finder highlight",
+  "status": "completed",
+  "summary": "This iteration adds a reader-side finder to the full source inventory overview. The finder supports keyword lookup by source name, type, platform, or status, highlights matching rows, cycles one active match, and explicitly preserves all 154 canonical source rows without hiding, filtering, or reordering non-matches.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory finder\" tests/unit.test.js tests/skills.test.js",
+      "node --test --test-name-pattern \"source inventory panel|source inventory navigation|source inventory density controls|source inventory reader focus lanes|source inventory finder\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Playwright visual check: desktop 1280x900 and mobile 390x844 on docs/reports/2026/06/2026-06-29.html with WeChat query; screenshots .tmp/phase11-source-inventory-finder-desktop.png and .tmp/phase11-source-inventory-finder-mobile.png",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Reader-side source lookup must be a highlight interaction, not a filtering interaction, when the product promise is all sources remain visible.",
+      "evidence": "The dedicated finder uses `data-source-inventory-search` and row highlight classes instead of `data-search-for`, and E2E asserts 154 source rows, 0 hidden rows, matched rows, and one active match after a WeChat query.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep source inventory lookup separate from generic card search unless the generic interaction can prove it never sets `hidden`, `aria-hidden`, or `display:none` on source rows."
+    },
+    {
+      "lesson": "Self-contained report interactions need renderer, CSS, script, and harness-hub copies to move together.",
+      "evidence": "The production generator and `_harness-hub` generator/assets were updated in the same iteration so future harness-generated artifacts do not diverge from public daily pages.",
+      "scope": "effective_interact_renderer",
+      "persistence": "implemented",
+      "recommended_action": "For every Effective Interact component-level behavior, update both generator copies and both asset copies before running validation."
+    },
+    {
+      "lesson": "Visual checks should assert both behavior and framing for source inventory controls.",
+      "evidence": "The Playwright visual pass checked desktop and mobile screenshots, 154 retained rows, 0 hidden rows, 4 WeChat matches, one active match, no horizontal overflow, and visible finder controls.",
+      "scope": "frontend_validation",
+      "persistence": "implemented",
+      "recommended_action": "Keep the mobile viewport check for any future inventory control because the full-source page is dense and button rows can regress before unit tests notice."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "If users need faster navigation after matching, add previous-match and match-count anchor controls while preserving the non-hiding invariant.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-finder-highlight"
+}

@@ -14039,6 +14039,8 @@ test("source inventory reader focus lanes expose important slices without filter
   ).length;
 
   assert(inventory, "inventory overview should render");
+  assert.equal(inventory.sourceInventoryFinder, true, "inventory overview should request the non-hiding source finder");
+  assert.equal(inventory.sourceInventoryFinderTotal, inventoryRows.length);
   assert.match(inventory.content, /聚焦入口/);
   assert.match(inventory.content, /不会隐藏或重排/);
   assert.match(inventory.content, /配置待补/);
