@@ -13381,6 +13381,159 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("wechat-platform"));
 });
 
+test("source-first IA dashboard promotes source metrics and fixed source graph", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news-rss"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "official RSS parsed"
+    },
+    {
+      id: "anthropic-news",
+      name: "Anthropic News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: false,
+      not_included_reason: "candidate_not_selected_for_public_page",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 20,
+      display_mode: "expanded",
+      status_label: "updated_not_selected",
+      source_ids: ["content-anthropic-company-news"],
+      source_kinds: ["html_index"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 0,
+      notes: "candidate created but not selected"
+    },
+    {
+      id: "hugging-face-blog",
+      name: "Hugging Face Blog",
+      role: "official",
+      configured: true,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "blocked_or_unreachable",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 80,
+      display_mode: "expanded",
+      status_label: "blocked",
+      source_ids: ["content-hugging-face-blog"],
+      source_kinds: ["rss"],
+      statuses: ["blocked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "HTTP 500"
+    },
+    {
+      id: "github-trending",
+      name: "GitHub Trending",
+      role: "aggregator",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "open_source_platforms",
+      display_section_label: "开源、模型平台与代码生态",
+      display_section_rank: 30,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: [],
+      source_kinds: ["html"],
+      statuses: ["checked"],
+      candidate_count: 10,
+      included_count: 8,
+      notes: "weekly language pools"
+    },
+    {
+      id: "wechat-platform",
+      name: "WeChat Platform",
+      role: "platform",
+      configured: false,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "not_configured_or_not_checked",
+      display_section: "platform_cn_media",
+      display_section_label: "中文平台与媒体线索",
+      display_section_rank: 60,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "not_configured_or_skipped",
+      source_ids: ["platform-wechat-ai-feed"],
+      source_kinds: ["rsshub"],
+      statuses: ["skipped_missing_base_url"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "RSSHUB_BASE_URL missing"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const sourceStats = input.heroStats.filter((item) =>
+    ["公开信源", "候选信源", "阻塞信源"].includes(item.label)
+  );
+  const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
+  const graph = input.sections.find((section) => section.richId === "source-map");
+  const firstSection = input.sections.find((section) => !section.appendix);
+  const storySections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
+  const serializedSections = JSON.stringify(input.sections);
+
+  assert.deepEqual(sourceStats.map((item) => [item.label, item.value]), [
+    ["公开信源", "2/5"],
+    ["候选信源", "1"],
+    ["阻塞信源", "1"]
+  ]);
+  assert.equal(firstSection?.richId, "source-first-dashboard");
+  assert(dashboard, "source dashboard section should render before story tracks");
+  assert.match(dashboard.content, /公开入选/);
+  assert.match(dashboard.content, /有更新未入选/);
+  assert.match(dashboard.content, /未配置或跳过/);
+  assert(graph, "source graph section should render from source_effectiveness");
+  assert(graph.content.indexOf("核心一手源") < graph.content.indexOf("开源、模型平台与代码生态"));
+  assert(graph.content.indexOf("开源、模型平台与代码生态") < graph.content.indexOf("中文平台与媒体线索"));
+  assert.match(graph.content, /Hugging Face Blog/);
+  assert.match(graph.content, /blocked/);
+  assert.match(graph.content, /WeChat Platform/);
+  assert.match(graph.content, /not_configured_or_skipped/);
+  assert(storySections.length > 0, "story-first sections should remain visible");
+  assert(!serializedSections.includes("source_audit"));
+  assert(!serializedSections.includes("candidate_pool"));
+  assert(!serializedSections.includes("selection_snapshot"));
+});
+
 test("public daily followups hide empty Artificial Analysis fallback tabs", () => {
   const item = {
     id: "artificial-analysis-intelligence-index",

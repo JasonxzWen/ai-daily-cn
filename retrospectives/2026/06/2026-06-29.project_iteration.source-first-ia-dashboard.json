@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-ia-dashboard",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first IA dashboard and source graph",
+  "status": "completed",
+  "summary": "This iteration turns source visibility into the first reader-facing surface of the public daily page. It promotes source operating metrics into the hero, adds a source dashboard before story tracks, renders a fixed-order source graph from source_effectiveness rows, and keeps internal audit, candidate-pool, scoring, and debug records out of the public report.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first IA dashboard\" tests/unit.test.js",
+      "node --test tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The source dashboard should be a reader-facing operating summary, not a leak of the internal source audit.",
+      "evidence": "The public interaction input now derives metrics from source_effectiveness rows and explicitly omits source_audit, candidate pools, selection snapshots, scores, and self-check fields.",
+      "scope": "public_daily_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep future source-status widgets bound to source_effectiveness or another public projection rather than internal audit structures."
+    },
+    {
+      "lesson": "Blocked and skipped sources are easier to notice when the hero and first content section both surface them.",
+      "evidence": "Hero stats include public sources, candidate sources, and blocked sources; the dashboard table and source graph expose blocked and not_configured_or_skipped labels before story tracks.",
+      "scope": "source_visibility",
+      "persistence": "implemented",
+      "recommended_action": "In the next phase, add a focused blocked/skipped lane or filter only if the expanded graph becomes too long for daily scanning."
+    },
+    {
+      "lesson": "Source-first IA can coexist with the story-first report if the source map is placed before stories but does not replace story sections.",
+      "evidence": "Unit and E2E tests assert source dashboard and graph order while preserving track sections and story collapsible panels.",
+      "scope": "story_first_public_report",
+      "persistence": "implemented",
+      "recommended_action": "Treat Phase 3 as a visual refinement and interaction-filter pass, not a rewrite of story grouping."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Evaluate whether the source graph needs lightweight status filters after observing real daily pages with the full source set.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Consider a later source story rollup that summarizes why blocked or skipped sections matter for the day's editorial confidence.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-ia-dashboard"
+}
