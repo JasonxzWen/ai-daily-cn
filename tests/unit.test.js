@@ -13305,6 +13305,56 @@ test("source display contract governance is handbook-backed and complete", async
   assert(result.summary.validation_commands.includes("npm run validate"));
 });
 
+test("source insertion handbook is a validator-backed decision tree", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const handbook = await fs.readFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), "utf8");
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert(result.summary.required_handbook_markers.includes("source-insertion-handbook:v1"));
+  assert(contract.maintenance.handbook_required_markers.includes("source-insertion-handbook:v1"));
+
+  for (const phrase of [
+    "Source Insertion Decision Tree",
+    "Insertion Rank Rules",
+    "Collection Entry Only",
+    "Promotion To Logical Source",
+    "User Review",
+    "section_rank_step",
+    "baseline_source_rank_step",
+    "insertion_rank_step",
+    "Daily status must not reorder rows",
+    "core_primary",
+    "china_models",
+    "open_source_platforms",
+    "tracking_metrics",
+    "builder_community",
+    "platform_cn_media",
+    "english_media_search"
+  ]) {
+    assert(handbook.includes(phrase), `handbook should include insertion guidance phrase: ${phrase}`);
+  }
+});
+
+test("source insertion handbook validator rejects drift", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-insertion-handbook-validator-"));
+  await fs.cp(path.join(rootDir, "config"), path.join(tmp, "config"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.copyFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), path.join(tmp, "docs/source-first-ia-handbook.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-inventory-order.md"), path.join(tmp, "docs/source-inventory-order.md"));
+  await fs.copyFile(path.join(rootDir, "package.json"), path.join(tmp, "package.json"));
+
+  const handbookPath = path.join(tmp, "docs/source-first-ia-handbook.md");
+  const handbook = await fs.readFile(handbookPath, "utf8");
+  await fs.writeFile(handbookPath, handbook.replace("Source Insertion Decision Tree", "Source Insertion Drift"), "utf8");
+
+  const result = await validateSourceDisplayContract({ rootDir: tmp });
+  assert.equal(result.ok, false, "handbook missing the insertion decision tree should be rejected");
+  assert.match(result.failures.join("\n"), /handbook missing insertion handbook phrase: Source Insertion Decision Tree/);
+});
+
 test("source inventory order reference is handbook-backed and complete", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const result = await validateSourceDisplayContract({ rootDir });
