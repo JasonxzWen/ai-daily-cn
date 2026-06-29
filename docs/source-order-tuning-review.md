@@ -19,14 +19,14 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:103 -->
+<!-- order-tuning-total-unmapped:88 -->
 
 These counts come from the 154-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
 | `core_primary` | 9 | Promote the most durable official lab/company subchannels first. |
-| `china_models` | 35 | Promote Chinese model labs and platform blogs as a dedicated first-class layer. |
+| `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
 | `open_source_platforms` | 12 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
 | `builder_community` | 39 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
@@ -46,11 +46,6 @@ These candidates are proposed first-class logical sources. They are not merged i
 | `content-meta-engineering` | `meta-engineering` | `core_primary` | 65 | `promote` | Meta Engineering can carry infrastructure releases separate from Meta AI Blog. |
 | `content-nvidia-developer-blog` | `nvidia-ai-developer` | `core_primary` | 75 | `promote` | NVIDIA developer posts are high-impact AI platform signals. |
 | `content-xai-news` | `xai-news` | `core_primary` | 85 | `promote` | xAI official news deserves independent visibility when model/platform updates land. |
-| `china-ai-deepseek-news` | `deepseek-official` | `china_models` | 10 | `promote` | DeepSeek should be a first-class Chinese model source. |
-| `china-ai-qwen-blog` | `qwen-official` | `china_models` | 20 | `promote` | Qwen is a core Chinese model/platform source. |
-| `china-ai-kimi-blog` | `kimi-official` | `china_models` | 30 | `promote` | Kimi/Moonshot should have stable official visibility. |
-| `china-ai-minimax-blog` | `minimax-official` | `china_models` | 40 | `promote` | MiniMax model/product updates are first-class Chinese model signals. |
-| `china-ai-zhipu-news` | `zhipu-official` | `china_models` | 50 | `promote` | Zhipu/Z.ai is a durable Chinese model lab source. |
 | `content-tencent-hunyuan-blog` | `tencent-hunyuan` | `china_models` | 60 | `promote` | Hunyuan is the Tencent model/platform source that should not be hidden in generic company feeds. |
 | `content-bytedance-seed-blog` | `bytedance-seed` | `china_models` | 70 | `promote` | ByteDance Seed is a distinct model/research source. |
 | `china-ai-baidu-ai-news` | `baidu-ai` | `china_models` | 80 | `promote` | Baidu AI remains a recurring Chinese model/platform signal. |
