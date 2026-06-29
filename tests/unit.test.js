@@ -14722,6 +14722,71 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
   assert(!serializedSections.includes("selection_snapshot"));
 });
 
+test("source signal story renders first-screen cards before metrics", () => {
+  const report = strictPublishReportFixture();
+  report.stories = [
+    {
+      story_id: "story-openai-platform",
+      title: "OpenAI 发布企业平台能力",
+      what_happened: "OpenAI 发布面向企业平台的新能力。",
+      why_it_matters: "它影响工程团队的平台接入和治理成本。",
+      sources: [{ label: "OpenAI News", url: "https://openai.com/news/platform" }]
+    },
+    {
+      story_id: "story-github-agent",
+      title: "GitHub Trending 出现 agent 工具链",
+      what_happened: "GitHub Trending 出现新的 agent 工具链项目。",
+      why_it_matters: "它提供工程团队可复核的开源实现线索。",
+      sources: [{ label: "GitHub Trending", url: "https://github.com/example/agent-tooling" }]
+    }
+  ];
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const story = input.sections.find((section) => section.richId === "source-signal-story");
+  const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
+  const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
+  const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
+  const serializedStory = JSON.stringify(story);
+
+  assert(story, "source signal story should render");
+  assert(dashboard, "source metrics dashboard should render");
+  assert(storyIndex >= 0 && storyIndex < dashboardIndex, "source story cards should lead the metrics dashboard");
+  assert.equal(story.type, "filterable-cards");
+  assert.equal(story.cardClass, "source-signal-story-card");
+  assert.equal(story.showFilters, false);
+  assert.deepEqual(story.items.map((item) => item.title), [
+    "有效信源主线",
+    "可见 story",
+    "有效信源",
+    "旁路与缺口"
+  ]);
+  assert.equal(story.items[0].href, "#section-source-first-dashboard");
+  assert.deepEqual(story.items[0].stats.map((stat) => [stat.label, stat.value]), [
+    ["有效信源", "2/6"],
+    ["公开入选", "1/6"],
+    ["有更新未入选", "1"],
+    ["低信号", "2"],
+    ["阻塞", "1"],
+    ["未配置或跳过", "1"]
+  ]);
+  assert(story.items.every((item) => item.showGroup === false));
+  assert(story.items.every((item) => item.titleIcon));
+  assert.match(serializedStory, /OpenAI 发布企业平台能力/);
+  assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
+  assert.match(serializedStory, /OpenAI News/);
+  assert.match(serializedStory, /Anthropic News/);
+  assert.match(serializedStory, /Hugging Face Blog/);
+  assert.match(serializedStory, /WeChat Platform/);
+  assert.match(serializedStory, /#section-source-first-dashboard/);
+  assert.match(serializedStory, /#section-source-status-focus/);
+  assert.match(serializedStory, /#section-source-inventory/);
+  assert.equal(dashboard.type, "filterable-cards");
+  assert.equal(dashboard.cardClass, "source-metric-card");
+  assert.doesNotMatch(serializedStory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
 test("source signal story rollup summarizes public source signals before metrics", () => {
   const report = strictPublishReportFixture();
   report.stories = [
@@ -14863,9 +14928,12 @@ test("source signal story rollup summarizes public source signals before metrics
   const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
   const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
   const serializedStory = JSON.stringify(story);
+  const storyCardsText = JSON.stringify(story?.items || []);
 
   assert(story, "source signal story should render");
-  assert.equal(story.type, "markdown");
+  assert.equal(story.type, "filterable-cards");
+  assert.equal(story.cardClass, "source-signal-story-card");
+  assert.equal(story.showFilters, false);
   assert(storyIndex >= 0 && storyIndex < dashboardIndex, "source signal story should lead the source-first area");
   assert.match(story.content, /今日信源故事/);
   assert.match(story.content, /有效信源/);
