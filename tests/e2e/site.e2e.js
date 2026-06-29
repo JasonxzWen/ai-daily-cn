@@ -515,10 +515,17 @@ try {
   assert.match(sourceFocusText, /WeChat Platform/);
   assert.match(sourceFocusText, /Anthropic News/);
   const sourceMapText = await page.locator("#section-source-map").textContent();
-  assert.match(sourceMapText, /Hugging Face Blog/);
-  assert.match(sourceMapText, /blocked/);
-  assert.match(sourceMapText, /WeChat Platform/);
-  assert.match(sourceMapText, /not_configured_or_skipped/);
+  assert.match(sourceMapText, /固定顺序快速索引|鍥哄畾椤哄簭蹇€熺储寮?/);
+  assert.equal(await page.locator('#section-source-map a[href="#section-source-map-group-core-primary"]').count(), 1);
+  assert.equal(await page.locator('#section-source-map a[href="#section-source-map-group-open-source-platforms"]').count(), 1);
+  assert.equal(await page.locator("#section-source-map-group-core-primary").count(), 1);
+  assert.equal(await page.locator("#section-source-map-group-open-source-platforms").count(), 1);
+  const coreSourceGroupText = await page.locator("#section-source-map-group-core-primary").textContent();
+  const platformSourceGroupText = await page.locator("#section-source-map-group-platform-cn-media").textContent();
+  assert.match(coreSourceGroupText, /Hugging Face Blog/);
+  assert.match(coreSourceGroupText, /blocked/);
+  assert.match(platformSourceGroupText, /WeChat Platform/);
+  assert.match(platformSourceGroupText, /not_configured_or_skipped/);
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );

@@ -177,10 +177,7 @@ export function reportToInteractionInput(report, options = {}) {
   if (sourceStatusFocus) {
     sections.push(sourceStatusFocus);
   }
-  const sourceMap = formatSourceMapSection(sourceEffectivenessRows);
-  if (sourceMap) {
-    sections.push(sourceMap);
-  }
+  sections.push(...formatSourceMapSections(sourceEffectivenessRows));
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -3109,22 +3106,50 @@ function formatSourceFirstDashboardSection(rows = []) {
   };
 }
 
-function formatSourceMapSection(rows = []) {
+function formatSourceMapSections(rows = []) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    return null;
+    return [];
   }
   const groups = groupedSourceRows(rows);
   if (groups.length === 0) {
-    return null;
+    return [];
   }
-  return {
-    type: "markdown",
-    title: "信源图谱",
-    richId: "source-map",
-    group: "main",
-    collapsed: false,
-    content: groups.map(formatSourceMapGroup).join("\n\n")
-  };
+  return [
+    {
+      type: "markdown",
+      title: "信源图谱",
+      richId: "source-map",
+      group: "main",
+      collapsed: false,
+      content: formatSourceMapScanIndex(groups)
+    },
+    ...groups.map(formatSourceMapGroupSection)
+  ];
+}
+
+function formatSourceMapScanIndex(groups = []) {
+  const tableRows = groups.map((group) => {
+    const metrics = sourceFirstMetrics(group.rows);
+    const needAction = metrics.blocked + metrics.skipped;
+    const lowSignal = metrics.noRecentUpdate + metrics.parsedNotCandidate;
+    const href = `#section-${sourceMapGroupAnchor(group)}`;
+    return [
+      `[${escapeMarkdownTableCell(group.label)}](${href})`,
+      group.rows.length,
+      metrics.included,
+      needAction,
+      metrics.updatedNotSelected,
+      lowSignal,
+      sourceMapGroupIsOpen(group) ? "展开" : "折叠"
+    ];
+  });
+  return [
+    "固定顺序快速索引：按板块定位后再展开细项；今日状态只影响计数，不改变排序。",
+    "",
+    "| 板块 | 总数 | 公开 | 需处理 | 有更新未入选 | 低信号 | 默认 |",
+    "|---|---:|---:|---:|---:|---:|---|",
+    ...tableRows.map((row) => `| ${row[0]} | ${row.slice(1).map(escapeMarkdownTableCell).join(" | ")} |`)
+  ].join("\n");
 }
 
 function formatSourceStatusFocusSection(rows = []) {
@@ -3237,24 +3262,45 @@ function groupedSourceRows(rows = []) {
     .sort((left, right) => left.rank - right.rank || left.label.localeCompare(right.label));
 }
 
+function formatSourceMapGroupSection(group) {
+  const metrics = sourceFirstMetrics(group.rows);
+  const needAction = metrics.blocked + metrics.skipped;
+  return {
+    type: "markdown",
+    title: group.label,
+    richId: sourceMapGroupAnchor(group),
+    group: "main",
+    collapsed: false,
+    summary: `${group.rows.length} 个逻辑信源 · ${metrics.included} 公开 · ${needAction} 需处理`,
+    content: formatSourceMapGroup(group)
+  };
+}
+
 function formatSourceMapGroup(group) {
   const metrics = sourceFirstMetrics(group.rows);
-  const open = group.rows.some((row) => String(row?.display_mode || "") === "expanded") ? " open" : "";
   const summary = [
-    `<details${open}><summary><strong>${escapeInlineHtml(group.label)}</strong>`,
     `${group.rows.length} 个逻辑信源`,
     `${sourceEffectivenessStatusTag("included")} ${metrics.included}`,
     metrics.blocked > 0 ? `${sourceEffectivenessStatusTag("blocked")} ${metrics.blocked}` : "",
-    metrics.skipped > 0 ? `${sourceEffectivenessStatusTag("not_configured_or_skipped")} ${metrics.skipped}` : "",
-    "</summary>"
+    metrics.skipped > 0 ? `${sourceEffectivenessStatusTag("not_configured_or_skipped")} ${metrics.skipped}` : ""
   ].filter(Boolean).join(" ");
   return [
     summary,
     "",
-    ...group.rows.map(formatSourceMapRow),
-    "",
-    "</details>"
+    ...group.rows.map(formatSourceMapRow)
   ].join("\n");
+}
+
+function sourceMapGroupIsOpen(group) {
+  return group.rows.some((row) => String(row?.display_mode || "") === "expanded");
+}
+
+function sourceMapGroupAnchor(group) {
+  const slug = String(group?.id || "uncategorized")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `source-map-group-${slug || "uncategorized"}`;
 }
 
 function formatSourceMapRow(row) {
