@@ -131,6 +131,8 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
 }
 
 export function reportToInteractionInput(report, options = {}) {
+  const rawReport = report && typeof report === "object" ? report : {};
+  const rawMainItems = Array.isArray(rawReport.main_items) ? rawReport.main_items : [];
   report = normalizeStoryFirstReport(report);
   const includeInternalSections = options.includeInternalSections === true;
   const mediaOptions = {
@@ -182,13 +184,36 @@ export function reportToInteractionInput(report, options = {}) {
     })
   ];
   const sections = [];
-  sections.push(...formatSourceFirstRuntimeSections({
+  const sourceFirstRuntimeSections = formatSourceFirstRuntimeSections({
     presentation: sourceFirstPresentation,
     sourceEffectivenessRows,
     sourceInventoryRows,
     stories,
     mainItems
-  }));
+  });
+  const systemOperatingDashboard = formatSystemOperatingDashboardSection(report, {
+    stories,
+    mainItems: rawMainItems.length > 0 ? rawMainItems : mainItems,
+    hotBlogs,
+    chineseMediaDynamics,
+    dailyTracking: publicDailyTracking,
+    githubTrending,
+    huggingFaceTrending,
+    builderObservations,
+    officialOrgUpdates,
+    communityLeads,
+    sourceEffectivenessRows,
+    sourceInventoryRows
+  });
+  if (systemOperatingDashboard) {
+    const sourceDashboardIndex = sourceFirstRuntimeSections.findIndex((section) => section?.richId === "source-first-dashboard");
+    sourceFirstRuntimeSections.splice(
+      sourceDashboardIndex >= 0 ? sourceDashboardIndex + 1 : sourceFirstRuntimeSections.length,
+      0,
+      systemOperatingDashboard
+    );
+  }
+  sections.push(...sourceFirstRuntimeSections);
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -3623,6 +3648,225 @@ function sourceMetricDashboardCard({ title, value, tag, secondaryTag, subtitle, 
     group: "信源运行概况",
     showGroup: false,
     tags: [tag, secondaryTag].filter(Boolean),
+    stats: [
+      { label: "数量", value: String(value) },
+      ...stats
+    ],
+    body
+  };
+}
+
+function formatSystemOperatingDashboardSection(report, collections = {}) {
+  const metrics = systemOperatingMetrics(report, collections);
+  if (metrics.source.total === 0) {
+    return null;
+  }
+  return {
+    type: "filterable-cards",
+    title: "系统运行概况",
+    richId: "system-operating-dashboard",
+    group: "main",
+    collapsed: false,
+    summary: "把本期公开内容、信号模块、趋势追踪、信源覆盖和发布质量合成一个首屏仪表盘；只呈现读者需要的公开指标。",
+    cardClass: "system-metric-card",
+    showFilters: false,
+    items: systemMetricDashboardCards(metrics)
+  };
+}
+
+function systemOperatingMetrics(report, collections = {}) {
+  const content = {
+    stories: safeCollectionLength(collections.stories),
+    mainItems: safeCollectionLength(collections.mainItems),
+    hotBlogs: safeCollectionLength(collections.hotBlogs),
+    communityLeads: safeCollectionLength(collections.communityLeads),
+    officialOrgUpdates: safeCollectionLength(collections.officialOrgUpdates)
+  };
+  const signalModules = [
+    { label: "精选博客", count: safeCollectionLength(collections.hotBlogs) },
+    { label: "中文媒体", count: safeCollectionLength(collections.chineseMediaDynamics) },
+    { label: "每日追踪", count: safeCollectionLength(collections.dailyTracking) },
+    { label: "GitHub", count: safeCollectionLength(collections.githubTrending) },
+    { label: "Hugging Face", count: safeCollectionLength(collections.huggingFaceTrending) },
+    { label: "Builder", count: safeCollectionLength(collections.builderObservations) },
+    { label: "官方组织", count: safeCollectionLength(collections.officialOrgUpdates) },
+    { label: "社区线索", count: safeCollectionLength(collections.communityLeads) }
+  ];
+  const activeSignalModules = signalModules.filter((module) => module.count > 0);
+  const trends = {
+    total: safeCollectionLength(collections.githubTrending) +
+      safeCollectionLength(collections.huggingFaceTrending) +
+      safeCollectionLength(collections.dailyTracking),
+    github: safeCollectionLength(collections.githubTrending),
+    huggingFace: safeCollectionLength(collections.huggingFaceTrending),
+    dailyTracking: safeCollectionLength(collections.dailyTracking)
+  };
+  return {
+    content,
+    signalModules,
+    activeSignalModules,
+    trends,
+    source: sourceFirstMetrics(collections.sourceEffectivenessRows || []),
+    inventory: sourceInventoryRuntimeMetrics(collections.sourceInventoryRows || []),
+    quality: publicOperatingQualityMetrics(report?.quality_status)
+  };
+}
+
+function safeCollectionLength(value) {
+  return Array.isArray(value) ? value.length : 0;
+}
+
+function publicOperatingQualityMetrics(status) {
+  if (!status || typeof status !== "object") {
+    return {
+      status: "ok",
+      degradationCount: 0,
+      affectedSections: [],
+      publicNote: ""
+    };
+  }
+  const explicitReasons = Array.isArray(status.reasons)
+    ? status.reasons.filter((reason) => String(reason || "").trim())
+    : [];
+  const issueFallbackCount = [
+    ...(Array.isArray(status.blocking_issues) ? status.blocking_issues : []),
+    ...(Array.isArray(status.degraded_sections) ? status.degraded_sections : []),
+    ...(Array.isArray(status.affected_sections) ? status.affected_sections : [])
+  ].filter(Boolean).length;
+  const affectedSections = (Array.isArray(status.affected_sections) ? status.affected_sections : [])
+    .map(publicQualitySectionLabel)
+    .filter(Boolean);
+  return {
+    status: String(status.status || "ok"),
+    degradationCount: explicitReasons.length || issueFallbackCount,
+    affectedSections,
+    publicNote: publicOperatingQualityNote(status.public_note)
+  };
+}
+
+function publicOperatingQualityNote(note) {
+  const text = trimText(note, 72);
+  if (!text) {
+    return "";
+  }
+  const hanChars = text.match(/\p{Script=Han}/gu)?.length || 0;
+  if (hanChars >= 6 || hanChars / Math.max(text.length, 1) >= 0.25) {
+    return text;
+  }
+  return "部分公开板块降级，请以各板块提示为准。";
+}
+
+function publicOperatingQualityStatusLabel(status) {
+  const value = String(status || "ok");
+  if (value === "ok") return "正常";
+  if (value === "degraded") return "降级";
+  if (value === "blocked") return "阻断";
+  return value;
+}
+
+function publicQualitySectionLabel(section) {
+  const key = String(section || "").trim();
+  const labels = {
+    hot_blogs: "精选博客",
+    chinese_media_dynamics: "中文媒体",
+    daily_tracking: "每日追踪",
+    github_trending: "GitHub",
+    huggingface_trending: "Hugging Face",
+    builder_observations: "Builder",
+    official_org_updates: "官方组织",
+    community_leads: "社区线索",
+    wechat_items: "WeChat",
+    zhihu_items: "Zhihu",
+    x_items: "X/Twitter"
+  };
+  if (labels[key]) {
+    return labels[key];
+  }
+  return key.replace(/_items$/u, "").replace(/_/gu, " ").trim();
+}
+
+function systemMetricDashboardCards(metrics) {
+  const sourceCoverageValue = `${metrics.source.included}/${metrics.source.total}`;
+  const sourceNeedsAttention = metrics.source.blocked + metrics.source.skipped;
+  const activeModuleNames = metrics.activeSignalModules.map((module) => module.label).join("、") || "暂无公开信号模块";
+  const affectedSectionText = metrics.quality.affectedSections.join("、") || "无";
+  const qualityBody = metrics.quality.degradationCount > 0
+    ? [
+      `公开质量状态：${publicOperatingQualityStatusLabel(metrics.quality.status)}。`,
+      metrics.quality.publicNote ? `公开说明：${metrics.quality.publicNote}` : "",
+      `影响板块：${affectedSectionText}。`
+    ].filter(Boolean).join(" ")
+    : "当前没有面向读者的公开降级提醒。";
+  return [
+    systemMetricDashboardCard({
+      title: "公开内容规模",
+      value: metrics.content.stories,
+      tag: { label: "SYSTEM_CONTENT", kind: "major" },
+      subtitle: "story 与主体条目",
+      body: "首屏先给出可阅读 story 数量，并保留主体条目、深读和社区线索的公开规模。",
+      stats: [
+        { label: "主体条目", value: String(metrics.content.mainItems) },
+        { label: "深读", value: String(metrics.content.hotBlogs) },
+        { label: "社区线索", value: String(metrics.content.communityLeads) }
+      ]
+    }),
+    systemMetricDashboardCard({
+      title: "信号模块",
+      value: metrics.activeSignalModules.length,
+      tag: { label: "SYSTEM_SIGNALS", kind: "major" },
+      subtitle: "有公开输出的模块",
+      body: `本期有输出的公开信号模块：${activeModuleNames}。`,
+      stats: metrics.signalModules
+        .filter((module) => module.count > 0)
+        .slice(0, 5)
+        .map((module) => ({ label: module.label, value: String(module.count) }))
+    }),
+    systemMetricDashboardCard({
+      title: "趋势与追踪",
+      value: metrics.trends.total,
+      tag: { label: "SYSTEM_TRENDS", kind: "notable" },
+      subtitle: "榜单与每日追踪",
+      body: "把 GitHub、Hugging Face 和每日追踪合并成一个趋势规模指标，方便先判断本期外部动量。",
+      stats: [
+        { label: "GitHub", value: String(metrics.trends.github) },
+        { label: "Hugging Face", value: String(metrics.trends.huggingFace) },
+        { label: "每日追踪", value: String(metrics.trends.dailyTracking) }
+      ]
+    }),
+    systemMetricDashboardCard({
+      title: "信源覆盖",
+      value: sourceCoverageValue,
+      tag: { label: "SYSTEM_SOURCES", kind: sourceNeedsAttention > 0 ? "notable" : "major" },
+      subtitle: "公开信源与全量入口",
+      body: "公开信源覆盖继承信源运行概况；全量入口用于确认完整订阅清单没有静默消失。",
+      stats: [
+        { label: "候选信源", value: String(metrics.source.updatedNotSelected) },
+        { label: "需关注", value: String(sourceNeedsAttention) },
+        { label: "全量入口", value: String(metrics.inventory.total || 0) },
+        { label: "入口运行态", value: `${metrics.inventory.known || 0}/${metrics.inventory.total || 0}` }
+      ]
+    }),
+    systemMetricDashboardCard({
+      title: "运行质量",
+      value: metrics.quality.status,
+      tag: { label: "SYSTEM_QUALITY", kind: metrics.quality.status === "ok" ? "major" : "notable" },
+      subtitle: "公开降级状态",
+      body: qualityBody,
+      stats: [
+        { label: "降级提醒", value: String(metrics.quality.degradationCount) },
+        { label: "影响板块", value: String(metrics.quality.affectedSections.length) }
+      ]
+    })
+  ];
+}
+
+function systemMetricDashboardCard({ title, value, tag, subtitle, body, stats = [] }) {
+  return {
+    title,
+    subtitle,
+    group: "系统运行概况",
+    showGroup: false,
+    tags: [tag].filter(Boolean),
     stats: [
       { label: "数量", value: String(value) },
       ...stats

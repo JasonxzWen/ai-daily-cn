@@ -585,6 +585,14 @@ try {
   assert.notEqual(missingDashboardInventoryIssue.details.dashboard.inventory_metric_cards_present, true);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    document.querySelector("#section-system-operating-dashboard")?.remove();
+  });
+  const missingSystemDashboardChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(missingSystemDashboardChecklist.ok, false, JSON.stringify(missingSystemDashboardChecklist.checks, null, 2));
+  assert(missingSystemDashboardChecklist.issues.some((issue) => issue.id === "system_metrics_dashboard"));
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
     nodes.map((node) => [
       node.querySelector("span")?.textContent?.trim() || "",
@@ -644,6 +652,17 @@ try {
   assert.match(sourceDashboardText, /继承逻辑状态/);
   assert.match(sourceDashboardText, /未上报逻辑源/);
   assert.match(sourceDashboardText, /仅采集入口/);
+  assert.equal(await page.locator("#section-system-operating-dashboard").count(), 1);
+  assert.equal(await page.locator('#section-system-operating-dashboard[data-section-type="filterable-cards"]').count(), 1);
+  assert.equal(await page.locator("#section-system-operating-dashboard .system-metric-card").count(), 5);
+  assert.equal(await page.locator("#section-system-operating-dashboard .system-metric-card [data-card-stats]").count(), 5);
+  const systemDashboardText = await page.locator("#section-system-operating-dashboard").textContent();
+  assert.match(systemDashboardText, /公开内容规模/);
+  assert.match(systemDashboardText, /信号模块/);
+  assert.match(systemDashboardText, /趋势与追踪/);
+  assert.match(systemDashboardText, /信源覆盖/);
+  assert.match(systemDashboardText, /运行质量/);
+  assert.doesNotMatch(systemDashboardText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|quality_status|degraded_sections|remediation|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
   const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
   assert.match(sourceFocusText, /需处理/);
   assert.match(sourceFocusText, /有更新未入选/);

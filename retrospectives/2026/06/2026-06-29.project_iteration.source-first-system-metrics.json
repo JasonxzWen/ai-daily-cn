@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-system-metrics",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first system operating metrics dashboard",
+  "status": "completed",
+  "summary": "This iteration adds a first-screen system operating dashboard after the source metrics dashboard. The public page now summarizes content scale, active signal modules, trend and tracking volume, source coverage, and reader-safe quality status before the source status focus and long inventory.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"system operating dashboard\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory|source-first runtime|source metrics dashboard|source-first IA|source signal story|system operating dashboard\" tests/unit.test.js",
+      "node --test tests/e2e/site.e2e.js",
+      "npm run build",
+      "node scripts/check-daily-page.mjs --date 2026-06-29 --viewports 1280x900,390x1200",
+      "Playwright screenshot check for #section-system-operating-dashboard at 1280x1100 and 390x1200",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run sources:display-contract",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "community_cards_reader_facing",
+      "section": "real_page_page_check",
+      "message": "The 2026-06-29 page-check still reports the existing community_cards_reader_facing degraded check, but no blocking checks are present and this iteration does not modify community card rendering."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "The system operating dashboard should be a renderer-level layer, not another fixed source-order contract entry.",
+      "evidence": "The green page-check records #section-system-operating-dashboard at index 2, after source metrics and before source status focus, while the source-first order remains source_signal_story, source_first_dashboard, source_status_focus, source_map, and source_inventory.",
+      "scope": "source_first_page_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep the system dashboard inserted by report rendering and avoid adding it to config/source-display-contract.json unless the source order contract itself changes."
+    },
+    {
+      "lesson": "A system metrics card can summarize reader-safe public arrays without leaking review internals.",
+      "evidence": "The unit test and page-check require five cards and tags SYSTEM_CONTENT, SYSTEM_SIGNALS, SYSTEM_TRENDS, SYSTEM_SOURCES, and SYSTEM_QUALITY, and reject internal review fields in the serialized dashboard or rendered text.",
+      "scope": "system_operating_dashboard",
+      "persistence": "implemented",
+      "recommended_action": "When adding new system metrics, bind them to public arrays or sanitized quality status and add page-check assertions before exposing them."
+    },
+    {
+      "lesson": "Visual validation catches reader-facing language issues that structural checks can miss.",
+      "evidence": "The first screenshot pass showed an English quality note from a real report; the implementation now maps English quality notes to a generic Chinese reader-facing degradation note while preserving the raw machine status value in stats.",
+      "scope": "system_quality_card",
+      "persistence": "implemented",
+      "recommended_action": "Continue pairing page-check gates with desktop and mobile screenshots for first-screen public metrics work."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Continue the roadmap by refining the fixed source importance handbook and source insertion workflow, using the same red-green-page-check pattern.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-system-metrics"
+}

@@ -234,7 +234,7 @@ Public daily inventory rows project a runtime layer onto this fixed inventory: m
 
 ### First Viewport Order
 
-The first viewport must put source signal story before source metrics dashboard.
+The first viewport must put source signal story before source metrics dashboard. The renderer then inserts the reader-safe `system-operating-dashboard` immediately after `source_first_dashboard` and before `source_status_focus`; it is not part of `source_first_section_order`, so the fixed source order remains controlled only by the JSON contract.
 
 The source-first section order is:
 
@@ -252,6 +252,8 @@ The source metrics dashboard has two required metric bands:
 - Collection-entry runtime cards summarize the complete inventory before readers reach the long inventory: `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`.
 
 These collection-entry metrics are first-screen coverage indicators. They are derived from the same 154-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
+
+The system operating dashboard is the broader first-screen metrics layer. It must show exactly five public cards: `公开内容规模`, `信号模块`, `趋势与追踪`, `信源覆盖`, and `运行质量`. The cards use tags `SYSTEM_CONTENT`, `SYSTEM_SIGNALS`, `SYSTEM_TRENDS`, `SYSTEM_SOURCES`, and `SYSTEM_QUALITY`. They may summarize public arrays and reader-safe quality status, but they must not expose internal fields such as source audits, candidate pools, selection snapshots, debug fields, environment variable names, or remediation logs.
 
 <!-- full-inventory-expansion-semantics -->
 
@@ -313,8 +315,9 @@ npm run validate
 Contract checks must reject:
 
 - missing or renamed source-first v2 markers;
-- first viewport order that does not start with `source_signal_story` then `source_metrics_dashboard`;
+- first viewport order that does not start with `source_signal_story` then `source_first_dashboard`;
 - a source metrics dashboard that omits full-inventory runtime metric cards for `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`;
+- a missing `system-operating-dashboard` between source metrics and source status focus, or a system dashboard that omits one of the five public metrics cards;
 - a missing logical source vs collection entry distinction;
 - documentation that treats the 154-entry inventory as first-viewport story content;
 - runtime status being used to reorder fixed source rows.
