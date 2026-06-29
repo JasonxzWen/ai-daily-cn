@@ -2443,6 +2443,35 @@
         "not_included_reason": {
           "type": "string"
         },
+        "display_section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_section_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_section_rank": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "display_rank": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "display_mode": {
+          "enum": ["expanded", "collapsed"]
+        },
+        "status_label": {
+          "enum": [
+            "included",
+            "updated_not_selected",
+            "parsed_not_candidate",
+            "no_recent_update",
+            "blocked",
+            "not_configured_or_skipped"
+          ]
+        },
         "source_ids": {
           "type": "array",
           "items": {

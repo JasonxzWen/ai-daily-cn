@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "description": "Fixed display grouping and ordering contract for public source-first daily IA.",
+  "status_labels": [
+    "included",
+    "updated_not_selected",
+    "parsed_not_candidate",
+    "no_recent_update",
+    "blocked",
+    "not_configured_or_skipped"
+  ],
+  "sections": [
+    {
+      "id": "core_primary",
+      "label": "核心一手源",
+      "rank": 10,
+      "default_display_mode": "expanded",
+      "sources": [
+        { "id": "openai-news", "rank": 10 },
+        { "id": "anthropic-news", "rank": 20 },
+        { "id": "google-deepmind", "rank": 30 },
+        { "id": "google-research", "rank": 40 },
+        { "id": "microsoft-research", "rank": 50 },
+        { "id": "meta-ai", "rank": 60 },
+        { "id": "aws-ml", "rank": 70 },
+        { "id": "hugging-face-blog", "rank": 80 }
+      ]
+    },
+    {
+      "id": "china_models",
+      "label": "中国模型与厂商",
+      "rank": 20,
+      "default_display_mode": "expanded",
+      "sources": []
+    },
+    {
+      "id": "open_source_platforms",
+      "label": "开源、模型平台与代码生态",
+      "rank": 30,
+      "default_display_mode": "expanded",
+      "sources": [
+        { "id": "github-trending", "rank": 10 },
+        { "id": "github-org-watch", "rank": 20 },
+        { "id": "ml-papers-week", "rank": 80, "display_mode": "collapsed" },
+        { "id": "hellogithub", "rank": 90, "display_mode": "collapsed" },
+        { "id": "ruanyf-weekly", "rank": 100, "display_mode": "collapsed" }
+      ]
+    },
+    {
+      "id": "tracking_metrics",
+      "label": "榜单与持续指标",
+      "rank": 40,
+      "default_display_mode": "expanded",
+      "sources": []
+    },
+    {
+      "id": "builder_community",
+      "label": "Builder 与社区原始信号",
+      "rank": 50,
+      "default_display_mode": "collapsed",
+      "sources": [
+        { "id": "follow-builders", "rank": 10, "display_mode": "expanded" },
+        { "id": "hacker-news", "rank": 20 }
+      ]
+    },
+    {
+      "id": "platform_cn_media",
+      "label": "中文平台与媒体线索",
+      "rank": 60,
+      "default_display_mode": "expanded",
+      "sources": [
+        { "id": "wechat-platform", "rank": 10 },
+        { "id": "zhihu-platform", "rank": 20 }
+      ]
+    },
+    {
+      "id": "english_media_search",
+      "label": "英文媒体与搜索聚合",
+      "rank": 70,
+      "default_display_mode": "collapsed",
+      "sources": [
+        { "id": "techcrunch-ai", "rank": 10 },
+        { "id": "the-verge", "rank": 20 },
+        { "id": "mit-technology-review", "rank": 30 },
+        { "id": "ars-technica", "rank": 40 },
+        { "id": "venturebeat-ai", "rank": 50 }
+      ]
+    }
+  ]
+}

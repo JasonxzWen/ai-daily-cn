@@ -18,6 +18,7 @@ import { isPublishableOfficialComponentFragment } from "./official-component-sna
 import { normalizeStoryFirstReport } from "./story-first.js";
 import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 import { sanitizePublicDegradationEvent } from "./degradation-events.js";
+import { decorateSourceEffectivenessRows } from "./source-effectiveness.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -915,8 +916,8 @@ function publicHeroHighlights(highlights = []) {
 }
 
 function publicSourceEffectiveness(rows = []) {
-  return arrayValue(rows)
-    .filter((row) => row?.id && row?.name)
+  const publicRows = arrayValue(rows).filter((row) => row?.id && row?.name);
+  return decorateSourceEffectivenessRows(publicRows)
     .map((row) => ({
       id: String(row.id || ""),
       name: String(row.name || ""),
@@ -927,6 +928,12 @@ function publicSourceEffectiveness(rows = []) {
       candidate_created: Boolean(row.candidate_created),
       public_included: Boolean(row.public_included),
       not_included_reason: String(row.not_included_reason || ""),
+      display_section: String(row.display_section || ""),
+      display_section_label: String(row.display_section_label || ""),
+      display_section_rank: Number.isInteger(row.display_section_rank) ? row.display_section_rank : 0,
+      display_rank: Number.isInteger(row.display_rank) ? row.display_rank : 0,
+      display_mode: ["expanded", "collapsed"].includes(String(row.display_mode || "")) ? String(row.display_mode) : "",
+      status_label: String(row.status_label || ""),
       source_ids: arrayValue(row.source_ids).map((item) => String(item || "")).filter(Boolean),
       source_kinds: arrayValue(row.source_kinds).map((item) => String(item || "")).filter(Boolean),
       statuses: arrayValue(row.statuses).map((item) => String(item || "")).filter(Boolean),
