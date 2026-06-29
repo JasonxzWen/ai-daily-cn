@@ -223,6 +223,111 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Public card title links should include source or avatar icons.",
       { count: cardTitleLinks.length, missing_titles: missingCardTitleIcons }
     );
+    const sourceFirstSectionOrder = [
+      "section-source-signal-story",
+      "section-source-first-dashboard",
+      "section-source-status-focus",
+      "section-source-map",
+      "section-source-inventory"
+    ];
+    const sectionOrder = Array.from(document.querySelectorAll(".report-section-stack > [id]"))
+      .map((node) => node.id);
+    const sourceFirstOrderHits = sectionOrder.filter((id) => sourceFirstSectionOrder.includes(id));
+    const sourceFirstOrderIndexes = Object.fromEntries(
+      sourceFirstSectionOrder.map((id) => [id, sectionOrder.indexOf(id)])
+    );
+    const sourceMapGroupIndexes = sectionOrder
+      .map((id, index) => id.startsWith("section-source-map-group-") ? index : -1)
+      .filter((index) => index >= 0);
+    const sourceInventoryGroupIndexes = sectionOrder
+      .map((id, index) => id.startsWith("section-source-inventory-group-") ? index : -1)
+      .filter((index) => index >= 0);
+    const firstTrackOrderIndex = sectionOrder.findIndex((id) => id.startsWith("section-track-"));
+    const cardSectionContract = ({ id, cardSelector, expectedCards, minCards = 0, requireIcons = false }) => {
+      const section = document.querySelector(`#${id}`);
+      const cards = Array.from(section?.querySelectorAll(cardSelector) || []);
+      const expectedCountOk = typeof expectedCards === "number"
+        ? cards.length === expectedCards
+        : cards.length >= minCards;
+      const cardsWithStats = cards.filter((card) => card.querySelector("[data-card-stats]")).length;
+      const cardsWithIcons = cards.filter((card) => card.querySelector(".card-title-icon")).length;
+      return {
+        present: Boolean(section),
+        section_type: section?.getAttribute("data-section-type") || "",
+        card_count: cards.length,
+        expected_cards: typeof expectedCards === "number" ? expectedCards : `>=${minCards}`,
+        cards_with_stats: cardsWithStats,
+        cards_with_icons: cardsWithIcons,
+        ok: Boolean(section) &&
+          section.getAttribute("data-section-type") === "filterable-cards" &&
+          expectedCountOk &&
+          cardsWithStats === cards.length &&
+          (!requireIcons || cardsWithIcons === cards.length)
+      };
+    };
+    const sourceFirstContract = {
+      story: cardSectionContract({
+        id: "section-source-signal-story",
+        cardSelector: ".source-signal-story-card",
+        expectedCards: 4,
+        requireIcons: true
+      }),
+      dashboard: cardSectionContract({
+        id: "section-source-first-dashboard",
+        cardSelector: ".source-metric-card",
+        minCards: 6
+      }),
+      status_focus: cardSectionContract({
+        id: "section-source-status-focus",
+        cardSelector: ".source-status-focus-card",
+        expectedCards: 4
+      }),
+      inventory: cardSectionContract({
+        id: "section-source-inventory",
+        cardSelector: ".source-inventory-section-card",
+        expectedCards: 7
+      })
+    };
+    const inventorySection = document.querySelector("#section-source-inventory");
+    sourceFirstContract.inventory.rows = document.querySelectorAll("[id^='section-source-inventory-group-'] li strong").length;
+    sourceFirstContract.inventory.finder = {
+      root: Boolean(inventorySection?.querySelector("[data-source-inventory-finder]")),
+      search: Boolean(inventorySection?.querySelector("[data-source-inventory-search]")),
+      status: Boolean(inventorySection?.querySelector("[data-source-inventory-status]")),
+      next: Boolean(inventorySection?.querySelector("[data-source-inventory-next]")),
+      clear: Boolean(inventorySection?.querySelector("[data-source-inventory-clear]"))
+    };
+    sourceFirstContract.order = {
+      expected: sourceFirstSectionOrder,
+      actual_source_first_hits: sourceFirstOrderHits,
+      indexes: sourceFirstOrderIndexes,
+      source_map_group_count: sourceMapGroupIndexes.length,
+      inventory_group_count: sourceInventoryGroupIndexes.length,
+      first_track_order_index: firstTrackOrderIndex
+    };
+    const directOrderOk = sourceFirstOrderHits.length === sourceFirstSectionOrder.length &&
+      sourceFirstOrderHits.every((id, index) => id === sourceFirstSectionOrder[index]);
+    const sourceFirstDownstreamOrderOk = sourceMapGroupIndexes.length > 0 &&
+      sourceInventoryGroupIndexes.length > 0 &&
+      sourceFirstOrderIndexes["section-source-inventory"] > Math.max(...sourceMapGroupIndexes) &&
+      Math.min(...sourceInventoryGroupIndexes) > sourceFirstOrderIndexes["section-source-inventory"] &&
+      firstTrackOrderIndex > Math.max(...sourceInventoryGroupIndexes);
+    const inventoryFinderOk = Object.values(sourceFirstContract.inventory.finder).every(Boolean);
+    const sourceFirstPublicContractOk =
+      sourceFirstContract.story.ok &&
+      sourceFirstContract.dashboard.ok &&
+      sourceFirstContract.status_focus.ok &&
+      sourceFirstContract.inventory.ok &&
+      sourceFirstContract.inventory.rows === 154 &&
+      inventoryFinderOk &&
+      directOrderOk &&
+      sourceFirstDownstreamOrderOk;
+    addCheck(
+      "source_first_public_contract",
+      sourceFirstPublicContractOk,
+      "Source-first story, metrics, status, map and full inventory sections should be visible as the leading public page contract.",
+      sourceFirstContract
+    );
     const githubTrendingSection = document.querySelector(".github-trending-card-grid")?.closest("section") ||
       document.querySelector("section[id*='github-trending']");
     const githubTrendCards = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll(".github-trending-card")) : [];

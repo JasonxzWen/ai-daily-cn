@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-page-check-gate",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first page checklist gate",
+  "status": "completed",
+  "summary": "This iteration binds the source-first public page structure into the deterministic daily page checklist, so source story, metrics, status focus, source map, and full inventory regressions fail the page quality gate.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/e2e/site.e2e.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Direct DOM assertions are not enough for scheduled page quality.",
+      "evidence": "The red E2E removed `#section-source-signal-story` and `evaluateDailyPageChecklist` still returned `ok: true` before this phase.",
+      "scope": "page_checklist",
+      "persistence": "implemented",
+      "recommended_action": "Keep source-first DOM requirements inside `evaluateDailyPageChecklist` whenever they are required for public publish quality."
+    },
+    {
+      "lesson": "The source-first contract needs one blocking structural check with actionable details.",
+      "evidence": "`source_first_public_contract` reports per-section card counts, stat/icon coverage, inventory row and finder state, and source-first ordering details.",
+      "scope": "source_first_public_contract",
+      "persistence": "implemented",
+      "recommended_action": "Add future source-first structural requirements to this combined check instead of scattering them across unrelated content checks."
+    },
+    {
+      "lesson": "The full inventory must remain expanded even when the overview becomes card-based.",
+      "evidence": "The new checklist requires 7 inventory overview cards, finder controls, and exactly 154 expanded inventory rows after the overview.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "Preserve the overview-plus-expanded-detail pattern when refining source inventory density."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After the next real daily run, review whether the source-first card text needs density tuning while keeping this checklist contract intact.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-page-check-gate"
+}
