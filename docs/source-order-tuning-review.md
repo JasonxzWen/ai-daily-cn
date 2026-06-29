@@ -19,13 +19,13 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:88 -->
+<!-- order-tuning-total-unmapped:86 -->
 
 These counts come from the 154-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
-| `core_primary` | 9 | Promote the most durable official lab/company subchannels first. |
+| `core_primary` | 7 | Promote the most durable official lab/company subchannels first. |
 | `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
 | `open_source_platforms` | 12 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
@@ -41,7 +41,6 @@ These candidates are proposed first-class logical sources. They are not merged i
 
 | Source ID | Proposed logical source | Section | Suggested rank | Action | Rationale |
 |---|---|---|---:|---|---|
-| `content-anthropic-research` | `anthropic-research-engineering` | `core_primary` | 25 | `promote` | Anthropic research and engineering posts deserve a stable subchannel near Anthropic News. |
 | `content-apple-machine-learning` | `apple-ml-research` | `core_primary` | 55 | `promote` | Apple ML research is a durable official lab signal. |
 | `content-meta-engineering` | `meta-engineering` | `core_primary` | 65 | `promote` | Meta Engineering can carry infrastructure releases separate from Meta AI Blog. |
 | `content-nvidia-developer-blog` | `nvidia-ai-developer` | `core_primary` | 75 | `promote` | NVIDIA developer posts are high-impact AI platform signals. |

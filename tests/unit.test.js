@@ -13446,7 +13446,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 86);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -13469,7 +13469,6 @@ test("source order tuning review is validator-backed and complete", async () => 
   }
 
   for (const sourceId of [
-    "content-anthropic-research",
     "content-tencent-hunyuan-blog",
     "content-arxiv-cs-ai",
     "content-builder-simon-willison",
@@ -13501,23 +13500,107 @@ test("source order tuning review validator rejects drift and private fields", as
   }
 
   await expectInvalid(
-    review.replace("| `core_primary` | 9 |", "| `core_primary` | 8 |"),
-    /unmapped count for core_primary must be 9/
+    review.replace("| `core_primary` | 7 |", "| `core_primary` | 6 |"),
+    /unmapped count for core_primary must be 7/
   );
   await expectInvalid(
-    review.replace("`content-anthropic-research`", "`unknown-source-id`"),
+    review.replace("`content-apple-machine-learning`", "`unknown-source-id`"),
     /promotion candidate references unknown source id: unknown-source-id/
   );
   await expectInvalid(
-    review.replace("`content-anthropic-research`", "`content-openai-news`"),
+    review.replace("`content-apple-machine-learning`", "`content-openai-news`"),
     /promotion candidate is already mapped to logical source: content-openai-news/
   );
   await expectInvalid(
-    review.replace("| `content-anthropic-research` | `anthropic-research-engineering` | `core_primary` | 25 | `promote` |", "| `content-anthropic-research` | `anthropic-research-engineering` | `core_primary` | 23 | `promote` |"),
-    /promotion candidate content-anthropic-research suggested rank must use 5-point spacing/
+    review.replace("| `content-apple-machine-learning` | `apple-ml-research` | `core_primary` | 55 | `promote` |", "| `content-apple-machine-learning` | `apple-ml-research` | `core_primary` | 53 | `promote` |"),
+    /promotion candidate content-apple-machine-learning suggested rank must use 5-point spacing/
   );
   await expectInvalid(`${review}\nhttps://example.com/internal\n`, /order tuning review must not expose raw URLs/);
   await expectInvalid(`${review}\nAI_DAILY_RSSHUB_BASE_URL\n`, /order tuning review must not expose internal source fields/);
+});
+
+test("Anthropic Research logical source promotion is executable and review-backed", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const { CORE_SOURCE_CONTRACTS, buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const handbook = await fs.readFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), "utf8");
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+  const inventoryRows = buildSourceInventoryRows({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.logical_sources, 31);
+  assert.equal(result.summary.display_sources, 31);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 86);
+
+  const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
+  assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
+  assert.equal(logical.name, "Anthropic Research and Engineering");
+  assert(logical.aliases.includes("content-anthropic-research"));
+  assert(logical.aliases.includes("content-anthropic-engineering"));
+
+  const coreSection = contract.sections.find((section) => section.id === "core_primary");
+  assert.deepEqual(
+    coreSection.sources.slice(0, 4).map((source) => [source.id, source.rank]),
+    [
+      ["openai-news", 10],
+      ["anthropic-news", 20],
+      ["anthropic-research-engineering", 25],
+      ["google-deepmind", 30]
+    ]
+  );
+
+  const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
+  for (const sourceId of ["content-anthropic-research", "content-anthropic-engineering"]) {
+    assert.equal(
+      inventoryById.get(sourceId)?.logical_source_id,
+      "anthropic-research-engineering",
+      `${sourceId} should map to anthropic-research-engineering`
+    );
+  }
+
+  assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
+  assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
+  assert.match(review, /order-tuning-total-unmapped:86/);
+
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.sources = [
+    {
+      id: "content-anthropic-research",
+      name: "Anthropic Research",
+      source_kind: "html_index",
+      status: "checked",
+      parsed_count: 1,
+      notes: "research page parsed"
+    },
+    {
+      id: "content-anthropic-engineering",
+      name: "Anthropic Engineering",
+      source_kind: "html_index",
+      status: "checked",
+      parsed_count: 1,
+      notes: "engineering page parsed"
+    }
+  ];
+  const rows = buildSourceEffectivenessTable({
+    report,
+    candidates: [
+      {
+        id: "anthropic-research-candidate",
+        source_id: "content-anthropic-research",
+        source: "Anthropic Research",
+        included_in: "stories",
+        url: "https://www.anthropic.com/research/example"
+      }
+    ]
+  });
+  const promotedRow = rows.find((row) => row.id === "anthropic-research-engineering");
+  assert(promotedRow, "new source-effectiveness runs should emit the promoted logical source row");
+  assert.equal(promotedRow.display_section, "core_primary");
+  assert.equal(promotedRow.display_rank, 25);
+  assert.equal(promotedRow.status_label, "included");
+  assert.deepEqual(promotedRow.source_ids, ["content-anthropic-research", "content-anthropic-engineering"]);
 });
 
 test("tracking metrics logical sources are promoted into the fixed display contract", async () => {
@@ -13529,9 +13612,9 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 30);
-  assert.equal(result.summary.display_sources, 30);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
+  assert.equal(result.summary.logical_sources, 31);
+  assert.equal(result.summary.display_sources, 31);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 86);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -13567,9 +13650,9 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 30);
-  assert.equal(result.summary.display_sources, 30);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
+  assert.equal(result.summary.logical_sources, 31);
+  assert.equal(result.summary.display_sources, 31);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 86);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
