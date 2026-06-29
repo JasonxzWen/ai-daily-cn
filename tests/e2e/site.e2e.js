@@ -535,6 +535,9 @@ try {
   assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card").count() >= 6, true);
   assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card [data-card-stats]").count() >= 6, true);
   assert.equal(await page.locator("#section-source-status-focus").count(), 1);
+  assert.equal(await page.locator('#section-source-status-focus[data-section-type="filterable-cards"]').count(), 1);
+  assert.equal(await page.locator("#section-source-status-focus .source-status-focus-card").count(), 4);
+  assert.equal(await page.locator("#section-source-status-focus .source-status-focus-card [data-card-stats]").count(), 4);
   assert.equal(await page.locator("#section-source-map").count(), 1);
   assert.equal(await page.locator("#section-source-inventory").count(), 1);
   const sourceSignalStoryText = await page.locator("#section-source-signal-story").textContent();
@@ -549,11 +552,13 @@ try {
   const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
   assert.match(sourceFocusText, /需处理/);
   assert.match(sourceFocusText, /有更新未入选/);
-  assert.match(sourceFocusText, /无近期更新\s+0/);
-  assert.match(sourceFocusText, /解析未成候选\s+0/);
+  assert.match(sourceFocusText, /无近期更新[\s\S]*数量\s+0[\s\S]*no_recent_update\s+0/);
+  assert.match(sourceFocusText, /解析未成候选[\s\S]*数量\s+0[\s\S]*parsed_not_candidate\s+0/);
+  assert.match(sourceFocusText, /代表信源\s*暂无/);
   assert.match(sourceFocusText, /Hugging Face Blog/);
   assert.match(sourceFocusText, /WeChat Platform/);
   assert.match(sourceFocusText, /Anthropic News/);
+  assert.doesNotMatch(sourceFocusText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
   const sourceMapText = await page.locator("#section-source-map").textContent();
   assert.match(sourceMapText, /固定顺序快速索引|鍥哄畾椤哄簭蹇€熺储寮?/);
   assert.equal(await page.locator('#section-source-map a[href="#section-source-map-group-core-primary"]').count(), 1);

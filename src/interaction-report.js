@@ -3616,16 +3616,15 @@ function formatSourceStatusFocusSection(rows = []) {
   }
   const groups = sourceStatusFocusGroups(rows);
   return {
-    type: "markdown",
+    type: "filterable-cards",
     title: "信源状态焦点",
     richId: "source-status-focus",
     group: "main",
     collapsed: false,
-    content: [
-      "先看需要注意的源：阻塞、跳过、无近期更新和有更新未入选都会在这里显式出现；完整固定排序仍保留在下一节。",
-      "",
-      ...groups.map(formatSourceStatusFocusGroup)
-    ].join("\n\n")
+    summary: "先看需要注意的源：阻塞、跳过、无近期更新和有更新未入选都会在这里显式出现；完整固定排序仍保留在下一节。",
+    cardClass: "source-status-focus-card",
+    showFilters: false,
+    items: groups.map(formatSourceStatusFocusCard)
   };
 }
 
@@ -3663,33 +3662,56 @@ function sourceStatusFocusGroups(rows = []) {
   }));
 }
 
-function formatSourceStatusFocusGroup(group) {
+function formatSourceStatusFocusCard(group) {
   const statusCounts = group.statuses
     .map((status) => {
       const count = group.rows.filter((row) => String(row?.status_label || "") === status).length;
-      return `${sourceEffectivenessStatusTag(status)} ${count}`;
+      return `${status} ${count}`;
     })
-    .join(" ");
-  const rows = group.rows.length > 0
-    ? group.rows.map(formatSourceStatusFocusRow)
-    : ["- 暂无"];
-  return [
-    `### ${escapeMarkdownText(group.title)} ${group.rows.length}`,
-    "",
-    `${group.note}。${statusCounts}`,
-    "",
-    ...rows
-  ].join("\n");
+    .join(" / ");
+  const points = group.rows.length > 0
+    ? group.rows.map(formatSourceStatusFocusPoint)
+    : [{ label: "代表信源", value: "暂无" }];
+  return {
+    title: group.title,
+    subtitle: group.note,
+    group: "信源状态焦点",
+    showGroup: false,
+    tags: group.statuses.map(sourceStatusFocusTag),
+    stats: [
+      { label: "数量", value: String(group.rows.length), detail: statusCounts },
+      ...group.statuses.map((status) => ({
+        label: status,
+        value: String(group.rows.filter((row) => String(row?.status_label || "") === status).length)
+      }))
+    ],
+    body: `${group.note}。${statusCounts}`,
+    points
+  };
 }
 
-function formatSourceStatusFocusRow(row) {
-  const sectionLabel = row?.display_section_label ? `（${escapeMarkdownText(row.display_section_label)}）` : "";
-  const reason = row?.not_included_reason ? `；原因：${escapeMarkdownText(row.not_included_reason)}` : "";
-  return [
-    `- ${sourceEffectivenessStatusTag(row?.status_label)} **${escapeMarkdownText(row?.name || row?.id)}**${sectionLabel}：`,
-    sourceBooleanFlags(row),
-    `；${Number(row?.candidate_count || 0)} 候选 / ${Number(row?.included_count || 0)} 公开${reason}`
-  ].join("");
+function sourceStatusFocusTag(status) {
+  const value = String(status || "unknown");
+  const kind = {
+    blocked: "major",
+    not_configured_or_skipped: "notable",
+    updated_not_selected: "notable",
+    no_recent_update: "general",
+    parsed_not_candidate: "general"
+  }[value] || "general";
+  return { label: value, kind };
+}
+
+function formatSourceStatusFocusPoint(row) {
+  const sectionLabel = row?.display_section_label ? `（${row.display_section_label}）` : "";
+  const reason = row?.not_included_reason ? `；原因：${row.not_included_reason}` : "";
+  return {
+    label: `${row?.name || row?.id}${sectionLabel}`,
+    value: [
+      sourceBooleanFlags(row),
+      `；${Number(row?.candidate_count || 0)} 候选 / ${Number(row?.included_count || 0)} 公开${reason}`
+    ].join("")
+  };
 }
 
 function groupedSourceRows(rows = []) {

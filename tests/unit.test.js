@@ -14374,6 +14374,53 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
   assert.doesNotMatch(JSON.stringify(dashboard), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
 });
 
+test("source status focus renders attention cards", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const statusFocus = input.sections.find((section) => section.richId === "source-status-focus");
+
+  assert(statusFocus, "source status focus section should render");
+  assert.equal(statusFocus.type, "filterable-cards");
+  assert.equal(statusFocus.cardClass, "source-status-focus-card");
+  assert.equal(statusFocus.showFilters, false);
+  assert.deepEqual(statusFocus.items.map((item) => item.title), [
+    "需处理",
+    "有更新未入选",
+    "无近期更新",
+    "解析未成候选"
+  ]);
+  assert.deepEqual(statusFocus.items.map((item) => item.stats?.[0]?.value), ["2", "1", "1", "1"]);
+  assert(statusFocus.items.every((item) => item.showGroup === false));
+  assert(statusFocus.items.every((item) => Array.isArray(item.tags) && item.tags.length > 0));
+
+  const serialized = JSON.stringify(statusFocus);
+  assert.match(serialized, /Hugging Face Blog/);
+  assert.match(serialized, /WeChat Platform/);
+  assert.match(serialized, /not_configured_or_skipped/);
+  assert.match(serialized, /fetch_failed/);
+  assert.match(serialized, /Google AI Blog/);
+  assert.match(serialized, /no_recent_update/);
+  assert.match(serialized, /Google DeepMind Blog/);
+  assert.match(serialized, /parsed_not_candidate/);
+  assert(serialized.includes("1 候选 / 0 公开"));
+  assert.doesNotMatch(serialized, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
+
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture().filter((row) =>
+    ["openai-news", "wechat-platform"].includes(row.id)
+  );
+  const sparseInput = reportToInteractionInput(report);
+  const sparseStatusFocus = sparseInput.sections.find((section) => section.richId === "source-status-focus");
+  assert.deepEqual(sparseStatusFocus.items.map((item) => item.title), [
+    "需处理",
+    "有更新未入选",
+    "无近期更新",
+    "解析未成候选"
+  ]);
+  assert(sparseStatusFocus.items.slice(1).every((item) => /暂无/.test(JSON.stringify(item))));
+});
+
 test("source-first runtime contract binds interaction sections to presentation contract", async () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceFirstRuntimeRowsFixture();
@@ -15370,18 +15417,38 @@ test("source-first IA status focus surfaces actionable source states before the 
   assert(graphIndex > focusIndex, "source graph should render after source focus");
   assert(storyIndex > graphIndex, "story tracks should stay after source-first sections");
   assert.equal(focus?.title, "信源状态焦点");
-  assert.match(focus.content, /需处理\s+2/);
-  assert.match(focus.content, /Hugging Face Blog/);
-  assert.match(focus.content, /WeChat Platform/);
-  assert(focus.content.indexOf("Hugging Face Blog") < focus.content.indexOf("WeChat Platform"));
-  assert.match(focus.content, /有更新未入选\s+1/);
-  assert.match(focus.content, /Anthropic News/);
-  assert.match(focus.content, /无近期更新\s+1/);
-  assert.match(focus.content, /Google Research Blog/);
-  assert.match(focus.content, /解析未成候选\s+1/);
-  assert.match(focus.content, /ML Papers of the Week/);
-  assert.match(focus.content, /==tag-status-blocked\|blocked==/);
-  assert.match(focus.content, /==tag-status-skipped\|not_configured_or_skipped==/);
+  assert.equal(focus.type, "filterable-cards");
+  assert.equal(focus.cardClass, "source-status-focus-card");
+  assert.equal(focus.showFilters, false);
+  assert.deepEqual(focus.items.map((item) => item.title), [
+    "需处理",
+    "有更新未入选",
+    "无近期更新",
+    "解析未成候选"
+  ]);
+  assert.deepEqual(focus.items.map((item) => item.stats?.[0]?.value), ["2", "1", "1", "1"]);
+  assert(focus.items.every((item) => item.showGroup === false));
+
+  const actionCard = focus.items.find((item) => item.title === "需处理");
+  const actionText = JSON.stringify(actionCard);
+  assert.match(actionText, /Hugging Face Blog/);
+  assert.match(actionText, /WeChat Platform/);
+  assert(actionText.indexOf("Hugging Face Blog") < actionText.indexOf("WeChat Platform"));
+  assert.match(actionText, /blocked/);
+  assert.match(actionText, /not_configured_or_skipped/);
+  assert.match(actionText, /not_configured_or_not_checked/);
+
+  const updatedCard = focus.items.find((item) => item.title === "有更新未入选");
+  assert.match(JSON.stringify(updatedCard), /Anthropic News/);
+  assert.match(JSON.stringify(updatedCard), /1 候选 \/ 0 公开/);
+
+  const staleCard = focus.items.find((item) => item.title === "无近期更新");
+  assert.match(JSON.stringify(staleCard), /Google Research Blog/);
+  assert.match(JSON.stringify(staleCard), /no_recent_update/);
+
+  const parsedCard = focus.items.find((item) => item.title === "解析未成候选");
+  assert.match(JSON.stringify(parsedCard), /ML Papers of the Week/);
+  assert.match(JSON.stringify(parsedCard), /parsed_not_candidate/);
   assert(!serializedSections.includes("source_audit"));
   assert(!serializedSections.includes("candidate_pool"));
   assert(!serializedSections.includes("selection_snapshot"));
