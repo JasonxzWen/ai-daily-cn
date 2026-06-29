@@ -173,6 +173,10 @@ export function reportToInteractionInput(report, options = {}) {
   if (sourceDashboard) {
     sections.push(sourceDashboard);
   }
+  const sourceStatusFocus = formatSourceStatusFocusSection(sourceEffectivenessRows);
+  if (sourceStatusFocus) {
+    sections.push(sourceStatusFocus);
+  }
   const sourceMap = formatSourceMapSection(sourceEffectivenessRows);
   if (sourceMap) {
     sections.push(sourceMap);
@@ -3121,6 +3125,88 @@ function formatSourceMapSection(rows = []) {
     collapsed: false,
     content: groups.map(formatSourceMapGroup).join("\n\n")
   };
+}
+
+function formatSourceStatusFocusSection(rows = []) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+  const groups = sourceStatusFocusGroups(rows);
+  return {
+    type: "markdown",
+    title: "信源状态焦点",
+    richId: "source-status-focus",
+    group: "main",
+    collapsed: false,
+    content: [
+      "先看需要注意的源：阻塞、跳过、无近期更新和有更新未入选都会在这里显式出现；完整固定排序仍保留在下一节。",
+      "",
+      ...groups.map(formatSourceStatusFocusGroup)
+    ].join("\n\n")
+  };
+}
+
+function sourceStatusFocusGroups(rows = []) {
+  const sortedRows = rows.slice().sort((left, right) =>
+    Number(left.display_section_rank || 999) - Number(right.display_section_rank || 999) ||
+    Number(left.display_rank || 999) - Number(right.display_rank || 999) ||
+    String(left.name || "").localeCompare(String(right.name || ""))
+  );
+  const groupDefs = [
+    {
+      title: "需处理",
+      statuses: ["blocked", "not_configured_or_skipped"],
+      note: "不可达、解析阻塞、缺配置或被跳过"
+    },
+    {
+      title: "有更新未入选",
+      statuses: ["updated_not_selected"],
+      note: "抓到候选，但今天没有进入公开页"
+    },
+    {
+      title: "无近期更新",
+      statuses: ["no_recent_update"],
+      note: "源可访问，但没有近期有效更新"
+    },
+    {
+      title: "解析未成候选",
+      statuses: ["parsed_not_candidate"],
+      note: "解析到近期内容，但没有形成候选"
+    }
+  ];
+  return groupDefs.map((group) => ({
+    ...group,
+    rows: sortedRows.filter((row) => group.statuses.includes(String(row?.status_label || "")))
+  }));
+}
+
+function formatSourceStatusFocusGroup(group) {
+  const statusCounts = group.statuses
+    .map((status) => {
+      const count = group.rows.filter((row) => String(row?.status_label || "") === status).length;
+      return `${sourceEffectivenessStatusTag(status)} ${count}`;
+    })
+    .join(" ");
+  const rows = group.rows.length > 0
+    ? group.rows.map(formatSourceStatusFocusRow)
+    : ["- 暂无"];
+  return [
+    `### ${escapeMarkdownText(group.title)} ${group.rows.length}`,
+    "",
+    `${group.note}。${statusCounts}`,
+    "",
+    ...rows
+  ].join("\n");
+}
+
+function formatSourceStatusFocusRow(row) {
+  const sectionLabel = row?.display_section_label ? `（${escapeMarkdownText(row.display_section_label)}）` : "";
+  const reason = row?.not_included_reason ? `；原因：${escapeMarkdownText(row.not_included_reason)}` : "";
+  return [
+    `- ${sourceEffectivenessStatusTag(row?.status_label)} **${escapeMarkdownText(row?.name || row?.id)}**${sectionLabel}：`,
+    sourceBooleanFlags(row),
+    `；${Number(row?.candidate_count || 0)} 候选 / ${Number(row?.included_count || 0)} 公开${reason}`
+  ].join("");
 }
 
 function groupedSourceRows(rows = []) {

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-status-focus",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first IA status focus",
+  "status": "completed",
+  "summary": "This iteration adds a reader-facing source status focus section between the source dashboard and the full source graph. It groups blocked, skipped or unconfigured, updated-not-selected, no-recent-update, and parsed-not-candidate source states so important source health signals remain visible before the reader reaches the full fixed-order source map.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first IA status focus\" tests/unit.test.js",
+      "node --test tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A complete source graph can still hide actionable source states if the reader must scan every group manually.",
+      "evidence": "The new focus section places need-action, updated-not-selected, no-recent-update, and parsed-not-candidate groups before the full graph while preserving fixed ordering inside each group.",
+      "scope": "public_daily_ia",
+      "persistence": "implemented",
+      "recommended_action": "Use the focus section as the default place for future source-health summaries instead of adding more hero cards."
+    },
+    {
+      "lesson": "Zero-count source states should be explicit when they are part of the operating contract.",
+      "evidence": "The focus section renders zero-count groups such as no-recent-update even when no rows currently match, making absence auditable instead of implicit.",
+      "scope": "source_visibility",
+      "persistence": "implemented",
+      "recommended_action": "Keep zero-state rows in future source-status UI so readers can distinguish healthy absence from missing instrumentation."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Evaluate whether the full source graph should gain a lightweight collapsible status index once more logical source rows are added to the public contract.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-status-focus"
+}

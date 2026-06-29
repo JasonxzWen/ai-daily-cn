@@ -503,8 +503,17 @@ try {
     ["阻塞信源", "1"]
   ]);
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
+  assert.equal(await page.locator("#section-source-status-focus").count(), 1);
   assert.equal(await page.locator("#section-source-map").count(), 1);
   assert.match(await page.locator("#section-source-first-dashboard").textContent(), /全部逻辑信源|公开入选|未配置或跳过/);
+  const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
+  assert.match(sourceFocusText, /需处理/);
+  assert.match(sourceFocusText, /有更新未入选/);
+  assert.match(sourceFocusText, /无近期更新\s+0/);
+  assert.match(sourceFocusText, /解析未成候选\s+0/);
+  assert.match(sourceFocusText, /Hugging Face Blog/);
+  assert.match(sourceFocusText, /WeChat Platform/);
+  assert.match(sourceFocusText, /Anthropic News/);
   const sourceMapText = await page.locator("#section-source-map").textContent();
   assert.match(sourceMapText, /Hugging Face Blog/);
   assert.match(sourceMapText, /blocked/);
@@ -514,7 +523,8 @@ try {
     nodes.map((node) => node.id)
   );
   assert(publicSectionOrder.indexOf("section-source-first-dashboard") >= 0, JSON.stringify(publicSectionOrder));
-  assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-first-dashboard"));
+  assert(publicSectionOrder.indexOf("section-source-status-focus") > publicSectionOrder.indexOf("section-source-first-dashboard"));
+  assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-status-focus"));
   const firstTrackOrderIndex = publicSectionOrder.findIndex((id) => id.startsWith("section-track-"));
   assert(firstTrackOrderIndex > publicSectionOrder.indexOf("section-source-map"), JSON.stringify(publicSectionOrder));
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
@@ -574,6 +584,7 @@ try {
   const contentBox = await page.locator(".report-section-stack").boundingBox();
   assert(railBox && contentBox && railBox.x < contentBox.x, "nav rail should sit left of the content stack");
   assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 
@@ -602,6 +613,7 @@ try {
   const mobileLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
   assert.equal(mobileLayoutColumns.trim().split(/\s+/).length, 1, `report-layout should collapse to one column on mobile, got: ${mobileLayoutColumns}`);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
   await firstTrackHeading.evaluate((node) => {
