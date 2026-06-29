@@ -13521,6 +13521,8 @@ test("source-first IA dashboard promotes source metrics and fixed source graph",
   );
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const graph = input.sections.find((section) => section.richId === "source-map");
+  const coreSourceGroup = input.sections.find((section) => section.richId === "source-map-group-core-primary");
+  const platformSourceGroup = input.sections.find((section) => section.richId === "source-map-group-platform-cn-media");
   const firstSection = input.sections.find((section) => !section.appendix);
   const storySections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
   const serializedSections = JSON.stringify(input.sections);
@@ -13538,11 +13540,195 @@ test("source-first IA dashboard promotes source metrics and fixed source graph",
   assert(graph, "source graph section should render from source_effectiveness");
   assert(graph.content.indexOf("核心一手源") < graph.content.indexOf("开源、模型平台与代码生态"));
   assert(graph.content.indexOf("开源、模型平台与代码生态") < graph.content.indexOf("中文平台与媒体线索"));
-  assert.match(graph.content, /Hugging Face Blog/);
-  assert.match(graph.content, /blocked/);
-  assert.match(graph.content, /WeChat Platform/);
-  assert.match(graph.content, /not_configured_or_skipped/);
+  assert(coreSourceGroup, "core source group section should render from source_effectiveness");
+  assert(platformSourceGroup, "platform source group section should render from source_effectiveness");
+  assert.match(coreSourceGroup.content, /Hugging Face Blog/);
+  assert.match(coreSourceGroup.content, /blocked/);
+  assert.match(platformSourceGroup.content, /WeChat Platform/);
+  assert.match(platformSourceGroup.content, /not_configured_or_skipped/);
   assert(storySections.length > 0, "story-first sections should remain visible");
+  assert(!serializedSections.includes("source_audit"));
+  assert(!serializedSections.includes("candidate_pool"));
+  assert(!serializedSections.includes("selection_snapshot"));
+});
+
+test("source map scan index summarizes fixed groups before detail rows", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news-rss"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "official RSS parsed"
+    },
+    {
+      id: "anthropic-news",
+      name: "Anthropic News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: false,
+      not_included_reason: "candidate_not_selected_for_public_page",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 20,
+      display_mode: "expanded",
+      status_label: "updated_not_selected",
+      source_ids: ["content-anthropic-company-news"],
+      source_kinds: ["html_index"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 0,
+      notes: "candidate created but not selected"
+    },
+    {
+      id: "hugging-face-blog",
+      name: "Hugging Face Blog",
+      role: "official",
+      configured: true,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "blocked_or_unreachable",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 80,
+      display_mode: "expanded",
+      status_label: "blocked",
+      source_ids: ["content-hugging-face-blog"],
+      source_kinds: ["rss"],
+      statuses: ["blocked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "HTTP 500"
+    },
+    {
+      id: "github-trending",
+      name: "GitHub Trending",
+      role: "aggregator",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "open_source_platforms",
+      display_section_label: "开源、模型平台与代码生态",
+      display_section_rank: 30,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: [],
+      source_kinds: ["html"],
+      statuses: ["checked"],
+      candidate_count: 10,
+      included_count: 8,
+      notes: "weekly language pools"
+    },
+    {
+      id: "ml-papers-week",
+      name: "ML Papers of the Week",
+      role: "open_source_aggregator",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "parsed_but_no_candidate_created",
+      display_section: "open_source_platforms",
+      display_section_label: "开源、模型平台与代码生态",
+      display_section_rank: 30,
+      display_rank: 80,
+      display_mode: "collapsed",
+      status_label: "parsed_not_candidate",
+      source_ids: ["content-ml-papers-week"],
+      source_kinds: ["github"],
+      statuses: ["checked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "parsed but no candidate"
+    },
+    {
+      id: "wechat-platform",
+      name: "WeChat Platform",
+      role: "platform",
+      configured: false,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "not_configured_or_not_checked",
+      display_section: "platform_cn_media",
+      display_section_label: "中文平台与媒体线索",
+      display_section_rank: 60,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "not_configured_or_skipped",
+      source_ids: ["platform-wechat-ai-feed"],
+      source_kinds: ["rsshub"],
+      statuses: ["skipped_missing_base_url"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "RSSHUB_BASE_URL missing"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const graph = input.sections.find((section) => section.richId === "source-map");
+  const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");
+  const coreIndex = input.sections.findIndex((section) => section.richId === "source-map-group-core-primary");
+  const openSourceIndex = input.sections.findIndex((section) => section.richId === "source-map-group-open-source-platforms");
+  const platformIndex = input.sections.findIndex((section) => section.richId === "source-map-group-platform-cn-media");
+  const coreGroup = input.sections[coreIndex];
+  const openSourceGroup = input.sections[openSourceIndex];
+  const platformGroup = input.sections[platformIndex];
+  const serializedSections = JSON.stringify(input.sections);
+
+  assert(graph, "source graph section should render");
+  assert(coreGroup, "core source group section should render");
+  assert(openSourceGroup, "open source group section should render");
+  assert(platformGroup, "platform source group section should render");
+  assert(coreIndex > graphIndex, "core group should render after the scan index");
+  assert(openSourceIndex > coreIndex, "open source group should preserve fixed source order");
+  assert(platformIndex > openSourceIndex, "platform group should preserve fixed source order");
+  assert.match(graph.content, /固定顺序快速索引/);
+  assert.match(graph.content, /\]\(#section-source-map-group-core-primary\)/);
+  assert.match(graph.content, /\]\(#section-source-map-group-open-source-platforms\)/);
+  assert.match(graph.content, /\]\(#section-source-map-group-platform-cn-media\)/);
+  assert(graph.content.indexOf("source-map-group-core-primary") < graph.content.indexOf("source-map-group-open-source-platforms"));
+  assert(graph.content.indexOf("source-map-group-open-source-platforms") < graph.content.indexOf("source-map-group-platform-cn-media"));
+  assert.match(graph.content, /\|\s*\[核心一手源\]\(#section-source-map-group-core-primary\)\s*\|\s*3\s*\|\s*1\s*\|\s*1\s*\|\s*1\s*\|\s*0\s*\|/);
+  assert.match(graph.content, /\|\s*\[开源、模型平台与代码生态\]\(#section-source-map-group-open-source-platforms\)\s*\|\s*2\s*\|\s*1\s*\|\s*0\s*\|\s*0\s*\|\s*1\s*\|/);
+  assert.match(graph.content, /\|\s*\[中文平台与媒体线索\]\(#section-source-map-group-platform-cn-media\)\s*\|\s*1\s*\|\s*0\s*\|\s*1\s*\|\s*0\s*\|\s*0\s*\|/);
+  assert.match(coreGroup.content, /OpenAI News/);
+  assert.match(coreGroup.content, /Hugging Face Blog/);
+  assert.match(coreGroup.content, /blocked/);
+  assert.match(openSourceGroup.content, /ML Papers of the Week/);
+  assert.match(openSourceGroup.content, /parsed_not_candidate/);
+  assert.match(platformGroup.content, /WeChat Platform/);
+  assert.match(platformGroup.content, /not_configured_or_skipped/);
   assert(!serializedSections.includes("source_audit"));
   assert(!serializedSections.includes("candidate_pool"));
   assert(!serializedSections.includes("selection_snapshot"));

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-map-scan-index",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source map scan index",
+  "status": "completed",
+  "summary": "This iteration makes the fixed source map easier to scan before reading every logical source. It adds a compact source-map index with per-section counts for included, need-action, updated-not-selected, and low-signal rows, then renders each fixed source section as a stable `source-map-group-*` markdown panel that the index can link to without exposing internal audit data.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source map scan index\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source map scan index|source-first IA dashboard|source-first IA status focus\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Playwright desktop/mobile visual check for docs/reports/2026/06/2026-06-29.html",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Production daily markdown strips raw HTML before rendering.",
+      "evidence": "The first E2E pass failed because raw `<span>` and `<a id>` markers were removed from the pre-rendered HTML. The final implementation uses markdown links to renderer-native section ids instead.",
+      "scope": "effective_interact_pre_rendered_daily",
+      "persistence": "implemented",
+      "recommended_action": "For public daily anchors, prefer stable `richId` section ids over raw HTML embedded inside markdown content."
+    },
+    {
+      "lesson": "A full source graph needs a scan layer before detailed rows.",
+      "evidence": "The source-map section now lists every fixed source group with deterministic counts and links to the matching detailed `source-map-group-*` section.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "When expanding the logical source list, keep new sections in the display contract and rely on the scan index to preserve reader orientation."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After the fixed importance order is manually tuned, replay a larger source_effectiveness fixture to check the index remains compact with the expanded logical source graph.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-map-scan-index"
+}
