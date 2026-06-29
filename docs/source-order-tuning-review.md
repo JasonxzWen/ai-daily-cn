@@ -19,7 +19,7 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:106 -->
+<!-- order-tuning-total-unmapped:103 -->
 
 These counts come from the 154-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
@@ -28,7 +28,7 @@ These counts come from the 154-entry safe inventory. They show how many collecti
 | `core_primary` | 9 | Promote the most durable official lab/company subchannels first. |
 | `china_models` | 35 | Promote Chinese model labs and platform blogs as a dedicated first-class layer. |
 | `open_source_platforms` | 12 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
-| `tracking_metrics` | 3 | Promote all three structured benchmark/ranking sources. |
+| `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
 | `builder_community` | 39 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
 | `platform_cn_media` | 6 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
@@ -58,9 +58,6 @@ These candidates are proposed first-class logical sources. They are not merged i
 | `content-arxiv-cs-ai` | `arxiv-cs-ai` | `open_source_platforms` | 30 | `promote` | arXiv cs.AI is a durable paper stream. |
 | `content-huggingface-daily-papers` | `huggingface-daily-papers` | `open_source_platforms` | 40 | `promote` | Hugging Face Daily Papers is a recognizable paper discovery surface. |
 | `content-papers-with-code-api` | `papers-with-code` | `open_source_platforms` | 50 | `promote` | Papers with Code is a structured model/paper ecosystem source. |
-| `content-openrouter-rankings` | `openrouter-rankings` | `tracking_metrics` | 10 | `promote` | OpenRouter rankings are a core usage/market signal. |
-| `content-artificial-analysis-intelligence-index` | `artificial-analysis-index` | `tracking_metrics` | 20 | `promote` | Artificial Analysis is a durable model intelligence benchmark source. |
-| `content-swe-bench-pro-public` | `swe-bench-pro` | `tracking_metrics` | 30 | `promote` | SWE-Bench Pro is a compact coding benchmark source. |
 | `content-builder-simon-willison` | `simon-willison` | `builder_community` | 30 | `promote` | Simon Willison is a high-signal builder/analyst source. |
 | `content-builder-lilian-weng` | `lilian-weng` | `builder_community` | 40 | `promote` | Lilian Weng is a high-signal technical explainer source. |
 | `content-latent-space` | `latent-space` | `builder_community` | 50 | `promote` | Latent Space is a recurring builder/research community source. |

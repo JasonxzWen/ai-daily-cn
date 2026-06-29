@@ -142,6 +142,24 @@ export const CORE_SOURCE_CONTRACTS = [
     name: "GitHub Trending",
     role: "github_trending",
     aliases: ["github trending", "github.com/trending", "ossinsight trending"]
+  },
+  {
+    id: "openrouter-rankings",
+    name: "OpenRouter Rankings",
+    role: "tracking_metric",
+    aliases: ["content-openrouter-rankings", "openrouter rankings", "openrouter_rankings_public_playwright", "openrouter.ai/rankings"]
+  },
+  {
+    id: "artificial-analysis-index",
+    name: "Artificial Analysis Intelligence Index",
+    role: "tracking_metric",
+    aliases: ["content-artificial-analysis-intelligence-index", "artificial analysis intelligence index", "artificial analysis", "artificial_analysis_index_public_playwright"]
+  },
+  {
+    id: "swe-bench-pro",
+    name: "SWE-Bench Pro",
+    role: "tracking_metric",
+    aliases: ["content-swe-bench-pro-public", "swe-bench pro", "swe bench pro", "scale labs swe-bench pro", "swe_bench_pro_public_playwright"]
   }
 ];
 

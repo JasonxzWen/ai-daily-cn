@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.tracking-metrics-logical-sources",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Tracking metrics logical sources",
+  "status": "completed",
+  "summary": "This iteration promotes OpenRouter Rankings, Artificial Analysis Intelligence Index, and SWE-Bench Pro from unmapped collection entries into first-class logical sources under the fixed tracking_metrics section. It keeps the 154-entry inventory intact while reducing unmapped review candidates from 106 to 103.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"tracking metrics logical sources\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source display contract governance|source insertion handbook|source order tuning review|source inventory order reference|tracking metrics logical sources\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Structured metric sources should be first-class in the source graph.",
+      "evidence": "`openrouter-rankings`, `artificial-analysis-index`, and `swe-bench-pro` are now in `CORE_SOURCE_CONTRACTS` and `config/source-display-contract.json` under `tracking_metrics`.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Use the same small-batch promotion pattern for later high-confidence China model sources."
+    },
+    {
+      "lesson": "Promotion must update review and inventory references together.",
+      "evidence": "`docs/source-inventory-order.md` now maps the three tracking entries to logical sources, and `docs/source-order-tuning-review.md` reduces unmapped sources to 103 and removes those promotion rows.",
+      "scope": "source_order_review",
+      "persistence": "implemented",
+      "recommended_action": "For every future promotion, update the executable contract, inventory reference, review surface, handbook, and tests in the same PR."
+    },
+    {
+      "lesson": "Tracking source identity should not change collection or template behavior.",
+      "evidence": "This slice changes static logical-source metadata and deterministic generated HTML mapping text only; it leaves source registry, discovery, public JSON data, CSS/templates, automation, and publish behavior untouched.",
+      "scope": "tracking_metrics",
+      "persistence": "implemented",
+      "recommended_action": "Keep tracking component reconstruction and visual table behavior covered by existing tests when future metric sources are promoted."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-tracking-component-reconstruction",
+    "feedback/p1-tracking-visual-tables",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Promote the next small batch from `docs/source-order-tuning-review.md`, likely high-confidence `china_models` sources, after reviewing proposed ids and ranks.",
+      "owner": "project"
+    }
+  ],
+  "slug": "tracking-metrics-logical-sources"
+}

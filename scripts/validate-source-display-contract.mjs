@@ -427,6 +427,11 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
   }
 
   const expectedCounts = countUnmappedInventorySections(inventoryRows);
+  for (const sectionId of sectionIds) {
+    if (!expectedCounts.has(sectionId)) {
+      expectedCounts.set(sectionId, 0);
+    }
+  }
   const listedCounts = extractOrderTuningUnmappedCounts(review);
   for (const [sectionId, expectedCount] of expectedCounts.entries()) {
     const listedCount = listedCounts.get(sectionId);
