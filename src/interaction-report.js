@@ -3146,8 +3146,54 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
   const updatedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "updated_not_selected", 3);
   const blockedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "blocked", 3);
   const skippedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "not_configured_or_skipped", 3);
+  const lowSignalNames = sourceSignalSourceNames(rows, (row) =>
+    row.status_label === "no_recent_update" || row.status_label === "parsed_not_candidate",
+  3);
   const noSignalCount = metrics.noRecentUpdate + metrics.parsedNotCandidate;
-  const lines = [
+  return {
+    type: "filterable-cards",
+    title: "今日信源故事",
+    richId: "source-signal-story",
+    group: "main",
+    collapsed: false,
+    cardClass: "source-signal-story-card",
+    showFilters: false,
+    summary: `${validSignals}/${metrics.total} 个信源提供有效公开信号；阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+    content: sourceSignalStoryMarkdown({
+      metrics,
+      validSignals,
+      noSignalCount,
+      storyTitles,
+      includedNames,
+      updatedNames,
+      blockedNames,
+      skippedNames
+    }),
+    items: sourceSignalStoryCards({
+      metrics,
+      validSignals,
+      noSignalCount,
+      storyTitles,
+      includedNames,
+      updatedNames,
+      blockedNames,
+      skippedNames,
+      lowSignalNames
+    })
+  };
+}
+
+function sourceSignalStoryMarkdown({
+  metrics,
+  validSignals,
+  noSignalCount,
+  storyTitles = [],
+  includedNames = [],
+  updatedNames = [],
+  blockedNames = [],
+  skippedNames = []
+} = {}) {
+  return [
     "### 今日信源故事",
     "",
     `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}，低信号 ${noSignalCount}，阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
@@ -3162,17 +3208,118 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
       : "旁路更新：今天没有额外的有更新未入选信源。",
     sourceSignalGapSentence(blockedNames, skippedNames, metrics),
     "",
-    `继续查看：[信源运行概况](#section-source-first-dashboard) · [状态焦点](#section-source-status-focus) · [全量信源清单](#section-source-inventory)`
+    "继续查看：[信源运行概况](#section-source-first-dashboard) · [状态焦点](#section-source-status-focus) · [全量信源清单](#section-source-inventory)"
+  ].filter(Boolean).join("\n");
+}
+
+function sourceSignalStoryCards({
+  metrics,
+  validSignals,
+  noSignalCount,
+  storyTitles = [],
+  includedNames = [],
+  updatedNames = [],
+  blockedNames = [],
+  skippedNames = [],
+  lowSignalNames = []
+} = {}) {
+  return [
+    sourceSignalStoryCard({
+      title: "有效信源主线",
+      subtitle: "story first",
+      href: "#section-source-first-dashboard",
+      titleIcon: generatedSiteIcon("S1", "#0f766e", "#ffffff"),
+      tags: [
+        { label: "source story", kind: "major" },
+        { label: "metrics next", kind: "general" }
+      ],
+      stats: [
+        { label: "有效信源", value: `${validSignals}/${metrics.total}` },
+        { label: "公开入选", value: `${metrics.included}/${metrics.total}` },
+        { label: "有更新未入选", value: String(metrics.updatedNotSelected) },
+        { label: "低信号", value: String(noSignalCount) },
+        { label: "阻塞", value: String(metrics.blocked) },
+        { label: "未配置或跳过", value: String(metrics.skipped) }
+      ],
+      body: `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}。`,
+      points: [
+        { label: "下一屏", value: "信源运行概况给出完整 metrics 仪表盘。" },
+        { label: "固定关系", value: "story 先解释信号，dashboard 随后量化运行状态。" }
+      ]
+    }),
+    sourceSignalStoryCard({
+      title: "可见 story",
+      subtitle: "visible narrative",
+      href: "#section-source-first-dashboard",
+      titleIcon: generatedSiteIcon("S2", "#2563eb", "#ffffff"),
+      tags: [{ label: "story", kind: "notable" }],
+      stats: [{ label: "story", value: String(storyTitles.length) }],
+      body: storyTitles.length > 0
+        ? `今日主线来自 ${storyTitles.length} 个可见 story。`
+        : "今日没有足够清晰的公开 story，本页保留信源运行状态，不强行扩写。",
+      points: [
+        { label: "标题", value: sourceSignalListText(storyTitles, "暂无可见 story") }
+      ]
+    }),
+    sourceSignalStoryCard({
+      title: "有效信源",
+      subtitle: "included sources",
+      href: "#section-source-inventory",
+      titleIcon: generatedSiteIcon("S3", "#16a34a", "#ffffff"),
+      tags: [{ label: "included", kind: "major" }],
+      stats: [{ label: "公开入选", value: String(metrics.included) }],
+      body: includedNames.length > 0
+        ? "这些信源直接支撑今天的公开页面。"
+        : "今天没有信源进入公开页。",
+      points: [
+        { label: "代表源", value: sourceSignalListText(includedNames, "暂无公开入选信源") },
+        { label: "全量清单", value: "继续查看全量信源清单。" }
+      ]
+    }),
+    sourceSignalStoryCard({
+      title: "旁路与缺口",
+      subtitle: "updates and gaps",
+      href: "#section-source-status-focus",
+      titleIcon: generatedSiteIcon("S4", "#ea580c", "#ffffff"),
+      tags: [
+        { label: "gaps visible", kind: metrics.blocked || metrics.skipped ? "major" : "general" },
+        { label: "no hiding", kind: "general" }
+      ],
+      stats: [
+        { label: "旁路更新", value: String(metrics.updatedNotSelected) },
+        { label: "低信号", value: String(noSignalCount) },
+        { label: "阻塞", value: String(metrics.blocked) },
+        { label: "未配置或跳过", value: String(metrics.skipped) }
+      ],
+      body: sourceSignalGapSentence(blockedNames, skippedNames, metrics),
+      points: [
+        { label: "有更新未入选", value: sourceSignalListText(updatedNames, "暂无额外旁路更新") },
+        { label: "低信号", value: sourceSignalListText(lowSignalNames, "暂无低信号样本") },
+        { label: "阻塞/跳过", value: sourceSignalListText([...blockedNames, ...skippedNames], "暂无阻塞或跳过样本") },
+        { label: "全量清单", value: "继续查看全量信源清单。" }
+      ]
+    })
   ];
+}
+
+function sourceSignalStoryCard({ title, subtitle, href, titleIcon, tags = [], stats = [], body, points = [] }) {
   return {
-    type: "markdown",
-    title: "今日信源故事",
-    richId: "source-signal-story",
-    group: "main",
-    collapsed: false,
-    summary: `${validSignals}/${metrics.total} 个信源提供有效公开信号；阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
-    content: lines.filter(Boolean).join("\n")
+    title,
+    subtitle,
+    href,
+    titleIcon,
+    group: "首屏信源故事",
+    showGroup: false,
+    tags,
+    stats,
+    body,
+    points
   };
+}
+
+function sourceSignalListText(values = [], emptyText = "暂无") {
+  const names = uniqueSourceSignalStrings(values).slice(0, 4);
+  return names.length > 0 ? names.join("、") : emptyText;
 }
 
 function sourceSignalStoryTitles(stories = [], mainItems = []) {

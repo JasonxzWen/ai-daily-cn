@@ -530,6 +530,10 @@ try {
     return Boolean(heroSummary && nav && (heroSummary.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING));
   }), true);
   assert.equal(await page.locator("#section-source-signal-story").count(), 1);
+  assert.equal(await page.locator('#section-source-signal-story[data-section-type="filterable-cards"]').count(), 1);
+  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card").count(), 4);
+  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card [data-card-stats]").count(), 4);
+  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card .card-title-icon").count(), 4);
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
   assert.equal(await page.locator('#section-source-first-dashboard[data-section-type="filterable-cards"]').count(), 1);
   assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card").count() >= 6, true);
@@ -541,6 +545,9 @@ try {
   assert.equal(await page.locator("#section-source-map").count(), 1);
   assert.equal(await page.locator("#section-source-inventory").count(), 1);
   const sourceSignalStoryText = await page.locator("#section-source-signal-story").textContent();
+  assert.match(sourceSignalStoryText, /有效信源主线/);
+  assert.match(sourceSignalStoryText, /可见 story/);
+  assert.match(sourceSignalStoryText, /旁路与缺口/);
   assert.match(sourceSignalStoryText, /今日信源故事/);
   assert.match(sourceSignalStoryText, /有效信源|公开入选/);
   assert.match(sourceSignalStoryText, /Hugging Face Blog/);

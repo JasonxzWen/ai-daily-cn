@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-screen-story-dashboard",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source first-screen story and dashboard",
+  "status": "completed",
+  "summary": "This iteration turns the first-screen source signal story into four fixed cards and keeps the source metrics dashboard immediately after it as the numeric operating view.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source signal story renders first-screen cards before metrics\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source signal story renders first-screen cards before metrics|source signal story rollup|source-first hero synopsis|source metrics dashboard cards|source-first runtime contract|source status focus|source inventory|source map scan index|source display contract governance\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The first source section should be a story surface, not only prose.",
+      "evidence": "`source-signal-story` now emits an effective-interact `filterable-cards` section with four fixed cards for the lead source story, visible story titles, included sources, and side-channel or gap states.",
+      "scope": "source_signal_story",
+      "persistence": "implemented",
+      "recommended_action": "Keep future first-screen source refinements on the fixed card contract so story and metrics remain visually distinct."
+    },
+    {
+      "lesson": "Metrics should support the source story instead of replacing it.",
+      "evidence": "The source-first runtime order still starts with `source-signal-story` and then `source-first-dashboard`; the dashboard card contract and metric definitions remain unchanged.",
+      "scope": "source_first_dashboard",
+      "persistence": "implemented",
+      "recommended_action": "Tune metric wording or density only after preserving the story-first ordering contract."
+    },
+    {
+      "lesson": "Visible source gaps need to stay in the first viewport.",
+      "evidence": "The fourth story card exposes updated-not-selected, low-signal, blocked, and skipped/unconfigured source names without hiding them in the later inventory.",
+      "scope": "source_gap_visibility",
+      "persistence": "implemented",
+      "recommended_action": "Continue surfacing source gaps before long source maps or inventory sections."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the next phase to refine source card wording and density after reviewing the next real daily run, without changing source collection or ranking.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-screen-story-dashboard"
+}
