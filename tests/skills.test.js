@@ -339,6 +339,60 @@ test("effective-interact generator creates a validated self-contained interactio
   assert(result.checks.includes("source-linked-code-evidence"));
 });
 
+test("effective-interact renders source inventory finder without using row-hiding search", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-finder-"));
+  const inputPath = path.join(tmp, "source-finder.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "Source finder smoke",
+      summary: "Inventory finder smoke.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "markdown",
+          title: "Full source inventory",
+          richId: "source-inventory",
+          sourceInventoryFinder: true,
+          sourceInventoryFinderTotal: 2,
+          content: "- overview"
+        },
+        {
+          type: "markdown",
+          title: "Core sources",
+          richId: "source-inventory-group-core-primary",
+          content: "- **OpenAI News RSS**; rss / core / configured\n- **WeChat Platform AI Feed**; rsshub / manual / platform:wechat / configuration_needed"
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "source-finder", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-source-inventory-finder/);
+  assert.match(html, /data-source-inventory-search/);
+  assert.match(html, /data-source-inventory-status/);
+  assert.match(html, /data-source-inventory-next/);
+  assert.match(html, /data-source-inventory-clear/);
+  assert.doesNotMatch(html, /data-search-for="source-inventory"/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact hero highlight renders link and reason as full-width stacked lines", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hero-layout-"));
   const inputPath = path.join(tmp, "hero-layout.json");
