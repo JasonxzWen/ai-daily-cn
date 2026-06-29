@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const CORE_SOURCE_CONTRACTS = [
+export const CORE_SOURCE_CONTRACTS = [
   {
     id: "openai-news",
     name: "OpenAI News RSS",

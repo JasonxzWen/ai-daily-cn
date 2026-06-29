@@ -13290,6 +13290,20 @@ test("source-first IA contract defines fixed source display sections and ranks",
   assert.equal(byId.get("wechat-platform").section_id, "platform_cn_media");
 });
 
+test("source display contract governance is handbook-backed and complete", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const result = await validateSourceDisplayContract({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.logical_sources, result.summary.display_sources);
+  assert.equal(result.summary.handbook_path, "docs/source-first-ia-handbook.md");
+  assert(result.summary.required_handbook_markers.includes("source-display-governance:v1"));
+  assert(result.summary.required_handbook_markers.includes("new-source-insertion-rules"));
+  assert(result.summary.required_handbook_markers.includes("baseline-fixed-order"));
+  assert(result.summary.validation_commands.includes("npm run sources:display-contract"));
+  assert(result.summary.validation_commands.includes("npm run validate"));
+});
+
 test("source-first IA contract extends source effectiveness rows with stable display metadata", async () => {
   const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
   const report = strictPublishReportFixture();
