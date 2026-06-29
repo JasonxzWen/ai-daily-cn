@@ -13980,6 +13980,164 @@ test("source signal story rollup summarizes public source signals before metrics
   assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
+test("source-first hero synopsis promotes public source signals into the first viewport summary", () => {
+  const report = strictPublishReportFixture();
+  report.summary = "今天主线集中在 OpenAI 企业平台能力和 GitHub agent 工具链。";
+  report.stories = [
+    {
+      story_id: "story-openai-platform-shift",
+      title: "OpenAI 发布新的企业平台能力",
+      what_happened: "OpenAI 公布面向企业平台的新能力。",
+      why_it_matters: "它会影响工程团队评估平台接入和治理成本。",
+      sources: [{ label: "OpenAI News", url: "https://openai.com/news/platform" }]
+    },
+    {
+      story_id: "story-github-agent-tooling",
+      title: "GitHub Trending 出现新的 agent 工具链",
+      what_happened: "GitHub Trending 出现新的 agent 工具链项目。",
+      why_it_matters: "它提供了工程团队可以复核的开源实现线索。",
+      sources: [{ label: "GitHub Trending", url: "https://github.com/example/agent-tooling" }]
+    }
+  ];
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news-rss"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "official RSS parsed"
+    },
+    {
+      id: "anthropic-news",
+      name: "Anthropic News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: false,
+      not_included_reason: "candidate_not_selected_for_public_page",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 20,
+      display_mode: "expanded",
+      status_label: "updated_not_selected",
+      source_ids: ["content-anthropic-company-news"],
+      source_kinds: ["html_index"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 0,
+      notes: "candidate created but not selected"
+    },
+    {
+      id: "hugging-face-blog",
+      name: "Hugging Face Blog",
+      role: "official",
+      configured: true,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "blocked_or_unreachable",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 80,
+      display_mode: "expanded",
+      status_label: "blocked",
+      source_ids: ["content-hugging-face-blog"],
+      source_kinds: ["rss"],
+      statuses: ["blocked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "HTTP 500"
+    },
+    {
+      id: "github-trending",
+      name: "GitHub Trending",
+      role: "aggregator",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "open_source_platforms",
+      display_section_label: "开源、模型平台与代码生态",
+      display_section_rank: 30,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: [],
+      source_kinds: ["html"],
+      statuses: ["checked"],
+      candidate_count: 10,
+      included_count: 8,
+      notes: "weekly language pools"
+    },
+    {
+      id: "wechat-platform",
+      name: "WeChat Platform",
+      role: "platform",
+      configured: false,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "not_configured_or_not_checked",
+      display_section: "platform_cn_media",
+      display_section_label: "中文平台与媒体线索",
+      display_section_rank: 60,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "not_configured_or_skipped",
+      source_ids: ["platform-wechat-ai-feed"],
+      source_kinds: ["rsshub"],
+      statuses: ["skipped_missing_base_url"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "RSSHUB_BASE_URL missing"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const serializedHero = JSON.stringify({ summary: input.summary, heroStats: input.heroStats });
+
+  assert.match(input.summary, /今天主线集中在 OpenAI 企业平台能力和 GitHub agent 工具链/);
+  assert.match(input.summary, /信源信号/);
+  assert.match(input.summary, /有效信源 3\/5/);
+  assert.match(input.summary, /公开入选 2\/5/);
+  assert.match(input.summary, /有更新未入选 1/);
+  assert.match(input.summary, /阻塞 1/);
+  assert.match(input.summary, /未配置或跳过 1/);
+  assert.match(input.summary, /Hugging Face Blog/);
+  assert.match(input.summary, /WeChat Platform/);
+  assert.deepEqual(input.heroStats.slice(0, 3).map((item) => [item.label, item.value]), [
+    ["公开信源", "2/5"],
+    ["候选信源", "1"],
+    ["阻塞信源", "1"]
+  ]);
+  assert.doesNotMatch(serializedHero, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedHero, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
 test("source inventory panel lists all registered source entries before stories", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [

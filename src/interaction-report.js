@@ -346,7 +346,7 @@ export function reportToInteractionInput(report, options = {}) {
 
   return {
     title: report.title,
-    summary: editorialSummary(report),
+    summary: dailyHeroSynopsis(report, { stories, mainItems, sourceEffectivenessRows }),
     heroMode: "daily-report",
     heroTitle: report.report_date,
     heroEyebrow: dailyHeroEyebrow(report),
@@ -417,6 +417,36 @@ function editorialSummary(report) {
     .filter(Boolean)
     .join("、");
   return mainTitles ? `今日主线围绕 ${mainTitles} 展开。` : summary;
+}
+
+function dailyHeroSynopsis(report, { stories = [], mainItems = [], sourceEffectivenessRows = [] } = {}) {
+  const storyLine = editorialSummary(report);
+  const sourceLine = sourceHeroSynopsis(sourceEffectivenessRows);
+  if (!sourceLine) {
+    return storyLine;
+  }
+  const normalizedStoryLine = String(storyLine || "").trim()
+    || sourceSignalStoryTitles(stories, mainItems).join("；");
+  return [normalizedStoryLine, sourceLine]
+    .filter(Boolean)
+    .map((line) => `- ${line}`)
+    .join("\n");
+}
+
+function sourceHeroSynopsis(rows = []) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return "";
+  }
+  const metrics = sourceFirstMetrics(rows);
+  if (metrics.total === 0) {
+    return "";
+  }
+  const validSignals = metrics.included + metrics.updatedNotSelected;
+  const blockedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "blocked", 2);
+  const skippedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "not_configured_or_skipped", 2);
+  const gapNames = [...blockedNames, ...skippedNames];
+  const gapSuffix = gapNames.length > 0 ? `；需关注 ${gapNames.join("、")}` : "";
+  return `信源信号：有效信源 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}；有更新未入选 ${metrics.updatedNotSelected}；阻塞 ${metrics.blocked}；未配置或跳过 ${metrics.skipped}${gapSuffix}。`;
 }
 
 function isProcessStatusSummary(summary) {
