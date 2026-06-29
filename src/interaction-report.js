@@ -21,7 +21,12 @@ import {
   trackingComponentForInteraction
 } from "./tracking-components.js";
 import { normalizeStoryFirstReport, readerFacingStoryTitle } from "./story-first.js";
-import { buildSourceInventoryRows, decorateSourceEffectivenessRows } from "./source-effectiveness.js";
+import {
+  buildSourceInventoryRows,
+  decorateSourceEffectivenessRows,
+  sourceFirstPresentationContract,
+  sourceFirstPresentationRichIds
+} from "./source-effectiveness.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -144,6 +149,8 @@ export function reportToInteractionInput(report, options = {}) {
   const officialOrgUpdates = Array.isArray(report.official_org_updates) ? report.official_org_updates : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const sourceEffectivenessRows = sourceFirstRows(report.source_effectiveness);
+  const sourceFirstPresentation = sourceFirstPresentationContract(options.sourceFirstPresentationContract);
+  const sourceFirstRuntimeSectionOrder = sourceFirstPresentationRichIds(sourceFirstPresentation);
   const sourceInventoryRows = sourceEffectivenessRows.length > 0
     ? buildSourceInventoryRows({ rootDir: options.rootDir || process.cwd() })
     : [];
@@ -172,20 +179,13 @@ export function reportToInteractionInput(report, options = {}) {
     })
   ];
   const sections = [];
-  const sourceSignalStory = formatSourceSignalStorySection(sourceEffectivenessRows, { stories, mainItems });
-  if (sourceSignalStory) {
-    sections.push(sourceSignalStory);
-  }
-  const sourceDashboard = formatSourceFirstDashboardSection(sourceEffectivenessRows);
-  if (sourceDashboard) {
-    sections.push(sourceDashboard);
-  }
-  const sourceStatusFocus = formatSourceStatusFocusSection(sourceEffectivenessRows);
-  if (sourceStatusFocus) {
-    sections.push(sourceStatusFocus);
-  }
-  sections.push(...formatSourceMapSections(sourceEffectivenessRows));
-  sections.push(...formatSourceInventorySections(sourceInventoryRows));
+  sections.push(...formatSourceFirstRuntimeSections({
+    presentation: sourceFirstPresentation,
+    sourceEffectivenessRows,
+    sourceInventoryRows,
+    stories,
+    mainItems
+  }));
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -362,6 +362,8 @@ export function reportToInteractionInput(report, options = {}) {
     template: "research-explainer",
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
+    sourceFirstPresentationContract: sourceFirstPresentation,
+    sourceFirstRuntimeSectionOrder,
     intent: {
       audience: "3-10 年经验的研发工程师与技术管理者",
       primaryQuestion: `${report.report_date} 有哪些值得跟进的 AI 产品、模型、工程工具和开源项目动态？`,
@@ -380,6 +382,36 @@ export function reportToInteractionInput(report, options = {}) {
     sections,
     nextActions: []
   };
+}
+
+function formatSourceFirstRuntimeSections({
+  presentation,
+  sourceEffectivenessRows = [],
+  sourceInventoryRows = [],
+  stories = [],
+  mainItems = []
+} = {}) {
+  const factories = {
+    source_signal_story: () => formatSourceSignalStorySection(sourceEffectivenessRows, { stories, mainItems }),
+    source_first_dashboard: () => formatSourceFirstDashboardSection(sourceEffectivenessRows),
+    source_status_focus: () => formatSourceStatusFocusSection(sourceEffectivenessRows),
+    source_map: () => formatSourceMapSections(sourceEffectivenessRows),
+    source_inventory: () => formatSourceInventorySections(sourceInventoryRows)
+  };
+  const sections = [];
+  for (const sectionId of presentation.source_first_section_order) {
+    const factory = factories[sectionId];
+    if (!factory) {
+      throw new Error(`unknown source-first presentation section id: ${sectionId}`);
+    }
+    const produced = factory();
+    if (Array.isArray(produced)) {
+      sections.push(...produced.filter(Boolean));
+    } else if (produced) {
+      sections.push(produced);
+    }
+  }
+  return sections;
 }
 
 function hostnameLabel(value) {

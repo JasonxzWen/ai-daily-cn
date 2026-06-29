@@ -249,7 +249,14 @@ const DEFAULT_DISPLAY_SECTION = {
   rank: 999,
   default_display_mode: "collapsed"
 };
-const SOURCE_DISPLAY_CONTRACT = loadSourceDisplayContract();
+export const SOURCE_FIRST_PRESENTATION_SECTION_RICH_IDS = Object.freeze({
+  source_signal_story: "source-signal-story",
+  source_first_dashboard: "source-first-dashboard",
+  source_status_focus: "source-status-focus",
+  source_map: "source-map",
+  source_inventory: "source-inventory"
+});
+export const SOURCE_DISPLAY_CONTRACT = loadSourceDisplayContract();
 const SOURCE_DISPLAY_BY_ID = sourceDisplayIndex(SOURCE_DISPLAY_CONTRACT);
 const SOURCE_DISPLAY_SECTION_BY_ID = sourceDisplaySectionIndex(SOURCE_DISPLAY_CONTRACT);
 
@@ -302,6 +309,49 @@ export function buildSourceInventoryRows(options = {}) {
   return registry.sources
     .map((source, index) => sourceInventoryRow(source, index))
     .sort(compareSourceInventoryRows);
+}
+
+export function sourceFirstPresentationContract(override) {
+  const presentation = override && typeof override === "object"
+    ? override
+    : SOURCE_DISPLAY_CONTRACT.presentation_contract;
+  const order = Array.isArray(presentation?.source_first_section_order)
+    ? presentation.source_first_section_order.map((id) => String(id || "").trim()).filter(Boolean)
+    : [];
+  const knownIds = Object.keys(SOURCE_FIRST_PRESENTATION_SECTION_RICH_IDS);
+  const unknown = order.filter((id) => !Object.hasOwn(SOURCE_FIRST_PRESENTATION_SECTION_RICH_IDS, id));
+  if (unknown.length > 0) {
+    throw new Error(`unknown source-first presentation section id: ${uniqueStrings(unknown).join(", ")}`);
+  }
+  const missing = knownIds.filter((id) => !order.includes(id));
+  if (missing.length > 0) {
+    throw new Error(`missing source-first presentation section id: ${missing.join(", ")}`);
+  }
+  const duplicates = uniqueStrings(order.filter((id, index) => order.indexOf(id) !== index));
+  if (duplicates.length > 0) {
+    throw new Error(`duplicate source-first presentation section id: ${duplicates.join(", ")}`);
+  }
+  return {
+    ...presentation,
+    first_viewport_order: Array.isArray(presentation?.first_viewport_order)
+      ? [...presentation.first_viewport_order]
+      : [],
+    source_first_section_order: order
+  };
+}
+
+export function sourceFirstPresentationRichId(sectionId) {
+  const richId = SOURCE_FIRST_PRESENTATION_SECTION_RICH_IDS[sectionId];
+  if (!richId) {
+    throw new Error(`unknown source-first presentation section id: ${sectionId}`);
+  }
+  return richId;
+}
+
+export function sourceFirstPresentationRichIds(presentation) {
+  return sourceFirstPresentationContract(presentation)
+    .source_first_section_order
+    .map(sourceFirstPresentationRichId);
 }
 
 function resolveSourceInventoryRootDir(options = {}) {

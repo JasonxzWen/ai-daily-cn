@@ -12,7 +12,19 @@ import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../sr
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
 const trendConfigPath = path.join(rootDir, "config/trends.json");
+const sourceDisplayContract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
+
+function sourceFirstBrowserSectionId(sectionId) {
+  const map = {
+    source_signal_story: "section-source-signal-story",
+    source_first_dashboard: "section-source-first-dashboard",
+    source_status_focus: "section-source-status-focus",
+    source_map: "section-source-map",
+    source_inventory: "section-source-inventory"
+  };
+  return map[sectionId] || sectionId;
+}
 
 const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-e2e-"));
 const inputDir = path.join(tmp, "reports-source");
@@ -636,11 +648,14 @@ try {
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );
-  assert(publicSectionOrder.indexOf("section-source-signal-story") >= 0, JSON.stringify(publicSectionOrder));
-  assert(publicSectionOrder.indexOf("section-source-first-dashboard") >= 0, JSON.stringify(publicSectionOrder));
-  assert(publicSectionOrder.indexOf("section-source-signal-story") < publicSectionOrder.indexOf("section-source-first-dashboard"), JSON.stringify(publicSectionOrder));
-  assert(publicSectionOrder.indexOf("section-source-status-focus") > publicSectionOrder.indexOf("section-source-first-dashboard"));
-  assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-status-focus"));
+  const expectedSourceFirstOrder = sourceDisplayContract.presentation_contract.source_first_section_order.map(sourceFirstBrowserSectionId);
+  for (const sectionId of expectedSourceFirstOrder) {
+    assert(publicSectionOrder.indexOf(sectionId) >= 0, JSON.stringify(publicSectionOrder));
+  }
+  assert.deepEqual(
+    publicSectionOrder.filter((sectionId) => expectedSourceFirstOrder.includes(sectionId)),
+    expectedSourceFirstOrder
+  );
   const sourceMapGroupIndexes = publicSectionOrder
     .map((id, index) => id.startsWith("section-source-map-group-") ? index : -1)
     .filter((index) => index >= 0);
