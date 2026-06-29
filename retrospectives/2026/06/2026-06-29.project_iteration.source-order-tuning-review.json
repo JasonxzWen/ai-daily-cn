@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-order-tuning-review",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source order tuning review",
+  "status": "completed",
+  "summary": "This iteration creates a user-reviewable fixed source order tuning proposal. It adds a validator-backed review document with unmapped source counts, promotion candidates, suggested sections and ranks, and collection-only guidance without changing the executable source display order.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source order tuning review\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source display contract governance|source insertion handbook|source order tuning review|source inventory order reference\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A user-tuned fixed source order needs a review surface before executable rank changes.",
+      "evidence": "`docs/source-order-tuning-review.md` lists current unmapped counts, promotion candidates, suggested section/rank placements, and collection-only classes while leaving `config/source-display-contract.json` source rows unchanged.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Use the review file as the user-facing checklist before promoting any collection entry into a first-class logical source."
+    },
+    {
+      "lesson": "Review docs should drift-fail against the live inventory.",
+      "evidence": "`npm run sources:display-contract` now validates the review path, markers, unmapped counts, candidate source ids, unmapped status, valid sections, 5-point ranks, and public-data minimization.",
+      "scope": "source_order_review",
+      "persistence": "implemented",
+      "recommended_action": "Update the review document in the same PR as future source inventory or display contract changes."
+    },
+    {
+      "lesson": "The proposal should separate promotion from collection-only support entries.",
+      "evidence": "The review document distinguishes first-class logical source candidates from duplicate subchannels, mirrors, broad aggregators, investor pages, and bridge/manual entries that should remain collection-only until explicitly promoted.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "Promote only sources with durable public identity; keep helper entrypoints under existing logical sources."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Have the user tune `docs/source-order-tuning-review.md`, then promote approved sources into `config/source-display-contract.json` in one or more later rank-changing PRs.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-order-tuning-review"
+}

@@ -13355,6 +13355,88 @@ test("source insertion handbook validator rejects drift", async () => {
   assert.match(result.failures.join("\n"), /handbook missing insertion handbook phrase: Source Insertion Decision Tree/);
 });
 
+test("source order tuning review is validator-backed and complete", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
+  assert.equal(result.summary.order_tuning_unmapped_sources, 106);
+  assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
+  assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
+
+  for (const phrase of [
+    "User Review Surface",
+    "Daily source status must not reorder review priorities",
+    "Unmapped Source Counts",
+    "Promotion Candidate Review",
+    "Collection-Only Review",
+    "Order Tuning Validation",
+    "core_primary",
+    "china_models",
+    "open_source_platforms",
+    "tracking_metrics",
+    "builder_community",
+    "platform_cn_media",
+    "english_media_search"
+  ]) {
+    assert(review.includes(phrase), `review should include phrase: ${phrase}`);
+  }
+
+  for (const sourceId of [
+    "content-anthropic-research",
+    "china-ai-deepseek-news",
+    "content-arxiv-cs-ai",
+    "content-openrouter-rankings",
+    "content-builder-simon-willison",
+    "intermediary-qbitai",
+    "content-product-hunt-trending"
+  ]) {
+    assert(review.includes(`\`${sourceId}\``), `review should include promotion candidate ${sourceId}`);
+  }
+});
+
+test("source order tuning review validator rejects drift and private fields", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-order-tuning-review-validator-"));
+  await fs.cp(path.join(rootDir, "config"), path.join(tmp, "config"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.copyFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), path.join(tmp, "docs/source-first-ia-handbook.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-inventory-order.md"), path.join(tmp, "docs/source-inventory-order.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-order-tuning-review.md"), path.join(tmp, "docs/source-order-tuning-review.md"));
+  await fs.copyFile(path.join(rootDir, "package.json"), path.join(tmp, "package.json"));
+
+  const reviewPath = path.join(tmp, "docs/source-order-tuning-review.md");
+  const review = await fs.readFile(reviewPath, "utf8");
+
+  async function expectInvalid(mutatedReview, expectedPattern, label = "mutated source order tuning review") {
+    await fs.writeFile(reviewPath, mutatedReview, "utf8");
+    const result = await validateSourceDisplayContract({ rootDir: tmp });
+    assert.equal(result.ok, false, `${label} should be rejected`);
+    assert.match(result.failures.join("\n"), expectedPattern, label);
+  }
+
+  await expectInvalid(
+    review.replace("| `core_primary` | 9 |", "| `core_primary` | 8 |"),
+    /unmapped count for core_primary must be 9/
+  );
+  await expectInvalid(
+    review.replace("`content-anthropic-research`", "`unknown-source-id`"),
+    /promotion candidate references unknown source id: unknown-source-id/
+  );
+  await expectInvalid(
+    review.replace("`content-anthropic-research`", "`content-openai-news`"),
+    /promotion candidate is already mapped to logical source: content-openai-news/
+  );
+  await expectInvalid(
+    review.replace("| `content-anthropic-research` | `anthropic-research-engineering` | `core_primary` | 25 | `promote` |", "| `content-anthropic-research` | `anthropic-research-engineering` | `core_primary` | 23 | `promote` |"),
+    /promotion candidate content-anthropic-research suggested rank must use 5-point spacing/
+  );
+  await expectInvalid(`${review}\nhttps://example.com/internal\n`, /order tuning review must not expose raw URLs/);
+  await expectInvalid(`${review}\nAI_DAILY_RSSHUB_BASE_URL\n`, /order tuning review must not expose internal source fields/);
+});
+
 test("source inventory order reference is handbook-backed and complete", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const result = await validateSourceDisplayContract({ rootDir });
