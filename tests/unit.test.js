@@ -14400,6 +14400,113 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   assert.doesNotMatch(serializedDashboard, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
 });
 
+test("system operating dashboard summarizes public report metrics after source dashboard", () => {
+  const report = strictPublishReportFixture();
+  report.stories = [
+    {
+      story_id: "story-openai-platform",
+      title: "OpenAI 发布企业平台能力",
+      what_happened: "OpenAI 发布面向企业平台的新能力。",
+      why_it_matters: "它影响工程团队的平台接入和治理成本。",
+      sources: [{ label: "OpenAI News", url: "https://openai.com/news/platform" }]
+    },
+    {
+      story_id: "story-github-agent",
+      title: "GitHub Trending 出现 agent 工具链",
+      what_happened: "GitHub Trending 出现新的 agent 工具链项目。",
+      why_it_matters: "它提供工程团队可复核的开源实现线索。",
+      sources: [{ label: "GitHub Trending", url: "https://github.com/example/agent-tooling" }]
+    }
+  ];
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+  report.daily_tracking = [
+    {
+      title: "OpenRouter 排名变化",
+      summary: "OpenRouter 排名出现可复核变化。",
+      source: "OpenRouter",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed"
+    },
+    {
+      title: "Artificial Analysis 指标变化",
+      summary: "Artificial Analysis 指标出现可复核变化。",
+      source: "Artificial Analysis",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed"
+    }
+  ];
+  report.official_org_updates = [
+    {
+      title: "OpenAI 官方组织更新",
+      summary: "OpenAI 发布官方组织动态。",
+      url: "https://openai.com/news/org-update",
+      source: "OpenAI News"
+    }
+  ];
+  report.community_leads = [
+    {
+      title: "社区线索一",
+      summary: "社区围绕 agent workflow 展开讨论。",
+      url: "https://example.com/community-1",
+      source: "Community"
+    },
+    {
+      title: "社区线索二",
+      summary: "社区围绕模型部署展开讨论。",
+      url: "https://example.com/community-2",
+      source: "Community"
+    }
+  ];
+  report.quality_status = {
+    status: "degraded",
+    reasons: ["content_sources_blocked", "wechat_sources_blocked"],
+    affected_sections: ["hot_blogs", "wechat_items"],
+    public_note: "部分公开信源降级。"
+  };
+
+  const input = reportToInteractionInput(report);
+  const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
+  const sourceDashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
+  const systemDashboardIndex = input.sections.findIndex((section) => section.richId === "system-operating-dashboard");
+  const statusFocusIndex = input.sections.findIndex((section) => section.richId === "source-status-focus");
+  const dashboard = input.sections[systemDashboardIndex];
+  const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
+  const statValue = (title, label = "数量") =>
+    metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
+  const serializedDashboard = JSON.stringify(dashboard);
+
+  assert(storyIndex >= 0);
+  assert(sourceDashboardIndex > storyIndex);
+  assert(systemDashboardIndex > sourceDashboardIndex, "system dashboard should follow source metrics");
+  assert(statusFocusIndex > systemDashboardIndex, "status focus should follow system dashboard");
+  assert.equal(dashboard.type, "filterable-cards");
+  assert.equal(dashboard.cardClass, "system-metric-card");
+  assert.equal(dashboard.showFilters, false);
+  assert.deepEqual(dashboard.items.map((item) => item.title), [
+    "公开内容规模",
+    "信号模块",
+    "趋势与追踪",
+    "信源覆盖",
+    "运行质量"
+  ]);
+  assert.equal(statValue("公开内容规模"), "2");
+  assert.equal(statValue("公开内容规模", "主体条目"), "8");
+  assert.equal(statValue("信号模块"), "7");
+  assert.equal(statValue("趋势与追踪"), "22");
+  assert.equal(statValue("信源覆盖"), "1/6");
+  assert.equal(statValue("信源覆盖", "全量入口"), "154");
+  assert.equal(statValue("运行质量"), "degraded");
+  assert.equal(statValue("运行质量", "降级提醒"), "2");
+  assert.match(serializedDashboard, /SYSTEM_CONTENT/);
+  assert.match(serializedDashboard, /SYSTEM_SIGNALS/);
+  assert.match(serializedDashboard, /SYSTEM_TRENDS/);
+  assert.match(serializedDashboard, /SYSTEM_SOURCES/);
+  assert.match(serializedDashboard, /SYSTEM_QUALITY/);
+  assert.doesNotMatch(serializedDashboard, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|quality_status|degraded_sections|remediation|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
+});
+
 test("source inventory overview renders fixed section cards", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceFirstRuntimeRowsFixture();

@@ -288,6 +288,40 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         expectedCards: 7
       })
     };
+    const systemDashboardContract = cardSectionContract({
+      id: "section-system-operating-dashboard",
+      cardSelector: ".system-metric-card",
+      expectedCards: 5
+    });
+    const systemDashboardText = document.querySelector("#section-system-operating-dashboard")?.textContent || "";
+    const systemDashboardRequiredLabels = [
+      "公开内容规模",
+      "信号模块",
+      "趋势与追踪",
+      "信源覆盖",
+      "运行质量"
+    ];
+    const systemDashboardRequiredTags = [
+      "SYSTEM_CONTENT",
+      "SYSTEM_SIGNALS",
+      "SYSTEM_TRENDS",
+      "SYSTEM_SOURCES",
+      "SYSTEM_QUALITY"
+    ];
+    const systemDashboardForbiddenPattern = /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|quality_status|degraded_sections|remediation|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i;
+    const systemDashboardOrder = {
+      index: sectionOrder.indexOf("section-system-operating-dashboard"),
+      source_dashboard_index: sourceFirstOrderIndexes["section-source-first-dashboard"],
+      status_focus_index: sourceFirstOrderIndexes["section-source-status-focus"]
+    };
+    systemDashboardContract.required_labels = Object.fromEntries(
+      systemDashboardRequiredLabels.map((label) => [label, systemDashboardText.includes(label)])
+    );
+    systemDashboardContract.required_tags = Object.fromEntries(
+      systemDashboardRequiredTags.map((label) => [label, systemDashboardText.includes(label)])
+    );
+    systemDashboardContract.forbidden_hits = systemDashboardForbiddenPattern.test(systemDashboardText);
+    systemDashboardContract.order = systemDashboardOrder;
     const inventorySection = document.querySelector("#section-source-inventory");
     const inventoryRows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"))
       .filter((row) => row.querySelector("strong"));
@@ -446,6 +480,23 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       inventoryFinderOk &&
       directOrderOk &&
       sourceFirstDownstreamOrderOk;
+    const systemDashboardLabelsOk = Object.values(systemDashboardContract.required_labels).every(Boolean);
+    const systemDashboardTagsOk = Object.values(systemDashboardContract.required_tags).every(Boolean);
+    const systemDashboardOrderOk =
+      systemDashboardOrder.index > systemDashboardOrder.source_dashboard_index &&
+      systemDashboardOrder.index < systemDashboardOrder.status_focus_index;
+    const systemDashboardPublicContractOk =
+      systemDashboardContract.ok &&
+      systemDashboardLabelsOk &&
+      systemDashboardTagsOk &&
+      systemDashboardOrderOk &&
+      !systemDashboardContract.forbidden_hits;
+    addCheck(
+      "system_metrics_dashboard",
+      systemDashboardPublicContractOk,
+      "System operating metrics dashboard should summarize public content, signal, trend, source, and quality status immediately after source metrics.",
+      systemDashboardContract
+    );
     addCheck(
       "source_first_public_contract",
       sourceFirstPublicContractOk,
