@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-hero-synopsis",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first hero synopsis",
+  "status": "completed",
+  "summary": "This iteration promotes the source signal story into the daily report hero so the first viewport carries both the reader-facing story line and source signal metrics. The implementation keeps the expanded `source-signal-story`, source dashboard, status focus, map, fixed-order inventory, finder, and all 154 source rows intact.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first hero synopsis\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source-first IA dashboard|source signal story rollup|source-first hero synopsis\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Independent subagent verification: npm run test:e2e plus DOM checks for hero source synopsis, privacy leakage, and 154 source rows",
+      "Playwright visual check: desktop 1280x900 and mobile 390x844 on docs/reports/2026/06/2026-06-29.html; screenshots .tmp/phase13-source-first-hero-synopsis-desktop.png and .tmp/phase13-source-first-hero-synopsis-mobile.png",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The first viewport can express source-first IA without changing the renderer by shaping the existing daily hero summary into a two-line synopsis.",
+      "evidence": "`reportToInteractionInput()` now returns a bullet-form hero summary containing the story line and source signal line, and E2E verifies the summary appears before navigation.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Prefer deterministic interaction-input shaping for first-viewport source improvements before modifying the shared effective-interact renderer."
+    },
+    {
+      "lesson": "Hero summaries with semicolon-heavy source metrics must be explicit bullet lines, otherwise the renderer's long-summary splitter can truncate later counts.",
+      "evidence": "Initial E2E failed because the source signal sentence was split and capped; the final implementation prefixes the story and source lines with bullets so the renderer preserves the full source count line.",
+      "scope": "frontend_rendering",
+      "persistence": "implemented",
+      "recommended_action": "When adding structured synopsis text to `input.summary`, use explicit bullet lines if any line includes multiple metric clauses."
+    },
+    {
+      "lesson": "First-viewport source visibility still needs the detailed proof surfaces immediately below the hero.",
+      "evidence": "Visual checks confirmed the hero synopsis and metrics fit in desktop/mobile first viewports while the expanded source story and dashboard remain first in the section stack.",
+      "scope": "frontend_validation",
+      "persistence": "implemented",
+      "recommended_action": "Keep the hero as the compact lead and the `source-signal-story`/dashboard/inventory surfaces as the audit trail."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Convert the fixed source importance proposal into a maintainer-facing source insertion handbook so future sources can be placed consistently without dynamic re-ranking.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-hero-synopsis"
+}

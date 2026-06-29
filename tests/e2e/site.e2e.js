@@ -497,11 +497,26 @@ try {
       node.querySelector("strong")?.textContent?.trim() || ""
     ])
   );
+  const heroText = await page.locator("#report-top").textContent();
   assert.deepEqual(heroStats.slice(0, 3), [
     ["公开信源", "2/5"],
     ["候选信源", "1"],
     ["阻塞信源", "1"]
   ]);
+  assert.match(heroText, /信源信号/);
+  assert.match(heroText, /有效信源 3\/5/);
+  assert.match(heroText, /公开入选 2\/5/);
+  assert.match(heroText, /有更新未入选 1/);
+  assert.match(heroText, /阻塞 1/);
+  assert.match(heroText, /未配置或跳过 1/);
+  assert.match(heroText, /Hugging Face Blog/);
+  assert.match(heroText, /WeChat Platform/);
+  assert.doesNotMatch(heroText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
+  assert.equal(await page.evaluate(() => {
+    const heroSummary = document.querySelector("#report-top .hero-summary-text");
+    const nav = document.querySelector("nav.report-nav");
+    return Boolean(heroSummary && nav && (heroSummary.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING));
+  }), true);
   assert.equal(await page.locator("#section-source-signal-story").count(), 1);
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
   assert.equal(await page.locator("#section-source-status-focus").count(), 1);
