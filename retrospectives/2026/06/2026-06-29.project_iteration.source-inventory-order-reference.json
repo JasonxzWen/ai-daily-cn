@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-order-reference",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory order reference",
+  "status": "completed",
+  "summary": "This iteration makes the fixed source order maintainable after the public inventory was expanded. It adds a reader-safe full inventory order reference for all 154 registered collection entries, links it from the source-first IA handbook, and extends the source display validator so future source additions must update the reference without leaking operational fields.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory order reference\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source display contract governance|source inventory order reference\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Full source visibility needs a maintainable order reference, not just public rendering.",
+      "evidence": "The new reference lists 154 registered collection entries grouped by the same seven fixed source display sections used by the public page.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Use `docs/source-inventory-order.md` as the user review surface before changing collection-entry ordering or promoting unmapped entries into logical sources."
+    },
+    {
+      "lesson": "Source-order documentation must be machine-checked to stay useful.",
+      "evidence": "`npm run sources:display-contract` now validates inventory markers, section counts, source id coverage, duplicate ids, and public-data minimization for the order reference.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Regenerate the reference and run the validator in the same PR whenever sources are added, moved, or promoted."
+    },
+    {
+      "lesson": "Public-safe source metadata is enough for order tuning.",
+      "evidence": "The reference exposes ids, names, logical mapping, kind, enablement, tier, authority, platform, and generic config status while rejecting raw links, env field names, audit snapshots, candidate pools, scores, debug data, notes, keyword filters, and local paths.",
+      "scope": "public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Keep operational source configuration details out of user-facing order review docs."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-ai-daily-requirements-reconciliation",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Let the user tune high-priority unmapped entries in the new order reference, then promote the chosen entries into `config/source-display-contract.json` as logical sources in a later PR.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-order-reference"
+}

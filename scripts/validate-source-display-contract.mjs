@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { CORE_SOURCE_CONTRACTS } from "../src/source-effectiveness.js";
+import { buildSourceInventoryRows, CORE_SOURCE_CONTRACTS } from "../src/source-effectiveness.js";
 
 const REQUIRED_STATUS_LABELS = [
   "included",
@@ -16,6 +16,7 @@ const REQUIRED_STATUS_LABELS = [
 const REQUIRED_MAINTENANCE = {
   owner: "user-reviewed-fixed-source-order",
   handbook_path: "docs/source-first-ia-handbook.md",
+  inventory_order_reference_path: "docs/source-inventory-order.md",
   validation_commands: ["npm run sources:display-contract", "npm run validate"],
   handbook_required_markers: [
     "source-display-governance:v1",
@@ -23,6 +24,12 @@ const REQUIRED_MAINTENANCE = {
     "new-source-insertion-rules",
     "source-status-preservation",
     "validation-commands"
+  ],
+  inventory_order_required_markers: [
+    "source-inventory-order:v1",
+    "inventory-fixed-order-reference",
+    "collection-entry-insertion-rules",
+    "inventory-validation-commands"
   ]
 };
 
@@ -37,12 +44,17 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
   const handbookPath = String(maintenance.handbook_path || REQUIRED_MAINTENANCE.handbook_path);
   const handbookFullPath = path.join(rootDir, handbookPath);
   const handbook = await readText(handbookFullPath, failures, "handbook");
+  const inventoryOrderReferencePath = String(maintenance.inventory_order_reference_path || REQUIRED_MAINTENANCE.inventory_order_reference_path);
+  const inventoryOrderReferenceFullPath = path.join(rootDir, inventoryOrderReferencePath);
+  const inventoryOrderReference = await readText(inventoryOrderReferenceFullPath, failures, "inventory-order-reference");
+  const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   validateMaintenance(maintenance, failures);
   validateStatusLabels(contract, failures);
   const sectionRows = validateSections(contract, failures);
   validateLogicalSourceCoverage(sectionRows, failures);
   validateHandbook(handbook, contract, sectionRows, maintenance, failures);
+  validateInventoryOrderReference(inventoryOrderReference, inventoryRows, maintenance, failures);
   validatePackageScripts(packageJson, failures);
 
   return {
@@ -52,7 +64,10 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
       logical_sources: CORE_SOURCE_CONTRACTS.length,
       display_sources: sectionRows.length,
       handbook_path: handbookPath,
+      inventory_sources: inventoryRows.length,
+      inventory_order_reference_path: inventoryOrderReferencePath,
       required_handbook_markers: REQUIRED_MAINTENANCE.handbook_required_markers,
+      required_inventory_order_markers: REQUIRED_MAINTENANCE.inventory_order_required_markers,
       validation_commands: REQUIRED_MAINTENANCE.validation_commands
     },
     contract: {
@@ -86,6 +101,9 @@ function validateMaintenance(maintenance, failures) {
   if (maintenance.handbook_path !== REQUIRED_MAINTENANCE.handbook_path) {
     failures.push(`maintenance.handbook_path must be ${REQUIRED_MAINTENANCE.handbook_path}`);
   }
+  if (maintenance.inventory_order_reference_path !== REQUIRED_MAINTENANCE.inventory_order_reference_path) {
+    failures.push(`maintenance.inventory_order_reference_path must be ${REQUIRED_MAINTENANCE.inventory_order_reference_path}`);
+  }
   if (maintenance.user_review_required !== true) {
     failures.push("maintenance.user_review_required must be true");
   }
@@ -107,6 +125,11 @@ function validateMaintenance(maintenance, failures) {
   for (const marker of REQUIRED_MAINTENANCE.handbook_required_markers) {
     if (!Array.isArray(maintenance.handbook_required_markers) || !maintenance.handbook_required_markers.includes(marker)) {
       failures.push(`maintenance.handbook_required_markers must include ${marker}`);
+    }
+  }
+  for (const marker of REQUIRED_MAINTENANCE.inventory_order_required_markers) {
+    if (!Array.isArray(maintenance.inventory_order_required_markers) || !maintenance.inventory_order_required_markers.includes(marker)) {
+      failures.push(`maintenance.inventory_order_required_markers must include ${marker}`);
     }
   }
 }
@@ -226,6 +249,141 @@ function validateHandbook(handbook, contract, sectionRows, maintenance, failures
       failures.push(`handbook missing contract-declared marker: ${marker}`);
     }
   }
+}
+
+function validateInventoryOrderReference(reference, inventoryRows, maintenance, failures) {
+  for (const marker of REQUIRED_MAINTENANCE.inventory_order_required_markers) {
+    if (!reference.includes(marker)) {
+      failures.push(`inventory order reference missing marker: ${marker}`);
+    }
+  }
+  for (const marker of Array.isArray(maintenance.inventory_order_required_markers) ? maintenance.inventory_order_required_markers : []) {
+    if (!reference.includes(marker)) {
+      failures.push(`inventory order reference missing contract-declared marker: ${marker}`);
+    }
+  }
+  if (!reference.includes(REQUIRED_MAINTENANCE.owner)) {
+    failures.push(`inventory order reference must name maintenance owner ${REQUIRED_MAINTENANCE.owner}`);
+  }
+  if (!reference.includes("Daily source status must not reorder this reference")) {
+    failures.push("inventory order reference must state that daily source status cannot reorder the reference");
+  }
+
+  const listedIds = extractInventorySourceIds(reference);
+  const listedCounts = countValues(listedIds);
+  const expectedIds = new Set(inventoryRows.map((row) => row.id).filter(Boolean));
+  if (listedIds.length !== inventoryRows.length) {
+    failures.push(`inventory order reference must list ${inventoryRows.length} source ids, found ${listedIds.length}`);
+  }
+  for (const row of inventoryRows) {
+    const count = listedCounts.get(row.id) || 0;
+    if (count !== 1) {
+      failures.push(`inventory order reference must list source id exactly once: ${row.id} (found ${count})`);
+    }
+  }
+  for (const id of listedIds) {
+    if (!expectedIds.has(id)) {
+      failures.push(`inventory order reference lists unknown source id: ${id}`);
+    }
+    if ((listedCounts.get(id) || 0) > 1) {
+      failures.push(`inventory order reference duplicates source id: ${id}`);
+    }
+  }
+
+  const expectedSectionCounts = countInventorySections(inventoryRows);
+  const listedSectionCounts = extractInventorySectionCounts(reference);
+  const summarySectionCounts = extractInventorySummarySectionCounts(reference);
+  for (const [sectionId, expectedCount] of expectedSectionCounts.entries()) {
+    const listedCount = listedSectionCounts.get(sectionId);
+    if (listedCount !== expectedCount) {
+      failures.push(`inventory order reference section ${sectionId} count must be ${expectedCount}, found ${listedCount ?? "missing"}`);
+    }
+    const summaryCount = summarySectionCounts.get(sectionId);
+    if (summaryCount !== expectedCount) {
+      failures.push(`inventory order reference summary table section ${sectionId} count must be ${expectedCount}, found ${summaryCount ?? "missing"}`);
+    }
+  }
+  for (const sectionId of listedSectionCounts.keys()) {
+    if (!expectedSectionCounts.has(sectionId)) {
+      failures.push(`inventory order reference lists unknown section id: ${sectionId}`);
+    }
+  }
+  for (const sectionId of summarySectionCounts.keys()) {
+    if (!expectedSectionCounts.has(sectionId)) {
+      failures.push(`inventory order reference summary table lists unknown section id: ${sectionId}`);
+    }
+  }
+
+  const forbiddenChecks = [
+    {
+      pattern: /https?:\/\//i,
+      message: "inventory order reference must not expose raw URLs"
+    },
+    {
+      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
+      message: "inventory order reference must not expose internal source fields"
+    },
+    {
+      pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
+      message: "inventory order reference must not expose local paths"
+    },
+    {
+      pattern: /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|GITHUB_TOKEN|GH_TOKEN|NEWRANK_COOKIE|Authorization\s*:|Bearer\s+[A-Za-z0-9._~+/-]+=*)/i,
+      message: "inventory order reference must not expose secret-looking values"
+    }
+  ];
+  for (const check of forbiddenChecks) {
+    if (check.pattern.test(reference)) {
+      failures.push(check.message);
+    }
+  }
+}
+
+function extractInventorySourceIds(reference) {
+  const ids = [];
+  const rowPattern = /^\|\s*\d+\.\d+\s*\|\s*`([^`]+)`\s*\|/gm;
+  let match;
+  while ((match = rowPattern.exec(reference))) {
+    ids.push(match[1]);
+  }
+  return ids;
+}
+
+function extractInventorySectionCounts(reference) {
+  const counts = new Map();
+  const pattern = /<!--\s*inventory-section:([a-z0-9_-]+)\s+count:(\d+)\s*-->/g;
+  let match;
+  while ((match = pattern.exec(reference))) {
+    counts.set(match[1], Number(match[2]));
+  }
+  return counts;
+}
+
+function extractInventorySummarySectionCounts(reference) {
+  const counts = new Map();
+  const pattern = /^\|\s*`([a-z0-9_-]+)`[^|]*\|\s*(\d+)\s*\|/gm;
+  let match;
+  while ((match = pattern.exec(reference))) {
+    counts.set(match[1], Number(match[2]));
+  }
+  return counts;
+}
+
+function countInventorySections(rows = []) {
+  const counts = new Map();
+  for (const row of rows) {
+    const sectionId = String(row.display_section || "uncategorized");
+    counts.set(sectionId, (counts.get(sectionId) || 0) + 1);
+  }
+  return counts;
+}
+
+function countValues(values = []) {
+  const counts = new Map();
+  for (const value of values) {
+    counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  return counts;
 }
 
 function validatePackageScripts(packageJson, failures) {
