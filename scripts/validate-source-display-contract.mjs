@@ -17,6 +17,7 @@ const REQUIRED_MAINTENANCE = {
   owner: "user-reviewed-fixed-source-order",
   handbook_path: "docs/source-first-ia-handbook.md",
   inventory_order_reference_path: "docs/source-inventory-order.md",
+  order_tuning_review_path: "docs/source-order-tuning-review.md",
   validation_commands: ["npm run sources:display-contract", "npm run validate"],
   handbook_required_markers: [
     "source-display-governance:v1",
@@ -31,6 +32,13 @@ const REQUIRED_MAINTENANCE = {
     "inventory-fixed-order-reference",
     "collection-entry-insertion-rules",
     "inventory-validation-commands"
+  ],
+  order_tuning_required_markers: [
+    "source-order-tuning-review:v1",
+    "order-tuning-unmapped-counts",
+    "promotion-candidate-review",
+    "collection-only-review",
+    "order-tuning-validation"
   ]
 };
 
@@ -55,6 +63,15 @@ const REQUIRED_SOURCE_INSERTION_HANDBOOK_PHRASES = [
   "english_media_search"
 ];
 
+const REQUIRED_ORDER_TUNING_REVIEW_PHRASES = [
+  "User Review Surface",
+  "Daily source status must not reorder review priorities",
+  "Unmapped Source Counts",
+  "Promotion Candidate Review",
+  "Collection-Only Review",
+  "Order Tuning Validation"
+];
+
 export async function validateSourceDisplayContract({ rootDir = process.cwd() } = {}) {
   const failures = [];
   const contractPath = path.join(rootDir, "config", "source-display-contract.json");
@@ -69,7 +86,11 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
   const inventoryOrderReferencePath = String(maintenance.inventory_order_reference_path || REQUIRED_MAINTENANCE.inventory_order_reference_path);
   const inventoryOrderReferenceFullPath = path.join(rootDir, inventoryOrderReferencePath);
   const inventoryOrderReference = await readText(inventoryOrderReferenceFullPath, failures, "inventory-order-reference");
+  const orderTuningReviewPath = String(maintenance.order_tuning_review_path || REQUIRED_MAINTENANCE.order_tuning_review_path);
+  const orderTuningReviewFullPath = path.join(rootDir, orderTuningReviewPath);
+  const orderTuningReview = await readText(orderTuningReviewFullPath, failures, "order-tuning-review");
   const inventoryRows = buildSourceInventoryRows({ rootDir });
+  const unmappedInventoryCount = countUnmappedInventorySources(inventoryRows);
 
   validateMaintenance(maintenance, failures);
   validateStatusLabels(contract, failures);
@@ -77,6 +98,7 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
   validateLogicalSourceCoverage(sectionRows, failures);
   validateHandbook(handbook, contract, sectionRows, maintenance, failures);
   validateInventoryOrderReference(inventoryOrderReference, inventoryRows, maintenance, failures);
+  validateOrderTuningReview(orderTuningReview, inventoryRows, contract, maintenance, failures);
   validatePackageScripts(packageJson, failures);
 
   return {
@@ -88,8 +110,11 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
       handbook_path: handbookPath,
       inventory_sources: inventoryRows.length,
       inventory_order_reference_path: inventoryOrderReferencePath,
+      order_tuning_review_path: orderTuningReviewPath,
+      order_tuning_unmapped_sources: unmappedInventoryCount,
       required_handbook_markers: REQUIRED_MAINTENANCE.handbook_required_markers,
       required_inventory_order_markers: REQUIRED_MAINTENANCE.inventory_order_required_markers,
+      required_order_tuning_markers: REQUIRED_MAINTENANCE.order_tuning_required_markers,
       validation_commands: REQUIRED_MAINTENANCE.validation_commands
     },
     contract: {
@@ -126,6 +151,9 @@ function validateMaintenance(maintenance, failures) {
   if (maintenance.inventory_order_reference_path !== REQUIRED_MAINTENANCE.inventory_order_reference_path) {
     failures.push(`maintenance.inventory_order_reference_path must be ${REQUIRED_MAINTENANCE.inventory_order_reference_path}`);
   }
+  if (maintenance.order_tuning_review_path !== REQUIRED_MAINTENANCE.order_tuning_review_path) {
+    failures.push(`maintenance.order_tuning_review_path must be ${REQUIRED_MAINTENANCE.order_tuning_review_path}`);
+  }
   if (maintenance.user_review_required !== true) {
     failures.push("maintenance.user_review_required must be true");
   }
@@ -152,6 +180,11 @@ function validateMaintenance(maintenance, failures) {
   for (const marker of REQUIRED_MAINTENANCE.inventory_order_required_markers) {
     if (!Array.isArray(maintenance.inventory_order_required_markers) || !maintenance.inventory_order_required_markers.includes(marker)) {
       failures.push(`maintenance.inventory_order_required_markers must include ${marker}`);
+    }
+  }
+  for (const marker of REQUIRED_MAINTENANCE.order_tuning_required_markers) {
+    if (!Array.isArray(maintenance.order_tuning_required_markers) || !maintenance.order_tuning_required_markers.includes(marker)) {
+      failures.push(`maintenance.order_tuning_required_markers must include ${marker}`);
     }
   }
 }
@@ -366,6 +399,115 @@ function validateInventoryOrderReference(reference, inventoryRows, maintenance, 
   }
 }
 
+function validateOrderTuningReview(review, inventoryRows, contract, maintenance, failures) {
+  for (const marker of REQUIRED_MAINTENANCE.order_tuning_required_markers) {
+    if (!review.includes(marker)) {
+      failures.push(`order tuning review missing marker: ${marker}`);
+    }
+  }
+  for (const marker of Array.isArray(maintenance.order_tuning_required_markers) ? maintenance.order_tuning_required_markers : []) {
+    if (!review.includes(marker)) {
+      failures.push(`order tuning review missing contract-declared marker: ${marker}`);
+    }
+  }
+  for (const phrase of REQUIRED_ORDER_TUNING_REVIEW_PHRASES) {
+    if (!review.includes(phrase)) {
+      failures.push(`order tuning review missing phrase: ${phrase}`);
+    }
+  }
+  if (!review.includes(REQUIRED_MAINTENANCE.owner)) {
+    failures.push(`order tuning review must name maintenance owner ${REQUIRED_MAINTENANCE.owner}`);
+  }
+
+  const sectionIds = new Set((Array.isArray(contract?.sections) ? contract.sections : []).map((section) => String(section.id || "")).filter(Boolean));
+  for (const sectionId of sectionIds) {
+    if (!review.includes(sectionId)) {
+      failures.push(`order tuning review missing section id: ${sectionId}`);
+    }
+  }
+
+  const expectedCounts = countUnmappedInventorySections(inventoryRows);
+  const listedCounts = extractOrderTuningUnmappedCounts(review);
+  for (const [sectionId, expectedCount] of expectedCounts.entries()) {
+    const listedCount = listedCounts.get(sectionId);
+    if (listedCount !== expectedCount) {
+      failures.push(`order tuning review unmapped count for ${sectionId} must be ${expectedCount}, found ${listedCount ?? "missing"}`);
+    }
+  }
+  for (const sectionId of listedCounts.keys()) {
+    if (!expectedCounts.has(sectionId)) {
+      failures.push(`order tuning review lists unknown unmapped count section: ${sectionId}`);
+    }
+  }
+  const expectedTotal = countUnmappedInventorySources(inventoryRows);
+  const listedTotal = extractOrderTuningTotalUnmapped(review);
+  if (listedTotal !== expectedTotal) {
+    failures.push(`order tuning review total unmapped count must be ${expectedTotal}, found ${listedTotal ?? "missing"}`);
+  }
+
+  const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
+  const seenSourceIds = new Set();
+  const seenLogicalIds = new Set();
+  const candidates = extractPromotionCandidates(review);
+  if (candidates.length < 24) {
+    failures.push(`order tuning review must list at least 24 promotion candidates, found ${candidates.length}`);
+  }
+  for (const candidate of candidates) {
+    const row = inventoryById.get(candidate.sourceId);
+    if (!row) {
+      failures.push(`promotion candidate references unknown source id: ${candidate.sourceId}`);
+      continue;
+    }
+    if (row.logical_source_id) {
+      failures.push(`promotion candidate is already mapped to logical source: ${candidate.sourceId}`);
+    }
+    if (seenSourceIds.has(candidate.sourceId)) {
+      failures.push(`promotion candidate duplicates source id: ${candidate.sourceId}`);
+    }
+    seenSourceIds.add(candidate.sourceId);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(candidate.logicalSourceId)) {
+      failures.push(`promotion candidate ${candidate.sourceId} suggested logical source id is invalid: ${candidate.logicalSourceId}`);
+    }
+    if (seenLogicalIds.has(candidate.logicalSourceId)) {
+      failures.push(`promotion candidate duplicates suggested logical source id: ${candidate.logicalSourceId}`);
+    }
+    seenLogicalIds.add(candidate.logicalSourceId);
+    if (!sectionIds.has(candidate.sectionId)) {
+      failures.push(`promotion candidate ${candidate.sourceId} suggested section is invalid: ${candidate.sectionId}`);
+    }
+    if (!Number.isFinite(candidate.rank) || candidate.rank <= 0 || candidate.rank % 5 !== 0) {
+      failures.push(`promotion candidate ${candidate.sourceId} suggested rank must use 5-point spacing`);
+    }
+    if (candidate.action !== "promote") {
+      failures.push(`promotion candidate ${candidate.sourceId} action must be promote`);
+    }
+  }
+
+  const forbiddenChecks = [
+    {
+      pattern: /https?:\/\//i,
+      message: "order tuning review must not expose raw URLs"
+    },
+    {
+      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
+      message: "order tuning review must not expose internal source fields"
+    },
+    {
+      pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
+      message: "order tuning review must not expose local paths"
+    },
+    {
+      pattern: /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|GITHUB_TOKEN|GH_TOKEN|NEWRANK_COOKIE|Authorization\s*:|Bearer\s+[A-Za-z0-9._~+/-]+=*)/i,
+      message: "order tuning review must not expose secret-looking values"
+    }
+  ];
+  for (const check of forbiddenChecks) {
+    if (check.pattern.test(review)) {
+      failures.push(check.message);
+    }
+  }
+}
+
 function extractInventorySourceIds(reference) {
   const ids = [];
   const rowPattern = /^\|\s*\d+\.\d+\s*\|\s*`([^`]+)`\s*\|/gm;
@@ -374,6 +516,37 @@ function extractInventorySourceIds(reference) {
     ids.push(match[1]);
   }
   return ids;
+}
+
+function extractOrderTuningUnmappedCounts(review) {
+  const counts = new Map();
+  const pattern = /^\|\s*`([a-z0-9_-]+)`\s*\|\s*(\d+)\s*\|/gm;
+  let match;
+  while ((match = pattern.exec(review))) {
+    counts.set(match[1], Number(match[2]));
+  }
+  return counts;
+}
+
+function extractOrderTuningTotalUnmapped(review) {
+  const match = review.match(/<!--\s*order-tuning-total-unmapped:(\d+)\s*-->/);
+  return match ? Number(match[1]) : null;
+}
+
+function extractPromotionCandidates(review) {
+  const candidates = [];
+  const pattern = /^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|/gm;
+  let match;
+  while ((match = pattern.exec(review))) {
+    candidates.push({
+      sourceId: match[1],
+      logicalSourceId: match[2],
+      sectionId: match[3],
+      rank: Number(match[4]),
+      action: match[5]
+    });
+  }
+  return candidates;
 }
 
 function extractInventorySectionCounts(reference) {
@@ -392,6 +565,22 @@ function extractInventorySummarySectionCounts(reference) {
   let match;
   while ((match = pattern.exec(reference))) {
     counts.set(match[1], Number(match[2]));
+  }
+  return counts;
+}
+
+function countUnmappedInventorySources(rows = []) {
+  return rows.filter((row) => !row.logical_source_id).length;
+}
+
+function countUnmappedInventorySections(rows = []) {
+  const counts = new Map();
+  for (const row of rows) {
+    if (row.logical_source_id) {
+      continue;
+    }
+    const sectionId = String(row.display_section || "uncategorized");
+    counts.set(sectionId, (counts.get(sectionId) || 0) + 1);
   }
   return counts;
 }
