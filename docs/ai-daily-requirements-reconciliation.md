@@ -32,6 +32,23 @@ The user confirmed on 2026-06-26 that the highest-priority follow-up from the Co
 - Each downstream slice must declare whether it is independently verifiable and must bind success to a fixture, real generated artifact, page check, or runtime evidence boundary.
 - The roadmap is not evidence that downstream content quality is fixed; it only fixes the planning and memory surface.
 
+## Source-First V2 Addendum
+
+Status: `contract-implemented / runtime-layout-pending`.
+
+The user confirmed on 2026-06-29 that subscribed sources and platform coverage should become a first-class reader surface, not a late appendix or silent diagnostic. This addendum is now the controlling product direction for the next source-first page iteration.
+
+- The first viewport source area puts `source_signal_story` before `source_metrics_dashboard`.
+- `source_signal_story` summarizes the day's effective, updated, blocked, stale, skipped, and empty source lanes as one source-coverage story.
+- `source_metrics_dashboard` follows the story and shows operational metrics, including effective source counts, blocked/stale/no-update counts, and section health.
+- Reader-facing source order is fixed editorial order, not a daily dynamic sort: `core_primary`, `china_models`, `open_source_platforms`, `tracking_metrics`, `builder_community`, `platform_cn_media`, then `english_media_search`.
+- The reader-facing source unit is `logical_source`. A logical source may group multiple collection entries when they represent the same named source identity.
+- The complete inventory unit is `collection_entry`. The current 154 collection entries are full inventory rows, not first-viewport story content.
+- Full inventory expansion means every collection entry remains visible exactly once, grouped by fixed section rank, with search or focus behavior that highlights but does not hide non-matching rows.
+- Blocked, stale, skipped, unconfigured, disabled, manual, and no-update sources must remain visible rather than silently disappearing.
+- Story-centered daily content remains the fact carrier; source-first sections explain coverage, reliability, gaps, and provenance.
+- `config/source-display-contract.json` is the executable authority, and `docs/source-first-ia-handbook.md` is the maintenance handbook for inserting future sources.
+
 ## Current Contract
 
 | ID | Requirement | Ledger | Test / Gate | Runtime Evidence Boundary | Current Status |

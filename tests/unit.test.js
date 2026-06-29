@@ -13355,6 +13355,90 @@ test("source insertion handbook validator rejects drift", async () => {
   assert.match(result.failures.join("\n"), /handbook missing insertion handbook phrase: Source Insertion Decision Tree/);
 });
 
+test("source-first v2 contract defines first viewport source order and inventory layering", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const handbook = await fs.readFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), "utf8");
+  const reconciliation = await fs.readFile(path.join(rootDir, "docs/ai-daily-requirements-reconciliation.md"), "utf8");
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.deepEqual(result.summary.required_presentation_contract, contract.presentation_contract);
+  assert.equal(contract.presentation_contract.version, "source-first-v2");
+  assert.deepEqual(contract.presentation_contract.first_viewport_order, [
+    "source_signal_story",
+    "source_metrics_dashboard"
+  ]);
+  assert.deepEqual(contract.presentation_contract.source_first_section_order, [
+    "source_signal_story",
+    "source_first_dashboard",
+    "source_status_focus",
+    "source_map",
+    "source_inventory"
+  ]);
+  assert.equal(contract.presentation_contract.reader_source_unit, "logical_source");
+  assert.equal(contract.presentation_contract.inventory_unit, "collection_entry");
+  assert.equal(contract.presentation_contract.full_inventory_semantics, "visible_grouped_expanded_non_hiding_search");
+  assert.equal(contract.presentation_contract.story_content_contract, "story-centered-daily-contract");
+
+  for (const marker of [
+    "source-first-v2-contract:v1",
+    "source-first-v2-layering",
+    "first-viewport-source-order",
+    "full-inventory-expansion-semantics",
+    "baseline-source-importance-2026-06",
+    "source-promotion-review-loop",
+    "source-first-v2-validation"
+  ]) {
+    assert(contract.maintenance.handbook_required_markers.includes(marker), `contract should require handbook marker: ${marker}`);
+    assert(result.summary.required_handbook_markers.includes(marker), `validator summary should expose handbook marker: ${marker}`);
+    assert(handbook.includes(marker), `handbook should include marker: ${marker}`);
+  }
+
+  for (const phrase of [
+    "Logical Source Layer",
+    "Collection Entry Layer",
+    "source signal story before source metrics dashboard",
+    "154 collection entries are complete inventory rows, not first-viewport story content",
+    "Story-centered content remains the fact carrier",
+    "Promote a collection entry only when readers should track it as a named source"
+  ]) {
+    assert(handbook.includes(phrase), `handbook should explain source-first v2 phrase: ${phrase}`);
+  }
+
+  for (const phrase of [
+    "Source-First V2 Addendum",
+    "The first viewport source area puts `source_signal_story` before `source_metrics_dashboard`.",
+    "The current 154 collection entries are full inventory rows, not first-viewport story content.",
+    "`config/source-display-contract.json` is the executable authority"
+  ]) {
+    assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
+  }
+});
+
+test("source-first v2 contract validator rejects presentation drift", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-first-v2-validator-"));
+  await fs.cp(path.join(rootDir, "config"), path.join(tmp, "config"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.copyFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), path.join(tmp, "docs/source-first-ia-handbook.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-inventory-order.md"), path.join(tmp, "docs/source-inventory-order.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-order-tuning-review.md"), path.join(tmp, "docs/source-order-tuning-review.md"));
+  await fs.copyFile(path.join(rootDir, "package.json"), path.join(tmp, "package.json"));
+
+  const contractPath = path.join(tmp, "config/source-display-contract.json");
+  const contract = JSON.parse(await fs.readFile(contractPath, "utf8"));
+  contract.presentation_contract = {
+    ...(contract.presentation_contract || {}),
+    version: "source-first-v1"
+  };
+  await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
+
+  const result = await validateSourceDisplayContract({ rootDir: tmp });
+  assert.equal(result.ok, false, "presentation contract drift should be rejected");
+  assert.match(result.failures.join("\n"), /presentation_contract\.version must be source-first-v2/);
+});
+
 test("source order tuning review is validator-backed and complete", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const result = await validateSourceDisplayContract({ rootDir });

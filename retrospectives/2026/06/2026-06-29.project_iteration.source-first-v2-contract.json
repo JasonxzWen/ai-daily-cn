@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-v2-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first v2 contract",
+  "status": "completed",
+  "summary": "This iteration turns the user-confirmed source-first v2 direction into a validator-backed product contract: source signal story precedes the metrics dashboard, logical sources are the reader-facing layer, and the full 154-entry collection inventory remains visible as inventory rather than first-viewport story content.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first v2 contract\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The source-first page needs two explicit layers instead of one oversized list.",
+      "evidence": "`config/source-display-contract.json` now defines `reader_source_unit: logical_source` and `inventory_unit: collection_entry`, while `docs/source-first-ia-handbook.md` documents Logical Source Layer and Collection Entry Layer.",
+      "scope": "source_first_v2",
+      "persistence": "implemented",
+      "recommended_action": "Keep future reader-facing source work on logical sources, and keep collection entries as complete inventory evidence."
+    },
+    {
+      "lesson": "The first viewport should explain the day's source signal before showing the operating dashboard.",
+      "evidence": "`presentation_contract.first_viewport_order` is fixed to `source_signal_story` then `source_metrics_dashboard`, and unit tests reject presentation drift.",
+      "scope": "first_viewport_ia",
+      "persistence": "implemented",
+      "recommended_action": "Use this order when implementing the runtime layout slice."
+    },
+    {
+      "lesson": "Full inventory expansion must mean visible inventory, not 154 first-viewport story cards.",
+      "evidence": "`docs/ai-daily-requirements-reconciliation.md` and `docs/source-first-ia-handbook.md` both preserve the rule that 154 collection entries are complete inventory rows, not first-viewport story content.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "When adding source search or focus controls, highlight matches without hiding non-matching rows."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-fixed-source-candidate-effectiveness"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement the runtime page slice in the contract order: source signal story, metrics dashboard, status focus, source map, then full inventory.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-v2-contract"
+}

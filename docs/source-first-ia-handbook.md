@@ -201,6 +201,109 @@ npm run build:check-clean
 npm run test:e2e
 ```
 
+## Source-First V2 Operating Contract
+
+<!-- source-first-v2-contract:v1 -->
+
+Status: `phase-18-contract`
+
+The daily report is source-first v2. Source visibility is a first-class reader surface, but source lists do not replace edited stories. The page must show where the day came from, which source lanes worked, which lanes were blocked or stale, and which full inventory entries exist.
+
+<!-- source-first-v2-layering -->
+
+### Logical Source Layer
+
+The Logical Source Layer is the reader-facing source graph. A logical source is a named editorial source identity such as `openai-news`, `github-trending`, `wechat-platform`, or `openrouter-rankings`. It can group multiple collection entries when those entries serve the same reader-visible source identity.
+
+Logical sources are ordered by fixed editorial importance in `config/source-display-contract.json`. Daily runtime status may change tags and counts, but it must not move logical sources.
+
+### Collection Entry Layer
+
+The Collection Entry Layer is the complete registered inventory. Collection entries are concrete feed, page, bridge, manual, API, or platform inputs. They are visible so blocked, skipped, unconfigured, manual, or no-update rows do not disappear from review.
+
+154 collection entries are complete inventory rows, not first-viewport story content. They remain grouped and expanded in fixed source sections with non-hiding search/highlight behavior.
+
+<!-- first-viewport-source-order -->
+
+### First Viewport Order
+
+The first viewport must put source signal story before source metrics dashboard.
+
+The source-first section order is:
+
+1. `source_signal_story`
+2. `source_first_dashboard`
+3. `source_status_focus`
+4. `source_map`
+5. `source_inventory`
+
+The source signal story is a compact narrative rollup of effective, updated, blocked, and skipped source lanes. The source metrics dashboard is the numeric operating view. The status focus appears before the full graph so blocked or stale lanes are noticeable before the long inventory.
+
+<!-- full-inventory-expansion-semantics -->
+
+### Full Inventory Expansion Semantics
+
+All collection entries stay present in the public source-first area. Search, quick links, and focus lanes may help navigation, but they must not remove, hide, or reorder rows.
+
+Full expansion means:
+
+- every registered collection entry appears exactly once in the inventory detail groups;
+- groups follow fixed section rank;
+- entries keep their logical-source mapping or `unmapped` status;
+- blocked, skipped, manual, disabled, unconfigured, and no-update entries remain visible;
+- search highlights matches without hiding non-matching rows.
+
+<!-- baseline-source-importance-2026-06 -->
+
+### Baseline Source Importance 2026-06
+
+The baseline source importance order is:
+
+1. `core_primary`
+2. `china_models`
+3. `open_source_platforms`
+4. `tracking_metrics`
+5. `builder_community`
+6. `platform_cn_media`
+7. `english_media_search`
+
+Within each section, existing rank values remain the baseline until the user reviews a change. Codex may propose a rank, but merged JSON is the executable authority.
+
+Story-centered content remains the fact carrier. Stories explain what happened and why it matters. Source-first sections explain coverage, reliability, gaps, and provenance.
+
+<!-- source-promotion-review-loop -->
+
+### Source Promotion Review Loop
+
+Promote a collection entry only when readers should track it as a named source.
+
+Default loop:
+
+1. Decide whether the new input belongs to an existing logical source.
+2. If it is collection-only, update the registry and regenerate the inventory reference.
+3. If it deserves named reader visibility, add a logical source contract, section rank, handbook row, focused tests, and order-tuning review updates.
+4. Keep mirrors, duplicate org feeds, broad aggregators, and private/manual bridges collection-only unless the user explicitly promotes them.
+5. Run the source display validator and full validation before merging.
+
+<!-- source-first-v2-validation -->
+
+### Source-First V2 Validation
+
+Required commands:
+
+```powershell
+npm run sources:display-contract
+npm run validate
+```
+
+Contract checks must reject:
+
+- missing or renamed source-first v2 markers;
+- first viewport order that does not start with `source_signal_story` then `source_metrics_dashboard`;
+- a missing logical source vs collection entry distinction;
+- documentation that treats the 154-entry inventory as first-viewport story content;
+- runtime status being used to reorder fixed source rows.
+
 验收时必须确认：
 
 - `config/source-display-contract.json` 覆盖 `buildSourceEffectivenessTable` 输出的每个 logical source。
