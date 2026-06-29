@@ -13957,6 +13957,158 @@ test("source-first IA dashboard promotes source metrics and fixed source graph",
   assert(!serializedSections.includes("selection_snapshot"));
 });
 
+function sourceFirstContractRichId(sectionId) {
+  const map = {
+    source_signal_story: "source-signal-story",
+    source_first_dashboard: "source-first-dashboard",
+    source_status_focus: "source-status-focus",
+    source_map: "source-map",
+    source_inventory: "source-inventory"
+  };
+  return map[sectionId] || sectionId;
+}
+
+function sourceFirstRuntimeRowsFixture() {
+  return [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news-rss"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "official RSS parsed"
+    },
+    {
+      id: "anthropic-news",
+      name: "Anthropic News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: false,
+      not_included_reason: "candidate_not_selected_for_public_page",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 20,
+      display_mode: "expanded",
+      status_label: "updated_not_selected",
+      source_ids: ["content-anthropic-company-news"],
+      source_kinds: ["html_index"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 0,
+      notes: "candidate created but not selected"
+    },
+    {
+      id: "wechat-platform",
+      name: "WeChat Platform",
+      role: "platform",
+      configured: false,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "not_configured_or_not_checked",
+      display_section: "platform_cn_media",
+      display_section_label: "中文平台与媒体线索",
+      display_section_rank: 60,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "not_configured_or_skipped",
+      source_ids: ["platform-wechat-ai-feed"],
+      source_kinds: ["rsshub"],
+      statuses: ["skipped_missing_base_url"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "RSSHUB_BASE_URL missing"
+    }
+  ];
+}
+
+test("source-first runtime contract binds interaction sections to presentation contract", async () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+
+  const input = reportToInteractionInput(report);
+  const expectedRichIds = contract.presentation_contract.source_first_section_order.map(sourceFirstContractRichId);
+  const sourceFirstRichIds = input.sections
+    .map((section) => section.richId)
+    .filter((richId) => expectedRichIds.includes(richId));
+
+  assert.deepEqual(input.sourceFirstPresentationContract, contract.presentation_contract);
+  assert.deepEqual(input.sourceFirstRuntimeSectionOrder, expectedRichIds);
+  assert.deepEqual(sourceFirstRichIds, expectedRichIds);
+  assert(input.sections.findIndex((section) => /^track-/.test(section.richId || "")) > input.sections.findIndex((section) => section.richId === "source-inventory"));
+});
+
+test("source-first runtime contract can reorder top source sections from contract override", async () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const override = {
+    ...contract.presentation_contract,
+    source_first_section_order: [
+      "source_first_dashboard",
+      "source_signal_story",
+      "source_status_focus",
+      "source_map",
+      "source_inventory"
+    ]
+  };
+
+  const input = reportToInteractionInput(report, { sourceFirstPresentationContract: override });
+  assert.deepEqual(input.sourceFirstRuntimeSectionOrder, [
+    "source-first-dashboard",
+    "source-signal-story",
+    "source-status-focus",
+    "source-map",
+    "source-inventory"
+  ]);
+  assert.deepEqual(
+    input.sections
+      .map((section) => section.richId)
+      .filter((richId) => ["source-first-dashboard", "source-signal-story", "source-status-focus"].includes(richId)),
+    ["source-first-dashboard", "source-signal-story", "source-status-focus"]
+  );
+});
+
+test("source-first runtime contract rejects unknown section ids", async () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+
+  assert.throws(
+    () => reportToInteractionInput(report, {
+      sourceFirstPresentationContract: {
+        ...contract.presentation_contract,
+        source_first_section_order: [
+          ...contract.presentation_contract.source_first_section_order,
+          "unknown_source_panel"
+        ]
+      }
+    }),
+    /unknown source-first presentation section id: unknown_source_panel/
+  );
+});
+
 test("source map scan index summarizes fixed groups before detail rows", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-runtime-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first runtime contract binding",
+  "status": "completed",
+  "summary": "This iteration binds the runtime interaction-input section order to the source-first v2 presentation contract, so source signal story, source metrics dashboard, status focus, source map, and full inventory cannot silently drift from the configured product order.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first runtime contract\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source-first v2 contract|source-first runtime contract|source-first IA dashboard|source inventory|source map scan index\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source-first presentation order should be executable, not only documented.",
+      "evidence": "`reportToInteractionInput` now assembles source-first runtime sections from `presentation_contract.source_first_section_order`, and focused tests prove contract override reorders the source story and dashboard.",
+      "scope": "source_first_runtime_contract",
+      "persistence": "implemented",
+      "recommended_action": "Use the same contract-binding approach for future source-first layout refinements."
+    },
+    {
+      "lesson": "Browser order checks should read the same contract as the runtime.",
+      "evidence": "The E2E source-first section-order assertion reads `config/source-display-contract.json` and maps contract ids to rendered section ids before comparing browser order.",
+      "scope": "e2e_contract_binding",
+      "persistence": "implemented",
+      "recommended_action": "Avoid duplicating source-first order literals in future E2E tests."
+    },
+    {
+      "lesson": "Inventory detail sections must remain attached to their parent contract slots.",
+      "evidence": "The runtime contract keeps source map group sections after `source_map` and inventory group sections after `source_inventory`, preserving the full 154-entry inventory behavior.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "Keep future inventory controls non-hiding and grouped under the inventory contract slot."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the runtime-bound section order when refining the visible source story and metrics dashboard presentation.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-runtime-contract"
+}
