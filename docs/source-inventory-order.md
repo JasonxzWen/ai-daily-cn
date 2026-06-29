@@ -19,11 +19,11 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 
 | Section | Entries | Logical mappings | Core | Optional | Manual |
 |---|---:|---:|---:|---:|---:|
-| `core_primary` 核心一手源 | 22 | 9 | 22 | 0 | 0 |
+| `core_primary` 核心一手源 | 23 | 13 | 23 | 0 | 0 |
 | `china_models` 中国模型与厂商 | 35 | 5 | 26 | 9 | 0 |
 | `open_source_platforms` 开源、模型平台与代码生态 | 33 | 4 | 7 | 26 | 0 |
 | `tracking_metrics` 榜单与持续指标 | 3 | 3 | 3 | 0 | 0 |
-| `builder_community` Builder 与社区原始信号 | 41 | 1 | 9 | 30 | 2 |
+| `builder_community` Builder 与社区原始信号 | 40 | 1 | 8 | 30 | 2 |
 | `platform_cn_media` 中文平台与媒体线索 | 12 | 2 | 0 | 5 | 7 |
 | `english_media_search` 英文媒体与搜索聚合 | 8 | 5 | 0 | 8 | 0 |
 
@@ -51,7 +51,7 @@ npm run validate
 
 ### 核心一手源 (`core_primary`)
 
-<!-- inventory-section:core_primary count:22 -->
+<!-- inventory-section:core_primary count:23 -->
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
@@ -67,16 +67,17 @@ npm run validate
 | 10.010 | `content-google-deepmind-rss` | Google DeepMind RSS | `google-deepmind` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.011 | `content-google-research` | Google Research Blog | `google-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.012 | `content-microsoft-research` | Microsoft Research Blog | `microsoft-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.013 | `content-meta-ai-blog` | Meta AI Blog | `meta-ai` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.014 | `content-aws-machine-learning` | AWS Machine Learning Blog | `aws-ml` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.015 | `content-hugging-face-blog` | Hugging Face Blog | `hugging-face-blog` | `rss` | `core` | `T1` | `primary` | `-` | `configured` |
-| 10.016 | `content-apple-machine-learning` | Apple Machine Learning Research | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.017 | `content-nvidia-developer-blog` | NVIDIA Developer Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.018 | `content-azure-blog` | Azure Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.019 | `content-meta-engineering` | Meta Engineering | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.020 | `content-xai-news` | xAI News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.021 | `content-tiktok-developers-blog` | TikTok for Developers Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.022 | `content-cloudflare-blog` | Cloudflare Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.013 | `content-apple-machine-learning` | Apple Machine Learning Research | `apple-ml-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.014 | `content-meta-ai-blog` | Meta AI Blog | `meta-ai` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.015 | `content-meta-engineering` | Meta Engineering | `meta-engineering` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.016 | `content-aws-machine-learning` | AWS Machine Learning Blog | `aws-ml` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.017 | `content-nvidia-developer-blog` | NVIDIA Developer Blog | `nvidia-ai-developer` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.018 | `content-hugging-face-blog` | Hugging Face Blog | `hugging-face-blog` | `rss` | `core` | `T1` | `primary` | `-` | `configured` |
+| 10.019 | `content-xai-company-news` | xAI Company News | `xai-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.020 | `content-xai-news` | xAI News | `xai-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.021 | `content-azure-blog` | Azure Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.022 | `content-tiktok-developers-blog` | TikTok for Developers Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.023 | `content-cloudflare-blog` | Cloudflare Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 
 ### 中国模型与厂商 (`china_models`)
 
@@ -172,7 +173,7 @@ npm run validate
 
 ### Builder 与社区原始信号 (`builder_community`)
 
-<!-- inventory-section:builder_community count:41 -->
+<!-- inventory-section:builder_community count:40 -->
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
@@ -184,39 +185,38 @@ npm run validate
 | 50.006 | `content-meta-newsroom` | Meta Newsroom | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 50.007 | `content-amazon-news` | Amazon News | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 50.008 | `content-nvidia-newsroom-rss` | NVIDIA Newsroom RSS | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.009 | `content-xai-company-news` | xAI Company News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.010 | `content-huawei-newsroom` | Huawei Newsroom | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.011 | `content-xiaomi-investor-relations` | Xiaomi Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.012 | `content-jd-investor-news` | JD.com Investor News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.013 | `content-netease-company-news` | NetEase Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.014 | `content-kuaishou-company-news` | Kuaishou Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.015 | `content-meituan-investor-relations` | Meituan Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.016 | `content-builder-simon-willison` | Simon Willison's Weblog | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
-| 50.017 | `content-runway-changelog` | Runway Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.018 | `content-luma-changelog` | Luma Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.019 | `content-adobe-ai-blog` | Adobe Blog AI | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.020 | `content-pika-product` | Pika Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.021 | `content-kling-product` | Kling Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.022 | `content-unity-muse` | Unity Muse | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.023 | `content-nature-machine-learning` | Nature Machine Learning | `unmapped` | `rss` | `core` | `T0` | `secondary` | `-` | `configured` |
-| 50.024 | `content-techcrunch-enterprise` | TechCrunch Enterprise | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
-| 50.025 | `content-latent-space` | Latent.Space | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.026 | `content-reddit-machinelearning` | Reddit r/MachineLearning | `unmapped` | `search_api` | `optional` | `T2` | `community` | `-` | `configured` |
-| 50.027 | `content-smol-ai-news` | Smol AI News | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
-| 50.028 | `content-ai-news-buttondown` | AI News Archive | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
-| 50.029 | `content-bens-bites` | Ben's Bites | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
-| 50.030 | `content-interconnects` | Interconnects | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.031 | `content-the-magnifier-ai` | The Magnifier AI | `unmapped` | `html_index` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.032 | `content-fastcompany-creator-economy` | Fast Company Creator Economy | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
-| 50.033 | `content-crunchbase-ai-news` | Crunchbase News AI | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
-| 50.034 | `content-planet-ai` | Planet AI | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.035 | `general-news-google-ai` | Google News AI RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.036 | `general-news-google-ai-policy` | Google News AI Policy RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.037 | `general-news-google-aigc-content` | Google News AIGC Content Industry RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.038 | `general-news-google-aigc-video-image-game` | Google News AIGC Video Image Game RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.039 | `intermediary-leiphone` | Leiphone | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
-| 50.040 | `intermediary-ifanr` | iFanr | `unmapped` | `rss` | `manual` | `T3` | `intermediary` | `-` | `configured` |
-| 50.041 | `platform-reddit-local-llama-feed` | Reddit LocalLLaMA Platform Feed | `unmapped` | `rss` | `manual` | `T3` | `community` | `reddit` | `configured` |
+| 50.009 | `content-huawei-newsroom` | Huawei Newsroom | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.010 | `content-xiaomi-investor-relations` | Xiaomi Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.011 | `content-jd-investor-news` | JD.com Investor News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.012 | `content-netease-company-news` | NetEase Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.013 | `content-kuaishou-company-news` | Kuaishou Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.014 | `content-meituan-investor-relations` | Meituan Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.015 | `content-builder-simon-willison` | Simon Willison's Weblog | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
+| 50.016 | `content-runway-changelog` | Runway Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.017 | `content-luma-changelog` | Luma Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.018 | `content-adobe-ai-blog` | Adobe Blog AI | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.019 | `content-pika-product` | Pika Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
+| 50.020 | `content-kling-product` | Kling Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
+| 50.021 | `content-unity-muse` | Unity Muse | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
+| 50.022 | `content-nature-machine-learning` | Nature Machine Learning | `unmapped` | `rss` | `core` | `T0` | `secondary` | `-` | `configured` |
+| 50.023 | `content-techcrunch-enterprise` | TechCrunch Enterprise | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
+| 50.024 | `content-latent-space` | Latent.Space | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.025 | `content-reddit-machinelearning` | Reddit r/MachineLearning | `unmapped` | `search_api` | `optional` | `T2` | `community` | `-` | `configured` |
+| 50.026 | `content-smol-ai-news` | Smol AI News | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
+| 50.027 | `content-ai-news-buttondown` | AI News Archive | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
+| 50.028 | `content-bens-bites` | Ben's Bites | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
+| 50.029 | `content-interconnects` | Interconnects | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.030 | `content-the-magnifier-ai` | The Magnifier AI | `unmapped` | `html_index` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.031 | `content-fastcompany-creator-economy` | Fast Company Creator Economy | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
+| 50.032 | `content-crunchbase-ai-news` | Crunchbase News AI | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
+| 50.033 | `content-planet-ai` | Planet AI | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.034 | `general-news-google-ai` | Google News AI RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.035 | `general-news-google-ai-policy` | Google News AI Policy RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.036 | `general-news-google-aigc-content` | Google News AIGC Content Industry RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.037 | `general-news-google-aigc-video-image-game` | Google News AIGC Video Image Game RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.038 | `intermediary-leiphone` | Leiphone | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
+| 50.039 | `intermediary-ifanr` | iFanr | `unmapped` | `rss` | `manual` | `T3` | `intermediary` | `-` | `configured` |
+| 50.040 | `platform-reddit-local-llama-feed` | Reddit LocalLLaMA Platform Feed | `unmapped` | `rss` | `manual` | `T3` | `community` | `reddit` | `configured` |
 
 ### 中文平台与媒体线索 (`platform_cn_media`)
 

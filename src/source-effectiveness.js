@@ -37,6 +37,12 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["microsoft research", "microsoft.com/en-us/research"]
   },
   {
+    id: "apple-ml-research",
+    name: "Apple Machine Learning Research",
+    role: "official",
+    aliases: ["content-apple-machine-learning", "apple machine learning research", "apple ml research", "machinelearning.apple.com"]
+  },
+  {
     id: "aws-ml",
     name: "AWS ML Blog",
     role: "official",
@@ -62,10 +68,28 @@ export const CORE_SOURCE_CONTRACTS = [
     ]
   },
   {
+    id: "meta-engineering",
+    name: "Meta Engineering",
+    role: "official",
+    aliases: ["content-meta-engineering", "meta engineering", "engineering.fb.com"]
+  },
+  {
+    id: "nvidia-ai-developer",
+    name: "NVIDIA AI Developer Blog",
+    role: "official",
+    aliases: ["content-nvidia-developer-blog", "nvidia developer blog", "nvidia ai developer", "developer.nvidia.com/blog"]
+  },
+  {
     id: "hugging-face-blog",
     name: "Hugging Face Blog",
     role: "official",
     aliases: ["hugging face blog", "huggingface.co/blog", "huggingface blog feed"]
+  },
+  {
+    id: "xai-news",
+    name: "xAI News",
+    role: "official",
+    aliases: ["content-xai-news", "content-xai-company-news", "xai news", "x.ai/news"]
   },
   {
     id: "deepseek-official",

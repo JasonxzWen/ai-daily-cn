@@ -56,9 +56,13 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 | 30 | `google-deepmind` | Google DeepMind 官方博客 |
 | 40 | `google-research` | Google Research Blog |
 | 50 | `microsoft-research` | Microsoft Research Blog |
+| 55 | `apple-ml-research` | Apple Machine Learning Research，官方机器学习研究入口 |
 | 60 | `meta-ai` | Meta AI Blog |
+| 65 | `meta-engineering` | Meta Engineering，官方工程与基础设施入口 |
 | 70 | `aws-ml` | AWS ML Blog |
+| 75 | `nvidia-ai-developer` | NVIDIA AI Developer Blog，开发者和平台技术入口 |
 | 80 | `hugging-face-blog` | Hugging Face 官方博客 |
+| 85 | `xai-news` | xAI 官方新闻与公司新闻入口 |
 
 ### `china_models`
 

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.core-primary-logical-sources",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Core primary logical source promotions",
+  "status": "completed",
+  "summary": "This iteration promotes reviewed core-primary official source candidates into reader-visible logical sources, making Apple ML Research, Meta Engineering, NVIDIA AI Developer, and xAI News visible in the public source graph while preserving the 154-entry collection inventory.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"core primary official logical source promotions\" tests/unit.test.js",
+      "node --test --test-name-pattern \"core primary official logical source promotions|Anthropic Research logical source promotion|source display contract governance|source-first IA contract|source inventory order reference|source-first IA dashboard|source inventory|source map scan index|source order tuning review\" tests/unit.test.js",
+      "node scripts/generate-source-inventory-order.mjs",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Order-tuning candidates should be removed as soon as they become executable logical sources.",
+      "evidence": "`content-apple-machine-learning`, `content-meta-engineering`, `content-nvidia-developer-blog`, and `content-xai-news` are removed from the future-candidate review table after promotion.",
+      "scope": "source_order_promotion",
+      "persistence": "implemented",
+      "recommended_action": "Keep future promotion PRs paired with order-tuning review updates and replacement candidates."
+    },
+    {
+      "lesson": "A source-first promotion can map more than one collection entry when readers see a single source identity.",
+      "evidence": "`content-xai-news` and `content-xai-company-news` now map to `xai-news`, while both remain visible as separate collection inventory entries.",
+      "scope": "logical_source_layering",
+      "persistence": "implemented",
+      "recommended_action": "Continue grouping same-identity official subchannels when it improves reader clarity without hiding collection entries."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Promote the next reviewed batch from `docs/source-order-tuning-review.md`, likely China model platform sources or durable paper/model ecosystem sources.",
+      "owner": "project"
+    }
+  ],
+  "slug": "core-primary-logical-sources"
+}
