@@ -13939,9 +13939,17 @@ test("source-first IA dashboard promotes source metrics and fixed source graph",
   assert.equal(firstSection?.richId, "source-signal-story");
   assert(sourceSignalIndex >= 0 && sourceSignalIndex < dashboardIndex, "source story rollup should precede metrics dashboard");
   assert(dashboard, "source dashboard section should render before story tracks");
-  assert.match(dashboard.content, /公开入选/);
-  assert.match(dashboard.content, /有更新未入选/);
-  assert.match(dashboard.content, /未配置或跳过/);
+  assert.equal(dashboard.type, "filterable-cards");
+  assert.equal(dashboard.cardClass, "source-metric-card");
+  assert(dashboard.items.length >= 6);
+  assert.deepEqual(dashboard.items.slice(0, 6).map((item) => item.title), [
+    "全部逻辑信源",
+    "公开入选",
+    "有更新未入选",
+    "阻塞",
+    "未配置或跳过",
+    "低信号"
+  ]);
   assert(graph, "source graph section should render from source_effectiveness");
   assert(graph.content.indexOf("核心一手源") < graph.content.indexOf("开源、模型平台与代码生态"));
   assert(graph.content.indexOf("开源、模型平台与代码生态") < graph.content.indexOf("中文平台与媒体线索"));
@@ -14041,6 +14049,114 @@ function sourceFirstRuntimeRowsFixture() {
     }
   ];
 }
+
+function sourceMetricsDashboardRowsFixture() {
+  return [
+    ...sourceFirstRuntimeRowsFixture(),
+    {
+      id: "huggingface-blog",
+      name: "Hugging Face Blog",
+      role: "official",
+      configured: true,
+      reachable: false,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "fetch_failed",
+      display_section: "core_primary",
+      display_section_label: "Core primary sources",
+      display_section_rank: 10,
+      display_rank: 30,
+      display_mode: "expanded",
+      status_label: "blocked",
+      source_ids: ["content-huggingface-blog"],
+      source_kinds: ["rss"],
+      statuses: ["fetch_failed"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "fetch failed"
+    },
+    {
+      id: "google-ai-blog",
+      name: "Google AI Blog",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: false,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "no_recent_update",
+      display_section: "core_primary",
+      display_section_label: "Core primary sources",
+      display_section_rank: 10,
+      display_rank: 40,
+      display_mode: "expanded",
+      status_label: "no_recent_update",
+      source_ids: ["content-google-ai-blog"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "no recent update"
+    },
+    {
+      id: "deepmind-blog",
+      name: "Google DeepMind Blog",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "parsed_not_candidate",
+      display_section: "core_primary",
+      display_section_label: "Core primary sources",
+      display_section_rank: 10,
+      display_rank: 50,
+      display_mode: "expanded",
+      status_label: "parsed_not_candidate",
+      source_ids: ["content-deepmind-blog"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "parsed but below candidate threshold"
+    }
+  ];
+}
+
+test("source metrics dashboard cards render operational metrics as cards", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
+
+  assert(dashboard, "source dashboard section should render");
+  assert.equal(dashboard.type, "filterable-cards");
+  assert.equal(dashboard.cardClass, "source-metric-card");
+  assert.equal(dashboard.showFilters, false);
+  assert.deepEqual(dashboard.items.map((item) => item.title), [
+    "全部逻辑信源",
+    "公开入选",
+    "有更新未入选",
+    "阻塞",
+    "未配置或跳过",
+    "低信号"
+  ]);
+  assert.deepEqual(
+    dashboard.items.map((item) => item.stats?.[0]?.value),
+    ["6", "1", "1", "1", "1", "2"]
+  );
+  assert(dashboard.items.every((item) => item.group === "信源运行概况"));
+  assert(dashboard.items.every((item) => item.showGroup === false));
+  assert(dashboard.items.every((item) => Array.isArray(item.tags) && item.tags.length > 0));
+  assert(dashboard.items.every((item) => Array.isArray(item.stats) && item.stats.some((stat) => stat.label === "数量")));
+  assert.match(JSON.stringify(dashboard.items.find((item) => item.title === "阻塞")), /需处理|BLOCKED/);
+  assert.match(JSON.stringify(dashboard.items.find((item) => item.title === "未配置或跳过")), /需配置|SKIPPED/);
+  assert.match(JSON.stringify(dashboard.items.find((item) => item.title === "低信号")), /低信号|LOW_SIGNAL/);
+  assert.doesNotMatch(JSON.stringify(dashboard), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
+});
 
 test("source-first runtime contract binds interaction sections to presentation contract", async () => {
   const report = strictPublishReportFixture();

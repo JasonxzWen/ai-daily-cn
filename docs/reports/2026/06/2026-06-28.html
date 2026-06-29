@@ -3263,35 +3263,111 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 覆盖提醒：未配置或跳过：WeChat Platform Sources、Zhihu Platform Sources；这些缺口已经计入阻塞 0、未配置或跳过 2，不会从固定清单中消失。
 继续查看：[信源运行概况](#section-source-first-dashboard) · [状态焦点](#section-source-status-focus) · [全量信源清单](#section-source-inventory)</template>
   </section>
-<section class="panel rich-section" id="section-source-first-dashboard" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel" id="section-source-first-dashboard" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>信源运行概况</h2>
-
+      <p class="section-summary">今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。</p>
     </div>
 
   </div>
 
+    <div class="evidence-grid focus-field source-metric-card-grid" data-focus-field="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
 
-    <div class="rendered-markdown"><p>今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。</p>
-<p><mark class="text-highlight daily-tag daily-tag-status-checked">included</mark> 8 <mark class="text-highlight daily-tag daily-tag-status-checked">updated_not_selected</mark> 7 <mark class="text-highlight daily-tag daily-tag-status-blocked">blocked</mark> 0 <mark class="text-highlight daily-tag daily-tag-status-skipped">not_configured_or_skipped</mark> 2</p>
-<div class="markdown-table-scroll"><table><thead><tr><th>指标</th><th>数量</th><th>说明</th></tr></thead><tbody><tr><td>全部逻辑信源</td><td>22</td><td>固定展示合同中的公开信源行</td></tr><tr><td>公开入选</td><td>8</td><td>今天有内容进入公开页</td></tr><tr><td>有更新未入选</td><td>7</td><td>抓到候选但未进入公开页</td></tr><tr><td>解析未成候选</td><td>5</td><td>解析到近期内容但未形成候选</td></tr><tr><td>无近期更新</td><td>0</td><td>可访问但没有近期有效更新</td></tr><tr><td>阻塞</td><td>0</td><td>已配置但本轮不可达或解析阻塞</td></tr><tr><td>未配置或跳过</td><td>2</td><td>缺 token/base URL、手动源或占位源</td></tr></tbody></table></div>
-<p>公开页只展示这些读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。</p></div>
-    <template data-rich-source data-source-fallback>今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。
+    <h3><span class="card-title-text"><span>全部逻辑信源</span><span class="card-subtitle">固定展示合同</span></span></h3>
+    <div class="card-tags"><span class="chip chip-general">TOTAL</span></div>
 
-==tag-status-checked|included== 8 ==tag-status-checked|updated_not_selected== 7 ==tag-status-blocked|blocked== 0 ==tag-status-skipped|not_configured_or_skipped== 2
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>22</strong>
 
-| 指标 | 数量 | 说明 |
-|---|---:|---|
-| 全部逻辑信源 | 22 | 固定展示合同中的公开信源行 |
-| 公开入选 | 8 | 今天有内容进入公开页 |
-| 有更新未入选 | 7 | 抓到候选但未进入公开页 |
-| 解析未成候选 | 5 | 解析到近期内容但未形成候选 |
-| 无近期更新 | 0 | 可访问但没有近期有效更新 |
-| 阻塞 | 0 | 已配置但本轮不可达或解析阻塞 |
-| 未配置或跳过 | 2 | 缺 token/base URL、手动源或占位源 |
+    </div></div>
+    <p>固定展示合同中的公开信源行；公开页只展示读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。</p>
 
-公开页只展示这些读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。</template>
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>公开入选</span><span class="card-subtitle">进入公开页</span></span></h3>
+    <div class="card-tags"><span class="chip chip-major">有效</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>8</strong>
+
+    </div></div>
+    <p>今天有内容进入公开页，是当前 story 可直接回源的主体信号。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>有更新未入选</span><span class="card-subtitle">抓到候选</span></span></h3>
+    <div class="card-tags"><span class="chip chip-notable">旁路更新</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>7</strong>
+
+    </div></div>
+    <p>抓到候选但未进入公开页，用来提示有增量信号但未构成今日主线。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>阻塞</span><span class="card-subtitle">不可达或解析阻塞</span></span></h3>
+    <div class="card-tags"><span class="chip chip-major">需处理</span><span class="chip chip-major">BLOCKED</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>0</strong>
+
+    </div></div>
+    <p>已配置但本轮不可达或解析阻塞；即使为 0 也保留，避免静默失败。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>未配置或跳过</span><span class="card-subtitle">缺配置或手动源</span></span></h3>
+    <div class="card-tags"><span class="chip chip-notable">需配置</span><span class="chip chip-notable">SKIPPED</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>2</strong>
+
+    </div></div>
+    <p>缺 token/base URL、手动源或占位源；这些缺口会继续留在固定清单中。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>低信号</span><span class="card-subtitle">未形成公开候选</span></span></h3>
+    <div class="card-tags"><span class="chip chip-general">低信号</span><span class="chip chip-general">LOW_SIGNAL</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>5</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">无近期更新</span>
+      <strong>0</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">解析未成候选</span>
+      <strong>5</strong>
+
+    </div></div>
+    <p>可访问但没有近期有效更新，或解析到近期内容但未形成候选。</p>
+
+  </article>
+    </div>
   </section>
 <section class="panel rich-section" id="section-source-status-focus" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
