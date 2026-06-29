@@ -14000,6 +14000,63 @@ test("source inventory density controls keep all rows visible with static quick 
   assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
+test("source inventory reader focus lanes expose important slices without filtering rows", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventory = input.sections.find((section) => section.richId === "source-inventory");
+  const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
+  const groupRowCount = groupSections.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
+  const serializedInventory = JSON.stringify([inventory, ...groupSections]);
+  const countByField = (field, value) => inventoryRows.filter((row) => row[field] === value).length;
+  const platformBridgeCount = inventoryRows.filter((row) =>
+    row.source_kind === "rsshub" || ["wechat", "zhihu", "reddit"].includes(String(row.platform || "").toLowerCase())
+  ).length;
+
+  assert(inventory, "inventory overview should render");
+  assert.match(inventory.content, /聚焦入口/);
+  assert.match(inventory.content, /不会隐藏或重排/);
+  assert.match(inventory.content, /配置待补/);
+  assert.match(inventory.content, /手动维护/);
+  assert.match(inventory.content, /已停用/);
+  assert.match(inventory.content, /平台桥接/);
+  assert.match(inventory.content, new RegExp(`\\|\\s*配置待补\\s*\\|\\s*${countByField("config_status", "configuration_needed")}\\s*\\|`));
+  assert.match(inventory.content, new RegExp(`\\|\\s*手动维护\\s*\\|\\s*${countByField("enablement", "manual")}\\s*\\|`));
+  assert.match(inventory.content, new RegExp(`\\|\\s*已停用\\s*\\|\\s*${countByField("config_status", "disabled")}\\s*\\|`));
+  assert.match(inventory.content, new RegExp(`\\|\\s*平台桥接\\s*\\|\\s*${platformBridgeCount}\\s*\\|`));
+  assert.match(inventory.content, /\(#section-source-inventory-group-platform-cn-media\)/);
+  assert.match(inventory.content, /WeChat Platform AI Feed|Zhihu Platform AI Feed/);
+  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0, "focus overview must not duplicate all rows");
+  assert.equal(groupRowCount, inventoryRows.length, "focus lanes must not remove canonical detail rows");
+  assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
 test("source-first IA status focus surfaces actionable source states before the full graph", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [

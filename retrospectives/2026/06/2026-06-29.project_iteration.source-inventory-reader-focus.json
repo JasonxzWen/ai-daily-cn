@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-reader-focus",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory reader focus index",
+  "status": "completed",
+  "summary": "This iteration adds a reader-facing static focus index to the full source inventory overview. The focus index surfaces configuration gaps, manual-maintained sources, disabled-source state, and platform bridge entries with counts, group links, and representative source samples while keeping all 154 registered source rows visible in the canonical fixed-order detail groups.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory reader focus lanes\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory panel|source inventory navigation|source inventory density controls|source inventory reader focus lanes\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A full fixed-order inventory still needs a small set of reader focus lanes for the slices people check first.",
+      "evidence": "The source inventory overview now surfaces configuration gaps, manual-maintained sources, disabled-state rows, and platform bridge entries with counts, group anchors, and representative source names while preserving all 154 detail rows.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep focus lanes static and count-based unless a future interaction can prove it never removes canonical source rows from the DOM."
+    },
+    {
+      "lesson": "Markdown table adjacency can create a public layout regression even when data and tests are otherwise correct.",
+      "evidence": "Visual inspection found the section-summary table separator rendering as body text after the focus table; the inventory overview now joins content blocks with blank lines and E2E checks reject leaked table separators.",
+      "scope": "frontend_validation",
+      "persistence": "implemented",
+      "recommended_action": "When adding consecutive markdown tables, verify rendered HTML table count and scan for leaked `---` separator rows on desktop and mobile."
+    },
+    {
+      "lesson": "PowerShell stdin can mangle Chinese literals in ad hoc Node verification scripts.",
+      "evidence": "Browser checks using direct Chinese literals returned false while E2E and Unicode-escaped checks passed; the final visual script used Unicode escapes for stable marker assertions.",
+      "scope": "local_validation",
+      "persistence": "session_note",
+      "recommended_action": "Use Unicode escapes or file-based assertions for Chinese marker checks when piping scripts through PowerShell."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "If the full inventory remains hard to scan after user review, add an optional browser interaction for search/filtering that leaves the complete fixed-order source inventory in the DOM.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-reader-focus"
+}
