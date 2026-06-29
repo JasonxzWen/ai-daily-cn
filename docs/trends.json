@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-29T02:27:29.558Z",
+  "generated_at": "2026-06-29T18:42:27.633Z",
   "window_days": 7,
   "source": {
-    "report_count": 40,
-    "date_from": "2026-06-23",
-    "date_to": "2026-06-29"
+    "report_count": 41,
+    "date_from": "2026-06-24",
+    "date_to": "2026-06-30"
   },
   "thresholds": {
     "watching": {
@@ -33,7 +33,7 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 17,
+      "occurrences": 18,
       "active_days": 6,
       "sections": [
         "builder_observations",
@@ -41,23 +41,24 @@
       ],
       "entities": [
         "Claude Code",
-        "Codex"
+        "Codex",
+        "OpenAI"
       ],
       "dates": [
-        "2026-06-23",
         "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ],
       "related_reports": [
-        "2026-06-23",
         "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ]
     },
     {
@@ -76,33 +77,33 @@
         "Google"
       ],
       "dates": [
-        "2026-06-23",
         "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ],
       "related_reports": [
-        "2026-06-23",
         "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
-        "2026-06-29"
+        "2026-06-29",
+        "2026-06-30"
       ]
     }
   ],
   "candidate_topics": [
     {
-      "term": "with",
+      "term": "this",
       "occurrences": 193,
       "active_days": 6,
       "display": false
     },
     {
-      "term": "this",
-      "occurrences": 189,
+      "term": "with",
+      "occurrences": 191,
       "active_days": 6,
       "display": false
     },
@@ -114,7 +115,13 @@
     },
     {
       "term": "week",
-      "occurrences": 182,
+      "occurrences": 183,
+      "active_days": 6,
+      "display": false
+    },
+    {
+      "term": "this week",
+      "occurrences": 181,
       "active_days": 6,
       "display": false
     },
@@ -155,12 +162,6 @@
       "display": false
     },
     {
-      "term": "this week",
-      "occurrences": 180,
-      "active_days": 6,
-      "display": false
-    },
-    {
       "term": "weekly",
       "occurrences": 180,
       "active_days": 6,
@@ -180,37 +181,37 @@
     },
     {
       "term": "readme",
-      "occurrences": 177,
+      "occurrences": 178,
       "active_days": 6,
       "display": false
     },
     {
       "term": "再判断是否适合团队试用或接入",
-      "occurrences": 176,
+      "occurrences": 177,
       "active_days": 6,
       "display": false
     },
     {
       "term": "release",
-      "occurrences": 138,
+      "occurrences": 155,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 137,
+      "occurrences": 154,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 137,
+      "occurrences": 154,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 137,
+      "occurrences": 154,
       "active_days": 6,
       "display": false
     }
@@ -1790,6 +1791,29 @@
       ]
     },
     "2026-06-29": {
+      "main_items": [],
+      "github_trending": [
+        {
+          "index": 1,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 13x/6d",
+              "window_days": 7,
+              "occurrences": 13,
+              "active_days": 6,
+              "entities": [
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-06-30": {
       "main_items": [],
       "github_trending": [
         {

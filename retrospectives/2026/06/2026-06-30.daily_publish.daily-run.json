@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.daily_publish.daily-run",
+  "run_type": "daily_publish",
+  "date": "2026-06-30",
+  "title": "Daily publish retrospective 2026-06-30",
+  "status": "published_degraded",
+  "summary": "Daily publish publish completed for 2026-06-30 with status published_degraded.",
+  "evidence": {
+    "report_json": "reports-data/2026/06/2026-06-30.json",
+    "html": "docs/reports/2026/06/2026-06-30.html",
+    "validation_commands": [
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [
+    {
+      "code": "quality_review_failed",
+      "section": "quality_review",
+      "message": "Stage quality_review failed; inspect local run summary for detailed logs."
+    }
+  ],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Daily publish runs must leave a sanitized project-level retrospective record.",
+      "evidence": "The daily runner generated this record from stage status and repo-relative artifacts only.",
+      "scope": "daily_publish",
+      "persistence": "implemented",
+      "recommended_action": "Review this record with the generated report and keep follow-up suggestions statused."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "observed",
+      "issue": "Daily publish run ended with blocked stages.",
+      "evidence": "quality_review",
+      "module": "src/daily-runner.js",
+      "suggestion": "Inspect the failed stage evidence in the local run summary and promote durable fixes through the feedback ledger when confirmed.",
+      "expected_benefit": "Future scheduled runs can avoid repeating the same blocker.",
+      "requires_user_confirmation": true,
+      "promotion_path": "Confirm the blocker is durable before adding a P1 ledger item."
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Inspect blocked daily publish stage and decide whether it becomes a durable ledger item.",
+      "owner": "project"
+    }
+  ]
+}
