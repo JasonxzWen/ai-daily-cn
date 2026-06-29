@@ -2,7 +2,7 @@
   "schema_version": 1,
   "report_date": "2026-06-29",
   "title": "AI 日报 2026-06-29",
-  "summary": "今天最值得看的主线是 OpenAI 与 HP 的 Frontier 战略合作、DeepSeek 在 Hugging Face 上更新 dspark_qwen3 block7 模型，以及 HelloGitHub 收录的 Go 版斗地主和笔记工具项目。",
+  "summary": "今天主线集中在三类变化：惠普扩大与 OpenAI 的 Frontier 合作，DeepSeek 在 Hugging Face 更新多档 Qwen3 Block7 模型，以及多个开源工具进入候选观察池。",
   "source_window": {
     "date_from": "2026-06-27",
     "date_to": "2026-06-29",
@@ -11,29 +11,29 @@
   },
   "hero_highlights": [
     {
-      "title": "OpenAI更新agent 工作流和开发工具能力",
+      "title": "惠普扩大与 OpenAI 的 Frontier 战略合作",
       "url": "https://openai.com/index/hp-frontier-partnership",
       "reason": "信号集中在产品入口、采购时机和路线图影响",
-      "what_happened": "OpenAI更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性",
-      "why_watch": "信号集中在产品入口、采购时机和路线图影响",
+      "what_happened": "惠普宣布扩大与 OpenAI 的 Frontier 战略合作，把 AI 应用到客户体验、软件开发和企业运营场景。",
+      "why_watch": "这说明大型企业正在把生成式 AI 从单点试用推进到客户、研发和内部运营流程。",
       "category": "product_tool",
       "source_item_ref": "story-content-openai-news-hp-inc-launches-frontier-strategic-partnership-with-openai"
     },
     {
-      "title": "DeepSeek 14B block7 模型",
+      "title": "深度求索更新 Qwen3 14B Block7 模型",
       "url": "https://huggingface.co/deepseek-ai/dspark_qwen3_14b_block7",
       "reason": "工程价值集中在代码、权重、示例和生态复用条件",
-      "what_happened": "deepseek-ai/dspark_qwen3_14b_block7",
-      "why_watch": "工程价值集中在代码、权重、示例和生态复用条件",
+      "what_happened": "DeepSeek 在 Hugging Face 更新了 Qwen3 14B Block7 模型条目，页面显示约 14 小时前更新并有 3B 量级标记。",
+      "why_watch": "模型权重更新需要关注许可证、推理成本、适配脚本和与现有评测基线的差异。",
       "category": "china_open_source_community",
       "source_item_ref": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-14b-block7"
     },
     {
-      "title": "Go 版终端斗地主项目",
+      "title": "终端斗地主项目接入 DouZero AI",
       "url": "https://github.com/palemoky/fight-the-landlord",
       "reason": "工程价值集中在代码、权重、示例和生态复用条件",
-      "what_happened": "终端里的斗地主游戏。这是一款用 Go 编写的斗地主游戏，主打随机发牌、无控牌算法。支持联网对战、房间匹配、断线重连、记牌器、音乐开关等功能，还集成了快手开源的 DouZero 斗地主 AI，可作为机器人补位或对战。..",
-      "why_watch": "工程价值集中在代码、权重、示例和生态复用条件",
+      "what_happened": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。",
+      "why_watch": "它是小型游戏项目接入 AI 对战能力的案例，适合观察规则游戏、机器人补位和终端交互的实现方式。",
       "category": "china_open_source_community",
       "source_item_ref": "story-content-hellogithub-fight-the-landlord"
     }
@@ -146,7 +146,7 @@
       "included": 10,
       "sources_checked": 1,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-29T02:04:01.342Z",
+      "last_successful_feed_at": "2026-06-29T02:17:46.277Z",
       "notes": "Hugging Face public model ranking is tracked as a separate model/project lane, not as GitHub Trending."
     },
     "builder_sources": {
@@ -192,7 +192,7 @@
       "candidates_found": 22,
       "included": 9,
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-29T02:04:01.605Z",
+      "last_successful_feed_at": "2026-06-29T02:17:46.574Z",
       "notes": "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
     },
     "china_ai_sources": {
@@ -800,7 +800,7 @@
         {
           "name": "MiniMax Company News",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
+          "status": "no_signal",
           "id": "content-minimax-company-news",
           "source_kind": "html_index",
           "tier": "T0",
@@ -808,7 +808,8 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError; retry_failed_after_1"
+          "parsed_count": 0,
+          "notes": "0 recent intermediary lead entries parsed"
         },
         {
           "name": "Zhipu AI Chinese News",
@@ -1590,8 +1591,8 @@
           "enablement": "optional",
           "verification_policy": "community_only",
           "requires_original_url": false,
-          "parsed_count": 12,
-          "notes": "12 recent intermediary lead entries parsed"
+          "parsed_count": 13,
+          "notes": "13 recent intermediary lead entries parsed"
         },
         {
           "name": "Hugging Face Daily Papers",
@@ -1754,7 +1755,7 @@
             "type": "openrouter_rankings_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+            "snapshot_as_of": "2026-06-29T02:17:53.918Z",
             "source_url": "https://openrouter.ai/rankings",
             "top_entries": [
               {
@@ -1833,7 +1834,7 @@
               "source": "official_dom",
               "component_kind": "openrouter_rankings",
               "source_url": "https://openrouter.ai/rankings",
-              "captured_at": "2026-06-29T02:04:09.840Z",
+              "captured_at": "2026-06-29T02:17:53.918Z",
               "selector_version": "openrouter-rankings-v1",
               "source_selector": "[data-openrouter-rankings]",
               "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.66T tokens</td><td>6%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.48T tokens</td><td>14%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.74T tokens</td><td>1%</td></tr>\n        <tr><td>#4</td><td>Owl Alpha</td><td>openrouter</td><td>3.47T tokens</td><td>36%</td></tr>\n        <tr><td>#5</td><td>Hy3 preview</td><td>tencent</td><td>3.36T tokens</td><td>7%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.34T tokens</td><td>7%</td></tr>\n        <tr><td>#7</td><td>GLM 5.2</td><td>z-ai</td><td>2.11T tokens</td><td>66%</td></tr>\n        <tr><td>#8</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.04T tokens</td><td>19%</td></tr>\n        <tr><td>#9</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.91T tokens</td><td>13%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.53T tokens</td><td>1%</td></tr></tbody>\n        </table>\n      </section>",
@@ -1854,7 +1855,7 @@
             "type": "artificial_analysis_intelligence_index_public_page",
             "collection_method": "public_page_playwright",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+            "snapshot_as_of": "2026-06-29T02:17:53.918Z",
             "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
             "top_entries": [
               {
@@ -2029,7 +2030,7 @@
               "source": "official_dom",
               "component_kind": "artificial_analysis_index",
               "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-              "captured_at": "2026-06-29T02:04:09.840Z",
+              "captured_at": "2026-06-29T02:17:53.918Z",
               "selector_version": "artificial-analysis-index-v1",
               "source_selector": "[data-artificial-analysis-index]",
               "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -2050,7 +2051,7 @@
             "type": "swe_bench_pro_public_page",
             "collection_method": "public_page_static",
             "snapshot_status": "complete",
-            "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+            "snapshot_as_of": "2026-06-29T02:17:53.918Z",
             "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
             "top_entries": [
               {
@@ -2129,7 +2130,7 @@
               "source": "official_dom",
               "component_kind": "swe_bench_pro",
               "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-              "captured_at": "2026-06-29T02:04:09.840Z",
+              "captured_at": "2026-06-29T02:17:53.918Z",
               "selector_version": "swe-bench-pro-v1",
               "source_selector": "[data-swe-bench-pro-leaderboard]",
               "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -2180,8 +2181,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 57,
-          "notes": "57 recent intermediary lead entries parsed"
+          "parsed_count": 58,
+          "notes": "58 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -2208,8 +2209,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 51,
-          "notes": "51 recent intermediary lead entries parsed"
+          "parsed_count": 52,
+          "notes": "52 recent intermediary lead entries parsed"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -2264,8 +2265,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 29,
-          "notes": "29 recent intermediary lead entries parsed"
+          "parsed_count": 30,
+          "notes": "30 recent intermediary lead entries parsed"
         },
         {
           "name": "QbitAI",
@@ -2320,8 +2321,8 @@
           "enablement": "optional",
           "verification_policy": "primary_required",
           "requires_original_url": false,
-          "parsed_count": 6,
-          "notes": "6 recent intermediary lead entries parsed"
+          "parsed_count": 7,
+          "notes": "7 recent intermediary lead entries parsed"
         },
         {
           "name": "SSPAI",
@@ -2767,7 +2768,7 @@
         "swe_bench_pro_public_playwright": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-29T02:04:09.840Z",
+      "last_successful_feed_at": "2026-06-29T02:17:53.918Z",
       "notes": "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
     },
     "search_sources": {
@@ -2796,12 +2797,12 @@
       "candidates_found": 40,
       "included": 0,
       "provider_runtime_ms": {
-        "gdelt": 48889,
-        "openalex": 27610,
-        "arxiv": 10890
+        "gdelt": 49211,
+        "openalex": 22656,
+        "arxiv": 906
       },
       "provider_cost_units": {
-        "gdelt": 3,
+        "gdelt": 2,
         "openalex": 15,
         "arxiv": 15
       },
@@ -3984,7 +3985,7 @@
         {
           "name": "MiniMax Blog",
           "url": "https://www.minimax.io/blog",
-          "status": "blocked",
+          "status": "checked",
           "id": "content-minimax-blog",
           "source_kind": "html_index",
           "tier": "T0",
@@ -3992,10 +3993,11 @@
           "enablement": "core",
           "verification_policy": "primary_allowed",
           "requires_original_url": false,
-          "http_status": null,
+          "http_status": 200,
           "feed_like": false,
           "recent_48h_entries": 0,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "original_url_count": null,
+          "notes": "html_index source is reachable; feed_like=false"
         },
         {
           "name": "Z.ai Research",
@@ -4535,7 +4537,7 @@
         {
           "name": "HNRSS Frontpage",
           "url": "https://hnrss.org/frontpage",
-          "status": "blocked",
+          "status": "checked",
           "id": "content-hn-frontpage",
           "source_kind": "rss",
           "tier": "T2",
@@ -4543,10 +4545,11 @@
           "enablement": "optional",
           "verification_policy": "community_only",
           "requires_original_url": false,
-          "http_status": null,
-          "feed_like": false,
-          "recent_48h_entries": 0,
-          "notes": "The operation was aborted due to timeout; name=TimeoutError"
+          "http_status": 200,
+          "feed_like": true,
+          "recent_48h_entries": 20,
+          "original_url_count": null,
+          "notes": "20 feed entries parsed; 20 within 48h"
         },
         {
           "name": "Google News AI RSS",
@@ -4578,9 +4581,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 23,
+          "recent_48h_entries": 21,
           "original_url_count": null,
-          "notes": "58 feed entries parsed; 23 within 48h"
+          "notes": "57 feed entries parsed; 21 within 48h"
         },
         {
           "name": "Google News AIGC Content Industry RSS",
@@ -4595,9 +4598,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 15,
+          "recent_48h_entries": 16,
           "original_url_count": null,
-          "notes": "34 feed entries parsed; 15 within 48h"
+          "notes": "34 feed entries parsed; 16 within 48h"
         },
         {
           "name": "Google News AIGC Video Image Game RSS",
@@ -4612,9 +4615,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 23,
+          "recent_48h_entries": 13,
           "original_url_count": null,
-          "notes": "53 feed entries parsed; 23 within 48h"
+          "notes": "30 feed entries parsed; 13 within 48h"
         },
         {
           "name": "Google News Big Tech Company Watch RSS",
@@ -4663,9 +4666,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 13,
+          "recent_48h_entries": 7,
           "original_url_count": null,
-          "notes": "23 feed entries parsed; 13 within 48h"
+          "notes": "14 feed entries parsed; 7 within 48h"
         },
         {
           "name": "36Kr",
@@ -4680,9 +4683,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 24,
+          "recent_48h_entries": 25,
           "original_url_count": null,
-          "notes": "30 feed entries parsed; 24 within 48h"
+          "notes": "30 feed entries parsed; 25 within 48h"
         },
         {
           "name": "QbitAI",
@@ -4748,9 +4751,9 @@
           "requires_original_url": false,
           "http_status": 200,
           "feed_like": true,
-          "recent_48h_entries": 4,
+          "recent_48h_entries": 5,
           "original_url_count": null,
-          "notes": "20 feed entries parsed; 4 within 48h"
+          "notes": "20 feed entries parsed; 5 within 48h"
         },
         {
           "name": "SSPAI",
@@ -5530,7 +5533,7 @@
         "rss": 1
       },
       "blocked_reason": "",
-      "last_successful_feed_at": "2026-06-29T02:08:33.477Z",
+      "last_successful_feed_at": "2026-06-29T02:21:11.303Z",
       "notes": "reddit platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed."
     }
   },
@@ -5953,12 +5956,11 @@
         "rss"
       ],
       "statuses": [
-        "checked",
-        "blocked"
+        "checked"
       ],
       "candidate_count": 6,
       "included_count": 1,
-      "notes": "12 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; The operation was aborted due to timeout; name=TimeoutError"
+      "notes": "13 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; 20 feed entries parsed; 20 within 48h"
     },
     {
       "id": "wechat-platform",
@@ -6082,15 +6084,15 @@
   "stories": [
     {
       "story_id": "story-content-openai-news-hp-inc-launches-frontier-strategic-partnership-with-openai",
-      "title": "OpenAI News RSS: Hp Frontier Partnership",
+      "title": "惠普扩大与 OpenAI 的 Frontier 战略合作",
       "importance": "general",
       "trend": "AI products and developer workflow",
       "event_date": "2026-06-28",
       "primary_entity": "OpenAI News RSS",
       "event_type": "signal",
       "object": "OpenAI更新agent 工作流和开发工具能力",
-      "what_happened": "OpenAI 官网发布 HP Inc 与 OpenAI 的 Frontier 战略合作消息；OpenAI News、Blog RSS 和 Company News RSS 都指向同一官方链接，说明这是来自 OpenAI 的正式发布。",
-      "why_it_matters": "对企业 AI 采购和落地团队来说，这条官方消息提供了核对 HP 与 OpenAI 合作入口、适用对象和后续路线的源头材料，可用于安排试点、预算评估和供应商沟通。",
+      "what_happened": "OpenAI 公布惠普扩大 Frontier 战略合作，计划把 AI 用在客户体验、软件开发和企业运营等场景。",
+      "why_it_matters": "这是一条企业级 AI 部署信号，说明大公司正在把 AI 从单点工具推进到客户、研发和运营流程。",
       "evidence_level": "multi_source",
       "sources": [
         {
@@ -6112,15 +6114,15 @@
     },
     {
       "story_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-14b-block7",
-      "title": "deepseek-ai/dspark_qwen3_14b_block7",
+      "title": "深度求索更新 Qwen3 14B Block7 模型",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-28",
       "primary_entity": "DeepSeek Hugging Face Organization",
       "event_type": "signal",
       "object": "deepseek-ai/dspark_qwen3_14b_block7",
-      "what_happened": "deepseek-ai/dspark_qwen3_14b_block7。",
-      "why_it_matters": "14B block7 模型卡来自 DeepSeek 的 Hugging Face 组织页，给模型评估团队提供了可追溯的权重入口；是否进入 PoC，还要继续核对许可证、适配方式和推理成本。",
+      "what_happened": "DeepSeek Hugging Face 组织更新 Qwen3 14B Block7 模型条目，页面显示约 14 小时前更新并带有 3B 量级标记。",
+      "why_it_matters": "较大尺寸模型更新会影响推理成本和部署门槛，团队应等模型卡、许可证和评测结果补齐后再判断是否接入。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6132,15 +6134,15 @@
     },
     {
       "story_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-4b-block7",
-      "title": "deepseek-ai/dspark_qwen3_4b_block7",
+      "title": "深度求索更新 Qwen3 4B Block7 模型",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-28",
       "primary_entity": "DeepSeek Hugging Face Organization",
       "event_type": "signal",
       "object": "deepseek-ai/dspark_qwen3_4b_block7",
-      "what_happened": "deepseek-ai/dspark_qwen3_4b_block7。",
-      "why_it_matters": "4B block7 版本更适合先做低成本部署和边缘场景评估；它与 14B、8B 同源发布，方便团队比较模型体量、速度和输出质量之间的取舍。",
+      "what_happened": "DeepSeek Hugging Face 组织更新 Qwen3 4B Block7 模型条目，页面显示约 14 小时前更新并带有 1B 量级标记。",
+      "why_it_matters": "小尺寸模型更适合低成本和本地部署场景，但仍需要确认权重格式、运行框架和任务效果。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6152,15 +6154,15 @@
     },
     {
       "story_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-8b-block7",
-      "title": "deepseek-ai/dspark_qwen3_8b_block7",
+      "title": "深度求索更新 Qwen3 8B Block7 模型",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-28",
       "primary_entity": "DeepSeek Hugging Face Organization",
       "event_type": "signal",
       "object": "deepseek-ai/dspark_qwen3_8b_block7",
-      "what_happened": "deepseek-ai/dspark_qwen3_8b_block7。",
-      "why_it_matters": "8B block7 版本处在轻量部署和较高模型容量之间，适合做服务端成本、延迟和输出质量的中间档评估；来源是 DeepSeek 官方 Hugging Face 页面，便于复核。",
+      "what_happened": "DeepSeek Hugging Face 组织更新 Qwen3 8B Block7 模型条目，页面显示约 14 小时前更新并带有 2B 量级标记。",
+      "why_it_matters": "中等规模模型通常处在成本和能力的折中区间，后续应重点比较延迟、吞吐和目标任务准确率。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6172,15 +6174,15 @@
     },
     {
       "story_id": "story-content-hellogithub-fight-the-landlord",
-      "title": "fight-the-landlord",
+      "title": "终端斗地主项目接入 DouZero AI",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-29",
       "primary_entity": "palemoky/fight-the-landlord",
       "event_type": "launch",
       "object": "fight-the-landlord",
-      "what_happened": "终端里的斗地主游戏。这是一款用 Go 编写的斗地主游戏，主打随机发牌、无控牌算法。支持联网对战、房间匹配、断线重连、记牌器、音乐开关等功能，还集成了快手开源的 DouZero 斗地主 AI，可作为机器人补位或对战。..。",
-      "why_it_matters": "这个 Go 项目把联网对战、房间匹配、断线重连和 DouZero 机器人集成在终端斗地主里，适合作为游戏服务端、CLI 交互和 AI 对战样例的参考。",
+      "what_happened": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。",
+      "why_it_matters": "它展示了传统规则游戏如何接入 AI 对战和机器人补位，适合观察小型项目中的 AI 工程集成方式。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6192,15 +6194,15 @@
     },
     {
       "story_id": "story-content-hellogithub-chinese-poetry-api",
-      "title": "chinese-poetry-api：可部署的中国古诗词接口服务",
+      "title": "中国古诗词 API 服务支持搜索和容器部署",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-29",
       "primary_entity": "palemoky/chinese-poetry-api",
       "event_type": "update",
       "object": "palemoky/chinese-poetry-api披露 agent 与开发者工具能力",
-      "what_happened": "开箱即用的中国古诗词 API 服务。该项目是用 Go 语言编写的中国古诗词 API 服务，收录了唐诗、宋词、元曲等近 40 万首作品。它提供 REST API 和 GraphQL 接口，支持全文搜索、IP 限流、按朝代/作者/诗型随机取诗和 Docker 一键部署。HelloGitHub latest report ...。",
-      "why_it_matters": "项目把近 40 万首古诗词整理成 REST API 和 GraphQL 服务，并提供搜索、限流、随机取诗和 Docker 部署；内容产品或教育工具团队可以据此评估接口形态和部署成本。",
+      "what_happened": "chinese-poetry-api 用 Go 提供中国古诗词 API，收录近 40 万首作品，支持 REST API、GraphQL、全文搜索、限流和 Docker 部署。",
+      "why_it_matters": "对内容产品和教育工具来说，这类项目能降低诗词数据服务原型成本，但要确认数据来源、许可证和检索质量。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6212,15 +6214,15 @@
     },
     {
       "story_id": "story-content-hellogithub-papertodo",
-      "title": "PaperTodo",
+      "title": "Windows 桌面便签工具 PaperTodo",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-29",
       "primary_entity": "snownico0722/PaperTodo",
       "event_type": "update",
       "object": "PaperTodo",
-      "what_happened": "极简的 Windows 桌面便签工具。这是一款极简的 Windows 桌面便签工具，每张便签是独立无边框浮动窗口，无主窗口、无账号、无分类管理，内容自动保存。支持待办纸和笔记纸（轻量 Markdown 高亮）两种形态，可折叠成置顶小胶囊，自动贴到屏幕边缘。来自 [@snownico0722]( 的分享。HelloGi...。",
-      "why_it_matters": "PaperTodo 把便签做成独立无边框浮窗，并提供自动保存、Markdown 高亮和置顶小胶囊；对桌面效率工具来说，值得看的是低打扰交互和本地数据形态。",
+      "what_happened": "PaperTodo 是 Windows 桌面便签工具，采用独立无边框浮动窗口，内容自动保存，支持待办纸、轻量 Markdown 笔记纸和置顶小胶囊。",
+      "why_it_matters": "它提供了低复杂度桌面效率工具的样本：少账号、少分类、强调快速记录和本地窗口体验。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6232,15 +6234,15 @@
     },
     {
       "story_id": "story-content-hellogithub-speedynote",
-      "title": "SpeedyNote",
+      "title": "低成本设备手写笔记工具 SpeedyNote",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-06-29",
       "primary_entity": "alpha-liu-01/SpeedyNote",
       "event_type": "update",
       "object": "SpeedyNote",
-      "what_happened": "老旧平板也能用的手写笔记工具。这是一款专为低成本设备优化的跨平台手写笔记应用，目标是在老旧平板上实现接近 iPad 的书写体验。它支持压感书写、多图层、PDF 批注和手写 OCR，可在 Windows、macOS、Linux、Android 和 iPadOS 上运行。作者想让无纸化学习平民化，同时为那些被遗忘在角落的...。",
-      "why_it_matters": "SpeedyNote 面向老旧平板优化手写体验，支持压感、多图层、PDF 批注和 OCR；它的信号在于低成本硬件上的跨平台书写体验和设备复用。",
+      "what_happened": "SpeedyNote 面向低成本设备优化手写笔记体验，支持压感书写、多图层、PDF 批注和手写 OCR，并覆盖多个桌面和移动平台。",
+      "why_it_matters": "它的价值在于把旧平板和低成本设备纳入手写工作流，验证重点是延迟、PDF 兼容、OCR 质量和跨平台输入体验。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -6253,7 +6255,7 @@
   ],
   "main_items": [
     {
-      "title": "OpenAI News RSS: Hp Frontier Partnership",
+      "title": "惠普扩大与 OpenAI 的 Frontier 战略合作",
       "candidate_id": "story-content-openai-news-hp-inc-launches-frontier-strategic-partnership-with-openai",
       "editorial_category": "product_radar",
       "source_level": "official",
@@ -6265,11 +6267,11 @@
       "entities": [
         "OpenAI News RSS"
       ],
-      "summary": "OpenAI更新agent 工作流和开发工具能力，材料覆盖任务编排、上下文、权限控制、工程集成和失败恢复，边界落在落地质量取决于权限模型、评估回放、团队流程和可观测性。",
+      "summary": "OpenAI 公布惠普扩大 Frontier 战略合作，目标是在客户体验、软件开发和企业运营中部署 AI。重点不在单个模型发布，而在企业级流程改造和落地范围。",
       "bullets": [
-        "**OpenAI更新agent 工作流和开发工具能力**：材料把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，已披露事实集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏。",
-        "这会改变产品和采购团队安排试用、预算审批、替换工具和风险复盘的优先级。"
+        "**惠普扩大 OpenAI Frontier 合作**：公开材料显示，合作范围覆盖客户体验、软件开发和企业运营，属于企业部署 AI 的组织级案例。",
+        "已披露重点是合作对象、业务场景和部署范围，尚需继续看具体产品入口、权限边界和实施节奏。",
+        "对企业采购和平台团队来说，这类合作会影响 AI 工具进入客服、研发和运营流程的优先级。"
       ],
       "why_it_matters": "信号集中在产品入口、采购时机和路线图影响",
       "reader_relevance": "适合产品、运营和业务团队安排试用、替换工具或路线图复盘",
@@ -6277,7 +6279,7 @@
       "image_urls": []
     },
     {
-      "title": "deepseek-ai/dspark_qwen3_14b_block7",
+      "title": "深度求索更新 Qwen3 14B Block7 模型",
       "candidate_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-14b-block7",
       "editorial_category": "open_source",
       "source_level": "official",
@@ -6289,11 +6291,11 @@
       "entities": [
         "DeepSeek Hugging Face Organization"
       ],
-      "summary": "deepseek-ai/dspark_qwen3_14b_block7。",
+      "summary": "DeepSeek 在 Hugging Face 更新 Qwen3 14B Block7 模型条目。当前信息更像模型仓库更新信号，适合后续核对模型卡、许可证、推理成本和评测结果。",
       "bullets": [
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。",
-        "**deepseek-ai/dspark_qwen3_14**：deepseek-ai/dspark_qwen3_14b_block7。"
+        "页面显示该 14B Block7 条目约 14 小时前更新，并带有 3B 量级标记。",
+        "采用前应核对模型卡、许可证、上下文配置、推理成本和与既有 Qwen3 基线的差异。",
+        "**Qwen3 14B Block7 更新**：这是一条模型仓库更新信号，公开信息不足以单独判断能力提升幅度。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6301,7 +6303,7 @@
       "image_urls": []
     },
     {
-      "title": "deepseek-ai/dspark_qwen3_4b_block7",
+      "title": "深度求索更新 Qwen3 4B Block7 模型",
       "candidate_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-4b-block7",
       "editorial_category": "open_source",
       "source_level": "official",
@@ -6313,11 +6315,11 @@
       "entities": [
         "DeepSeek Hugging Face Organization"
       ],
-      "summary": "deepseek-ai/dspark_qwen3_4b_block7。",
+      "summary": "DeepSeek 同步更新 Qwen3 4B Block7 模型条目，页面显示约 14 小时前更新并带有 1B 量级标记。小尺寸版本更适合关注本地部署和成本敏感场景。",
       "bullets": [
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。",
-        "**deepseek-ai/dspark_qwen3_4b**：deepseek-ai/dspark_qwen3_4b_block7。"
+        "该条目来自 DeepSeek Hugging Face 组织，公开信号是模型仓库近期更新。",
+        "如果团队关注轻量部署，应优先核对权重格式、推理框架兼容性和基准测试。",
+        "**Qwen3 4B Block7 更新**：它提供更小尺寸的观察对象，但仍需要模型卡和评测结果确认实际价值。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6325,7 +6327,7 @@
       "image_urls": []
     },
     {
-      "title": "deepseek-ai/dspark_qwen3_8b_block7",
+      "title": "深度求索更新 Qwen3 8B Block7 模型",
       "candidate_id": "story-content-huggingface-deepseek-ai-deepseek-ai-dspark-qwen3-8b-block7",
       "editorial_category": "open_source",
       "source_level": "official",
@@ -6337,11 +6339,11 @@
       "entities": [
         "DeepSeek Hugging Face Organization"
       ],
-      "summary": "deepseek-ai/dspark_qwen3_8b_block7。",
+      "summary": "DeepSeek 还更新了 Qwen3 8B Block7 模型条目，页面显示约 14 小时前更新并带有 2B 量级标记。它处在轻量部署和更强能力之间的折中带。",
       "bullets": [
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。",
-        "**deepseek-ai/dspark_qwen3_8b**：deepseek-ai/dspark_qwen3_8b_block7。"
+        "该条目与 4B、14B Block7 版本同时出现，说明 DeepSeek 正在维护一组不同规模的模型仓库。",
+        "评估时应比较显存需求、吞吐、延迟和目标任务准确率，而不是只看参数规模。",
+        "**Qwen3 8B Block7 更新**：公开页提供仓库更新信号，能力变化仍需后续模型卡和测试确认。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6349,7 +6351,7 @@
       "image_urls": []
     },
     {
-      "title": "fight-the-landlord",
+      "title": "终端斗地主项目接入 DouZero AI",
       "candidate_id": "story-content-hellogithub-fight-the-landlord",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -6361,11 +6363,11 @@
       "entities": [
         "palemoky/fight-the-landlord"
       ],
-      "summary": "终端里的斗地主游戏。这是一款用 Go 编写的斗地主游戏，主打随机发牌、无控牌算法。支持联网对战、房间匹配、断线重连、记牌器、音乐开关等功能，还集成了快手开源的 DouZero 斗地主 AI，可作为机器人补位或对战。..。",
+      "summary": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连、记牌器和音乐开关，并集成 DouZero AI 作为机器人补位或对战。",
       "bullets": [
-        "**fight-the-landlord**：终端里的斗地主游戏。这是一款用 Go 编写的斗地主游戏，主打随机发牌、无控牌算法。支持联网对战、房间匹配、断线重连、记牌器、音乐开关等功能，还集成了快手开源的 DouZero 斗地主 AI，可作为机器人补位或对战。..。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+        "**终端斗地主项目**：项目把 Go 终端游戏、联网对战和 DouZero AI 机器人组合在一起，可观察规则游戏里的 AI 对战接入方式。",
+        "公开信息覆盖随机发牌、房间匹配、断线重连、记牌器和机器人补位能力。",
+        "适合关注小游戏、终端交互和 AI 机器人对战的开发者先看玩法完整性和部署成本。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6375,7 +6377,7 @@
       "image_urls": []
     },
     {
-      "title": "chinese-poetry-api：可部署的中国古诗词接口服务",
+      "title": "中国古诗词 API 服务支持搜索和容器部署",
       "candidate_id": "story-content-hellogithub-chinese-poetry-api",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -6387,11 +6389,11 @@
       "entities": [
         "palemoky/chinese-poetry-api"
       ],
-      "summary": "开箱即用的中国古诗词 API 服务。该项目是用 Go 语言编写的中国古诗词 API 服务，收录了唐诗、宋词、元曲等近 40 万首作品。它提供 REST API 和 GraphQL 接口，支持全文搜索、IP 限流、按朝代/作者/诗型随机取诗和 Docker 一键部署。HelloGitHub latest report ...。",
+      "summary": "chinese-poetry-api 是 Go 编写的中国古诗词 API 服务，收录近 40 万首唐诗、宋词、元曲等作品，提供 REST API 和 GraphQL 接口，并支持全文搜索、限流、随机取诗和 Docker 部署。",
       "bullets": [
-        "**chinese-poetry-api**：项目用 Go 提供中国古诗词 API，收录唐诗、宋词、元曲等近 40 万首作品，提供 REST API、GraphQL、全文搜索、IP 限流、随机取诗和 Docker 部署能力。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+        "**中国古诗词 API 服务**：该项目把近 40 万首诗词数据封装成 REST API 和 GraphQL 接口，适合内容产品或教学工具做数据服务原型。",
+        "已披露能力包括全文搜索、IP 限流、按朝代/作者/诗型随机取诗和 Docker 一键部署。",
+        "采用前应检查数据来源、许可证、接口性能和中文全文检索质量。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6401,7 +6403,7 @@
       "image_urls": []
     },
     {
-      "title": "PaperTodo",
+      "title": "Windows 桌面便签工具 PaperTodo",
       "candidate_id": "story-content-hellogithub-papertodo",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -6413,11 +6415,11 @@
       "entities": [
         "snownico0722/PaperTodo"
       ],
-      "summary": "极简的 Windows 桌面便签工具。这是一款极简的 Windows 桌面便签工具，每张便签是独立无边框浮动窗口，无主窗口、无账号、无分类管理，内容自动保存。支持待办纸和笔记纸（轻量 Markdown 高亮）两种形态，可折叠成置顶小胶囊，自动贴到屏幕边缘。来自 [@snownico0722]( 的分享。HelloGi...。",
+      "summary": "PaperTodo 是极简 Windows 桌面便签工具，每张便签都是独立无边框浮动窗口，内容自动保存，支持待办纸和轻量 Markdown 笔记纸，并可折叠成置顶小胶囊。",
       "bullets": [
-        "**PaperTodo**：极简的 Windows 桌面便签工具。这是一款极简的 Windows 桌面便签工具，每张便签是独立无边框浮动窗口，无主窗口、无账号、无分类管理，内容自动保存。支持待办纸和笔记纸（轻量 Markdown 高亮）两种形态，可折叠成置顶小胶囊，自动贴到屏幕边缘。来自 [@snownico0722]( 的分享。HelloGitHub latest report l...。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+        "**桌面便签工具**：PaperTodo 不设主窗口、账号或分类系统，重点是快速记录、自动保存和屏幕边缘吸附。",
+        "它支持待办纸和轻量 Markdown 笔记纸两种形态，可折叠为置顶小胶囊。",
+        "适合观察低复杂度桌面工具如何减少账号、同步和信息架构成本。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6427,7 +6429,7 @@
       "image_urls": []
     },
     {
-      "title": "SpeedyNote",
+      "title": "低成本设备手写笔记工具 SpeedyNote",
       "candidate_id": "story-content-hellogithub-speedynote",
       "editorial_category": "open_source",
       "source_level": "github",
@@ -6439,11 +6441,11 @@
       "entities": [
         "alpha-liu-01/SpeedyNote"
       ],
-      "summary": "老旧平板也能用的手写笔记工具。这是一款专为低成本设备优化的跨平台手写笔记应用，目标是在老旧平板上实现接近 iPad 的书写体验。它支持压感书写、多图层、PDF 批注和手写 OCR，可在 Windows、macOS、Linux、Android 和 iPadOS 上运行。作者想让无纸化学习平民化，同时为那些被遗忘在角落的...。",
+      "summary": "SpeedyNote 是面向低成本设备优化的跨平台手写笔记应用，支持压感书写、多图层、PDF 批注和手写 OCR，可运行在 Windows、macOS、Linux、Android 和 iPadOS。",
       "bullets": [
-        "**SpeedyNote**：老旧平板也能用的手写笔记工具。这是一款专为低成本设备优化的跨平台手写笔记应用，目标是在老旧平板上实现接近 iPad 的书写体验。它支持压感书写、多图层、PDF 批注和手写 OCR，可在 Windows、macOS、Linux、Android 和 iPadOS 上运行。作者想让无纸化学习平民化，同时为那些被遗忘在角落的旧设备注入新的活力。HelloGitHu...。",
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+        "**低成本设备手写笔记**：SpeedyNote 目标是在老旧平板上提供接近 iPad 的书写体验。",
+        "已披露能力包括压感书写、多图层、PDF 批注、手写 OCR 和多平台运行。",
+        "这类项目的关键验证点是笔迹延迟、旧设备性能、文件兼容和跨平台输入体验。"
       ],
       "why_it_matters": "工程价值集中在代码、权重、示例和生态复用条件",
       "reader_relevance": "适合技术和产品团队评估仓库、模型权重或生态工具的采用条件",
@@ -6577,12 +6579,12 @@
       "description": "design.md 是面向agent 工作流和自动化工程的开源项目，README 显示核心能力包括Agent 构建、评测与回归，并给出测试或评估资产。读者应先确认测试或评测资产、近期维护，再判断是否适合团队试用或接入。 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。",
       "readme_summary": "design.md 是面向agent 工作流和自动化工程的开源项目，README 显示核心能力包括Agent 构建、评测与回归，并给出测试或评估资产。读者应先确认测试或评测资产、近期维护，再判断是否适合团队试用或接入。 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。",
       "readme_cache": {
-        "key": "github-readme/google-labs-code/design.md/main/unknown",
+        "key": "github-readme/google-labs-code/design.md/master/unknown",
         "hit": true,
         "repo": "google-labs-code/design.md",
         "sha": "unknown",
-        "default_branch": "main",
-        "source_url": "https://raw.githubusercontent.com/google-labs-code/design.md/main/README.md"
+        "default_branch": "master",
+        "source_url": "https://raw.githubusercontent.com/google-labs-code/design.md/master/README.md"
       },
       "readme_fetch_status": "ok",
       "url": "https://github.com/google-labs-code/design.md",
@@ -6780,12 +6782,12 @@
       "description": "hyperframes 是面向agent 工作流和自动化工程的开源项目，README 显示核心能力包括Agent 构建、工具调用和工作流编排，并给出部署说明。读者应先确认快速开始和运行前提、近期维护，再判断是否适合团队试用或接入。 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。",
       "readme_summary": "hyperframes 是面向agent 工作流和自动化工程的开源项目，README 显示核心能力包括Agent 构建、工具调用和工作流编排，并给出部署说明。读者应先确认快速开始和运行前提、近期维护，再判断是否适合团队试用或接入。 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。",
       "readme_cache": {
-        "key": "github-readme/heygen-com/hyperframes/master/unknown",
+        "key": "github-readme/heygen-com/hyperframes/main/unknown",
         "hit": true,
         "repo": "heygen-com/hyperframes",
         "sha": "unknown",
-        "default_branch": "master",
-        "source_url": "https://raw.githubusercontent.com/heygen-com/hyperframes/master/README.md"
+        "default_branch": "main",
+        "source_url": "https://raw.githubusercontent.com/heygen-com/hyperframes/main/README.md"
       },
       "readme_fetch_status": "ok",
       "url": "https://github.com/heygen-com/hyperframes",
@@ -7359,7 +7361,7 @@
         "type": "openrouter_rankings_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+        "snapshot_as_of": "2026-06-29T02:17:53.918Z",
         "source_url": "https://openrouter.ai/rankings",
         "top_entries": [
           {
@@ -7438,7 +7440,7 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
           "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.66T tokens</td><td>6%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.48T tokens</td><td>14%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.74T tokens</td><td>1%</td></tr>\n        <tr><td>#4</td><td>Owl Alpha</td><td>openrouter</td><td>3.47T tokens</td><td>36%</td></tr>\n        <tr><td>#5</td><td>Hy3 preview</td><td>tencent</td><td>3.36T tokens</td><td>7%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.34T tokens</td><td>7%</td></tr>\n        <tr><td>#7</td><td>GLM 5.2</td><td>z-ai</td><td>2.11T tokens</td><td>66%</td></tr>\n        <tr><td>#8</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.04T tokens</td><td>19%</td></tr>\n        <tr><td>#9</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.91T tokens</td><td>13%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.53T tokens</td><td>1%</td></tr></tbody>\n        </table>\n      </section>",
@@ -7453,10 +7455,10 @@
         "source": "OpenRouter",
         "component_kind": "openrouter_rankings",
         "source_url": "https://openrouter.ai/rankings",
-        "collected_at": "2026-06-29T02:04:09.840Z",
+        "collected_at": "2026-06-29T02:17:53.918Z",
         "selector_version": "openrouter-rankings-v1",
         "raw_dom_hash": "sha256:98c495e2fd7ec5103820948a0c93e0cd1755cdd8516e756746f1bc8b38116b87",
-        "data_hash": "sha256:8e38cffccea8e00aac9e62cf9e5791d836afa2515832fc6f8ceae927c3499916",
+        "data_hash": "sha256:b15554ebd1b4629926f7d718bc1fbcfbae47ff62e393fbfd12e917d1af28ac4e",
         "tabs": [
           {
             "id": "top-models",
@@ -7760,7 +7762,7 @@
           "source": "official_dom",
           "component_kind": "openrouter_rankings",
           "source_url": "https://openrouter.ai/rankings",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "openrouter-rankings-v1",
           "source_selector": "[data-openrouter-rankings]",
           "sanitized_html": "<section class=\"openrouter-rankings-card\" data-openrouter-rankings>\n        <header>\n          <p>OpenRouter Top Models</p>\n          <span>This Week usage ranking</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Tokens</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>DeepSeek V4 Flash</td><td>deepseek</td><td>4.66T tokens</td><td>6%</td></tr>\n        <tr><td>#2</td><td>MiMo-V2.5</td><td>xiaomi</td><td>4.48T tokens</td><td>14%</td></tr>\n        <tr><td>#3</td><td>MiniMax M3</td><td>minimax</td><td>3.74T tokens</td><td>1%</td></tr>\n        <tr><td>#4</td><td>Owl Alpha</td><td>openrouter</td><td>3.47T tokens</td><td>36%</td></tr>\n        <tr><td>#5</td><td>Hy3 preview</td><td>tencent</td><td>3.36T tokens</td><td>7%</td></tr>\n        <tr><td>#6</td><td>Claude Opus 4.7</td><td>anthropic</td><td>2.34T tokens</td><td>7%</td></tr>\n        <tr><td>#7</td><td>GLM 5.2</td><td>z-ai</td><td>2.11T tokens</td><td>66%</td></tr>\n        <tr><td>#8</td><td>DeepSeek V4 Pro</td><td>deepseek</td><td>2.04T tokens</td><td>19%</td></tr>\n        <tr><td>#9</td><td>Claude Opus 4.8</td><td>anthropic</td><td>1.91T tokens</td><td>13%</td></tr>\n        <tr><td>#10</td><td>Claude Sonnet 4.6</td><td>anthropic</td><td>1.53T tokens</td><td>1%</td></tr></tbody>\n        </table>\n      </section>",
@@ -7770,9 +7772,9 @@
         },
         "public_trace": {
           "source_url": "https://openrouter.ai/rankings",
-          "collected_at": "2026-06-29T02:04:09.840Z",
+          "collected_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "openrouter-rankings-v1",
-          "data_hash": "sha256:8e38cffccea8e00aac9e62cf9e5791d836afa2515832fc6f8ceae927c3499916",
+          "data_hash": "sha256:b15554ebd1b4629926f7d718bc1fbcfbae47ff62e393fbfd12e917d1af28ac4e",
           "top_rows": [
             {
               "rank": 1,
@@ -7954,7 +7956,7 @@
         "type": "artificial_analysis_intelligence_index_public_page",
         "collection_method": "public_page_playwright",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+        "snapshot_as_of": "2026-06-29T02:17:53.918Z",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         "top_entries": [
           {
@@ -8129,7 +8131,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -8144,10 +8146,10 @@
         "source": "Artificial Analysis",
         "component_kind": "artificial_analysis_index",
         "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-        "collected_at": "2026-06-29T02:04:09.840Z",
+        "collected_at": "2026-06-29T02:17:53.918Z",
         "selector_version": "artificial-analysis-index-v1",
         "raw_dom_hash": "sha256:caa7d33c2116c5495c0ff87bb3af671e33346e063be109cb1e5beccdf50e227a",
-        "data_hash": "sha256:e2f56037f2795210cee5104ef5901f166f69e886c1a2def01ba69f75bcbba0ad",
+        "data_hash": "sha256:8de898f722f289ea4142aea357298989b2874b2979fb47f73b35fe56024ba14d",
         "tabs": [
           {
             "id": "score",
@@ -8375,7 +8377,7 @@
           "source": "official_dom",
           "component_kind": "artificial_analysis_index",
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "artificial-analysis-index-v1",
           "source_selector": "[data-artificial-analysis-index]",
           "sanitized_html": "<section class=\"artificial-analysis-index-card\" data-artificial-analysis-index>\n        <header>\n          <p>Artificial Analysis Intelligence Index</p>\n          <span>Top models by independent Intelligence Index</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model</th><th>Provider</th><th>Score</th><th>Metric</th></tr></thead>\n          <tbody>\n        <tr><td>#1</td><td>Claude Fable 5 (with fallback)</td><td>anthropic</td><td>60 分</td><td>AA Index</td></tr>\n        <tr><td>#2</td><td>Claude Opus 4.8 (max)</td><td>anthropic</td><td>56 分</td><td>AA Index</td></tr>\n        <tr><td>#3</td><td>GPT-5.5 (xhigh)</td><td>openai</td><td>55 分</td><td>AA Index</td></tr>\n        <tr><td>#4</td><td>Claude Opus 4.7 (max)</td><td>anthropic</td><td>54 分</td><td>AA Index</td></tr>\n        <tr><td>#5</td><td>GPT-5.5 (high)</td><td>openai</td><td>53 分</td><td>AA Index</td></tr>\n        <tr><td>#6</td><td>GLM-5.2 (max)</td><td>zhipu</td><td>51 分</td><td>AA Index</td></tr>\n        <tr><td>#7</td><td>Gemini 3.5 Flash</td><td>google</td><td>50 分</td><td>AA Index</td></tr>\n        <tr><td>#8</td><td>Claude Sonnet 4.6 (max)</td><td>anthropic</td><td>47 分</td><td>AA Index</td></tr>\n        <tr><td>#9</td><td>Gemini 3.1 Pro Preview</td><td>google</td><td>46 分</td><td>AA Index</td></tr>\n        <tr><td>#10</td><td>Qwen3.7 Max</td><td>alibaba</td><td>46 分</td><td>AA Index</td></tr></tbody>\n        </table>\n      </section>",
@@ -8385,9 +8387,9 @@
         },
         "public_trace": {
           "source_url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-          "collected_at": "2026-06-29T02:04:09.840Z",
+          "collected_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "artificial-analysis-index-v1",
-          "data_hash": "sha256:e2f56037f2795210cee5104ef5901f166f69e886c1a2def01ba69f75bcbba0ad",
+          "data_hash": "sha256:8de898f722f289ea4142aea357298989b2874b2979fb47f73b35fe56024ba14d",
           "top_rows": [
             {
               "rank": 1,
@@ -8569,7 +8571,7 @@
         "type": "swe_bench_pro_public_page",
         "collection_method": "public_page_static",
         "snapshot_status": "complete",
-        "snapshot_as_of": "2026-06-29T02:04:09.840Z",
+        "snapshot_as_of": "2026-06-29T02:17:53.918Z",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
         "top_entries": [
           {
@@ -8648,7 +8650,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8663,10 +8665,10 @@
         "source": "Scale Labs SWE-Bench Pro",
         "component_kind": "swe_bench_pro",
         "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-        "collected_at": "2026-06-29T02:04:09.840Z",
+        "collected_at": "2026-06-29T02:17:53.918Z",
         "selector_version": "swe-bench-pro-v1",
         "raw_dom_hash": "sha256:2d5ebf88219cf9ca3b8537c2a99a9339988bd6f4b8cb73e80b37c9c1e786a9a9",
-        "data_hash": "sha256:e792bb5ab76678a35c4f1d5a82dd8e3c77a61566a9fb7a10634b60367aa98f2c",
+        "data_hash": "sha256:d52579cbadd45a52a24c2746e46ee8e5f587ed8bd63f30363e78830bb807b202",
         "tabs": [
           {
             "id": "leaderboard",
@@ -8894,7 +8896,7 @@
           "source": "official_dom",
           "component_kind": "swe_bench_pro",
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "captured_at": "2026-06-29T02:04:09.840Z",
+          "captured_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "swe-bench-pro-v1",
           "source_selector": "[data-swe-bench-pro-leaderboard]",
           "sanitized_html": "<section class=\"swe-bench-pro-card\" data-swe-bench-pro-leaderboard>\n        <header>\n          <p>SWE-Bench Pro (Public Dataset)</p>\n          <h2>Performance Comparison</h2>\n          <span>Primary metric: Resolve Rate</span>\n        </header>\n        <table>\n          <thead><tr><th>Rank</th><th>Model / Agent</th><th>Provider</th><th>Resolve Rate</th><th>Change</th></tr></thead>\n          <tbody>\n        <tr>\n          <td>#1</td>\n          <td>gpt-5.4 (xHigh)*</td>\n          <td>openai</td>\n          <td>59.10±3.56%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#2</td>\n          <td>Muse Spark*</td>\n          <td>scale</td>\n          <td>55.00±3.60%</td>\n          <td>new</td>\n        </tr>\n        <tr>\n          <td>#3</td>\n          <td>claude-opus-4-6 (thinking)*</td>\n          <td>anthropic</td>\n          <td>51.90±3.61%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#4</td>\n          <td>gemini-3.1-pro (thinking)*</td>\n          <td>google</td>\n          <td>46.10±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#5</td>\n          <td>claude-opus-4-5-20251101</td>\n          <td>anthropic</td>\n          <td>45.89±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#6</td>\n          <td>claude-4-5-Sonnet</td>\n          <td>anthropic</td>\n          <td>43.60±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#7</td>\n          <td>gemini-3-pro-preview</td>\n          <td>google</td>\n          <td>43.30±3.60%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#8</td>\n          <td>claude-4-Sonnet</td>\n          <td>anthropic</td>\n          <td>42.70±3.59%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#9</td>\n          <td>gpt-5-2025-08-07 (High)</td>\n          <td>openai</td>\n          <td>41.78±3.49%</td>\n          <td>Resolve Rate</td>\n        </tr>\n        <tr>\n          <td>#10</td>\n          <td>gpt-5.2-codex</td>\n          <td>openai</td>\n          <td>41.04±3.57%</td>\n          <td>Resolve Rate</td>\n        </tr></tbody>\n        </table>\n      </section>",
@@ -8904,9 +8906,9 @@
         },
         "public_trace": {
           "source_url": "https://labs.scale.com/leaderboard/swe_bench_pro_public",
-          "collected_at": "2026-06-29T02:04:09.840Z",
+          "collected_at": "2026-06-29T02:17:53.918Z",
           "selector_version": "swe-bench-pro-v1",
-          "data_hash": "sha256:e792bb5ab76678a35c4f1d5a82dd8e3c77a61566a9fb7a10634b60367aa98f2c",
+          "data_hash": "sha256:d52579cbadd45a52a24c2746e46ee8e5f587ed8bd63f30363e78830bb807b202",
           "top_rows": [
             {
               "rank": 1,
@@ -9204,9 +9206,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Swyx 认为，如果评测报告固定推理预算，开放模型在每美元可生成的 token 上通常比闭源 API 更占优；因此发布开放模型或偏向开放模型的一方，应该按热门推理服务商上的美元推理成本衡量 thinking levels，而不是只把 token 数放在横轴。",
+      "content": "Swyx 认为，如果评测报告始终保持固定推理预算，那么开源模型在每美元 token 产出上通常比闭源 API 更划算。因此，发布开源模型或倾向开源模型的人，应该用主流推理服务上的美元推理成本来衡量 thinking level，而不是只把 token 数放在横轴上。",
       "original_text": "An interesting way to take Noam at his word in regards to always keeping a constant inference budget for any eval reporting - is that open models have a lot more dollar per token mileage than closed model APIs. So anyone launching an open model today or situationally incentivized toward open models should obviously report thinking levels measured by dollar inference on popular inference providers, instead of by number of tokens on the x axis",
-      "translation": "Swyx 认为，如果评测报告固定推理预算，开放模型在每美元可生成的 token 上通常比闭源 API 更占优；因此发布开放模型或偏向开放模型的一方，应该按热门推理服务商上的美元推理成本衡量 thinking levels，而不是只把 token 数放在横轴。",
+      "translation": "Swyx 认为，如果评测报告始终保持固定推理预算，那么开源模型在每美元 token 产出上通常比闭源 API 更划算。因此，发布开源模型或倾向开源模型的人，应该用主流推理服务上的美元推理成本来衡量 thinking level，而不是只把 token 数放在横轴上。",
       "avatar_url": "https://unavatar.io/x/swyx",
       "url": "https://x.com/swyx/status/2070949306060931312",
       "role": "builder",
@@ -9225,9 +9227,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Swyx 临时做了 AI Engineer 会前展区导览和 AMA，并附上视频链接。",
+      "content": "Swyx 临时做了一场 AI Engineer 会前现场导览和问答。",
       "original_text": "impromptu ai engineer preshow floor tour and AMA https://t.co/Jjo8Ai7aHh",
-      "translation": "Swyx 临时做了 AI Engineer 会前展区导览和 AMA，并附上视频链接。",
+      "translation": "Swyx 临时做了一场 AI Engineer 会前现场导览和问答。",
       "avatar_url": "https://unavatar.io/x/swyx",
       "url": "https://x.com/swyx/status/2070971772548366788",
       "role": "builder",
@@ -9246,9 +9248,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Matt Turck 用 2013 年 Google、2016 年 Microsoft、2023 年 Meta、2024 年 Apple 到 2026 年 Snap 的例子，回顾智能眼镜和护目镜反复寻找大众接受度的历史。",
+      "content": "Matt Turck 用时间线调侃智能眼镜和头显：从 2013 年 Google Glass 到微软企业场景、Meta 普通外观加 AI、苹果高价头显，再到 2026 年 Snap 的新尝试，市场一直在“也许需要”和“还是不要”之间摇摆。",
       "original_text": "Smart glasses and goggles, a history: Silicon Valley, 2013 (Google): “you really want this” Everyone: “no we don’t” Silicon Valley, 2016 (Microsoft): “ok but what if it’s for the enterprise” Enterprise: “maybe, but also, no” Silicon Valley, 2023 (Meta): “ok but what if they look normal and have AI” Everyone: “wait… maybe? … Actually, no” Silicon Valley, 2024 (Apple): “ok but what if it’s $3,499 and covers your whole face” Everyone: “absolutely not” Silicon Valley, 2026 (Snap): “ok but this time...",
-      "translation": "Matt Turck 用 2013 年 Google、2016 年 Microsoft、2023 年 Meta、2024 年 Apple 到 2026 年 Snap 的例子，回顾智能眼镜和护目镜反复寻找大众接受度的历史。",
+      "translation": "Matt Turck 用时间线调侃智能眼镜和头显：从 2013 年 Google Glass 到微软企业场景、Meta 普通外观加 AI、苹果高价头显，再到 2026 年 Snap 的新尝试，市场一直在“也许需要”和“还是不要”之间摇摆。",
       "avatar_url": "https://unavatar.io/x/mattturck",
       "url": "https://x.com/mattturck/status/2070972014945243622",
       "role": "builder",
@@ -9267,9 +9269,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Peter Yang 介绍了每周六由 Hermes 发送的健康检查邮件：它从 Withings 智能秤、Fitbit 和 Google Health，以及他用 MCP server 和移动健身应用记录的训练数据中汇总要点和统计。",
+      "content": "Peter Yang 每周六会收到 Hermes 的健康检查邮件，里面汇总健康目标相关的要点和数据；数据来自 Withings 智能体重秤、Fitbit、Google Health，以及他自己 vibe coded 的 MCP server 和移动健身应用。",
       "original_text": "Every Saturday, Hermes sends me a health check email with top takeaways and stats to help me work toward my health goals by pulling data from: → My smart scale via the Withings API → My Fitbit and Google Health → An MCP server and mobile fitness app I vibe coded to track my workouts I find this super useful, even if my body fat is going the wrong way 😅 I talk about how to do this in my Hermes tutorial here: https://t.co/p0BDhL6PAp Should I make another video on building my fitness app?",
-      "translation": "Peter Yang 介绍了每周六由 Hermes 发送的健康检查邮件：它从 Withings 智能秤、Fitbit 和 Google Health，以及他用 MCP server 和移动健身应用记录的训练数据中汇总要点和统计。",
+      "translation": "Peter Yang 每周六会收到 Hermes 的健康检查邮件，里面汇总健康目标相关的要点和数据；数据来自 Withings 智能体重秤、Fitbit、Google Health，以及他自己 vibe coded 的 MCP server 和移动健身应用。",
       "avatar_url": "https://unavatar.io/x/petergyang",
       "url": "https://x.com/petergyang/status/2070906940352520477",
       "role": "builder",
@@ -9288,9 +9290,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Aaron Levie 认为，AI token 成本优化不能脱离对具体工作的理解；真正起作用的是位于业务流程和底层模型之间、能理解工作流、上下文和业务过程的一层，而单家公司独自搭建这层很难规模化。",
+      "content": "Aaron Levie 认为，AI token 成本优化的最佳实践离不开对实际工作流的深入理解。真正的含义是，工作本身和底层智能之间需要一层能够理解工作流、上下文和业务流程的系统；单家公司各自从零做这件事很难规模化。",
       "original_text": "Some good best practices here on AI token cost optimization. None of these happens though without a deep understanding of the underlying work being done in a non-abstract way. The ultimate implication is that a layer between the work itself and the underlying intelligence needs to deeply understand your workflows, context, and business process. Now, each individual company doing this on their own is unlikely to be effective at scale, so as a consequence, this is effectively the playbook for any...",
-      "translation": "Aaron Levie 认为，AI token 成本优化不能脱离对具体工作的理解；真正起作用的是位于业务流程和底层模型之间、能理解工作流、上下文和业务过程的一层，而单家公司独自搭建这层很难规模化。",
+      "translation": "Aaron Levie 认为，AI token 成本优化的最佳实践离不开对实际工作流的深入理解。真正的含义是，工作本身和底层智能之间需要一层能够理解工作流、上下文和业务流程的系统；单家公司各自从零做这件事很难规模化。",
       "avatar_url": "https://unavatar.io/x/levie",
       "url": "https://x.com/levie/status/2070937863806751154",
       "role": "builder",
@@ -9309,9 +9311,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Thibault Sottiaux 用一张图调侃 2026 年操作 Codex 时的状态。",
+      "content": "Thibault Sottiaux 用一张图调侃：2026 年操作 Codex 时的 Sol。",
       "original_text": "Sol when operating Codex. Circa 2026 https://t.co/bOCl1QB56x",
-      "translation": "Thibault Sottiaux 用一张图调侃 2026 年操作 Codex 时的状态。",
+      "translation": "Thibault Sottiaux 用一张图调侃：2026 年操作 Codex 时的 Sol。",
       "avatar_url": "https://unavatar.io/x/thsottiaux",
       "url": "https://x.com/thsottiaux/status/2071089307062837744",
       "role": "builder",
@@ -9330,9 +9332,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Thibault Sottiaux 调侃说，和植物说话不再奇怪，因为现在可以用 Codex 做这些事，并附上相关链接。",
+      "content": "Thibault Sottiaux 说，现在对植物说话已经不奇怪了；你可以直接用 Codex 把这些事做起来。",
       "original_text": "Talking to your plants isn't weird anymore. You can just codex things. https://t.co/RUAI7w1oPO",
-      "translation": "Thibault Sottiaux 调侃说，和植物说话不再奇怪，因为现在可以用 Codex 做这些事，并附上相关链接。",
+      "translation": "Thibault Sottiaux 说，现在对植物说话已经不奇怪了；你可以直接用 Codex 把这些事做起来。",
       "avatar_url": "https://unavatar.io/x/thsottiaux",
       "url": "https://x.com/thsottiaux/status/2071077932244570112",
       "role": "builder",
@@ -9351,9 +9353,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Thibault Sottiaux 列出 Codex 的一批改进：更顺畅处理超长线程、悬停式导航栏、覆盖更多控件的设置搜索、缩放后弹层与菜单不再错位，以及复制到 Slack 时保留 Markdown 格式等。",
+      "content": "Thibault Sottiaux 提到 Codex 最近有大量改进：长线程处理更顺滑，导航栏可悬停预览并跳转到不同回合，设置搜索覆盖更多控制项，外观和主机过滤选项更清楚，自定义 provider 设置更容易找到，缩放级别变化后工具提示、对话框、菜单、选择气泡、拖拽预览和自动补全不再错位，复制到 Slack 时也能保留 Markdown 格式。",
       "original_text": "Tons of improvements landed in Codex. - Handles super long threads smoothly. - Hoverable navigation rail for previewing and jumping between turns that feels just right. - Settings search covers more controls, with clearer appearance and host-filtering options and easier-to-find custom-provider settings. - Zoom-level changes no longer misalign tooltips, dialogs, menus, selection bubbles, drag previews, or autocomplete. - Copying into Slack preserves Markdown formatting such as bullets, bold text...",
-      "translation": "Thibault Sottiaux 列出 Codex 的一批改进：更顺畅处理超长线程、悬停式导航栏、覆盖更多控件的设置搜索、缩放后弹层与菜单不再错位，以及复制到 Slack 时保留 Markdown 格式等。",
+      "translation": "Thibault Sottiaux 提到 Codex 最近有大量改进：长线程处理更顺滑，导航栏可悬停预览并跳转到不同回合，设置搜索覆盖更多控制项，外观和主机过滤选项更清楚，自定义 provider 设置更容易找到，缩放级别变化后工具提示、对话框、菜单、选择气泡、拖拽预览和自动补全不再错位，复制到 Slack 时也能保留 Markdown 格式。",
       "avatar_url": "https://unavatar.io/x/thsottiaux",
       "url": "https://x.com/thsottiaux/status/2071071289247244481",
       "role": "builder",
@@ -9372,9 +9374,9 @@
       "verification_status": "original_social_only",
       "verification_note": "该来源仅作为线索，事实性结论需要一手来源或多源确认。",
       "risk_note": "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。",
-      "content": "Guillermo Rauch 发帖写道“我和我的智能体”，并附上相关图片链接。",
+      "content": "Guillermo Rauch 发了一条“我和我的 agents”的短帖，配图表达自己与多个 agent 协作的状态。",
       "original_text": "Me and my agents https://t.co/z3FIH7doEH",
-      "translation": "Guillermo Rauch 发帖写道“我和我的智能体”，并附上相关图片链接。",
+      "translation": "Guillermo Rauch 发了一条“我和我的 agents”的短帖，配图表达自己与多个 agent 协作的状态。",
       "avatar_url": "https://unavatar.io/x/rauchg",
       "url": "https://x.com/rauchg/status/2070982746080715052",
       "role": "builder",
@@ -9420,13 +9422,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-36kr-idg",
-      "title": "港大教授李弘扬创业做通用全身具身大脑，获真格高榕IDG五源等数亿种子轮融资｜硬氪独家",
-      "content": "s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。光源资本担任独家财务顾问。 本轮资金将主要用于全身人形基础模型研发、多模态全身动作数据采集、人才团队扩充，以及多地研发中心与产业合作生态搭建，加速在今年内实现开源人形基座模型落地。...",
-      "url": "https://36kr.com/p/3868055841641476?f=rss",
+      "candidate_id": "intermediary-infoq-cn-kpi-minimax-6-deepseek-dspark-ai",
+      "title": "不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报",
+      "content": "不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报。",
+      "url": "https://www.infoq.cn/article/6FP1sl5CrwdggVrXrwIN?utm_source=rss&utm_medium=article",
       "event_date": "2026-06-29",
-      "source": "36Kr",
-      "evidence": "s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。光源资本担任独家财务顾问。 本轮资金将主要用于全身人形基础模型研发、多模态全身动作数据采集、人才团队扩充，以及多地研发中心与产业合作生态搭建，加速在今年内实现开源人形基座模型落地。 源策未来成立于2026年4月，研发总部位于。..",
+      "source": "InfoQ CN",
+      "evidence": "点击查看原文>。",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -9436,13 +9438,13 @@
       "image_urls": []
     },
     {
-      "candidate_id": "intermediary-36kr-8-1-9-3-anthropic-fable-5",
-      "title": "8点1氪丨两大存储巨头今日发布大规模投资计划；江淮汽车股价腰斩，章建平9日套现近3亿元；Anthropic Fable 5有望很快恢复访问",
-      "content": "今日热点导览 《给阿嬷的情书》总票房已突破19亿元 梁文锋署名，DeepSeek发布最新论文 WPS回应C盘占用问题，即将更新七月版本上线磁盘存储管理功能 触屏MacBook将搭载M5芯片发布，苹果计划跳过M6 Pro及M6 Max 美国监管部门关闭针对特斯拉Model 3及Model Y转向失控调查 TOP 3大新闻 韩国将于6月29...",
-      "url": "https://36kr.com/p/3873476968272902?f=rss",
+      "candidate_id": "intermediary-36kr-idg",
+      "title": "港大教授李弘扬创业做通用全身具身大脑，获真格高榕IDG五源等数亿种子轮融资｜硬氪独家",
+      "content": "s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。光源资本担任独家财务顾问。 本轮资金将主要用于全身人形基础模型研发、多模态全身动作数据采集、人才团队扩充，以及多地研发中心与产业合作生态搭建，加速在今年内实现开源人形基座模型落地。...",
+      "url": "https://36kr.com/p/3868055841641476?f=rss",
       "event_date": "2026-06-29",
       "source": "36Kr",
-      "evidence": "今日热点导览 《给阿嬷的情书》总票房已突破19亿元 梁文锋署名，DeepSeek发布最新论文 WPS回应C盘占用问题，即将更新七月版本上线磁盘存储管理功能 触屏MacBook将搭载M5芯片发布，苹果计划跳过M6 Pro及M6 Max 美国监管部门关闭针对特斯拉Model 3及Model Y转向失控调查 TOP 3大新闻 韩国将于6月29日宣布三星、SK集团的多个大型项目 韩国将于6月29日宣布“三大工程”计划，韩国总统李在明将与政府各部门、三星电子和SK的官员会面，并发布政策。..",
+      "evidence": "s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。光源资本担任独家财务顾问。 本轮资金将主要用于全身人形基础模型研发、多模态全身动作数据采集、人才团队扩充，以及多地研发中心与产业合作生态搭建，加速在今年内实现开源人形基座模型落地。 源策未来成立于2026年4月，研发总部位于。..",
       "editorial_category": "community_signal",
       "source_level": "intermediary",
       "verification_status": "intermediary_only",
@@ -9535,11 +9537,11 @@
           "builder_low_signal": 10,
           "not_main_refill_material": 6,
           "unverified_high_risk_claim": 1,
-          "low_value": 1,
+          "low_value": 3,
           "primary_required_intermediary_lead": 34,
-          "secondary_single_source_story": 23,
+          "secondary_single_source_story": 22,
           "outside_main_window": 6,
-          "unverified_aggregator_lead": 27,
+          "unverified_aggregator_lead": 26,
           "statuspage": 2,
           "search_shadow": 4,
           "future_dated": 36
@@ -9561,11 +9563,11 @@
           "builder_low_signal": 10,
           "not_main_refill_material": 6,
           "unverified_high_risk_claim": 1,
-          "low_value": 1,
+          "low_value": 3,
           "primary_required_intermediary_lead": 34,
-          "secondary_single_source_story": 23,
+          "secondary_single_source_story": 22,
           "outside_main_window": 6,
-          "unverified_aggregator_lead": 27,
+          "unverified_aggregator_lead": 26,
           "statuspage": 2,
           "search_shadow": 4,
           "future_dated": 36
@@ -9627,17 +9629,17 @@
     "source_status_history": {
       "path": "source-status-history.json",
       "tracked_sources": 321,
-      "no_signal_or_blocked": 171,
+      "no_signal_or_blocked": 169,
       "stale_sources": 0,
       "window_days": 10
     },
     "automation_revision": {
       "schema_version": 1,
-      "git_commit": "0caa1aa8d57f6f087c1b8020184970da760287b4",
-      "git_commit_short": "0caa1aa8d57f",
+      "git_commit": "1e643b1b18aa975d0f4f6ed6e000a7a4fb8a50eb",
+      "git_commit_short": "1e643b1b18aa",
       "git_branch": "main",
-      "origin_main_sha": "0caa1aa8d57f6f087c1b8020184970da760287b4",
-      "origin_main_short": "0caa1aa8d57f",
+      "origin_main_sha": "1e643b1b18aa975d0f4f6ed6e000a7a4fb8a50eb",
+      "origin_main_short": "1e643b1b18aa",
       "prompt_manifest": "prompts/ai-daily/manifest.json",
       "prompt_modules": [
         "base.md",
@@ -9671,7 +9673,7 @@
       ]
     }
   },
-  "generated_at": "2026-06-29T02:10:38.512Z",
+  "generated_at": "2026-06-29T02:22:54.656Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-29.html",
   "html_path": "reports/2026/06/2026-06-29.html",
