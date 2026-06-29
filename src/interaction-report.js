@@ -3184,12 +3184,14 @@ function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
       "",
       formatSourceInventoryQuickFilters(rows, sectionGroups),
       "",
+      formatSourceInventoryFocusLanes(rows, sectionGroups),
+      "",
       formatSourceInventorySectionSummary(sectionGroups),
       "",
       formatSourceInventoryCompactSummary("类型分布", countBy(rows, "source_kind")),
       "",
       formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement"))
-    ].filter(Boolean).join("\n")
+    ].filter(Boolean).join("\n\n")
   };
 }
 
@@ -3203,6 +3205,100 @@ function formatSourceInventoryQuickFilters(rows = [], groups = []) {
     `- 启用层级快速定位：${formatSourceInventoryCountChips(countBy(rows, "enablement"))}`,
     `- 类型快速定位：${formatSourceInventoryCountChips(countBy(rows, "source_kind"))}`
   ].join("\n");
+}
+
+function formatSourceInventoryFocusLanes(rows = [], groups = []) {
+  const lanes = [
+    {
+      label: "配置待补",
+      detail: "安全配置或入口待补齐",
+      predicate: (row) => row.config_status === "configuration_needed"
+    },
+    {
+      label: "人工复核",
+      detail: "需要人工确认或手动复核",
+      predicate: (row) => row.config_status === "manual_review"
+    },
+    {
+      label: "已停用",
+      detail: "当前不参与自动采集",
+      predicate: (row) => row.config_status === "disabled"
+    },
+    {
+      label: "手动维护",
+      detail: "通过人工或半自动流程维护",
+      predicate: (row) => row.enablement === "manual"
+    },
+    {
+      label: "平台桥接",
+      detail: "平台/RSSHub 桥接入口",
+      predicate: (row) => row.source_kind === "rsshub" || ["wechat", "zhihu", "reddit"].includes(String(row.platform || "").toLowerCase())
+    }
+  ];
+  const tableRows = lanes
+    .map((lane) => {
+      const matches = rows.filter(lane.predicate);
+      return [
+        lane.label,
+        matches.length,
+        matches.length > 0 ? formatSourceInventoryLaneLinks(matches, groups) : "当前无",
+        `${matches.length > 0 ? formatSourceInventoryNameSample(matches) : "当前无"}；${lane.detail}`
+      ];
+    })
+    .filter(Boolean);
+
+  if (tableRows.length === 0) {
+    return "";
+  }
+
+  return [
+    "### 聚焦入口（静态索引，不会隐藏或重排）",
+    "这些入口只把需要关注的固定切片提前到总览；完整 154 条仍在下方分组。",
+    "",
+    "| 聚焦 | 数量 | 入口 | 代表源 |",
+    "|---|---:|---|---|",
+    ...tableRows.map((row) =>
+      `| ${escapeMarkdownTableCell(row[0])} | ${escapeMarkdownTableCell(row[1])} | ${row[2]} | ${escapeMarkdownTableCell(row[3])} |`
+    )
+  ].join("\n");
+}
+
+function formatSourceInventoryLaneLinks(rows = [], groups = []) {
+  const groupById = new Map(groups.map((group) => [group.id, group]));
+  const counts = new Map();
+  for (const row of rows) {
+    const sectionId = String(row?.display_section || "uncategorized");
+    counts.set(sectionId, (counts.get(sectionId) || 0) + 1);
+  }
+  const links = [...counts.entries()]
+    .map(([sectionId, count]) => {
+      const group = groupById.get(sectionId) || {
+        id: sectionId,
+        label: String(rows.find((row) => row.display_section === sectionId)?.display_section_label || sectionId),
+        rank: 999
+      };
+      return { group, count };
+    })
+    .sort((left, right) => Number(left.group.rank || 999) - Number(right.group.rank || 999) || String(left.group.label || "").localeCompare(String(right.group.label || "")));
+  const visibleLinks = links.slice(0, 3).map(({ group, count }) =>
+    `[${escapeMarkdownText(group.label)}](#section-${sourceInventoryGroupAnchor(group)}) ${count}`
+  );
+  if (links.length > visibleLinks.length) {
+    visibleLinks.push(`另 ${links.length - visibleLinks.length} 组`);
+  }
+  return visibleLinks.join(" · ");
+}
+
+function formatSourceInventoryNameSample(rows = []) {
+  const names = rows
+    .slice(0, 4)
+    .map((row) => row.name || row.id)
+    .filter(Boolean)
+    .map(escapeMarkdownText);
+  if (rows.length > names.length) {
+    names.push(`等 ${rows.length} 个`);
+  }
+  return names.join("、");
 }
 
 function groupedSourceInventoryRows(rows = []) {

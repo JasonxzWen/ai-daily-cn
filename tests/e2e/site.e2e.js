@@ -539,6 +539,14 @@ try {
   assert.match(sourceInventoryText, /html_index/);
   assert.match(sourceInventoryText, /openrouter_rankings_public_playwright/);
   assert.match(sourceInventoryText, /manual/);
+  assert.match(sourceInventoryText, /聚焦入口/);
+  assert.match(sourceInventoryText, /配置待补/);
+  assert.match(sourceInventoryText, /手动维护/);
+  assert.match(sourceInventoryText, /已停用/);
+  assert.match(sourceInventoryText, /平台桥接/);
+  assert.match(sourceInventoryText, /不会隐藏或重排/);
+  assert(await page.locator("#section-source-inventory table").count() >= 2);
+  assert.doesNotMatch(sourceInventoryText, /\|---|---:/);
   assert.equal(await sourceInventoryGroupLocator.count() >= 7, true);
   assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
   const sourceInventoryDetails = sourceInventoryDetailText.join("\n");
