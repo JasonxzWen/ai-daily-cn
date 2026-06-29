@@ -22,7 +22,7 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 | `core_primary` 核心一手源 | 22 | 8 | 22 | 0 | 0 |
 | `china_models` 中国模型与厂商 | 35 | 0 | 26 | 9 | 0 |
 | `open_source_platforms` 开源、模型平台与代码生态 | 33 | 4 | 7 | 26 | 0 |
-| `tracking_metrics` 榜单与持续指标 | 3 | 0 | 3 | 0 | 0 |
+| `tracking_metrics` 榜单与持续指标 | 3 | 3 | 3 | 0 | 0 |
 | `builder_community` Builder 与社区原始信号 | 41 | 1 | 9 | 30 | 2 |
 | `platform_cn_media` 中文平台与媒体线索 | 12 | 2 | 0 | 5 | 7 |
 | `english_media_search` 英文媒体与搜索聚合 | 8 | 5 | 0 | 8 | 0 |
@@ -166,9 +166,9 @@ npm run validate
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
-| 40.001 | `content-openrouter-rankings` | OpenRouter Rankings | `unmapped` | `openrouter_rankings_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
-| 40.002 | `content-artificial-analysis-intelligence-index` | Artificial Analysis Intelligence Index | `unmapped` | `artificial_analysis_index_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
-| 40.003 | `content-swe-bench-pro-public` | Scale Labs SWE-Bench Pro | `unmapped` | `swe_bench_pro_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
+| 40.001 | `content-openrouter-rankings` | OpenRouter Rankings | `openrouter-rankings` | `openrouter_rankings_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
+| 40.002 | `content-artificial-analysis-intelligence-index` | Artificial Analysis Intelligence Index | `artificial-analysis-index` | `artificial_analysis_index_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
+| 40.003 | `content-swe-bench-pro-public` | Scale Labs SWE-Bench Pro | `swe-bench-pro` | `swe_bench_pro_public_playwright` | `core` | `T0` | `primary` | `-` | `configured` |
 
 ### Builder 与社区原始信号 (`builder_community`)
 

@@ -13362,7 +13362,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 106);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 103);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -13388,7 +13388,6 @@ test("source order tuning review is validator-backed and complete", async () => 
     "content-anthropic-research",
     "china-ai-deepseek-news",
     "content-arxiv-cs-ai",
-    "content-openrouter-rankings",
     "content-builder-simon-willison",
     "intermediary-qbitai",
     "content-product-hunt-trending"
@@ -13435,6 +13434,44 @@ test("source order tuning review validator rejects drift and private fields", as
   );
   await expectInvalid(`${review}\nhttps://example.com/internal\n`, /order tuning review must not expose raw URLs/);
   await expectInvalid(`${review}\nAI_DAILY_RSSHUB_BASE_URL\n`, /order tuning review must not expose internal source fields/);
+});
+
+test("tracking metrics logical sources are promoted into the fixed display contract", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const { CORE_SOURCE_CONTRACTS } = await import("../src/source-effectiveness.js");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+  const inventoryRows = buildSourceInventoryRows({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.logical_sources, 25);
+  assert.equal(result.summary.display_sources, 25);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 103);
+
+  const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
+  for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
+    assert(logicalIds.has(id), `CORE_SOURCE_CONTRACTS should include ${id}`);
+  }
+
+  const trackingSection = contract.sections.find((section) => section.id === "tracking_metrics");
+  assert.deepEqual(
+    trackingSection.sources.map((source) => [source.id, source.rank]),
+    [
+      ["openrouter-rankings", 10],
+      ["artificial-analysis-index", 20],
+      ["swe-bench-pro", 30]
+    ]
+  );
+
+  const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
+  assert.equal(inventoryById.get("content-openrouter-rankings")?.logical_source_id, "openrouter-rankings");
+  assert.equal(inventoryById.get("content-artificial-analysis-intelligence-index")?.logical_source_id, "artificial-analysis-index");
+  assert.equal(inventoryById.get("content-swe-bench-pro-public")?.logical_source_id, "swe-bench-pro");
+
+  for (const sourceId of ["content-openrouter-rankings", "content-artificial-analysis-intelligence-index", "content-swe-bench-pro-public"]) {
+    assert(!review.includes(`| \`${sourceId}\``), `review should no longer list promoted source ${sourceId} as a promotion candidate`);
+  }
 });
 
 test("source inventory order reference is handbook-backed and complete", async () => {

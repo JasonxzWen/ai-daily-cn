@@ -75,7 +75,11 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 
 ### `tracking_metrics`
 
-当前作为预留 section。新增稳定排行榜或评测源时，只接收可结构化复核的指标源；不可把完整网页截图当成指标事实。
+| Rank | Logical source | 规则 |
+|---:|---|---|
+| 10 | `openrouter-rankings` | OpenRouter usage and market rankings，必须来自结构化 public trace |
+| 20 | `artificial-analysis-index` | Artificial Analysis model intelligence index，必须保留可复核表格数据 |
+| 30 | `swe-bench-pro` | SWE-Bench Pro coding benchmark，必须保留结构化指标来源 |
 
 ### `builder_community`
 
