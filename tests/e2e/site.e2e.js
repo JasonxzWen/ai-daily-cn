@@ -531,6 +531,9 @@ try {
   }), true);
   assert.equal(await page.locator("#section-source-signal-story").count(), 1);
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
+  assert.equal(await page.locator('#section-source-first-dashboard[data-section-type="filterable-cards"]').count(), 1);
+  assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card").count() >= 6, true);
+  assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card [data-card-stats]").count() >= 6, true);
   assert.equal(await page.locator("#section-source-status-focus").count(), 1);
   assert.equal(await page.locator("#section-source-map").count(), 1);
   assert.equal(await page.locator("#section-source-inventory").count(), 1);

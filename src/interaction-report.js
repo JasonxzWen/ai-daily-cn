@@ -3222,40 +3222,86 @@ function formatSourceFirstDashboardSection(rows = []) {
     return null;
   }
   const metrics = sourceFirstMetrics(rows);
-  const tableRows = [
-    ["全部逻辑信源", metrics.total, "固定展示合同中的公开信源行"],
-    ["公开入选", metrics.included, "今天有内容进入公开页"],
-    ["有更新未入选", metrics.updatedNotSelected, "抓到候选但未进入公开页"],
-    ["解析未成候选", metrics.parsedNotCandidate, "解析到近期内容但未形成候选"],
-    ["无近期更新", metrics.noRecentUpdate, "可访问但没有近期有效更新"],
-    ["阻塞", metrics.blocked, "已配置但本轮不可达或解析阻塞"],
-    ["未配置或跳过", metrics.skipped, "缺 token/base URL、手动源或占位源"]
-  ];
-  const statusLine = [
-    `${sourceEffectivenessStatusTag("included")} ${metrics.included}`,
-    `${sourceEffectivenessStatusTag("updated_not_selected")} ${metrics.updatedNotSelected}`,
-    `${sourceEffectivenessStatusTag("blocked")} ${metrics.blocked}`,
-    `${sourceEffectivenessStatusTag("not_configured_or_skipped")} ${metrics.skipped}`
-  ].join(" ");
   return {
-    type: "markdown",
+    type: "filterable-cards",
     title: "信源运行概况",
     richId: "source-first-dashboard",
     group: "main",
     collapsed: false,
-    content: [
-      "今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。",
-      "",
-      statusLine,
-      "",
-      "| 指标 | 数量 | 说明 |",
-      "|---|---:|---|",
-      ...tableRows.map(([label, value, note]) =>
-        `| ${escapeMarkdownTableCell(label)} | ${escapeMarkdownTableCell(value)} | ${escapeMarkdownTableCell(note)} |`
-      ),
-      "",
-      "公开页只展示这些读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。"
-    ].join("\n")
+    summary: "今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。",
+    cardClass: "source-metric-card",
+    showFilters: false,
+    items: sourceMetricDashboardCards(metrics)
+  };
+}
+
+function sourceMetricDashboardCards(metrics) {
+  const lowSignal = metrics.noRecentUpdate + metrics.parsedNotCandidate;
+  return [
+    sourceMetricDashboardCard({
+      title: "全部逻辑信源",
+      value: metrics.total,
+      tag: { label: "TOTAL", kind: "general" },
+      subtitle: "固定展示合同",
+      body: "固定展示合同中的公开信源行；公开页只展示读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。"
+    }),
+    sourceMetricDashboardCard({
+      title: "公开入选",
+      value: metrics.included,
+      tag: { label: "有效", kind: "major" },
+      subtitle: "进入公开页",
+      body: "今天有内容进入公开页，是当前 story 可直接回源的主体信号。"
+    }),
+    sourceMetricDashboardCard({
+      title: "有更新未入选",
+      value: metrics.updatedNotSelected,
+      tag: { label: "旁路更新", kind: "notable" },
+      subtitle: "抓到候选",
+      body: "抓到候选但未进入公开页，用来提示有增量信号但未构成今日主线。"
+    }),
+    sourceMetricDashboardCard({
+      title: "阻塞",
+      value: metrics.blocked,
+      tag: { label: "需处理", kind: "major" },
+      secondaryTag: { label: "BLOCKED", kind: "major" },
+      subtitle: "不可达或解析阻塞",
+      body: "已配置但本轮不可达或解析阻塞；即使为 0 也保留，避免静默失败。"
+    }),
+    sourceMetricDashboardCard({
+      title: "未配置或跳过",
+      value: metrics.skipped,
+      tag: { label: "需配置", kind: "notable" },
+      secondaryTag: { label: "SKIPPED", kind: "notable" },
+      subtitle: "缺配置或手动源",
+      body: "缺 token/base URL、手动源或占位源；这些缺口会继续留在固定清单中。"
+    }),
+    sourceMetricDashboardCard({
+      title: "低信号",
+      value: lowSignal,
+      tag: { label: "低信号", kind: "general" },
+      secondaryTag: { label: "LOW_SIGNAL", kind: "general" },
+      subtitle: "未形成公开候选",
+      body: "可访问但没有近期有效更新，或解析到近期内容但未形成候选。",
+      stats: [
+        { label: "无近期更新", value: String(metrics.noRecentUpdate) },
+        { label: "解析未成候选", value: String(metrics.parsedNotCandidate) }
+      ]
+    })
+  ];
+}
+
+function sourceMetricDashboardCard({ title, value, tag, secondaryTag, subtitle, body, stats = [] }) {
+  return {
+    title,
+    subtitle,
+    group: "信源运行概况",
+    showGroup: false,
+    tags: [tag, secondaryTag].filter(Boolean),
+    stats: [
+      { label: "数量", value: String(value) },
+      ...stats
+    ],
+    body
   };
 }
 

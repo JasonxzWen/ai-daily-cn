@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-metrics-dashboard-cards",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source metrics dashboard cards",
+  "status": "completed",
+  "summary": "This iteration turns the source-first metrics dashboard from a markdown table into visible operational metric cards, making effective, updated, blocked, skipped, and low-signal source states scannable before story tracks.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source metrics dashboard cards\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source metrics dashboard cards|source-first runtime contract|source-first IA dashboard|source inventory|source map scan index\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source metrics need a visible card contract, not only a markdown table.",
+      "evidence": "`source-first-dashboard` now emits an effective-interact `filterable-cards` section with `source-metric-card` cards for total, included, updated-not-selected, blocked, skipped, and low-signal states.",
+      "scope": "source_first_dashboard",
+      "persistence": "implemented",
+      "recommended_action": "Keep future source dashboard refinements on the same public-safe card contract."
+    },
+    {
+      "lesson": "Failure states should stay visible even when counts are zero.",
+      "evidence": "Blocked, skipped, and low-signal cards are always present in the fixed six-card order instead of disappearing when the count is small.",
+      "scope": "source_failure_visibility",
+      "persistence": "implemented",
+      "recommended_action": "Use the same always-visible rule for future source health and freshness summaries."
+    },
+    {
+      "lesson": "The source dashboard can become more visual without changing collection or ranking behavior.",
+      "evidence": "The implementation only changes `reportToInteractionInput` section shaping and tests; source registry, source inventory count, collection, candidate scoring, and automation behavior remain untouched.",
+      "scope": "source_display_surface",
+      "persistence": "implemented",
+      "recommended_action": "Continue separating presentation iterations from source collection/ranking iterations."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Draft the source insertion handbook and owner-maintained fixed importance order before adding or moving more registered sources.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-metrics-dashboard-cards"
+}
