@@ -13366,6 +13366,8 @@ test("source inventory order reference validator rejects drift and private field
     ["raw URL", "https://example.com/internal", /raw URLs/],
     ["RSSHub env name", "AI_DAILY_RSSHUB_BASE_URL", /internal source fields/],
     ["WeChat2RSS env name", "AI_DAILY_WECHAT2RSS_FEED_URL", /internal source fields/],
+    ["bare url config status", "| `url` |", /internal source fields/],
+    ["env required config status", "env_required", /internal source fields/],
     ["allowed hosts", "allowed_hosts", /internal source fields/],
     ["keywords", "keywords", /internal source fields/],
     ["notes", "notes", /internal source fields/],
@@ -13874,7 +13876,7 @@ test("source inventory panel lists all registered source entries before stories"
   assert.match(inventory.content, /openrouter_rankings_public_playwright/);
   assert.match(inventory.content, /manual/);
   assert.doesNotMatch(serializedSections, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(`${inventory.content}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
+  assert.doesNotMatch(`${inventory.content}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
 });
 
 test("source inventory navigation splits overview from fixed-section detail groups", () => {
@@ -13939,7 +13941,63 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(lastGroupIndex > inventoryIndex, JSON.stringify(publicSectionOrder));
   assert(firstStoryIndex > lastGroupIndex, JSON.stringify(publicSectionOrder));
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
+test("source inventory density controls keep all rows visible with static quick filters", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventory = input.sections.find((section) => section.richId === "source-inventory");
+  const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
+  const groupText = groupSections.map((section) => section.content || "").join("\n");
+  const groupRowCount = groupSections.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
+  const serializedInventory = JSON.stringify([inventory, ...groupSections]);
+
+  assert(inventory, "inventory overview should render");
+  assert.match(inventory.content, /快速定位/);
+  assert.match(inventory.content, /启用层级快速定位/);
+  assert.match(inventory.content, /类型快速定位/);
+  assert.match(inventory.content, /不会隐藏或重排/);
+  assert.match(inventory.content, /core\s+67/);
+  assert.match(inventory.content, /manual\s+9/);
+  assert.match(inventory.content, /rss/);
+  assert.match(inventory.content, /html_index/);
+  assert.match(inventory.content, /openrouter_rankings_public_playwright/);
+  assert.equal(groupRowCount, inventoryRows.length);
+  for (const section of groupSections) {
+    assert.match(section.content || "", /\[回到全量信源清单\]\(#section-source-inventory\)/);
+    assert.match(section.content || "", /类型分布/);
+    assert.match(section.content || "", /保留规则/);
+    assert.match(section.content || "", /阻塞、未配置、跳过、手动或无更新/);
+  }
+  assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
 test("source-first IA status focus surfaces actionable source states before the full graph", () => {

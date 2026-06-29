@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-density-controls",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory density controls",
+  "status": "completed",
+  "summary": "This iteration improves the reader-facing density of the full source inventory without hiding or reordering any source. The public inventory overview now includes static quick-location lanes for fixed sections, enablement, and source kinds, while each detail group starts with a compact density summary, type counts, a back link, and a preservation note for blocked, unconfigured, skipped, manual, or no-update entries.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory density controls\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory panel|source inventory navigation|source inventory density controls\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Full source visibility still needs density controls once all collection entries are expanded.",
+      "evidence": "The overview adds static section, enablement, and source-kind quick-location lanes while keeping all 154 source bullets in the fixed detail groups.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Prefer static scan aids before adding client-side filtering that could accidentally hide canonical source rows."
+    },
+    {
+      "lesson": "Inventory group summaries should restate preservation rules where readers scan the actual entries.",
+      "evidence": "Each `source-inventory-group-*` section now starts with density counts, source-kind counts, a back-to-overview anchor, and the rule that blocked, unconfigured, skipped, manual, or no-update entries stay visible.",
+      "scope": "public_source_visibility",
+      "persistence": "implemented",
+      "recommended_action": "Keep source gap disclosure near the source list, not only in higher-level status dashboards."
+    },
+    {
+      "lesson": "Rendered HTML needs viewport checks after adding long source-kind labels.",
+      "evidence": "Desktop and mobile Playwright checks verified the inventory overview and representative source groups render without horizontal overflow after adding long kind labels such as `openrouter_rankings_public_playwright`.",
+      "scope": "frontend_validation",
+      "persistence": "implemented",
+      "recommended_action": "Whenever source-kind labels or inventory tables change, include mobile overflow checks in the acceptance evidence."
+    },
+    {
+      "lesson": "Generic configuration status must not expose configuration mechanics.",
+      "evidence": "A read-only review found `url` and `env_required` in public inventory output; the source status mapper and validator now use generic states such as `configured`, `configuration_needed`, `manual_review`, and `disabled`, with unit and E2E coverage rejecting the leaked tokens.",
+      "scope": "public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "When adding any public inventory status, name the reader-visible state instead of the underlying config field or transport mechanism."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "If the full inventory still feels heavy after user review, add an explicitly optional search/filter interaction that never removes sources from the canonical fixed-order DOM.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-density-controls"
+}
