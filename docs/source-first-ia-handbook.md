@@ -6,6 +6,8 @@ Status: `phase-4-governance`
 
 Machine contract: `config/source-display-contract.json`
 
+Full inventory order reference: `docs/source-inventory-order.md`
+
 Maintenance owner: `user-reviewed-fixed-source-order`
 
 This handbook is the human-facing maintenance guide for the source-first daily IA. The JSON contract is the executable authority; this document explains how to change it without losing the fixed source order the public report depends on.
@@ -115,6 +117,7 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 6. 判断是否是英文媒体或搜索聚合。是则进入 `english_media_search`。
 7. 选择 rank：优先使用相邻源之间的空位；没有空位时重排该 section，保持 10 点间隔。
 8. 在同一 PR 中补充测试，证明新 logical source 有 section、rank、display mode 和可推导状态。
+9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `npm run sources:display-contract` 确认 154+ 全量入口参考表仍完整。
 
 不要把 source `tier`、`authority`、当日候选数或当天是否阻塞作为 public display rank 的动态输入。它们可以影响采集和候选排序，但不能改变固定图谱顺序。
 

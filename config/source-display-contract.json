@@ -27,6 +27,13 @@
       "source-status-preservation",
       "validation-commands"
     ],
+    "inventory_order_reference_path": "docs/source-inventory-order.md",
+    "inventory_order_required_markers": [
+      "source-inventory-order:v1",
+      "inventory-fixed-order-reference",
+      "collection-entry-insertion-rules",
+      "inventory-validation-commands"
+    ],
     "validation_commands": [
       "npm run sources:display-contract",
       "npm run validate"

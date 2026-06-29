@@ -13305,6 +13305,82 @@ test("source display contract governance is handbook-backed and complete", async
   assert(result.summary.validation_commands.includes("npm run validate"));
 });
 
+test("source inventory order reference is handbook-backed and complete", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const inventoryRows = buildSourceInventoryRows({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.inventory_sources, inventoryRows.length);
+  assert.equal(result.summary.inventory_order_reference_path, "docs/source-inventory-order.md");
+  assert(result.summary.required_inventory_order_markers.includes("source-inventory-order:v1"));
+  assert(result.summary.required_inventory_order_markers.includes("inventory-fixed-order-reference"));
+  assert(result.summary.required_inventory_order_markers.includes("collection-entry-insertion-rules"));
+  assert(result.summary.required_inventory_order_markers.includes("inventory-validation-commands"));
+});
+
+test("source inventory order reference validator rejects drift and private fields", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-inventory-order-validator-"));
+  await fs.cp(path.join(rootDir, "config"), path.join(tmp, "config"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
+  await fs.copyFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), path.join(tmp, "docs/source-first-ia-handbook.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-inventory-order.md"), path.join(tmp, "docs/source-inventory-order.md"));
+  await fs.copyFile(path.join(rootDir, "package.json"), path.join(tmp, "package.json"));
+
+  const referencePath = path.join(tmp, "docs/source-inventory-order.md");
+  const reference = await fs.readFile(referencePath, "utf8");
+  const firstSourceId = buildSourceInventoryRows({ rootDir })[0].id;
+  const firstSourceLinePattern = new RegExp(`^\\|[^\\n]*\`${escapeRegExp(firstSourceId)}\`[^\\n]*\\n`, "m");
+  const firstSourceLine = reference.match(firstSourceLinePattern)?.[0] || "";
+  assert(firstSourceLine, "test fixture should find the first generated source row");
+
+  async function expectInvalid(mutatedReference, expectedPattern, label = "mutated inventory reference") {
+    await fs.writeFile(referencePath, mutatedReference, "utf8");
+    const result = await validateSourceDisplayContract({ rootDir: tmp });
+    assert.equal(result.ok, false, `${label} should be rejected`);
+    assert.match(result.failures.join("\n"), expectedPattern, label);
+  }
+
+  await expectInvalid(
+    reference.replace(firstSourceLinePattern, ""),
+    /must list 154 source ids|must list source id exactly once/
+  );
+  await expectInvalid(
+    reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
+    /duplicates source id|must list source id exactly once/
+  );
+  await expectInvalid(
+    reference.replace("inventory-section:core_primary count:22", "inventory-section:core_primary count:21"),
+    /section core_primary count must be 22/
+  );
+  await expectInvalid(
+    reference.replace("| `core_primary` 核心一手源 | 22 |", "| `core_primary` 核心一手源 | 21 |"),
+    /summary table section core_primary count must be 22/
+  );
+  await expectInvalid(
+    reference.replace("source-inventory-order:v1", "source-inventory-order:missing"),
+    /missing marker: source-inventory-order:v1/
+  );
+  const forbiddenCases = [
+    ["raw URL", "https://example.com/internal", /raw URLs/],
+    ["RSSHub env name", "AI_DAILY_RSSHUB_BASE_URL", /internal source fields/],
+    ["WeChat2RSS env name", "AI_DAILY_WECHAT2RSS_FEED_URL", /internal source fields/],
+    ["allowed hosts", "allowed_hosts", /internal source fields/],
+    ["keywords", "keywords", /internal source fields/],
+    ["notes", "notes", /internal source fields/],
+    ["candidate pool", "candidate_pool", /internal source fields/],
+    ["selection snapshot", "selection_snapshot", /internal source fields/],
+    ["self check", "self_check", /internal source fields/],
+    ["score", "score", /internal source fields/],
+    ["debug", "debug", /internal source fields/],
+    ["local path", "C:\\Users\\Admin\\.codex\\secret", /local paths/]
+  ];
+  for (const [label, token, expectedPattern] of forbiddenCases) {
+    await expectInvalid(`${reference}\n${token}\n`, expectedPattern, label);
+  }
+});
+
 test("source-first IA contract extends source effectiveness rows with stable display metadata", async () => {
   const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
   const report = strictPublishReportFixture();
