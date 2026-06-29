@@ -152,7 +152,10 @@ export function reportToInteractionInput(report, options = {}) {
   const sourceFirstPresentation = sourceFirstPresentationContract(options.sourceFirstPresentationContract);
   const sourceFirstRuntimeSectionOrder = sourceFirstPresentationRichIds(sourceFirstPresentation);
   const sourceInventoryRows = sourceEffectivenessRows.length > 0
-    ? buildSourceInventoryRows({ rootDir: options.rootDir || process.cwd() })
+    ? sourceInventoryRowsWithRuntime(
+      buildSourceInventoryRows({ rootDir: options.rootDir || process.cwd() }),
+      sourceEffectivenessRows
+    )
     : [];
   const platformItems = Object.fromEntries(
     PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
@@ -412,6 +415,37 @@ function formatSourceFirstRuntimeSections({
     }
   }
   return sections;
+}
+
+function sourceInventoryRowsWithRuntime(rows = [], sourceEffectivenessRows = []) {
+  const runtimeById = new Map(
+    (Array.isArray(sourceEffectivenessRows) ? sourceEffectivenessRows : [])
+      .filter((row) => row?.id)
+      .map((row) => [String(row.id), row])
+  );
+  return (Array.isArray(rows) ? rows : []).map((row) => {
+    const logicalSourceId = String(row?.logical_source_id || "");
+    if (!logicalSourceId) {
+      return {
+        ...row,
+        runtime_status_label: "collection_only",
+        runtime_status_detail: "未归入逻辑源，仅展示采集入口配置"
+      };
+    }
+    const runtime = runtimeById.get(logicalSourceId);
+    if (!runtime) {
+      return {
+        ...row,
+        runtime_status_label: "unreported",
+        runtime_status_detail: "逻辑源未在今日状态表出现"
+      };
+    }
+    return {
+      ...row,
+      runtime_status_label: String(runtime.status_label || "unknown"),
+      runtime_status_detail: `继承逻辑源 ${runtime.name || row.logical_source_name || logicalSourceId}`
+    };
+  });
 }
 
 function hostnameLabel(value) {
@@ -3785,7 +3819,13 @@ function formatSourceInventoryRow(row) {
   const logical = row.logical_source_name && row.logical_source_name !== "未归入逻辑源"
     ? `；逻辑源：${escapeMarkdownText(row.logical_source_name)}`
     : "；逻辑源：未归入逻辑源";
-  return `- **${escapeMarkdownText(row.name || row.id)}**${logical}；${details}`;
+  return `- **${escapeMarkdownText(row.name || row.id)}**${logical}${formatSourceInventoryRuntime(row)}；${details}`;
+}
+
+function formatSourceInventoryRuntime(row) {
+  const statusLabel = String(row?.runtime_status_label || (row?.logical_source_id ? "unreported" : "collection_only"));
+  const detail = row?.runtime_status_detail ? `（${escapeMarkdownText(row.runtime_status_detail)}）` : "";
+  return `；运行状态：${sourceEffectivenessStatusTag(statusLabel)}${detail}`;
 }
 
 function countBy(rows = [], field) {
