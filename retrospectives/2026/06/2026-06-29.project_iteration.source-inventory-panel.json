@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-panel",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory panel",
+  "status": "completed",
+  "summary": "This iteration makes the registered collection surface visible as reader-facing source-first content. It renders all 154 safe public collection entries from `config/sources` after the logical source map and before story sections, groups them by the fixed source display sections, and exposes only public-safe metadata such as kind, enablement, tier, authority, platform, and generic config status.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory panel\" tests/unit.test.js",
+      "node --input-type=module -e \"import { buildSourceInventoryRows } from './src/source-effectiveness.js'; const rows = buildSourceInventoryRows({ rootDir: process.cwd() }); console.log(rows.length);\"",
+      "node --test --test-name-pattern \"source map scan index|source-first IA dashboard|source-first IA status focus|source inventory panel\" tests/unit.test.js",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "Playwright desktop/mobile visual check for docs/reports/2026/06/2026-06-29.html; screenshots in .tmp/phase6-source-inventory-desktop.png and .tmp/phase6-source-inventory-mobile.png",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Collection entries and logical sources need separate reader surfaces.",
+      "evidence": "The logical source map still summarizes 22 status rows, while the new inventory panel lists 154 registry entries grouped under the same fixed display sections.",
+      "scope": "source_first_ia",
+      "persistence": "implemented",
+      "recommended_action": "Keep status reasoning on logical sources, and use the inventory panel to show every subscribed or configured collection entry."
+    },
+    {
+      "lesson": "Public source inventory must avoid leaking configuration internals.",
+      "evidence": "The renderer exposes generic config status tokens such as `url`, `manual`, `env_required`, and `kill_switch` instead of URL fields, env var names, keyword filters, notes, audit trails, scores, or debug snapshots.",
+      "scope": "public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "When adding collection metadata, only surface fields that are explicitly reader-safe or map them to generic status tokens first."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the source display handbook to manually tune the fixed importance order, then replay the inventory E2E checks to confirm new source insertions land in the expected section.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-panel"
+}

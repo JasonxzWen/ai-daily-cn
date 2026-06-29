@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadSourceRegistrySync } from "./source-registry.js";
 
 export const CORE_SOURCE_CONTRACTS = [
   {
@@ -168,14 +169,15 @@ const SKIPPED_SOURCE_STATUSES = new Set([
   "skipped_manual_source",
   "skipped_manual_review_required"
 ]);
-const SOURCE_DISPLAY_CONTRACT = loadSourceDisplayContract();
-const SOURCE_DISPLAY_BY_ID = sourceDisplayIndex(SOURCE_DISPLAY_CONTRACT);
 const DEFAULT_DISPLAY_SECTION = {
   id: "uncategorized",
   label: "未分组信源",
   rank: 999,
   default_display_mode: "collapsed"
 };
+const SOURCE_DISPLAY_CONTRACT = loadSourceDisplayContract();
+const SOURCE_DISPLAY_BY_ID = sourceDisplayIndex(SOURCE_DISPLAY_CONTRACT);
+const SOURCE_DISPLAY_SECTION_BY_ID = sourceDisplaySectionIndex(SOURCE_DISPLAY_CONTRACT);
 
 export function buildSourceEffectivenessTable({ report = {}, candidates = [] } = {}) {
   const auditSources = collectAuditSources(report?.source_audit);
@@ -214,6 +216,27 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
     };
   });
   return decorateSourceEffectivenessRows(rows);
+}
+
+export function buildSourceInventoryRows(options = {}) {
+  const rootDir = resolveSourceInventoryRootDir(options);
+  const registry = loadSourceRegistrySync({
+    rootDir,
+    sourcesPath: options.sourcesPath || "config/sources",
+    includeEnablement: options.includeEnablement || "core,optional,manual"
+  });
+  return registry.sources
+    .map((source, index) => sourceInventoryRow(source, index))
+    .sort(compareSourceInventoryRows);
+}
+
+function resolveSourceInventoryRootDir(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const sourcesPath = options.sourcesPath || "config/sources";
+  if (pathExists(path.resolve(rootDir, sourcesPath))) {
+    return rootDir;
+  }
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 }
 
 export function decorateSourceEffectivenessRows(rows = []) {
@@ -274,6 +297,44 @@ function sourceDisplayIndex(contract) {
   return rows;
 }
 
+function sourceDisplaySectionIndex(contract) {
+  const rows = new Map();
+  const sections = Array.isArray(contract?.sections) ? contract.sections : [];
+  for (const section of sections) {
+    const id = String(section?.id || "").trim();
+    if (!id) {
+      continue;
+    }
+    rows.set(id, {
+      sectionId: id,
+      sectionLabel: String(section.label || section.id || DEFAULT_DISPLAY_SECTION.label),
+      sectionRank: Number.isFinite(Number(section.rank)) ? Number(section.rank) : DEFAULT_DISPLAY_SECTION.rank,
+      mode: ["expanded", "collapsed"].includes(String(section.default_display_mode))
+        ? String(section.default_display_mode)
+        : DEFAULT_DISPLAY_SECTION.default_display_mode
+    });
+  }
+  rows.set(DEFAULT_DISPLAY_SECTION.id, {
+    sectionId: DEFAULT_DISPLAY_SECTION.id,
+    sectionLabel: DEFAULT_DISPLAY_SECTION.label,
+    sectionRank: DEFAULT_DISPLAY_SECTION.rank,
+    mode: DEFAULT_DISPLAY_SECTION.default_display_mode
+  });
+  return rows;
+}
+
+function pathExists(filePath) {
+  try {
+    readFileSync(filePath);
+    return true;
+  } catch (error) {
+    if (error && (error.code === "EISDIR" || error.code === "EPERM")) {
+      return true;
+    }
+    return false;
+  }
+}
+
 function sourceDisplayMetadata(contract, contractIndex) {
   const display = SOURCE_DISPLAY_BY_ID.get(contract.id);
   if (display) {
@@ -286,6 +347,107 @@ function sourceDisplayMetadata(contract, contractIndex) {
     rank: (contractIndex + 1) * 10,
     mode: DEFAULT_DISPLAY_SECTION.default_display_mode
   };
+}
+
+function sourceInventoryRow(source, sourceIndex) {
+  const contractIndex = CORE_SOURCE_CONTRACTS.findIndex((contract) => sourceMatchesContract(source, contract));
+  const contract = contractIndex >= 0 ? CORE_SOURCE_CONTRACTS[contractIndex] : null;
+  const display = contract
+    ? sourceDisplayMetadata(contract, contractIndex)
+    : inferredSourceInventoryDisplay(source, sourceIndex);
+  return {
+    id: String(source?.id || ""),
+    name: String(source?.name || source?.id || "Unnamed source"),
+    source_kind: String(source?.source_kind || "unknown"),
+    enablement: String(source?.enablement || "unknown"),
+    tier: String(source?.tier || ""),
+    authority: String(source?.authority || ""),
+    platform: String(source?.platform || ""),
+    config_status: publicSourceConfigStatus(source),
+    logical_source_id: contract?.id || "",
+    logical_source_name: contract?.name || "未归入逻辑源",
+    display_section: display.sectionId,
+    display_section_label: display.sectionLabel,
+    display_section_rank: display.sectionRank,
+    display_rank: display.rank || 999,
+    display_mode: display.mode,
+    _source_index: sourceIndex
+  };
+}
+
+function inferredSourceInventoryDisplay(source, sourceIndex) {
+  const sectionId = inferSourceInventorySectionId(source);
+  const section = SOURCE_DISPLAY_SECTION_BY_ID.get(sectionId) || SOURCE_DISPLAY_SECTION_BY_ID.get(DEFAULT_DISPLAY_SECTION.id);
+  return {
+    sectionId: section.sectionId,
+    sectionLabel: section.sectionLabel,
+    sectionRank: section.sectionRank,
+    rank: 10000 + sourceIndex,
+    mode: section.mode
+  };
+}
+
+function inferSourceInventorySectionId(source = {}) {
+  const text = searchableText([
+    source.id,
+    source.name,
+    source.url,
+    source.source_kind,
+    source.candidate_category,
+    source.category,
+    source.platform,
+    source.authority
+  ]);
+  if (/china-ai|deepseek|qwen|kimi|minimax|zhipu|moonshot|baidu|tencent|alibaba|bytedance|doubao|siliconflow/.test(text)) {
+    return "china_models";
+  }
+  if (/openrouter|artificial analysis|swe[-_ ]?bench|leaderboard|rankings|public_playwright/.test(text)) {
+    return "tracking_metrics";
+  }
+  if (/wechat|zhihu|jike|qbitai|machine heart|jiqizhixin|sspai|36kr|infoq cn|newrank|weixin|mp\.weixin/.test(text)) {
+    return "platform_cn_media";
+  }
+  if (/github|huggingface|hugging face|arxiv|papers|open source|opensource|hellogithub|ruanyf|model card/.test(text)) {
+    return "open_source_platforms";
+  }
+  if (/follow-builders|hacker news|hnrss|reddit|x\/twitter|twitter|builder|community/.test(text)) {
+    return "builder_community";
+  }
+  if (/search_api|techcrunch|verge|technologyreview|ars technica|venturebeat|media|intermediary|aggregator/.test(text)) {
+    return "english_media_search";
+  }
+  if (/primary|official|company|research|blog|news/.test(text)) {
+    return "core_primary";
+  }
+  return DEFAULT_DISPLAY_SECTION.id;
+}
+
+function publicSourceConfigStatus(source = {}) {
+  const statuses = [];
+  if (source.kill_switch === true) {
+    statuses.push("kill_switch");
+  }
+  if (source.source_kind === "manual") {
+    statuses.push("manual");
+  }
+  if (source.url) {
+    statuses.push("url");
+  }
+  if (source.url_env || source.base_url_env || source.required_env) {
+    statuses.push("env_required");
+  }
+  if (statuses.length === 0) {
+    statuses.push("placeholder");
+  }
+  return uniqueStrings(statuses).join("+");
+}
+
+function compareSourceInventoryRows(left, right) {
+  return Number(left.display_section_rank) - Number(right.display_section_rank) ||
+    Number(left.display_rank) - Number(right.display_rank) ||
+    String(left.logical_source_name || "").localeCompare(String(right.logical_source_name || "")) ||
+    String(left.name || "").localeCompare(String(right.name || "")) ||
+    Number(left._source_index) - Number(right._source_index);
 }
 
 function compareSourceEffectivenessRows(left, right) {
