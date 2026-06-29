@@ -19,17 +19,17 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:86 -->
+<!-- order-tuning-total-unmapped:81 -->
 
 These counts come from the 154-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
-| `core_primary` | 7 | Promote the most durable official lab/company subchannels first. |
+| `core_primary` | 3 | Phase 22 promotes the reviewed Apple, Meta Engineering, NVIDIA Developer, and xAI official sources; keep reviewing the remaining durable company/platform blogs. |
 | `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
 | `open_source_platforms` | 12 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 39 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
+| `builder_community` | 38 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
 | `platform_cn_media` | 6 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
 
@@ -41,10 +41,10 @@ These candidates are proposed first-class logical sources. They are not merged i
 
 | Source ID | Proposed logical source | Section | Suggested rank | Action | Rationale |
 |---|---|---|---:|---|---|
-| `content-apple-machine-learning` | `apple-ml-research` | `core_primary` | 55 | `promote` | Apple ML research is a durable official lab signal. |
-| `content-meta-engineering` | `meta-engineering` | `core_primary` | 65 | `promote` | Meta Engineering can carry infrastructure releases separate from Meta AI Blog. |
-| `content-nvidia-developer-blog` | `nvidia-ai-developer` | `core_primary` | 75 | `promote` | NVIDIA developer posts are high-impact AI platform signals. |
-| `content-xai-news` | `xai-news` | `core_primary` | 85 | `promote` | xAI official news deserves independent visibility when model/platform updates land. |
+| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promote` | Azure platform posts can carry durable Microsoft AI infrastructure signals separate from Microsoft Research. |
+| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `promote` | TikTok developer posts can surface platform and applied AI developer changes. |
+| `content-cloudflare-blog` | `cloudflare-ai-platform` | `core_primary` | 115 | `promote` | Cloudflare platform posts can surface Workers AI, edge inference, and developer infrastructure signals. |
+| `content-google-keyword` | `google-keyword-ai` | `core_primary` | 125 | `promote` | Google Keyword can carry corporate and product AI announcements outside DeepMind and Research. |
 | `content-tencent-hunyuan-blog` | `tencent-hunyuan` | `china_models` | 60 | `promote` | Hunyuan is the Tencent model/platform source that should not be hidden in generic company feeds. |
 | `content-bytedance-seed-blog` | `bytedance-seed` | `china_models` | 70 | `promote` | ByteDance Seed is a distinct model/research source. |
 | `china-ai-baidu-ai-news` | `baidu-ai` | `china_models` | 80 | `promote` | Baidu AI remains a recurring Chinese model/platform signal. |
