@@ -1,14 +1,14 @@
 ---
-name: source-to-insight-blog
-description: "Load when turning an external article, blog, release note, interview, or report into a source-backed insight blog with Chinese fidelity, media references, an effective-interact summary layer, and project-iteration review; do not load for ordinary summaries, full copyrighted reposts, or production site design."
+name: source-post
+description: "Load when turning an external article, blog, release note, interview, or report into a source-backed public post with Chinese fidelity, media references, an effective-interact summary layer, and project-iteration review; do not load for ordinary summaries, full copyrighted reposts, or production site design."
 license: MIT
 metadata:
   source: "local-original"
 ---
 
-# Source To Insight Blog
+# Source Post
 
-Use this skill when source material must become a publishable insight blog, not just a chat summary.
+Use this skill when source material must become a publishable source post, not just a chat summary.
 
 ## Workflow
 
@@ -18,11 +18,11 @@ Use this skill when source material must become a publishable insight blog, not 
 4. Write the reader-facing blog before the evidence apparatus. Lead with a short article narrative, then the simplest source structure needed for orientation, then analysis. Put source ledger, copyright boundary, and validation details after the reader understands the source.
 5. Use `effective-interact` only as a secondary summary or visualization layer. Do not use a raw generated interaction report as the blog body.
 6. Add a project-iteration review: what the source confirms, what should change in this repo, what was already changed, what may be redundant, what should stay out of scope, and what needs a later SDD/spec.
-7. Validate the generated post with `scripts/validate-source-blog.mjs`, the normal insight validation, a rendered screenshot, and repo gates proportionate to changed files.
+7. Validate the generated post with `scripts/validate-source-post.mjs`, the normal source-post validation, a rendered screenshot, and repo gates proportionate to changed files.
 
 ## Reader-First Shape
 
-Prefer normal article flow over dashboard flow. The default public blog shape is:
+Prefer normal article flow over dashboard flow. The default public post shape is:
 
 1. **One-minute answer**: one short paragraph saying what the source is and why this repo cares.
 2. **Source structure**: one tree, outline, or compact table that lets the reader orient quickly.
@@ -48,12 +48,12 @@ Use a table only when rows are genuinely comparable. If a table cell becomes a p
 
 - Read `references/workflow.md` for the detailed step sequence and acceptance checklist.
 - Read `references/copyright-and-fidelity.md` before publishing translated or paraphrased third-party material.
-- Use `assets/source-blog-checklist.md` as the authoring checklist.
-- Run `scripts/validate-source-blog.mjs <post-dir>` before handoff.
+- Use `assets/source-post-checklist.md` as the authoring checklist.
+- Run `scripts/validate-source-post.mjs <post-dir>` before handoff.
 
 ## Gotchas
 
-- A source-backed blog is not the same thing as an effective-interact report. Effective-interact lowers summary and decision cost; it does not replace the translated or reconstructed source layer.
+- A source-backed public post is not the same thing as an effective-interact report. Effective-interact lowers summary and decision cost; it does not replace the translated or reconstructed source layer.
 - Do not mistake high information density for readability. Dense pages still need a human reading order: answer, structure, implications, reflection, sources.
 - Do not lead with authorization mechanics, source-ledger implementation, or generated-component details when the reader asked to understand the source.
 - Do not turn article sections into repeated `summary-cards` or `data-table` blocks just because the generator supports them.

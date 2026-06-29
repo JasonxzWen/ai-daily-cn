@@ -168,6 +168,9 @@ function readManifest(manifestPath) {
 
 function resolveSkillCategories(manifest, sourceSkillNames, targetSkillNames, targetSkillsRoot) {
   const sourceSkillSet = new Set(sourceSkillNames);
+  const targetSkillSet = new Set(targetSkillNames);
+  const previousImportedSkills = new Set(manifest.importedSkills ?? []);
+  const previousLocalOnlySkills = new Set(manifest.localOnlySkills ?? []);
   const overlappingSkills = new Set(
     (manifest.overlappingSkills ?? []).filter((skill) => sourceSkillSet.has(skill) || fs.existsSync(path.join(targetSkillsRoot, skill)))
   );
@@ -178,14 +181,25 @@ function resolveSkillCategories(manifest, sourceSkillNames, targetSkillNames, ta
     }
   }
 
-  const localOnlySkills = new Set(manifest.localOnlySkills ?? []);
+  const localOnlySkills = new Set(
+    [...previousLocalOnlySkills].filter(
+      (skill) => targetSkillSet.has(skill) && !sourceSkillSet.has(skill) && !overlappingSkills.has(skill)
+    )
+  );
+  const staleImportedSkills = new Set();
   for (const skill of targetSkillNames) {
     if (!sourceSkillSet.has(skill) && !overlappingSkills.has(skill)) {
+      if (previousImportedSkills.has(skill) && !previousLocalOnlySkills.has(skill)) {
+        staleImportedSkills.add(skill);
+        continue;
+      }
       localOnlySkills.add(skill);
     }
   }
 
-  const importedSkills = new Set((manifest.importedSkills ?? []).filter((skill) => sourceSkillSet.has(skill)));
+  const importedSkills = new Set(
+    (manifest.importedSkills ?? []).filter((skill) => sourceSkillSet.has(skill) && !overlappingSkills.has(skill))
+  );
   for (const skill of sourceSkillNames) {
     if (!overlappingSkills.has(skill) && !localOnlySkills.has(skill)) {
       importedSkills.add(skill);
@@ -196,6 +210,7 @@ function resolveSkillCategories(manifest, sourceSkillNames, targetSkillNames, ta
     importedSkills: [...importedSkills].sort(),
     overlappingSkills: [...overlappingSkills].sort(),
     localOnlySkills: [...localOnlySkills].sort(),
+    staleImportedSkills: [...staleImportedSkills].sort()
   };
 }
 
@@ -346,7 +361,13 @@ export function syncHarnessHub(options = {}) {
   const localOnlyFilesKept = [];
 
   fs.mkdirSync(targetSkillsRoot, { recursive: true });
-  removeStaleImportedSkills(sourceSkillNames, targetSkillsRoot, categories.importedSkills, categories.localOnlySkills, categories.overlappingSkills);
+  removeStaleImportedSkills(
+    sourceSkillNames,
+    targetSkillsRoot,
+    [...categories.importedSkills, ...categories.staleImportedSkills],
+    categories.localOnlySkills,
+    categories.overlappingSkills
+  );
 
   for (const skillName of categories.importedSkills) {
     syncImportedSkill(skillName, {

@@ -1,6 +1,6 @@
 ---
 name: insight
-description: "Load when the user asks for a repository interaction insight audit, cross-session Codex or Claude Code work trace review, agent task profile, tool-call decision audit, or project collaboration bottleneck analysis; do not load for public source-backed insight blog posts, single-run agent failure debugging, or ordinary summaries."
+description: "Load when the user asks for a repository interaction insight audit, cross-session Codex or Claude Code work trace review, agent task profile, tool-call decision audit, or project collaboration bottleneck analysis; do not load for public source-backed posts, single-run agent failure debugging, or ordinary summaries."
 license: MIT
 metadata:
   source: "local-original"
@@ -67,7 +67,7 @@ The report must include:
 
 ## Gotchas
 
-- Do not confuse this with `source-to-insight-blog`; that skill turns external sources into public insight posts.
+- Do not confuse this with `source-post`; that skill turns external sources into public source posts.
 - Do not confuse this with `agent-introspection-debugging`; that skill diagnoses a single agent run or tool loop.
 - Do not turn a weak candidate trace into a strong conclusion. Use candidate evidence for leads, not verdicts.
 - Do not treat ordinary repo source files as interaction evidence. Repo state is context unless it is explicit task, decision, progress, handoff, or host trace state.

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.harness-hub-027-sync",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Harness Hub 27cc200 sync and source-post migration",
+  "status": "completed",
+  "summary": "Refreshed the local Harness Hub aggregation to source commit 27cc200d1108e8f382d5c49c64312c6b4561da85, migrated the renamed source-post skill into Codex and Claude curated skill surfaces, removed the stale source-to-insight-blog import, and preserved local workflow-router routing as an explicit overlay with the upstream copy stored under _harness-hub.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "commits": [
+      "27cc200d1108e8f382d5c49c64312c6b4561da85"
+    ],
+    "validation_commands": [
+      "red source-alignment check failed before update with manifest commit 8ac264bed8a06fc6bf954a88ad92330e13e63e03 versus origin/main 27cc200d1108e8f382d5c49c64312c6b4561da85",
+      "node scripts/update-harness-hub.mjs",
+      "node --test --test-name-pattern \"Harness Hub skill aggregation|Claude Code curated skills expose|Harness Hub updater\" tests/skills.test.js",
+      "HARNESS_HUB_STRICT_SOURCE_CHECK=1 node --test tests/skills.test.js",
+      "node scripts/harness-validate.mjs"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Harness Hub updater state must distinguish stale imported skills from real local-only skills.",
+      "evidence": "The source-to-insight-blog rename initially left the old skill in localOnlySkills even after its files were removed; the updater test now covers stale imported and stale local-only entries.",
+      "scope": "harness_hub_sync",
+      "persistence": "implemented",
+      "recommended_action": "When a Hub skill disappears or is renamed, verify the aggregation manifest does not promote the old imported skill to local-only state."
+    },
+    {
+      "lesson": "Target repositories may need a workflow-router overlay for local maintenance language even when the upstream router is stricter.",
+      "evidence": "The strict skills test caught the Harness Hub update prompt routing to review; workflow-router is now an overlapping skill with only route-intent.mjs preserved as a local conflict.",
+      "scope": "workflow_router_overlay",
+      "persistence": "implemented",
+      "recommended_action": "Keep target-specific router adaptations as overlapping skill conflicts instead of patching the upstream source checkout or silently editing imported skills."
+    },
+    {
+      "lesson": "Claude Code curation needs to follow skill renames, not just copied file updates.",
+      "evidence": "The curated Claude surface now replaces source-to-insight-blog with source-post, updates insight and package-release-sniffer references, and has a regression test for the new name.",
+      "scope": "claude_skill_curation",
+      "persistence": "implemented",
+      "recommended_action": "For every Harness Hub skill rename, update Codex aggregation, Claude curated README, copied skill bodies, and route tests in the same pass."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-ledger-validation-binding",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider adding a first-class Claude curation command to the Harness Hub updater so source-post style renames cannot leave stale curated skill directories behind.",
+      "owner": "project"
+    }
+  ],
+  "slug": "harness-hub-027-sync"
+}

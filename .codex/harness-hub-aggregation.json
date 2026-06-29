@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-26T03:32:48.496Z",
+  "generatedAt": "2026-06-29T10:15:48.849Z",
   "source": {
     "path": "D:/harness-hub",
     "branch": "main",
-    "commit": "8ac264bed8a06fc6bf954a88ad92330e13e63e03",
+    "commit": "27cc200d1108e8f382d5c49c64312c6b4561da85",
     "status": "## main...origin/main"
   },
   "target": {
-    "path": "D:/ai-daily-cn",
+    "path": "C:/Users/Admin/.codex/worktrees/3d23/ai-daily-cn",
     "skillsRoot": ".codex/skills"
   },
   "policy": {
@@ -22,13 +22,13 @@
   },
   "counts": {
     "hubSkills": 47,
-    "localSkillsBefore": 12,
-    "importedSkills": 36,
-    "overlappingSkills": 11,
+    "localSkillsBefore": 13,
+    "importedSkills": 35,
+    "overlappingSkills": 12,
     "localOnlySkills": 1,
-    "copiedFiles": 122,
+    "copiedFiles": 108,
     "preservedConflicts": 29,
-    "identicalFiles": 32,
+    "identicalFiles": 46,
     "localOnlyFilesKept": 10
   },
   "importedSkills": [
@@ -61,13 +61,12 @@
     "sdd-workflow",
     "skill-creator",
     "slack-gif-creator",
-    "source-to-insight-blog",
+    "source-post",
     "stop-slop",
     "theme-factory",
     "web-artifacts-builder",
     "web-design-guidelines",
-    "webapp-testing",
-    "workflow-router"
+    "webapp-testing"
   ],
   "overlappingSkills": [
     "agent-introspection-debugging",
@@ -80,7 +79,8 @@
     "prototype",
     "security-review",
     "tdd-workflow",
-    "verification-loop"
+    "verification-loop",
+    "workflow-router"
   ],
   "localOnlySkills": [
     "html-work-reports"
@@ -457,28 +457,28 @@
       "strategy": "imported-skill"
     },
     {
-      "skill": "source-to-insight-blog",
+      "skill": "source-post",
       "path": "SKILL.md",
       "strategy": "imported-skill"
     },
     {
-      "skill": "source-to-insight-blog",
-      "path": "assets/source-blog-checklist.md",
+      "skill": "source-post",
+      "path": "assets/source-post-checklist.md",
       "strategy": "imported-skill"
     },
     {
-      "skill": "source-to-insight-blog",
+      "skill": "source-post",
       "path": "references/copyright-and-fidelity.md",
       "strategy": "imported-skill"
     },
     {
-      "skill": "source-to-insight-blog",
+      "skill": "source-post",
       "path": "references/workflow.md",
       "strategy": "imported-skill"
     },
     {
-      "skill": "source-to-insight-blog",
-      "path": "scripts/validate-source-blog.mjs",
+      "skill": "source-post",
+      "path": "scripts/validate-source-post.mjs",
       "strategy": "imported-skill"
     },
     {
@@ -625,76 +625,6 @@
       "skill": "webapp-testing",
       "path": "scripts/with_server.py",
       "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "SKILL.md",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/intent-taxonomy.md",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/orchestration-policy.md",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/state-handoff.md",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/advisory-check.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/helper-contract-check.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/owner-contract-check.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/route-intent.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/skill-activation-check.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/workflow-check.mjs",
-      "strategy": "imported-skill"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/mode-structure-cases.json",
-      "strategy": "hub-only-file"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/skill-research-report-readable.json",
-      "strategy": "hub-only-file"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "scripts/check-mode-structure.mjs",
-      "strategy": "hub-only-file"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "scripts/serve-artifact.mjs",
-      "strategy": "hub-only-file"
     }
   ],
   "preservedConflicts": [
@@ -758,7 +688,7 @@
       "active": ".codex/skills/effective-interact/assets/components/interaction-ui.css",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css",
       "sourceSha256": "57b744136c24fe5e457b9549fdb7f128976334596291c97fac51cacd331723ba",
-      "activeSha256": "07c64027284cb0b0367cbbb5c15823f2dbb2b38ad75c382bfaa2484b9bbaa0f9",
+      "activeSha256": "e934c6817014864aa3ffc2b92c5badcee568d4b0354355a11ce024ed4217debb",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -767,7 +697,7 @@
       "active": ".codex/skills/effective-interact/assets/components/interaction-ui.js",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.js",
       "sourceSha256": "c3072948eb9275b730f50a8be5b1f38f60586d1b8e61393b6c7019008fdf7c31",
-      "activeSha256": "079bc19907c8a0a5b8b05963b59903c672be82c38dda5ee61e486ba23e6d17ad",
+      "activeSha256": "6b28e2aa299087ca5d94a76da402aee8ad38d400a98809e03c41a6954a392594",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -811,17 +741,8 @@
       "path": "assets/fixtures/harness-vocabulary-explainer-report.json",
       "active": ".codex/skills/effective-interact/assets/fixtures/harness-vocabulary-explainer-report.json",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/harness-vocabulary-explainer-report.json",
-      "sourceSha256": "47d930cf06822c3e579fe766a361151161a1df9557ed5bbbddc02b35151d794c",
+      "sourceSha256": "661ef1f04f1a34345e7434ec370a1c5e93b6574b7bc2ad01c404966ab4d4377d",
       "activeSha256": "3b19df5fb4b0e127680474427af3f80e48461298b71d1d7bcd92b9f783ad183f",
-      "strategy": "active-local-kept-hub-copy-preserved"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/source-to-insight-blog-report.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/source-to-insight-blog-report.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/source-to-insight-blog-report.json",
-      "sourceSha256": "896b4e90c2fcbb6ed64c411a01d027576b95e34fce863242f110a0419bab6379",
-      "activeSha256": "dd9db74d53a77bc81489e97cd5588a00570460619e0eff50cebc04733d594218",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -902,7 +823,7 @@
       "active": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
       "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/scripts/create-interaction.mjs",
       "sourceSha256": "07546ba8fc14e626aa7275c632bd59abfc91e6d8e5c41dd4a0c7987938c50eba",
-      "activeSha256": "4dd669045439a092fd4dddb1af1774af7cbc6a4348d9b4e2d03cb8771221578e",
+      "activeSha256": "0a81222fb62bb3fb0e04d209b8b700c34acdc720c0af4b4699bad11b7eab6698",
       "strategy": "active-local-kept-hub-copy-preserved"
     },
     {
@@ -958,6 +879,15 @@
       "sourceSha256": "580a4ef2a8cc7d76f94d28a02d346a5cbb444115b19afe2017c5fb5bf6fae844",
       "activeSha256": "abe40a95fc1fe7d5ff47ed2bab27600f160871e487fb1698546b0c80e45b1fbb",
       "strategy": "active-local-kept-hub-copy-preserved"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/route-intent.mjs",
+      "active": ".codex/skills/workflow-router/scripts/route-intent.mjs",
+      "harnessHubCopy": ".codex/skills/workflow-router/_harness-hub/scripts/route-intent.mjs",
+      "sourceSha256": "6c7fbd6d1b4f8706d44576be7b1b02fe20e3856fdb9a67b4a3bb4702e7df8cd8",
+      "activeSha256": "f1cc2de06d8e3ced6917978b5cc3bc86c2cf9cca77233fa0ca7836fcc0d8a4ba",
+      "strategy": "active-local-kept-hub-copy-preserved"
     }
   ],
   "identicalFiles": [
@@ -1011,6 +941,10 @@
     },
     {
       "skill": "effective-interact",
+      "path": "assets/fixtures/mode-structure-cases.json"
+    },
+    {
+      "skill": "effective-interact",
       "path": "assets/fixtures/option-gallery-report.json"
     },
     {
@@ -1031,7 +965,15 @@
     },
     {
       "skill": "effective-interact",
+      "path": "assets/fixtures/skill-research-report-readable.json"
+    },
+    {
+      "skill": "effective-interact",
       "path": "assets/fixtures/skill-structure-map-report.json"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/source-post-report.json"
     },
     {
       "skill": "effective-interact",
@@ -1066,6 +1008,14 @@
       "path": "assets/templates/visual-exploration.html"
     },
     {
+      "skill": "effective-interact",
+      "path": "scripts/check-mode-structure.mjs"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "scripts/serve-artifact.mjs"
+    },
+    {
       "skill": "prototype",
       "path": "references/logic-prototype.md"
     },
@@ -1088,6 +1038,42 @@
     {
       "skill": "tdd-workflow",
       "path": "references/tests.md"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "SKILL.md"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/intent-taxonomy.md"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/orchestration-policy.md"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/state-handoff.md"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/advisory-check.mjs"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/helper-contract-check.mjs"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/owner-contract-check.mjs"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/skill-activation-check.mjs"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/workflow-check.mjs"
     }
   ],
   "localOnlyFilesKept": [

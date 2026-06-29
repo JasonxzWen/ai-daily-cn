@@ -68,6 +68,6 @@ Return concise candidates:
 ## Boundaries
 
 - Use `documentation-lookup` when the task is to read current docs for an already chosen package.
-- Use `source-to-insight-blog` when a confirmed release must become a publishable article.
+- Use `source-post` when a confirmed release must become a publishable article.
 - Use implementation workflows when the user wants a registry client, scraper, monitor, or scheduled job built.
 - Do not create accounts, subscribe to feeds, change automation, or publish packages.

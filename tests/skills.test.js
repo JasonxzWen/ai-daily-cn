@@ -58,18 +58,27 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
 
   assert.match(manifest.source.commit, /^[a-f0-9]{40}$/);
   assert.equal(manifest.source.path, "D:/harness-hub");
-  assert(manifest.importedSkills.includes("workflow-router"));
+  assert.equal(manifest.importedSkills.includes("workflow-router"), false);
   assert(manifest.importedSkills.includes("karpathy-guidelines"));
   assert(manifest.importedSkills.includes("harness-quality-check"));
   assert(manifest.importedSkills.includes("insight"));
+  assert(manifest.importedSkills.includes("source-post"));
   assert(manifest.localOnlySkills.includes("html-work-reports"));
+  assert.equal(manifest.localOnlySkills.includes("source-to-insight-blog"), false);
   assert(manifest.overlappingSkills.includes("tdd-workflow"));
+  assert(manifest.overlappingSkills.includes("workflow-router"));
 
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "SKILL.md")), true);
+  assert.equal(
+    fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "_harness-hub", "scripts", "route-intent.mjs")),
+    true
+  );
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "karpathy-guidelines", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "harness-quality-check", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "insight", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "insight", "scripts", "collect-insight-events.mjs")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "source-post", "SKILL.md")), true);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "source-to-insight-blog", "SKILL.md")), false);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "html-work-reports", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "agents", "openai.yaml")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "_harness-hub", "SKILL.md")), true);
@@ -87,7 +96,9 @@ test("Claude Code curated skills expose Harness Hub additions without Codex scaf
     path.join(claudeSkillsRoot, "insight", "SKILL.md"),
     path.join(claudeSkillsRoot, "insight", "references", "host-adapters.md"),
     path.join(claudeSkillsRoot, "insight", "scripts", "collect-insight-events.mjs"),
-    path.join(claudeSkillsRoot, "insight", "scripts", "build-insight-report.mjs")
+    path.join(claudeSkillsRoot, "insight", "scripts", "build-insight-report.mjs"),
+    path.join(claudeSkillsRoot, "source-post", "SKILL.md"),
+    path.join(claudeSkillsRoot, "source-post", "scripts", "validate-source-post.mjs")
   ];
 
   for (const file of requiredFiles) {
@@ -98,11 +109,18 @@ test("Claude Code curated skills expose Harness Hub additions without Codex scaf
   assert.match(readme, /Included \(17\)/);
   assert.match(readme, /harness-quality-check/);
   assert.match(readme, /insight/);
+  assert.match(readme, /source-post/);
+  assert.doesNotMatch(readme, /source-to-insight-blog/);
   assert.match(readme, /\.claude-plugin/);
 
   const claudeWebappTesting = await fsp.readFile(path.join(claudeSkillsRoot, "webapp-testing", "SKILL.md"), "utf8");
   const codexWebappTesting = await fsp.readFile(path.join(rootDir, ".codex", "skills", "webapp-testing", "SKILL.md"), "utf8");
   assert.equal(claudeWebappTesting, codexWebappTesting);
+
+  const claudeSourcePost = await fsp.readFile(path.join(claudeSkillsRoot, "source-post", "SKILL.md"), "utf8");
+  const codexSourcePost = await fsp.readFile(path.join(rootDir, ".codex", "skills", "source-post", "SKILL.md"), "utf8");
+  assert.equal(claudeSourcePost, codexSourcePost);
+  assert.equal(fs.existsSync(path.join(claudeSkillsRoot, "source-to-insight-blog", "SKILL.md")), false);
 
   const forbidden = [];
   function visit(dirPath) {
@@ -234,6 +252,7 @@ test("Harness Hub updater preserves local overlays while refreshing upstream cop
 
   await write(path.join(targetSkillsRoot, "imported-skill", "SKILL.md"), "old imported skill\n");
   await write(path.join(targetSkillsRoot, "imported-skill", "local.txt"), "remove me\n");
+  await write(path.join(targetSkillsRoot, "stale-imported-skill", "SKILL.md"), "remove stale imported skill\n");
   await write(path.join(targetSkillsRoot, "overlap-skill", "SKILL.md"), "local active overlap skill\n");
   await write(path.join(targetSkillsRoot, "overlap-skill", "local-only.md"), "keep me\n");
   await write(path.join(targetSkillsRoot, "overlap-skill", "_harness-hub", "stale.md"), "stale upstream copy\n");
@@ -263,9 +282,9 @@ test("Harness Hub updater preserves local overlays while refreshing upstream cop
           skippedTopLevelSourceDirs: ["artifacts"],
           baseline: "Original local skills are computed from tracked .codex/skills/*/SKILL.md files before this aggregation."
         },
-        importedSkills: ["imported-skill"],
+        importedSkills: ["imported-skill", "stale-imported-skill", "overlap-skill"],
         overlappingSkills: ["overlap-skill"],
-        localOnlySkills: ["local-only-skill"]
+        localOnlySkills: ["local-only-skill", "stale-local-only-skill"]
       },
       null,
       2
@@ -284,6 +303,7 @@ test("Harness Hub updater preserves local overlays while refreshing upstream cop
 
   assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "imported-skill", "SKILL.md"), "utf8"), "source imported skill\n");
   assert.equal(fs.existsSync(path.join(targetSkillsRoot, "imported-skill", "local.txt")), false);
+  assert.equal(fs.existsSync(path.join(targetSkillsRoot, "stale-imported-skill", "SKILL.md")), false);
   assert.equal(await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "SKILL.md"), "utf8"), "local active overlap skill\n");
   assert.equal(
     await fsp.readFile(path.join(targetSkillsRoot, "overlap-skill", "_harness-hub", "SKILL.md"), "utf8"),

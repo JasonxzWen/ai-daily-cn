@@ -920,42 +920,18 @@ function renderRuntimeMarkdown(section, index) {
   const statusId = `markdown-status-${index}`;
   const trustLevel = normalizeTrustLevel(section.trustLevel);
   const trustedAttr = trustLevel === "trusted-generated" ? ' data-trusted="true"' : "";
-  const inventoryFinder = renderSourceInventoryFinder(section);
   return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="pending" data-source-fallback>
     ${renderSectionHeader(section)}
-    ${inventoryFinder}
     <div class="rich-target" data-rich-markdown data-rich-status-id="${statusId}" data-rich-section-id="${escapeAttr(section.id)}"${trustedAttr}>${escapeHtml(safeAuditText(section.content || ""))}</div>
     <template id="${sourceId}" data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
   </section>`;
 }
 
-function renderSourceInventoryFinder(section) {
-  if (section.sourceInventoryFinder !== true) return "";
-  const totalValue = Number(section.sourceInventoryFinderTotal);
-  const total = Number.isFinite(totalValue) && totalValue >= 0 ? Math.trunc(totalValue) : "";
-  const totalAttr = total === "" ? "" : ` data-source-inventory-total="${escapeAttr(total)}"`;
-  const totalLabel = total === "" ? "全部信源" : `全部 ${total} 条`;
-  const baseId = section.id || "section-source-inventory";
-  const inputId = `${baseId}-finder-search`;
-  const statusId = `${baseId}-finder-status`;
-  return `<div class="source-inventory-finder" data-source-inventory-finder data-source-inventory-target-prefix="section-source-inventory-group-"${totalAttr}>
-    <label class="source-inventory-finder__label" for="${escapeAttr(inputId)}">查找信源</label>
-    <div class="source-inventory-finder__row">
-      <input id="${escapeAttr(inputId)}" type="search" autocomplete="off" spellcheck="false" data-source-inventory-search aria-describedby="${escapeAttr(statusId)}" placeholder="OpenAI / rsshub / platform:wechat / manual">
-      <button type="button" data-source-inventory-next disabled>下一个</button>
-      <button type="button" data-source-inventory-clear disabled>清除</button>
-    </div>
-    <p class="source-inventory-finder__status" id="${escapeAttr(statusId)}" data-source-inventory-status aria-live="polite">输入关键词后只高亮匹配项，${escapeHtml(totalLabel)}仍保留在页面中。</p>
-  </div>`;
-}
-
 async function renderMarkdownSection(section, mode, index) {
   if (isRuntimeMode(mode)) return renderRuntimeMarkdown(section, index);
   const rendered = mode === "pre-rendered";
-  const inventoryFinder = renderSourceInventoryFinder(section);
   return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback>
     ${renderSectionHeader(section, rendered ? "ready" : "degraded")}
-    ${inventoryFinder}
     ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
     <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
   </section>`;

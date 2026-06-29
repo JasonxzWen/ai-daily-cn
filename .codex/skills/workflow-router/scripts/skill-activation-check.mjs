@@ -469,11 +469,11 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     'skill authoring',
     'update a skill',
   ]);
-  const sourceToInsightBlogSignal = includesAny(text, [
+  const sourcePostSignal = includesAny(text, [
     'external openai article',
     'preserve figures and links',
-    'source-backed insight blog',
-    'source-backed blog',
+    'source-backed public post',
+    'source-backed post',
     'turn this external',
   ]) && includesAny(text, [
     'article',
@@ -500,11 +500,11 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
       /(?:\u4eba\u673a\u4ea4\u4e92|\u4eba\u673a\u534f\u4f5c).*(?:\u590d\u76d8|\u5ba1\u8ba1|\u5361\u70b9|\u753b\u50cf)/,
       /(?:\u4f1a\u8bdd\u8bb0\u5f55|\u5de5\u4f5c\u8bb0\u5f55).*(?:codex|claude code).*(?:\u68b3\u7406|\u590d\u76d8|\u5ba1\u8ba1)/,
     ])
-  ) && !sourceToInsightBlogSignal && !includesAny(text, [
+  ) && !sourcePostSignal && !includesAny(text, [
     'external article',
-    'public blog',
-    'source-backed blog',
-    'source-backed insight blog',
+    'public post',
+    'source-backed post',
+    'source-backed public post',
   ]);
   const docCoauthoringSignal = includesAny(text, [
     'collaboratively draft',
@@ -683,8 +683,8 @@ export function selectSkillForPrompt(prompt, metadata = readSkillMetadata()) {
     return 'skill-creator';
   }
 
-  if (sourceToInsightBlogSignal && canLoad(metadata, 'source-to-insight-blog', ['source-backed insight blog'])) {
-    return 'source-to-insight-blog';
+  if (sourcePostSignal && canLoad(metadata, 'source-post', ['source-backed public post'])) {
+    return 'source-post';
   }
 
   if (openspecArchiveSignal && canLoad(metadata, 'openspec-archive-change', ['archive a completed openspec change'])) {
