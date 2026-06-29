@@ -13768,9 +13768,15 @@ test("source inventory panel lists all registered source entries before stories"
   const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");
   const sourceGroupIndex = input.sections.findIndex((section) => section.richId === "source-map-group-core-primary");
   const inventoryIndex = input.sections.findIndex((section) => section.richId === "source-inventory");
+  const inventoryGroupIndexes = input.sections
+    .map((section, index) => String(section.richId || "").startsWith("source-inventory-group-") ? index : -1)
+    .filter((index) => index >= 0);
   const storyIndex = input.sections.findIndex((section) => /^track-/.test(section.richId || ""));
   const inventory = input.sections[inventoryIndex];
+  const inventoryGroups = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventoryGroupContent = inventoryGroups.map((section) => section.content || "").join("\n");
+  const inventoryGroupRowCount = inventoryGroups.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
   const serializedSections = JSON.stringify(input.sections);
 
   assert(dashboardIndex >= 0, "source dashboard should still render");
@@ -13778,19 +13784,86 @@ test("source inventory panel lists all registered source entries before stories"
   assert(sourceGroupIndex > graphIndex, "logical source groups should still follow the scan index");
   assert(inventory, "full registered source inventory should render");
   assert(inventoryIndex > sourceGroupIndex, "inventory should render after logical source groups");
-  assert(storyIndex > inventoryIndex, "stories should remain after the complete source-first area");
+  assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
+  assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.match(inventory.content, /154/);
-  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, inventoryRows.length);
-  assert.match(inventory.content, /DeepSeek News/);
-  assert.match(inventory.content, /OpenAI News RSS/);
-  assert.match(inventory.content, /OpenRouter Rankings/);
-  assert.match(inventory.content, /WeChat Platform AI Feed/);
-  assert.match(inventory.content, /Zhihu Platform AI Feed/);
+  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0);
+  assert.equal(inventoryGroupRowCount, inventoryRows.length);
+  assert.match(inventoryGroupContent, /DeepSeek News/);
+  assert.match(inventoryGroupContent, /OpenAI News RSS/);
+  assert.match(inventoryGroupContent, /OpenRouter Rankings/);
+  assert.match(inventoryGroupContent, /WeChat Platform AI Feed/);
+  assert.match(inventoryGroupContent, /Zhihu Platform AI Feed/);
   assert.match(inventory.content, /html_index/);
   assert.match(inventory.content, /openrouter_rankings_public_playwright/);
   assert.match(inventory.content, /manual/);
   assert.doesNotMatch(serializedSections, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(inventory.content, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
+  assert.doesNotMatch(`${inventory.content}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
+});
+
+test("source inventory navigation splits overview from fixed-section detail groups", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const publicSectionOrder = input.sections.map((section) => section.richId).filter(Boolean);
+  const inventoryIndex = publicSectionOrder.indexOf("source-inventory");
+  const inventory = input.sections.find((section) => section.richId === "source-inventory");
+  const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
+  const groupIds = groupSections.map((section) => section.richId);
+  const groupText = groupSections.map((section) => section.content || "").join("\n");
+  const groupRowCount = groupSections.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
+  const lastGroupIndex = Math.max(...groupSections.map((section) => publicSectionOrder.indexOf(section.richId)));
+  const firstStoryIndex = publicSectionOrder.findIndex((id) => /^track-/.test(id));
+  const serializedInventory = JSON.stringify([inventory, ...groupSections]);
+
+  assert(inventory, "inventory overview should render");
+  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0, "overview should not carry all detail rows");
+  assert.match(inventory.content, /154/);
+  assert.match(inventory.content, /\(#section-source-inventory-group-core-primary\)/);
+  assert.match(inventory.content, /\(#section-source-inventory-group-china-models\)/);
+  assert.match(inventory.content, /\(#section-source-inventory-group-tracking-metrics\)/);
+  assert.match(inventory.content, /\(#section-source-inventory-group-platform-cn-media\)/);
+  assert.match(inventory.content, /\(#section-source-inventory-group-english-media-search\)/);
+  assert(groupIds.includes("source-inventory-group-core-primary"), JSON.stringify(groupIds));
+  assert(groupIds.includes("source-inventory-group-china-models"), JSON.stringify(groupIds));
+  assert(groupIds.includes("source-inventory-group-tracking-metrics"), JSON.stringify(groupIds));
+  assert(groupIds.includes("source-inventory-group-platform-cn-media"), JSON.stringify(groupIds));
+  assert(groupIds.includes("source-inventory-group-english-media-search"), JSON.stringify(groupIds));
+  assert.equal(groupRowCount, inventoryRows.length);
+  assert.match(groupText, /DeepSeek News/);
+  assert.match(groupText, /OpenAI News RSS/);
+  assert.match(groupText, /OpenRouter Rankings/);
+  assert.match(groupText, /WeChat Platform AI Feed/);
+  assert.match(groupText, /Zhihu Platform AI Feed/);
+  assert(lastGroupIndex > inventoryIndex, JSON.stringify(publicSectionOrder));
+  assert(firstStoryIndex > lastGroupIndex, JSON.stringify(publicSectionOrder));
+  assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
 test("source-first IA status focus surfaces actionable source states before the full graph", () => {

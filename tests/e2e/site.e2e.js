@@ -528,17 +528,27 @@ try {
   assert.match(platformSourceGroupText, /WeChat Platform/);
   assert.match(platformSourceGroupText, /not_configured_or_skipped/);
   const sourceInventoryText = await page.locator("#section-source-inventory").textContent();
+  const sourceInventoryGroupLocator = page.locator("[id^='section-source-inventory-group-']");
+  const sourceInventoryDetailText = await sourceInventoryGroupLocator.allTextContents();
   assert.match(sourceInventoryText, /154/);
-  assert.match(sourceInventoryText, /DeepSeek News/);
-  assert.match(sourceInventoryText, /OpenAI News RSS/);
-  assert.match(sourceInventoryText, /OpenRouter Rankings/);
-  assert.match(sourceInventoryText, /WeChat Platform AI Feed/);
-  assert.match(sourceInventoryText, /Zhihu Platform AI Feed/);
+  assert.equal(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-core-primary"]').count(), 1);
+  assert.equal(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-china-models"]').count(), 1);
+  assert.equal(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-tracking-metrics"]').count(), 1);
+  assert.equal(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-platform-cn-media"]').count(), 1);
+  assert.equal(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-english-media-search"]').count(), 1);
   assert.match(sourceInventoryText, /html_index/);
   assert.match(sourceInventoryText, /openrouter_rankings_public_playwright/);
   assert.match(sourceInventoryText, /manual/);
+  assert.equal(await sourceInventoryGroupLocator.count() >= 7, true);
+  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
+  const sourceInventoryDetails = sourceInventoryDetailText.join("\n");
+  assert.match(sourceInventoryDetails, /DeepSeek News/);
+  assert.match(sourceInventoryDetails, /OpenAI News RSS/);
+  assert.match(sourceInventoryDetails, /OpenRouter Rankings/);
+  assert.match(sourceInventoryDetails, /WeChat Platform AI Feed/);
+  assert.match(sourceInventoryDetails, /Zhihu Platform AI Feed/);
   assert.doesNotMatch(
-    sourceInventoryText,
+    `${sourceInventoryText}\n${sourceInventoryDetails}`,
     /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i
   );
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
@@ -552,8 +562,13 @@ try {
     .filter((index) => index >= 0);
   assert(sourceMapGroupIndexes.length > 0, JSON.stringify(publicSectionOrder));
   assert(publicSectionOrder.indexOf("section-source-inventory") > Math.max(...sourceMapGroupIndexes), JSON.stringify(publicSectionOrder));
+  const sourceInventoryGroupIndexes = publicSectionOrder
+    .map((id, index) => id.startsWith("section-source-inventory-group-") ? index : -1)
+    .filter((index) => index >= 0);
+  assert(sourceInventoryGroupIndexes.length > 0, JSON.stringify(publicSectionOrder));
+  assert(Math.min(...sourceInventoryGroupIndexes) > publicSectionOrder.indexOf("section-source-inventory"), JSON.stringify(publicSectionOrder));
   const firstTrackOrderIndex = publicSectionOrder.findIndex((id) => id.startsWith("section-track-"));
-  assert(firstTrackOrderIndex > publicSectionOrder.indexOf("section-source-inventory"), JSON.stringify(publicSectionOrder));
+  assert(firstTrackOrderIndex > Math.max(...sourceInventoryGroupIndexes), JSON.stringify(publicSectionOrder));
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
   assert(await page.locator("[id^='section-track-']").count() >= 1, "editorial track sections render");
@@ -614,6 +629,8 @@ try {
   assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-core-primary"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-platform-cn-media"), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.evaluate(() => {
@@ -644,6 +661,8 @@ try {
   assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-core-primary"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-platform-cn-media"), true);
   const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
   await firstTrackHeading.evaluate((node) => {
     node.scrollIntoView({ block: "start", behavior: "instant" });

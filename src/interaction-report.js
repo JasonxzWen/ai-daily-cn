@@ -181,10 +181,7 @@ export function reportToInteractionInput(report, options = {}) {
     sections.push(sourceStatusFocus);
   }
   sections.push(...formatSourceMapSections(sourceEffectivenessRows));
-  const sourceInventory = formatSourceInventorySection(sourceInventoryRows);
-  if (sourceInventory) {
-    sections.push(sourceInventory);
-  }
+  sections.push(...formatSourceInventorySections(sourceInventoryRows));
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -3160,11 +3157,21 @@ function formatSourceMapScanIndex(groups = []) {
   ].join("\n");
 }
 
-function formatSourceInventorySection(rows = []) {
+function formatSourceInventorySections(rows = []) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    return null;
+    return [];
   }
   const sectionGroups = groupedSourceInventoryRows(rows);
+  if (sectionGroups.length === 0) {
+    return [];
+  }
+  return [
+    formatSourceInventoryIndexSection(rows, sectionGroups),
+    ...sectionGroups.map(formatSourceInventoryGroupSection)
+  ];
+}
+
+function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
   return {
     type: "markdown",
     title: "全量信源清单",
@@ -3173,15 +3180,13 @@ function formatSourceInventorySection(rows = []) {
     collapsed: false,
     summary: `${rows.length} 个注册采集入口，按固定信源板块展开。`,
     content: [
-      `共 ${rows.length} 个注册采集入口；这里展示的是公开安全的采集入口清单，今日状态不会改变排序。`,
+      `共 ${rows.length} 个注册采集入口；这里是固定顺序导航，完整明细在下方各板块全部展开，今日状态不会改变排序。`,
       "",
       formatSourceInventorySectionSummary(sectionGroups),
       "",
       formatSourceInventoryCompactSummary("类型分布", countBy(rows, "source_kind")),
       "",
-      formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement")),
-      "",
-      ...sectionGroups.map(formatSourceInventoryGroup)
+      formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement"))
     ].filter(Boolean).join("\n")
   };
 }
@@ -3208,12 +3213,13 @@ function groupedSourceInventoryRows(rows = []) {
 
 function formatSourceInventorySectionSummary(groups = []) {
   return [
-    "| 板块 | 采集入口 | 逻辑源映射 | core | optional | manual |",
+    "| 板块 | 采集入口 | 逻辑源映射 | 核心 | 可选 | 手动 |",
     "|---|---:|---:|---:|---:|---:|",
     ...groups.map((group) => {
       const enablement = countBy(group.rows, "enablement");
       const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
-      return `| ${escapeMarkdownTableCell(group.label)} | ${group.rows.length} | ${logicalSources.size} | ${enablement.core || 0} | ${enablement.optional || 0} | ${enablement.manual || 0} |`;
+      const href = `#section-${sourceInventoryGroupAnchor(group)}`;
+      return `| [${escapeMarkdownTableCell(group.label)}](${href}) | ${group.rows.length} | ${logicalSources.size} | ${enablement.core || 0} | ${enablement.optional || 0} | ${enablement.manual || 0} |`;
     })
   ].join("\n");
 }
@@ -3226,11 +3232,39 @@ function formatSourceInventoryCompactSummary(title, counts = {}) {
 }
 
 function formatSourceInventoryGroup(group) {
+  const enablement = countBy(group.rows, "enablement");
+  const summary = [
+    `${group.rows.length} 个注册采集入口`,
+    `core ${enablement.core || 0}`,
+    `optional ${enablement.optional || 0}`,
+    `manual ${enablement.manual || 0}`
+  ].join(" · ");
   return [
-    `### ${escapeMarkdownText(group.label)} ${group.rows.length}`,
+    summary,
     "",
     ...group.rows.map(formatSourceInventoryRow)
   ].join("\n");
+}
+
+function formatSourceInventoryGroupSection(group) {
+  const enablement = countBy(group.rows, "enablement");
+  return {
+    type: "markdown",
+    title: `${group.label} · 采集入口`,
+    richId: sourceInventoryGroupAnchor(group),
+    group: "main",
+    collapsed: false,
+    summary: `${group.rows.length} 个注册采集入口 · core ${enablement.core || 0} · optional ${enablement.optional || 0} · manual ${enablement.manual || 0}`,
+    content: formatSourceInventoryGroup(group)
+  };
+}
+
+function sourceInventoryGroupAnchor(group) {
+  const slug = String(group?.id || "uncategorized")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `source-inventory-group-${slug || "uncategorized"}`;
 }
 
 function formatSourceInventoryRow(row) {
