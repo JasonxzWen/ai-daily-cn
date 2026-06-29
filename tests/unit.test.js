@@ -9690,7 +9690,7 @@ test("buildSite ignores source status history metadata in reports-data", async (
   assert(result.writtenFiles.includes(`data/${year}/${month}/${structuredReport.report_date}.json`));
 });
 
-test("buildSite writes reader-safe public data without internal fields or candidate pools", async () => {
+test("source-first IA contract keeps display fields while buildSite writes reader-safe public data without internal fields or candidate pools", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-data-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -9877,6 +9877,12 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
   assert.equal(publicData.source_effectiveness.length, 1);
+  assert.equal(publicData.source_effectiveness[0].display_section, "core_primary");
+  assert.equal(publicData.source_effectiveness[0].display_section_label, "核心一手源");
+  assert.equal(publicData.source_effectiveness[0].display_section_rank, 10);
+  assert.equal(publicData.source_effectiveness[0].display_rank, 60);
+  assert.equal(publicData.source_effectiveness[0].display_mode, "expanded");
+  assert.equal(publicData.source_effectiveness[0].status_label, "parsed_not_candidate");
   assert.match(publicData.source_effectiveness[0].notes, /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
   assert.match(publicData.source_effectiveness[0].notes, /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
   assert.equal(publicData.evidence_assets.length, 1);
@@ -13253,6 +13259,126 @@ test("public daily IA reset enforces stories original X compact tracking hover a
   assert.deepEqual(meta.source_ids, ["content-meta-ai-blog"]);
   assert.match(meta.notes || "", /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
   assert.match(meta.notes || "", /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
+});
+
+test("source-first IA contract defines fixed source display sections and ranks", async () => {
+  const contractPath = path.join(rootDir, "config/source-display-contract.json");
+  const contract = JSON.parse(await fs.readFile(contractPath, "utf8"));
+
+  assert.equal(contract.schema_version, 1);
+  assert(Array.isArray(contract.sections));
+  assert(contract.sections.length >= 6);
+
+  const sections = new Map(contract.sections.map((section) => [section.id, section]));
+  assert.equal(sections.get("core_primary")?.label, "核心一手源");
+  assert.equal(sections.get("china_models")?.label, "中国模型与厂商");
+  assert.equal(sections.get("open_source_platforms")?.label, "开源、模型平台与代码生态");
+  assert.equal(sections.get("platform_cn_media")?.label, "中文平台与媒体线索");
+
+  const rows = contract.sections.flatMap((section) =>
+    (section.sources || []).map((source) => ({ ...source, section_id: section.id }))
+  );
+  const byId = new Map(rows.map((row) => [row.id, row]));
+
+  for (const id of ["openai-news", "anthropic-news", "google-deepmind", "github-trending", "github-org-watch", "wechat-platform", "zhihu-platform"]) {
+    assert(byId.has(id), `display contract should include ${id}`);
+    assert.equal(typeof byId.get(id).rank, "number", `${id} should have a numeric display rank`);
+  }
+
+  assert.equal(byId.get("openai-news").section_id, "core_primary");
+  assert.equal(byId.get("github-trending").section_id, "open_source_platforms");
+  assert.equal(byId.get("wechat-platform").section_id, "platform_cn_media");
+});
+
+test("source-first IA contract extends source effectiveness rows with stable display metadata", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.candidates_found = 0;
+  report.source_audit.content_sources.included = 0;
+  report.source_audit.content_sources.sources = [
+    {
+      id: "content-openai-news-rss",
+      name: "OpenAI News RSS",
+      url: "https://openai.com/news/rss.xml",
+      source_kind: "rss",
+      status: "checked",
+      parsed_count: 2,
+      notes: "2 recent official entries parsed"
+    },
+    {
+      id: "content-anthropic-company-news",
+      name: "Anthropic Company News",
+      url: "https://www.anthropic.com/news",
+      source_kind: "html_index",
+      status: "checked",
+      parsed_count: 1,
+      notes: "1 recent official entry parsed"
+    },
+    {
+      id: "content-google-deepmind-rss",
+      name: "Google DeepMind RSS",
+      url: "https://deepmind.google/blog/rss.xml",
+      source_kind: "rss",
+      status: "no_signal",
+      parsed_count: 0,
+      notes: "0 recent entries parsed"
+    },
+    {
+      id: "content-hugging-face-blog",
+      name: "Hugging Face Blog",
+      url: "https://huggingface.co/blog/feed.xml",
+      source_kind: "rss",
+      status: "blocked",
+      parsed_count: 1,
+      notes: "HTTP 500 after a previously parsed recent entry"
+    }
+  ];
+  report.wechat_items = [];
+  report.zhihu_items = [];
+
+  const rows = buildSourceEffectivenessTable({
+    report,
+    candidates: [
+      {
+        id: "openai-source-first-candidate",
+        source_id: "content-openai-news-rss",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/source-first",
+        status: "included",
+        included_in: "stories"
+      },
+      {
+        id: "anthropic-source-first-candidate",
+        source_id: "content-anthropic-company-news",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/source-first",
+        status: "excluded"
+      }
+    ]
+  });
+
+  const openai = rows.find((row) => row.id === "openai-news");
+  const anthropic = rows.find((row) => row.id === "anthropic-news");
+  const deepmind = rows.find((row) => row.id === "google-deepmind");
+  const huggingFace = rows.find((row) => row.id === "hugging-face-blog");
+  const wechat = rows.find((row) => row.id === "wechat-platform");
+
+  assert.equal(openai.display_section, "core_primary");
+  assert.equal(openai.display_section_label, "核心一手源");
+  assert.equal(openai.display_section_rank, 10);
+  assert.equal(openai.display_rank, 10);
+  assert.equal(openai.display_mode, "expanded");
+  assert.equal(openai.status_label, "included");
+
+  assert.equal(anthropic.status_label, "updated_not_selected");
+  assert.equal(deepmind.status_label, "no_recent_update");
+  assert.equal(huggingFace.status_label, "blocked");
+  assert.equal(wechat.status_label, "not_configured_or_skipped");
+
+  const orderedIds = rows.map((row) => row.id);
+  assert(orderedIds.indexOf("openai-news") < orderedIds.indexOf("github-trending"));
+  assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("wechat-platform"));
 });
 
 test("public daily followups hide empty Artificial Analysis fallback tabs", () => {

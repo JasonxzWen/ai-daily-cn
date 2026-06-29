@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-ia-contract",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first IA display contract",
+  "status": "completed",
+  "summary": "This iteration added the repository contract needed to make subscribed sources and platform status a first-class public data surface. It defines fixed source display sections and ranks, extends source_effectiveness rows with display metadata and reader-facing status labels, keeps public docs data sanitized, and documents how future sources should be inserted into the fixed order.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source-first IA contract\" tests/unit.test.js",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "node src/cli.js sources:validate",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source visibility needs a stable display contract instead of being inferred from whichever source happened to produce a candidate today.",
+      "evidence": "config/source-display-contract.json now assigns fixed sections, ranks, and default expansion modes to the public source-effectiveness surface.",
+      "scope": "public_daily_ia",
+      "persistence": "implemented",
+      "recommended_action": "Add future logical sources to the display contract at the same time as their collection contract, using rank gaps for later insertion."
+    },
+    {
+      "lesson": "Blocked and skipped source states should be public reader-facing statuses, not implicit absence.",
+      "evidence": "source_effectiveness rows now emit status_label values including blocked and not_configured_or_skipped, and unit tests cover blocked precedence over parsed-but-not-candidate signals.",
+      "scope": "source_effectiveness",
+      "persistence": "implemented",
+      "recommended_action": "Use these labels directly in the next UI phase so outages and unconfigured sources are visible without exposing private audit details."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-origin-main-baseline",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ledger-validation-binding"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Implement the first-screen story and source metrics dashboard using the new source_effectiveness display fields.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Render the fixed source graph with default expanded sections, collapsed long-tail sections, and visible blocked or skipped source rows.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-ia-contract"
+}

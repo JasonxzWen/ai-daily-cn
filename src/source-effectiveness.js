@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const CORE_SOURCE_CONTRACTS = [
   {
     id: "openai-news",
@@ -158,10 +162,24 @@ const PUBLIC_REPORT_SECTIONS = [
 ];
 
 const REACHABLE_STATUSES = new Set(["checked", "no_signal"]);
+const SKIPPED_SOURCE_STATUSES = new Set([
+  "skipped_missing_token",
+  "skipped_missing_base_url",
+  "skipped_manual_source",
+  "skipped_manual_review_required"
+]);
+const SOURCE_DISPLAY_CONTRACT = loadSourceDisplayContract();
+const SOURCE_DISPLAY_BY_ID = sourceDisplayIndex(SOURCE_DISPLAY_CONTRACT);
+const DEFAULT_DISPLAY_SECTION = {
+  id: "uncategorized",
+  label: "未分组信源",
+  rank: 999,
+  default_display_mode: "collapsed"
+};
 
 export function buildSourceEffectivenessTable({ report = {}, candidates = [] } = {}) {
   const auditSources = collectAuditSources(report?.source_audit);
-  return CORE_SOURCE_CONTRACTS.map((contract) => {
+  const rows = CORE_SOURCE_CONTRACTS.map((contract) => {
     const sources = auditSources.filter((source) => sourceMatchesContract(source, contract));
     const activeSources = contract.requires_real_configuration
       ? sources.filter((source) => !isInactivePlaceholderSource(source))
@@ -195,6 +213,128 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
       notes: sourceEffectivenessNotes(contract, sources)
     };
   });
+  return decorateSourceEffectivenessRows(rows);
+}
+
+export function decorateSourceEffectivenessRows(rows = []) {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  return rows
+    .map((row, rowIndex) => {
+      const display = sourceDisplayMetadata(row, rowIndex);
+      return {
+        ...row,
+        display_section: display.sectionId,
+        display_section_label: display.sectionLabel,
+        display_section_rank: display.sectionRank,
+        display_rank: display.rank,
+        display_mode: display.mode,
+        status_label: isValidSourceDisplayStatusLabel(row?.status_label)
+          ? String(row.status_label)
+          : sourceDisplayStatusLabelFromRow(row),
+        _contract_index: rowIndex
+      };
+    })
+    .sort(compareSourceEffectivenessRows)
+    .map(({ _contract_index, ...row }) => row);
+}
+
+function loadSourceDisplayContract() {
+  const sourceFile = fileURLToPath(import.meta.url);
+  const configPath = path.resolve(path.dirname(sourceFile), "../config/source-display-contract.json");
+  try {
+    return JSON.parse(readFileSync(configPath, "utf8"));
+  } catch {
+    return { schema_version: 1, sections: [] };
+  }
+}
+
+function sourceDisplayIndex(contract) {
+  const rows = new Map();
+  const sections = Array.isArray(contract?.sections) ? contract.sections : [];
+  for (const section of sections) {
+    const sources = Array.isArray(section?.sources) ? section.sources : [];
+    for (const source of sources) {
+      const id = String(source?.id || "").trim();
+      if (!id) {
+        continue;
+      }
+      rows.set(id, {
+        sectionId: String(section.id || DEFAULT_DISPLAY_SECTION.id),
+        sectionLabel: String(section.label || section.id || DEFAULT_DISPLAY_SECTION.label),
+        sectionRank: Number.isFinite(Number(section.rank)) ? Number(section.rank) : DEFAULT_DISPLAY_SECTION.rank,
+        rank: Number.isFinite(Number(source.rank)) ? Number(source.rank) : 999,
+        mode: ["expanded", "collapsed"].includes(String(source.display_mode || section.default_display_mode))
+          ? String(source.display_mode || section.default_display_mode)
+          : DEFAULT_DISPLAY_SECTION.default_display_mode
+      });
+    }
+  }
+  return rows;
+}
+
+function sourceDisplayMetadata(contract, contractIndex) {
+  const display = SOURCE_DISPLAY_BY_ID.get(contract.id);
+  if (display) {
+    return display;
+  }
+  return {
+    sectionId: DEFAULT_DISPLAY_SECTION.id,
+    sectionLabel: DEFAULT_DISPLAY_SECTION.label,
+    sectionRank: DEFAULT_DISPLAY_SECTION.rank,
+    rank: (contractIndex + 1) * 10,
+    mode: DEFAULT_DISPLAY_SECTION.default_display_mode
+  };
+}
+
+function compareSourceEffectivenessRows(left, right) {
+  return Number(left.display_section_rank) - Number(right.display_section_rank) ||
+    Number(left.display_rank) - Number(right.display_rank) ||
+    Number(left._contract_index) - Number(right._contract_index) ||
+    String(left.id || "").localeCompare(String(right.id || ""));
+}
+
+function sourceDisplayStatusLabelFromRow(row = {}) {
+  return sourceDisplayStatusLabel({
+    configured: Boolean(row.configured),
+    reachable: Boolean(row.reachable),
+    parsedRecent: Boolean(row.parsed_recent),
+    candidateCreated: Boolean(row.candidate_created),
+    publicIncluded: Boolean(row.public_included),
+    statuses: Array.isArray(row.statuses) ? row.statuses : []
+  });
+}
+
+function isValidSourceDisplayStatusLabel(value) {
+  return [
+    "included",
+    "updated_not_selected",
+    "parsed_not_candidate",
+    "no_recent_update",
+    "blocked",
+    "not_configured_or_skipped"
+  ].includes(String(value || ""));
+}
+
+function sourceDisplayStatusLabel({ configured, reachable, parsedRecent, candidateCreated, publicIncluded, statuses = [] }) {
+  const normalizedStatuses = statuses.map((status) => String(status || ""));
+  if (publicIncluded) {
+    return "included";
+  }
+  if (candidateCreated) {
+    return "updated_not_selected";
+  }
+  if (!configured || normalizedStatuses.some((status) => SKIPPED_SOURCE_STATUSES.has(status))) {
+    return "not_configured_or_skipped";
+  }
+  if (!reachable || normalizedStatuses.some((status) => status === "blocked")) {
+    return "blocked";
+  }
+  if (parsedRecent) {
+    return "parsed_not_candidate";
+  }
+  return "no_recent_update";
 }
 
 function collectAuditSources(sourceAudit) {
