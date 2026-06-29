@@ -22,6 +22,13 @@ const REQUIRED_MAINTENANCE = {
   handbook_required_markers: [
     "source-display-governance:v1",
     "baseline-fixed-order",
+    "source-first-v2-contract:v1",
+    "source-first-v2-layering",
+    "first-viewport-source-order",
+    "full-inventory-expansion-semantics",
+    "baseline-source-importance-2026-06",
+    "source-promotion-review-loop",
+    "source-first-v2-validation",
     "new-source-insertion-rules",
     "source-insertion-handbook:v1",
     "source-status-preservation",
@@ -72,6 +79,34 @@ const REQUIRED_ORDER_TUNING_REVIEW_PHRASES = [
   "Order Tuning Validation"
 ];
 
+const REQUIRED_PRESENTATION_CONTRACT = {
+  version: "source-first-v2",
+  first_viewport_order: [
+    "source_signal_story",
+    "source_metrics_dashboard"
+  ],
+  source_first_section_order: [
+    "source_signal_story",
+    "source_first_dashboard",
+    "source_status_focus",
+    "source_map",
+    "source_inventory"
+  ],
+  reader_source_unit: "logical_source",
+  inventory_unit: "collection_entry",
+  full_inventory_semantics: "visible_grouped_expanded_non_hiding_search",
+  story_content_contract: "story-centered-daily-contract"
+};
+
+const REQUIRED_SOURCE_FIRST_V2_HANDBOOK_PHRASES = [
+  "Logical Source Layer",
+  "Collection Entry Layer",
+  "source signal story before source metrics dashboard",
+  "154 collection entries are complete inventory rows, not first-viewport story content",
+  "Story-centered content remains the fact carrier",
+  "Promote a collection entry only when readers should track it as a named source"
+];
+
 export async function validateSourceDisplayContract({ rootDir = process.cwd() } = {}) {
   const failures = [];
   const contractPath = path.join(rootDir, "config", "source-display-contract.json");
@@ -94,6 +129,7 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
 
   validateMaintenance(maintenance, failures);
   validateStatusLabels(contract, failures);
+  validatePresentationContract(contract, failures);
   const sectionRows = validateSections(contract, failures);
   validateLogicalSourceCoverage(sectionRows, failures);
   validateHandbook(handbook, contract, sectionRows, maintenance, failures);
@@ -113,6 +149,7 @@ export async function validateSourceDisplayContract({ rootDir = process.cwd() } 
       order_tuning_review_path: orderTuningReviewPath,
       order_tuning_unmapped_sources: unmappedInventoryCount,
       required_handbook_markers: REQUIRED_MAINTENANCE.handbook_required_markers,
+      required_presentation_contract: REQUIRED_PRESENTATION_CONTRACT,
       required_inventory_order_markers: REQUIRED_MAINTENANCE.inventory_order_required_markers,
       required_order_tuning_markers: REQUIRED_MAINTENANCE.order_tuning_required_markers,
       validation_commands: REQUIRED_MAINTENANCE.validation_commands
@@ -194,6 +231,22 @@ function validateStatusLabels(contract, failures) {
   for (const label of REQUIRED_STATUS_LABELS) {
     if (!labels.has(label)) {
       failures.push(`status_labels must include ${label}`);
+    }
+  }
+}
+
+function validatePresentationContract(contract, failures) {
+  const presentation = contract?.presentation_contract || {};
+  for (const [key, expected] of Object.entries(REQUIRED_PRESENTATION_CONTRACT)) {
+    const actual = presentation[key];
+    if (Array.isArray(expected)) {
+      if (!arrayEquals(actual, expected)) {
+        failures.push(`presentation_contract.${key} must be ${JSON.stringify(expected)}`);
+      }
+      continue;
+    }
+    if (actual !== expected) {
+      failures.push(`presentation_contract.${key} must be ${expected}`);
     }
   }
 }
@@ -292,6 +345,11 @@ function validateHandbook(handbook, contract, sectionRows, maintenance, failures
   for (const phrase of REQUIRED_SOURCE_INSERTION_HANDBOOK_PHRASES) {
     if (!handbook.includes(phrase)) {
       failures.push(`handbook missing insertion handbook phrase: ${phrase}`);
+    }
+  }
+  for (const phrase of REQUIRED_SOURCE_FIRST_V2_HANDBOOK_PHRASES) {
+    if (!handbook.includes(phrase)) {
+      failures.push(`handbook missing source-first v2 phrase: ${phrase}`);
     }
   }
   for (const section of Array.isArray(contract?.sections) ? contract.sections : []) {
@@ -605,6 +663,12 @@ function countValues(values = []) {
     counts.set(value, (counts.get(value) || 0) + 1);
   }
   return counts;
+}
+
+function arrayEquals(actual, expected) {
+  return Array.isArray(actual) &&
+    actual.length === expected.length &&
+    actual.every((value, index) => value === expected[index]);
 }
 
 function validatePackageScripts(packageJson, failures) {
