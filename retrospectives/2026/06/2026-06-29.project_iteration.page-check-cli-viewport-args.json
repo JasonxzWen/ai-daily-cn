@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.page-check-cli-viewport-args",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Page-check CLI viewport argument hardening",
+  "status": "completed",
+  "summary": "This iteration hardens the daily page quality CLI so positional viewport arguments from direct Node calls and npm-run PowerShell forwarding are parsed as viewports instead of output directories.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/e2e/site.e2e.js",
+      "npm run quality:page-check -- 2026-06-29 1280x900,390x1200 --output .tmp/phase27-npm-page-check.json",
+      "node scripts/check-daily-page.mjs --date 2026-06-29 --viewports \"1280x900 390x1200\" --output .tmp/phase27-explicit-page-check.json",
+      "node scripts/check-daily-page.mjs 2026-06-29 1280x900,390x1200 .tmp/phase27-comma-pos-page-check.json",
+      "node scripts/check-daily-page.mjs 2026-06-29 docs .tmp/phase27-legacy-docs-page-check.json",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "community_cards_reader_facing",
+      "section": "real_page_page_check",
+      "message": "The real 2026-06-29 page-check still reports the existing community_cards_reader_facing degraded check, but no blocking checks are present and this iteration does not modify community card rendering."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "Package-script argument forwarding on Windows can reshape comma-separated viewport input into one whitespace-separated token.",
+      "evidence": "The npm wrapper forwarded `1280x900,390x1200` to the script as a single positional token `1280x900 390x1200`; the parser previously treated that token as `outDir` and fell back to the default mobile viewport.",
+      "scope": "quality_page_check_cli",
+      "persistence": "implemented",
+      "recommended_action": "Normalize viewport lists by both comma and whitespace before positional outDir/output inference."
+    },
+    {
+      "lesson": "CLI hardening should be verified through the same page-check path used for source-first public quality gates.",
+      "evidence": "The focused E2E builds the deterministic daily site, invokes `scripts/check-daily-page.mjs`, reads its JSON output, and asserts viewport widths `1280` and `390`.",
+      "scope": "page_quality_gate",
+      "persistence": "implemented",
+      "recommended_action": "Keep page-check invocation shapes covered in E2E when package scripts become part of the publish runbook."
+    },
+    {
+      "lesson": "Explicit flags must remain authoritative while positional inference becomes more forgiving.",
+      "evidence": "`--date`, `--viewports`, `--out`, and `--output` continue to work in direct validation, while positional npm-run invocations now use the requested viewports.",
+      "scope": "cli_argument_contract",
+      "persistence": "implemented",
+      "recommended_action": "Add future CLI options through `parseArgs` first, then extend positional inference only for backwards-compatible shorthand."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Proceed to the next source-first roadmap slice only after this page-check CLI fix is merged, so later visual/page gates use stable viewport inputs.",
+      "owner": "project"
+    }
+  ],
+  "slug": "page-check-cli-viewport-args"
+}
