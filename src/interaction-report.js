@@ -3182,6 +3182,8 @@ function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
     content: [
       `共 ${rows.length} 个注册采集入口；这里是固定顺序导航，完整明细在下方各板块全部展开，今日状态不会改变排序。`,
       "",
+      formatSourceInventoryQuickFilters(rows, sectionGroups),
+      "",
       formatSourceInventorySectionSummary(sectionGroups),
       "",
       formatSourceInventoryCompactSummary("类型分布", countBy(rows, "source_kind")),
@@ -3189,6 +3191,18 @@ function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
       formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement"))
     ].filter(Boolean).join("\n")
   };
+}
+
+function formatSourceInventoryQuickFilters(rows = [], groups = []) {
+  const sectionLinks = groups
+    .map((group) => `[${escapeMarkdownText(group.label)}](#section-${sourceInventoryGroupAnchor(group)}) ${group.rows.length}`)
+    .join(" · ");
+  return [
+    "### 快速定位（静态扫描，不会隐藏或重排）",
+    `- 板块快速定位：${sectionLinks}`,
+    `- 启用层级快速定位：${formatSourceInventoryCountChips(countBy(rows, "enablement"))}`,
+    `- 类型快速定位：${formatSourceInventoryCountChips(countBy(rows, "source_kind"))}`
+  ].join("\n");
 }
 
 function groupedSourceInventoryRows(rows = []) {
@@ -3225,14 +3239,19 @@ function formatSourceInventorySectionSummary(groups = []) {
 }
 
 function formatSourceInventoryCompactSummary(title, counts = {}) {
-  const cells = Object.entries(counts)
+  return `**${escapeMarkdownText(title)}**：${formatSourceInventoryCountChips(counts)}`;
+}
+
+function formatSourceInventoryCountChips(counts = {}) {
+  return Object.entries(counts)
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([label, count]) => `${escapeMarkdownText(label)} ${count}`);
-  return `**${escapeMarkdownText(title)}**：${cells.join(" · ")}`;
+    .map(([label, count]) => `${escapeMarkdownText(label)} ${count}`)
+    .join(" · ");
 }
 
 function formatSourceInventoryGroup(group) {
   const enablement = countBy(group.rows, "enablement");
+  const kinds = countBy(group.rows, "source_kind");
   const summary = [
     `${group.rows.length} 个注册采集入口`,
     `core ${enablement.core || 0}`,
@@ -3240,7 +3259,15 @@ function formatSourceInventoryGroup(group) {
     `manual ${enablement.manual || 0}`
   ].join(" · ");
   return [
-    summary,
+    "[回到全量信源清单](#section-source-inventory)",
+    "",
+    `**本组密度**：${summary}`,
+    "",
+    formatSourceInventoryCompactSummary("启用层级", enablement),
+    "",
+    formatSourceInventoryCompactSummary("类型分布", kinds),
+    "",
+    "**保留规则**：阻塞、未配置、跳过、手动或无更新的入口仍保留在本组；今日状态不会改变排序。",
     "",
     ...group.rows.map(formatSourceInventoryRow)
   ].join("\n");

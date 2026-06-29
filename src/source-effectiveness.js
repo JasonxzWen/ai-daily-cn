@@ -425,16 +425,15 @@ function inferSourceInventorySectionId(source = {}) {
 function publicSourceConfigStatus(source = {}) {
   const statuses = [];
   if (source.kill_switch === true) {
-    statuses.push("kill_switch");
+    statuses.push("disabled");
   }
   if (source.source_kind === "manual") {
-    statuses.push("manual");
-  }
-  if (source.url) {
-    statuses.push("url");
+    statuses.push("manual_review");
   }
   if (source.url_env || source.base_url_env || source.required_env) {
-    statuses.push("env_required");
+    statuses.push("configuration_needed");
+  } else if (source.url) {
+    statuses.push("configured");
   }
   if (statuses.length === 0) {
     statuses.push("placeholder");
