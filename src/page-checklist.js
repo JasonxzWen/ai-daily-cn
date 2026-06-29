@@ -289,7 +289,27 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       })
     };
     const inventorySection = document.querySelector("#section-source-inventory");
-    sourceFirstContract.inventory.rows = document.querySelectorAll("[id^='section-source-inventory-group-'] li strong").length;
+    const inventoryRows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"))
+      .filter((row) => row.querySelector("strong"));
+    const inventoryRowsWithLogicalMapping = inventoryRows.filter((row) =>
+      (row.textContent || "").includes("逻辑源：")
+    );
+    const inventoryRowsWithMetadata = inventoryRows.filter((row) => {
+      const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
+      const metadataParts = text.split(/\s\/\s/).map((part) => part.trim()).filter(Boolean);
+      return text.includes("逻辑源：") &&
+        metadataParts.length >= 5 &&
+        metadataParts.some((part) => /^T[0-9]$/i.test(part)) &&
+        /\b(configured|configuration_needed)\b/i.test(metadataParts.at(-1) || "");
+    });
+    const inventoryMissingMetadataSamples = inventoryRows
+      .filter((row) => !inventoryRowsWithMetadata.includes(row))
+      .slice(0, 5)
+      .map((row) => row.textContent?.replace(/\s+/g, " ").trim().slice(0, 160) || "");
+    sourceFirstContract.inventory.rows = inventoryRows.length;
+    sourceFirstContract.inventory.rows_with_logical_mapping = inventoryRowsWithLogicalMapping.length;
+    sourceFirstContract.inventory.rows_with_metadata = inventoryRowsWithMetadata.length;
+    sourceFirstContract.inventory.missing_metadata_samples = inventoryMissingMetadataSamples;
     sourceFirstContract.inventory.finder = {
       root: Boolean(inventorySection?.querySelector("[data-source-inventory-finder]")),
       search: Boolean(inventorySection?.querySelector("[data-source-inventory-search]")),
@@ -297,6 +317,17 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       next: Boolean(inventorySection?.querySelector("[data-source-inventory-next]")),
       clear: Boolean(inventorySection?.querySelector("[data-source-inventory-clear]"))
     };
+    const sourceStatusFocusText = document.querySelector("#section-source-status-focus")?.textContent || "";
+    const sourceStatusFocusLabels = [
+      "blocked",
+      "not_configured_or_skipped",
+      "updated_not_selected",
+      "no_recent_update",
+      "parsed_not_candidate"
+    ];
+    sourceFirstContract.status_focus.status_labels = Object.fromEntries(
+      sourceStatusFocusLabels.map((label) => [label, sourceStatusFocusText.includes(label)])
+    );
     sourceFirstContract.order = {
       expected: sourceFirstSectionOrder,
       actual_source_first_hits: sourceFirstOrderHits,
@@ -313,12 +344,18 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       Math.min(...sourceInventoryGroupIndexes) > sourceFirstOrderIndexes["section-source-inventory"] &&
       firstTrackOrderIndex > Math.max(...sourceInventoryGroupIndexes);
     const inventoryFinderOk = Object.values(sourceFirstContract.inventory.finder).every(Boolean);
+    const sourceInventoryMetadataOk =
+      sourceFirstContract.inventory.rows === 154 &&
+      sourceFirstContract.inventory.rows_with_logical_mapping === 154 &&
+      sourceFirstContract.inventory.rows_with_metadata === 154;
+    const sourceStatusFocusLabelsOk = Object.values(sourceFirstContract.status_focus.status_labels).every(Boolean);
     const sourceFirstPublicContractOk =
       sourceFirstContract.story.ok &&
       sourceFirstContract.dashboard.ok &&
       sourceFirstContract.status_focus.ok &&
       sourceFirstContract.inventory.ok &&
-      sourceFirstContract.inventory.rows === 154 &&
+      sourceInventoryMetadataOk &&
+      sourceStatusFocusLabelsOk &&
       inventoryFinderOk &&
       directOrderOk &&
       sourceFirstDownstreamOrderOk;

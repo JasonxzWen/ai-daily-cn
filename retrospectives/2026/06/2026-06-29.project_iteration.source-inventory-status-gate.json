@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-status-gate",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory metadata page-check gate",
+  "status": "completed",
+  "summary": "This iteration strengthens the source-first daily page checklist so the 154-row source inventory cannot regress into a name-only list; each row must keep logical-source mapping and source metadata, and the status focus must keep runtime status labels visible.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/e2e/site.e2e.js",
+      "npm run quality:page-check -- 2026-06-29 1280x900,390x1200 --output .tmp/phase28-real-page-check.json",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run sources:display-contract",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "community_cards_reader_facing",
+      "section": "real_page_page_check",
+      "message": "The real 2026-06-29 page-check still reports the existing community_cards_reader_facing degraded check, but no blocking checks are present and this iteration does not modify community card rendering."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "A complete inventory row count is insufficient evidence for source-first visibility.",
+      "evidence": "The red E2E stripped inventory rows down to 154 source names; before this phase, `source_first_public_contract` still passed because it only counted `li strong` nodes.",
+      "scope": "source_first_public_contract",
+      "persistence": "implemented",
+      "recommended_action": "Keep row-level logical-source mapping and metadata counts inside the page checklist whenever the inventory contract is refined."
+    },
+    {
+      "lesson": "The 154-row inventory is a collection-entry layer, while daily runtime status belongs to the logical source status focus/map.",
+      "evidence": "The implementation validates collection-entry metadata in inventory rows and validates runtime status labels in `#section-source-status-focus`.",
+      "scope": "source_first_layering",
+      "persistence": "implemented",
+      "recommended_action": "Avoid treating every collection entry as a daily logical-source status row unless the data model is explicitly expanded."
+    },
+    {
+      "lesson": "Real-page check details should be useful for diagnosis, not just boolean pass/fail.",
+      "evidence": "The real 2026-06-29 page-check reports `rows:154`, `rows_with_logical_mapping:154`, `rows_with_metadata:154`, empty `missing_metadata_samples`, and status labels for blocked/skipped/updated/no-recent/parsed states.",
+      "scope": "page_check_diagnostics",
+      "persistence": "implemented",
+      "recommended_action": "Continue adding actionable counts and samples to blocking page checks so future failures can be repaired without guesswork."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Continue the source-first roadmap by auditing whether collection entries should ever receive per-entry runtime status, or whether logical-source status remains the correct daily runtime layer.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-status-gate"
+}

@@ -531,6 +531,21 @@ try {
   assert(missingSourceStoryChecklist.issues.some((issue) => issue.id === "source_first_public_contract"));
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    document.querySelectorAll("[id^='section-source-inventory-group-'] li").forEach((row) => {
+      const sourceName = row.querySelector("strong")?.textContent?.trim();
+      if (sourceName) {
+        const nameNode = document.createElement("strong");
+        nameNode.textContent = sourceName;
+        row.replaceChildren(nameNode);
+      }
+    });
+  });
+  const missingInventoryMetadataChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(missingInventoryMetadataChecklist.ok, false, JSON.stringify(missingInventoryMetadataChecklist.checks, null, 2));
+  assert(missingInventoryMetadataChecklist.issues.some((issue) => issue.id === "source_first_public_contract"));
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
     nodes.map((node) => [
       node.querySelector("span")?.textContent?.trim() || "",
