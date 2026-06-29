@@ -395,8 +395,8 @@ function formatSourceFirstRuntimeSections({
   mainItems = []
 } = {}) {
   const factories = {
-    source_signal_story: () => formatSourceSignalStorySection(sourceEffectivenessRows, { stories, mainItems }),
-    source_first_dashboard: () => formatSourceFirstDashboardSection(sourceEffectivenessRows),
+    source_signal_story: () => formatSourceSignalStorySection(sourceEffectivenessRows, { stories, mainItems, sourceInventoryRows }),
+    source_first_dashboard: () => formatSourceFirstDashboardSection(sourceEffectivenessRows, { sourceInventoryRows }),
     source_status_focus: () => formatSourceStatusFocusSection(sourceEffectivenessRows),
     source_map: () => formatSourceMapSections(sourceEffectivenessRows),
     source_inventory: () => formatSourceInventorySections(sourceInventoryRows)
@@ -446,6 +446,65 @@ function sourceInventoryRowsWithRuntime(rows = [], sourceEffectivenessRows = [])
       runtime_status_detail: `继承逻辑源 ${runtime.name || row.logical_source_name || logicalSourceId}`
     };
   });
+}
+
+function sourceInventoryRuntimeMetrics(rows = []) {
+  const metrics = {
+    total: 0,
+    known: 0,
+    missing: 0,
+    inherited: 0,
+    unreported: 0,
+    collectionOnly: 0,
+    unknown: 0,
+    included: 0,
+    updatedNotSelected: 0,
+    blocked: 0,
+    skipped: 0,
+    noRecentUpdate: 0,
+    parsedNotCandidate: 0,
+    labelCounts: {}
+  };
+  for (const row of Array.isArray(rows) ? rows : []) {
+    metrics.total += 1;
+    const label = String(row?.runtime_status_label || "").trim();
+    if (!label) {
+      metrics.missing += 1;
+      continue;
+    }
+    metrics.known += 1;
+    metrics.labelCounts[label] = (metrics.labelCounts[label] || 0) + 1;
+    if (label === "collection_only") {
+      metrics.collectionOnly += 1;
+    } else if (label === "unreported") {
+      metrics.unreported += 1;
+    } else if (label === "unknown") {
+      metrics.unknown += 1;
+    } else {
+      metrics.inherited += 1;
+    }
+    if (label === "included") {
+      metrics.included += 1;
+    } else if (label === "updated_not_selected") {
+      metrics.updatedNotSelected += 1;
+    } else if (label === "blocked") {
+      metrics.blocked += 1;
+    } else if (label === "not_configured_or_skipped") {
+      metrics.skipped += 1;
+    } else if (label === "no_recent_update") {
+      metrics.noRecentUpdate += 1;
+    } else if (label === "parsed_not_candidate") {
+      metrics.parsedNotCandidate += 1;
+    }
+  }
+  return metrics;
+}
+
+function sourceInventoryRuntimeSummary(metrics = {}) {
+  if (!metrics.total) {
+    return "";
+  }
+  return `全量采集入口 ${metrics.total}，入口运行态可见 ${metrics.known}/${metrics.total}，继承逻辑状态 ${metrics.inherited}，未上报 ${metrics.unreported}，仅采集入口 ${metrics.collectionOnly}`;
 }
 
 function hostnameLabel(value) {
@@ -3174,6 +3233,7 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
     return null;
   }
   const metrics = sourceFirstMetrics(rows);
+  const inventoryMetrics = sourceInventoryRuntimeMetrics(options.sourceInventoryRows);
   const validSignals = metrics.included + metrics.updatedNotSelected;
   const storyTitles = sourceSignalStoryTitles(options.stories, options.mainItems);
   const includedNames = sourceSignalSourceNames(rows, (row) => row.status_label === "included", 4);
@@ -3192,9 +3252,13 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
     collapsed: false,
     cardClass: "source-signal-story-card",
     showFilters: false,
-    summary: `${validSignals}/${metrics.total} 个信源提供有效公开信号；阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+    summary: [
+      `${validSignals}/${metrics.total} 个逻辑信源提供有效公开信号；阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+      sourceInventoryRuntimeSummary(inventoryMetrics)
+    ].filter(Boolean).join(" "),
     content: sourceSignalStoryMarkdown({
       metrics,
+      inventoryMetrics,
       validSignals,
       noSignalCount,
       storyTitles,
@@ -3205,6 +3269,7 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
     }),
     items: sourceSignalStoryCards({
       metrics,
+      inventoryMetrics,
       validSignals,
       noSignalCount,
       storyTitles,
@@ -3219,6 +3284,7 @@ function formatSourceSignalStorySection(rows = [], options = {}) {
 
 function sourceSignalStoryMarkdown({
   metrics,
+  inventoryMetrics = {},
   validSignals,
   noSignalCount,
   storyTitles = [],
@@ -3231,6 +3297,9 @@ function sourceSignalStoryMarkdown({
     "### 今日信源故事",
     "",
     `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}，低信号 ${noSignalCount}，阻塞 ${metrics.blocked}，未配置或跳过 ${metrics.skipped}。`,
+    sourceInventoryRuntimeSummary(inventoryMetrics)
+      ? `全量信源入口：${sourceInventoryRuntimeSummary(inventoryMetrics)}。`
+      : "",
     storyTitles.length > 0
       ? `今日主线来自这些可见 story：${storyTitles.map(escapeMarkdownText).join("；")}。`
       : "今日没有足够清晰的公开 story，本页保留信源运行状态，不强行扩写。",
@@ -3248,6 +3317,7 @@ function sourceSignalStoryMarkdown({
 
 function sourceSignalStoryCards({
   metrics,
+  inventoryMetrics = {},
   validSignals,
   noSignalCount,
   storyTitles = [],
@@ -3273,9 +3343,16 @@ function sourceSignalStoryCards({
         { label: "有更新未入选", value: String(metrics.updatedNotSelected) },
         { label: "低信号", value: String(noSignalCount) },
         { label: "阻塞", value: String(metrics.blocked) },
-        { label: "未配置或跳过", value: String(metrics.skipped) }
+        { label: "未配置或跳过", value: String(metrics.skipped) },
+        ...(inventoryMetrics.total ? [
+          { label: "全量入口", value: String(inventoryMetrics.total) },
+          { label: "入口运行态", value: `${inventoryMetrics.known}/${inventoryMetrics.total}` }
+        ] : [])
       ],
-      body: `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}。`,
+      body: [
+        `今天可用于公开叙事的有效信源为 ${validSignals}/${metrics.total}；公开入选 ${metrics.included}/${metrics.total}，有更新未入选 ${metrics.updatedNotSelected}。`,
+        sourceInventoryRuntimeSummary(inventoryMetrics)
+      ].filter(Boolean).join(" "),
       points: [
         { label: "下一屏", value: "信源运行概况给出完整 metrics 仪表盘。" },
         { label: "固定关系", value: "story 先解释信号，dashboard 随后量化运行状态。" }
@@ -3398,25 +3475,29 @@ function uniqueSourceSignalStrings(values = []) {
   return result;
 }
 
-function formatSourceFirstDashboardSection(rows = []) {
+function formatSourceFirstDashboardSection(rows = [], options = {}) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return null;
   }
   const metrics = sourceFirstMetrics(rows);
+  const inventoryMetrics = sourceInventoryRuntimeMetrics(options.sourceInventoryRows);
   return {
     type: "filterable-cards",
     title: "信源运行概况",
     richId: "source-first-dashboard",
     group: "main",
     collapsed: false,
-    summary: "今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。",
+    summary: [
+      "今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。",
+      sourceInventoryRuntimeSummary(inventoryMetrics)
+    ].filter(Boolean).join(" "),
     cardClass: "source-metric-card",
     showFilters: false,
-    items: sourceMetricDashboardCards(metrics)
+    items: sourceMetricDashboardCards(metrics, inventoryMetrics)
   };
 }
 
-function sourceMetricDashboardCards(metrics) {
+function sourceMetricDashboardCards(metrics, inventoryMetrics = {}) {
   const lowSignal = metrics.noRecentUpdate + metrics.parsedNotCandidate;
   return [
     sourceMetricDashboardCard({
@@ -3466,6 +3547,70 @@ function sourceMetricDashboardCards(metrics) {
       stats: [
         { label: "无近期更新", value: String(metrics.noRecentUpdate) },
         { label: "解析未成候选", value: String(metrics.parsedNotCandidate) }
+      ]
+    })
+  ].concat(sourceInventoryMetricDashboardCards(inventoryMetrics));
+}
+
+function sourceInventoryMetricDashboardCards(metrics = {}) {
+  if (!metrics.total) {
+    return [];
+  }
+  const lowSignal = metrics.noRecentUpdate + metrics.parsedNotCandidate;
+  return [
+    sourceMetricDashboardCard({
+      title: "全量采集入口",
+      value: metrics.total,
+      tag: { label: "INVENTORY_TOTAL", kind: "general" },
+      subtitle: "固定 154 入口",
+      body: "固定 source inventory 中的全部采集入口；它们按重要性排序展示，不随当天信号强弱重新排序。",
+      stats: [
+        { label: "运行态可见", value: `${metrics.known}/${metrics.total}` },
+        { label: "逻辑继承", value: String(metrics.inherited) }
+      ]
+    }),
+    sourceMetricDashboardCard({
+      title: "已知入口运行态",
+      value: metrics.known,
+      tag: { label: "RUNTIME_KNOWN", kind: metrics.missing ? "notable" : "major" },
+      subtitle: "入口状态覆盖",
+      body: "每个采集入口都应能看到 inherited、unreported 或 collection_only 之一，避免静默失败。",
+      stats: [
+        { label: "缺失运行态", value: String(metrics.missing) }
+      ]
+    }),
+    sourceMetricDashboardCard({
+      title: "继承逻辑状态",
+      value: metrics.inherited,
+      tag: { label: "INHERITED_RUNTIME", kind: "major" },
+      subtitle: "映射到今日逻辑源",
+      body: "这些采集入口继承今日逻辑信源状态，包含公开入选、有更新未入选、阻塞、未配置、未更新或解析未成候选。",
+      stats: [
+        { label: "公开入选", value: String(metrics.included) },
+        { label: "有更新", value: String(metrics.updatedNotSelected) },
+        { label: "阻塞", value: String(metrics.blocked) },
+        { label: "未配置/跳过", value: String(metrics.skipped) },
+        { label: "低信号", value: String(lowSignal) }
+      ]
+    }),
+    sourceMetricDashboardCard({
+      title: "未上报逻辑源",
+      value: metrics.unreported,
+      tag: { label: "UNREPORTED_RUNTIME", kind: metrics.unreported ? "notable" : "general" },
+      subtitle: "有映射但今日缺状态",
+      body: "这些采集入口映射到逻辑源，但该逻辑源没有出现在今日 source_effectiveness 表中，需要在全量清单中继续可见。",
+      stats: [
+        { label: "运行态缺失", value: String(metrics.missing) }
+      ]
+    }),
+    sourceMetricDashboardCard({
+      title: "仅采集入口",
+      value: metrics.collectionOnly,
+      tag: { label: "COLLECTION_ONLY", kind: "general" },
+      subtitle: "尚未归入逻辑源",
+      body: "这些入口是注册的采集配置或辅助入口，暂未归入每日逻辑信源；它们仍保留在固定清单里，供后续归类。",
+      stats: [
+        { label: "未知", value: String(metrics.unknown) }
       ]
     })
   ];

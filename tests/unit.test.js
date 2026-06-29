@@ -14352,7 +14352,7 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
   assert.equal(dashboard.type, "filterable-cards");
   assert.equal(dashboard.cardClass, "source-metric-card");
   assert.equal(dashboard.showFilters, false);
-  assert.deepEqual(dashboard.items.map((item) => item.title), [
+  assert.deepEqual(dashboard.items.slice(0, 6).map((item) => item.title), [
     "全部逻辑信源",
     "公开入选",
     "有更新未入选",
@@ -14361,7 +14361,7 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
     "低信号"
   ]);
   assert.deepEqual(
-    dashboard.items.map((item) => item.stats?.[0]?.value),
+    dashboard.items.slice(0, 6).map((item) => item.stats?.[0]?.value),
     ["6", "1", "1", "1", "1", "2"]
   );
   assert(dashboard.items.every((item) => item.group === "信源运行概况"));
@@ -14372,6 +14372,32 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
   assert.match(JSON.stringify(dashboard.items.find((item) => item.title === "未配置或跳过")), /需配置|SKIPPED/);
   assert.match(JSON.stringify(dashboard.items.find((item) => item.title === "低信号")), /低信号|LOW_SIGNAL/);
   assert.doesNotMatch(JSON.stringify(dashboard), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
+});
+
+test("source-first dashboard exposes full inventory runtime metrics", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
+  const statValue = (title, label = "数量") =>
+    metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
+  const serializedDashboard = JSON.stringify(dashboard);
+
+  assert.equal(inventoryRows.length, 154);
+  assert.equal(statValue("全量采集入口"), "154");
+  assert.equal(statValue("已知入口运行态"), "154");
+  assert.equal(statValue("继承逻辑状态"), "9");
+  assert.equal(statValue("未上报逻辑源"), "64");
+  assert.equal(statValue("仅采集入口"), "81");
+  assert.match(serializedDashboard, /INVENTORY_TOTAL/);
+  assert.match(serializedDashboard, /RUNTIME_KNOWN/);
+  assert.match(serializedDashboard, /INHERITED_RUNTIME/);
+  assert.match(serializedDashboard, /UNREPORTED_RUNTIME/);
+  assert.match(serializedDashboard, /COLLECTION_ONLY/);
+  assert.doesNotMatch(serializedDashboard, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
 });
 
 test("source inventory overview renders fixed section cards", () => {
@@ -14768,10 +14794,14 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["有更新未入选", "1"],
     ["低信号", "2"],
     ["阻塞", "1"],
-    ["未配置或跳过", "1"]
+    ["未配置或跳过", "1"],
+    ["全量入口", "154"],
+    ["入口运行态", "154/154"]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
+  assert.match(story.summary, /全量采集入口 154/);
+  assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
   assert.match(serializedStory, /OpenAI News/);

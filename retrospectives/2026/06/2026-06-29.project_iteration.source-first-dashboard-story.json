@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-first-dashboard-story",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source-first dashboard story inventory metrics",
+  "status": "completed",
+  "summary": "This iteration carries the 154-entry collection inventory runtime projection into the first source story and source metrics dashboard, so readers see inventory total, known runtime coverage, inherited logical status, unreported logical-source mappings, and collection-only entries before the long inventory.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source metrics dashboard cards render operational metrics as cards|source-first dashboard exposes full inventory runtime metrics\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory|source-first runtime|source metrics dashboard|source-first IA|source signal story\" tests/unit.test.js",
+      "node --test tests/e2e/site.e2e.js",
+      "npm run build",
+      "npm run quality:page-check -- 2026-06-29 1280x900,390x1200 --output .tmp/phase30-real-page-check.json",
+      "Playwright screenshot check for #section-source-first-dashboard at 1280x900 and 390x1200",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run sources:display-contract",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "community_cards_reader_facing",
+      "section": "real_page_page_check",
+      "message": "The real 2026-06-29 page-check still reports the existing community_cards_reader_facing degraded check, but no blocking checks are present and this iteration does not modify community card rendering."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "The full inventory runtime layer is only actionable when the first dashboard summarizes it before the reader reaches the long list.",
+      "evidence": "The red unit test failed because the dashboard had only six logical-source cards and no full-inventory runtime metric; the green page-check records 11 dashboard cards including INVENTORY_TOTAL, RUNTIME_KNOWN, INHERITED_RUNTIME, UNREPORTED_RUNTIME, and COLLECTION_ONLY.",
+      "scope": "source_first_dashboard",
+      "persistence": "implemented",
+      "recommended_action": "Keep the dashboard inventory metric gate whenever source-first public pages are regenerated."
+    },
+    {
+      "lesson": "A visible full inventory section is not enough to prove first-screen observability.",
+      "evidence": "The red E2E removed only the dashboard inventory metric cards while leaving source story, status focus, map, and full inventory rows intact; old page-check still passed until the dashboard metric gate was added.",
+      "scope": "source_first_page_check",
+      "persistence": "implemented",
+      "recommended_action": "Page-check should continue validating both dashboard-level summary and row-level inventory runtime coverage."
+    },
+    {
+      "lesson": "Story and dashboard should share the same inventory projection but remain different surfaces.",
+      "evidence": "The story remains four cards while its summary and lead card now mention full inventory coverage; the dashboard carries the detailed metric cards.",
+      "scope": "source_signal_story",
+      "persistence": "implemented",
+      "recommended_action": "Do not expand the source story card count unless the user approves a layout change; put additional numeric detail into the dashboard."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Continue the source-first roadmap by refining source group scan ergonomics or adding a compact first-viewport system health dashboard only if it can be gated without hiding the 154-entry inventory.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-first-dashboard-story"
+}
