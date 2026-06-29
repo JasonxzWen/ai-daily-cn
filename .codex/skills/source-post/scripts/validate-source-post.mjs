@@ -40,7 +40,7 @@ const EVIDENCE_LEAD_MARKERS = [
 ];
 
 function usage() {
-  return `Usage: node skills/source-to-insight-blog/scripts/validate-source-blog.mjs <post-dir> [--json]\n\nValidates a source-backed insight blog post directory for reader-first shape, source coverage, and UTF-8 hygiene.`;
+  return `Usage: node skills/source-post/scripts/validate-source-post.mjs <post-dir> [--json]\n\nValidates a source-backed public post directory for reader-first shape, source coverage, and UTF-8 hygiene.`;
 }
 
 function firstMarkerIndex(text, markers) {
@@ -186,7 +186,7 @@ const result = {
   postDir,
   exitCode: failures.length > 0 ? 3 : 0,
   checks,
-  reason: failures.length > 0 ? `${failures.length} source blog checks failed.` : warnings.length > 0 ? `Source blog validation passed with ${warnings.length} warnings.` : 'Source blog validation passed.',
+  reason: failures.length > 0 ? `${failures.length} source post checks failed.` : warnings.length > 0 ? `Source post validation passed with ${warnings.length} warnings.` : 'Source post validation passed.',
 };
 
 if (json) {

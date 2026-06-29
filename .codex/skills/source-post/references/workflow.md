@@ -1,4 +1,4 @@
-# Source-To-Insight Blog Workflow
+# Source Post Workflow
 
 ## 1. Source Capture
 
@@ -75,4 +75,4 @@ Answer these explicitly:
 - Effective-interact summary exists and is not the main blog body.
 - Project-iteration decision is present.
 - Public page screenshot shows readable article layout.
-- `validate-source-blog.mjs`, insight validation, diff check, and relevant repo gates pass.
+- `validate-source-post.mjs`, source-post validation, diff check, and relevant repo gates pass.

@@ -16,7 +16,7 @@ Hub is updated.
 Editorial quality:
 
 - `stop-slop` - remove AI-writing tells from English prose
-- `source-to-insight-blog` - turn a source article or release into a grounded summary
+- `source-post` - turn a source article or release into a grounded public post
 - `grill-me` - one-question-at-a-time stress testing for a plan or design
 
 Engineering discipline:

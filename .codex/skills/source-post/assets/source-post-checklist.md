@@ -15,5 +15,5 @@
 - [ ] Project-iteration review says already changed / effective / redundant risk / next optimization / not now.
 - [ ] 60-second reader test passes: a reader can say what the source is, how it is organized, what changed locally, and whether it was worth it.
 - [ ] Rendered screenshot confirms the blog is readable.
-- [ ] `validate-source-blog.mjs <post-dir>` passes.
-- [ ] Insight site validation passes.
+- [ ] `validate-source-post.mjs <post-dir>` passes.
+- [ ] Source-post site validation passes.
