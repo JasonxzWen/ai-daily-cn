@@ -505,6 +505,7 @@ try {
   assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
   assert.equal(await page.locator("#section-source-status-focus").count(), 1);
   assert.equal(await page.locator("#section-source-map").count(), 1);
+  assert.equal(await page.locator("#section-source-inventory").count(), 1);
   assert.match(await page.locator("#section-source-first-dashboard").textContent(), /全部逻辑信源|公开入选|未配置或跳过/);
   const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
   assert.match(sourceFocusText, /需处理/);
@@ -526,14 +527,33 @@ try {
   assert.match(coreSourceGroupText, /blocked/);
   assert.match(platformSourceGroupText, /WeChat Platform/);
   assert.match(platformSourceGroupText, /not_configured_or_skipped/);
+  const sourceInventoryText = await page.locator("#section-source-inventory").textContent();
+  assert.match(sourceInventoryText, /154/);
+  assert.match(sourceInventoryText, /DeepSeek News/);
+  assert.match(sourceInventoryText, /OpenAI News RSS/);
+  assert.match(sourceInventoryText, /OpenRouter Rankings/);
+  assert.match(sourceInventoryText, /WeChat Platform AI Feed/);
+  assert.match(sourceInventoryText, /Zhihu Platform AI Feed/);
+  assert.match(sourceInventoryText, /html_index/);
+  assert.match(sourceInventoryText, /openrouter_rankings_public_playwright/);
+  assert.match(sourceInventoryText, /manual/);
+  assert.doesNotMatch(
+    sourceInventoryText,
+    /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i
+  );
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );
   assert(publicSectionOrder.indexOf("section-source-first-dashboard") >= 0, JSON.stringify(publicSectionOrder));
   assert(publicSectionOrder.indexOf("section-source-status-focus") > publicSectionOrder.indexOf("section-source-first-dashboard"));
   assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-status-focus"));
+  const sourceMapGroupIndexes = publicSectionOrder
+    .map((id, index) => id.startsWith("section-source-map-group-") ? index : -1)
+    .filter((index) => index >= 0);
+  assert(sourceMapGroupIndexes.length > 0, JSON.stringify(publicSectionOrder));
+  assert(publicSectionOrder.indexOf("section-source-inventory") > Math.max(...sourceMapGroupIndexes), JSON.stringify(publicSectionOrder));
   const firstTrackOrderIndex = publicSectionOrder.findIndex((id) => id.startsWith("section-track-"));
-  assert(firstTrackOrderIndex > publicSectionOrder.indexOf("section-source-map"), JSON.stringify(publicSectionOrder));
+  assert(firstTrackOrderIndex > publicSectionOrder.indexOf("section-source-inventory"), JSON.stringify(publicSectionOrder));
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
   assert(await page.locator("[id^='section-track-']").count() >= 1, "editorial track sections render");
@@ -593,6 +613,7 @@ try {
   assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.evaluate(() => {
@@ -622,6 +643,7 @@ try {
   assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
   assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
   const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
   await firstTrackHeading.evaluate((node) => {
     node.scrollIntoView({ block: "start", behavior: "instant" });

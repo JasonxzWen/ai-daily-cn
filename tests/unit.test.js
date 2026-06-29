@@ -40,6 +40,7 @@ import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
 import { renderIndexHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
+import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
@@ -13732,6 +13733,64 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
   assert(!serializedSections.includes("source_audit"));
   assert(!serializedSections.includes("candidate_pool"));
   assert(!serializedSections.includes("selection_snapshot"));
+});
+
+test("source inventory panel lists all registered source entries before stories", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = [
+    {
+      id: "openai-news",
+      name: "OpenAI News",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      display_section: "core_primary",
+      display_section_label: "核心一手源",
+      display_section_rank: 10,
+      display_rank: 10,
+      display_mode: "expanded",
+      status_label: "included",
+      source_ids: ["content-openai-news"],
+      source_kinds: ["rss"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "official RSS parsed"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
+  const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");
+  const sourceGroupIndex = input.sections.findIndex((section) => section.richId === "source-map-group-core-primary");
+  const inventoryIndex = input.sections.findIndex((section) => section.richId === "source-inventory");
+  const storyIndex = input.sections.findIndex((section) => /^track-/.test(section.richId || ""));
+  const inventory = input.sections[inventoryIndex];
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const serializedSections = JSON.stringify(input.sections);
+
+  assert(dashboardIndex >= 0, "source dashboard should still render");
+  assert(graphIndex > dashboardIndex, "source map should still follow the dashboard/focus area");
+  assert(sourceGroupIndex > graphIndex, "logical source groups should still follow the scan index");
+  assert(inventory, "full registered source inventory should render");
+  assert(inventoryIndex > sourceGroupIndex, "inventory should render after logical source groups");
+  assert(storyIndex > inventoryIndex, "stories should remain after the complete source-first area");
+  assert.match(inventory.content, /154/);
+  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, inventoryRows.length);
+  assert.match(inventory.content, /DeepSeek News/);
+  assert.match(inventory.content, /OpenAI News RSS/);
+  assert.match(inventory.content, /OpenRouter Rankings/);
+  assert.match(inventory.content, /WeChat Platform AI Feed/);
+  assert.match(inventory.content, /Zhihu Platform AI Feed/);
+  assert.match(inventory.content, /html_index/);
+  assert.match(inventory.content, /openrouter_rankings_public_playwright/);
+  assert.match(inventory.content, /manual/);
+  assert.doesNotMatch(serializedSections, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(inventory.content, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
 });
 
 test("source-first IA status focus surfaces actionable source states before the full graph", () => {

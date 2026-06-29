@@ -21,7 +21,7 @@ import {
   trackingComponentForInteraction
 } from "./tracking-components.js";
 import { normalizeStoryFirstReport, readerFacingStoryTitle } from "./story-first.js";
-import { decorateSourceEffectivenessRows } from "./source-effectiveness.js";
+import { buildSourceInventoryRows, decorateSourceEffectivenessRows } from "./source-effectiveness.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -144,6 +144,9 @@ export function reportToInteractionInput(report, options = {}) {
   const officialOrgUpdates = Array.isArray(report.official_org_updates) ? report.official_org_updates : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
   const sourceEffectivenessRows = sourceFirstRows(report.source_effectiveness);
+  const sourceInventoryRows = sourceEffectivenessRows.length > 0
+    ? buildSourceInventoryRows({ rootDir: options.rootDir || process.cwd() })
+    : [];
   const platformItems = Object.fromEntries(
     PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
   );
@@ -178,6 +181,10 @@ export function reportToInteractionInput(report, options = {}) {
     sections.push(sourceStatusFocus);
   }
   sections.push(...formatSourceMapSections(sourceEffectivenessRows));
+  const sourceInventory = formatSourceInventorySection(sourceInventoryRows);
+  if (sourceInventory) {
+    sections.push(sourceInventory);
+  }
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -661,6 +668,7 @@ export async function renderReportWithEffectiveInteract(report, options = {}) {
   await fs.mkdir(inputDir, { recursive: true });
   await fs.mkdir(outputDir, { recursive: true });
   await fs.writeFile(inputPath, `${JSON.stringify(reportToInteractionInput(report, {
+    rootDir,
     trendAnnotations: options.trendAnnotations,
     assetRootDir: options.assetRootDir,
     includeInternalSections: options.includeInternalSections
@@ -3150,6 +3158,103 @@ function formatSourceMapScanIndex(groups = []) {
     "|---|---:|---:|---:|---:|---:|---|",
     ...tableRows.map((row) => `| ${row[0]} | ${row.slice(1).map(escapeMarkdownTableCell).join(" | ")} |`)
   ].join("\n");
+}
+
+function formatSourceInventorySection(rows = []) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+  const sectionGroups = groupedSourceInventoryRows(rows);
+  return {
+    type: "markdown",
+    title: "全量信源清单",
+    richId: "source-inventory",
+    group: "main",
+    collapsed: false,
+    summary: `${rows.length} 个注册采集入口，按固定信源板块展开。`,
+    content: [
+      `共 ${rows.length} 个注册采集入口；这里展示的是公开安全的采集入口清单，今日状态不会改变排序。`,
+      "",
+      formatSourceInventorySectionSummary(sectionGroups),
+      "",
+      formatSourceInventoryCompactSummary("类型分布", countBy(rows, "source_kind")),
+      "",
+      formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement")),
+      "",
+      ...sectionGroups.map(formatSourceInventoryGroup)
+    ].filter(Boolean).join("\n")
+  };
+}
+
+function groupedSourceInventoryRows(rows = []) {
+  const groups = [];
+  const bySection = new Map();
+  for (const row of rows) {
+    const sectionId = String(row?.display_section || "uncategorized");
+    if (!bySection.has(sectionId)) {
+      const group = {
+        id: sectionId,
+        label: String(row?.display_section_label || sectionId),
+        rank: Number.isFinite(Number(row?.display_section_rank)) ? Number(row.display_section_rank) : 999,
+        rows: []
+      };
+      bySection.set(sectionId, group);
+      groups.push(group);
+    }
+    bySection.get(sectionId).rows.push(row);
+  }
+  return groups.sort((left, right) => left.rank - right.rank || left.label.localeCompare(right.label));
+}
+
+function formatSourceInventorySectionSummary(groups = []) {
+  return [
+    "| 板块 | 采集入口 | 逻辑源映射 | core | optional | manual |",
+    "|---|---:|---:|---:|---:|---:|",
+    ...groups.map((group) => {
+      const enablement = countBy(group.rows, "enablement");
+      const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
+      return `| ${escapeMarkdownTableCell(group.label)} | ${group.rows.length} | ${logicalSources.size} | ${enablement.core || 0} | ${enablement.optional || 0} | ${enablement.manual || 0} |`;
+    })
+  ].join("\n");
+}
+
+function formatSourceInventoryCompactSummary(title, counts = {}) {
+  const cells = Object.entries(counts)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([label, count]) => `${escapeMarkdownText(label)} ${count}`);
+  return `**${escapeMarkdownText(title)}**：${cells.join(" · ")}`;
+}
+
+function formatSourceInventoryGroup(group) {
+  return [
+    `### ${escapeMarkdownText(group.label)} ${group.rows.length}`,
+    "",
+    ...group.rows.map(formatSourceInventoryRow)
+  ].join("\n");
+}
+
+function formatSourceInventoryRow(row) {
+  const details = [
+    row.source_kind,
+    row.enablement,
+    row.tier,
+    row.authority,
+    row.platform ? `platform:${row.platform}` : "",
+    row.config_status
+  ].filter(Boolean).map(escapeMarkdownText).join(" / ");
+  const logical = row.logical_source_name && row.logical_source_name !== "未归入逻辑源"
+    ? `；逻辑源：${escapeMarkdownText(row.logical_source_name)}`
+    : "；逻辑源：未归入逻辑源";
+  return `- **${escapeMarkdownText(row.name || row.id)}**${logical}；${details}`;
+}
+
+function countBy(rows = [], field) {
+  const counts = {};
+  for (const row of rows) {
+    const key = String(row?.[field] || "unknown");
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
 }
 
 function formatSourceStatusFocusSection(rows = []) {

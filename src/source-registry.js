@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import fsSync from "node:fs";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { validateSourceRegistry } from "./schema.js";
@@ -10,6 +11,25 @@ export async function loadSourceRegistry(options = {}) {
   const sourcesPath = options.sourcesPath || DEFAULT_SOURCE_DIR;
   const resolved = path.resolve(rootDir, sourcesPath);
   const payloads = await readRegistryPayloads(resolved);
+  const sources = payloads.flatMap((payload) => normalizeRegistryPayload(payload).sources);
+  const normalized = normalizeSourceRegistry({
+    schema_version: 1,
+    sources
+  });
+
+  if (options.includeEnablement) {
+    const allowed = new Set(normalizeEnablements(options.includeEnablement));
+    normalized.sources = normalized.sources.filter((source) => allowed.has(source.enablement));
+  }
+
+  return normalized;
+}
+
+export function loadSourceRegistrySync(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const sourcesPath = options.sourcesPath || DEFAULT_SOURCE_DIR;
+  const resolved = path.resolve(rootDir, sourcesPath);
+  const payloads = readRegistryPayloadsSync(resolved);
   const sources = payloads.flatMap((payload) => normalizeRegistryPayload(payload).sources);
   const normalized = normalizeSourceRegistry({
     schema_version: 1,
@@ -96,6 +116,18 @@ async function readRegistryPayloads(resolvedPath) {
     return payloads;
   }
   return [JSON.parse(await fs.readFile(resolvedPath, "utf8"))];
+}
+
+function readRegistryPayloadsSync(resolvedPath) {
+  const stat = fsSync.statSync(resolvedPath);
+  if (stat.isDirectory()) {
+    return fsSync.readdirSync(resolvedPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+      .map((entry) => path.join(resolvedPath, entry.name))
+      .sort()
+      .map((filePath) => JSON.parse(fsSync.readFileSync(filePath, "utf8")));
+  }
+  return [JSON.parse(fsSync.readFileSync(resolvedPath, "utf8"))];
 }
 
 function normalizeRegistryPayload(payload) {
