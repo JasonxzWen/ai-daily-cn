@@ -22,6 +22,7 @@ const REQUIRED_MAINTENANCE = {
     "source-display-governance:v1",
     "baseline-fixed-order",
     "new-source-insertion-rules",
+    "source-insertion-handbook:v1",
     "source-status-preservation",
     "validation-commands"
   ],
@@ -32,6 +33,27 @@ const REQUIRED_MAINTENANCE = {
     "inventory-validation-commands"
   ]
 };
+
+const REQUIRED_SOURCE_INSERTION_HANDBOOK_PHRASES = [
+  "Source Insertion Decision Tree",
+  "Insertion Rank Rules",
+  "Collection Entry Only",
+  "Promotion To Logical Source",
+  "User Review",
+  "section_rank_step",
+  "baseline_source_rank_step",
+  "insertion_rank_step",
+  "Daily status must not reorder rows",
+  "first-class logical source",
+  "collection-only entry",
+  "core_primary",
+  "china_models",
+  "open_source_platforms",
+  "tracking_metrics",
+  "builder_community",
+  "platform_cn_media",
+  "english_media_search"
+];
 
 export async function validateSourceDisplayContract({ rootDir = process.cwd() } = {}) {
   const failures = [];
@@ -233,6 +255,11 @@ function validateHandbook(handbook, contract, sectionRows, maintenance, failures
   }
   if (!handbook.includes("do not reorder by daily status")) {
     failures.push("handbook must state: do not reorder by daily status");
+  }
+  for (const phrase of REQUIRED_SOURCE_INSERTION_HANDBOOK_PHRASES) {
+    if (!handbook.includes(phrase)) {
+      failures.push(`handbook missing insertion handbook phrase: ${phrase}`);
+    }
   }
   for (const section of Array.isArray(contract?.sections) ? contract.sections : []) {
     if (!handbook.includes(String(section.id || ""))) {

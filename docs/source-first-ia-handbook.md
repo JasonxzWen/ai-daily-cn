@@ -105,6 +105,40 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 
 <!-- new-source-insertion-rules -->
 
+<!-- source-insertion-handbook:v1 -->
+
+### Source Insertion Decision Tree
+
+This is the fixed source insertion handbook for new sources. The goal is to keep source visibility predictable: choose the source's stable editorial home first, then record daily runtime status separately. Daily status must not reorder rows.
+
+1. If the source is an official first-party company, lab, product, model, research, safety, pricing, or platform announcement source, add or promote it as a first-class logical source in `core_primary`.
+2. If the source is an official Chinese model vendor, Chinese AI lab, Chinese model platform, or official Chinese technical blog, add or promote it as a first-class logical source in `china_models`.
+3. If the source is a code, model, package, paper, benchmark artifact, GitHub, Hugging Face, or open ecosystem signal, place it in `open_source_platforms`.
+4. If the source is a structured leaderboard, status feed, benchmark tracker, pricing tracker, adoption tracker, or recurring metrics source, place it in `tracking_metrics`.
+5. If the source is an individual builder, researcher, maintainer, social feed, community thread, or raw community signal, place it in `builder_community`.
+6. If the source is a Chinese platform bridge, Chinese media feed, WeChat/Zhihu-style channel, or China-focused media clue source, place it in `platform_cn_media`.
+7. If the source is English media, search, or a third-party news aggregation entry, place it in `english_media_search`.
+
+### Insertion Rank Rules
+
+- Keep `section_rank_step` at 10. A new display section is only allowed when the user explicitly approves a new stable editorial category.
+- Keep `baseline_source_rank_step` at 10 for normal baseline ordering inside a section.
+- Use `insertion_rank_step` 5 when a new source naturally belongs between two existing adjacent sources, such as rank 15 between rank 10 and rank 20.
+- If a section has no available gap, renumber only that section in the same PR, keep 10-point spacing, and explain why the relative order changed.
+- Runtime fields such as included, blocked, skipped, no recent update, candidate count, score, tier, or authority may affect collection and review, but must not change public display rank.
+
+### Collection Entry Only
+
+Use a collection-only entry when the new source is a feed, org page, API endpoint, search query, bridge, or manual input that supports an existing logical source. In that case, update the source registry and regenerate `docs/source-inventory-order.md`; do not add a new row to `config/source-display-contract.json` unless the source deserves reader-visible first-class identity.
+
+### Promotion To Logical Source
+
+Promote a source to a first-class logical source when readers should understand it as a named source in the public source graph, when it has distinct editorial importance, or when its blocked/skipped/no-update status should be visible independently. The same PR must update `config/source-display-contract.json`, this handbook if the insertion rule is new, focused tests, and the source inventory reference when registry entries move.
+
+### User Review
+
+Codex may propose the baseline placement, but the fixed importance order is user-reviewed. The user may tune section placement or rank before merge. Once merged, the JSON contract is the executable authority and daily status remains only a status label.
+
 新增信源先判断“逻辑源”，再判断“采集入口”。多个 RSS、HTML index、GitHub org、Hugging Face org、RSSHub 或人工入口可以汇总到同一个 logical source；public source graph 展示 logical source，不展示每个底层 URL。
 
 插入流程：

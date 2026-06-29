@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-insertion-handbook",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source insertion handbook",
+  "status": "completed",
+  "summary": "This iteration turns the fixed source importance order into a maintainable insertion handbook. It adds a validator-backed marker and decision tree for placing future first-class logical sources or collection-only entries without dynamic re-ranking or silent source disappearance.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source insertion handbook\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source display contract governance|source insertion handbook|source inventory order reference\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Fixed source importance needs an insertion rule, not only a current sorted list.",
+      "evidence": "The handbook now defines `Source Insertion Decision Tree`, `Insertion Rank Rules`, `Collection Entry Only`, `Promotion To Logical Source`, and `User Review` sections.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Use the handbook before adding or promoting any source, then let the user tune final section placement and rank before merge."
+    },
+    {
+      "lesson": "Source insertion rules should be machine-checked because they are part of the product contract.",
+      "evidence": "`npm run sources:display-contract` validates the `source-insertion-handbook:v1` marker and required insertion handbook phrases.",
+      "scope": "source_maintenance",
+      "persistence": "implemented",
+      "recommended_action": "Keep the insertion handbook marker and required sections in the same PR as future source display contract changes."
+    },
+    {
+      "lesson": "Collection entries and first-class logical sources need separate review paths.",
+      "evidence": "The handbook tells maintainers to use collection-only entries for feeds or endpoints that support an existing logical source and to promote only reader-visible sources into `config/source-display-contract.json`.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "When adding a source, decide whether it changes public source identity before editing display ranks."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-platform-unconfigured-degraded"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Have the user review and tune the proposed fixed importance ordering, then apply any approved rank changes in a later source display contract PR.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-insertion-handbook"
+}
