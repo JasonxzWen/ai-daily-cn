@@ -49,6 +49,19 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["anthropic news", "anthropic.com/news"]
   },
   {
+    id: "anthropic-research-engineering",
+    name: "Anthropic Research and Engineering",
+    role: "official",
+    aliases: [
+      "content-anthropic-research",
+      "content-anthropic-engineering",
+      "anthropic research",
+      "anthropic engineering",
+      "anthropic.com/research",
+      "anthropic.com/engineering"
+    ]
+  },
+  {
     id: "hugging-face-blog",
     name: "Hugging Face Blog",
     role: "official",

@@ -52,6 +52,7 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 |---:|---|---|
 | 10 | `openai-news` | OpenAI 官方新闻和 RSS，默认最高优先级 |
 | 20 | `anthropic-news` | Anthropic 官方新闻 |
+| 25 | `anthropic-research-engineering` | Anthropic Research and Engineering，官方研究与工程子频道 |
 | 30 | `google-deepmind` | Google DeepMind 官方博客 |
 | 40 | `google-research` | Google Research Blog |
 | 50 | `microsoft-research` | Microsoft Research Blog |

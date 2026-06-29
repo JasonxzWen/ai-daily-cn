@@ -19,7 +19,7 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 
 | Section | Entries | Logical mappings | Core | Optional | Manual |
 |---|---:|---:|---:|---:|---:|
-| `core_primary` 核心一手源 | 22 | 8 | 22 | 0 | 0 |
+| `core_primary` 核心一手源 | 22 | 9 | 22 | 0 | 0 |
 | `china_models` 中国模型与厂商 | 35 | 5 | 26 | 9 | 0 |
 | `open_source_platforms` 开源、模型平台与代码生态 | 33 | 4 | 7 | 26 | 0 |
 | `tracking_metrics` 榜单与持续指标 | 3 | 3 | 3 | 0 | 0 |
@@ -60,16 +60,16 @@ npm run validate
 | 10.003 | `content-openai-news` | OpenAI News RSS | `openai-news` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.004 | `content-anthropic-company-news` | Anthropic Company News | `anthropic-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.005 | `content-anthropic-news` | Anthropic News | `anthropic-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.006 | `content-google-deepmind-blog` | Google DeepMind Blog | `google-deepmind` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.007 | `content-github-google-deepmind-org` | Google DeepMind GitHub Organization | `google-deepmind` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.008 | `content-google-deepmind-rss` | Google DeepMind RSS | `google-deepmind` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.009 | `content-google-research` | Google Research Blog | `google-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.010 | `content-microsoft-research` | Microsoft Research Blog | `microsoft-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.011 | `content-meta-ai-blog` | Meta AI Blog | `meta-ai` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.012 | `content-aws-machine-learning` | AWS Machine Learning Blog | `aws-ml` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.013 | `content-hugging-face-blog` | Hugging Face Blog | `hugging-face-blog` | `rss` | `core` | `T1` | `primary` | `-` | `configured` |
-| 10.014 | `content-anthropic-engineering` | Anthropic Engineering | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.015 | `content-anthropic-research` | Anthropic Research | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.006 | `content-anthropic-engineering` | Anthropic Engineering | `anthropic-research-engineering` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.007 | `content-anthropic-research` | Anthropic Research | `anthropic-research-engineering` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.008 | `content-google-deepmind-blog` | Google DeepMind Blog | `google-deepmind` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.009 | `content-github-google-deepmind-org` | Google DeepMind GitHub Organization | `google-deepmind` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.010 | `content-google-deepmind-rss` | Google DeepMind RSS | `google-deepmind` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.011 | `content-google-research` | Google Research Blog | `google-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.012 | `content-microsoft-research` | Microsoft Research Blog | `microsoft-research` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.013 | `content-meta-ai-blog` | Meta AI Blog | `meta-ai` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.014 | `content-aws-machine-learning` | AWS Machine Learning Blog | `aws-ml` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.015 | `content-hugging-face-blog` | Hugging Face Blog | `hugging-face-blog` | `rss` | `core` | `T1` | `primary` | `-` | `configured` |
 | 10.016 | `content-apple-machine-learning` | Apple Machine Learning Research | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.017 | `content-nvidia-developer-blog` | NVIDIA Developer Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.018 | `content-azure-blog` | Azure Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |

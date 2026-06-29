@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.anthropic-research-logical-source",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Anthropic Research logical source promotion",
+  "status": "completed",
+  "summary": "This iteration promotes Anthropic Research and Engineering from collection-only inventory rows into a first-class source-first logical source under core_primary, making an important official research channel visible in the public source graph.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"Anthropic Research logical source promotion\" tests/unit.test.js",
+      "node --test --test-name-pattern \"Anthropic Research logical source promotion|source display contract governance|source-first IA contract|source inventory order reference|source-first IA dashboard|source inventory|source map scan index\" tests/unit.test.js",
+      "node scripts/generate-source-inventory-order.mjs",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Promotion batches should be small enough that rank intent is reviewable.",
+      "evidence": "Only `anthropic-research-engineering` was added to the executable display contract in this slice, at rank 25 between Anthropic News and Google DeepMind.",
+      "scope": "source_order_promotion",
+      "persistence": "implemented",
+      "recommended_action": "Continue future promotion batches in small groups tied to the order tuning review."
+    },
+    {
+      "lesson": "One reader-visible logical source may group multiple collection entries.",
+      "evidence": "`content-anthropic-research` and `content-anthropic-engineering` now map to `anthropic-research-engineering`, while the full inventory still lists 154 collection entries.",
+      "scope": "logical_source_layering",
+      "persistence": "implemented",
+      "recommended_action": "Keep grouping official subchannels when they represent a single reader-visible source identity."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Promote the next small batch from `docs/source-order-tuning-review.md`, starting with official lab/company subchannels or China model platform sources after user review.",
+      "owner": "project"
+    }
+  ],
+  "slug": "anthropic-research-logical-source"
+}
