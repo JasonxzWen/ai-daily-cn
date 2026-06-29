@@ -3252,7 +3252,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="section-heading split-row">
     <div>
       <h2>今日信源故事</h2>
-      <p class="section-summary">15/22 个信源提供有效公开信号；阻塞 0，未配置或跳过 2。</p>
+      <p class="section-summary">15/22 个逻辑信源提供有效公开信号；阻塞 0，未配置或跳过 2。 全量采集入口 154，入口运行态可见 154/154，继承逻辑状态 48，未上报 25，仅采集入口 81</p>
     </div>
 
   </div>
@@ -3295,7 +3295,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <strong>2</strong>
 
     </div></div>
-    <p>今天可用于公开叙事的有效信源为 15/22；公开入选 8/22，有更新未入选 7。</p>
+    <p>今天可用于公开叙事的有效信源为 15/22；公开入选 8/22，有更新未入选 7。 全量采集入口 154，入口运行态可见 154/154，继承逻辑状态 48，未上报 25，仅采集入口 81</p>
     <dl class="card-detail-list"><div><dt>下一屏</dt><dd><span>信源运行概况给出完整 metrics 仪表盘。</span></dd></div><div><dt>固定关系</dt><dd><span>story 先解释信号，dashboard 随后量化运行状态。</span></dd></div></dl>
   </article>
 <article class="interactive-card evidence-card evidence-spotlight source-signal-story-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="首屏信源故事" data-search-target="html-work-report">
@@ -3361,7 +3361,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="section-heading split-row">
     <div>
       <h2>信源运行概况</h2>
-      <p class="section-summary">今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。</p>
+      <p class="section-summary">今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。 全量采集入口 154，入口运行态可见 154/154，继承逻辑状态 48，未上报 25，仅采集入口 81</p>
     </div>
 
   </div>
@@ -3460,6 +3460,126 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
     </div></div>
     <p>可访问但没有近期有效更新，或解析到近期内容但未形成候选。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>全量采集入口</span><span class="card-subtitle">固定 154 入口</span></span></h3>
+    <div class="card-tags"><span class="chip chip-general">INVENTORY_TOTAL</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>154</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">运行态可见</span>
+      <strong>154/154</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">逻辑继承</span>
+      <strong>48</strong>
+
+    </div></div>
+    <p>固定 source inventory 中的全部采集入口；它们按重要性排序展示，不随当天信号强弱重新排序。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>已知入口运行态</span><span class="card-subtitle">入口状态覆盖</span></span></h3>
+    <div class="card-tags"><span class="chip chip-major">RUNTIME_KNOWN</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>154</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">缺失运行态</span>
+      <strong>0</strong>
+
+    </div></div>
+    <p>每个采集入口都应能看到 inherited、unreported 或 collection_only 之一，避免静默失败。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>继承逻辑状态</span><span class="card-subtitle">映射到今日逻辑源</span></span></h3>
+    <div class="card-tags"><span class="chip chip-major">INHERITED_RUNTIME</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>48</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">公开入选</span>
+      <strong>25</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">有更新</span>
+      <strong>9</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">阻塞</span>
+      <strong>0</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">未配置/跳过</span>
+      <strong>6</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">低信号</span>
+      <strong>8</strong>
+
+    </div></div>
+    <p>这些采集入口继承今日逻辑信源状态，包含公开入选、有更新未入选、阻塞、未配置、未更新或解析未成候选。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>未上报逻辑源</span><span class="card-subtitle">有映射但今日缺状态</span></span></h3>
+    <div class="card-tags"><span class="chip chip-notable">UNREPORTED_RUNTIME</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>25</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">运行态缺失</span>
+      <strong>0</strong>
+
+    </div></div>
+    <p>这些采集入口映射到逻辑源，但该逻辑源没有出现在今日 source_effectiveness 表中，需要在全量清单中继续可见。</p>
+
+  </article>
+<article class="interactive-card evidence-card evidence-spotlight source-metric-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="信源运行概况" data-search-target="html-work-report">
+
+    <h3><span class="card-title-text"><span>仅采集入口</span><span class="card-subtitle">尚未归入逻辑源</span></span></h3>
+    <div class="card-tags"><span class="chip chip-general">COLLECTION_ONLY</span></div>
+
+    <div class="card-stat-grid" data-card-stats>
+    <div class="card-stat">
+      <span class="card-stat-label">数量</span>
+      <strong>81</strong>
+
+    </div>
+    <div class="card-stat">
+      <span class="card-stat-label">未知</span>
+      <strong>0</strong>
+
+    </div></div>
+    <p>这些入口是注册的采集配置或辅助入口，暂未归入每日逻辑信源；它们仍保留在固定清单里，供后续归类。</p>
 
   </article>
     </div>

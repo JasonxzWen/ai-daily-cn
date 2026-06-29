@@ -570,6 +570,21 @@ try {
   assert.notEqual(missingInventoryRuntimeIssue.details.inventory.rows_with_runtime_status, 154);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    document.querySelectorAll("#section-source-first-dashboard .source-metric-card").forEach((card) => {
+      const text = card.textContent || "";
+      if (/全量采集入口|已知入口运行态|继承逻辑状态|未上报逻辑源|仅采集入口/.test(text)) {
+        card.remove();
+      }
+    });
+  });
+  const missingDashboardInventoryChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(missingDashboardInventoryChecklist.ok, false, JSON.stringify(missingDashboardInventoryChecklist.checks, null, 2));
+  const missingDashboardInventoryIssue = missingDashboardInventoryChecklist.issues.find((issue) => issue.id === "source_first_public_contract");
+  assert(missingDashboardInventoryIssue, JSON.stringify(missingDashboardInventoryChecklist.checks, null, 2));
+  assert.notEqual(missingDashboardInventoryIssue.details.dashboard.inventory_metric_cards_present, true);
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
     nodes.map((node) => [
       node.querySelector("span")?.textContent?.trim() || "",
@@ -622,7 +637,13 @@ try {
   assert.match(sourceSignalStoryText, /信源运行概况/);
   assert.match(sourceSignalStoryText, /全量信源清单/);
   assert.doesNotMatch(sourceSignalStoryText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
-  assert.match(await page.locator("#section-source-first-dashboard").textContent(), /全部逻辑信源|公开入选|未配置或跳过/);
+  const sourceDashboardText = await page.locator("#section-source-first-dashboard").textContent();
+  assert.match(sourceDashboardText, /全部逻辑信源|公开入选|未配置或跳过/);
+  assert.match(sourceDashboardText, /全量采集入口/);
+  assert.match(sourceDashboardText, /已知入口运行态/);
+  assert.match(sourceDashboardText, /继承逻辑状态/);
+  assert.match(sourceDashboardText, /未上报逻辑源/);
+  assert.match(sourceDashboardText, /仅采集入口/);
   const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
   assert.match(sourceFocusText, /需处理/);
   assert.match(sourceFocusText, /有更新未入选/);

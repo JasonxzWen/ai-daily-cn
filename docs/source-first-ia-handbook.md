@@ -244,7 +244,14 @@ The source-first section order is:
 4. `source_map`
 5. `source_inventory`
 
-The source signal story is a compact narrative rollup of effective, updated, blocked, and skipped source lanes. The source metrics dashboard is the numeric operating view. The status focus appears before the full graph so blocked or stale lanes are noticeable before the long inventory.
+The source signal story is a compact narrative rollup of effective, updated, blocked, skipped, and full-inventory source coverage. The source metrics dashboard is the numeric operating view. The status focus appears before the full graph so blocked or stale lanes are noticeable before the long inventory.
+
+The source metrics dashboard has two required metric bands:
+
+- Logical-source operating cards keep the fixed reader-facing source graph visible: total logical sources, public included, updated but not selected, blocked, not configured or skipped, and low-signal sources.
+- Collection-entry runtime cards summarize the complete inventory before readers reach the long inventory: `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`.
+
+These collection-entry metrics are first-screen coverage indicators. They are derived from the same 154-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
 
 <!-- full-inventory-expansion-semantics -->
 
@@ -307,6 +314,7 @@ Contract checks must reject:
 
 - missing or renamed source-first v2 markers;
 - first viewport order that does not start with `source_signal_story` then `source_metrics_dashboard`;
+- a source metrics dashboard that omits full-inventory runtime metric cards for `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`;
 - a missing logical source vs collection entry distinction;
 - documentation that treats the 154-entry inventory as first-viewport story content;
 - runtime status being used to reorder fixed source rows.

@@ -368,6 +368,28 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     sourceFirstContract.inventory.runtime_status_labels = Object.fromEntries(
       inventoryRuntimeStatusLabels.map((label) => [label, inventoryRuntimeSegments.some((segment) => segment.includes(label))])
     );
+    const dashboardMetricCards = Array.from(document.querySelectorAll("#section-source-first-dashboard .source-metric-card"));
+    const dashboardInventoryExpectedMetrics = [
+      { label: "全量采集入口", count: sourceFirstContract.inventory.rows },
+      { label: "已知入口运行态", count: sourceFirstContract.inventory.rows_with_known_runtime_status },
+      { label: "继承逻辑状态", count: sourceFirstContract.inventory.rows_with_inherited_runtime_status },
+      { label: "未上报逻辑源", count: sourceFirstContract.inventory.rows_with_unreported_runtime_status },
+      { label: "仅采集入口", count: sourceFirstContract.inventory.rows_with_collection_only_runtime_status }
+    ];
+    sourceFirstContract.dashboard.inventory_metric_cards = dashboardInventoryExpectedMetrics.map(({ label, count }) => {
+      const card = dashboardMetricCards.find((node) => (node.textContent || "").includes(label));
+      const text = card?.textContent?.replace(/\s+/g, " ").trim() || "";
+      const countPattern = new RegExp(`(^|\\D)${escapeRegExp(String(count))}(\\D|$)`);
+      return {
+        label,
+        expected_count: count,
+        present: Boolean(card),
+        has_expected_count: Boolean(card && countPattern.test(text)),
+        text: text.slice(0, 180)
+      };
+    });
+    sourceFirstContract.dashboard.inventory_metric_cards_present =
+      sourceFirstContract.dashboard.inventory_metric_cards.every((item) => item.present && item.has_expected_count);
     sourceFirstContract.inventory.finder = {
       root: Boolean(inventorySection?.querySelector("[data-source-inventory-finder]")),
       search: Boolean(inventorySection?.querySelector("[data-source-inventory-search]")),
@@ -411,11 +433,13 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       sourceFirstContract.inventory.rows_with_runtime_status === 154 &&
       sourceFirstContract.inventory.rows_with_known_runtime_status === 154;
     const sourceStatusFocusLabelsOk = Object.values(sourceFirstContract.status_focus.status_labels).every(Boolean);
+    const sourceDashboardInventoryMetricsOk = sourceFirstContract.dashboard.inventory_metric_cards_present;
     const sourceFirstPublicContractOk =
       sourceFirstContract.story.ok &&
       sourceFirstContract.dashboard.ok &&
       sourceFirstContract.status_focus.ok &&
       sourceFirstContract.inventory.ok &&
+      sourceDashboardInventoryMetricsOk &&
       sourceInventoryMetadataOk &&
       sourceInventoryRuntimeOk &&
       sourceStatusFocusLabelsOk &&
