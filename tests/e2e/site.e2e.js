@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
@@ -11,6 +13,7 @@ import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../sr
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
+const execFileAsync = promisify(execFile);
 const trendConfigPath = path.join(rootDir, "config/trends.json");
 const sourceDisplayContract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
@@ -437,6 +440,23 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
+
+const positionalPageCheckOutput = path.join(tmp, "page-check-positional-viewports.json");
+await execFileAsync(process.execPath, [
+  path.join(rootDir, "scripts/check-daily-page.mjs"),
+  "2026-05-15",
+  "1280x900 390x1200",
+  "--out",
+  outDir,
+  "--output",
+  positionalPageCheckOutput
+], { cwd: rootDir, maxBuffer: 20 * 1024 * 1024 });
+const positionalPageCheck = JSON.parse(await fs.readFile(positionalPageCheckOutput, "utf8"));
+assert.equal(positionalPageCheck.ok, true, JSON.stringify(positionalPageCheck.blocking_checks, null, 2));
+assert.deepEqual(
+  positionalPageCheck.results.map((result) => result.viewport.width),
+  [1280, 390]
+);
 
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();

@@ -5,13 +5,16 @@ import path from "node:path";
 import { chromium } from "@playwright/test";
 import { evaluateDailyPageChecklist, classifyDailyPageCheckResults } from "../src/page-checklist.js";
 
-const args = parseArgs(process.argv.slice(2));
-const positional = positionalArgs(process.argv.slice(2));
-const reportDate = args.date || firstDate(process.argv.slice(2));
+const argv = process.argv.slice(2);
+const args = parseArgs(argv);
+const positional = positionalArgs(argv);
+const inferred = inferPositionalArgs(positional);
+const reportDate = args.date || firstDate(argv);
 const rootDir = path.resolve(args["repo-root"] || process.cwd());
-const outDir = path.resolve(rootDir, args.out || positional[1] || "docs");
-const outputPath = args.output || positional[2] ? path.resolve(rootDir, args.output || positional[2]) : "";
-const viewports = parseViewports(args.viewports || "1280x900,375x812");
+const outDir = path.resolve(rootDir, args.out || inferred.outDir || "docs");
+const outputArg = args.output || inferred.outputPath;
+const outputPath = outputArg ? path.resolve(rootDir, outputArg) : "";
+const viewports = parseViewports(args.viewports || inferred.viewports || "1280x900,375x812");
 
 if (!reportDate) {
   process.stderr.write("quality:page-check requires --date YYYY-MM-DD\n");
@@ -154,9 +157,54 @@ function positionalArgs(argv) {
   return values;
 }
 
+function inferPositionalArgs(positional) {
+  const inferred = {
+    outDir: "",
+    outputPath: "",
+    viewports: ""
+  };
+  const values = [...positional];
+  const dateIndex = values.findIndex((value) => /^\d{4}-\d{2}-\d{2}$/.test(value));
+  if (dateIndex >= 0) {
+    values.splice(dateIndex, 1);
+  }
+
+  for (const value of values) {
+    const viewportList = normalizeViewportList(value);
+    if (viewportList) {
+      inferred.viewports = [inferred.viewports, viewportList].filter(Boolean).join(",");
+      continue;
+    }
+    if (!inferred.outDir && !looksLikeJsonOutputPath(value)) {
+      inferred.outDir = value;
+      continue;
+    }
+    if (!inferred.outputPath) {
+      inferred.outputPath = value;
+    }
+  }
+
+  return inferred;
+}
+
+function normalizeViewportList(value) {
+  const parts = String(value || "")
+    .split(/[,\s]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (!parts.length || !parts.every((part) => /^\d+x\d+$/.test(part))) {
+    return "";
+  }
+  return parts.join(",");
+}
+
+function looksLikeJsonOutputPath(value) {
+  return /\.json$/i.test(String(value || ""));
+}
+
 function parseViewports(value) {
   return String(value || "")
-    .split(",")
+    .split(/[,\s]+/)
     .map((part) => part.trim())
     .filter(Boolean)
     .map((part) => {
