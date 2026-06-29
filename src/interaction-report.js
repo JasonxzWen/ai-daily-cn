@@ -21,6 +21,7 @@ import {
   trackingComponentForInteraction
 } from "./tracking-components.js";
 import { normalizeStoryFirstReport, readerFacingStoryTitle } from "./story-first.js";
+import { decorateSourceEffectivenessRows } from "./source-effectiveness.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -142,6 +143,7 @@ export function reportToInteractionInput(report, options = {}) {
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const officialOrgUpdates = Array.isArray(report.official_org_updates) ? report.official_org_updates : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
+  const sourceEffectivenessRows = sourceFirstRows(report.source_effectiveness);
   const platformItems = Object.fromEntries(
     PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
   );
@@ -162,10 +164,19 @@ export function reportToInteractionInput(report, options = {}) {
       githubTrending,
       projects,
       builderObservations,
-      communityLeads
+      communityLeads,
+      sourceEffectiveness: sourceEffectivenessRows
     })
   ];
   const sections = [];
+  const sourceDashboard = formatSourceFirstDashboardSection(sourceEffectivenessRows);
+  if (sourceDashboard) {
+    sections.push(sourceDashboard);
+  }
+  const sourceMap = formatSourceMapSection(sourceEffectivenessRows);
+  if (sourceMap) {
+    sections.push(sourceMap);
+  }
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -421,7 +432,10 @@ function dailyHeroStats(report, collections) {
   const sourceWindow = report.source_window || {};
   const builderCount = collections.builderObservations.length;
   const aigcCount = countAigcSignals(collections);
+  const sourceStats = sourceHeroStats(collections.sourceEffectiveness);
+  const sourceStatCount = sourceStats.length;
   const stats = [
+    ...sourceStats,
     { label: "主体", value: String(collections.mainItems.length), detail: "重点条目" },
     { label: "精选博客", value: String(collections.hotBlogs.length), detail: "深读" },
     { label: "GitHub", value: String(collections.githubTrending.length), detail: "Top 10" },
@@ -433,13 +447,52 @@ function dailyHeroStats(report, collections) {
     }
   ];
   if (aigcCount > 0) {
-    stats.splice(1, 0, { label: "AIGC", value: String(aigcCount), detail: "产品/内容" });
+    stats.splice(sourceStatCount + 1, 0, { label: "AIGC", value: String(aigcCount), detail: "产品/内容" });
   }
   if ((collections.dailyTracking?.length || 0) > 0) {
-    const insertAt = aigcCount > 0 ? 2 : 1;
+    const insertAt = sourceStatCount + (aigcCount > 0 ? 2 : 1);
     stats.splice(insertAt, 0, { label: "追踪", value: String(collections.dailyTracking.length), detail: "榜单变化" });
   }
   return stats;
+}
+
+function sourceFirstRows(rows = []) {
+  return decorateSourceEffectivenessRows(Array.isArray(rows) ? rows : [])
+    .filter((row) => row?.id && row?.name);
+}
+
+function sourceHeroStats(rows = []) {
+  const metrics = sourceFirstMetrics(rows);
+  if (metrics.total === 0) {
+    return [];
+  }
+  return [
+    { label: "公开信源", value: `${metrics.included}/${metrics.total}`, detail: "进入公开页" },
+    { label: "候选信源", value: String(metrics.updatedNotSelected), detail: "有更新未入选" },
+    { label: "阻塞信源", value: String(metrics.blocked), detail: metrics.skipped > 0 ? `跳过 ${metrics.skipped}` : "需处理" }
+  ];
+}
+
+function sourceFirstMetrics(rows = []) {
+  const metrics = {
+    total: rows.length,
+    included: 0,
+    updatedNotSelected: 0,
+    parsedNotCandidate: 0,
+    noRecentUpdate: 0,
+    blocked: 0,
+    skipped: 0
+  };
+  for (const row of rows) {
+    const status = String(row?.status_label || "");
+    if (status === "included") metrics.included += 1;
+    else if (status === "updated_not_selected") metrics.updatedNotSelected += 1;
+    else if (status === "parsed_not_candidate") metrics.parsedNotCandidate += 1;
+    else if (status === "no_recent_update") metrics.noRecentUpdate += 1;
+    else if (status === "blocked") metrics.blocked += 1;
+    else if (status === "not_configured_or_skipped") metrics.skipped += 1;
+  }
+  return metrics;
 }
 
 function dateIndexHeroStats(item) {
@@ -3008,6 +3061,147 @@ function formatSourceAudit(audit) {
     audit.zhihu_sources ? formatAuditGroup(platformItemLabel("zhihu"), audit.zhihu_sources) : "",
     audit.reddit_sources ? formatAuditGroup(platformItemLabel("reddit"), audit.reddit_sources) : ""
   ].filter(Boolean).join("\n\n");
+}
+
+function formatSourceFirstDashboardSection(rows = []) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+  const metrics = sourceFirstMetrics(rows);
+  const tableRows = [
+    ["全部逻辑信源", metrics.total, "固定展示合同中的公开信源行"],
+    ["公开入选", metrics.included, "今天有内容进入公开页"],
+    ["有更新未入选", metrics.updatedNotSelected, "抓到候选但未进入公开页"],
+    ["解析未成候选", metrics.parsedNotCandidate, "解析到近期内容但未形成候选"],
+    ["无近期更新", metrics.noRecentUpdate, "可访问但没有近期有效更新"],
+    ["阻塞", metrics.blocked, "已配置但本轮不可达或解析阻塞"],
+    ["未配置或跳过", metrics.skipped, "缺 token/base URL、手动源或占位源"]
+  ];
+  const statusLine = [
+    `${sourceEffectivenessStatusTag("included")} ${metrics.included}`,
+    `${sourceEffectivenessStatusTag("updated_not_selected")} ${metrics.updatedNotSelected}`,
+    `${sourceEffectivenessStatusTag("blocked")} ${metrics.blocked}`,
+    `${sourceEffectivenessStatusTag("not_configured_or_skipped")} ${metrics.skipped}`
+  ].join(" ");
+  return {
+    type: "markdown",
+    title: "信源运行概况",
+    richId: "source-first-dashboard",
+    group: "main",
+    collapsed: false,
+    content: [
+      "今日 story 仍按可回源信息撰写；本节把信源运行状态前置，便于先判断哪些源有效、阻塞、未更新或尚未配置。",
+      "",
+      statusLine,
+      "",
+      "| 指标 | 数量 | 说明 |",
+      "|---|---:|---|",
+      ...tableRows.map(([label, value, note]) =>
+        `| ${escapeMarkdownTableCell(label)} | ${escapeMarkdownTableCell(value)} | ${escapeMarkdownTableCell(note)} |`
+      ),
+      "",
+      "公开页只展示这些读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。"
+    ].join("\n")
+  };
+}
+
+function formatSourceMapSection(rows = []) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+  const groups = groupedSourceRows(rows);
+  if (groups.length === 0) {
+    return null;
+  }
+  return {
+    type: "markdown",
+    title: "信源图谱",
+    richId: "source-map",
+    group: "main",
+    collapsed: false,
+    content: groups.map(formatSourceMapGroup).join("\n\n")
+  };
+}
+
+function groupedSourceRows(rows = []) {
+  const groups = [];
+  const bySection = new Map();
+  for (const row of rows) {
+    const sectionId = String(row?.display_section || "uncategorized");
+    if (!bySection.has(sectionId)) {
+      const group = {
+        id: sectionId,
+        label: String(row?.display_section_label || sectionId),
+        rank: Number.isFinite(Number(row?.display_section_rank)) ? Number(row.display_section_rank) : 999,
+        rows: []
+      };
+      bySection.set(sectionId, group);
+      groups.push(group);
+    }
+    bySection.get(sectionId).rows.push(row);
+  }
+  return groups
+    .map((group) => ({
+      ...group,
+      rows: group.rows.slice().sort((left, right) =>
+        Number(left.display_rank || 999) - Number(right.display_rank || 999) ||
+        String(left.name || "").localeCompare(String(right.name || ""))
+      )
+    }))
+    .sort((left, right) => left.rank - right.rank || left.label.localeCompare(right.label));
+}
+
+function formatSourceMapGroup(group) {
+  const metrics = sourceFirstMetrics(group.rows);
+  const open = group.rows.some((row) => String(row?.display_mode || "") === "expanded") ? " open" : "";
+  const summary = [
+    `<details${open}><summary><strong>${escapeInlineHtml(group.label)}</strong>`,
+    `${group.rows.length} 个逻辑信源`,
+    `${sourceEffectivenessStatusTag("included")} ${metrics.included}`,
+    metrics.blocked > 0 ? `${sourceEffectivenessStatusTag("blocked")} ${metrics.blocked}` : "",
+    metrics.skipped > 0 ? `${sourceEffectivenessStatusTag("not_configured_or_skipped")} ${metrics.skipped}` : "",
+    "</summary>"
+  ].filter(Boolean).join(" ");
+  return [
+    summary,
+    "",
+    ...group.rows.map(formatSourceMapRow),
+    "",
+    "</details>"
+  ].join("\n");
+}
+
+function formatSourceMapRow(row) {
+  const candidateText = `${Number(row?.candidate_count || 0)} 候选 / ${Number(row?.included_count || 0)} 公开`;
+  const reason = row?.not_included_reason ? `；原因：${escapeMarkdownText(row.not_included_reason)}` : "";
+  return [
+    `- ${sourceEffectivenessStatusTag(row?.status_label)} **${escapeMarkdownText(row?.name || row?.id)}**：`,
+    sourceBooleanFlags(row),
+    `；${candidateText}${reason}`
+  ].join("");
+}
+
+function sourceBooleanFlags(row = {}) {
+  return [
+    row.configured ? "已配置" : "未配置",
+    row.reachable ? "可达" : "不可达",
+    row.parsed_recent ? "近期解析" : "未更新",
+    row.candidate_created ? "有候选" : "无候选",
+    row.public_included ? "已公开" : "未公开"
+  ].join(" / ");
+}
+
+function sourceEffectivenessStatusTag(statusLabel) {
+  const value = String(statusLabel || "unknown");
+  const className = {
+    included: "checked",
+    updated_not_selected: "checked",
+    parsed_not_candidate: "no-signal",
+    no_recent_update: "no-signal",
+    blocked: "blocked",
+    not_configured_or_skipped: "skipped"
+  }[value] || "unknown";
+  return `==tag-status-${className}|${value}==`;
 }
 
 function formatPublicSourceCoverage(audit) {

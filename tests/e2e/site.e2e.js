@@ -239,6 +239,83 @@ structuredReport.daily_tracking = [
     }
   }
 ];
+structuredReport.source_effectiveness = [
+  {
+    id: "openai-news",
+    name: "OpenAI News",
+    role: "official",
+    configured: true,
+    reachable: true,
+    parsed_recent: true,
+    candidate_created: true,
+    public_included: true,
+    not_included_reason: "",
+    statuses: ["checked"],
+    candidate_count: 1,
+    included_count: 1,
+    notes: "official RSS parsed"
+  },
+  {
+    id: "anthropic-news",
+    name: "Anthropic News",
+    role: "official",
+    configured: true,
+    reachable: true,
+    parsed_recent: true,
+    candidate_created: true,
+    public_included: false,
+    not_included_reason: "candidate_not_selected_for_public_page",
+    statuses: ["checked"],
+    candidate_count: 1,
+    included_count: 0,
+    notes: "candidate created but not selected"
+  },
+  {
+    id: "hugging-face-blog",
+    name: "Hugging Face Blog",
+    role: "official",
+    configured: true,
+    reachable: false,
+    parsed_recent: false,
+    candidate_created: false,
+    public_included: false,
+    not_included_reason: "blocked_or_unreachable",
+    statuses: ["blocked"],
+    candidate_count: 0,
+    included_count: 0,
+    notes: "HTTP 500"
+  },
+  {
+    id: "github-trending",
+    name: "GitHub Trending",
+    role: "github_trending",
+    configured: true,
+    reachable: true,
+    parsed_recent: true,
+    candidate_created: true,
+    public_included: true,
+    not_included_reason: "",
+    statuses: ["checked"],
+    candidate_count: 10,
+    included_count: 8,
+    notes: "weekly language pools"
+  },
+  {
+    id: "wechat-platform",
+    name: "WeChat Platform",
+    role: "platform_signal",
+    configured: false,
+    reachable: false,
+    parsed_recent: false,
+    candidate_created: false,
+    public_included: false,
+    not_included_reason: "not_configured_or_not_checked",
+    statuses: ["skipped_missing_base_url"],
+    candidate_count: 0,
+    included_count: 0,
+    notes: "RSSHUB_BASE_URL missing"
+  }
+];
 structuredReport.source_audit = {
   github_trending: {
     checked: true,
@@ -414,6 +491,32 @@ try {
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
   assert.equal(desktopChecklist.checks.find((check) => check.id === "story_first_sections_expanded")?.ok, true);
+  const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
+    nodes.map((node) => [
+      node.querySelector("span")?.textContent?.trim() || "",
+      node.querySelector("strong")?.textContent?.trim() || ""
+    ])
+  );
+  assert.deepEqual(heroStats.slice(0, 3), [
+    ["公开信源", "2/5"],
+    ["候选信源", "1"],
+    ["阻塞信源", "1"]
+  ]);
+  assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
+  assert.equal(await page.locator("#section-source-map").count(), 1);
+  assert.match(await page.locator("#section-source-first-dashboard").textContent(), /全部逻辑信源|公开入选|未配置或跳过/);
+  const sourceMapText = await page.locator("#section-source-map").textContent();
+  assert.match(sourceMapText, /Hugging Face Blog/);
+  assert.match(sourceMapText, /blocked/);
+  assert.match(sourceMapText, /WeChat Platform/);
+  assert.match(sourceMapText, /not_configured_or_skipped/);
+  const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
+    nodes.map((node) => node.id)
+  );
+  assert(publicSectionOrder.indexOf("section-source-first-dashboard") >= 0, JSON.stringify(publicSectionOrder));
+  assert(publicSectionOrder.indexOf("section-source-map") > publicSectionOrder.indexOf("section-source-first-dashboard"));
+  const firstTrackOrderIndex = publicSectionOrder.findIndex((id) => id.startsWith("section-track-"));
+  assert(firstTrackOrderIndex > publicSectionOrder.indexOf("section-source-map"), JSON.stringify(publicSectionOrder));
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
   assert(await page.locator("[id^='section-track-']").count() >= 1, "editorial track sections render");
@@ -470,6 +573,8 @@ try {
   const railBox = await page.locator("nav.report-nav").boundingBox();
   const contentBox = await page.locator(".report-section-stack").boundingBox();
   assert(railBox && contentBox && railBox.x < contentBox.x, "nav rail should sit left of the content stack");
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.evaluate(() => {
@@ -496,6 +601,8 @@ try {
   assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
   const mobileLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
   assert.equal(mobileLayoutColumns.trim().split(/\s+/).length, 1, `report-layout should collapse to one column on mobile, got: ${mobileLayoutColumns}`);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
+  assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
   const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
   await firstTrackHeading.evaluate((node) => {
     node.scrollIntoView({ block: "start", behavior: "instant" });
@@ -618,6 +725,13 @@ async function allExternalLinksHaveRel(page) {
 
 async function hasHorizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+}
+
+async function sectionHasVisibleBox(page, selector) {
+  return page.locator(selector).evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    return rect.width > 240 && rect.height > 80 && getComputedStyle(node).display !== "none";
+  });
 }
 
 async function dateCardOrder(page) {
