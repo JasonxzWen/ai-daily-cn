@@ -9,6 +9,29 @@
     "blocked",
     "not_configured_or_skipped"
   ],
+  "maintenance": {
+    "owner": "user-reviewed-fixed-source-order",
+    "handbook_path": "docs/source-first-ia-handbook.md",
+    "user_review_required": true,
+    "review_note": "Codex proposes baseline rank changes; the user may tune the fixed order before merge. Runtime source status must not reorder rows.",
+    "rank_policy": {
+      "section_rank_step": 10,
+      "baseline_source_rank_step": 10,
+      "insertion_rank_step": 5,
+      "renumber_when_gap_exhausted": true
+    },
+    "handbook_required_markers": [
+      "source-display-governance:v1",
+      "baseline-fixed-order",
+      "new-source-insertion-rules",
+      "source-status-preservation",
+      "validation-commands"
+    ],
+    "validation_commands": [
+      "npm run sources:display-contract",
+      "npm run validate"
+    ]
+  },
   "sections": [
     {
       "id": "core_primary",

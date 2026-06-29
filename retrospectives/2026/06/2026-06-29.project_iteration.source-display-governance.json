@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-display-governance",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source display governance handbook",
+  "status": "completed",
+  "summary": "This iteration makes the fixed source-first display order maintainable. It adds machine-readable governance metadata to the source display contract, a deterministic validator that checks contract and handbook alignment, and a readable handbook that explains ownership, baseline ranking, insertion rules, status preservation, and validation commands.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source display contract governance\" tests/unit.test.js",
+      "node scripts/validate-source-display-contract.mjs",
+      "node --test tests/unit.test.js",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A fixed source-first order needs a machine gate, not only a handbook.",
+      "evidence": "The new validator checks maintenance metadata, source coverage, unique ranks, package validation wiring, and required handbook markers.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Run `npm run sources:display-contract` whenever editing source ranking, handbook text, or logical source definitions."
+    },
+    {
+      "lesson": "New source insertion should use logical-source rules before collection-entry details.",
+      "evidence": "The handbook distinguishes logical source placement from RSS, HTML, GitHub, platform, or manual collection entrypoints.",
+      "scope": "source_maintenance",
+      "persistence": "implemented",
+      "recommended_action": "When adding a source, choose the logical source section and rank first, then wire one or more collection entrypoints underneath it."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the handbook as the review surface for the user's manual tuning of fixed source importance before expanding the logical source list further.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-display-governance"
+}
