@@ -3367,28 +3367,68 @@ function formatSourceInventorySections(rows = []) {
 
 function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
   return {
-    type: "markdown",
+    type: "filterable-cards",
     title: "全量信源清单",
     richId: "source-inventory",
     group: "main",
     collapsed: false,
     sourceInventoryFinder: true,
     sourceInventoryFinderTotal: rows.length,
-    summary: `${rows.length} 个注册采集入口，按固定信源板块展开。`,
-    content: [
-      `共 ${rows.length} 个注册采集入口；这里是固定顺序导航，完整明细在下方各板块全部展开，今日状态不会改变排序。`,
-      "",
-      formatSourceInventoryQuickFilters(rows, sectionGroups),
-      "",
-      formatSourceInventoryFocusLanes(rows, sectionGroups),
-      "",
-      formatSourceInventorySectionSummary(sectionGroups),
-      "",
-      formatSourceInventoryCompactSummary("类型分布", countBy(rows, "source_kind")),
-      "",
-      formatSourceInventoryCompactSummary("启用层级", countBy(rows, "enablement"))
-    ].filter(Boolean).join("\n\n")
+    summary: `${rows.length} 个注册采集入口，按固定信源板块卡片展开；下方明细全部保留，搜索只高亮不隐藏。`,
+    cardClass: "source-inventory-section-card",
+    showFilters: false,
+    items: sectionGroups.map((group, index) => formatSourceInventorySectionCard(group, index))
   };
+}
+
+function formatSourceInventorySectionCard(group, index) {
+  const enablement = countBy(group.rows, "enablement");
+  const kinds = countBy(group.rows, "source_kind");
+  const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
+  const rankLabel = Number.isFinite(Number(group.rank)) ? `rank ${group.rank}` : "rank unknown";
+  return {
+    title: group.label,
+    subtitle: `${String(index + 1).padStart(2, "0")} · ${group.id}`,
+    href: `#section-${sourceInventoryGroupAnchor(group)}`,
+    titleIcon: generatedSiteIcon(`S${index + 1}`, "#0f766e", "#ffffff"),
+    group: "固定板块",
+    showGroup: false,
+    tags: [
+      { label: group.id, kind: "general" },
+      { label: rankLabel, kind: "general" }
+    ],
+    stats: [
+      { label: "采集入口", value: String(group.rows.length), detail: "固定清单行" },
+      { label: "逻辑源", value: String(logicalSources.size) },
+      { label: "core", value: String(enablement.core || 0) },
+      { label: "optional", value: String(enablement.optional || 0) },
+      { label: "manual", value: String(enablement.manual || 0) }
+    ],
+    body: `固定排序第 ${index + 1} 组；完整 ${group.rows.length} 条采集入口在下方明细展开，今日状态不会改变排序。`,
+    points: [
+      { label: "代表源", value: formatSourceInventoryPlainNameSample(group.rows) },
+      { label: "类型分布", value: formatSourceInventoryPlainCountChips(kinds) },
+      { label: "保留规则", value: "阻塞、未配置、跳过、手动或无更新的入口仍保留在本组。" }
+    ]
+  };
+}
+
+function formatSourceInventoryPlainCountChips(counts = {}) {
+  return Object.entries(counts)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([label, count]) => `${label} ${count}`)
+    .join(" · ");
+}
+
+function formatSourceInventoryPlainNameSample(rows = []) {
+  const names = rows
+    .slice(0, 4)
+    .map((row) => row.name || row.id)
+    .filter(Boolean);
+  if (rows.length > names.length) {
+    names.push(`等 ${rows.length} 个`);
+  }
+  return names.join("、");
 }
 
 function formatSourceInventoryQuickFilters(rows = [], groups = []) {
