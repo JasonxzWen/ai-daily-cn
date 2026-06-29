@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-runtime-layer",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory runtime layer",
+  "status": "completed",
+  "summary": "This iteration projects daily logical-source runtime status onto the full 154-row collection-entry inventory, so mapped rows show inherited source status, mapped-but-missing rows show unreported, and unmapped rows show collection_only without changing fixed source order.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory rows expose runtime status layer\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory|source-first runtime|source metrics dashboard|source-first IA\" tests/unit.test.js",
+      "node --test tests/e2e/site.e2e.js",
+      "npm run build",
+      "npm run quality:page-check -- 2026-06-29 1280x900,390x1200 --output .tmp/phase29-real-page-check.json",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run sources:display-contract",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "code": "community_cards_reader_facing",
+      "section": "real_page_page_check",
+      "message": "The real 2026-06-29 page-check still reports the existing community_cards_reader_facing degraded check, but no blocking checks are present and this iteration does not modify community card rendering."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "Static collection-entry visibility does not answer whether a source had a daily runtime state.",
+      "evidence": "The red unit test failed because inventory rows only showed logical-source mapping and static metadata; the red E2E showed source_first_public_contract still passed after runtime status was absent.",
+      "scope": "source_inventory_runtime_layer",
+      "persistence": "implemented",
+      "recommended_action": "Keep per-row runtime projection and page-check counts whenever the source inventory remains public."
+    },
+    {
+      "lesson": "Collection-only entries need an explicit public label instead of pretending to have per-entry runtime health.",
+      "evidence": "The real 2026-06-29 page-check reports 81 collection_only rows, 25 unreported rows, and 48 inherited runtime rows inside the 154-row inventory.",
+      "scope": "source_first_layering",
+      "persistence": "implemented",
+      "recommended_action": "Continue using logical source rows as the authoritative daily runtime layer unless the data model is expanded to collect per-entry health."
+    },
+    {
+      "lesson": "Generated order references and public daily pages now have different runtime surfaces.",
+      "evidence": "The handbook and source inventory order reference now state that the reference is static while public daily pages additionally project runtime status.",
+      "scope": "source_inventory_order_reference",
+      "persistence": "implemented",
+      "recommended_action": "Do not use runtime status to reorder docs/source-inventory-order.md; use it only in daily public rendering and page-check diagnostics."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Continue the source-first roadmap by refining the first-screen story and metrics dashboard using the now-visible runtime inventory layer.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-runtime-layer"
+}

@@ -228,6 +228,8 @@ The Collection Entry Layer is the complete registered inventory. Collection entr
 
 154 collection entries are complete inventory rows, not first-viewport story content. They remain grouped and expanded in fixed source sections with non-hiding search/highlight behavior.
 
+Public daily inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
+
 <!-- first-viewport-source-order -->
 
 ### First Viewport Order

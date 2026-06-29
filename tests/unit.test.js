@@ -15180,6 +15180,32 @@ test("source inventory panel lists all registered source entries before stories"
   assert.doesNotMatch(`${inventoryCardsText}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
 });
 
+test("source inventory rows expose runtime status layer", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventoryGroups = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
+  const inventoryLines = inventoryGroups
+    .flatMap((section) => String(section.content || "").split("\n"))
+    .filter((line) => line.startsWith("- **"));
+  const findInventoryLine = (name) => inventoryLines.find((line) => line.includes(`**${name}**`)) || "";
+  const missingRuntimeLines = inventoryLines
+    .filter((line) => !line.includes("运行状态："))
+    .slice(0, 5);
+
+  assert.equal(inventoryLines.length, inventoryRows.length);
+  assert.equal(missingRuntimeLines.length, 0, JSON.stringify(missingRuntimeLines));
+  assert.match(findInventoryLine("OpenAI News RSS"), /运行状态：[\s\S]*included/);
+  assert.match(findInventoryLine("Anthropic News"), /运行状态：[\s\S]*updated_not_selected/);
+  assert.match(findInventoryLine("WeChat Platform AI Feed"), /运行状态：[\s\S]*not_configured_or_skipped/);
+  assert.match(findInventoryLine("Hugging Face Blog"), /运行状态：[\s\S]*unreported/);
+  assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*collection_only/);
+  assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(inventoryLines.join("\n"), /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
 test("source inventory navigation splits overview from fixed-section detail groups", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [

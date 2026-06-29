@@ -546,6 +546,30 @@ try {
   assert(missingInventoryMetadataChecklist.issues.some((issue) => issue.id === "source_first_public_contract"));
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
+  await page.evaluate(() => {
+    document.querySelectorAll("[id^='section-source-inventory-group-'] li").forEach((row) => {
+      const sourceName = row.querySelector("strong")?.textContent?.trim();
+      const rowText = row.textContent?.replace(/\s+/g, " ").trim() || "";
+      if (!sourceName || !rowText.includes("运行状态：")) {
+        return;
+      }
+      const nameNode = document.createElement("strong");
+      nameNode.textContent = sourceName;
+      const nameIndex = rowText.indexOf(sourceName);
+      const details = rowText
+        .slice(nameIndex >= 0 ? nameIndex + sourceName.length : sourceName.length)
+        .replace(/；运行状态：[^；]+(?=；)/u, "")
+        .replace(/；运行状态：[^；]+$/u, "");
+      row.replaceChildren(nameNode, document.createTextNode(details));
+    });
+  });
+  const missingInventoryRuntimeChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(missingInventoryRuntimeChecklist.ok, false, JSON.stringify(missingInventoryRuntimeChecklist.checks, null, 2));
+  const missingInventoryRuntimeIssue = missingInventoryRuntimeChecklist.issues.find((issue) => issue.id === "source_first_public_contract");
+  assert(missingInventoryRuntimeIssue, JSON.stringify(missingInventoryRuntimeChecklist.checks, null, 2));
+  assert.notEqual(missingInventoryRuntimeIssue.details.inventory.rows_with_runtime_status, 154);
+
+  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
     nodes.map((node) => [
       node.querySelector("span")?.textContent?.trim() || "",

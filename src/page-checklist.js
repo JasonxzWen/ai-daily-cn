@@ -302,14 +302,72 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         metadataParts.some((part) => /^T[0-9]$/i.test(part)) &&
         /\b(configured|configuration_needed)\b/i.test(metadataParts.at(-1) || "");
     });
+    const inventoryRuntimeStatusLabels = [
+      "included",
+      "updated_not_selected",
+      "parsed_not_candidate",
+      "no_recent_update",
+      "blocked",
+      "not_configured_or_skipped",
+      "unreported",
+      "collection_only",
+      "unknown"
+    ];
+    const inventoryRuntimeSegment = (row) => {
+      const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
+      const marker = "运行状态：";
+      const markerIndex = text.indexOf(marker);
+      if (markerIndex < 0) {
+        return "";
+      }
+      const tail = text.slice(markerIndex + marker.length);
+      const nextBreak = tail.indexOf("；");
+      return (nextBreak >= 0 ? tail.slice(0, nextBreak) : tail).trim();
+    };
+    const inventoryRuntimeSegments = inventoryRows.map(inventoryRuntimeSegment);
+    const inventoryRowsWithRuntimeStatus = inventoryRows.filter((row) => inventoryRuntimeSegment(row));
+    const inventoryRowsWithKnownRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) => {
+      const segment = inventoryRuntimeSegment(row);
+      return inventoryRuntimeStatusLabels.some((label) => segment.includes(label));
+    });
+    const inventoryRowsWithInheritedRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) => {
+      const segment = inventoryRuntimeSegment(row);
+      return [
+        "included",
+        "updated_not_selected",
+        "parsed_not_candidate",
+        "no_recent_update",
+        "blocked",
+        "not_configured_or_skipped"
+      ].some((label) => segment.includes(label));
+    });
+    const inventoryRowsWithUnreportedRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) =>
+      inventoryRuntimeSegment(row).includes("unreported")
+    );
+    const inventoryRowsWithCollectionOnlyRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) =>
+      inventoryRuntimeSegment(row).includes("collection_only")
+    );
     const inventoryMissingMetadataSamples = inventoryRows
       .filter((row) => !inventoryRowsWithMetadata.includes(row))
+      .slice(0, 5)
+      .map((row) => row.textContent?.replace(/\s+/g, " ").trim().slice(0, 160) || "");
+    const inventoryMissingRuntimeSamples = inventoryRows
+      .filter((row) => !inventoryRowsWithRuntimeStatus.includes(row))
       .slice(0, 5)
       .map((row) => row.textContent?.replace(/\s+/g, " ").trim().slice(0, 160) || "");
     sourceFirstContract.inventory.rows = inventoryRows.length;
     sourceFirstContract.inventory.rows_with_logical_mapping = inventoryRowsWithLogicalMapping.length;
     sourceFirstContract.inventory.rows_with_metadata = inventoryRowsWithMetadata.length;
     sourceFirstContract.inventory.missing_metadata_samples = inventoryMissingMetadataSamples;
+    sourceFirstContract.inventory.rows_with_runtime_status = inventoryRowsWithRuntimeStatus.length;
+    sourceFirstContract.inventory.rows_with_known_runtime_status = inventoryRowsWithKnownRuntimeStatus.length;
+    sourceFirstContract.inventory.rows_with_inherited_runtime_status = inventoryRowsWithInheritedRuntimeStatus.length;
+    sourceFirstContract.inventory.rows_with_unreported_runtime_status = inventoryRowsWithUnreportedRuntimeStatus.length;
+    sourceFirstContract.inventory.rows_with_collection_only_runtime_status = inventoryRowsWithCollectionOnlyRuntimeStatus.length;
+    sourceFirstContract.inventory.missing_runtime_status_samples = inventoryMissingRuntimeSamples;
+    sourceFirstContract.inventory.runtime_status_labels = Object.fromEntries(
+      inventoryRuntimeStatusLabels.map((label) => [label, inventoryRuntimeSegments.some((segment) => segment.includes(label))])
+    );
     sourceFirstContract.inventory.finder = {
       root: Boolean(inventorySection?.querySelector("[data-source-inventory-finder]")),
       search: Boolean(inventorySection?.querySelector("[data-source-inventory-search]")),
@@ -348,6 +406,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       sourceFirstContract.inventory.rows === 154 &&
       sourceFirstContract.inventory.rows_with_logical_mapping === 154 &&
       sourceFirstContract.inventory.rows_with_metadata === 154;
+    const sourceInventoryRuntimeOk =
+      sourceFirstContract.inventory.rows === 154 &&
+      sourceFirstContract.inventory.rows_with_runtime_status === 154 &&
+      sourceFirstContract.inventory.rows_with_known_runtime_status === 154;
     const sourceStatusFocusLabelsOk = Object.values(sourceFirstContract.status_focus.status_labels).every(Boolean);
     const sourceFirstPublicContractOk =
       sourceFirstContract.story.ok &&
@@ -355,6 +417,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       sourceFirstContract.status_focus.ok &&
       sourceFirstContract.inventory.ok &&
       sourceInventoryMetadataOk &&
+      sourceInventoryRuntimeOk &&
       sourceStatusFocusLabelsOk &&
       inventoryFinderOk &&
       directOrderOk &&
