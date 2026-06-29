@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-inventory-section-cards",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source inventory section cards",
+  "status": "completed",
+  "summary": "This iteration turns the full source inventory overview into seven fixed source section cards while preserving all 154 collection entries in expanded detail groups.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source inventory overview renders fixed section cards\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source inventory overview renders fixed section cards|source inventory panel|source inventory navigation|source inventory density controls|source inventory section cards\" tests/unit.test.js",
+      "node --test --test-name-pattern \"effective-interact renders source inventory finder\" tests/skills.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The full inventory needs a visible section overview before the long expanded list.",
+      "evidence": "`source-inventory` now emits an effective-interact `filterable-cards` section with `source-inventory-section-card` cards for seven fixed source sections, while detail groups keep every collection entry expanded below.",
+      "scope": "source_inventory",
+      "persistence": "implemented",
+      "recommended_action": "Keep new inventory navigation affordances on the fixed section-card contract instead of reintroducing dense overview tables."
+    },
+    {
+      "lesson": "Finder behavior must stay non-hiding after the overview changes type.",
+      "evidence": "`renderFilterableCards` renders the source inventory finder when `sourceInventoryFinder` is set, and the browser smoke proved WeChat search highlights 4/154 rows while hiding zero rows.",
+      "scope": "source_inventory_finder",
+      "persistence": "implemented",
+      "recommended_action": "Any future source inventory search or grouping control should preserve highlight-only behavior unless the user explicitly asks for hiding or filtering."
+    },
+    {
+      "lesson": "Presentation changes can expose source importance without changing collection or ranking contracts.",
+      "evidence": "The implementation keeps source registry, source display contract ranks, collection, ranking, automation, Pages, credentials, and publish commands untouched; source display validation still checks 154 inventory sources.",
+      "scope": "source_display_surface",
+      "persistence": "implemented",
+      "recommended_action": "Continue separating source acquisition/ranking changes from public presentation refinements."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-source-outage-disclosure",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Use the next phase to tune the first-screen source story and metrics relationship without changing the fixed source inventory ordering.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-inventory-section-cards"
+}

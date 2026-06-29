@@ -14374,6 +14374,58 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
   assert.doesNotMatch(JSON.stringify(dashboard), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
 });
 
+test("source inventory overview renders fixed section cards", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const inventory = input.sections.find((section) => section.richId === "source-inventory");
+  const inventoryGroups = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const groupedRows = [];
+  const bySection = new Map();
+  for (const row of inventoryRows) {
+    const sectionId = String(row.display_section || "uncategorized");
+    if (!bySection.has(sectionId)) {
+      const group = {
+        id: sectionId,
+        label: String(row.display_section_label || sectionId),
+        rank: Number(row.display_section_rank || 999),
+        rows: []
+      };
+      bySection.set(sectionId, group);
+      groupedRows.push(group);
+    }
+    bySection.get(sectionId).rows.push(row);
+  }
+  groupedRows.sort((left, right) => left.rank - right.rank || left.label.localeCompare(right.label));
+  const inventoryGroupRowCount = inventoryGroups.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
+  const serializedInventory = JSON.stringify([inventory, ...inventoryGroups]);
+
+  assert(inventory, "inventory overview should render");
+  assert.equal(inventory.type, "filterable-cards");
+  assert.equal(inventory.cardClass, "source-inventory-section-card");
+  assert.equal(inventory.showFilters, false);
+  assert.equal(inventory.sourceInventoryFinder, true);
+  assert.equal(inventory.sourceInventoryFinderTotal, inventoryRows.length);
+  assert.equal(inventory.items.length, groupedRows.length);
+  assert.deepEqual(inventory.items.map((item) => item.title), groupedRows.map((group) => group.label));
+  assert.deepEqual(inventory.items.map((item) => item.href), groupedRows.map((group) =>
+    `#section-source-inventory-group-${group.id.replace(/[^a-z0-9]+/gi, "-").toLowerCase().replace(/^-+|-+$/g, "")}`
+  ));
+  assert.deepEqual(inventory.items.map((item) => item.stats?.[0]?.value), groupedRows.map((group) => String(group.rows.length)));
+  assert(inventory.items.every((item) => item.group === "固定板块"));
+  assert(inventory.items.every((item) => item.showGroup === false));
+  assert(inventory.items.every((item) => Array.isArray(item.tags) && item.tags.length > 0));
+  assert.match(JSON.stringify(inventory.items[0]), /core_primary|OpenAI Blog RSS|OpenAI News RSS/);
+  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "中文平台与媒体线索")), /platform_cn_media|WeChat Platform AI Feed|Zhihu Platform AI Feed/);
+  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "榜单与持续指标")), /OpenRouter Rankings|Artificial Analysis Intelligence Index/);
+  assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview must not duplicate all detail rows");
+  assert.equal(inventoryGroupRowCount, inventoryRows.length, "detail groups must keep every collection entry");
+  assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
+  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+});
+
 test("source status focus renders attention cards", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
@@ -15035,6 +15087,7 @@ test("source inventory panel lists all registered source entries before stories"
   const inventoryGroupContent = inventoryGroups.map((section) => section.content || "").join("\n");
   const inventoryGroupRowCount = inventoryGroups.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
   const serializedSections = JSON.stringify(input.sections);
+  const inventoryCardsText = JSON.stringify(inventory?.items || []);
 
   assert(dashboardIndex >= 0, "source dashboard should still render");
   assert(graphIndex > dashboardIndex, "source map should still follow the dashboard/focus area");
@@ -15043,19 +15096,20 @@ test("source inventory panel lists all registered source entries before stories"
   assert(inventoryIndex > sourceGroupIndex, "inventory should render after logical source groups");
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
-  assert.match(inventory.content, /154/);
-  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0);
+  assert.equal(inventory.type, "filterable-cards");
+  assert.match(inventory.summary, /154/);
+  assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
   assert.match(inventoryGroupContent, /OpenAI News RSS/);
   assert.match(inventoryGroupContent, /OpenRouter Rankings/);
   assert.match(inventoryGroupContent, /WeChat Platform AI Feed/);
   assert.match(inventoryGroupContent, /Zhihu Platform AI Feed/);
-  assert.match(inventory.content, /html_index/);
-  assert.match(inventory.content, /openrouter_rankings_public_playwright/);
-  assert.match(inventory.content, /manual/);
+  assert.match(inventoryCardsText, /html_index/);
+  assert.match(inventoryCardsText, /openrouter_rankings_public_playwright/);
+  assert.match(inventoryCardsText, /manual/);
   assert.doesNotMatch(serializedSections, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(`${inventory.content}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
+  assert.doesNotMatch(`${inventoryCardsText}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
 });
 
 test("source inventory navigation splits overview from fixed-section detail groups", () => {
@@ -15097,15 +15151,17 @@ test("source inventory navigation splits overview from fixed-section detail grou
   const lastGroupIndex = Math.max(...groupSections.map((section) => publicSectionOrder.indexOf(section.richId)));
   const firstStoryIndex = publicSectionOrder.findIndex((id) => /^track-/.test(id));
   const serializedInventory = JSON.stringify([inventory, ...groupSections]);
+  const inventoryHrefs = (inventory?.items || []).map((item) => item.href);
 
   assert(inventory, "inventory overview should render");
-  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.content, /154/);
-  assert.match(inventory.content, /\(#section-source-inventory-group-core-primary\)/);
-  assert.match(inventory.content, /\(#section-source-inventory-group-china-models\)/);
-  assert.match(inventory.content, /\(#section-source-inventory-group-tracking-metrics\)/);
-  assert.match(inventory.content, /\(#section-source-inventory-group-platform-cn-media\)/);
-  assert.match(inventory.content, /\(#section-source-inventory-group-english-media-search\)/);
+  assert.equal(inventory.type, "filterable-cards");
+  assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
+  assert.match(inventory.summary, /154/);
+  assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
+  assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
+  assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));
+  assert(inventoryHrefs.includes("#section-source-inventory-group-platform-cn-media"), JSON.stringify(inventoryHrefs));
+  assert(inventoryHrefs.includes("#section-source-inventory-group-english-media-search"), JSON.stringify(inventoryHrefs));
   assert(groupIds.includes("source-inventory-group-core-primary"), JSON.stringify(groupIds));
   assert(groupIds.includes("source-inventory-group-china-models"), JSON.stringify(groupIds));
   assert(groupIds.includes("source-inventory-group-tracking-metrics"), JSON.stringify(groupIds));
@@ -15123,7 +15179,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
-test("source inventory density controls keep all rows visible with static quick filters", () => {
+test("source inventory density controls keep all rows visible with fixed section cards", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [
     {
@@ -15157,17 +15213,21 @@ test("source inventory density controls keep all rows visible with static quick 
   const groupText = groupSections.map((section) => section.content || "").join("\n");
   const groupRowCount = groupSections.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
   const serializedInventory = JSON.stringify([inventory, ...groupSections]);
+  const cards = inventory?.items || [];
+  const serializedCards = JSON.stringify(cards);
+  const countByField = (field, value) => inventoryRows.filter((row) => row[field] === value).length;
+  const cardStatTotal = (label) => cards.reduce((sum, card) =>
+    sum + Number(card.stats?.find((stat) => stat.label === label)?.value || 0), 0);
 
   assert(inventory, "inventory overview should render");
-  assert.match(inventory.content, /快速定位/);
-  assert.match(inventory.content, /启用层级快速定位/);
-  assert.match(inventory.content, /类型快速定位/);
-  assert.match(inventory.content, /不会隐藏或重排/);
-  assert.match(inventory.content, /core\s+67/);
-  assert.match(inventory.content, /manual\s+9/);
-  assert.match(inventory.content, /rss/);
-  assert.match(inventory.content, /html_index/);
-  assert.match(inventory.content, /openrouter_rankings_public_playwright/);
+  assert.equal(inventory.type, "filterable-cards");
+  assert.equal(inventory.cardClass, "source-inventory-section-card");
+  assert.match(inventory.summary, /搜索只高亮不隐藏/);
+  assert.equal(cardStatTotal("core"), countByField("enablement", "core"));
+  assert.equal(cardStatTotal("manual"), countByField("enablement", "manual"));
+  assert.match(serializedCards, /rss/);
+  assert.match(serializedCards, /html_index/);
+  assert.match(serializedCards, /openrouter_rankings_public_playwright/);
   assert.equal(groupRowCount, inventoryRows.length);
   for (const section of groupSections) {
     assert.match(section.content || "", /\[回到全量信源清单\]\(#section-source-inventory\)/);
@@ -15179,7 +15239,7 @@ test("source inventory density controls keep all rows visible with static quick 
   assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
-test("source inventory reader focus lanes expose important slices without filtering rows", () => {
+test("source inventory section cards expose important slices without filtering rows", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [
     {
@@ -15212,27 +15272,22 @@ test("source inventory reader focus lanes expose important slices without filter
   const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
   const groupRowCount = groupSections.reduce((sum, section) => sum + ((section.content || "").match(/^- \*\*/gm) || []).length, 0);
   const serializedInventory = JSON.stringify([inventory, ...groupSections]);
-  const countByField = (field, value) => inventoryRows.filter((row) => row[field] === value).length;
-  const platformBridgeCount = inventoryRows.filter((row) =>
-    row.source_kind === "rsshub" || ["wechat", "zhihu", "reddit"].includes(String(row.platform || "").toLowerCase())
-  ).length;
+  const cardsText = JSON.stringify(inventory?.items || []);
+  const platformCard = (inventory?.items || []).find((item) => item.title === "中文平台与媒体线索");
+  const platformSectionCount = inventoryRows.filter((row) => row.display_section === "platform_cn_media").length;
 
   assert(inventory, "inventory overview should render");
+  assert.equal(inventory.type, "filterable-cards");
   assert.equal(inventory.sourceInventoryFinder, true, "inventory overview should request the non-hiding source finder");
   assert.equal(inventory.sourceInventoryFinderTotal, inventoryRows.length);
-  assert.match(inventory.content, /聚焦入口/);
-  assert.match(inventory.content, /不会隐藏或重排/);
-  assert.match(inventory.content, /配置待补/);
-  assert.match(inventory.content, /手动维护/);
-  assert.match(inventory.content, /已停用/);
-  assert.match(inventory.content, /平台桥接/);
-  assert.match(inventory.content, new RegExp(`\\|\\s*配置待补\\s*\\|\\s*${countByField("config_status", "configuration_needed")}\\s*\\|`));
-  assert.match(inventory.content, new RegExp(`\\|\\s*手动维护\\s*\\|\\s*${countByField("enablement", "manual")}\\s*\\|`));
-  assert.match(inventory.content, new RegExp(`\\|\\s*已停用\\s*\\|\\s*${countByField("config_status", "disabled")}\\s*\\|`));
-  assert.match(inventory.content, new RegExp(`\\|\\s*平台桥接\\s*\\|\\s*${platformBridgeCount}\\s*\\|`));
-  assert.match(inventory.content, /\(#section-source-inventory-group-platform-cn-media\)/);
-  assert.match(inventory.content, /WeChat Platform AI Feed|Zhihu Platform AI Feed/);
-  assert.equal((inventory.content.match(/^- \*\*/gm) || []).length, 0, "focus overview must not duplicate all rows");
+  assert.match(inventory.summary, /下方明细全部保留/);
+  assert.match(cardsText, /中文平台与媒体线索/);
+  assert.match(cardsText, /platform_cn_media/);
+  assert.match(cardsText, /WeChat Platform AI Feed|Zhihu Platform AI Feed/);
+  assert.match(cardsText, /手动或无更新/);
+  assert.equal(platformCard?.href, "#section-source-inventory-group-platform-cn-media");
+  assert.equal(platformCard?.stats?.[0]?.value, String(platformSectionCount));
+  assert.equal((cardsText.match(/^- \*\*/gm) || []).length, 0, "focus overview must not duplicate all rows");
   assert.equal(groupRowCount, inventoryRows.length, "focus lanes must not remove canonical detail rows");
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
   assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);

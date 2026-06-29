@@ -1701,6 +1701,7 @@ function renderFilterableCards(section) {
   const showFilters = section.showFilters !== false && groups.length > 2;
   return `<section class="panel" ${sectionAttrs(section)}>
     ${renderSectionHeader(section)}
+    ${renderSourceInventoryFinder(section)}
     ${showFilters ? `<div class="toolbar" role="toolbar" aria-label="${escapeAttr(section.filterLabel || section.title)} filters">
       ${groups.map((group, index) => `<button data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" aria-pressed="${index === 0 ? "true" : "false"}">${escapeHtml(group === "all" ? "全部" : group)}</button>`).join("")}
     </div>` : ""}
