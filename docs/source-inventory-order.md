@@ -20,7 +20,7 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 | Section | Entries | Logical mappings | Core | Optional | Manual |
 |---|---:|---:|---:|---:|---:|
 | `core_primary` 核心一手源 | 22 | 8 | 22 | 0 | 0 |
-| `china_models` 中国模型与厂商 | 35 | 0 | 26 | 9 | 0 |
+| `china_models` 中国模型与厂商 | 35 | 5 | 26 | 9 | 0 |
 | `open_source_platforms` 开源、模型平台与代码生态 | 33 | 4 | 7 | 26 | 0 |
 | `tracking_metrics` 榜单与持续指标 | 3 | 3 | 3 | 0 | 0 |
 | `builder_community` Builder 与社区原始信号 | 41 | 1 | 9 | 30 | 2 |
@@ -84,34 +84,34 @@ npm run validate
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
-| 20.001 | `china-ai-tencent-news-cn` | Tencent Newsroom CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.002 | `china-ai-alibaba-group-cn` | Alibaba Group News CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.003 | `china-ai-alibaba-cloud-cn-blog` | Alibaba Cloud Blog CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.004 | `china-ai-qwen-blog` | Qwen Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.005 | `china-ai-deepseek-news` | DeepSeek News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.006 | `china-ai-zhipu-news` | Zhipu AI News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.007 | `china-ai-kimi-blog` | Kimi Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.008 | `china-ai-minimax-blog` | MiniMax Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.009 | `china-ai-bytedance-seed-cn` | ByteDance Seed CN Blog | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
-| 20.010 | `china-ai-baidu-ai-news` | Baidu AI News | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
-| 20.011 | `content-tencent-media-center` | Tencent Media Center | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.012 | `content-bytedance-news` | ByteDance News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.013 | `content-alibaba-group-press-releases` | Alibaba Group Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.014 | `content-baidu-press-releases` | Baidu Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.015 | `content-moonshot-kimi-company-news` | Moonshot AI Kimi Company News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.016 | `content-minimax-company-news` | MiniMax Company News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.017 | `content-zhipu-zh-news` | Zhipu AI Chinese News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.018 | `content-minimax-news` | MiniMax News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.019 | `content-kimi-official-blog-company-news` | Kimi Official Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.020 | `content-bytedance-seed-blog` | ByteDance Seed Tech Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.021 | `content-tencent-corporate-ai` | Tencent AI Business | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.022 | `content-tencent-hunyuan-blog` | Tencent Hunyuan Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.023 | `content-qwen-blog` | Qwen Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.024 | `content-alibaba-cloud-blog` | Alibaba Cloud Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.025 | `content-kimi-platform-blog` | Moonshot AI Kimi Platform Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.026 | `content-kimi-technical-blog` | Kimi Technical Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.027 | `content-minimax-blog` | MiniMax Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.028 | `content-zhipu-research` | Z.ai Research | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.001 | `china-ai-deepseek-news` | DeepSeek News | `deepseek-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.002 | `china-ai-qwen-blog` | Qwen Blog | `qwen-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.003 | `content-qwen-blog` | Qwen Blog | `qwen-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.004 | `china-ai-kimi-blog` | Kimi Blog | `kimi-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.005 | `content-kimi-official-blog-company-news` | Kimi Official Blog | `kimi-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.006 | `content-kimi-technical-blog` | Kimi Technical Blog | `kimi-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.007 | `content-moonshot-kimi-company-news` | Moonshot AI Kimi Company News | `kimi-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.008 | `content-kimi-platform-blog` | Moonshot AI Kimi Platform Blog | `kimi-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.009 | `china-ai-minimax-blog` | MiniMax Blog | `minimax-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.010 | `content-minimax-blog` | MiniMax Blog | `minimax-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.011 | `content-minimax-company-news` | MiniMax Company News | `minimax-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.012 | `content-minimax-news` | MiniMax News | `minimax-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.013 | `content-zhipu-research` | Z.ai Research | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.014 | `content-zhipu-zh-news` | Zhipu AI Chinese News | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.015 | `china-ai-zhipu-news` | Zhipu AI News | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.016 | `china-ai-tencent-news-cn` | Tencent Newsroom CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.017 | `china-ai-alibaba-group-cn` | Alibaba Group News CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.018 | `china-ai-alibaba-cloud-cn-blog` | Alibaba Cloud Blog CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.019 | `china-ai-bytedance-seed-cn` | ByteDance Seed CN Blog | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
+| 20.020 | `china-ai-baidu-ai-news` | Baidu AI News | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
+| 20.021 | `content-tencent-media-center` | Tencent Media Center | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.022 | `content-bytedance-news` | ByteDance News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.023 | `content-alibaba-group-press-releases` | Alibaba Group Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.024 | `content-baidu-press-releases` | Baidu Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.025 | `content-bytedance-seed-blog` | ByteDance Seed Tech Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.026 | `content-tencent-corporate-ai` | Tencent AI Business | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.027 | `content-tencent-hunyuan-blog` | Tencent Hunyuan Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.028 | `content-alibaba-cloud-blog` | Alibaba Cloud Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 20.029 | `general-news-google-china-big-tech-company-watch` | Google News China Big Tech Company Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
 | 20.030 | `general-news-google-official-open-source-watch` | Google News Official Open Source Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
 | 20.031 | `content-huggingface-deepseek-ai` | DeepSeek Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |

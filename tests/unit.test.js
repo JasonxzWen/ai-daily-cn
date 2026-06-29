@@ -13362,7 +13362,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 103);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -13386,7 +13386,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   for (const sourceId of [
     "content-anthropic-research",
-    "china-ai-deepseek-news",
+    "content-tencent-hunyuan-blog",
     "content-arxiv-cs-ai",
     "content-builder-simon-willison",
     "intermediary-qbitai",
@@ -13445,9 +13445,9 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 25);
-  assert.equal(result.summary.display_sources, 25);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 103);
+  assert.equal(result.summary.logical_sources, 30);
+  assert.equal(result.summary.display_sources, 30);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -13470,6 +13470,76 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(inventoryById.get("content-swe-bench-pro-public")?.logical_source_id, "swe-bench-pro");
 
   for (const sourceId of ["content-openrouter-rankings", "content-artificial-analysis-intelligence-index", "content-swe-bench-pro-public"]) {
+    assert(!review.includes(`| \`${sourceId}\``), `review should no longer list promoted source ${sourceId} as a promotion candidate`);
+  }
+});
+
+test("china model logical sources are promoted into the fixed display contract", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const { CORE_SOURCE_CONTRACTS } = await import("../src/source-effectiveness.js");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+  const inventoryRows = buildSourceInventoryRows({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(result.summary.logical_sources, 30);
+  assert.equal(result.summary.display_sources, 30);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 88);
+
+  const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
+  for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
+    assert(logicalIds.has(id), `CORE_SOURCE_CONTRACTS should include ${id}`);
+  }
+
+  const chinaSection = contract.sections.find((section) => section.id === "china_models");
+  assert.deepEqual(
+    chinaSection.sources.map((source) => [source.id, source.rank]),
+    [
+      ["deepseek-official", 10],
+      ["qwen-official", 20],
+      ["kimi-official", 30],
+      ["minimax-official", 40],
+      ["zhipu-official", 50]
+    ]
+  );
+
+  const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
+  for (const [sourceId, logicalSourceId] of [
+    ["china-ai-deepseek-news", "deepseek-official"],
+    ["china-ai-qwen-blog", "qwen-official"],
+    ["content-qwen-blog", "qwen-official"],
+    ["china-ai-kimi-blog", "kimi-official"],
+    ["content-moonshot-kimi-company-news", "kimi-official"],
+    ["content-kimi-official-blog-company-news", "kimi-official"],
+    ["content-kimi-platform-blog", "kimi-official"],
+    ["content-kimi-technical-blog", "kimi-official"],
+    ["china-ai-minimax-blog", "minimax-official"],
+    ["content-minimax-company-news", "minimax-official"],
+    ["content-minimax-news", "minimax-official"],
+    ["content-minimax-blog", "minimax-official"],
+    ["china-ai-zhipu-news", "zhipu-official"],
+    ["content-zhipu-zh-news", "zhipu-official"],
+    ["content-zhipu-research", "zhipu-official"]
+  ]) {
+    assert.equal(inventoryById.get(sourceId)?.logical_source_id, logicalSourceId, `${sourceId} should map to ${logicalSourceId}`);
+  }
+
+  for (const [sourceId, forbiddenLogicalSourceId] of [
+    ["content-github-deepseek-ai-org", "deepseek-official"],
+    ["content-github-qwenlm-org", "qwen-official"],
+    ["content-github-minimax-ai-org", "minimax-official"],
+    ["content-github-moonshotai-org", "kimi-official"],
+    ["content-huggingface-deepseek-ai", "deepseek-official"],
+    ["content-huggingface-qwen", "qwen-official"],
+    ["content-huggingface-minimaxai", "minimax-official"],
+    ["content-huggingface-moonshotai", "kimi-official"],
+    ["content-huggingface-zai-org", "zhipu-official"]
+  ]) {
+    assert.notEqual(inventoryById.get(sourceId)?.logical_source_id, forbiddenLogicalSourceId, `${sourceId} should not map to ${forbiddenLogicalSourceId}`);
+  }
+
+  for (const sourceId of ["china-ai-deepseek-news", "china-ai-qwen-blog", "china-ai-kimi-blog", "china-ai-minimax-blog", "china-ai-zhipu-news"]) {
     assert(!review.includes(`| \`${sourceId}\``), `review should no longer list promoted source ${sourceId} as a promotion candidate`);
   }
 });

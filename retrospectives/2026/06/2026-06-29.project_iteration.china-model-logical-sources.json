@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.china-model-logical-sources",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "China model logical sources",
+  "status": "completed",
+  "summary": "This iteration promotes DeepSeek, Qwen, Kimi, MiniMax, and Zhipu/Z.ai official source lines into first-class logical sources under the fixed china_models section. It keeps the 154-entry inventory intact while reducing unmapped review candidates from 103 to 88.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"china model logical sources\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source display contract governance|source insertion handbook|source order tuning review|source inventory order reference|tracking metrics logical sources|china model logical sources\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "High-importance China model vendors should have first-class source identities.",
+      "evidence": "`deepseek-official`, `qwen-official`, `kimi-official`, `minimax-official`, and `zhipu-official` are now in `CORE_SOURCE_CONTRACTS` and `config/source-display-contract.json` under `china_models`.",
+      "scope": "source_display_governance",
+      "persistence": "implemented",
+      "recommended_action": "Use the same small-batch promotion pattern for remaining China model and platform sources."
+    },
+    {
+      "lesson": "Official duplicate entrypoints should map together without absorbing mirrors.",
+      "evidence": "Focused tests prove 15 official DeepSeek/Qwen/Kimi/MiniMax/Zhipu collection entries map to the new logical sources while GitHub and Hugging Face mirror rows do not map to those official identities.",
+      "scope": "china_models",
+      "persistence": "implemented",
+      "recommended_action": "Keep future aliases source-id or official-domain specific to avoid stealing open-source platform rows."
+    },
+    {
+      "lesson": "Promotion must update review and inventory references together.",
+      "evidence": "`docs/source-inventory-order.md` now maps the official China model entries to logical sources, and `docs/source-order-tuning-review.md` reduces unmapped sources to 88 and removes those promotion rows.",
+      "scope": "source_order_review",
+      "persistence": "implemented",
+      "recommended_action": "For every future promotion, update the executable contract, inventory reference, review surface, handbook, and tests in the same PR."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-domestic-dynamics-public-visibility",
+    "feedback/p1-china-ai-hard-gate",
+    "feedback/p1-chinese-media-dynamics",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Promote the next small China model/platform batch from `docs/source-order-tuning-review.md`, likely Tencent Hunyuan, ByteDance Seed, Baidu AI, and Alibaba Cloud AI after reviewing proposed ids and ranks.",
+      "owner": "project"
+    }
+  ],
+  "slug": "china-model-logical-sources"
+}

@@ -55,6 +55,62 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["hugging face blog", "huggingface.co/blog", "huggingface blog feed"]
   },
   {
+    id: "deepseek-official",
+    name: "DeepSeek Official",
+    role: "china_model_official",
+    aliases: ["china-ai-deepseek-news", "deepseek news", "api-docs.deepseek.com/news"]
+  },
+  {
+    id: "qwen-official",
+    name: "Qwen Official",
+    role: "china_model_official",
+    aliases: ["china-ai-qwen-blog", "content-qwen-blog", "qwen blog", "qwen.ai/blog"]
+  },
+  {
+    id: "kimi-official",
+    name: "Kimi Official",
+    role: "china_model_official",
+    aliases: [
+      "china-ai-kimi-blog",
+      "content-moonshot-kimi-company-news",
+      "content-kimi-official-blog-company-news",
+      "content-kimi-platform-blog",
+      "content-kimi-technical-blog",
+      "kimi blog",
+      "platform.kimi.com/blog",
+      "www.kimi.com/blog"
+    ]
+  },
+  {
+    id: "minimax-official",
+    name: "MiniMax Official",
+    role: "china_model_official",
+    aliases: [
+      "china-ai-minimax-blog",
+      "content-minimax-company-news",
+      "content-minimax-news",
+      "content-minimax-blog",
+      "minimax blog",
+      "minimax news",
+      "minimax.io/blog",
+      "minimax.io/news"
+    ]
+  },
+  {
+    id: "zhipu-official",
+    name: "Zhipu Official",
+    role: "china_model_official",
+    aliases: [
+      "china-ai-zhipu-news",
+      "content-zhipu-zh-news",
+      "content-zhipu-research",
+      "zhipu ai news",
+      "z.ai research",
+      "zhipuai.cn/zh/news",
+      "zhipuai.cn/en/research"
+    ]
+  },
+  {
     id: "follow-builders",
     name: "follow-builders",
     role: "builder_aggregator",

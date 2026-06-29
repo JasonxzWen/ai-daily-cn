@@ -61,7 +61,15 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 
 ### `china_models`
 
-当前作为预留 section。后续加入 DeepSeek、Qwen、Kimi、MiniMax、智谱、Tencent、ByteDance、Baidu 等官方源时，按“原创模型发布和平台影响力优先”的规则插入。
+| Rank | Logical source | 规则 |
+|---:|---|---|
+| 10 | `deepseek-official` | DeepSeek 官方新闻/API 更新；只归并官方新闻入口，不吸收 GitHub/Hugging Face 镜像 |
+| 20 | `qwen-official` | Qwen 官方博客与模型/平台发布；归并 Qwen 官方博客重复入口 |
+| 30 | `kimi-official` | Kimi/Moonshot 官方博客、平台博客和技术博客 |
+| 40 | `minimax-official` | MiniMax 官方博客与新闻入口 |
+| 50 | `zhipu-official` | Zhipu/Z.ai 官方中文新闻与研究入口 |
+
+后续 Tencent Hunyuan、ByteDance Seed、Baidu AI、Alibaba Cloud AI 等源按“原创模型发布和平台影响力优先”的规则继续插入。
 
 ### `open_source_platforms`
 
