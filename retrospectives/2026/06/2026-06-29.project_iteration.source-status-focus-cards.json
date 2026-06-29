@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-29.project_iteration.source-status-focus-cards",
+  "run_type": "project_iteration",
+  "date": "2026-06-29",
+  "title": "Source status focus cards",
+  "status": "completed",
+  "summary": "This iteration turns source status focus from a dense markdown block into four fixed attention cards for actionable, updated-not-selected, stale, and parsed-without-candidate source states.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"source status focus renders attention cards\" tests/unit.test.js",
+      "node --test --test-name-pattern \"source status focus renders attention cards|source metrics dashboard cards|source-first IA dashboard|source-first IA contract|source inventory|source map scan index|source display contract governance\" tests/unit.test.js",
+      "npm run sources:display-contract",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run privacy:validate",
+      "npm run build:check-clean",
+      "npm run test:e2e",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source health exceptions need a card-level visual contract.",
+      "evidence": "`source-status-focus` now emits an effective-interact `filterable-cards` section with fixed cards for sources needing attention, updated but not selected sources, sources without recent updates, and parsed sources that did not form candidates.",
+      "scope": "source_status_focus",
+      "persistence": "implemented",
+      "recommended_action": "Keep future source status refinements on the same fixed-card contract so failure and low-signal states remain visible."
+    },
+    {
+      "lesson": "Empty source status groups should remain visible.",
+      "evidence": "The four focus cards are always emitted in fixed order, and groups with no rows show an explicit `暂无` detail instead of disappearing.",
+      "scope": "source_failure_visibility",
+      "persistence": "implemented",
+      "recommended_action": "Apply the same explicit-empty pattern when adding new fixed source status groups."
+    },
+    {
+      "lesson": "The source status focus can become more prominent without changing collection, ranking, or registry behavior.",
+      "evidence": "The implementation only changes the interaction report shaping and test contract; source registry, source display contract, collection, ranking, automation, and publishing configuration remain untouched.",
+      "scope": "source_display_surface",
+      "persistence": "implemented",
+      "recommended_action": "Continue separating presentation iterations from source acquisition or ranking changes."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-public-source-coverage-visualization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-followup-contracts"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Review the rendered attention cards after the next real daily run to decide whether the source status detail list needs stricter truncation or section anchors.",
+      "owner": "project"
+    }
+  ],
+  "slug": "source-status-focus-cards"
+}
